@@ -6,4 +6,4 @@ Requestly Issues is maintained for requestly users for the following purposes
 - Any Suggestions
 
 # Alternative Contact
-In case this does not suffice, please drop an email to requestly.extension@gmail.com
+In case this does not suffice, please drop an email to contact [at] requestly [dot] io 
