@@ -1,4 +1,5 @@
 
+
 # About This Repository
 This repository is maintained for Requestly users for the following purposes
 - Asking Questions
@@ -9,6 +10,44 @@ This repository is maintained for Requestly users for the following purposes
 # About Requestly
 Requestly is a set of tools (browser extensions and desktop apps) that supercharges your web development. Requestly allows you to modify network (HTTP/S) requests by setting up "Rules" for redirects, modifying headers, switching hosts, inserting user scripts, cancelling requests and modifying AJAX response. 
 Requestly also offers a library service which allows you to upload and host JS/CSS files with direct links to ease dubugging process. These files can also be used directly inside Rules with a single click. 
+
+# Documentation
+
+ - [Introduction](https://docs.requestly.io/)
+ 
+ ##### Getting Started
+ 
+ - [Installation](https://docs.requestly.io/getting-started/installation)
+ - [Understanding Rule Operators](https://docs.requestly.io/getting-started/rule-operators) 
+ 
+ ##### Managing Rules
+ 
+ - [Using Groups](https://docs.requestly.io/managing-rules/groups)
+ - [Sharing Rules](https://docs.requestly.io/managing-rules/sharing)
+ - [Shared List](https://docs.requestly.io/managing-rules/shared-list)
+
+ 
+ ##### Using Rules
+ 
+ - [Replace Rule](https://docs.requestly.io/using-rules/replace-rule)
+ - [User-agent Modification Rule](https://docs.requestly.io/using-rules/user-agent-modification-rule)
+ - [Modify AJAX Response Rule](https://docs.requestly.io/using-rules/modify-ajax-response-rule)
+ 
+ ##### Library
+ 
+ - [Introduction to Library](https://docs.requestly.io/library/introduction-to-library)
+ - [Managing Library](https://docs.requestly.io/library/managing-library)
+
+ 
+ ##### Uninstalling
+ 
+ - [Deactivate Extension](https://docs.requestly.io/uninstall/deactivate) 
+ 
+ ##### Desktop App
+ 
+ - [How to...](https://docs.requestly.io/desktop-app/how-to...)
+ - [Troubleshooting](https://docs.requestly.io/desktop-app/troubleshooting)
+
 
 # Screenshots
 
