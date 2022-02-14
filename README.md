@@ -1,6 +1,6 @@
 # Requestly 🚀
 
-<img src="https://j.gifs.com/VvnYr1.gif" width="40%" />
+<p align="center"><img src="https://j.gifs.com/VvnYr1.gif" width="40%" /></p>
 
 ### Requestly browser extensions and desktop app supercharges⚡ your web development.
 
