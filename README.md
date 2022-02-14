@@ -47,7 +47,7 @@ Hi there Requestly users! In this repository you can:
 
 - [Deactivate Extension](https://docs.requestly.io/uninstall/deactivate)
 
-##### Desktop App 💻
+##### 💻 Desktop App 
 
 - [How to...](https://docs.requestly.io/desktop-app/how-to...)
 - [Troubleshooting](https://docs.requestly.io/desktop-app/troubleshooting)
