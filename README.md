@@ -36,12 +36,11 @@ Hi there Requestly users! In this repository you can:
 
 - [Replace Rule](https://docs.requestly.io/using-rules/replace-rule)
 - [User-agent Modification Rule](https://docs.requestly.io/using-rules/user-agent-modification-rule)
-- [Modify AJAX Response Rule](https://docs.requestly.io/using-rules/modify-ajax-response-rule)
+- [Modify API Response Rule](https://docs.requestly.io/using-rules/modify-ajax-response-rule)
 
-##### 📚 Library
+##### 📚 Mock Server
 
-- [Introduction to Library](https://docs.requestly.io/library/introduction-to-library)
-- [Managing Library](https://docs.requestly.io/library/managing-library)
+- [Using mock server](https://docs.requestly.io/using-rules/mock-server)
 
 ##### ❌ Uninstalling
 
@@ -60,9 +59,9 @@ Hi there Requestly users! In this repository you can:
 
   Primarily designed for web developers – Requestly enables easy debugging of remote & external scripts using simple Redirect & Script Rules.
 
-- ### Files Library 🗃
+- ### Mock Server 🗃
 
-  Requestly allows uploading, creating and managing js, css, json etc files which can be used in Requestly rules. No need to setup local server now.
+  Requestly lets you create a simple server which can be used in Requestly rules. No need to setup local server now.
 
 - ### Regex Support 💬
 
@@ -114,9 +113,9 @@ Modify HTTP Request & Response headers. (Extremely helpful for web developers fo
 - Setup different user agents for websites and test how they behave
 - Useful for web developers for testing cross-device compatibility
 
-### 📱 Modify AJAX Response
+### 📱 Modify API Response
 
-Use Modify AJAX Response Rule to define custom response to AJAX requests initiated by browser.
+Use Modify API Response Rule to define custom response to any intercepted request.
 
 # Additional Features ➕
 
