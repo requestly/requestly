@@ -6,7 +6,7 @@
 
 Requestly allows you to modify network (HTTP/S) requests by setting up **'Rules'** for **Redirects, Modifying Headers, Switching Hosts, Injecting Custom Scripts, Cancelling Requests, Modifying AJAX responses and a whole lot more!**
 
-Requestly also offers a library service which allows you to upload and host JS/CSS files with direct links to ease dubugging process. These files can also be used directly inside rules **with a single click!**
+Requestly also offers a library service which allows you to upload and host JS/CSS files with direct links to ease debugging process. These files can also be used directly inside rules **with a single click!**
 
 # Who's this Repository for? 🤔
 
