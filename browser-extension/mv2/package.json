@@ -1,0 +1,48 @@
+{
+  "name": "@requestly/browser-extension-mv2",
+  "version": "23.2.10",
+  "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
+  "homepage": "https://requestly.io",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "browser-extension/mv2"
+  },
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "scripts": {
+    "config": "cd ../config && npm run build && cd ../mv2",
+    "watch": "chokidar 'src' '../common/dist' -c 'npm run build:current' --initial",
+    "build": "npm run build:common && npm run build:current",
+    "build:current": "grunt build",
+    "build:common": "cd ../common && npm run build && cd ../mv2",
+    "start:firefox": "web-ext run -s dist",
+    "release": "BUILD_MODE='production' npm run build && node scripts/createZip",
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "@requestly/web-sdk": "0.11.2",
+    "archiver": "^5.3.1",
+    "babel-polyfill": "^6.26.0",
+    "chokidar-cli": "^3.0.0",
+    "grunt": "^1.6.1",
+    "grunt-cli": "^1.4.3",
+    "grunt-contrib-concat": "^2.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-handlebars": "^3.0.0",
+    "grunt-contrib-jshint": "^3.2.0",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-karma": "^4.0.2",
+    "jasmine-core": "^3.1.0",
+    "karma": "^6.4.1",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-coverage": "^2.2.0",
+    "karma-jasmine": "^0.1.6",
+    "karma-junit-reporter": "^2.0.1",
+    "web-ext": "^7.5.0"
+  }
+}

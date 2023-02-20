@@ -1,0 +1,56 @@
+{
+  "shared": [
+    "../config/dist/config.js",
+    "../../common/constants.js",
+    "src/shared/constants.js",
+    "src/shared/utils.js",
+    "src/shared/ContentScriptMessageHandler.js",
+    "src/shared/DataStoreUtils.js",
+    "src/shared/userAgentLibrary.js",
+    "src/shared/DOMUtils.js"
+  ],
+  "pages": [
+    "dist/generated/shared.js",
+    "src/client/js/utils.js",
+    "src/modules/StorageService.js",
+    "src/client/js/sessionRecorder.js",
+    "src/pages/init.js"
+  ],
+  "client": [
+    "../config/dist/config.js",
+    "../../common/constants.js",
+    "src/shared/constants.js",
+    "src/client/js/utils.js",
+    "src/client/js/ruleMatcher.js",
+    "src/client/js/scriptRuleHandler.js",
+    "src/client/js/userAgentRuleHandler.js",
+    "src/client/js/requestResponseRuleHandler.js",
+    "src/client/js/consoleLoggerHandler.js",
+    "src/client/js/sessionRecorder.js",
+    "src/client/js/ruleExecutionHandler.js",
+    "src/client/js/client.js"
+  ],
+  "devtools-panel": [
+    "../config/dist/config.js",
+    "../../common/constants.js",
+    "src/shared/constants.js",
+    "src/devtools/libs/jquery-3.5.1.js",
+    "src/devtools/libs/handlebars.runtime-v4.7.7.js",
+    "src/devtools/panel/js/handlebarHelpers.js",
+    "dist/generated/devtools/panel/templates.hbs.js",
+    "src/devtools/panel/js/main.js"
+  ],
+  "background": [
+    "dist/generated/shared.js",
+    "../../common/logger.js",
+    "src/external/CircularQueue.js",
+    "src/external/chromeTabService.js",
+    "src/modules/StorageService.js",
+    "src/modules/PreDefinedFunction.js",
+    "src/modules/PreDefinedFunctions.js",
+    "src/modules/RuleMatcher.js",
+    "src/background/SampleRules.js",
+    "src/background/flags.js",
+    "src/background/background.js"
+  ]
+}

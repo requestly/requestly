@@ -1,0 +1,12 @@
+version: 0.0.7-beta
+files:
+  - url: Requestly-0.0.7-beta-mac.zip
+    sha512: weQ33/xAEGhOB8DdmVA/Ewg6bqcIOD0Mx3B8+sX+OIz2iZtzEvjUGUEtTgNYDefvs3gMt3LRx89LipVE+PUdfg==
+    size: 86219123
+    blockMapSize: 90626
+  - url: Requestly-0.0.7-beta.dmg
+    sha512: cZvKdOsDiEpJF3OWX3E4f0cWpfgZ8rWtLCo73SY8r4n9Ynpv0xLHqO29NkUSa1pEHVqjUIwAxiXTHkthPpMGLw==
+    size: 90246172
+path: Requestly-0.0.7-beta-mac.zip
+sha512: weQ33/xAEGhOB8DdmVA/Ewg6bqcIOD0Mx3B8+sX+OIz2iZtzEvjUGUEtTgNYDefvs3gMt3LRx89LipVE+PUdfg==
+releaseDate: "2021-06-18T22:00:19.048Z"

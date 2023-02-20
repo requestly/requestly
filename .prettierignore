@@ -1,0 +1,16 @@
+*.iml
+*.idea
+*.hbs
+node_modules/
+*.log
+*.sublime-workspace
+.sass-cache/
+.DS_Store
+dist/
+/public/
+scripts/venv/
+app/build
+app/dist
+app/~
+app/src/assets
+app/.env.local

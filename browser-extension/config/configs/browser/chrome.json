@@ -1,0 +1,4 @@
+{
+  "storageType": "sync",
+  "contextMenuContexts": ["browser_action"]
+}

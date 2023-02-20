@@ -1,0 +1,53 @@
+{
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDesc__",
+  "default_locale": "en",
+
+  "manifest_version": 2,
+  "update_URL": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
+  "content_scripts": [
+    {
+      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*"],
+      "js": ["generated/pages/main.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": ["*://*.requestly.in/*", "*://*.requestly.io/*"],
+      "js": ["generated/client/client.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+
+  "devtools_page": "generated/devtools/devtools.html",
+
+  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://ssl.google-analytics.com; object-src 'self'",
+
+  "background": {
+    "scripts": ["generated/background/background-bundled.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "resources/images/128x128.png",
+    "default_title": "__MSG_extIconTitle__",
+    "default_popup": "generated/popup/popup.html"
+  },
+
+  "web_accessible_resources": ["libs/requestly-web-sdk.js"],
+
+  "icons": {
+    "16": "resources/images/16x16.png",
+    "128": "resources/images/128x128.png"
+  },
+
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "unlimitedStorage",
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "<all_urls>"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "@requestly/browser-extension-common",
+  "version": "1.0.0",
+  "description": "Common code between MV2 and MV3 browser extensions",
+  "homepage": "https://requestly.io",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "browser-extension/common"
+  },
+  "author": {
+    "name": "Requestly",
+    "email": "contact@requestly.io",
+    "url": "https://requestly.io/"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "scripts": {
+    "build": "rm -rf dist && rollup -c",
+    "watch": "rm -rf dist && rollup -cw"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-json": "^5.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-typescript": "^9.0.1",
+    "@svgr/rollup": "^6.5.1",
+    "@types/chrome": "^0.0.200",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "archiver": "^5.3.1",
+    "node-sass": "^8.0.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.8.0",
+    "@devtools-ds/navigation": "^1.2.1",
+    "@devtools-ds/object-inspector": "^1.2.1",
+    "@devtools-ds/table": "^1.2.1",
+    "@devtools-ds/themes": "^1.2.1",
+    "antd": "^5.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-split": "^2.0.14"
+  }
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "creationDate": 1462161870499,
+    "description": "",
+    "id": "Replace_1462161870499",
+    "name": "Test Source Matching in Replace Rule",
+    "pairs": [
+      {
+        "from": "/\\?.+/ig",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example"
+        },
+        "status": "Inactive",
+        "to": ""
+      },
+      {
+        "from": "exmple",
+        "source": {
+          "key": "Url",
+          "operator": "Equals",
+          "value": "http://exmple.com"
+        },
+        "status": "Inactive",
+        "to": "example"
+      },
+      {
+        "from": "?q=0",
+        "source": {
+          "key": "Url",
+          "operator": "Matches",
+          "value": "/expl/ig"
+        },
+        "status": "Inactive",
+        "to": "?q=1"
+      }
+    ],
+    "ruleType": "Replace",
+    "status": "Active",
+    "version": 2
+  }
+]

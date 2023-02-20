@@ -1,0 +1,24 @@
+{
+  "name": "@requestly/browser-extension-config",
+  "version": "1.0.0",
+  "description": "Config for MV2 and MV3 browser extensions",
+  "homepage": "https://requestly.io",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "browser-extension/config"
+  },
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "author": {
+    "name": "Requestly",
+    "email": "contact@requestly.io",
+    "url": "https://requestly.io/"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "build": "node generate-config"
+  }
+}

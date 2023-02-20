@@ -1,0 +1,12 @@
+{
+  "addons": {
+    "extension@requestly.in": {
+      "updates": [
+        {
+          "version": "23.2.10",
+          "update_link": "https://app.requestly.io/firefox/builds/requestly-latest.xpi"
+        }
+      ]
+    }
+  }
+}
