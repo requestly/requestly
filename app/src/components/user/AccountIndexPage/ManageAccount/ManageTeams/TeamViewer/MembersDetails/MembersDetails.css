@@ -1,0 +1,61 @@
+.members-details-container {
+  margin-top: 4px;
+}
+
+.members-invite-title {
+  margin-top: 1.25rem;
+}
+
+.members-invite-title,
+.members-details-title {
+  margin-bottom: 8px;
+  color: var(--white);
+}
+
+.members-info-message {
+  font-size: 13px;
+  line-height: 22px;
+  max-width: 37.5rem;
+  margin-bottom: 1rem;
+}
+
+.members-table-container {
+  margin: 1.25rem 0px;
+}
+
+.members-invite-message {
+  line-height: 22px;
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.members-invite-empty-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  row-gap: 8px;
+  margin-top: 1rem;
+  padding: 5.75rem 1rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.members-invite-empty-container:hover {
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+
+.ant-input-group .invite-link-input.ant-input {
+  border: none;
+  height: 30px;
+  font-size: 13px;
+  width: calc(100% - 85px);
+  box-shadow: var(--input-box-shadow);
+}
+
+.members-quantity-info {
+  margin: 2rem;
+}

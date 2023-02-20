@@ -1,0 +1,166 @@
+.dialog {
+  --dialog-bg: #111111d9;
+  --cmdk-active: #ffffff0e;
+  --cmdk-gray0: #1e1e1ed9;
+  --cmdk-gray1: #1c1c1c;
+  --cmdk-gray2: #232323;
+  --cmdk-gray3: #2e2e2e;
+  --cmdk-gray4: #7e7e7e;
+  --cmdk-gray5: #707070;
+}
+
+.dialog {
+  width: 640px;
+  min-height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--component-background);
+  background: var(--dialog-bg);
+  transition: transform 100ms ease;
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.cmdk-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.746);
+  pointer-events: auto;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div[cmdk-dialog] {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  pointer-events: none !important;
+  z-index: 3;
+}
+
+.dialog [cmdk-input] {
+  font-family: var(--font-sans);
+  border: none;
+  width: 100%;
+  padding: 8px;
+  outline: none;
+  background: transparent;
+  color: var(--text-gray);
+  font-size: 1rem;
+  border-bottom: 1px solid var(--cmdk-gray3);
+  margin-bottom: 16px;
+}
+.dialog [cmdk-input]::placeholder {
+  color: var(--cmdk-gray5);
+}
+
+.dialog [cmdk-item] {
+  content-visibility: auto;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: var(--text-gray);
+  user-select: none;
+  transition: all 150ms ease;
+}
+.dialog [cmdk-item][aria-selected="true"] {
+  background: var(--cmdk-gray0);
+  border-left: 3px solid var(--primary);
+  color: #fff;
+}
+
+.dialog [cmdk-item] + [cmdk-item] {
+  margin-top: 4px;
+}
+.dialog [cmdk-item] svg {
+  width: 20px;
+  height: 20px;
+  align-self: center;
+}
+.cmd-list-wrapper {
+  padding: 8px;
+}
+
+.dialog [cmdk-list] {
+  max-height: 350px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  transition: 100ms ease;
+  transition-property: height;
+}
+
+.dialog [cmdk-separator] {
+  height: 1px;
+  background: var(--cmdk-gray1);
+  margin: 4px 0;
+}
+
+.dialog [cmdk-group-heading] {
+  user-select: none;
+  color: var(--cmdk-gray4);
+  padding: 0 8px;
+  font-weight: 500;
+  margin: 8px 0;
+}
+.dialog [cmdk-empty] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  color: var(--text-gray);
+}
+.dialog .fix-dark-mode-color {
+  margin-top: -5px;
+  width: 15px !important;
+  height: 15px !important;
+}
+.dialog .cmd-user-rule-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dialog .cmd-breadcrumb-wrapper {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  z-index: 3;
+}
+
+.dialog .cmd-breadcrumb-page-name {
+  background: var(--cmdk-gray2);
+  color: var(--text-gray);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.dialog .cmd-footer-wrapper {
+  background: var(--cmdk-gray0);
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  color: var(--text-gray);
+  border-top: 1px solid var(--component-background);
+  z-index: 3;
+}
+.dialog .cmd-footer-wrapper .cmd-key-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.dialog .cmd-footer-wrapper .cmd {
+  display: flex;
+  align-items: center;
+}

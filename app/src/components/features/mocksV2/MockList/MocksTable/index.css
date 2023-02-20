@@ -1,0 +1,64 @@
+.mock-table-container {
+  margin: 1.25rem;
+}
+.mock-table-container .mocks-table {
+  margin-top: 1.25rem;
+}
+.mock-table-row .primary-cell {
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mock-table-row .mock-tag {
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  padding: 5px;
+}
+
+.mock-actions-container .ant-btn-icon-only:hover {
+  background: var(--border);
+}
+.mock-actions-container .ant-btn-icon-only svg {
+  color: var(--text-gray);
+  transition: 0.2s ease-in-out;
+}
+.mock-actions-container .ant-btn-icon-only:hover svg {
+  color: var(--white);
+}
+
+.mocks-table .ant-btn-primary {
+  font-weight: 500;
+}
+.mock-table-container .mock-table-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mock-table-header-actions .mock-header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-dark);
+}
+.mock-table-header-actions .mock-search-input {
+  padding: 4px 6px;
+  background: var(--background-dark);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  flex: 1;
+  max-width: 275px;
+}
+.mock-table-header-actions .mock-search-input .ant-input {
+  background: var(--background-dark);
+}
+.mock-table-header-actions .mock-search-input .ant-input-prefix {
+  color: var(--text-gray);
+}
+.mock-table-header-actions .ant-btn {
+  font-weight: 500;
+}
+.mock-table-container .mocks-header-left-section {
+  color: var(--white);
+  font-weight: 500;
+  font-size: 1.25rem;
+}

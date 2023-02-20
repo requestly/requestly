@@ -1,0 +1,211 @@
+{
+  "fresh-chrome": {
+    "id": "fresh-chrome",
+    "name": "Google Chrome",
+    "description": "New Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-chrome": {
+    "id": "existing-chrome",
+    "name": "Google Chrome",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-chrome-beta": {
+    "id": "fresh-chrome-beta",
+    "name": "Chrome Beta",
+    "description": "New Profile",
+    "icon": "chrome-beta.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-chrome-dev": {
+    "id": "fresh-chrome-dev",
+    "name": "Chrome Dev",
+    "description": "New Profile",
+    "icon": "chrome-dev.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-chrome-canary": {
+    "id": "fresh-chrome-canary",
+    "name": "Chrome Canary",
+    "description": "New Profile",
+    "icon": "chrome-canary.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-chromium": {
+    "id": "fresh-chromium",
+    "name": "Chromium",
+    "description": "New Profile",
+    "icon": "chromium.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-chromium-dev": {
+    "id": "fresh-chromium-dev",
+    "name": "Chromium Dev",
+    "description": "New Profile",
+    "icon": "chromium.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-edge": {
+    "id": "fresh-edge",
+    "name": "Microsoft Edge ",
+    "description": "New Profile",
+    "icon": "edge.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-edge-beta": {
+    "id": "fresh-edge-beta",
+    "name": "Edge Beta",
+    "description": "New Profile",
+    "icon": "edge-beta.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-edge-dev": {
+    "id": "fresh-edge-dev",
+    "name": "Edge Developer",
+    "description": "New Profile",
+    "icon": "edge-dev.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-edge-canary": {
+    "id": "fresh-edge-canary",
+    "name": "Edge Canary",
+    "description": "New Profile",
+    "icon": "edge-can.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-brave": {
+    "id": "fresh-brave",
+    "name": "Brave",
+    "description": "New Profile",
+    "icon": "brave.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-opera": {
+    "id": "fresh-opera",
+    "name": "Opera",
+    "description": "New Profile",
+    "icon": "opera.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-firefox": {
+    "id": "fresh-firefox",
+    "name": "Mozilla Firefox",
+    "description": "New Profile",
+    "icon": "firefox.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-safari": {
+    "id": "fresh-safari",
+    "name": "Safari",
+    "description": "New Profile",
+    "icon": "safari.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "electron": {
+    "id": "electron",
+    "name": "Any Electron App",
+    "description": "Spotify, VS Code, more",
+    "icon": "electron.png",
+    "isActive": false,
+    "comingSoon": true,
+    "isAvailable": false
+  },
+  "existing-terminal": {
+    "id": "existing-terminal",
+    "name": "Terminal",
+    "description": "Terminal",
+    "icon": "terminal.png",
+    "isActive": true,
+    "isScanned": false,
+    "comingSoon": false,
+    "isAvailable": false,
+    "isDocAvailable": "https://docs.requestly.io/desktop-app/how-to.../terminal-setup"
+  },
+  "system-wide": {
+    "id": "system-wide",
+    "name": "Everywhere",
+    "description": "System Wide",
+    "icon": "pc.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "android": {
+    "id": "android",
+    "name": "Android",
+    "description": "External Device",
+    "icon": "android.png",
+    "isActive": true,
+    "isScanned": false,
+    "comingSoon": false,
+    "isAvailable": false
+  },
+  "ios": {
+    "id": "ios",
+    "name": "iOS",
+    "description": "External Device",
+    "icon": "ios.png",
+    "isActive": true,
+    "isScanned": false,
+    "comingSoon": false,
+    "isAvailable": false
+  },
+  "raspberry-pi": {
+    "id": "raspberry-pi",
+    "name": "Raspberry Pi",
+    "description": "External Device",
+    "icon": "raspberry-pi.png",
+    "isActive": false,
+    "comingSoon": true,
+    "isAvailable": false
+  }
+}

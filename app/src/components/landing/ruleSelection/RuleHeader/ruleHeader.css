@@ -1,0 +1,31 @@
+.ant-row.rule-header {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.rule-header-icon.ant-col {
+  height: 4.125rem;
+  max-width: 4.125rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-background);
+}
+
+.rule-header-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--white);
+}
+
+.rule-header-name-container {
+  padding: 0 3.12rem 0 1.25rem;
+}
+
+.rule-header.ant-row .ant-btn.ant-btn-lg {
+  font-size: 14px;
+  padding: 0.5rem 1rem;
+}

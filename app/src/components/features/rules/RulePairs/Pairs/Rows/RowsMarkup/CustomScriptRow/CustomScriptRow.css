@@ -1,0 +1,20 @@
+.custom-script-row {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.code-editor-header-row {
+  margin-top: 1rem;
+  padding: 1rem 0.5rem;
+  background: var(--component-header-background);
+  border-top-left-radius: var(--border-radius-sm);
+  border-top-right-radius: var(--border-radius-sm);
+}
+
+.code-editor-character-count-row {
+  padding: 0 10px;
+  background: var(--component-header-background);
+  border-bottom-left-radius: var(--border-radius-sm);
+  border-bottom-right-radius: var(--border-radius-sm);
+}

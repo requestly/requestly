@@ -1,0 +1,674 @@
+{
+  "templates": [
+    {
+      "key": "1",
+      "name": "Remove Content-Security-Policy Header",
+      "description": "Turn this on and see content-security-policy header being removed",
+      "imageURL": "",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "version": 2,
+          "creationDate": 1643724819721,
+          "description": "Turn this on and see content-security-policy header being removed",
+          "groupId": "",
+          "id": "Headers_ddon1",
+          "isSample": false,
+          "modificationDate": 1644102502913,
+          "name": "Remove Content-Security-Policy Header",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "7tg21",
+              "modifications": {
+                "Request": [],
+                "Response": [
+                  {
+                    "header": "content-security-policy",
+                    "type": "Remove",
+                    "value": ""
+                  }
+                ]
+              },
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": ""
+              }
+            }
+          ],
+          "ruleType": "Headers",
+          "status": "Active"
+        }
+      }
+    },
+    {
+      "key": "2",
+      "name": "Redirect Google Queries to DuckDuckGo",
+      "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+      "isSharedList": false,
+      "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643717688716,
+          "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+          "groupId": "",
+          "id": "Redirect_mbdyf",
+          "isSample": false,
+          "name": "Redirect Google Queries to DuckDuckGo",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "destination": "$1://duckduckgo.com/?q=$3&$4",
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Wildcard_Matches",
+                "value": "*://www.google.*/search?q=*&*"
+              },
+              "id": "soktt"
+            }
+          ],
+          "ruleType": "Redirect",
+          "status": "Active",
+          "modificationDate": 1643718041831
+        }
+      }
+    },
+    {
+      "key": "3",
+      "name": "Bypass CORS",
+      "description": "You can Bypass CORS by turning this on",
+      "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643755328278,
+          "description": "You can Bypass CORS by turning this on",
+          "groupId": "",
+          "id": "Headers_qdrqr",
+          "isSample": false,
+          "name": "Bypass CORS",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "z3v66",
+              "modifications": {
+                "Request": [],
+                "Response": [
+                  {
+                    "header": "Access-Control-Allow-Origin",
+                    "type": "Add",
+                    "value": "*"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Methods",
+                    "type": "Add",
+                    "value": "*"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Headers",
+                    "type": "Add",
+                    "value": "*"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Credentials",
+                    "type": "Add",
+                    "value": "true"
+                  }
+                ]
+              },
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "<yourdomain.com>"
+              }
+            }
+          ],
+          "ruleType": "Headers",
+          "status": "Active",
+          "modificationDate": 1643756052651,
+          "version": 2
+        }
+      }
+    },
+    {
+      "key": "4",
+      "name": "Load Google Analytics in Debug Mode",
+      "description": "Prints useful information to the JavaScript console by enabling the debug version of the Google Analytics Javascript.",
+      "isSharedList": true,
+      "tags": ["Redirect", "Script"],
+      "imageURL": "https://www.gstatic.com/analytics-suite/header/suite/v2/ic_analytics.svg",
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "shareId": "1643984301107",
+        "sharedListName": "Load Google Analytics in Debug Mode"
+      }
+    },
+    {
+      "key": "5",
+      "name": "Highlight Google Ads",
+      "description": "Highlights Ads in Google Search Result to avoid clicking on them",
+      "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643752821159,
+          "description": "Highlights Ads in Google Search Result to avoid clicking on them",
+          "groupId": "",
+          "id": "Script_mq17e",
+          "isSample": false,
+          "name": "Highlight Google Ads",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "libraries": [],
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": ""
+              },
+              "scripts": [
+                {
+                  "codeType": "js",
+                  "fileName": "",
+                  "loadTime": "afterPageLoad",
+                  "type": "code",
+                  "value": "if(document.querySelector('#tvcap'))document.querySelector('#tvcap').style.background='#f8fcae'",
+                  "id": "nu40j"
+                }
+              ],
+              "id": "0mard"
+            }
+          ],
+          "ruleType": "Script",
+          "status": "Active",
+          "modificationDate": 1643753009682
+        }
+      }
+    },
+    {
+      "key": "6",
+      "name": "Browse Quora Anonymously",
+      "description": "Can load Quora in Incognito Mode without signing in",
+      "imageURL": "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643723253038,
+          "description": "Can load Quora in Incognito Mode without signing in",
+          "groupId": "",
+          "id": "QueryParam_bwjbn",
+          "isSample": false,
+          "name": "Browse Quora Anonymously",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "modifications": [
+                {
+                  "actionWhenParamExists": "Overwrite",
+                  "param": "share",
+                  "type": "Add",
+                  "value": "1",
+                  "id": "mlcns"
+                }
+              ],
+              "source": {
+                "filters": {
+                  "resourceType": ["main_frame"]
+                },
+                "key": "Url",
+                "operator": "Contains",
+                "value": "quora.com"
+              },
+              "id": "irgm4"
+            }
+          ],
+          "ruleType": "QueryParam",
+          "status": "Active",
+          "modificationDate": 1643723413510
+        }
+      }
+    },
+    {
+      "key": "7",
+      "name": "Remove UTM Params",
+      "description": "Turn it on and try opening example.com?utm_source=gmail",
+      "imageURL": "",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643986033516,
+          "description": "Turn it on and try opening example.com?utm_source=gmail",
+          "groupId": "",
+          "id": "QueryParam_az606",
+          "isSample": false,
+          "modificationDate": 1643987482731,
+          "name": "Remove UTM Params",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "ak6l0",
+              "modifications": [
+                {
+                  "actionWhenParamExists": "Overwrite",
+                  "id": "pb9or",
+                  "param": "utm_medium",
+                  "type": "Remove",
+                  "value": ""
+                },
+                {
+                  "actionWhenParamExists": "Overwrite",
+                  "id": "dczkx",
+                  "param": "utm_source",
+                  "type": "Remove",
+                  "value": ""
+                },
+                {
+                  "actionWhenParamExists": "Overwrite",
+                  "id": "ydx5z",
+                  "param": "utm_term",
+                  "type": "Remove",
+                  "value": ""
+                },
+                {
+                  "actionWhenParamExists": "Overwrite",
+                  "id": "i7vwu",
+                  "param": "utm_campaign",
+                  "type": "Remove",
+                  "value": ""
+                }
+              ],
+              "source": {
+                "filters": {
+                  "resourceType": ["main_frame"]
+                },
+                "key": "Url",
+                "operator": "Contains",
+                "value": ""
+              }
+            }
+          ],
+          "ruleType": "QueryParam",
+          "status": "Active"
+        }
+      }
+    },
+    {
+      "key": "8",
+      "name": "Redirect Google Queries to Bing",
+      "description": "Turn it on and your chrome address bar will show results from Bing",
+      "imageURL": "https://www.vectorlogo.zone/logos/bing/bing-icon.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643725370294,
+          "description": "Turn it on and your chrome address bar will show results from Bing",
+          "groupId": "",
+          "id": "Redirect_796qs",
+          "isSample": false,
+          "name": "Redirect Google Queries to Bing",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "destination": "$1://bing.com/?q=$3&$4",
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Wildcard_Matches",
+                "value": "*://www.google.*/search?q=*&*"
+              },
+              "id": "yi3r8"
+            }
+          ],
+          "ruleType": "Redirect",
+          "status": "Active",
+          "modificationDate": 1643725511730
+        }
+      }
+    },
+    {
+      "key": "9",
+      "name": "Block Twitter",
+      "description": "Block Twitter and do something and do something productive",
+      "imageURL": "https://www.vectorlogo.zone/logos/twitter/twitter-official.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643749070407,
+          "description": "Block Twitter and do something and do something productive",
+          "groupId": "",
+          "id": "Cancel_vcmis",
+          "isSample": false,
+          "name": "Block Twitter",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "twitter.com"
+              },
+              "id": "gm1p2"
+            }
+          ],
+          "ruleType": "Cancel",
+          "status": "Active",
+          "modificationDate": 1643749150140
+        }
+      }
+    },
+    {
+      "key": "10",
+      "name": "Block Instagram",
+      "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
+      "imageURL": "https://www.vectorlogo.zone/logos/instagram/instagram-icon.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643752540500,
+          "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
+          "groupId": "",
+          "id": "Cancel_wzltx",
+          "isSample": false,
+          "name": "Block Instagram",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "instagram.com"
+              },
+              "id": "q7k5t"
+            }
+          ],
+          "ruleType": "Cancel",
+          "status": "Active",
+          "modificationDate": 1643752716055
+        }
+      }
+    },
+    {
+      "key": "11",
+      "name": "Block Adult Sites",
+      "description": "",
+      "imageURL": "",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643753300929,
+          "description": "",
+          "groupId": "",
+          "id": "Cancel_003oi",
+          "isSample": false,
+          "name": "Block Adult Sites",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "pornhub"
+              },
+              "id": "1cgz4"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "dipsea"
+              },
+              "id": "dxel7"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "xhamster"
+              },
+              "id": "g60m9"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "frolicme"
+              },
+              "id": "sdtb2"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "bellesa"
+              },
+              "id": "rpt1p"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "xtube"
+              },
+              "id": "6pmxr"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "mvtube"
+              },
+              "id": "7w0g9"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "quinn"
+              },
+              "id": "2e2zd"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "literocia"
+              },
+              "id": "hdawb"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "xvideos"
+              },
+              "id": "vptvn"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "xnxx"
+              },
+              "id": "41k0z"
+            },
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "porn"
+              },
+              "id": "3ya9j"
+            }
+          ],
+          "ruleType": "Cancel",
+          "status": "Active",
+          "modificationDate": 1643753569959
+        }
+      }
+    },
+    {
+      "key": "12",
+      "name": "Block Youtube",
+      "description": "Avoid distractions",
+      "imageURL": "https://www.vectorlogo.zone/logos/youtube/youtube-icon.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643753954887,
+          "description": "Avoid distractions",
+          "groupId": "",
+          "id": "Cancel_bwxnf",
+          "isSample": false,
+          "name": "Block Youtube",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "youtube.com"
+              },
+              "id": "5boow"
+            }
+          ],
+          "ruleType": "Cancel",
+          "status": "Active",
+          "modificationDate": 1643754021243
+        }
+      }
+    },
+    {
+      "key": "13",
+      "name": "Block Facebook ",
+      "description": "Block Facebook to stay focused",
+      "imageURL": "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643754300535,
+          "description": "Block Facebook to stay focused",
+          "groupId": "",
+          "id": "Cancel_9naiu",
+          "isSample": false,
+          "name": "Block Facebook",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "facebook.com"
+              },
+              "id": "jxq48"
+            }
+          ],
+          "ruleType": "Cancel",
+          "status": "Active",
+          "modificationDate": 1643754391040
+        }
+      }
+    },
+    {
+      "key": "14",
+      "name": "Redirect Dictionary.com to Merriam-Webster in Adobe Acrobat Reader Lookup",
+      "description": "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
+      "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643754671488,
+          "description": "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
+          "groupId": "",
+          "id": "Redirect_24doz",
+          "isSample": false,
+          "name": "Redirect Dictionary.com to Merriam-Webster in Adobe Acrobat Reader Lookup",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "destination": "https://www.merriam-webster.com/dictionary/$1",
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Wildcard_Matches",
+                "value": "https://www.dictionary.com/browse/*"
+              },
+              "id": "azvg0"
+            }
+          ],
+          "ruleType": "Redirect",
+          "status": "Active",
+          "modificationDate": 1643754728923
+        }
+      }
+    },
+    {
+      "key": "15",
+      "name": "Redirect Dictionary.com to dict.cc in Adobe Acrobat Reader Lookup",
+      "description": "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
+      "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
+      "isSharedList": false,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "ruleDefinition": {
+          "creationDate": 1643757615673,
+          "description": "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
+          "groupId": "",
+          "id": "Redirect_uhm4d",
+          "isSample": false,
+          "lastModifiedBy": "7px5zooOVjOHfAyGFMetTrrrzsg1",
+          "modificationDate": 1643758451249,
+          "name": "Redirect Dictionary.com to dict.cc in Adobe Acrobat Reader Lookup",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "destination": "https://www.dict.cc/?s=$1",
+              "id": "w679g",
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Wildcard_Matches",
+                "value": "https://www.dictionary.com/browse/*"
+              }
+            }
+          ],
+          "ruleType": "Redirect",
+          "status": "Active"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+.ant-dropdown-menu
+  .ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item {
+  display: flex;
+  align-items: center;
+  margin: 0 8px;
+  padding: 10px 8px;
+}
+
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item
+  .rule-type-icon {
+  padding: 1px;
+}
+
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  color: var(--text-gray);
+}
+
+.rule-selection-dropdown-btn .ant-btn.ant-btn-icon-only {
+  height: 30px;
+}
+
+.group-action-buttons .show-record,
+.rule-action-buttons .show-record,
+.ant-table-row:hover .rule-action-buttons,
+.ant-table-row:hover .group-action-buttons {
+  visibility: visible;
+}
+
+.ant-table-row .rule-action-buttons,
+.ant-table-row .group-action-buttons {
+  visibility: hidden;
+}
+
+.rule-name-col {
+  width: calc(100% / 3);
+}
+
+.rule-name-col a span {
+  color: var(--link);
+  transition: color 0.1s;
+}

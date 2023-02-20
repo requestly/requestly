@@ -1,0 +1,25 @@
+.chrome-store-stats-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-dark);
+  padding-top: 14px;
+  margin: 60px 0;
+}
+.chrome-store-stats-container .stat-wrapper {
+  display: flex;
+  gap: 8px;
+}
+.chrome-store-stats-container .stat-wrapper .stat {
+  color: var(--white);
+  font-weight: 500;
+}
+@media (max-width: 650px) {
+  .chrome-store-stats-container {
+    justify-content: space-evenly;
+  }
+  .chrome-store-stats-container .stat-wrapper {
+    margin-top: 1rem;
+  }
+}

@@ -1,0 +1,12 @@
+.remove-user-btn {
+  margin-left: 8px;
+}
+
+.remove-user-message {
+  margin-top: 8px;
+}
+
+.rq-modal-content .remove-user-message p {
+  margin: 0;
+  line-height: 22px;
+}

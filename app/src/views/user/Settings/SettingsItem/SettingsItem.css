@@ -1,0 +1,12 @@
+.setting-item-container {
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.setting-item-caption {
+  font-size: 13px;
+  line-height: 23px;
+  max-width: 37.5rem;
+  margin: 8px 0 1.25rem 0;
+  color: var(--text-dark-gray);
+}

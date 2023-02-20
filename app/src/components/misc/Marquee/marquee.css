@@ -1,0 +1,19 @@
+.marquee {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.marquee-container {
+  max-width: 600px;
+}
+
+@media (max-width: 660px) {
+  .marquee-container {
+    max-width: 350px;
+  }
+}
+
+.marquee-icons {
+  width: 60px;
+}

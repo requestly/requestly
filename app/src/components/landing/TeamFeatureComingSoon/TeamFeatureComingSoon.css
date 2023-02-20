@@ -1,0 +1,28 @@
+.team-feature-coming-soon-container {
+  margin-top: 2.5rem;
+}
+
+.team-feature-coming-soon-caption {
+  font-size: 13px;
+  line-height: 22px;
+  margin: 8px 0 16px 0;
+}
+
+.team-feature-banner {
+  height: 19.37rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.team-feature-banner .file-icon {
+  margin-bottom: 1.5rem;
+}
+
+.team-feature-banner .header {
+  margin-bottom: 8px;
+}

@@ -1,0 +1,19 @@
+.workspace-learn-more-link-container {
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.workspace-learn-more-icon {
+  font-size: 13px;
+}
+
+.workspace-learn-more-link,
+.workspace-learn-more-link:hover {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.workspace-learn-more-link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,15 @@
+.group-expand-icon {
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--color-icon);
+  margin: 0 8px 0 16px;
+}
+
+.group-expanded,
+.record-name-container .group-expanded.icon-wrapper svg {
+  color: var(--color-primary);
+}
+
+.empty-group-message {
+  margin: 6px 0 6px 68px;
+}

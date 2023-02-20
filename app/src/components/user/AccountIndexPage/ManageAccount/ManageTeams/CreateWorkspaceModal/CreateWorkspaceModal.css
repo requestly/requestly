@@ -1,0 +1,30 @@
+.create-workspace-modal-header,
+.create-workspace-modal-header div.subtitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.create-workspace-modal-header div.subtitle {
+  margin-top: 8px;
+  margin-bottom: 1.75rem;
+}
+
+.create-workspace-form.ant-form {
+  border-radius: inherit;
+}
+
+.create-workspace-form.ant-form .ant-form-item-label label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.create-workspace-modal-description.ant-form-item {
+  margin-bottom: 0;
+}
+
+.create-workspace-input.ant-input,
+.create-workspace-modal-description textarea {
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+}

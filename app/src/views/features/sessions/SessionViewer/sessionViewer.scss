@@ -1,0 +1,284 @@
+.session-viewer-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  .session-recording-player-row {
+    display: flex;
+    width: 100%;
+    column-gap: 12px;
+    margin: 12px 0;
+
+    .session-recording-player-container {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      overflow-x: auto;
+    }
+
+    .session-recording-properties {
+      width: 300px;
+      overflow: auto;
+      min-height: 100%;
+
+      > div {
+        height: auto;
+      }
+
+      .session-property-label {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .session-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+
+    .session-recording-name {
+      line-height: 40px;
+      margin: 0;
+    }
+
+    .session-viewer-actions {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: row;
+      column-gap: 10px;
+
+      button {
+        height: 40px;
+      }
+    }
+  }
+
+  .session-info-divider {
+    border-width: 2px;
+    height: 18px;
+  }
+
+  .session-panels-container {
+    > div {
+      padding-top: 0;
+    }
+
+    /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
+    .ant-tabs-ink-bar {
+      display: none;
+    }
+
+    .ant-tabs-tab {
+      border-bottom: 2px solid transparent;
+
+      &.ant-tabs-tab-active {
+        border-bottom-color: #1e69ff;
+      }
+
+      .ant-tabs-tab-btn > span {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .session-panel-content {
+      height: 300px;
+      overflow: auto;
+      font-size: 12px;
+
+      .placeholder {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .session-details-panel-row {
+        display: flex;
+        flex-direction: column;
+        padding: 6px 10px 4px 10px;
+
+        span,
+        a,
+        .right-info,
+        .secondary-message {
+          line-height: 12px;
+        }
+
+        .primary-message {
+          // object-inspector button
+          li > div {
+            line-height: 12px;
+            width: auto !important; // overriding inline style
+          }
+        }
+
+        .right-info {
+          margin-left: 8px;
+          width: 200px;
+          text-align: right;
+          flex: 0 0 auto;
+        }
+
+        .secondary-message {
+          padding-left: 40px;
+        }
+      }
+    }
+  }
+
+  .console-log-row {
+    .primary-message,
+    .secondary-message {
+      white-space: pre-wrap;
+      font-family: Menlo, monospace;
+
+      span {
+        font-family: Menlo, monospace;
+      }
+    }
+
+    .info span {
+      color: #157af3;
+    }
+    .error span {
+      color: #ff4d4f;
+    }
+    .warn span {
+      color: #d3a403;
+    }
+  }
+
+  .network-logs-panel {
+    .network-logs-table {
+      overflow: auto;
+      height: 100%;
+
+      .network-log-row {
+        cursor: pointer;
+
+        &.selected {
+          background-color: #0948b2;
+          color: #fff;
+        }
+
+        .network-log-url {
+          &.failed {
+            color: #ff4d4f;
+          }
+        }
+
+        .request-method-tag {
+          font-size: 11px;
+          padding: 2px 8px;
+          margin-right: 10px;
+          margin-top: -2px;
+          min-width: 48px;
+          text-align: center;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    .gutter {
+      background-color: #0000000f;
+      margin: 0 8px;
+      cursor: col-resize;
+    }
+
+    .network-log-details {
+      .ant-tabs-tab {
+        padding: 6px 0;
+
+        + .ant-tabs-tab {
+          margin: 0 0 0 20px;
+        }
+      }
+
+      .network-log-details-tab-content {
+        overflow: auto;
+        height: 244px;
+      }
+
+      .network-payload-object {
+        span {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}
+
+.session-viewer-more-actions {
+  .more-action {
+    padding: 5px 10px;
+
+    .more-action-icon {
+      width: initial;
+      padding: 5px !important;
+    }
+  }
+}
+
+body.dark {
+  .session-viewer-page {
+    .session-recording-name {
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    .rr-controller {
+      color: white !important;
+
+      .rr-timeline__time {
+        color: white !important;
+      }
+
+      svg {
+        fill: white !important;
+      }
+    }
+
+    .network-logs-panel .gutter {
+      background-color: #313a46;
+    }
+
+    .ant-pro-card,
+    .ant-pro-card-body,
+    .rr-player,
+    .rr-controller {
+      background: #1c2128 !important;
+    }
+
+    .rr-player {
+      overflow: hidden;
+    }
+
+    .rr-player,
+    .ant-pro-card {
+      border: 1px solid #303030;
+      border-radius: 5px;
+      box-sizing: content-box;
+    }
+
+    .ant-input-number-group-addon {
+      color: #ffffff;
+      border-color: #313a46;
+      background-color: #313a46;
+    }
+
+    .ant-btn-link {
+      padding: 5px;
+      min-height: 0;
+
+      &:hover,
+      &:focus {
+        border-color: transparent !important;
+        background: transparent;
+      }
+    }
+  }
+}

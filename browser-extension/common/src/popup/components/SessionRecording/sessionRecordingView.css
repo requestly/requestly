@@ -1,0 +1,55 @@
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.session-view-content {
+  width: 100%;
+}
+
+.session-view-content .main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-view-content p {
+  margin: 0;
+}
+
+.session-view-content .record-indicator {
+  margin: 0;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: #fa2828;
+  animation: blink 0.5s cubic-bezier(0.5, 0, 1, 1) infinite alternate;
+}
+
+.session-view-link-button {
+  padding: 0;
+  height: auto;
+  color: var(--color-secondary);
+}
+
+.session-view-link-button span {
+  text-decoration: underline;
+}
+
+.session-recording-caption {
+  font-size: 12px;
+}
+
+.no-session-recording-message {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-recording-camera-icon {
+  margin-right: 3px;
+}

@@ -1,0 +1,29 @@
+.testimonial-btn {
+  font-weight: 500;
+  color: var(--white);
+  background: #4b4d52 !important;
+}
+.testimonial-btn img {
+  transform: rotate(180deg);
+  margin-left: 8px;
+}
+
+.testimonial-card .testimonial-user-meta-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-card .testimonial-user-meta-container img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+.testimonial-card .testimonial-content {
+  line-height: 24px;
+}
+.testimonial-company-logo {
+  width: 5rem;
+  /* height: 2rem; */
+  object-fit: contain;
+  margin-top: 1rem;
+}

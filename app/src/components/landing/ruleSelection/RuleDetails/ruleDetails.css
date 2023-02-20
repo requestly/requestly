@@ -1,0 +1,37 @@
+.rule-details-container {
+  padding: 1.87rem;
+}
+
+.rule-details-description-container {
+  margin-bottom: 1.125rem;
+}
+
+.rule-details-description-title {
+  margin-bottom: 8px;
+}
+
+.rule-details-description {
+  max-width: 90ch;
+}
+
+.rule-details-description ul {
+  padding-left: 14px;
+}
+
+.rule-details-description li {
+  margin-bottom: 4px;
+}
+
+.rule-details-description p {
+  margin-bottom: 4px;
+}
+
+.rule-details-description code {
+  padding: 2px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.rule-details-example-title {
+  margin-bottom: 1rem;
+}

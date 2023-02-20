@@ -1,0 +1,80 @@
+import { trackEvent } from "modules/analytics";
+import { trackRQLastActivity } from "utils/AnalyticsUtils";
+import { SESSION_RECORDING } from "../constants";
+
+export const trackDemoVideoOpened = () =>
+  trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
+
+export const trackConfigurationOpened = () =>
+  trackEvent(SESSION_RECORDING.session_recordings_config_opened);
+
+export const trackConfigurationSaved = (params) => {
+  trackEvent(SESSION_RECORDING.session_recordings_config_saved, params);
+  trackRQLastActivity(SESSION_RECORDING.session_recordings_config_saved);
+};
+
+export const trackInstallExtensionDialogShown = (params) =>
+  trackEvent(
+    SESSION_RECORDING.session_recordings_install_extension_dialog_shown,
+    params
+  );
+
+export const trackSessionRecordingFailed = (reason) =>
+  trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
+
+export const trackDraftSessionViewed = () => {
+  trackEvent(SESSION_RECORDING.draft_session_recording_viewed);
+  trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
+};
+
+export const trackDraftSessionDiscarded = () =>
+  trackEvent(SESSION_RECORDING.draft_session_discarded);
+
+export const trackDraftSessionNamed = () =>
+  trackEvent(SESSION_RECORDING.draft_session_recording_named);
+
+export const trackDraftSessionSaved = (sessionLength) => {
+  trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
+    sessionLength,
+  });
+  trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
+};
+
+export const trackDraftSessionSaveFailed = (reason) =>
+  trackEvent(SESSION_RECORDING.draft_session_recording_save_failed, { reason });
+
+export const trackSavedSessionViewedFromApp = () =>
+  trackEvent(SESSION_RECORDING.saved_session_recording_viewed, {
+    source: "app",
+  });
+
+export const trackSavedSessionViewedFromLink = () =>
+  trackEvent(SESSION_RECORDING.saved_session_recording_viewed, {
+    source: "link",
+  });
+
+export const trackSessionRecordingShareClicked = () => {
+  trackEvent(SESSION_RECORDING.session_recording_share_clicked);
+  trackRQLastActivity(SESSION_RECORDING.session_recording_share_clicked);
+};
+
+export const trackSessionRecordingShareLinkCopied = () =>
+  trackEvent(SESSION_RECORDING.session_recording_share_link_copied);
+
+export const trackSessionRecordingVisibilityUpdated = (visibility) => {
+  trackEvent(SESSION_RECORDING.session_recording_visibility_updated, {
+    visibility,
+  });
+  trackRQLastActivity(SESSION_RECORDING.session_recording_visibility_updated);
+};
+
+export const trackSessionRecordingStartTimeOffsetUpdated = () =>
+  trackEvent(SESSION_RECORDING.session_recording_start_time_offset_updated);
+
+export const trackSessionRecordingDeleted = () => {
+  trackEvent(SESSION_RECORDING.session_recording_deleted);
+  trackRQLastActivity(SESSION_RECORDING.session_recording_deleted);
+};
+
+export const trackSessionRecordingDescriptionUpdated = () =>
+  trackEvent(SESSION_RECORDING.session_recording_description_added);

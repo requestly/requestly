@@ -1,0 +1,31 @@
+.rules-pair-content-header {
+  padding: 4px;
+  background-color: var(--component-header-background);
+  border-radius: var(--border-radius-sm);
+  -webkit-box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
+  -moz-box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
+  box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
+}
+
+.rules-pair-content-header .rules-pair-input,
+.rules-pair-content-header .rules-pair-input:focus {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+.source-filter-col.ant-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.source-filter-icon-container {
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}

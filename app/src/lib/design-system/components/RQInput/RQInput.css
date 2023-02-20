@@ -1,0 +1,22 @@
+.rq-input .ant-input-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-header-background);
+}
+
+.rq-input .ant-input-wrapper * {
+  border: none;
+}
+
+.rq-input .ant-input-wrapper .ant-input,
+.rq-input .ant-input-wrapper .ant-input-group-addon {
+  padding: 11px;
+}
+
+.rq-input.ant-input-group-wrapper .ant-input:focus {
+  box-shadow: 0 0 0 2px rgb(30, 105, 255, 0.7);
+}
+
+.rq-input .ant-input-wrapper .ant-input-group-addon {
+  background-color: var(--component-header-background);
+}

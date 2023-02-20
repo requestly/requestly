@@ -1,0 +1,13 @@
+.code-editor {
+  overflow: auto;
+}
+
+.custom-handle {
+  height: 25px;
+  background: #1c1d21;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transition: 0.3s all;
+  cursor: row-resize;
+}

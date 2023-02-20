@@ -1,0 +1,4 @@
+.rules-info-container {
+  overflow: auto;
+  height: calc(100vh - 72px); /* 72px -> height of navbar */
+}

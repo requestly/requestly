@@ -1,0 +1,74 @@
+.delete-pair-icon {
+  font-size: 1rem;
+}
+
+.panel-header {
+  font-weight: 500;
+}
+
+.rule-pairs-collapse.ant-collapse {
+  border: none;
+  background-color: transparent;
+}
+
+.rule-pairs-panel.ant-collapse-item {
+  margin-bottom: 1.25rem;
+  border-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item {
+  border: 1px solid var(--border);
+}
+
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  border: none;
+  padding: 1rem 1.25rem;
+  background-color: var(--component-header-background);
+  border-top-left-radius: var(--border-radius-md);
+  border-top-right-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse.ant-collapse
+  > .ant-collapse-item:not(.ant-collapse-item-active)
+  .ant-collapse-header {
+  border-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-content {
+  border: none;
+  background-color: var(--component-background);
+  border-bottom-left-radius: var(--border-radius-md);
+  border-bottom-right-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse.ant-collapse
+  > .ant-collapse-item
+  > .ant-collapse-content
+  .ant-collapse-content-box {
+  padding: 1rem 1.25rem;
+}
+
+.rule-pairs-collapse.ant-collapse
+  > .ant-collapse-item:last-child
+  > .ant-collapse-header {
+  border-top-left-radius: var(--border-radius-md);
+  border-top-right-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item:last-child {
+  border-radius: var(--border-radius-md);
+}
+
+.rule-pairs-collapse .ant-tabs-top > .ant-tabs-nav::before {
+  border-bottom: 1px solid var(--border);
+}
+
+.headers-rule-pair-card .ant-card-body {
+  width: 100%;
+  padding: 1rem 0 0 0;
+  background-color: var(--component-background);
+}
+
+.ant-select.ant-select-lg {
+  font-size: 14px;
+}

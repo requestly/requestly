@@ -1,0 +1,28 @@
+:root {
+  /* colors */
+  --white: #ffffff;
+  --text-gray: #b0b0b5;
+  --text-dark-gray: #b0b0b5b3;
+  --border: #4f5053;
+  --border-dark: #3e4044;
+  --danger: #fc5f5f;
+  --primary: #1e69ff;
+  --background: #141414;
+  --background-dark: #1c1d21;
+  --component-background: #323337;
+  --component-dark-background: #2c2d31;
+  --input-background: var(--component-dark-background);
+  --component-header-background: var(--component-dark-background);
+  --body-background: #242529;
+  --hover-color: #3c3d42;
+  --dropdown-active-border-color: #0361ff;
+
+  /* utils */
+  --space: 2px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+
+  /* shadows */
+  --input-box-shadow: inset 0px -1px 2px #4f5154,
+    inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+}

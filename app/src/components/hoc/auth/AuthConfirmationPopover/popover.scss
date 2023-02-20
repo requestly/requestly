@@ -1,0 +1,25 @@
+.confirmation-popover {
+  & .ant-popover-inner-content {
+    background: #2c2d31;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  & .ant-popover-arrow {
+    display: none;
+  }
+  & .ant-popover-buttons {
+    text-align: left;
+  }
+  & .ant-btn-default,
+  & .ant-btn-primary {
+    border: 0;
+    background: var(--hover-color);
+    color: var(--white);
+    padding: 2px 6px;
+  }
+  & .ant-btn-default:hover,
+  & .ant-btn-primary:hover {
+    background: var(--primary);
+    color: var(--white);
+  }
+}

@@ -1,0 +1,14 @@
+.rule-template-container {
+  width: 100%;
+  max-width: 19rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-background);
+}
+
+.rule-template-item-link .ant-btn-link {
+  padding: 0;
+  font-size: 0.75rem;
+}

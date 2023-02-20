@@ -1,0 +1,122 @@
+/* table */
+.invoice-details-table.ant-pro-table .ant-pro-card-body {
+  padding: 0;
+}
+
+.invoice-details-table.ant-pro-table .ant-table-wrapper {
+  padding: 1.25rem;
+  padding-bottom: 4px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.invoice-details-table.ant-pro-table .ant-table-wrapper .ant-table {
+  background-color: var(--component-background);
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-thead
+  .ant-table-cell {
+  padding: 0px 0px 8px 0px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-gray);
+  background-color: var(--component-background);
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+  visibility: hidden;
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th,
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > td {
+  border-bottom: none;
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-tbody
+  .ant-table-cell-row-hover {
+  background-color: var(--component-background);
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-tbody
+  .ant-table-row
+  td {
+  border-top: 1px solid #3e4044;
+}
+
+.invoice-details-table.ant-pro-table
+  .ant-table-wrapper
+  .ant-table-tbody
+  .ant-table-row
+  .ant-table-cell {
+  font-weight: 400;
+  padding: 1.25rem 4px 1.25rem 2px;
+}
+
+.invoice-table-view-past-invoice-btn.ant-btn {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.invoice-url-link.ant-btn-link {
+  padding: 0;
+  text-align: left;
+  color: var(--white);
+  font-weight: bold;
+}
+
+.invoice-url-link.ant-btn-link:hover,
+.invoice-url-link.ant-btn-link:focus {
+  color: var(--white);
+}
+
+.invoice-url-link.ant-btn-link:hover,
+.invoice-url-link.ant-btn-link:focus span {
+  text-decoration: underline;
+}
+
+.invoice-pay-now-btn.ant-btn {
+  font-weight: 500;
+  padding: 8px 12px;
+  margin-left: 12px;
+  font-size: 12px !important;
+}
+
+.invoice-status-data {
+  margin-left: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  padding: 8px 12px;
+  border-radius: 47px;
+  border: 1px solid var(--border);
+}
+
+.invoice-status-data .invoice-status-icon {
+  width: 13px;
+  height: 13px;
+  margin-right: 5px;
+}
+
+.invoice-status-label {
+  font-size: 12px;
+}

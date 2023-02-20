@@ -1,0 +1,22 @@
+.billing-footer {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  margin-bottom: 2rem;
+  color: var(--text-gray);
+}
+
+.billing-footer-list-item {
+  margin-bottom: 1rem;
+}
+
+.billing-footer a {
+  color: var(--text-gray);
+}
+
+.billing-footer a:hover,
+.billing-footer a:focus {
+  color: var(--text-gray);
+  text-decoration: underline;
+}

@@ -1,0 +1,16 @@
+.auth-modal {
+  max-width: 1136px;
+}
+.modal-close-icon {
+  position: fixed;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  margin: 20px;
+  z-index: 99999;
+}
+
+.modal-wrapper .ant-modal-content {
+  background: transparent;
+  box-shadow: none;
+}

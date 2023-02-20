@@ -1,0 +1,32 @@
+.status-light {
+  display: inline-block;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  &.success::before {
+    background-color: #268e6c;
+  }
+
+  &.warning::before {
+    background-color: #d3a403;
+  }
+
+  &.error::before {
+    background-color: #ff4d4f;
+  }
+
+  &.info::before {
+    background-color: #157af3;
+  }
+
+  &.neutral::before {
+    background-color: #5c5c5c;
+  }
+}

@@ -1,0 +1,61 @@
+import ProCard from "@ant-design/pro-card";
+import { Button, Col, Row } from "antd";
+import Jumbotron from "components/bootstrap-legacy/jumbotron";
+import React from "react";
+
+import img from "../../../../../assets/images/pages/error/404.svg";
+import { useNavigate } from "react-router-dom";
+import PATHS from "../../../../../config/constants/sub/paths";
+
+const NotFoundError = () => {
+  const navigate = useNavigate();
+
+  return (
+    <React.Fragment>
+      <ProCard
+        className="primary-card github-like-border"
+        style={{ height: "100%" }}
+      >
+        <Row className="hp-text-center">
+          <Col span={24}>
+            <Row justify="center">
+              <Col>
+                <img
+                  className="hp-position-relative hp-d-block hp-m-auto"
+                  src={img}
+                  alt="403"
+                  style={{ maxHeight: "30vh" }}
+                />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+
+        <Row style={{ textAlign: "center" }} align="center">
+          <Col span={24}>
+            <Jumbotron
+              style={{ background: "transparent" }}
+              className="text-center"
+            >
+              <h1 className="display-3">
+                The session recording you were looking for does not exist.
+              </h1>
+              <center>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    navigate(PATHS.SESSIONS.RELATIVE);
+                  }}
+                >
+                  Go Back
+                </Button>
+              </center>
+            </Jumbotron>
+          </Col>
+        </Row>
+      </ProCard>
+    </React.Fragment>
+  );
+};
+
+export default NotFoundError;
