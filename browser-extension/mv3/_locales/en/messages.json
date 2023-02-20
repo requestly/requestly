@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Requestly - BETA",
+    "description": "Requestly browser extension name which is visible in Web Stores"
+  },
+  "extDesc": {
+    "message": "Web Debugging Proxy to Intercept & Modify HTTPs Requests - Redirect URL, Modify Headers, Mock APIs, Modify Response, Insert Scripts.",
+    "description": "Requestly browser extension description visible in Web Stores"
+  },
+  "extIconTitle": {
+    "message": "Requestly: Intercept & Modify HTTPs Requests",
+    "description": "Tooltip text shown on hovering Requestly browser extension icon"
+  }
+}

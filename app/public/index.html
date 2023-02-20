@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" class="perfect-scrollbar-off nav-open" dir="ltr">
+  <head>
+    <script>
+      if ("https://app.requestly.io/goodbye/" === window.location.href) { const a = { api_key: "62ff1b46909e50358cfca0668d41f011", events: [{ user_id: localStorage.getItem("__rq_uid") || Math.random().toString(36).slice(2, 10), event_type: "extension_uninstalled" }] }, b = new Blob([JSON.stringify(a)]); navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b) }
+    </script>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap"
+    />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-0J86Z3VN8N"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-0J86Z3VN8N");
+    </script>
+
+    <style type="text/css">
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        pointer-events: none;
+      }
+      body {
+        font-family: Roboto, sans-serif;
+        font-size: 13px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .ipl-progress-indicator.available {
+        opacity: 0;
+      }
+      .ipl-progress-indicator {
+        background-color: #22272d;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        opacity: 1;
+        pointer-events: none;
+        -webkit-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+        -moz-transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+        transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 436ms;
+        z-index: 9999;
+      }
+      .insp-logo-frame {
+        display: -webkit-flex;
+        display: -moz-flex;
+        display: flex;
+        -webkit-flex-direction: column;
+        -moz-flex-direction: column;
+        flex-direction: column;
+        -webkit-justify-content: center;
+        -moz-justify-content: center;
+        justify-content: center;
+        -webkit-animation: fadein 436ms;
+        -moz-animation: fadein 436ms;
+        animation: fadein 436ms;
+        height: 98%;
+      }
+      .insp-logo-frame-img {
+        max-width: 13%;
+        max-height: 13%;
+        -webkit-align-self: center;
+        -moz-align-self: center;
+        align-self: center;
+      }
+      .ipl-progress-indicator-head {
+        background-color: #d7e5fd;
+        height: 4px;
+        overflow: hidden;
+        position: relative;
+      }
+      .ipl-progress-indicator .first-indicator,
+      .ipl-progress-indicator .second-indicator {
+        background-color: #264ec8;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        position: absolute;
+        -webkit-transform-origin: left center;
+        -moz-transform-origin: left center;
+        transform-origin: left center;
+        -webkit-transform: scaleX(0);
+        -moz-transform: scaleX(0);
+        transform: scaleX(0);
+      }
+      .ipl-progress-indicator .first-indicator {
+        -webkit-animation: first-indicator 2s linear infinite;
+        -moz-animation: first-indicator 2s linear infinite;
+        animation: first-indicator 2s linear infinite;
+      }
+      .ipl-progress-indicator .second-indicator {
+        -webkit-animation: second-indicator 2s linear infinite;
+        -moz-animation: second-indicator 2s linear infinite;
+        animation: second-indicator 2s linear infinite;
+      }
+      .ipl-progress-indicator .insp-logo {
+        animation: App-logo-spin infinite 20s linear;
+        border-radius: 50%;
+        -webkit-align-self: center;
+        -moz-align-self: center;
+        align-self: center;
+      }
+      @keyframes App-logo-spin {
+        from {
+          transform: rotate(0);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @-webkit-keyframes fadein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @-moz-keyframes fadein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes first-indicator {
+        0% {
+          transform: translate(0) scaleX(0);
+        }
+        25% {
+          transform: translate(0) scaleX(0.5);
+        }
+        50% {
+          transform: translate(25%) scaleX(0.75);
+        }
+        75% {
+          transform: translate(100%) scaleX(0);
+        }
+        100% {
+          transform: translate(100%) scaleX(0);
+        }
+      }
+      @keyframes second-indicator {
+        0% {
+          transform: translate(0) scaleX(0);
+        }
+        60% {
+          transform: translate(0) scaleX(0);
+        }
+        80% {
+          transform: translate(0) scaleX(0.6);
+        }
+        100% {
+          transform: translate(100%) scaleX(0.1);
+        }
+      }
+    </style>
+
+    <title>
+      Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests
+    </title>
+  </head>
+  <body class="dark">
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <!-- Start - Preloading animation -->
+    <div class="ipl-progress-indicator" id="ipl-progress-indicator">
+      <div class="ipl-progress-indicator-head">
+        <div class="first-indicator"></div>
+        <div class="second-indicator"></div>
+      </div>
+      <div class="insp-logo-frame">
+        <img
+          class="insp-logo-frame-img"
+          src="data:image/png;base64,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"
+        />
+      </div>
+    </div>
+    <!-- End - Preloading animation -->
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>

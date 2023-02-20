@@ -1,0 +1,12 @@
+version: 0.0.3
+files:
+  - url: Requestly-0.0.3-mac.zip
+    sha512: F0V2WFg7psqjxcFvWjkpF5mjAlLHqTUmMZ1e4CxCEfM0kARRzmR8E5iBPy7JFVx7QwgBau8r37AQmV5NBUybww==
+    size: 85507082
+    blockMapSize: 89625
+  - url: Requestly-0.0.3.dmg
+    sha512: d/0YUetJieR5nt6pRxrqx36JbhLbiFQQzxf/G3bT7m3wNcouG4mJakwKzfhqogqF2cVGUnS6aHNr4FgACa23Jg==
+    size: 89469087
+path: Requestly-0.0.3-mac.zip
+sha512: F0V2WFg7psqjxcFvWjkpF5mjAlLHqTUmMZ1e4CxCEfM0kARRzmR8E5iBPy7JFVx7QwgBau8r37AQmV5NBUybww==
+releaseDate: "2020-07-01T11:01:43.407Z"

@@ -1,0 +1,1 @@
+window.RQ = window.RQ || {};

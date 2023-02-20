@@ -1,0 +1,20 @@
+name: Build beta & production images
+on:
+  push:
+    branches: [master, production]
+
+jobs:
+  build-image:
+    name: Build Requestly Production Cloud Image
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY: "${{ github.ref_name == 'production' }}"
+
+    steps:
+      - name: Triggering ${{ github.ref_name }} Image Build
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REQUESTLY_CLOUD_TOKEN }}
+          repository: requestly/requestly-cloud
+          event-type: requestly-cloud-build
+          client-payload: '{"branch_name": "${{ github.ref_name }}", "deploy": "${{ env.DEPLOY }}"}'

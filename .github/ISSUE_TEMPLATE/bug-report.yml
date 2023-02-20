@@ -1,0 +1,71 @@
+name: "🐛 Bug report"
+description: "You're having technical issues 🐞"
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for taking the time to fill out this bug report!
+
+
+        **Please do a quick search of the existing issues first** at
+        https://github.com/requestly/requestly/issues. Somebody may have reported this already, and if
+        you're lucky, then you might even find the solution for it.
+
+
+        ---
+  - type: textarea
+    attributes:
+      label: Describe your issue?
+      description: |
+        Summary of the issue that you are trying to report
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Repro steps
+      description: |
+        What were you doing when this bug happened? Tip: You can attach Requestly Session Recordings https://app.requestly.io/sessions also.
+      placeholder: |
+        Example Repro steps:
+        1. Open the Requestly app
+        2. Create a Redirect Rule.
+        3. A wild 404 error has appeared.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: What Requestly tool were you using?
+      options:
+        - label: Extension
+        - label: Desktop-App
+        - label: Android SDK
+        - label: Selenium
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Your Environment
+      description: |
+        The operating system, browser type and version you're using on your computer
+      placeholder: |
+        e.g. MacOS 12, Chrome 101
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Requestly Version
+      description: |
+        Requestly version where you found this bug. https://docs.requestly.io/other/requestly-faqs#find-requestly-version
+      placeholder: |
+        e.g. v1.4.8
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Error screenshot
+      description: |
+        Attach your screenshot for the bug here:
+      placeholder: |
+        To attach a file to this issue, drag it onto this field, paste an image, or select this field and click the bar at the bottom.
