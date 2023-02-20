@@ -1,0 +1,12 @@
+.error-icon {
+  color: red !important;
+  font-size: 2.5rem;
+}
+.sharedList-viewer-error-wrapper {
+  height: 100%;
+}
+.sharedList-viewer-error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

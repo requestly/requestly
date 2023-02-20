@@ -1,0 +1,35 @@
+.restricted-users-input {
+  color: #ffffff;
+  border-radius: 7px;
+  background: #22272c;
+
+  & input,
+  &.focused {
+    background: #22272c;
+  }
+
+  &.empty span[data-placeholder] {
+    color: #54545a;
+  }
+}
+
+.radio-hero-icon {
+  margin-right: 0.3rem;
+}
+
+.share-option-description {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.radio-share-option {
+  margin-bottom: 1.5rem;
+
+  .share-recording-radio .ant-radio {
+    top: 0px;
+  }
+}
+
+.radio-share-option .ant-radio-disabled + span {
+  color: #717171 !important;
+}

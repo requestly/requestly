@@ -1,0 +1,24 @@
+.rq-dropdown {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.ant-dropdown .ant-dropdown-menu {
+  padding: 6px 0;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-dark-background);
+}
+
+.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  margin: 0 8px;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 14.06px;
+}
+
+.ant-dropdown-menu-item-active {
+  border-radius: var(--border-radius-sm);
+}

@@ -1,0 +1,8 @@
+.csp-header-removal-notice {
+  margin-top: 16px;
+}
+
+.csp-header-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #4f5053;
+  border-color: #4f5053;
+}

@@ -1,0 +1,20 @@
+.rule-type-tag.ant-tag {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rule-type-tag-name {
+  margin-left: 6px;
+  display: inline-block;
+}
+
+.rule-type-tag.ant-tag svg {
+  width: 11px;
+  height: 11px;
+}
+
+@media only screen and (max-width: 1024px) {
+  .rule-type-tag-name {
+    display: none;
+  }
+}

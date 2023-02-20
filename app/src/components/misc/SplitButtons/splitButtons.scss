@@ -1,0 +1,18 @@
+.rq-split-buttons {
+  .split-button {
+    vertical-align: middle;
+  }
+
+  .left-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0;
+    margin-right: 1px;
+  }
+
+  .right-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+}

@@ -1,0 +1,25 @@
+.transparent-dialog {
+  background-color: transparent;
+  .antd-modal-content,
+  div {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.disabled-download-btn {
+  opacity: 50%;
+  margin-top: 30px;
+}
+
+.disabled-download-btn.ant-btn {
+  cursor: not-allowed;
+}
+
+.download-btn {
+  margin-top: 30px;
+}
+
+.download-progress-text {
+  color: "#00C8AF";
+}

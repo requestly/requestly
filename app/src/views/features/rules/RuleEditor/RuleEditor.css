@@ -1,0 +1,7 @@
+.rule-editor-procard .ant-pro-card-body {
+  padding: 0 0 1.5rem 0;
+}
+
+.rule-editor-split-procard.ant-pro-card .ant-pro-card-body {
+  padding-top: 2px;
+}

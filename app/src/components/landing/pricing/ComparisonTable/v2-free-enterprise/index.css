@@ -1,0 +1,81 @@
+.pricing-table-row.ant-row {
+  justify-content: center;
+  max-width: 700px;
+}
+.pricing-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+}
+.pricing-table-wrapper .pricing-table-col {
+  min-width: 340px;
+  padding: 30px !important;
+  margin: 0 5px;
+  border: 1px solid var(--border-dark);
+  background: var(--component-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.pricing-table-col .pricing-col-header .plan-for {
+  text-align: left;
+  margin: 0;
+  margin-bottom: 8px;
+}
+.pricing-table-col .price-container {
+  margin: 8px 0;
+}
+.pricing-table-col .price {
+  color: var(--white);
+  font-size: 18px;
+}
+.pricing-table-col .plan-feature {
+  margin-top: 8px;
+  gap: 8px;
+}
+.pricing-table-col .basic-use-with-text {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 1.25rem;
+  color: var(--white);
+}
+.pricing-table-col .pro-basic-feature-title {
+  font-size: 1rem;
+  color: var(--white);
+  font-weight: 500;
+  margin-top: 40px;
+}
+.pricing-table-col .pro-basic-feature-title span {
+  display: inline-flex;
+  flex-direction: column;
+}
+.pricing-table-col .pro-basic-feature-title span img {
+  width: 75px;
+  height: 8px;
+}
+
+.rq-use-with {
+  display: flex;
+  gap: 12px;
+  color: var(--text-gray);
+  margin-top: 8px;
+}
+.rq-use-with img {
+  transform: rotate(180deg);
+}
+.current-plan {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: text-gray;
+  padding: 4px 16px;
+  border-radius: var(--border-radius-sm);
+}
+.pricing-table-wrapper .note-container {
+  max-width: 615px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}

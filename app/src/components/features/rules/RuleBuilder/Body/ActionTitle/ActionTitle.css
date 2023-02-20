@@ -1,0 +1,24 @@
+.rule-header-action-title {
+  margin-top: 2.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.rule-type-info-icon {
+  font-size: 15px;
+}
+
+.rule-type-info-icon:hover {
+  cursor: pointer;
+}
+
+.ant-tooltip.rule-type-info-tooltip {
+  max-width: 100%;
+}
+
+.rule-demo-link.ant-btn {
+  padding-left: 0;
+}
+
+.rule-demo-iframe {
+  padding: 1rem;
+}

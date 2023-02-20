@@ -1,0 +1,31 @@
+.add-member-modal-header {
+  margin-top: 1.43rem;
+  max-width: 38ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.members-email-input {
+  margin-bottom: 1rem;
+}
+
+.add-member-modal-email-label {
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.add-members-modal-info-text {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.guide-link,
+.guide-link:hover {
+  color: var(--text-gray);
+  text-decoration: underline;
+}
+
+.access-dropdown-container {
+  margin: -10px 0px 4px 0px;
+}

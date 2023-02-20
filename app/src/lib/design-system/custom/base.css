@@ -1,0 +1,142 @@
+/* typography */
+.header {
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.465rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.title {
+  font-size: 1rem; /* 16px */
+  line-height: 1.625rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.subtitle {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.026rem;
+}
+
+.caption {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.375rem;
+}
+
+/* utilities */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-disabled {
+  cursor: not-allowed;
+}
+
+.max-content {
+  min-width: max-content;
+}
+
+.min-dropdown-tile-width {
+  min-width: 6.25rem;
+}
+
+.min-dropdown-tile-width-lg {
+  min-width: 7.5rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.text-white {
+  color: var(--white);
+}
+
+.text-gray {
+  color: var(--text-gray);
+}
+
+.text-dark-gray {
+  color: var(--text-dark-gray);
+}
+
+.text-bold {
+  font-weight: 500;
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+
+.text-sm {
+  font-size: 13px;
+  line-height: 14.06px;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.text-normal {
+  font-size: 400;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.line-clamp {
+  -webkit-line-clamp: 1;
+  display: -webkit-box !important;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-2 {
+  -webkit-line-clamp: 2;
+  display: -webkit-box !important;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.display-row-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.items-center {
+  display: flex;
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.shrink-0 {
+  flex-shrink: 0;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.mr-auto {
+  margin-right: auto;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}

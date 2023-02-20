@@ -1,0 +1,15 @@
+.empty-pinned-rules-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.empty-pinned-rules-caption-message.ant-typography-secondary {
+  color: #b0b0b5b3;
+}
+
+.record-switch.ant-popover-disabled-compatible-wrapper {
+  margin-top: -1.58px;
+}

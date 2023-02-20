@@ -1,0 +1,53 @@
+.member-avatar.ant-avatar {
+  margin-right: 8px;
+}
+
+.workspace-member-table.ant-table-wrapper {
+  padding: 1.25rem;
+  padding-bottom: 4px;
+  margin-bottom: 2.5rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.workspace-member-table.ant-table-wrapper .ant-table {
+  background-color: var(--component-background);
+}
+
+.workspace-member-table.ant-table-wrapper .ant-table-thead .ant-table-cell {
+  padding: 0px 0px 8px 0px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-gray);
+  background-color: var(--component-background);
+}
+
+.workspace-member-table.ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+  visibility: hidden;
+}
+
+.workspace-member-table.ant-table-wrapper .ant-table-thead > tr > th,
+.workspace-member-table.ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom: none;
+}
+
+.workspace-member-table.ant-table-wrapper
+  .ant-table-tbody
+  .ant-table-cell-row-hover {
+  background-color: var(--component-background);
+}
+
+.workspace-member-table.ant-table-wrapper .ant-table-tbody .ant-table-row td {
+  border-top: 1px solid #3e4044;
+}
+
+.workspace-member-table.ant-table-wrapper
+  .ant-table-tbody
+  .ant-table-row
+  .ant-table-cell {
+  padding: 1.25rem 4px 1.25rem 2px;
+}

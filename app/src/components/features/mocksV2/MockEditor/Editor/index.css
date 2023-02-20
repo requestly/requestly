@@ -1,0 +1,64 @@
+.mock-editor-container {
+  overflow: auto;
+}
+.mock-editor-body {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--component-background);
+  border-radius: var(--border-radius-md);
+}
+.mock-editor-body .meta-data-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mock-editor-body .mock-editor-meta-data-row {
+  width: 100%;
+}
+
+.meta-data-option .meta-data-option-label {
+  color: var(--white);
+  font-weight: 500;
+}
+.meta-data-option .ant-select-selector,
+.meta-data-option .ant-input-group-wrapper .ant-input-group,
+.meta-data-option .ant-input-number-group .ant-input-number-input {
+  background: var(--component-dark-background);
+  border-radius: var(--border-radius-sm);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  color: var(--white);
+}
+
+.mock-editor-body .addon-option {
+  margin-top: 1.25rem;
+}
+
+.mock-editor-body .ant-input-group-addon,
+.mock-editor-body .ant-input-number-group-addon {
+  background: #3e3f42;
+  color: var(--text-gray);
+}
+.mock-editor-body .ant-tabs {
+  width: 100%;
+}
+.mock-editor-body .ant-tabs-tab:hover {
+  color: var(--text-gray);
+}
+
+.mock-editor-body .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--white);
+}
+
+.mock-editor-body .ant-tabs-nav-wrap {
+  border-bottom: 1px solid var(--border-dark);
+}
+.mock-editor-body .editor-row {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.meta-data-option .ant-input-disabled,
+.meta-data-option .ant-input-group-wrapper .ant-input {
+  background: var(--component-dark-background);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+}

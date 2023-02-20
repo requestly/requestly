@@ -1,0 +1,15 @@
+.rules-faq-title {
+  margin-bottom: 0.75rem;
+}
+
+.faq-read-more-link.ant-btn-link {
+  padding: 0;
+}
+
+.rule-faq-header.ant-collapse-item
+  .ant-collapse-header
+  .anticon.ant-collapse-arrow {
+  position: absolute;
+  top: 62%;
+  right: 20px;
+}

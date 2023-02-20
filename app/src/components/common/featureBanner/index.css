@@ -1,0 +1,28 @@
+.feature-banner-container {
+  margin-top: 2.5rem;
+}
+
+.feature-banner-caption {
+  font-size: 13px;
+  line-height: 22px;
+  margin: 8px 0 16px 0;
+}
+
+.feature-banner {
+  height: 19.37rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.feature-banner .hero-img {
+  margin-bottom: 1.5rem;
+}
+
+.feature-banner .header {
+  margin-bottom: 8px;
+}

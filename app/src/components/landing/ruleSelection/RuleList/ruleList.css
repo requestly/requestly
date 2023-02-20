@@ -1,0 +1,13 @@
+.rule-list-container {
+  overflow: auto;
+  height: calc(100vh - 72px); /* 72px -> height of navbar */
+  border-right: 1px solid var(--border-dark);
+}
+
+.rule-list-container .header {
+  padding: 2rem 1.3rem 1rem 1.3rem;
+}
+
+.rule-list-back-btn.ant-btn {
+  margin-left: -4px;
+}

@@ -1,0 +1,52 @@
+.pricing-navbar {
+  display: flex;
+  align-items: center;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-dark);
+}
+.pricing-navbar .logo {
+  width: 100px;
+  cursor: pointer;
+}
+.pricing-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+}
+.pricing-page-container .pricing-page-body {
+  max-width: 980px;
+}
+.pricing-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pricing-title-container .pricing-title {
+  color: #fa1ed2;
+  font-size: 14px;
+}
+.pricing-title-container .pricing-hero-title {
+  font-size: 3rem;
+  max-width: 480px;
+  margin-top: 1.25rem;
+  line-height: 56px !important;
+}
+
+.company-marquee-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.testimonials-container {
+  display: flex;
+  justify-content: center;
+  flex-flow: "1 1 auto";
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 60px;
+}
+.testimonials-container .testimonial-card {
+  background: var(--component-background);
+  border: 1px solid var(--border-dark);
+  flex: 1;
+  min-width: 320px;
+}

@@ -1,0 +1,11 @@
+.split-pane {
+  display: flex;
+  height: 100%;
+
+  .gutter {
+    position: absolute;
+    height: 100%;
+    margin-left: -3px;
+    cursor: ew-resize;
+  }
+}

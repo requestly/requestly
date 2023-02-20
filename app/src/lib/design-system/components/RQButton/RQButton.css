@@ -1,0 +1,34 @@
+.rq-btn.ant-btn:disabled {
+  opacity: 0.6;
+}
+
+.btn-default.ant-btn-default {
+  color: var(--white);
+  border: 1px solid var(--border);
+  background-color: var(--component-background);
+}
+
+.btn-default.ant-btn-default:hover,
+.btn-default.ant-btn-default:focus {
+  color: var(--white);
+  border: 1px solid #5f6164;
+  background-color: var(--component-background);
+}
+
+.btn-icon-only.ant-btn {
+  border: none;
+  font-size: 13px;
+  color: var(--text-gray);
+  border-radius: var(--border-radius-sm);
+  background-color: transparent;
+}
+
+.btn-icon-only.ant-btn svg {
+  font-size: 1.048rem;
+}
+
+.btn-icon-only.ant-btn:hover,
+.btn-icon-only.ant-btn:focus {
+  border: none;
+  background-color: var(--component-background);
+}

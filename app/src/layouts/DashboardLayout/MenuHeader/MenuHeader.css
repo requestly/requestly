@@ -1,0 +1,139 @@
+.layout-header.ant-layout-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.layout-header .ant-divider.ant-divider-horizontal {
+  margin: 8px 0;
+}
+
+.layout-header-signup-btn.ant-btn {
+  font-size: 13px;
+}
+
+.header-left-section {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+  margin-left: 8px;
+}
+
+.header-middle-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 8px;
+  font-size: 13px;
+}
+
+.header-middle-section > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 22rem;
+}
+
+.header-right-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.profile-dropdown,
+.notification-dropdown {
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-dark-background);
+}
+
+.profile-dropdown {
+  width: 16.25rem;
+}
+
+.profile-avatar-container .ant-dropdown-menu-title-content {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.profile-username {
+  margin-bottom: 4px;
+}
+
+.profile-divider.ant-divider {
+  margin: 6px 0;
+}
+
+.profile-menu-items {
+  color: var(--text-gray);
+}
+
+.profile-menu-items:hover {
+  color: var(--white);
+}
+
+.ant-btn.header-icon-btn {
+  padding: 4px;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+}
+
+.ant-btn.header-icon-btn svg {
+  font-size: 1.1rem;
+}
+
+.ant-btn.header-icon-btn .anticon {
+  margin: 0px;
+  color: var(--text-gray);
+}
+
+.ant-btn.header-icon-btn:hover,
+.ant-btn.header-icon-btn:focus {
+  background-color: var(--hover-color);
+}
+
+.header-help-menu-divider.ant-divider {
+  margin: 8px 0;
+}
+
+.header-help-menu-container.ant-dropdown-menu {
+  width: 16.25rem;
+}
+
+.header-help-menu-container.ant-dropdown-menu .ant-dropdown-menu-item {
+  height: 30px;
+  color: var(--text-gray);
+}
+
+.header-help-menu-container.ant-dropdown-menu
+  .ant-dropdown-menu-item
+  .ant-dropdown-menu-title-content
+  a {
+  display: flex;
+  align-items: center;
+}
+
+.header-help-menu-container.ant-dropdown-menu
+  .ant-dropdown-menu-item
+  .ant-dropdown-menu-title-content
+  .anticon {
+  font-size: 1.1rem;
+  margin-right: 9px;
+}
+
+.header-vertival-divider.ant-divider-vertical {
+  height: 60px;
+  margin-right: 12px;
+  margin-left: 16px;
+}

@@ -1,0 +1,83 @@
+.editor-title-container.ant-row {
+  width: 100%;
+  padding: 1.25rem 0;
+}
+
+.editor-title-container-divider.ant-row {
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.editor-title-container .editor-title-name,
+.editor-title-container .editor-description {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.editor-title-container .editor-title-name {
+  min-height: 33px;
+}
+.editor-title-container .editor-title-description .ant-input {
+  min-height: 30px !important;
+  transition: 0.2s ease-in-out;
+}
+.editor-description .ant-typography {
+  margin-bottom: 0;
+  color: #86868b;
+}
+.editor-title-name .ant-input,
+.editor-title-description .ant-input {
+  max-width: 600px;
+  padding: 0;
+  border-radius: 0;
+  transition: 0.05s ease-in-out;
+}
+
+.editor-title-description .ant-input,
+.editor-title-description .ant-typography {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.editor-title-name .ant-input:focus,
+.editor-title-description .ant-input:focus {
+  border-bottom: 1px solid var(--primary);
+}
+.editor-title-name .editor-title {
+  display: flex;
+  gap: 4px;
+  max-width: 600px;
+}
+.editor-title-name .editor-title svg {
+  align-self: center;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+.editor-title-name .ant-input,
+.editor-title-name .editor-title {
+  color: var(--white);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+.editor-title-container .editor-description {
+  max-width: 600px;
+}
+.editor-description .edit-description-btn {
+  padding: 0;
+  color: var(--text-gray);
+  transition: 0.2s ease-in-out;
+}
+
+.editor-description .edit-description-btn:active,
+.editor-description .edit-description-btn:focus {
+  background: none;
+}
+.editor-description .edit-description-btn:hover,
+.editor-description .edit-description-btn span:hover {
+  background: none;
+  color: white;
+}
+.editor-title-name .ant-input.error {
+  border-bottom: 1px solid red !important;
+}

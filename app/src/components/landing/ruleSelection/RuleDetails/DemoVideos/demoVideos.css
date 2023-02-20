@@ -1,0 +1,18 @@
+.demo-videos-container {
+  margin-bottom: 1.87rem;
+}
+
+.demo-videos-title {
+  margin-bottom: 8px;
+}
+
+.demo-video-fallback-image {
+  max-inline-size: 100%;
+  block-size: auto;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.demo-video-fallback-image:hover {
+  filter: brightness(0.9);
+}

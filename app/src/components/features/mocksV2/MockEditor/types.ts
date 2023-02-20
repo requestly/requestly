@@ -1,0 +1,38 @@
+import { FileType, MockType } from "../types";
+
+export interface MockEditorDataSchema {
+  id: string;
+  type?: MockType;
+  fileType?: FileType;
+  name: string;
+  desc: string;
+  method: RequestMethod;
+  latency: number;
+  endpoint: string;
+  statusCode: number;
+  contentType: string;
+  headers: { [key: string]: string };
+  body: string;
+  responseId?: string; // Keeping it separate as we only support 1 response
+  // TODO: Response should ideally be an array
+}
+
+export interface ValidationErrors {
+  name?: string;
+  method?: string;
+  statusCode?: string;
+  endpoint?: string;
+}
+
+// TODO: Remove this. Fetch this from @requestly/mock-server or APP_CONSTANTS
+/* eslint-disable no-unused-vars */
+export enum RequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+}
+/* eslint-enable no-unused-vars */

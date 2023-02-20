@@ -1,0 +1,28 @@
+<div class="toolbar">
+  <div class="toolbar-item">
+    <button type="button" class="clear-logs">&#128683; Clear</button>
+  </div>
+
+  <div class="toolbar-item">
+    <label for="url-filter">Request URL:</label>
+    <input type="text" id="url-filter" placeholder="Filter">
+  </div>
+
+  <div class="toolbar-item">
+    <label for="rule-filter">Rule:</label>
+    <input type="text" id="rule-filter" placeholder="Filter">
+  </div>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th class="cell-time">Time</th>
+      <th class="cell-url">Request URL</th>
+      <th class="cell-method">Method</th>
+      <th class="cell-type">Type</th>
+      <th class="cell-rule-name">Rule</th>
+      <th class="cell-modification">Modification</th>
+    </tr>
+  </thead>
+  <tbody id="rows" />
+</table>

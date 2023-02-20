@@ -1,0 +1,13 @@
+.desktop-setting-port-input-label {
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.desktop-setting-port-input.ant-input {
+  border-color: transparent;
+  box-shadow: var(--input-box-shadow);
+}
+
+.desktop-port-update-btn {
+  margin-top: 8px;
+}

@@ -1,0 +1,43 @@
+.editor-rule-options-trigger {
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  padding: 7px 8px 6px 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-dark-background);
+  border: 1px solid transparent;
+  transition: border 0.3s;
+}
+
+.editor-rule-options-trigger.editor-rule-options-active {
+  border-color: var(--dropdown-active-border-color);
+}
+
+.editor-rule-options-trigger-icon {
+  margin-left: 5px;
+}
+
+.editor-rule-options-menu.ant-dropdown-menu {
+  width: 7.35rem;
+}
+
+.ant-dropdown .editor-rule-options-menu-item.ant-dropdown-menu-item {
+  padding: 0;
+}
+
+.editor-rule-options-menu-item.ant-dropdown-menu-item .ant-btn-text {
+  padding: 8px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.editor-rule-options-menu .editor-rule-options-menu-divider {
+  margin: 4px 0px 6px 0px;
+}
+
+.editor-rule-options-danger-menu-item .ant-btn-text,
+.editor-rule-options-danger-menu-item:hover .ant-btn-text {
+  color: var(--danger);
+}

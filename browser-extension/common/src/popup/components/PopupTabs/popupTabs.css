@@ -1,0 +1,27 @@
+.popup-tabs .ant-tabs-tab {
+  padding-top: 4px;
+  color: #b0b0b5;
+}
+
+.popup-tabs .ant-tabs-tab .anticon {
+  margin-right: 8px;
+}
+
+.popup-tabs .ant-tabs-nav .ant-tabs-nav-wrap {
+  justify-content: center;
+}
+
+.popup-tab-badge {
+  margin-left: 4px;
+}
+
+.popup-tab-badge .ant-badge-count.ant-scroll-number {
+  height: 17px;
+  padding: 2px 4px;
+  font-size: 10px;
+  line-height: 11px;
+  color: var(--color-success);
+  background-color: transparent;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-success);
+}

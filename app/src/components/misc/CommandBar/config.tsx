@@ -1,0 +1,320 @@
+import APP_CONSTANTS from "config/constants";
+import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { actions } from "store";
+import {
+  AiOutlineHome,
+  AiOutlineStar,
+  AiOutlineFolderOpen,
+  AiOutlineUser,
+  AiOutlineSetting,
+  AiFillYoutube,
+} from "react-icons/ai";
+import { BsHandbag, BsCameraVideo } from "react-icons/bs";
+import {
+  MdOutlineFileDownload,
+  MdOutlineGroupAdd,
+  MdReportGmailerrorred,
+} from "react-icons/md";
+import { TbArrowsDownUp } from "react-icons/tb";
+import { RiApps2Line } from "react-icons/ri";
+import { BiRocket, BiBook } from "react-icons/bi";
+import { Document, PaperUpload } from "react-iconly";
+import {
+  redirectToDownloadPage,
+  redirectToFileMocksList,
+  redirectToMocksList,
+  redirectToRoot,
+  redirectToSessionRecordingHome,
+  redirectToSharedList,
+  redirectToTemplates,
+  redirectToTraffic,
+  redirectToApps,
+  redirectToAccountDetails,
+  redirectToPricingPlans,
+  redirectToSettings,
+  redirectToUrl,
+  redirectToRuleEditor,
+  redirectToCreateNewRule,
+} from "utils/RedirectionUtils";
+import { isSignUpRequired } from "utils/AuthUtils";
+import {
+  ActionProps,
+  CommandBarItem,
+  CommandItemType,
+  PageConfig,
+  Page,
+  TitleProps,
+} from "./types";
+import { Tag } from "antd";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { AUTH } from "modules/analytics/events/common/constants";
+import "./index.css";
+
+export const config: PageConfig[] = [
+  {
+    id: Page.HOME,
+    items: [
+      {
+        id: "home",
+        title: "Home",
+        icon: <AiOutlineHome />,
+        action: ({ navigate }: ActionProps) => {
+          redirectToRoot(navigate);
+        },
+      },
+      {
+        id: "download",
+        title: "Download",
+        icon: <MdOutlineFileDownload />,
+        action: (props: ActionProps) => {
+          redirectToDownloadPage();
+        },
+      },
+      {
+        id: "review chrome store",
+        title: "Review us on Chrome Store",
+        icon: <AiOutlineStar />,
+        action: (props: ActionProps) => {
+          redirectToUrl(APP_CONSTANTS.LINKS.CHROME_STORE_REVIEWS, true);
+        },
+      },
+      {
+        id: "rules",
+        type: CommandItemType.GROUP,
+        title: "Rules",
+        children: [
+          {
+            id: "create new rule",
+            title: "Create new rule",
+            icon: <MdOutlineGroupAdd />,
+            nextPage: Page.NEW_RULES,
+          },
+          {
+            id: "open rule",
+            title: ({ rules }: TitleProps) =>
+              rules?.length ? "Open a rule" : null,
+            icon: <AiOutlineFolderOpen />,
+            nextPage: Page.MY_RULES,
+          },
+          {
+            id: "templates",
+            title: "Template rules",
+            icon: <BsHandbag />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToTemplates(navigate);
+            },
+          },
+          {
+            id: "shared list",
+            title: "Shared lists",
+            icon: <MdOutlineGroupAdd />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToSharedList(navigate);
+            },
+          },
+        ],
+      },
+      {
+        id: "mock api",
+        type: CommandItemType.GROUP,
+        title: "Mocks",
+        children: [
+          {
+            id: "mock api",
+            title: "Mock API",
+            icon: <Document />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToMocksList(navigate);
+            },
+          },
+          {
+            id: "file server",
+            title: "File server",
+            icon: <PaperUpload />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToFileMocksList(navigate);
+            },
+          },
+        ],
+      },
+      {
+        id: "session recording",
+        type: CommandItemType.GROUP,
+        title: "Session Recording",
+        children: [
+          {
+            id: "record a session",
+            title: "Record a session",
+            icon: <BsCameraVideo />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToSessionRecordingHome(navigate);
+            },
+          },
+        ],
+      },
+      {
+        id: "desktop",
+        type: CommandItemType.GROUP,
+        title: ({ user, appMode }: TitleProps) =>
+          appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "Desktop App" : null,
+        children: [
+          {
+            id: "traffic table",
+            title: "Network Traffic",
+            icon: <TbArrowsDownUp />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToTraffic(navigate);
+            },
+          },
+          {
+            id: "connected apps",
+            title: "Connected apps",
+            icon: <RiApps2Line />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToApps(navigate);
+            },
+          },
+        ],
+      },
+      {
+        id: "user",
+        type: CommandItemType.GROUP,
+        title: "User",
+        children: [
+          {
+            id: "my account",
+            title: ({ user }: TitleProps) =>
+              !user?.loggedIn ? null : "My Account",
+            icon: <AiOutlineUser />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToAccountDetails(navigate);
+            },
+          },
+          {
+            id: "upgrade plan",
+            title: ({ user }: TitleProps) =>
+              user.loggedIn || user?.details?.isPremium ? null : "Upgrade Plan",
+            icon: <BiRocket />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToPricingPlans(navigate);
+            },
+          },
+          {
+            id: "settings",
+            title: "Settings",
+            icon: <AiOutlineSetting />,
+            action: ({ navigate }: ActionProps) => {
+              redirectToSettings(navigate);
+            },
+          },
+        ],
+      },
+      {
+        id: "help",
+        type: CommandItemType.GROUP,
+        title: "Help",
+        children: [
+          {
+            id: "report an issue",
+            title: "Report an Issue",
+            icon: <MdReportGmailerrorred />,
+            action: () => {
+              redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_GITHUB_ISSUES, true);
+            },
+          },
+          {
+            id: "documentation",
+            title: "Documentation",
+            icon: <BiBook />,
+            action: () => {
+              redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_DOCS, true);
+            },
+          },
+          {
+            id: "tutorials",
+            title: "Tutorials",
+            icon: <AiFillYoutube />,
+            action: () => {
+              redirectToUrl(APP_CONSTANTS.LINKS.YOUTUBE_TUTORIALS, true);
+            },
+          },
+        ],
+      },
+    ],
+  },
+];
+
+/***** Page: New Rule *****/
+const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
+  .filter((ruleConfig) => ruleConfig.ID !== 11)
+  .map(
+    ({ ID, TYPE, ICON, NAME }): CommandBarItem => {
+      return {
+        id: NAME,
+        title: NAME,
+        icon: <ICON />,
+        action: async ({ navigate, dispatch, user, appMode, rules }) => {
+          if (user.loggedIn) redirectToCreateNewRule(navigate, TYPE);
+          else {
+            if (await isSignUpRequired(rules, appMode, user))
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "authModal",
+                  newValue: true,
+                  newProps: {
+                    callback: () => redirectToCreateNewRule(navigate, TYPE),
+                    authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                    eventSource: AUTH.SOURCE.COMMAND_BAR,
+                  },
+                })
+              );
+            else redirectToCreateNewRule(navigate, TYPE);
+          }
+        },
+      };
+    }
+  );
+const newRuleItems: CommandBarItem[] = [
+  {
+    id: "new rule",
+    type: CommandItemType.GROUP,
+    title: "New Rule",
+    children: newRuleChildren,
+  },
+];
+
+const newRulePage: PageConfig = {
+  id: Page.NEW_RULES,
+  items: newRuleItems,
+};
+
+config.push(newRulePage);
+/**********/
+
+/***** Page: Open Rule *****/
+const userRulesPage: PageConfig = {
+  id: Page.MY_RULES,
+  items: [],
+  itemsFetcher: (rules: any = []) => {
+    const items: CommandBarItem[] = rules.map(
+      (rule: any): CommandBarItem => {
+        return {
+          id: `${rule?.name}-${rule?.id}`, // Same rule name might exist, which breaks cmdk selection logic
+          title: (
+            <div className="cmd-user-rule-item">
+              <span>{rule?.name}</span>
+              <Tag>{APP_CONSTANTS.RULE_TYPES_CONFIG[rule?.ruleType].NAME}</Tag>
+            </div>
+          ),
+          action: ({ navigate }: ActionProps) => {
+            redirectToRuleEditor(navigate, rule?.id);
+          },
+        };
+      }
+    );
+
+    return items;
+  },
+};
+config.push(userRulesPage);

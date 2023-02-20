@@ -1,0 +1,32 @@
+.team-settings-container {
+  margin-top: 4px;
+}
+
+.team-settings-title {
+  color: var(--white);
+  margin: 1.25rem 0 0.75rem 0;
+}
+
+/* form */
+.team-settings-form {
+  max-width: 26.25rem;
+}
+
+.team-settings-form-item {
+  margin-bottom: 1.25rem;
+}
+
+.team-settings-name-input.ant-input,
+.team-settings-description.ant-input {
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+}
+
+.team-settings-name-input-label,
+.team-settings-description-label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--white);
+  display: inline-block;
+}

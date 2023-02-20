@@ -1,0 +1,13 @@
+.ant-btn.add-pair-btn {
+  height: 44px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-color: var(--primary);
+  border-radius: var(--border-radius-md);
+  background-color: rgba(31, 105, 255, 0.102);
+}
+
+.ant-btn.add-pair-btn:hover {
+  opacity: 0.8;
+  background-color: rgba(31, 105, 255, 0.102);
+}

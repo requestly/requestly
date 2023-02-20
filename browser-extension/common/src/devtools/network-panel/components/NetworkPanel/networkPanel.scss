@@ -1,0 +1,38 @@
+.empty-panel-placeholder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  > span {
+    font-size: 14px;
+  }
+}
+
+.network-panel {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .network-panel-toolbar {
+    flex: 0 0 auto;
+    padding: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: var(--background-color-toolbar);
+
+    .clear-events-button {
+      margin: 0 10px;
+      font-size: 12px;
+    }
+  }
+
+  .network-table-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+}

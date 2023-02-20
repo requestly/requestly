@@ -1,0 +1,14 @@
+.rule-editor-header-action-btns .ant-btn {
+  font-size: 13px;
+}
+
+.rule-editor-header-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-header-share-btn-icon {
+  width: 16px;
+  height: 18px;
+}

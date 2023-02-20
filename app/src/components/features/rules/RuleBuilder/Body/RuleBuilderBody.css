@@ -1,0 +1,13 @@
+.ant-divider.rule-builder-body-divider {
+  margin: 8px 0 16px 0;
+}
+
+.ant-row.rule-builder-body {
+  height: 80vh;
+  padding-bottom: 4rem;
+  overflow: auto;
+}
+
+.rule-builder-body > .ant-col {
+  margin-bottom: 4rem;
+}

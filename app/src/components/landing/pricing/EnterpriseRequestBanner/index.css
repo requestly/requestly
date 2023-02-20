@@ -1,0 +1,15 @@
+.pricing-alert-row .ant-alert {
+  background-color: transparent;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  max-width: 700px;
+}
+.pricing-alert-row .ant-alert svg {
+  color: var(--text-gray);
+  align-self: flex-start;
+  margin-top: 5px;
+}
+.pricing-alert-row .ant-alert .ant-alert-content .ant-alert-message {
+  color: var(--text-gray);
+  text-align: left;
+}

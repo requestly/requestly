@@ -1,0 +1,37 @@
+.rule-editor-header.ant-layout-header {
+  display: flex;
+  align-items: center;
+}
+
+.rule-editor-row.ant-row {
+  width: 100%;
+}
+
+.rule-editor-header-title {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.rule-editor-header-actions {
+  width: 100%;
+  margin-left: auto;
+}
+
+.rule-editor-header .ant-divider {
+  margin: 0 8px;
+}
+
+.rule-editor-header-actions-container > div {
+  display: flex;
+  align-items: center;
+}
+
+.rule-editor-back-btn {
+  visibility: hidden;
+}
+
+@media only screen and (max-width: 1200px) {
+  .rule-editor-back-btn {
+    visibility: visible;
+  }
+}

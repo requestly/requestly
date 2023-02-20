@@ -1,0 +1,47 @@
+.manage-workspace-container {
+  margin-top: 2.5rem;
+}
+
+.manage-workspace-header {
+  margin-bottom: 1.625rem;
+}
+
+.manage-workspace-header span.header {
+  max-width: 52ch;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-left: 12px;
+}
+
+.billing-tab-label {
+  display: flex;
+  align-items: center;
+}
+
+.billing-tab-label .anticon.anticon-question-circle {
+  margin: 0 0 0 5px;
+}
+
+/* workspace divider */
+.manage-workspace-divider.ant-divider-horizontal {
+  margin: 20px 0;
+  border-color: var(--border-dark);
+}
+
+.workspace-billing-guide-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.workspace-billing-guide-link:hover,
+.workspace-billing-guide-link:focus {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* tabs content */
+.manage-workspace-tabs .ant-tabs-content {
+  overflow: auto;
+  height: calc(100vh - 200px);
+}

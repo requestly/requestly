@@ -1,0 +1,56 @@
+export const mockLocalRecords = [
+  {
+    createdBy: null,
+    creationDate: 1637883809503,
+    currentOwner: "B9iucUbkz7uWut24Ryo0OlDW5Rry",
+    description: "",
+    groupId: "",
+    id: "Cancel_dr301",
+    isSample: false,
+    lastModified: 1637883811831,
+    lastModifiedBy: null,
+    modificationDate: 1637883811830,
+    name: "ertert",
+    objectType: "rule",
+    pairs: [
+      {
+        id: "7kvez",
+        source: {
+          filters: {},
+          key: "Url",
+          operator: "Contains",
+          value: "yiuiyui",
+        },
+      },
+    ],
+    ruleType: "Cancel",
+    status: "Active",
+  },
+  {
+    createdBy: null,
+    creationDate: 1637883802524,
+    currentOwner: "B9iucUbkz7uWut24Ryo0OlDW5Rry",
+    description: "",
+    groupId: "",
+    id: "Cancel_1vkei",
+    isSample: false,
+    lastModified: 1637883805567,
+    lastModifiedBy: null,
+    modificationDate: 1637883805567,
+    name: "sewr",
+    objectType: "rule",
+    pairs: [
+      {
+        id: "j23ip",
+        source: {
+          filters: {},
+          key: "Url",
+          operator: "Contains",
+          value: "trytyut",
+        },
+      },
+    ],
+    ruleType: "Cancel",
+    status: "Active",
+  },
+];

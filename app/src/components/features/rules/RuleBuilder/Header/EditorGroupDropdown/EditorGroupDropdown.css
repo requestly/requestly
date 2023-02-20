@@ -1,0 +1,116 @@
+.editor-group-dropdown-trigger {
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  padding: 7px 8px 6px 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-dark-background);
+  border: 1px solid transparent;
+  transition: border 0.3s;
+}
+
+.editor-group-dropdown-trigger.editor-group-dropdown-active {
+  border-color: var(--dropdown-active-border-color);
+}
+
+.editor-group-dropdown-trigger img {
+  margin-left: 5px;
+}
+
+.editor-group-dropdown-menu.ant-dropdown-menu {
+  width: 10.87rem;
+  max-height: 15rem;
+  overflow: auto;
+  position: relative;
+  color: var(--white);
+}
+
+.show-group-input.editor-group-dropdown-menu.ant-dropdown-menu {
+  width: 13.625rem;
+}
+
+.editor-group-menu-item.ant-dropdown-menu-item {
+  padding: 8px;
+}
+
+.editor-group-menu-item-active.ant-dropdown-menu-item {
+  background-color: var(--hover-color);
+  border-radius: var(--border-radius-sm);
+}
+
+.editor-group-menu-item-active.ant-dropdown-menu-item span {
+  color: var(--white);
+}
+
+.editor-group-menu-item .ant-dropdown-menu-title-content {
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-group-menu-item .ant-dropdown-menu-title-content span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-group-empty-message {
+  font-size: 13px;
+  padding-left: 12px;
+  color: var(--text-dark-gray);
+}
+
+.editor-group-list-title {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  margin: 16px 0 12px 14px;
+}
+
+.editor-dropdown-add-new-group.ant-btn {
+  margin: 0 6px;
+  padding: 3px 6px;
+  width: calc(10.87rem - 14px);
+  justify-content: flex-start;
+}
+
+.editor-dropdown-add-new-group.ant-btn:hover {
+  background-color: var(--hover-color);
+}
+
+.editor-dropdown-add-new-group .anticon-plus {
+  margin-top: 5px;
+}
+
+.editor-group-dropdown-input-container {
+  padding: 6px;
+  font-size: 13px;
+}
+
+.editor-group-input-title {
+  font-size: 10px;
+  font-weight: 500;
+  margin: 0 0 8px 6px;
+  letter-spacing: 1px;
+}
+
+.editor-group-dropdown-input.ant-input {
+  margin: 0 6px;
+  height: 30px;
+  width: calc(13.625rem - 25px);
+  display: inline-block;
+}
+
+.editor-group-dropdown-actions {
+  font-size: 13px;
+  margin: 12px 6px 0px auto;
+}
+
+.editor-group-dropdown-actions .ant-btn {
+  font-size: 13px;
+}
+
+.editor-group-dropdown-cancel-btn {
+  margin-right: 8px;
+}
