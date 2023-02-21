@@ -1,25 +1,17 @@
 import { getMocks } from "backend/mocks/getMocks";
 import { fetchUserMocks } from "components/features/filesLibrary/FilesLibraryIndexPage/actions";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MockType, RQMockMetadataSchema } from "../types";
 import {
   oldFileMockToNewMockMetadataAdapter,
   oldMockToNewMockMetadataAdapter,
 } from "../utils/oldMockAdapter";
 
-export function useFetchMocks({
-  type,
-  uid,
-  setOldMocksList,
-  setMocksList,
-  setIsLoading,
-}: {
-  type: MockType;
-  uid: any;
-  setOldMocksList: React.Dispatch<React.SetStateAction<RQMockMetadataSchema[]>>;
-  setMocksList: React.Dispatch<React.SetStateAction<RQMockMetadataSchema[]>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export function useFetchMocks({ type, uid }: { type: MockType; uid: any }) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
+  const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
+
   // TODO: Remove this after all mocks are migrated to new schema
   const fetchOldMocks = useCallback(() => {
     fetchUserMocks().then((list: any[]) => {
@@ -57,7 +49,7 @@ export function useFetchMocks({
       }
       setOldMocksList([...adaptedData]);
     });
-  }, [type, uid, setOldMocksList]);
+  }, [type, uid]);
 
   const fetchMocks = useCallback(() => {
     // API|FILE|null
@@ -70,11 +62,11 @@ export function useFetchMocks({
         setMocksList([]);
         setIsLoading(false);
       });
-  }, [type, uid, setMocksList, setIsLoading]);
+  }, [type, uid]);
 
   useEffect(() => {
     fetchMocks();
     fetchOldMocks();
   }, [fetchMocks, fetchOldMocks]);
-  return { fetchOldMocks, fetchMocks };
+  return { fetchOldMocks, fetchMocks, isLoading, mocksList, oldMocksList };
 }

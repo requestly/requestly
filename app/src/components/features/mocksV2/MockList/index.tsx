@@ -39,9 +39,6 @@ const MockListIndex: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
-  const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
   const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(
     false
@@ -54,12 +51,15 @@ const MockListIndex: React.FC<Props> = ({
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
     false
   );
-  const { fetchOldMocks, fetchMocks } = useFetchMocks({
+  const {
+    fetchOldMocks,
+    fetchMocks,
+    mocksList,
+    oldMocksList,
+    isLoading,
+  } = useFetchMocks({
     type,
     uid,
-    setOldMocksList,
-    setMocksList,
-    setIsLoading,
   });
 
   const handleCreateNewMock = () => {
