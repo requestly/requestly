@@ -38,6 +38,7 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.58.3",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4"
   },
