@@ -1,7 +1,5 @@
-import { getMocks } from "backend/mocks/getMocks";
-import { fetchUserMocks } from "components/features/filesLibrary/FilesLibraryIndexPage/actions";
 import SpinnerCard from "components/misc/SpinnerCard";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
@@ -15,13 +13,10 @@ import {
 import MockUploaderModal from "../MockUploaderModal";
 import { DeleteMockModal } from "../DeleteMockModal";
 import { MockType, RQMockMetadataSchema } from "../types";
-import {
-  oldFileMockToNewMockMetadataAdapter,
-  oldMockToNewMockMetadataAdapter,
-} from "../utils/oldMockAdapter";
 import MocksTable from "./MocksTable";
 import NewFileModal from "../NewFileModal";
 import MocksEmptyState from "./MocksEmptyState";
+import { useFetchMocks } from "./useFetchMocks";
 
 /* eslint-disable no-unused-vars */
 export enum MockListSource {
@@ -59,63 +54,13 @@ const MockListIndex: React.FC<Props> = ({
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
     false
   );
-
-  // TODO: Remove this after all mocks are migrated to new schema
-  const fetchOldMocks = useCallback(() => {
-    fetchUserMocks().then((list: any[]) => {
-      let mocksData = [];
-      let filesData = [];
-      let i = 0;
-      for (i = 0; i < list.length; i++) {
-        if (list[i]?.isMock === true) {
-          mocksData.push(list[i]);
-        } else {
-          filesData.push(list[i]);
-        }
-      }
-
-      let adaptedData: RQMockMetadataSchema[] = [];
-      if (type === MockType.API) {
-        // mocksData
-        adaptedData = mocksData.map((oldData) => {
-          return oldMockToNewMockMetadataAdapter(uid, oldData);
-        });
-      } else if (type === MockType.FILE) {
-        // filesData
-        adaptedData = filesData.map((oldData) => {
-          return oldFileMockToNewMockMetadataAdapter(uid, oldData);
-        });
-      } else {
-        // mocksData + filesData
-        const mocksAdaptedData = mocksData.map((oldData) => {
-          return oldMockToNewMockMetadataAdapter(uid, oldData);
-        });
-        const filesAdaptedData = filesData.map((oldData) => {
-          return oldFileMockToNewMockMetadataAdapter(uid, oldData);
-        });
-        adaptedData = [...mocksAdaptedData, ...filesAdaptedData];
-      }
-      setOldMocksList([...adaptedData]);
-    });
-  }, [type, uid]);
-
-  const fetchMocks = useCallback(() => {
-    // API|FILE|null
-    getMocks(uid, type)
-      .then((data) => {
-        setMocksList(data);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setMocksList([]);
-        setIsLoading(false);
-      });
-  }, [type, uid]);
-
-  useEffect(() => {
-    fetchMocks();
-    fetchOldMocks();
-  }, [fetchMocks, fetchOldMocks]);
+  const { fetchOldMocks, fetchMocks } = useFetchMocks({
+    type,
+    uid,
+    setOldMocksList,
+    setMocksList,
+    setIsLoading,
+  });
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
