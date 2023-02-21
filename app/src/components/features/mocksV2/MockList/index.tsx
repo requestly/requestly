@@ -6,7 +6,6 @@ import {
   redirectToFileViewer,
   redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
-  redirectToMocksList,
 } from "utils/RedirectionUtils";
 import MockUploaderModal from "../MockUploaderModal";
 import { DeleteMockModal } from "../DeleteMockModal";
@@ -17,18 +16,7 @@ import MocksEmptyState from "./MocksEmptyState";
 import { useFetchMocks } from "./useFetchMocks";
 import { useMockListType } from "../MockListContext";
 
-/* eslint-disable no-unused-vars */
-export enum MockListSource {
-  PICKER_MODAL,
-}
-/* eslint-enable no-unused-vars */
-
-interface Props {
-  source?: MockListSource;
-  mockSelectionCallback?: (url: string) => void;
-}
-
-const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback }) => {
+const MockListIndex: React.FC = () => {
   const navigate = useNavigate();
 
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
@@ -48,9 +36,6 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback }) => {
   const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks();
 
   const handleCreateNewMock = () => {
-    if (source === MockListSource.PICKER_MODAL) {
-      return redirectToMocksList(navigate, true);
-    }
     // TODO: Change this to a constant
     if (type === MockType.FILE) {
       return setFileModalVisibility(true);
@@ -67,10 +52,6 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback }) => {
     url: string,
     isOldMock: boolean
   ) => {
-    if (source === MockListSource.PICKER_MODAL) {
-      return handleSelectAction(url);
-    }
-
     return handleEditAction(mockId, isOldMock);
   };
 
@@ -82,10 +63,6 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback }) => {
       return redirectToFileMockEditorEditMock(navigate, mockId);
     }
     return redirectToMockEditorEditMock(navigate, mockId);
-  };
-
-  const handleSelectAction = (url: string) => {
-    mockSelectionCallback(url);
   };
 
   const handleUploadAction = () => {

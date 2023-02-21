@@ -10,12 +10,6 @@ import { GettingStartedWithMocks } from "../GettingStartedWithMocks";
 import MocksTable from "../MocksTable";
 import { useFetchMocks } from "../useFetchMocks";
 
-/* eslint-disable no-unused-vars */
-export enum MockListSource {
-  PICKER_MODAL,
-}
-/* eslint-enable no-unused-vars */
-
 interface Props {
   mockSelectionCallback?: (url: string) => void;
 }

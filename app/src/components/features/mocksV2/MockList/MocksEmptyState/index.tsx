@@ -4,12 +4,6 @@ import MockUploaderModal from "../../MockUploaderModal";
 import NewFileModal from "../../NewFileModal";
 import { GettingStartedWithMocks } from "../GettingStartedWithMocks";
 
-/* eslint-disable no-unused-vars */
-export enum MockListSource {
-  PICKER_MODAL,
-}
-/* eslint-enable no-unused-vars */
-
 interface Props {
   handleCreateNewMock: () => void;
   handleUploadAction: () => void;
