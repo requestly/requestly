@@ -1,8 +1,6 @@
 import SpinnerCard from "components/misc/SpinnerCard";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserUid } from "store/selectors";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileViewer,
@@ -36,7 +34,6 @@ const MockListIndex: React.FC<Props> = ({
   type,
 }) => {
   const navigate = useNavigate();
-  const uid = useSelector(getUserUid);
 
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
   const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(
@@ -52,7 +49,6 @@ const MockListIndex: React.FC<Props> = ({
   );
   const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks({
     type,
-    uid,
   });
 
   const handleCreateNewMock = () => {
