@@ -16,7 +16,7 @@ const ProductAnnouncement: React.FC = () => {
   return (
     <>
       <Typography.Text className="text-sm text-bold">
-        We're now Open-Source!
+        We're now Open-Source 🚀
       </Typography.Text>
       {/* <Typography.Text type="secondary">
         Contributions and feedback are welcome.
@@ -28,7 +28,7 @@ const ProductAnnouncement: React.FC = () => {
           trackProductAnnouncementClicked("opensource", "sidebar");
           trackSidebarClicked("product_announcement");
         }}
-        href="https://github.com/requestly/requestly/issues/284"
+        href="https://github.com/requestly/requestly/"
         target="_blank"
       >
         Checkout Github
