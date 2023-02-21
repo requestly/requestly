@@ -103,55 +103,53 @@ const MockListIndex: React.FC<Props> = ({
 
   if (isLoading) {
     return <SpinnerCard customLoadingMessage="Loading Mocks" />;
-  } else {
-    if (mocksList.length === 0) {
-      return (
-        <MocksEmptyState
-          handleCreateNewMock={handleCreateNewMock}
-          handleUploadAction={handleUploadAction}
-          type={type}
-          fileModalVisibility={fileModalVisibility}
-          setFileModalVisibility={setFileModalVisibility}
-          uploadModalVisibility={uploadModalVisibility}
-          setUploadModalVisibility={setUploadModalVisibility}
-        />
-      );
-    }
+  }
 
+  if (mocksList.length === 0) {
     return (
-      <>
-        <MocksTable
-          handleCreateNew={handleCreateNewMock}
-          mocks={mocksList}
-          mockType={type}
-          handleItemSelect={handleItemSelect}
-          handleNameClick={handleNameClick}
-          handleEditAction={handleEditAction}
-          handleUploadAction={handleUploadAction}
-          handleDeleteAction={handleDeleteAction}
-        />
-        <NewFileModal
-          visible={fileModalVisibility}
-          toggleModalVisiblity={(visible) => setFileModalVisibility(visible)}
-        />
-        <MockUploaderModal
-          mockType={type}
-          visible={uploadModalVisibility}
-          toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
-        />
-        <DeleteMockModal
-          visible={deleteModalVisibility}
-          toggleDeleteModalVisibility={(visible: boolean) =>
-            setDeleteModalVisibility(visible)
-          }
-          mock={selectedMock}
-          callbackOnSuccess={
-            selectedMock?.isOldMock ? fetchOldMocks : fetchMocks
-          }
-        />
-      </>
+      <MocksEmptyState
+        handleCreateNewMock={handleCreateNewMock}
+        handleUploadAction={handleUploadAction}
+        type={type}
+        fileModalVisibility={fileModalVisibility}
+        setFileModalVisibility={setFileModalVisibility}
+        uploadModalVisibility={uploadModalVisibility}
+        setUploadModalVisibility={setUploadModalVisibility}
+      />
     );
   }
+
+  return (
+    <>
+      <MocksTable
+        handleCreateNew={handleCreateNewMock}
+        mocks={mocksList}
+        mockType={type}
+        handleItemSelect={handleItemSelect}
+        handleNameClick={handleNameClick}
+        handleEditAction={handleEditAction}
+        handleUploadAction={handleUploadAction}
+        handleDeleteAction={handleDeleteAction}
+      />
+      <NewFileModal
+        visible={fileModalVisibility}
+        toggleModalVisiblity={(visible) => setFileModalVisibility(visible)}
+      />
+      <MockUploaderModal
+        mockType={type}
+        visible={uploadModalVisibility}
+        toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
+      />
+      <DeleteMockModal
+        visible={deleteModalVisibility}
+        toggleDeleteModalVisibility={(visible: boolean) =>
+          setDeleteModalVisibility(visible)
+        }
+        mock={selectedMock}
+        callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
+      />
+    </>
+  );
 };
 
 export default MockListIndex;
