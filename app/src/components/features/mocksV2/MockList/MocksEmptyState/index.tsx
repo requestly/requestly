@@ -1,7 +1,7 @@
 import React from "react";
+import { useMockListType } from "../../MockListContext";
 import MockUploaderModal from "../../MockUploaderModal";
 import NewFileModal from "../../NewFileModal";
-import { MockType } from "../../types";
 import { GettingStartedWithMocks } from "../GettingStartedWithMocks";
 
 /* eslint-disable no-unused-vars */
@@ -11,7 +11,6 @@ export enum MockListSource {
 /* eslint-enable no-unused-vars */
 
 interface Props {
-  type?: MockType;
   handleCreateNewMock: () => void;
   handleUploadAction: () => void;
   fileModalVisibility: boolean;
@@ -23,12 +22,13 @@ interface Props {
 const MocksEmptyState: React.FC<Props> = ({
   handleCreateNewMock,
   handleUploadAction,
-  type,
+
   fileModalVisibility,
   setFileModalVisibility,
   uploadModalVisibility,
   setUploadModalVisibility,
 }) => {
+  const type = useMockListType();
   return (
     <>
       <GettingStartedWithMocks

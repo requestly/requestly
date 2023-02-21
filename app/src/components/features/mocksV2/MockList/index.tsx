@@ -15,6 +15,7 @@ import MocksTable from "./MocksTable";
 import NewFileModal from "../NewFileModal";
 import MocksEmptyState from "./MocksEmptyState";
 import { useFetchMocks } from "./useFetchMocks";
+import { useMockListType } from "../MockListContext";
 
 /* eslint-disable no-unused-vars */
 export enum MockListSource {
@@ -24,29 +25,27 @@ export enum MockListSource {
 
 interface Props {
   source?: MockListSource;
-  type?: MockType;
   mockSelectionCallback?: (url: string) => void;
 }
 
-const MockListIndex: React.FC<Props> = ({
-  source,
-  mockSelectionCallback,
-  type,
-}) => {
+const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback }) => {
   const navigate = useNavigate();
 
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
-  const [deleteModalVisibility, setDeleteModalVisibility] =
-    useState<boolean>(false);
+  const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(
+    false
+  );
 
-  const [fileModalVisibility, setFileModalVisibility] =
-    useState<boolean>(false);
+  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(
+    false
+  );
 
-  const [uploadModalVisibility, setUploadModalVisibility] =
-    useState<boolean>(false);
-  const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks({
-    type,
-  });
+  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
+    false
+  );
+
+  const type = useMockListType();
+  const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks();
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
@@ -107,7 +106,6 @@ const MockListIndex: React.FC<Props> = ({
       <MocksEmptyState
         handleCreateNewMock={handleCreateNewMock}
         handleUploadAction={handleUploadAction}
-        type={type}
         fileModalVisibility={fileModalVisibility}
         setFileModalVisibility={setFileModalVisibility}
         uploadModalVisibility={uploadModalVisibility}

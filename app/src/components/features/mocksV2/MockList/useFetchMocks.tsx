@@ -3,17 +3,19 @@ import { fetchUserMocks } from "components/features/filesLibrary/FilesLibraryInd
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserUid } from "store/selectors";
+import { useMockListType } from "../MockListContext";
 import { MockType, RQMockMetadataSchema } from "../types";
 import {
   oldFileMockToNewMockMetadataAdapter,
   oldMockToNewMockMetadataAdapter,
 } from "../utils/oldMockAdapter";
 
-export function useFetchMocks({ type }: { type: MockType }) {
+export function useFetchMocks() {
   const uid = useSelector(getUserUid);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
+  const type = useMockListType();
 
   // TODO: Remove this after all mocks are migrated to new schema
   const fetchOldMocks = useCallback(() => {

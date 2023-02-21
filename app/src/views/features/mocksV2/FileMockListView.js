@@ -1,6 +1,7 @@
 import React from "react";
 
 import MockListIndex from "components/features/mocksV2/MockList";
+import { MockListProvider } from "components/features/mocksV2/MockListContext";
 import { MockType } from "components/features/mocksV2/types";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -12,9 +13,13 @@ const FileMockListView = () => {
   if (isWorkspaceMode) return <TeamFeatureComingSoon title="File server" />;
 
   return (
-    <>
-      <MockListIndex type={MockType.FILE} />
-    </>
+    <MockListProvider
+      value={{
+        type: MockType.FILE,
+      }}
+    >
+      <MockListIndex />
+    </MockListProvider>
   );
 };
 
