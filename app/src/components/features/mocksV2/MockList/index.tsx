@@ -21,7 +21,7 @@ import {
 } from "../utils/oldMockAdapter";
 import MocksTable from "./MocksTable";
 import NewFileModal from "../NewFileModal";
-import { GettingStartedWithMocks } from "./GettingStartedWithMocks";
+import MocksEmptyState from "./MocksEmptyState";
 
 /* eslint-disable no-unused-vars */
 export enum MockListSource {
@@ -172,24 +172,15 @@ const MockListIndex: React.FC<Props> = ({
   } else {
     if (mocksList.length + oldMocksList.length === 0) {
       return (
-        <>
-          <GettingStartedWithMocks
-            mockType={type}
-            handleCreateNew={handleCreateNewMock}
-            handleUploadAction={handleUploadAction}
-          />
-          <NewFileModal
-            visible={fileModalVisibility}
-            toggleModalVisiblity={(visible) => setFileModalVisibility(visible)}
-          />
-          <MockUploaderModal
-            mockType={type}
-            visible={uploadModalVisibility}
-            toggleModalVisibility={(visible) =>
-              setUploadModalVisibility(visible)
-            }
-          />
-        </>
+        <MocksEmptyState
+          handleCreateNewMock={handleCreateNewMock}
+          handleUploadAction={handleUploadAction}
+          type={type}
+          fileModalVisibility={fileModalVisibility}
+          setFileModalVisibility={setFileModalVisibility}
+          uploadModalVisibility={uploadModalVisibility}
+          setUploadModalVisibility={setUploadModalVisibility}
+        />
       );
     }
     if (source === MockListSource.PICKER_MODAL) {
