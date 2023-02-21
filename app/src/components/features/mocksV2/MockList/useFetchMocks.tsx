@@ -68,5 +68,7 @@ export function useFetchMocks({ type, uid }: { type: MockType; uid: any }) {
     fetchMocks();
     fetchOldMocks();
   }, [fetchMocks, fetchOldMocks]);
-  return { fetchOldMocks, fetchMocks, isLoading, mocksList, oldMocksList };
+
+  const fullMocksList = [...mocksList, ...oldMocksList];
+  return { fetchOldMocks, fetchMocks, isLoading, mocksList: fullMocksList };
 }

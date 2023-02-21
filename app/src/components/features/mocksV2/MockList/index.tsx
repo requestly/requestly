@@ -51,13 +51,7 @@ const MockListIndex: React.FC<Props> = ({
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
     false
   );
-  const {
-    fetchOldMocks,
-    fetchMocks,
-    mocksList,
-    oldMocksList,
-    isLoading,
-  } = useFetchMocks({
+  const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks({
     type,
     uid,
   });
@@ -115,7 +109,7 @@ const MockListIndex: React.FC<Props> = ({
   if (isLoading) {
     return <SpinnerCard customLoadingMessage="Loading Mocks" />;
   } else {
-    if (mocksList.length + oldMocksList.length === 0) {
+    if (mocksList.length === 0) {
       return (
         <MocksEmptyState
           handleCreateNewMock={handleCreateNewMock}
@@ -131,7 +125,7 @@ const MockListIndex: React.FC<Props> = ({
     if (source === MockListSource.PICKER_MODAL) {
       return (
         <MocksTable
-          mocks={[...mocksList, ...oldMocksList]}
+          mocks={mocksList}
           mockType={type}
           handleItemSelect={handleItemSelect}
           handleCreateNew={handleCreateNewMock}
@@ -144,7 +138,7 @@ const MockListIndex: React.FC<Props> = ({
         <>
           <MocksTable
             handleCreateNew={handleCreateNewMock}
-            mocks={[...mocksList, ...oldMocksList]}
+            mocks={mocksList}
             mockType={type}
             handleItemSelect={handleItemSelect}
             handleNameClick={handleNameClick}
