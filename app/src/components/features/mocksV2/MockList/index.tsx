@@ -36,17 +36,14 @@ const MockListIndex: React.FC<Props> = ({
   const navigate = useNavigate();
 
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
-  const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(
-    false
-  );
+  const [deleteModalVisibility, setDeleteModalVisibility] =
+    useState<boolean>(false);
 
-  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(
-    false
-  );
+  const [fileModalVisibility, setFileModalVisibility] =
+    useState<boolean>(false);
 
-  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
-    false
-  );
+  const [uploadModalVisibility, setUploadModalVisibility] =
+    useState<boolean>(false);
   const { fetchOldMocks, fetchMocks, mocksList, isLoading } = useFetchMocks({
     type,
   });
