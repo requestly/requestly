@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 import React from "react";
-import MockListIndex, { MockListSource } from "../MockList";
+import MocksModal from "../MockList/MocksModal";
 
 interface Props {
   isVisible: boolean;
@@ -14,12 +14,7 @@ const MockPickerModal: React.FC<Props> = ({
   mockSelectionCallback,
 }) => {
   const renderMockList = () => {
-    return (
-      <MockListIndex
-        mockSelectionCallback={mockSelectionCallback}
-        source={MockListSource.PICKER_MODAL}
-      />
-    );
+    return <MocksModal mockSelectionCallback={mockSelectionCallback} />;
   };
 
   return (
