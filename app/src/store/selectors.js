@@ -80,6 +80,9 @@ export const getLastBackupTimeStamp = (state) => {
 export const getUserAuthDetails = (state) => {
   return getGlobalState(state)["user"];
 };
+export const getUserUid = (state) => {
+  return getUserAuthDetails(state)?.details?.profile?.uid;
+};
 
 export const getSearch = (state) => {
   return getGlobalState(state)["search"];
