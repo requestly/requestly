@@ -152,7 +152,6 @@
 }
 
 .sidebar-announcement.ant-row {
-  margin-top: auto;
   padding: 8px 16px;
 }
 
@@ -178,7 +177,7 @@
 .sidebar-footer.ant-row {
   font-size: 13px;
   height: 4.5rem;
-  /* margin-top: auto; */
+  margin-top: auto;
   padding: 14px 6px;
   color: var(--text-gray);
   background-color: #191a1e;
