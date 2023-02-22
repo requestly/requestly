@@ -365,26 +365,6 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       },
     ],
   },
-  [RuleType.REQUEST]: {
-    id: 10,
-    type: RuleType.REQUEST,
-    name: "Modify Request Body",
-    subtitle: "Modify Body of POST Requests",
-    icon: <RuleIcon ruleType={RuleType.REQUEST} />,
-    header: {
-      description:
-        "Override API request body with static data or programmatically modify existing request payload.",
-    },
-    description: `<p>
-    Use Modify Request Body rule to change the payload sent in POST/PUT API
-    requests. Primarily used in
-  </p>
-  <ul>
-    <li>Sending additional data in request payload to the API server.</li>
-    <li>Testing different edge cases.</li>
-    <li>Modifying GraphQL Queries.</li>
-  </ul>`,
-  },
   [RuleType.RESPONSE]: {
     id: 7,
     type: RuleType.RESPONSE,
@@ -463,6 +443,26 @@ export const rulesData: Record<RuleType, RuleDetail> = {
           "https://stackoverflow.com/questions/14360125/is-it-possible-to-rewrite-a-status-code-with-charles-proxy/70651277#70651277",
       },
     ],
+  },
+  [RuleType.REQUEST]: {
+    id: 10,
+    type: RuleType.REQUEST,
+    name: "Modify Request Body",
+    subtitle: "Modify Body of POST Requests",
+    icon: <RuleIcon ruleType={RuleType.REQUEST} />,
+    header: {
+      description:
+        "Override API request body with static data or programmatically modify existing request payload.",
+    },
+    description: `<p>
+    Use Modify Request Body rule to change the payload sent in POST/PUT API
+    requests. Primarily used in
+  </p>
+  <ul>
+    <li>Sending additional data in request payload to the API server.</li>
+    <li>Testing different edge cases.</li>
+    <li>Modifying GraphQL Queries.</li>
+  </ul>`,
   },
   [RuleType.DELAY]: {
     id: 9,
