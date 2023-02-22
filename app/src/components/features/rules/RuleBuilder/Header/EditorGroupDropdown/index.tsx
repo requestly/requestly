@@ -35,8 +35,6 @@ const EditorGroupDropdown = () => {
 
   // Component State
   const [currentGroupId, setCurrentGroupId] = useState(rule?.groupId ?? "");
-
-  // Component State
   const [showInput, setShowInput] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -194,9 +192,9 @@ const EditorGroupDropdown = () => {
             <span>{name}</span>
             {id === currentGroupId && (
               <img
-                alt="back"
                 width="9px"
                 height="7px"
+                alt="selected"
                 src="/assets/icons/tick.svg"
               />
             )}

@@ -43,10 +43,14 @@
 }
 
 .editor-group-menu-item .ant-dropdown-menu-title-content {
-  color: var(--text-gray);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 20ch;
+  text-overflow: ellipsis;
+  color: var(--text-gray);
 }
 
 .editor-group-menu-item .ant-dropdown-menu-title-content span {
