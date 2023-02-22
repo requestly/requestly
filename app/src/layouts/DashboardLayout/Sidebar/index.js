@@ -54,18 +54,20 @@ const Sidebar = ({ visible, setVisible, collapsed, setCollapsed }) => {
         <SideBarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
       </Row>
       <MenuItem onClose={onClose} collapsed={collapsed} />
-      <Row className="sidebar-announcement">
-        {featureFlag.getValue(
-          APP_CONSTANTS.FEATURES.OPEN_SOURCE_ANNOUNCEMENT,
-          false
-        ) &&
-        checkedCollapseState &&
-        !collapsed ? (
-          <ProductAnnouncement />
-        ) : null}
-      </Row>
+      <div className="mt-auto">
+        <Row className="sidebar-announcement">
+          {featureFlag.getValue(
+            APP_CONSTANTS.FEATURES.OPEN_SOURCE_ANNOUNCEMENT,
+            false
+          ) &&
+          checkedCollapseState &&
+          !collapsed ? (
+            <ProductAnnouncement />
+          ) : null}
+        </Row>
 
-      <SidebarFooter collapsed={collapsed} />
+        <SidebarFooter collapsed={collapsed} />
+      </div>
       <MenuMobile onClose={onClose} visible={visible} />
     </Sider>
   );

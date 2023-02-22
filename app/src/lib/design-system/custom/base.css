@@ -137,6 +137,10 @@
   margin-right: auto;
 }
 
+.mt-auto {
+  margin-top: auto;
+}
+
 .visibility-hidden {
   visibility: hidden;
 }
