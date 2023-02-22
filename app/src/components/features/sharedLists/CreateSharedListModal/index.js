@@ -403,7 +403,7 @@ const CreateSharedListModal = (props) => {
           unselectAllRules(dispatch);
         }}
         footer={
-          createSharedListConfirmed ? (
+          rulesToShare.length === 0 ? null : createSharedListConfirmed ? (
             <>{isSharedListCreated ? renderPostConFirmationFooter() : null}</>
           ) : (
             <Row justify="space-between">
