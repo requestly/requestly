@@ -8,6 +8,7 @@ import {
   redirectToMocksList,
 } from "utils/RedirectionUtils";
 import "./index.css";
+import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -28,6 +29,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
 
   const handleCloseEditor = () => {
     if (mockType === MockType.API) {
+      trackMockEditorClosed("cancel_button");
       redirectToMocksList(navigate);
     } else {
       redirectToFileMocksList(navigate);

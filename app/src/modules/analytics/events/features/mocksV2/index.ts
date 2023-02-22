@@ -44,3 +44,29 @@ export const trackDeleteMockEvent = (
   };
   trackEvent(MOCKSV2.DELETED, params);
 };
+
+export const trackNewMockButtonClicked = (source: string) => {
+  const params = { source };
+  trackEvent(MOCKSV2.NEW_MOCK_BUTTON_CLICKED, params);
+};
+
+export const trackMockEditorOpened = () => {
+  trackEvent(MOCKSV2.MOCK_EDITOR_OPENED);
+};
+
+export const trackMockEditorClosed = (cause: string) => {
+  const params = { cause };
+  trackEvent(MOCKSV2.MOCK_EDITOR_CLOSED, params);
+};
+
+export const trackMockUploadWorkflowStarted = () => {
+  trackEvent(MOCKSV2.MOCK_UPLOAD_WORKFLOW_STARTED);
+};
+
+export const trackMockUploaded = () => {
+  trackEvent(MOCKSV2.MOCK_UPLOADED);
+};
+
+export const trackMockUploadFailed = (cause: string) => {
+  trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, cause);
+};

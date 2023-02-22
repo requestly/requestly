@@ -10,7 +10,6 @@ import {
   redirectToFileViewer,
   redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
-  redirectToMocksList,
 } from "utils/RedirectionUtils";
 import MockUploaderModal from "../MockUploaderModal";
 import { DeleteMockModal } from "../DeleteMockModal";
@@ -22,6 +21,10 @@ import {
 import MocksTable from "./MocksTable";
 import NewFileModal from "../NewFileModal";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks";
+import {
+  trackMockUploadWorkflowStarted,
+  trackNewMockButtonClicked,
+} from "modules/analytics/events/features/mocksV2";
 
 /* eslint-disable no-unused-vars */
 export enum MockListSource {
@@ -119,12 +122,14 @@ const MockListIndex: React.FC<Props> = ({
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
-      return redirectToMocksList(navigate, true);
+      trackNewMockButtonClicked("picker_modal");
+      return redirectToMockEditorCreateMock(navigate, true);
     }
     // TODO: Change this to a constant
     if (type === MockType.FILE) {
       return setFileModalVisibility(true);
     }
+    trackNewMockButtonClicked("mock_list");
     return redirectToMockEditorCreateMock(navigate);
   };
 
@@ -159,6 +164,7 @@ const MockListIndex: React.FC<Props> = ({
   };
 
   const handleUploadAction = () => {
+    trackMockUploadWorkflowStarted();
     setUploadModalVisibility(true);
   };
 

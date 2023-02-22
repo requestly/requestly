@@ -1,6 +1,10 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Modal, Upload, UploadProps } from "antd";
-import { trackCreateMockEvent } from "modules/analytics/events/features/mocksV2";
+import {
+  trackCreateMockEvent,
+  trackMockUploaded,
+  trackMockUploadFailed,
+} from "modules/analytics/events/features/mocksV2";
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +41,7 @@ const MockUploaderModal: React.FC<Props> = ({
       .then((mock: RQMockSchema) => {
         toast.success("Mock Created Successfully");
         uploadOptions.onSuccess("OK");
+        trackMockUploaded();
         trackCreateMockEvent(mock.id, mockType, mock.fileType, "uploader");
         if (mockType === MockType.API) {
           redirectToMockEditorEditMock(navigate, mock.id);
@@ -47,6 +52,7 @@ const MockUploaderModal: React.FC<Props> = ({
       .catch((err) => {
         toast.success("Mock Creation Failure");
         uploadOptions.onError("Failure");
+        trackMockUploadFailed(err);
       });
   };
 

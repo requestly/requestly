@@ -9,7 +9,13 @@ import CodeEditor from "components/misc/CodeEditor";
 import CopyButton from "components/misc/CopyButton";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
-import React, { ReactNode, useState, useMemo, useCallback } from "react";
+import React, {
+  ReactNode,
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
@@ -24,6 +30,7 @@ import {
 } from "../types";
 import { getEditorLanguage, validateEndpoint } from "../utils";
 import "./index.css";
+import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 
 interface Props {
   isNew?: boolean;
@@ -68,6 +75,10 @@ const MockEditor: React.FC<Props> = ({
     statusCode: null,
     endpoint: null,
   });
+
+  useEffect(() => {
+    trackMockEditorOpened();
+  }, []);
 
   const handleMockLatencyChange = (value: number) => {
     if (Number.isInteger(value)) {
