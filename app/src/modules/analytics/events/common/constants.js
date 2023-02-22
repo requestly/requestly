@@ -125,4 +125,7 @@ export const TEAMS = {
   CREATE_NEW_WORKSPACE_BUTTON_CLICKED: "create_new_workspace_button_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
   ADD_MEMBER_CLICKED: "add_member_clicked",
+  REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
+  REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
+  TEAM_PLAN_INTEREST_CAPTURED: "team_plan_interest_captured",
 };
