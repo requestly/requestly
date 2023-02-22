@@ -148,3 +148,8 @@ export const trackGettingStartedVideoPlayed = () => {
   const params = {};
   trackEvent(RULES.GETTING_STARTED_VIDEO_PLAYED, params);
 };
+
+export const trackRuleSimulatorTried = (rule_type, rule_saved) => {
+  const params = { rule_type, rule_saved };
+  trackEvent(RULES.RULE_SIMULATOR_TRIED, params);
+};

@@ -1,3 +1,4 @@
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { useState } from "react";
 import SettingsItem from "../../SettingsItem";
 
@@ -12,9 +13,11 @@ const DataCollection = () => {
     if (dataCollectionStatus === "enabled") {
       localStorage.setItem("dataCollectionStatus", "disabled");
       setDataCollectionStatus("disabled");
+      trackSettingsToggled("data_collection", "disabled");
     } else {
       localStorage.setItem("dataCollectionStatus", "enabled");
       setDataCollectionStatus("enabled");
+      trackSettingsToggled("data_collection", "enabled");
     }
   };
   return (

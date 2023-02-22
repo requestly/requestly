@@ -36,6 +36,7 @@ export const isEmailVerified = (userId) => {
 };
 
 export const setEmailVerified = async (userId, value) => {
+  submitAttrUtil(TRACKING.ATTR.EMAIL_VERIFIED, value);
   return DataStoreUtils.updateValueAsPromise(
     ["customProfile", userId, "signup"],
     {

@@ -1,3 +1,4 @@
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import React, { useState } from "react";
 import { toast } from "utils/Toast";
 import SettingsItem from "../../SettingsItem";
@@ -12,10 +13,12 @@ const WorkspaceStatusSyncing = () => {
       localStorage.setItem("syncRuleStatus", false);
       setSyncRuleStatus(false);
       toast.success("Status syncing turned off");
+      trackSettingsToggled("workspace_status_syncing", false);
     } else {
       localStorage.setItem("syncRuleStatus", true);
       setSyncRuleStatus(true);
       toast.success("Status syncing turned on");
+      trackSettingsToggled("workspace_status_syncing", true);
     }
   };
 
