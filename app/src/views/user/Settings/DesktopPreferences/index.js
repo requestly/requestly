@@ -12,6 +12,7 @@ import {
 } from "modules/analytics/events/desktopApp";
 import { toast } from "utils/Toast";
 import "./DesktopPreference.css";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const DesktopPreference = ({ appMode }) => {
   const [portInput, setPortInput] = useState("");
@@ -58,6 +59,7 @@ const DesktopPreference = ({ appMode }) => {
       toast.error(`Please use a valid port number`);
       trackInvalidProxyPortInput(newPort);
     }
+    trackSettingsToggled("port_changed", newPort);
     setPortSubmitLoading(false);
   };
 

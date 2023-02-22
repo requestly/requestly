@@ -28,6 +28,7 @@ import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import {
   trackCreateMockEvent,
+  trackMockEditorClosed,
   trackUpdateMockEvent,
 } from "modules/analytics/events/features/mocksV2";
 
@@ -80,7 +81,7 @@ const MockEditorIndex: React.FC<Props> = ({
         setSavingInProgress(false);
         if (mockId) {
           toast.success("Mock Created Successfully");
-          trackCreateMockEvent(mockId, mockType, fileType);
+          trackCreateMockEvent(mockId, mockType, fileType, "editor");
           if (mockType === MockType.FILE) {
             return redirectToFileMockEditorEditMock(navigate, mockId);
           }
@@ -105,6 +106,7 @@ const MockEditorIndex: React.FC<Props> = ({
 
   const handleOnClose = () => {
     // TODO: Create a constant for this
+    trackMockEditorClosed(mockType, "cancel_button");
     if (mockType === MockType.FILE) {
       return redirectToFileMocksList(navigate);
     }

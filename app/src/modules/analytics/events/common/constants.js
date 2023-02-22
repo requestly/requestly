@@ -100,6 +100,7 @@ export const RULES = {
   RULE_TYPE_SWITCHED: "rule_type_switched",
   RULE_DEMO_VIDEO_CLICKED: "rule_demo_video_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
+  RULE_SIMULATOR_TRIED: "rule_simulator_tried",
 };
 
 export const GROUPS = {
@@ -125,4 +126,7 @@ export const TEAMS = {
   CREATE_NEW_WORKSPACE_BUTTON_CLICKED: "create_new_workspace_button_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
   ADD_MEMBER_CLICKED: "add_member_clicked",
+  REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
+  REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
+  TEAM_PLAN_INTEREST_CAPTURED: "team_plan_interest_captured",
 };

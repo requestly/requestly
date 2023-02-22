@@ -10,6 +10,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import Plans from "./PricingPlan.json";
 import underlineIcon from "../../../../../assets/img/icons/common/underline.svg";
 import "./index.css";
+import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 
 const FreeAndEnterprisePlanTable = () => {
   // Component State
@@ -136,15 +137,17 @@ const FreeAndEnterprisePlanTable = () => {
           limitations, but sharing and other collaboration features will be
           unavailable.
         </div>
-        <GitHubButton
-          href="https://github.com/requestly/requestly"
-          data-color-scheme="no-preference: dark; light: light; dark: dark;"
-          data-size="large"
-          data-show-count="false"
-          aria-label="Star requestly/requestly on GitHub"
-        >
-          View on Github
-        </GitHubButton>
+        <div onClick={trackViewGithubClicked}>
+          <GitHubButton
+            href="https://github.com/requestly/requestly"
+            data-color-scheme="no-preference: dark; light: light; dark: dark;"
+            data-size="large"
+            data-show-count="false"
+            aria-label="Star requestly/requestly on GitHub"
+          >
+            View on Github
+          </GitHubButton>
+        </div>
       </div>
       <ContactUsModal
         isOpen={isContactUsModalOpen}

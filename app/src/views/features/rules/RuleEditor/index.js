@@ -97,6 +97,7 @@ const RuleEditor = (props) => {
                       showExecutionLogs={true}
                       expandRulePane={expandRulePane}
                       collapseRulesPlane={collapseRulesPlane}
+                      ruleType={CURRENT_RULE_TYPE}
                     />
                   </ProCard>
                 </Row>
