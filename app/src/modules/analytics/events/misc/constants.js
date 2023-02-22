@@ -67,3 +67,5 @@ export const COMMAND_BAR = {
   COMMAND_BAR_TOGGLED: "command_bar_toggled",
   COMMAND_BAR_ACTION_SELECTED: "command_bar_action_selected",
 };
+
+export const SETTINGS_TOGGLED = "settings_toggled";
