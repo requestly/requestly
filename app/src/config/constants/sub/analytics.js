@@ -157,6 +157,7 @@ export const GA_EVENTS = {
     HAS_AVAILED_CHROME_STORE_TRIAL: "HAS_AVAILED_CHROME_STORE_TRIAL",
     HAS_AVAILED_GITHUB_TRIAL: "HAS_AVAILED_GITHUB_TRIAL",
     TRIAL_MODE_ENABLED: "trial_mode_enabled",
+    NUM_WORKSPACES: "num_workspaces",
   },
   VALUES: {
     PAYPAL: "paypal",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -35,6 +35,7 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./WorkSpaceSelector.css";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -109,6 +110,15 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     false
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (availableTeams?.length > 0) {
+      submitAttrUtil(
+        APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES,
+        availableTeams.length
+      );
+    }
+  }, [availableTeams?.length]);
 
   const renderLoader = () => {
     return (
