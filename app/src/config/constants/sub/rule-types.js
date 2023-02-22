@@ -224,34 +224,6 @@ const RULE_TYPES_CONFIG = {
     CUSTOM_SCRIPT_CHARACTER_LIMIT: 500,
     REMOVE_CSP_HEADER: true,
   },
-  [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: {
-    ID: 10,
-    TYPE: GLOBAL_CONSTANTS.RULE_TYPES.REQUEST,
-    NAME: "Modify Request Body",
-    DESCRIPTION: "Modify Body of POST Requests",
-    ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.REQUEST} />,
-    PRIMARY_COLOR: "#880e4f",
-    SECONDARY_COLOR: "#710C42",
-    TOOL_TIP_PLACEMENT: "bottom",
-    PAIR_CONFIG: {
-      TITLE: "Modify POST Request",
-    },
-    EMPTY_PAIR_FORMAT: {
-      source: getSourceFormat(),
-      request: {
-        type: "static",
-        value: "",
-        statusCode: "",
-      },
-    },
-    ALLOW_ADD_PAIR: false,
-    HIDE_IN_EXTENSION: false,
-    SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW: false,
-    ALLOW_APPLY_RULE_TO_ALL_URLS: false,
-    ALLOW_REQUEST_SOURCE_FILTERS: true,
-    REQUEST_BODY_CHARACTER_LIMIT: 1500,
-    REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE: modifyRequestDefaultCode(),
-  },
   [GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE]: {
     ID: 7,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE,
@@ -283,6 +255,35 @@ const RULE_TYPES_CONFIG = {
     ALLOW_REQUEST_SOURCE_FILTERS: true,
     RESPONSE_BODY_CHARACTER_LIMIT: 1500,
     RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE: modifyResponseDefaultCode(),
+  },
+
+  [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: {
+    ID: 10,
+    TYPE: GLOBAL_CONSTANTS.RULE_TYPES.REQUEST,
+    NAME: "Modify Request Body",
+    DESCRIPTION: "Modify Body of POST Requests",
+    ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.REQUEST} />,
+    PRIMARY_COLOR: "#880e4f",
+    SECONDARY_COLOR: "#710C42",
+    TOOL_TIP_PLACEMENT: "bottom",
+    PAIR_CONFIG: {
+      TITLE: "Modify POST Request",
+    },
+    EMPTY_PAIR_FORMAT: {
+      source: getSourceFormat(),
+      request: {
+        type: "static",
+        value: "",
+        statusCode: "",
+      },
+    },
+    ALLOW_ADD_PAIR: false,
+    HIDE_IN_EXTENSION: false,
+    SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW: false,
+    ALLOW_APPLY_RULE_TO_ALL_URLS: false,
+    ALLOW_REQUEST_SOURCE_FILTERS: true,
+    REQUEST_BODY_CHARACTER_LIMIT: 1500,
+    REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE: modifyRequestDefaultCode(),
   },
 
   [GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT]: {
