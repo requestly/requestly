@@ -32,3 +32,18 @@ export const trackNewWorkspaceCreated = () => {
 export const trackAddMemberClicked = () => {
   trackEvent(TEAMS.ADD_MEMBER_CLICKED);
 };
+
+export const trackTeamPlanCardShown = (domain) => {
+  const params = { domain };
+  trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_SHOWN, params);
+};
+
+export const trackTeamPlanCardClicked = (domain) => {
+  const params = { domain };
+  trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_CLICKED, params);
+};
+
+export const trackTeamPlanInterestCaptured = (domain) => {
+  const params = { domain };
+  trackEvent(TEAMS.TEAM_PLAN_INTEREST_CAPTURED, params);
+};

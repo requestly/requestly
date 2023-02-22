@@ -529,7 +529,11 @@ export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
   navigate(mockEditUrl);
 };
 
-export const redirectToMockEditorCreateMock = (navigate) => {
+export const redirectToMockEditorCreateMock = (navigate, newTab = false) => {
+  if (newTab) {
+    window.open(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, "_blank");
+    return;
+  }
   navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE);
 };
 
