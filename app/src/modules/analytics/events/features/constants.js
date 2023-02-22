@@ -61,6 +61,12 @@ export const MOCKSV2 = {
   UPDATED: "mock_updated",
   CREATED: "mock_created",
   SELECTED: "mock_selected",
+  NEW_MOCK_BUTTON_CLICKED: "new_mock_button_clicked",
+  MOCK_EDITOR_OPENED: "mock_editor_opened",
+  MOCK_EDITOR_CLOSED: "mock_editor_closed",
+  MOCK_UPLOAD_WORKFLOW_STARTED: "mock_upload_workflow_started",
+  MOCK_UPLOADED: "mock_uploaded",
+  MOCK_UPLOAD_FAILED: "mock_upload_failed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

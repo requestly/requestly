@@ -79,10 +79,10 @@ const AuthForm = ({
       }
     }
     if (trackEvent) {
-      trackAuthModalShownEvent();
+      trackAuthModalShownEvent(eventSource);
       setTrackEvent(false);
     }
-  }, [referralCode, trackEvent]);
+  }, [eventSource, referralCode, trackEvent]);
 
   const SocialAuthButtons = () => {
     switch (MODE) {

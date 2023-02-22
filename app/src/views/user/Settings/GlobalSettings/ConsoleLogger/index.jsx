@@ -7,6 +7,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { toast } from "utils/Toast";
 import { trackConsoleLoggerToggled } from "modules/analytics/events/features/consoleLogger";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const ConsoleLogger = ({ isCompatible }) => {
   const appMode = useSelector(getAppMode);
@@ -23,6 +24,7 @@ const ConsoleLogger = ({ isCompatible }) => {
     trackConsoleLoggerToggled(window.uid, status);
     StorageService(appMode).saveConsoleLoggerState(status);
     toast.success(`Console logging ${status ? "enabled" : "disabled"}`);
+    trackSettingsToggled("console_logger", status);
   };
 
   return isCompatible ? (

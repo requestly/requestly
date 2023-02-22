@@ -37,6 +37,7 @@ export const BUSINESS = {
   TRIAL_MODE_EXPIRED_UPGRADE_BUTTON_CLICKED:
     "trial_mode_expired_upgrade_button_clicked",
   UPGRADE_CLICKED: "upgrade_clicked",
+  VIEW_GITHUB_CLICKED: "view_github_clicked",
 };
 
 export const INTEREST_CAPTURED = "interest_captured";
@@ -67,3 +68,5 @@ export const COMMAND_BAR = {
   COMMAND_BAR_TOGGLED: "command_bar_toggled",
   COMMAND_BAR_ACTION_SELECTED: "command_bar_action_selected",
 };
+
+export const SETTINGS_TOGGLED = "settings_toggled";

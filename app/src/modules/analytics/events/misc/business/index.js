@@ -13,3 +13,7 @@ export const trackUpgradeNowClickedEvent = (reason, source) => {
   const params = { reason, source };
   trackEvent(BUSINESS.UPGRADE_CLICKED, params);
 };
+
+export const trackViewGithubClicked = () => {
+  trackEvent(BUSINESS.VIEW_GITHUB_CLICKED);
+};

@@ -8,6 +8,11 @@ import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/busin
 import { LoadingOutlined } from "@ant-design/icons";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import "./index.css";
+import {
+  trackTeamPlanCardClicked,
+  trackTeamPlanCardShown,
+  trackTeamPlanInterestCaptured,
+} from "modules/analytics/events/common/teams";
 
 export default function EnterpriseRequestBanner({ user }) {
   const [enterpriseContactDetails, setEnterpriseContactDetails] = useState({});
@@ -28,6 +33,7 @@ export default function EnterpriseRequestBanner({ user }) {
     setEnterpriseRequestedState(1);
     const enterpriseAdmin = enterpriseContactDetails.data.enterpriseData.admin;
     const domain = enterpriseAdmin.email.split("@")[1];
+    trackTeamPlanCardClicked(domain);
     requestEnterprisePlanFromAdmin({
       userEmail: user.details.profile.email,
       adminEmail: enterpriseAdmin.email,
@@ -35,6 +41,7 @@ export default function EnterpriseRequestBanner({ user }) {
     })
       .then(() => {
         //GA4
+        trackTeamPlanInterestCaptured(domain);
         trackEnterpriseRequestEvent(domain);
         setEnterpriseRequestedState(2);
       })
@@ -49,6 +56,13 @@ export default function EnterpriseRequestBanner({ user }) {
       if (Object.keys(enterpriseContactDetails).length === 0) {
         getEnterpriseAdminDetails({}).then((response) => {
           setEnterpriseContactDetails(response);
+          if (enterpriseContactDetails.data.success) {
+            trackTeamPlanCardShown(
+              enterpriseContactDetails.data?.enterpriseData?.admin?.email?.split(
+                "@"
+              )?.[1]
+            );
+          }
         });
       }
     }
