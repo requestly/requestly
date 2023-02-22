@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Input, Typography } from "antd";
+import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { BiPencil } from "react-icons/bi";
 import { TextAreaRef } from "antd/lib/input/TextArea";
@@ -38,10 +38,12 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
     false
   );
   const textAreaRef = useRef<TextAreaRef | null>(null);
+  const nameInputRef = useRef<InputRef | null>(null);
 
   useEffect(() => {
     if (errors?.name) {
       setIsNameEditable(true);
+      nameInputRef.current?.focus({ cursor: "end" });
     }
   }, [errors]);
 
@@ -68,18 +70,24 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
       >
         <Row className="editor-title-name">
           {name.length === 0 || isNameEditable ? (
-            <Input
-              className={`${errors?.name && !name ? "error" : null}`}
-              autoFocus={true || mode === "create"}
-              onFocus={() => setIsNameEditable(true)}
-              onBlur={() => setIsNameEditable(false)}
-              bordered={false}
-              spellCheck={false}
-              value={name}
-              onChange={(e) => nameChangeCallback(e.target.value)}
-              placeholder={namePlaceholder}
-              onPressEnter={() => setIsNameEditable(false)}
-            />
+            <div className="editor-title-name-wrapper">
+              <Input
+                ref={nameInputRef}
+                className={`${errors?.name && !name ? "error" : null}`}
+                autoFocus={true || mode === "create"}
+                onFocus={() => setIsNameEditable(true)}
+                onBlur={() => setIsNameEditable(false)}
+                bordered={false}
+                spellCheck={false}
+                value={name}
+                onChange={(e) => nameChangeCallback(e.target.value)}
+                placeholder={namePlaceholder}
+                onPressEnter={() => setIsNameEditable(false)}
+              />
+              <div className="field-error-prompt">
+                {errors?.name && !name ? errors?.name : null}
+              </div>
+            </div>
           ) : (
             <div className="editor-title">
               <Typography.Text

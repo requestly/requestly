@@ -128,6 +128,9 @@ const MockEditor: React.FC<Props> = ({
     if (!data.statusCode) {
       updatedErrors.statusCode = "Status Code is required";
     }
+    if (!data.contentType) {
+      updatedErrors.contentType = "content type is required";
+    }
     // TODO: Add more validations here for special characters, //, etc.
     const endpointValidationError = validateEndpoint(data.endpoint);
     if (endpointValidationError) {
@@ -175,7 +178,7 @@ const MockEditor: React.FC<Props> = ({
           onChange={(e) => setMethod(e)}
           value={method}
           status={errors.method ? "error" : ""}
-          placeholder={errors.method ? errors.method : "Method"}
+          placeholder="Method"
         />
       </Col>
     );
@@ -222,8 +225,11 @@ const MockEditor: React.FC<Props> = ({
             }
           }}
           status={errors.statusCode ? "error" : ""}
-          placeholder={errors.statusCode ? errors.statusCode : "Response Code"}
+          placeholder="Response Code"
         />
+        <span className="field-error-prompt">
+          {errors.statusCode ? errors.statusCode : null}
+        </span>
       </Col>
     );
   };
@@ -237,6 +243,7 @@ const MockEditor: React.FC<Props> = ({
         <AutoComplete
           id="content-type"
           size="large"
+          status={errors.contentType ? "error" : ""}
           // @ts-ignore
           type="text"
           placeholder="content"
@@ -245,6 +252,9 @@ const MockEditor: React.FC<Props> = ({
           name="type"
           onChange={(e) => setContentType(e)}
         />
+        <span className="field-error-prompt">
+          {errors.contentType ? errors.contentType : null}
+        </span>
       </Col>
     );
   };
@@ -261,6 +271,7 @@ const MockEditor: React.FC<Props> = ({
           Endpoint
         </label>
         <Input
+          required
           id="endpoint"
           addonBefore={
             username
@@ -274,7 +285,9 @@ const MockEditor: React.FC<Props> = ({
           status={errors.endpoint ? "error" : ""}
           placeholder={errors.endpoint ? errors.endpoint : "Enter endpoint"}
         />
-        <span color="red">{errors.endpoint ? errors.endpoint : null}</span>
+        <span className="field-error-prompt">
+          {errors.endpoint ? errors.endpoint : null}
+        </span>
       </Col>
     );
   };

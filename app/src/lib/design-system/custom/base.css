@@ -144,3 +144,8 @@
 .visibility-hidden {
   visibility: hidden;
 }
+
+.field-error-prompt {
+  color: #fa2828cb;
+  font-size: 12px;
+}

@@ -22,6 +22,7 @@ export interface ValidationErrors {
   method?: string;
   statusCode?: string;
   endpoint?: string;
+  contentType?: string;
 }
 
 // TODO: Remove this. Fetch this from @requestly/mock-server or APP_CONSTANTS
