@@ -41,8 +41,8 @@ const MockUploaderModal: React.FC<Props> = ({
       .then((mock: RQMockSchema) => {
         toast.success("Mock Created Successfully");
         uploadOptions.onSuccess("OK");
-        trackMockUploaded();
         trackCreateMockEvent(mock.id, mockType, mock.fileType, "uploader");
+        trackMockUploaded(mockType);
         if (mockType === MockType.API) {
           redirectToMockEditorEditMock(navigate, mock.id);
         } else if (mockType === MockType.FILE) {
@@ -52,7 +52,7 @@ const MockUploaderModal: React.FC<Props> = ({
       .catch((err) => {
         toast.success("Mock Creation Failure");
         uploadOptions.onError("Failure");
-        trackMockUploadFailed(err);
+        trackMockUploadFailed(mockType, err);
       });
   };
 

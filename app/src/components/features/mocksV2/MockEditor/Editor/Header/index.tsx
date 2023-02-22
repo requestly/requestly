@@ -28,8 +28,8 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
 
   const handleCloseEditor = () => {
+    trackMockEditorClosed(mockType, "back_button");
     if (mockType === MockType.API) {
-      trackMockEditorClosed("cancel_button");
       redirectToMocksList(navigate);
     } else {
       redirectToFileMocksList(navigate);

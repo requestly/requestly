@@ -45,28 +45,32 @@ export const trackDeleteMockEvent = (
   trackEvent(MOCKSV2.DELETED, params);
 };
 
-export const trackNewMockButtonClicked = (source: string) => {
-  const params = { source };
+export const trackNewMockButtonClicked = (type: string, source: string) => {
+  const params = { type, source };
   trackEvent(MOCKSV2.NEW_MOCK_BUTTON_CLICKED, params);
 };
 
-export const trackMockEditorOpened = () => {
-  trackEvent(MOCKSV2.MOCK_EDITOR_OPENED);
+export const trackMockEditorOpened = (type: string) => {
+  const params = { type };
+  trackEvent(MOCKSV2.MOCK_EDITOR_OPENED, params);
 };
 
-export const trackMockEditorClosed = (cause: string) => {
-  const params = { cause };
+export const trackMockEditorClosed = (type: string, cause: string) => {
+  const params = { type, cause };
   trackEvent(MOCKSV2.MOCK_EDITOR_CLOSED, params);
 };
 
-export const trackMockUploadWorkflowStarted = () => {
-  trackEvent(MOCKSV2.MOCK_UPLOAD_WORKFLOW_STARTED);
+export const trackMockUploadWorkflowStarted = (type: string) => {
+  const params = { type };
+  trackEvent(MOCKSV2.MOCK_UPLOAD_WORKFLOW_STARTED, params);
 };
 
-export const trackMockUploaded = () => {
-  trackEvent(MOCKSV2.MOCK_UPLOADED);
+export const trackMockUploaded = (type: string) => {
+  const params = { type };
+  trackEvent(MOCKSV2.MOCK_UPLOADED, params);
 };
 
-export const trackMockUploadFailed = (cause: string) => {
-  trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, cause);
+export const trackMockUploadFailed = (type: string, cause: string) => {
+  const params = { type, cause };
+  trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
 };

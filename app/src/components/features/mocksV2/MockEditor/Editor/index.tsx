@@ -77,8 +77,8 @@ const MockEditor: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    trackMockEditorOpened();
-  }, []);
+    trackMockEditorOpened(mockType);
+  }, [mockType]);
 
   const handleMockLatencyChange = (value: number) => {
     if (Number.isInteger(value)) {

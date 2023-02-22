@@ -122,14 +122,14 @@ const MockListIndex: React.FC<Props> = ({
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
-      trackNewMockButtonClicked("picker_modal");
+      trackNewMockButtonClicked(type, "picker_modal");
       return redirectToMockEditorCreateMock(navigate, true);
     }
     // TODO: Change this to a constant
     if (type === MockType.FILE) {
       return setFileModalVisibility(true);
     }
-    trackNewMockButtonClicked("mock_list");
+    trackNewMockButtonClicked(type, "mock_list");
     return redirectToMockEditorCreateMock(navigate);
   };
 
@@ -164,7 +164,7 @@ const MockListIndex: React.FC<Props> = ({
   };
 
   const handleUploadAction = () => {
-    trackMockUploadWorkflowStarted();
+    trackMockUploadWorkflowStarted(type);
     setUploadModalVisibility(true);
   };
 
