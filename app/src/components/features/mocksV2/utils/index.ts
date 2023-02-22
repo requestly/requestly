@@ -1,5 +1,7 @@
 // @ts-ignore
 import { createMock } from "backend/mocks/createMock";
+import APP_CONSTANTS from "config/constants";
+import { isEnvBeta, isEnvEmulator } from "utils/EnvUtils";
 import { v4 as uuidv4 } from "uuid";
 import {
   defaultCssEditorMock,
@@ -83,8 +85,16 @@ export const generateFinalUrl = (
 ) => {
   let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}?rq_uid=${uid}`;
 
-  if (username) {
-    finalUrl = `https://${username}.requestly.dev/${endpoint}`;
+  if(isEnvBeta()) {
+    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}?rq_uid=${uid}`;
+  }
+  else if(isEnvEmulator()) {
+    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}?rq_uid=${uid}`;
+  }
+  else {
+    if (username) {
+      finalUrl = `https://${username}.requestly.dev/${endpoint}`;
+    }
   }
 
   return finalUrl;
