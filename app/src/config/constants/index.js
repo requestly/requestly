@@ -140,4 +140,16 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
 
 APP_CONSTANTS.GA_EVENTS = GA_EVENTS;
 
+APP_CONSTANTS.url = {
+  prod: "app.requestly.io",
+  beta: "beta.requestly.io",
+  local: "localhost:3000",
+}
+
+APP_CONSTANTS.mock_base_url = {
+  prod: "https://requestly.dev/api/mockv2",
+  beta: "https://beta.requestly.io/api/mockv2",
+  local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2" // Change port depending upon you firebase functions emulator port
+}
+
 export default APP_CONSTANTS;
