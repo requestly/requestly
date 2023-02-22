@@ -6,6 +6,7 @@ import ExecutionLogs from "./ExecutionLogs";
 import { isExtensionVersionCompatible } from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import PremiumRequiredCTA from "../../../payments/PremiumRequiredCTA";
+import { trackRuleSimulatorTried } from "modules/analytics/events/common/rules";
 const { TabPane } = Tabs;
 
 const RuleEditorSplitPane = ({
@@ -13,6 +14,7 @@ const RuleEditorSplitPane = ({
   showExecutionLogs,
   expandRulePane,
   collapseRulesPlane,
+  ruleType,
 }) => {
   const activeKey = showExecutionLogs ? "executionLogs" : "ruleSimulator";
   const isExecutionLogsCompatible = isExtensionVersionCompatible(
@@ -44,7 +46,15 @@ const RuleEditorSplitPane = ({
         size="middle"
         tabBarGutter={4}
         style={{ marginTop: "8px" }}
-        onTabClick={expandRulePane}
+        onTabClick={(key) => {
+          expandRulePane();
+          if (key === "ruleSimulator") {
+            trackRuleSimulatorTried(
+              ruleType,
+              mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
+            );
+          }
+        }}
         tabBarExtraContent={{
           right: (
             <Button

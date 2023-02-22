@@ -100,6 +100,7 @@ export const RULES = {
   RULE_TYPE_SWITCHED: "rule_type_switched",
   RULE_DEMO_VIDEO_CLICKED: "rule_demo_video_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
+  RULE_SIMULATOR_TRIED: "rule_simulator_tried",
 };
 
 export const GROUPS = {
