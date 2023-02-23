@@ -19,7 +19,11 @@ RQ.ClientRuleMatcher = (namespace) => {
       return null;
     }
 
-    return new RegExp(matchRegExp[1], matchRegExp[2]);
+    try {
+      return new RegExp(matchRegExp[1], matchRegExp[2]);
+    } catch {
+      return null;
+    }
   };
 
   const checkRegexMatch = (regexString, inputString) => {
