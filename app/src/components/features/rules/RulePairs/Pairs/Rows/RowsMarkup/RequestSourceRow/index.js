@@ -26,108 +26,101 @@ const RequestSourceRow = ({
 
   const sourceKeyOptions = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.URL
-            )
-          }
-        >
-          URL
-        </span>
+      <Menu.Item
+        key={1}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+            GLOBAL_CONSTANTS.RULE_KEYS.URL
+          )
+        }
+      >
+        URL
       </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.HOST
-            )
-          }
-        >
-          Host
-        </span>
+      <Menu.Item
+        key={2}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+            GLOBAL_CONSTANTS.RULE_KEYS.HOST
+          )
+        }
+      >
+        Host
       </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.PATH
-            )
-          }
-        >
-          Path
-        </span>
+      <Menu.Item
+        key={3}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+            GLOBAL_CONSTANTS.RULE_KEYS.PATH
+          )
+        }
+      >
+        Path
       </Menu.Item>
     </Menu>
   );
 
   const sourceOperatorOptions = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS
-            )
-          }
-        >
-          Equals
-        </span>
+      <Menu.Item
+        key={1}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+            GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS
+          )
+        }
+      >
+        Equals
       </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS
-            )
-          }
-        >
-          Contains
-        </span>
+      <Menu.Item
+        key={2}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+            GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS
+          )
+        }
+      >
+        Contains
       </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
-            )
-          }
-        >
-          Matches (RegEx)
-        </span>
+      <Menu.Item
+        key={3}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+            GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
+          )
+        }
+      >
+        Matches (RegEx)
       </Menu.Item>
-      <Menu.Item key={4}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
-            )
-          }
-        >
-          Matches (Wildcard)
-        </span>
+      <Menu.Item
+        key={4}
+        onClick={(event) =>
+          modifyPairAtGivenPath(
+            event,
+            pairIndex,
+            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+            GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
+          )
+        }
+      >
+        Matches (Wildcard)
       </Menu.Item>
     </Menu>
   );
