@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -65,7 +65,7 @@ const RequestSourceRow = ({
     },
   ];
 
-  const renderSourceKeys = () => {
+  const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
         {sourceKeys.map(({ id, title, ruleKey }) => (
@@ -85,9 +85,9 @@ const RequestSourceRow = ({
         ))}
       </Menu>
     );
-  };
+  }, [sourceKeys]);
 
-  const renderSourceOperators = () => {
+  const renderSourceOperators = useMemo(() => {
     return (
       <Menu>
         {sourceOperators.map(({ id, title, ruleOperator }) => (
@@ -107,7 +107,7 @@ const RequestSourceRow = ({
         ))}
       </Menu>
     );
-  };
+  }, [sourceOperators]);
 
   return (
     <Row
@@ -119,7 +119,7 @@ const RequestSourceRow = ({
       wrap={false}
     >
       <Col className="shrink-0">
-        <RQDropdown overlay={renderSourceKeys()} disabled={isInputDisabled}>
+        <RQDropdown overlay={renderSourceKeys} disabled={isInputDisabled}>
           <Text
             strong
             className="ant-dropdown-link cursor-pointer uppercase"
@@ -130,10 +130,7 @@ const RequestSourceRow = ({
         </RQDropdown>
       </Col>
       <Col className="shrink-0">
-        <RQDropdown
-          overlay={renderSourceOperators()}
-          disabled={isInputDisabled}
-        >
+        <RQDropdown overlay={renderSourceOperators} disabled={isInputDisabled}>
           <Text
             strong
             className="ant-dropdown-link cursor-pointer"
