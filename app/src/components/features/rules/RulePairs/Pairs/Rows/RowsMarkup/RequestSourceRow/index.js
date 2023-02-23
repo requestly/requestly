@@ -24,46 +24,52 @@ const RequestSourceRow = ({
     generatePlaceholderText,
   } = helperFunctions;
 
-  const sourceKeys = [
-    {
-      id: 1,
-      title: "URL",
-      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.URL,
-    },
-    {
-      id: 2,
-      title: "Host",
-      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
-    },
-    {
-      id: 3,
-      title: "Path",
-      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
-    },
-  ];
+  const sourceKeys = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "URL",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+      },
+      {
+        id: 2,
+        title: "Host",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
+      },
+      {
+        id: 3,
+        title: "Path",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+      },
+    ],
+    []
+  );
 
-  const sourceOperators = [
-    {
-      id: 1,
-      title: "Equals",
-      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
-    },
-    {
-      id: 2,
-      title: "Contains",
-      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
-    },
-    {
-      id: 3,
-      title: "Matches (RegEx)",
-      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
-    },
-    {
-      id: 4,
-      title: "Matches (Wildcard)",
-      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES,
-    },
-  ];
+  const sourceOperators = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "Equals",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+      },
+      {
+        id: 2,
+        title: "Contains",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+      },
+      {
+        id: 3,
+        title: "Matches (RegEx)",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+      },
+      {
+        id: 4,
+        title: "Matches (Wildcard)",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES,
+      },
+    ],
+    []
+  );
 
   const renderSourceKeys = useMemo(() => {
     return (
@@ -85,7 +91,7 @@ const RequestSourceRow = ({
         ))}
       </Menu>
     );
-  }, [sourceKeys]);
+  }, [sourceKeys, modifyPairAtGivenPath, pairIndex]);
 
   const renderSourceOperators = useMemo(() => {
     return (
@@ -107,7 +113,7 @@ const RequestSourceRow = ({
         ))}
       </Menu>
     );
-  }, [sourceOperators]);
+  }, [sourceOperators, modifyPairAtGivenPath, pairIndex]);
 
   return (
     <Row
