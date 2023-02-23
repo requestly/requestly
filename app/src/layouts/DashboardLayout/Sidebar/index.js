@@ -56,11 +56,7 @@ const Sidebar = ({ visible, setVisible, collapsed, setCollapsed }) => {
       <MenuItem onClose={onClose} collapsed={collapsed} />
       <div className="mt-auto">
         <Row className="sidebar-announcement">
-          {featureFlag.getValue(
-            APP_CONSTANTS.FEATURES.OPEN_SOURCE_ANNOUNCEMENT,
-            false
-          ) &&
-          checkedCollapseState &&
+          {checkedCollapseState &&
           !collapsed ? (
             <ProductAnnouncement />
           ) : null}
