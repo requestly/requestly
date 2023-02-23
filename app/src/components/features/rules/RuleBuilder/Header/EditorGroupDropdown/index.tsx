@@ -25,7 +25,13 @@ import {
 } from "modules/analytics/events/common/groups";
 import "./EditorGroupDropdown.css";
 
-const EditorGroupDropdown = () => {
+const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
+
+interface EditorGroupDropdownProps {
+  mode: "create" | "edit";
+}
+
+const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   // Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -212,6 +218,7 @@ const EditorGroupDropdown = () => {
         placement="bottomRight"
         open={showDropdown}
         overlay={dropdownOverlay}
+        disabled={mode === RULE_EDITOR_CONFIG.MODES.CREATE}
         onOpenChange={handleDropdownVisibleChange}
         className={`editor-group-dropdown-trigger ${
           showDropdown ? "editor-group-dropdown-active" : ""

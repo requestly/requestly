@@ -9,6 +9,11 @@
   transition: border 0.3s;
 }
 
+.editor-group-dropdown-trigger[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .editor-group-dropdown-trigger.editor-group-dropdown-active {
   border-color: var(--dropdown-active-border-color);
 }
