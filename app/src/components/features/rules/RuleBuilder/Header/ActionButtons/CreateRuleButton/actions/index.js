@@ -1,4 +1,5 @@
 import isEmpty from "is-empty";
+import { actions } from "../../../../../../../../store";
 //UTILS
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -6,9 +7,10 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
-export const validateRule = (rule, user) => {
+export const validateRule = (rule, user, dispatch) => {
   let output;
   if (isEmpty(rule.name)) {
+    dispatch(actions.updateCurrentlySelectedRuleNameIsInvalid(true));
     return {
       result: false,
       message: `Please provide a rule name`,

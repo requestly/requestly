@@ -59,7 +59,11 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
     //Validation
-    const ruleValidation = validateRule(currentlySelectedRuleData, user);
+    const ruleValidation = validateRule(
+      currentlySelectedRuleData,
+      user,
+      dispatch
+    );
     if (ruleValidation.result) {
       saveRule(
         appMode,

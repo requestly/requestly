@@ -72,6 +72,11 @@ export const getIsCurrentlySelectedRuleHasUnsavedChanges = (state) => {
   return currentlySelectedRule["hasUnsavedChanges"];
 };
 
+export const getIsCurrentlySelectedRuleNameIsInvalid = (state) => {
+  const currentlySelectedRule = getCurrentlySelectedRule(state);
+  return currentlySelectedRule["isRuleNameInvalid"];
+};
+
 export const getLastBackupTimeStamp = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["lastBackupTimeStamp"];

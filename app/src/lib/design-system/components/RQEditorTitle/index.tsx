@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { getIsCurrentlySelectedRuleNameIsInvalid } from "store/selectors";
 import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { BiPencil } from "react-icons/bi";
@@ -37,15 +39,20 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   const [isDescriptionEditable, setIsDescriptionEditable] = useState<boolean>(
     false
   );
+
+  const isRuleNameInvalid = useSelector(
+    getIsCurrentlySelectedRuleNameIsInvalid
+  );
+
   const textAreaRef = useRef<TextAreaRef | null>(null);
   const nameInputRef = useRef<InputRef | null>(null);
 
   useEffect(() => {
-    if (errors?.name) {
+    if (errors?.name || isRuleNameInvalid) {
       setIsNameEditable(true);
       nameInputRef.current?.focus({ cursor: "end" });
     }
-  }, [errors]);
+  }, [errors, isRuleNameInvalid]);
 
   useEffect(() => {
     if (isDescriptionEditable) {
@@ -73,7 +80,9 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             <div className="editor-title-name-wrapper">
               <Input
                 ref={nameInputRef}
-                className={`${errors?.name && !name ? "error" : null}`}
+                className={`${
+                  (errors?.name || isRuleNameInvalid) && !name ? "error" : null
+                }`}
                 autoFocus={true || mode === "create"}
                 onFocus={() => setIsNameEditable(true)}
                 onBlur={() => setIsNameEditable(false)}
@@ -85,7 +94,9 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                 onPressEnter={() => setIsNameEditable(false)}
               />
               <div className="field-error-prompt">
-                {errors?.name && !name ? errors?.name : null}
+                {(errors?.name || isRuleNameInvalid) && !name
+                  ? "Name is required"
+                  : null}
               </div>
             </div>
           ) : (
