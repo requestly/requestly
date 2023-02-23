@@ -24,106 +24,90 @@ const RequestSourceRow = ({
     generatePlaceholderText,
   } = helperFunctions;
 
-  const sourceKeyOptions = (
-    <Menu>
-      <Menu.Item
-        key={1}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-            GLOBAL_CONSTANTS.RULE_KEYS.URL
-          )
-        }
-      >
-        URL
-      </Menu.Item>
-      <Menu.Item
-        key={2}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-            GLOBAL_CONSTANTS.RULE_KEYS.HOST
-          )
-        }
-      >
-        Host
-      </Menu.Item>
-      <Menu.Item
-        key={3}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-            GLOBAL_CONSTANTS.RULE_KEYS.PATH
-          )
-        }
-      >
-        Path
-      </Menu.Item>
-    </Menu>
-  );
+  const sourceKeys = [
+    {
+      id: 1,
+      title: "URL",
+      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+    },
+    {
+      id: 2,
+      title: "Host",
+      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
+    },
+    {
+      id: 3,
+      title: "Path",
+      ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+    },
+  ];
 
-  const sourceOperatorOptions = (
-    <Menu>
-      <Menu.Item
-        key={1}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-            GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS
-          )
-        }
-      >
-        Equals
-      </Menu.Item>
-      <Menu.Item
-        key={2}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-            GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS
-          )
-        }
-      >
-        Contains
-      </Menu.Item>
-      <Menu.Item
-        key={3}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-            GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
-          )
-        }
-      >
-        Matches (RegEx)
-      </Menu.Item>
-      <Menu.Item
-        key={4}
-        onClick={(event) =>
-          modifyPairAtGivenPath(
-            event,
-            pairIndex,
-            APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-            GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
-          )
-        }
-      >
-        Matches (Wildcard)
-      </Menu.Item>
-    </Menu>
-  );
+  const sourceOperators = [
+    {
+      id: 1,
+      title: "Equals",
+      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+    },
+    {
+      id: 2,
+      title: "Contains",
+      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+    },
+    {
+      id: 3,
+      title: "Matches (RegEx)",
+      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+    },
+    {
+      id: 4,
+      title: "Matches (Wildcard)",
+      ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES,
+    },
+  ];
+
+  const renderSourceKeys = () => {
+    return (
+      <Menu>
+        {sourceKeys.map(({ id, title, ruleKey }) => (
+          <Menu.Item
+            key={id}
+            onClick={(event) => {
+              modifyPairAtGivenPath(
+                event,
+                pairIndex,
+                APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+                ruleKey
+              );
+            }}
+          >
+            {title}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+  };
+
+  const renderSourceOperators = () => {
+    return (
+      <Menu>
+        {sourceOperators.map(({ id, title, ruleOperator }) => (
+          <Menu.Item
+            key={id}
+            onClick={(event) => {
+              modifyPairAtGivenPath(
+                event,
+                pairIndex,
+                APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+                ruleOperator
+              );
+            }}
+          >
+            {title}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+  };
 
   return (
     <Row
@@ -135,7 +119,7 @@ const RequestSourceRow = ({
       wrap={false}
     >
       <Col className="shrink-0">
-        <RQDropdown overlay={sourceKeyOptions} disabled={isInputDisabled}>
+        <RQDropdown overlay={renderSourceKeys()} disabled={isInputDisabled}>
           <Text
             strong
             className="ant-dropdown-link cursor-pointer uppercase"
@@ -146,7 +130,10 @@ const RequestSourceRow = ({
         </RQDropdown>
       </Col>
       <Col className="shrink-0">
-        <RQDropdown overlay={sourceOperatorOptions} disabled={isInputDisabled}>
+        <RQDropdown
+          overlay={renderSourceOperators()}
+          disabled={isInputDisabled}
+        >
           <Text
             strong
             className="ant-dropdown-link cursor-pointer"
