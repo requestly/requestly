@@ -143,7 +143,7 @@ const MockEditor: React.FC<Props> = ({
       setErrors(updatedErrors);
       return true;
     }
-    focusedInvalidFieldRef.current?.focus({ cursor: "end" });
+    focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
     setErrors(updatedErrors);
     return false;
   };
