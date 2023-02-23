@@ -13,10 +13,10 @@
 }
 
 .ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
-  margin: 0 8px;
   padding: 8px;
   font-size: 13px;
   line-height: 14.06px;
+  margin: 0 8px 2px 8px;
 }
 
 .ant-dropdown-menu-item-active {
