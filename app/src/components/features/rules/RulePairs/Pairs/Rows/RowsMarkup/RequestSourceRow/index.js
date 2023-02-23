@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -24,113 +24,96 @@ const RequestSourceRow = ({
     generatePlaceholderText,
   } = helperFunctions;
 
-  const sourceKeyOptions = (
-    <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.URL
-            )
-          }
-        >
-          URL
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.HOST
-            )
-          }
-        >
-          Host
-        </span>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-              GLOBAL_CONSTANTS.RULE_KEYS.PATH
-            )
-          }
-        >
-          Path
-        </span>
-      </Menu.Item>
-    </Menu>
+  const sourceKeys = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "URL",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+      },
+      {
+        id: 2,
+        title: "Host",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
+      },
+      {
+        id: 3,
+        title: "Path",
+        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+      },
+    ],
+    []
   );
 
-  const sourceOperatorOptions = (
-    <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS
-            )
-          }
-        >
-          Equals
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS
-            )
-          }
-        >
-          Contains
-        </span>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
-            )
-          }
-        >
-          Matches (RegEx)
-        </span>
-      </Menu.Item>
-      <Menu.Item key={4}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
-            )
-          }
-        >
-          Matches (Wildcard)
-        </span>
-      </Menu.Item>
-    </Menu>
+  const sourceOperators = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "Equals",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS,
+      },
+      {
+        id: 2,
+        title: "Contains",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS,
+      },
+      {
+        id: 3,
+        title: "Matches (RegEx)",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES,
+      },
+      {
+        id: 4,
+        title: "Matches (Wildcard)",
+        ruleOperator: GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES,
+      },
+    ],
+    []
   );
+
+  const renderSourceKeys = useMemo(() => {
+    return (
+      <Menu>
+        {sourceKeys.map(({ id, title, ruleKey }) => (
+          <Menu.Item
+            key={id}
+            onClick={(event) => {
+              modifyPairAtGivenPath(
+                event,
+                pairIndex,
+                APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+                ruleKey
+              );
+            }}
+          >
+            {title}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+  }, [sourceKeys, modifyPairAtGivenPath, pairIndex]);
+
+  const renderSourceOperators = useMemo(() => {
+    return (
+      <Menu>
+        {sourceOperators.map(({ id, title, ruleOperator }) => (
+          <Menu.Item
+            key={id}
+            onClick={(event) => {
+              modifyPairAtGivenPath(
+                event,
+                pairIndex,
+                APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+                ruleOperator
+              );
+            }}
+          >
+            {title}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+  }, [sourceOperators, modifyPairAtGivenPath, pairIndex]);
 
   return (
     <Row
@@ -142,7 +125,7 @@ const RequestSourceRow = ({
       wrap={false}
     >
       <Col className="shrink-0">
-        <RQDropdown overlay={sourceKeyOptions} disabled={isInputDisabled}>
+        <RQDropdown overlay={renderSourceKeys} disabled={isInputDisabled}>
           <Text
             strong
             className="ant-dropdown-link cursor-pointer uppercase"
@@ -153,7 +136,7 @@ const RequestSourceRow = ({
         </RQDropdown>
       </Col>
       <Col className="shrink-0">
-        <RQDropdown overlay={sourceOperatorOptions} disabled={isInputDisabled}>
+        <RQDropdown overlay={renderSourceOperators} disabled={isInputDisabled}>
           <Text
             strong
             className="ant-dropdown-link cursor-pointer"
