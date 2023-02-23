@@ -4,6 +4,11 @@ RQ.Utils = RQ.Utils || {};
 RQ.Utils.regexFormat = "^/(.+)/(|i|g|ig|gi)$";
 
 RQ.Utils.isValidRegex = function (regexStr) {
+  try {
+    new RegExp(regexStr);
+  } catch {
+    return false;
+  }
   return regexStr.search(new RegExp(RQ.Utils.regexFormat)) !== -1;
 };
 
