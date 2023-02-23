@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { Divider, Input, Button, Row, Menu, Dropdown, Tooltip } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Divider, Input, Button, Row, Menu, Dropdown } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllGroups,
@@ -15,6 +15,7 @@ import {
 } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { actions } from "store";
 import { StorageService } from "init";
+import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -24,7 +25,13 @@ import {
 } from "modules/analytics/events/common/groups";
 import "./EditorGroupDropdown.css";
 
-const EditorGroupDropdown = () => {
+const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
+
+interface EditorGroupDropdownProps {
+  mode: "create" | "edit";
+}
+
+const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   // Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -35,8 +42,6 @@ const EditorGroupDropdown = () => {
 
   // Component State
   const [currentGroupId, setCurrentGroupId] = useState(rule?.groupId ?? "");
-
-  // Component State
   const [showInput, setShowInput] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -164,44 +169,41 @@ const EditorGroupDropdown = () => {
         )}
       </div>
 
-      {!showInput && groupList.length > 0 && (
-        <Menu.Item
-          key="0"
-          onClick={() =>
-            handleGroupChange(
-              APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-            )
-          }
-          className="editor-group-menu-item"
-        >
-          <span className="text-gray">
-            Ungroup{" "}
-            <Tooltip title="Ungroup rule" placement="top">
-              <QuestionCircleOutlined />
-            </Tooltip>
-          </span>
-        </Menu.Item>
+      {!showInput && (
+        <div className="editor-group-menu-name-container">
+          {groupList.map(({ id, name }: { id: string; name: string }) => (
+            <GroupMenuItem
+              key={id}
+              id={id}
+              name={name}
+              currentGroupId={currentGroupId}
+              handleMenuItemClick={() => handleGroupChange(id)}
+            />
+          ))}
+        </div>
       )}
-      {!showInput &&
-        groupList.map(({ id, name }: { id: string; name: string }) => (
+
+      {!showInput && groupList.length > 0 && (
+        <>
+          <Divider className="editor-group-menu-divider" />
           <Menu.Item
-            key={id}
-            onClick={() => handleGroupChange(id)}
-            className={`editor-group-menu-item ${
-              id === currentGroupId ? "editor-group-menu-item-active" : ""
-            }`}
+            danger
+            disabled={
+              currentGroupId ===
+              APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+            }
+            key="remove from group"
+            onClick={() =>
+              handleGroupChange(
+                APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+              )
+            }
+            className="editor-group-menu-item"
           >
-            <span>{name}</span>
-            {id === currentGroupId && (
-              <img
-                alt="back"
-                width="9px"
-                height="7px"
-                src="/assets/icons/tick.svg"
-              />
-            )}
+            Remove from group
           </Menu.Item>
-        ))}
+        </>
+      )}
 
       {!showInput && groupList.length === 0 && (
         <p className="editor-group-empty-message">No groups available</p>
@@ -216,13 +218,17 @@ const EditorGroupDropdown = () => {
         placement="bottomRight"
         open={showDropdown}
         overlay={dropdownOverlay}
+        disabled={mode === RULE_EDITOR_CONFIG.MODES.CREATE}
         onOpenChange={handleDropdownVisibleChange}
         className={`editor-group-dropdown-trigger ${
           showDropdown ? "editor-group-dropdown-active" : ""
         }`}
       >
         <span className="text-gray">
-          {currentGroupId === "" ? "Add to" : "Edit group"}
+          {currentGroupId ===
+          APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+            ? "Add to group"
+            : "Edit group"}
           <img
             width={10}
             height={6}

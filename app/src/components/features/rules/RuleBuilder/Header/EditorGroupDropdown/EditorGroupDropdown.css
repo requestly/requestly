@@ -9,6 +9,11 @@
   transition: border 0.3s;
 }
 
+.editor-group-dropdown-trigger[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .editor-group-dropdown-trigger.editor-group-dropdown-active {
   border-color: var(--dropdown-active-border-color);
 }
@@ -18,9 +23,8 @@
 }
 
 .editor-group-dropdown-menu.ant-dropdown-menu {
-  width: 10.87rem;
-  max-height: 15rem;
-  overflow: auto;
+  width: 13rem;
+  max-height: 19.5rem;
   position: relative;
   color: var(--white);
 }
@@ -29,12 +33,12 @@
   width: 13.625rem;
 }
 
-.editor-group-menu-item.ant-dropdown-menu-item {
-  padding: 8px;
+.editor-group-menu-divider.ant-divider {
+  margin: 6px 0;
 }
 
-.editor-group-menu-item-active.ant-dropdown-menu-item {
-  background-color: var(--hover-color);
+.editor-group-menu-item.ant-dropdown-menu-item {
+  padding: 8px;
   border-radius: var(--border-radius-sm);
 }
 
@@ -42,11 +46,42 @@
   color: var(--white);
 }
 
+.editor-group-menu-name-container {
+  overflow: auto;
+  max-height: 11rem;
+}
+
+.editor-group-selected-icon {
+  margin-left: 2px;
+}
+
+.editor-group-menu-item.ant-dropdown-menu-item:not(.editor-group-menu-item-active) {
+  background-color: transparent;
+}
+
+.editor-group-menu-item.ant-dropdown-menu-item:not(.editor-group-menu-item-active):hover,
+.editor-group-menu-item-active.ant-dropdown-menu-item {
+  background-color: var(--hover-color);
+}
+
+.editor-group-menu-item.ant-dropdown-menu-item-danger span {
+  user-select: none;
+  color: var(--danger);
+}
+
+.editor-group-menu-item.ant-dropdown-menu-item-danger.ant-dropdown-menu-item-disabled {
+  opacity: 0.7;
+}
+
 .editor-group-menu-item .ant-dropdown-menu-title-content {
-  color: var(--text-gray);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 24ch;
+  text-overflow: ellipsis;
+  color: var(--white);
 }
 
 .editor-group-menu-item .ant-dropdown-menu-title-content span {
@@ -65,13 +100,13 @@
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 1.1px;
-  margin: 16px 0 12px 14px;
+  margin: 16px 0 8px 14px;
 }
 
 .editor-dropdown-add-new-group.ant-btn {
   margin: 0 6px;
   padding: 3px 6px;
-  width: calc(10.87rem - 14px);
+  width: calc(13rem - 14px);
   justify-content: flex-start;
 }
 
@@ -79,8 +114,9 @@
   background-color: var(--hover-color);
 }
 
-.editor-dropdown-add-new-group .anticon-plus {
+.editor-dropdown-add-new-group.ant-btn .anticon-plus {
   margin-top: 5px;
+  margin-right: -4px;
 }
 
 .editor-group-dropdown-input-container {
