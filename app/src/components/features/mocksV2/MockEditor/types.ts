@@ -19,10 +19,8 @@ export interface MockEditorDataSchema {
 
 export interface ValidationErrors {
   name?: string;
-  method?: string;
   statusCode?: string;
   endpoint?: string;
-  contentType?: string;
 }
 
 // TODO: Remove this. Fetch this from @requestly/mock-server or APP_CONSTANTS

@@ -15,6 +15,7 @@ import React, {
   useMemo,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -71,10 +72,13 @@ const MockEditor: React.FC<Props> = ({
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
     name: null,
-    method: null,
     statusCode: null,
     endpoint: null,
   });
+
+  //editor fields ref
+  const endpointRef = useRef(null);
+  const statusCodeRef = useRef(null);
 
   useEffect(() => {
     trackMockEditorOpened(mockType);
@@ -118,23 +122,20 @@ const MockEditor: React.FC<Props> = ({
 
   const validateMockEditorData = (data: MockEditorDataSchema): boolean => {
     const updatedErrors: ValidationErrors = {};
+    let focusedInvalidFieldRef = null;
 
     if (!data.name) {
       updatedErrors.name = "Name is required";
     }
-    if (!data.method) {
-      updatedErrors.method = "Method is required";
-    }
     if (!data.statusCode) {
       updatedErrors.statusCode = "Status Code is required";
-    }
-    if (!data.contentType) {
-      updatedErrors.contentType = "content type is required";
+      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
     }
     // TODO: Add more validations here for special characters, //, etc.
     const endpointValidationError = validateEndpoint(data.endpoint);
     if (endpointValidationError) {
       updatedErrors.endpoint = endpointValidationError;
+      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
     }
 
     // No errors found.
@@ -142,7 +143,7 @@ const MockEditor: React.FC<Props> = ({
       setErrors(updatedErrors);
       return true;
     }
-
+    focusedInvalidFieldRef.current?.focus({ cursor: "end" });
     setErrors(updatedErrors);
     return false;
   };
@@ -177,7 +178,6 @@ const MockEditor: React.FC<Props> = ({
           options={requestMethodDropdownOptions}
           onChange={(e) => setMethod(e)}
           value={method}
-          status={errors.method ? "error" : ""}
           placeholder="Method"
         />
       </Col>
@@ -214,6 +214,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          ref={statusCodeRef}
           id="status-code"
           size="large"
           options={APP_CONSTANTS.STATUS_CODE}
@@ -224,11 +225,11 @@ const MockEditor: React.FC<Props> = ({
               return option.value.includes(inputValue);
             }
           }}
-          status={errors.statusCode ? "error" : ""}
+          status={errors.statusCode && !statusCode ? "error" : ""}
           placeholder="Response Code"
         />
         <span className="field-error-prompt">
-          {errors.statusCode ? errors.statusCode : null}
+          {errors.statusCode && !statusCode ? errors.statusCode : null}
         </span>
       </Col>
     );
@@ -243,7 +244,6 @@ const MockEditor: React.FC<Props> = ({
         <AutoComplete
           id="content-type"
           size="large"
-          status={errors.contentType ? "error" : ""}
           // @ts-ignore
           type="text"
           placeholder="content"
@@ -252,9 +252,6 @@ const MockEditor: React.FC<Props> = ({
           name="type"
           onChange={(e) => setContentType(e)}
         />
-        <span className="field-error-prompt">
-          {errors.contentType ? errors.contentType : null}
-        </span>
       </Col>
     );
   };
@@ -271,6 +268,7 @@ const MockEditor: React.FC<Props> = ({
           Endpoint
         </label>
         <Input
+          ref={endpointRef}
           required
           id="endpoint"
           addonBefore={
@@ -282,11 +280,11 @@ const MockEditor: React.FC<Props> = ({
           value={endpoint}
           name="path"
           onChange={(e) => setEndpoint(e.target.value)}
-          status={errors.endpoint ? "error" : ""}
+          status={errors.endpoint && !endpoint ? "error" : ""}
           placeholder={errors.endpoint ? errors.endpoint : "Enter endpoint"}
         />
         <span className="field-error-prompt">
-          {errors.endpoint ? errors.endpoint : null}
+          {errors.endpoint && !endpoint ? errors.endpoint : null}
         </span>
       </Col>
     );
