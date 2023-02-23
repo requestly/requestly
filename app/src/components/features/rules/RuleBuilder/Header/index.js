@@ -64,7 +64,7 @@ const Header = ({
               <RuleOptions mode={mode} rule={currentlySelectedRuleData} />
             </Col>
             <Col>
-              <EditorGroupDropdown />
+              <EditorGroupDropdown mode={mode} />
             </Col>
             <Col>
               <ActionButtons
