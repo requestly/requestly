@@ -14,6 +14,9 @@
   align-items: center;
   gap: 4px;
 }
+.editor-title-name .editor-title-name-wrapper {
+  width: 100%;
+}
 .editor-title-container .editor-title-name {
   min-height: 33px;
 }
@@ -25,7 +28,7 @@
   margin-bottom: 0;
   color: #86868b;
 }
-.editor-title-name .ant-input,
+.editor-title-name .editor-title-name-wrapper .ant-input,
 .editor-title-description .ant-input {
   max-width: 600px;
   padding: 0;

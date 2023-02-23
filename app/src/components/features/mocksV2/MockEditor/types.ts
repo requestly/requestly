@@ -19,7 +19,6 @@ export interface MockEditorDataSchema {
 
 export interface ValidationErrors {
   name?: string;
-  method?: string;
   statusCode?: string;
   endpoint?: string;
 }
