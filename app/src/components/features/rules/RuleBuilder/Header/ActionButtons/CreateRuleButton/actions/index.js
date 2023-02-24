@@ -383,7 +383,7 @@ export const fixSourceRegexFormat = (dispatch, rule) => {
       const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
       if (!regexFormat.test(pair.source.value)) {
         const sourceValueInRegexFormat = pair.source.value.replace(
-          /(.*)/,
+          /^\/?([^/]+(?:\/[^/]+)*)\/?$/,
           "/$1/"
         );
         self[i].source.value = sourceValueInRegexFormat;
