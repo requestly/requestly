@@ -3,10 +3,11 @@ import isEmpty from "is-empty";
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // LODASH
-import { inRange } from "lodash";
+import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 
-export const validateRule = (rule, user) => {
+export const validateRule = (rule) => {
   let output;
   if (isEmpty(rule.name)) {
     return {
@@ -337,6 +338,26 @@ export const validateRule = (rule, user) => {
     });
   }
 
+  if (!output) {
+    // regex validation
+    rule.pairs.every((pair) => {
+      if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+        const pattern = pair.source.value.replace(/\/(.*)\//, "$1");
+        try {
+          new RegExp(pattern);
+        } catch (err) {
+          output = {
+            result: false,
+            message: err.message,
+            error: "invalid regex",
+          };
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
   if (output && output.result === false) {
     return output;
   }
@@ -353,4 +374,22 @@ export const ruleModifiedAnalytics = (user) => {
     const data = new Date().getTime();
     usageMetrics(data);
   }
+};
+
+export const fixSourceRegexFormat = (dispatch, rule) => {
+  const ruleCopy = cloneDeep(rule);
+  ruleCopy.pairs.forEach((pair, i, self) => {
+    if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+      const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
+      if (!regexFormat.test(pair.source.value)) {
+        const sourceValueInRegexFormat = pair.source.value.replace(
+          /^\/?([^/]+(?:\/[^/]+)*)\/?$/,
+          "/$1/"
+        );
+        self[i].source.value = sourceValueInRegexFormat;
+      }
+    }
+  });
+
+  setCurrentlySelectedRule(dispatch, ruleCopy);
 };

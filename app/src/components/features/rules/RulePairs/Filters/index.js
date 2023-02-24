@@ -428,7 +428,6 @@ const Filters = (props) => {
             )}
             name="description"
             type="text"
-            // className="has-dark-text height-two-rem"
             value={getObjectValue(
               currentlySelectedRuleData,
               pairIndex,
