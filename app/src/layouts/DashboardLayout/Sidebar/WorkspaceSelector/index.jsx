@@ -206,7 +206,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast(team.name);
     }, 2 * 1000);
-    handleMobileSidebarClose();
+    handleMobileSidebarClose?.();
   };
 
   const unauthenticatedUserMenu = (
