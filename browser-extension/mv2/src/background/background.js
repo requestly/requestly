@@ -1267,7 +1267,7 @@ function buildExecutionLogObject({ ruleName, requestDetails, modification }) {
     modification,
   };
 
-  if (requestDetails.type !== RQ.REQUEST_TYPES.MAIN_FRAME) {
+  if (requestDetails.type !== "main_frame") {
     executionLogObject.pageSourceUrl = window.tabService.getTabUrl(
       requestDetails.tabId
     );
@@ -1342,7 +1342,7 @@ BG.Methods.sendLogToConsoleLogger = async function (
   chrome.tabs.sendMessage(
     requestDetails.tabId,
     {
-      action: RQ.PRINT_CONSOLE_LOGS,
+      action: RQ.CLIENT_MESSAGES.PRINT_CONSOLE_LOGS,
       requestDetails,
       rule,
       modification,
