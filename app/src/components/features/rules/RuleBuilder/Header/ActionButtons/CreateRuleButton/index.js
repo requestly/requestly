@@ -17,7 +17,7 @@ import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../actions";
-import { validateRule } from "./actions";
+import { fixSourceRegexFormat, validateRule } from "./actions";
 //Constants
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -58,12 +58,10 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
+    //Prevalidation regex fix
+    fixSourceRegexFormat(dispatch, currentlySelectedRuleData);
     //Validation
-    const ruleValidation = validateRule(
-      currentlySelectedRuleData,
-      user,
-      dispatch
-    );
+    const ruleValidation = validateRule(currentlySelectedRuleData, dispatch);
     if (ruleValidation.result) {
       saveRule(
         appMode,

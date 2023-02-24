@@ -162,7 +162,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     if (user.loggedIn) {
       trackCreateNewWorkspaceLinkClicked();
       setIsCreateWorkspaceModalOpen(true);
-      handleMobileSidebarClose();
+      handleMobileSidebarClose?.();
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -206,7 +206,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast(team.name);
     }, 2 * 1000);
-    handleMobileSidebarClose();
+    handleMobileSidebarClose?.();
   };
 
   const unauthenticatedUserMenu = (
