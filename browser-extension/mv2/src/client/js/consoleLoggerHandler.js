@@ -19,7 +19,7 @@ RQ.ConsoleLogger.setup = () => {
   });
 
   chrome.runtime.onMessage.addListener(function (message) {
-    if (message.action === RQ.PRINT_CONSOLE_LOGS) {
+    if (message.action === RQ.CLIENT_MESSAGES.PRINT_CONSOLE_LOGS) {
       RQ.ConsoleLogger.handleMessage(message);
     }
   });
