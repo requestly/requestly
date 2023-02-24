@@ -15,7 +15,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
   collapsed,
   setCollapsed,
   isMobileMenu = false,
-  handleMobileSidebarClose,
+  handleMobileSidebarClose = () => {},
 }) => {
   const toggle = () => {
     localStorage.setItem("collapsed-sidebar", `${!collapsed}`);
