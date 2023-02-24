@@ -73,10 +73,3 @@ export const getTabSession = (tabId: number, callback: () => void) => {
     callback
   );
 };
-
-export const checkIfRecordingConfigPresent = async (): Promise<boolean> => {
-  const sessionRecordingConfig =
-    (await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY)) || {};
-
-  return Object.keys(sessionRecordingConfig)?.length > 0;
-};
