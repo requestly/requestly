@@ -49,4 +49,6 @@ RQ.CLIENT_MESSAGES = {
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
+  SYNC_APPLIED_RULES: "syncAppliedRules",
+  NOTIFY_CONTENT_SCRIPT_LOADED: "notifyContentScriptLoaded",
 };
