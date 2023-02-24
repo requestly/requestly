@@ -10,7 +10,6 @@ import SidebarFooter from "./SidebarFooter";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ProductAnnouncement from "./ProductAnnouncement";
-import featureFlag from "utils/feature-flag";
 import "./Sidebar.css";
 
 const { Sider } = Layout;
@@ -56,10 +55,7 @@ const Sidebar = ({ visible, setVisible, collapsed, setCollapsed }) => {
       <MenuItem onClose={onClose} collapsed={collapsed} />
       <div className="mt-auto">
         <Row className="sidebar-announcement">
-          {checkedCollapseState &&
-          !collapsed ? (
-            <ProductAnnouncement />
-          ) : null}
+          {checkedCollapseState && !collapsed ? <ProductAnnouncement /> : null}
         </Row>
 
         <SidebarFooter collapsed={collapsed} />
