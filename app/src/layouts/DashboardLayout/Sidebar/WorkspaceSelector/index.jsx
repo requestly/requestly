@@ -162,7 +162,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     if (user.loggedIn) {
       trackCreateNewWorkspaceLinkClicked();
       setIsCreateWorkspaceModalOpen(true);
-      handleMobileSidebarClose();
+      handleMobileSidebarClose?.();
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
