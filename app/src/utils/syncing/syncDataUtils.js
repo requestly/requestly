@@ -289,9 +289,10 @@ export const syncToLocalFromFirebase = async (
   const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter(
     (x) => !recordIdsOnFirebase.includes(x)
   );
-  await StorageService(appMode).removeRecordsWithoutSyncing(
-    recordsThatShouldBeDeletedFromLocal
-  );
+  if (!isEmpty(recordsThatShouldBeDeletedFromLocal))
+    await StorageService(appMode).removeRecordsWithoutSyncing(
+      recordsThatShouldBeDeletedFromLocal
+    );
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
 
   // Todo - @sagar - Fix duplicate code - src/utils/syncing/syncDataUtils.js
