@@ -36,7 +36,7 @@ const useDatabase = () => {
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
     if (unsubscribeSyncingNodeRef.current) unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
-    if (user?.loggedIn && user?.details) {
+    if (user?.loggedIn && user?.details?.profile?.uid) {
       if (currentlyActiveWorkspace.id) {
         // This is a team sync
         // Set the db node listener
@@ -66,7 +66,8 @@ const useDatabase = () => {
     appMode,
     currentlyActiveWorkspace.id,
     dispatch,
-    user,
+    user?.loggedIn,
+    user?.details?.profile?.uid,
     user?.details?.isSyncEnabled,
   ]);
 
