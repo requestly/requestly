@@ -183,7 +183,6 @@ class StorageServiceWrapper {
   }
 
   removeRecordsWithoutSyncing(array) {
-    // Seems useless
     return this.StorageHelper.removeStorageObjects(array);
   }
 
