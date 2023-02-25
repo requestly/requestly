@@ -14,13 +14,7 @@ const clearCurrentlySelectedRuleAndConfig = (dispatch) => {
   dispatch(actions.clearCurrentlySelectedRuleAndConfig());
 };
 
-export const saveRule = async (
-  appMode,
-  dispatch,
-  ruleObject,
-  navigate,
-  callback
-) => {
+export const saveRule = async (appMode, ruleObject, callback) => {
   //Set the modification date of rule
   const ruleToSave = {
     ...ruleObject,

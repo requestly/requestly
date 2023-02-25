@@ -3,9 +3,13 @@ import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
 import APP_CONSTANTS from "config/constants";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import { checkTimestampAndSync } from "utils/syncing/SyncUtils";
 import _ from "lodash";
 import Logger from "lib/logger";
+import {
+  getAllSyncedRecords,
+  syncToLocalFromFirebase,
+} from "utils/syncing/syncDataUtils";
+import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 
 export const resetSyncDebounceTimerStart = () =>
   (window.syncDebounceTimerStart = Date.now());
@@ -26,17 +30,22 @@ const animateSyncIcon = () => {
   }
 };
 
-const doSync = (uid, appMode, dispatch) => {
-  checkTimestampAndSync(uid, appMode).then(() => {
-    // Refresh Rules
-    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-    // Refresh Session Recording Config
-    dispatch(
-      actions.updateRefreshPendingStatus({
-        type: "sessionRecordingConfig",
-      })
-    );
-  });
+const doSync = async (uid, appMode, dispatch) => {
+  if (!isLocalStoragePresent(appMode)) {
+    return;
+  }
+  const allSyncedRecords = await getAllSyncedRecords(appMode);
+  await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
+  trackSyncCompleted(uid);
+
+  // Refresh Rules
+  dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+  // Refresh Session Recording Config
+  dispatch(
+    actions.updateRefreshPendingStatus({
+      type: "sessionRecordingConfig",
+    })
+  );
 };
 const doSyncDebounced = _.debounce(doSync, 5000);
 

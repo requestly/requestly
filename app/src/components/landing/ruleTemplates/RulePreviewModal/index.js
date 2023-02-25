@@ -37,7 +37,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
     const lastModifiedBy = Date.now();
     const modificationDate = Date.now();
     ruleObj.appMode = appMode;
-    saveRule(ruleObj.appMode, dispatch, {
+    saveRule(ruleObj.appMode, {
       ...ruleObj.ruleDefinition,
       createdBy,
       currentOwner,

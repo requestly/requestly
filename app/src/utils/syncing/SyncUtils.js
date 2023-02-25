@@ -5,17 +5,8 @@ import {
 import {
   updateUserSyncRecords,
   removeUserSyncRecords,
-  getSyncTimestamp,
-  getAllLocalRecords,
-  getAllSyncedRecords,
-  syncAllRulesAndGroupsToFirebase,
   setLastSyncTimestamp,
-  mergeRecords,
-  syncToLocalFromFirebase,
-  saveRecords,
   updateSessionRecordingPageConfig,
-  syncSessionRecordingPageConfigToFirebase,
-  mergeAndSyncRecordingPageSources,
   getTeamUserRuleConfigPath,
 } from "./syncDataUtils";
 import {
@@ -25,7 +16,6 @@ import {
   trackSyncTriggered,
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
-import { isLocalStoragePresent } from "utils/AppUtils";
 
 /**
  * This functions triggers syncing process
@@ -35,13 +25,15 @@ import { isLocalStoragePresent } from "utils/AppUtils";
  *
  * syncing is disabled when storage is remote
  */
-export const doSyncRecords = (records, syncType, appMode) => {
+export const doSyncRecords = async (records, syncType, appMode) => {
   if (!window.uid) return; // If user is not logged in
   if (!window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return; // If personal syncing is disabled and user has no active workspace
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
-      syncRecordUpdates(records, appMode);
+      await updateUserSyncRecords(window.uid, records).catch((e) =>
+        console.error(e)
+      );
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
@@ -103,33 +95,6 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
   }
 };
 
-/**
- * Should run when records are created/updated to sync with database
- * @param {Object} recordsObject
- * @param {String} uid
- * @param {String} appMode
- */
-export const syncRecordUpdates = async (recordsObject, appMode) => {
-  const recordLength = Object.keys(recordsObject)?.length;
-  trackSyncTriggered(
-    window.uid,
-    recordLength,
-    SYNC_CONSTANTS.SYNC_UPDATE_RECORDS
-  );
-  updateUserSyncRecords(window.uid, recordsObject)
-    .then(() => {
-      setLastSyncTimestamp(window.uid, appMode);
-      trackSyncCompleted(window.uid);
-    })
-    .catch((e) =>
-      trackSyncFailed(
-        window.uid,
-        SYNC_CONSTANTS.SYNC_UPDATE_RECORDS,
-        JSON.stringify(e)
-      )
-    );
-};
-
 const syncSessionRecordingPageConfig = async (object, appMode) => {
   trackSyncTriggered(window.uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
   updateSessionRecordingPageConfig(window.uid, object)
@@ -144,85 +109,4 @@ const syncSessionRecordingPageConfig = async (object, appMode) => {
         JSON.stringify(e)
       )
     );
-};
-
-export const checkTimestampAndSync = async (uid, appMode) => {
-  if (!isLocalStoragePresent(appMode)) {
-    return;
-  }
-
-  const { firebaseTimestamp, localTimestamp } = await getSyncTimestamp(
-    uid,
-    appMode
-  );
-
-  if (!firebaseTimestamp) {
-    syncAllRulesAndGroupsToFirebase(uid, appMode);
-    syncSessionRecordingPageConfigToFirebase(uid, appMode);
-  } else {
-    const allLocalRecords = await getAllLocalRecords(appMode, false);
-    const allSyncedRecords = await getAllSyncedRecords(appMode);
-
-    // if rules in local and in firebase and !localts----> merge and sync to firebase
-    if (
-      !localTimestamp &&
-      allLocalRecords.length > 0 &&
-      allSyncedRecords.length >= 0
-    ) {
-      // set current ts to both lts and fts
-      const mergedRecords = mergeRecords(allSyncedRecords, allLocalRecords);
-      trackSyncTriggered(
-        uid,
-        mergedRecords.length,
-        SYNC_CONSTANTS.MERGE_AND_SYNC_TO_FIREBASE
-      );
-      saveRecords(mergedRecords, appMode);
-      trackSyncCompleted(uid);
-    }
-    // else if no rules in local and !localts ---->  add to local from firebase
-    else if (!localTimestamp && allLocalRecords.length === 0) {
-      await syncToLocalFromFirebase(
-        allSyncedRecords,
-        appMode,
-        firebaseTimestamp,
-        uid
-      );
-      trackSyncCompleted(uid);
-    }
-    // else if localts==firebasets ---->  merge and add to local from firebase
-    else if (localTimestamp === firebaseTimestamp) {
-      const mergedRecords = mergeRecords(allSyncedRecords, allLocalRecords);
-      trackSyncTriggered(
-        uid,
-        mergedRecords.length,
-        SYNC_CONSTANTS.MERGE_AND_SYNC_TO_FIREBASE_LTS_EQUALS_FTS
-      );
-      saveRecords(mergedRecords, appMode);
-      trackSyncCompleted(uid);
-    }
-    // else if fts>lts ---> add to local from firebase
-    else if (firebaseTimestamp > localTimestamp) {
-      await syncToLocalFromFirebase(
-        allSyncedRecords,
-        appMode,
-        firebaseTimestamp,
-        uid
-      );
-      trackSyncCompleted(uid);
-    }
-    // else if lts>fts ---> sync to firebase, this case is only possible when rules are not synced to firebase due to bad connection
-    else if (localTimestamp > firebaseTimestamp) {
-      const mergedRecords = mergeRecords(allSyncedRecords, allLocalRecords);
-      trackSyncTriggered(
-        uid,
-        mergedRecords.length,
-        SYNC_CONSTANTS.MERGE_AND_SYNC_TO_FIREBASE_LTS_EXCEEDS_FTS
-      );
-      saveRecords(mergedRecords, appMode);
-      trackSyncCompleted(uid);
-    }
-
-    // Session Recording Syncing
-    mergeAndSyncRecordingPageSources(uid, appMode);
-  }
 };

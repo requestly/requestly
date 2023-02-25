@@ -267,27 +267,6 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
   return [...rules, ...groups];
 };
 
-export const syncAllRulesAndGroupsToFirebase = async (
-  uid,
-  appMode,
-  timestamp
-) => {
-  const { rules, groups } = await getAllRulesAndGroups(appMode);
-  const allRecords = [...rules, ...groups];
-  const recordsObject = processRecordsArrayIntoObject(allRecords);
-
-  trackSyncTriggered(
-    uid,
-    allRecords.length,
-    SYNC_CONSTANTS.SYNC_ALL_RECORDS_TO_FIREBASE
-  );
-
-  updateUserSyncRecords(uid, recordsObject).then(() => {
-    trackSyncCompleted(uid);
-  });
-  setLastSyncTimestamp(uid, appMode, timestamp);
-};
-
 export const saveRecords = (records, appMode) => {
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };
@@ -295,7 +274,6 @@ export const saveRecords = (records, appMode) => {
 export const syncToLocalFromFirebase = async (
   allSyncedRecords,
   appMode,
-  timestamp,
   uid
 ) => {
   // dump the entire firebase node in the storage
@@ -356,7 +334,6 @@ export const syncToLocalFromFirebase = async (
   }
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
-  setLastSyncTimestampInLocalStorage(appMode, timestamp);
   return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(
     allSyncedRecords
   );
