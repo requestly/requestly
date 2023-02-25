@@ -14,31 +14,37 @@ const getSourceFormat = () => ({
 });
 
 const modifyResponseDefaultCode = () => {
-  let value =
-    "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  \n  return response;\n}";
+  const docString =
+    "/** \n   * @param {String} method The HTTP verb of the request: GET | PUT | POST etc.  \n   * @param {String} url Request URL  \n   * @param {Object | undefinded} requestHeaders key: Header name, value: Header value  \n   * @param {String | Object | undefined} requestData present in case of request with payloads.  \n   * @param {String} response stringified response  \n   * @param {String | undefinded} responseType value of content-type response header  \n   * @param {Object | undefined} responseJSON if content-type is application/json or similar. Contains value of JSON.parse(response)  \n   * @returns {String | Object} Object should be valid JSON\n  */ \n";
+
+  let funcString = `function modifyResponse(args) {\n  ${docString}  const {method, url, requestHeaders, requestData, response, responseType, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  \n  return response;\n}`;
 
   if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_RESPONSE_BODY)) {
-    value = "async " + value;
+    funcString = "async " + funcString;
   }
 
-  return value;
+  return funcString;
 };
 
 const modifyRequestDefaultCode = () => {
-  let value =
-    "function modifyRequest(args) {\n  const {method, url, request:requestData} = args;\n  // Change request below depending upon request attributes received in args\n  \n  return requestData;\n}";
+  let docString =
+    "/** \n   * @param {String} method  The HTTP verb of the request: GET | PUT | POST etc.  \n   * @param {String} url     Request URL string  \n   * @param {String} request The stringified version of the body  \n   * @returns {String} \n  */ \n";
+
+  let funcString = `function modifyRequest(args) {\n  ${docString}  const {method, url, request:requestData} = args;\n  // Change request below depending upon request attributes received in args\n  \n  return requestData;\n}`;
 
   // updated modifyRequestBody starter template with renamed args
   if (isFeatureCompatible(FEATURES.UPDATED_REQUEST_BODY_ARGS)) {
-    value =
-      "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  \n  return body;\n}";
+    docString =
+      "/** \n   * @param {String} method     The HTTP verb of the request: GET | PUT | POST etc.  \n   * @param {String} url        request URL  \n   * @param {String} body       The stringified version of the body  \n   * @param {Object} bodyAsJson if the content-type === application/json , This is JSON.parse(body)  \n   * @returns {String | Object} Object should be valid JSON  \n  */ \n";
+
+    funcString = `function modifyRequestBody(args) {\n  ${docString}  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  \n  return body;\n}`;
   }
 
   if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_RESPONSE_BODY)) {
-    value = "async " + value;
+    funcString = "async " + funcString;
   }
 
-  return value;
+  return funcString;
 };
 
 const getHeaderMetadataConfig = () => {
