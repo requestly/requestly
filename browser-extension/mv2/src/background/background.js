@@ -752,30 +752,12 @@ BG.Methods.getPinnedGroups = function (populateChildren) {
   return Object.values(pinnedGroups);
 };
 
-BG.Methods.getRecentRules = function () {
-  const rules = RQ.StorageService.records.filter(function (record) {
-    return record.objectType === RQ.OBJECT_TYPES.RULE;
-  });
-  return rules
-    .sort((rule1, rule2) => rule2.modificationDate - rule1.modificationDate)
-    .slice(0, 5);
-};
-
 BG.Methods.checkIfNoRulesPresent = function () {
   const hasRules = RQ.StorageService.records.some(function (record) {
     return record.objectType === RQ.OBJECT_TYPES.RULE;
   });
 
   return !hasRules;
-};
-
-BG.Methods.checkIfRecordingConfigPresent = async function () {
-  const sessionRecordingConfig =
-    (await RQ.StorageService.getRecord(
-      RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-    )) || {};
-
-  return Object.keys(sessionRecordingConfig)?.length > 0;
 };
 
 BG.Methods.registerListeners = function () {
@@ -1113,17 +1095,9 @@ BG.Methods.addListenerForExtensionMessages = function () {
         sendResponse(BG.Methods.getPinnedGroups(message.populateChildren));
         break;
 
-      case RQ.EXTENSION_MESSAGES.GET_RECENT_RULES:
-        sendResponse(BG.Methods.getRecentRules());
-        break;
-
       case RQ.EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
         sendResponse(BG.Methods.checkIfNoRulesPresent());
         break;
-
-      case RQ.EXTENSION_MESSAGES.CHECK_IF_RECORDING_CONFIG_PRESENT:
-        BG.Methods.checkIfRecordingConfigPresent().then(sendResponse);
-        return true;
 
       case RQ.EXTENSION_MESSAGES.GET_FLAGS:
         sendResponse(RQ.flags);
