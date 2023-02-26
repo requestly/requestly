@@ -6,7 +6,6 @@ import { isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
-  checkIfRecordingConfigPresent,
   getTabSession,
   initSessionRecording,
   onSessionRecordingStartedNotification,
@@ -71,10 +70,6 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
         checkIfNoRulesPresent().then(sendResponse);
-        return true;
-
-      case EXTENSION_MESSAGES.CHECK_IF_RECORDING_CONFIG_PRESENT:
-        checkIfRecordingConfigPresent().then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
