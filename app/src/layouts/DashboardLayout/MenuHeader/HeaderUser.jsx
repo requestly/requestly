@@ -111,7 +111,7 @@ export default function HeaderUser() {
           handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
             .then(() =>
               dispatch(
-                actions.updateRefreshPendingStatus({
+                actions.updateHardRefreshPendingStatus({
                   type: "rules",
                 })
               )
