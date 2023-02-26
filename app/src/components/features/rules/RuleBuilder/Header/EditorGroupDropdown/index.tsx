@@ -24,6 +24,7 @@ import {
   trackGroupCreatedEvent,
 } from "modules/analytics/events/common/groups";
 import "./EditorGroupDropdown.css";
+import Logger from "lib/logger";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
@@ -47,6 +48,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
+    Logger.log("Reading storage in EditorGroupDropdown");
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
       .then((groups) => dispatch(actions.updateGroups(groups)));
@@ -65,6 +67,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
       (groupId: string) => {
         handleGroupChange(groupId);
         trackGroupCreatedEvent("rule_editor");
+        Logger.log("Reading storage in EditorGroupDropdown handleAddNewGroup");
         StorageService(appMode)
           .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
           .then((groups) => dispatch(actions.updateGroups(groups)));

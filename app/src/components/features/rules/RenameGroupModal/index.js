@@ -16,6 +16,7 @@ import {
 } from "../../../../store/selectors";
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import Logger from "lib/logger";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
@@ -93,6 +94,8 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
       lastModifiedBy,
       modificationDate: generateObjectCreationDate(),
     };
+
+    Logger.log("Writing to storage in RenameGroupModal");
     StorageService(appMode)
       .saveRuleOrGroup(newGroup)
       .then(async () => {
@@ -110,6 +113,7 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   };
 
   useEffect(() => {
+    Logger.log("Writing to storage in RenameGroupModal useEffect");
     StorageService(appMode)
       .getRecord(groupIdFromProps)
       .then((group) => {

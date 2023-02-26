@@ -57,6 +57,8 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
 export const updateUserSyncMetadata = (uid, metadata, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(getMetadataSyncPath(uid), metadata);
+
+    Logger.log("Writing storage in updateUserSyncMetadata");
     StorageService(appMode)
       .saveRecord(metadata)
       .then(() => resolve())
@@ -177,6 +179,7 @@ export const getSyncTimestamp = (uid, appMode) => {
         syncTimestamp["firebaseTimestamp"] = null;
       }
       try {
+        Logger.log("Reading storage in getSyncTimestamp");
         syncTimestamp["localTimestamp"] = await StorageService(
           appMode
         ).getRecord(APP_CONSTANTS.LAST_SYNC_TIMESTAMP);
@@ -268,6 +271,7 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
 };
 
 export const saveRecords = (records, appMode) => {
+  Logger.log("Writing storage in saveRecords");
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };
 
@@ -289,10 +293,13 @@ export const syncToLocalFromFirebase = async (
   const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter(
     (x) => !recordIdsOnFirebase.includes(x)
   );
-  if (!isEmpty(recordsThatShouldBeDeletedFromLocal))
+  if (!isEmpty(recordsThatShouldBeDeletedFromLocal)) {
+    Logger.log("Removing storage in syncToLocalFromFirebase");
     await StorageService(appMode).removeRecordsWithoutSyncing(
       recordsThatShouldBeDeletedFromLocal
     );
+  }
+
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
 
   // Todo - @sagar - Fix duplicate code - src/utils/syncing/syncDataUtils.js
@@ -335,6 +342,7 @@ export const syncToLocalFromFirebase = async (
   }
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
+  Logger.log("Writing storage in syncToLocalFromFirebase");
   return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(
     allSyncedRecords
   );
@@ -369,6 +377,7 @@ export const setLastSyncTimestampInLocalStorage = (
     [APP_CONSTANTS.LAST_SYNC_TIMESTAMP]: timestampToUse,
   };
 
+  Logger.log("Writing storage in setLastSyncTimestampInLocalStorage");
   StorageService(appMode).saveRecord(syncTimestampObject);
 };
 
@@ -409,6 +418,9 @@ const saveSessionRecordingPageConfigLocallyWithoutSync = async (
   object,
   appMode
 ) => {
+  Logger.log(
+    "Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync"
+  );
   await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
 
@@ -423,6 +435,7 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 };
 
 export const getLocalSessionRecordingPageConfig = (appMode) => {
+  Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
   return new Promise((resolve) => {
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
@@ -466,12 +479,10 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
   ];
   let mergedPageSources;
 
-  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(
-    uid
-  );
-  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(
-    appMode
-  );
+  const firebaseSessionRecordingPageConfig =
+    await getSyncedSessionRecordingPageConfig(uid);
+  const localSessionRecordingPageConfig =
+    await getLocalSessionRecordingPageConfig(appMode);
 
   const firebasePageSources =
     firebaseSessionRecordingPageConfig?.pageSources || [];

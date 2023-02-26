@@ -11,6 +11,7 @@ import { getAllRulesAndGroups } from "./rules/misc";
 import { getTimeDifferenceFromTimestamps } from "./DateTimeUtils";
 import { toast } from "./Toast";
 import { trackBackupCreated } from "modules/analytics/events/features/syncing/backup";
+import Logger from "lib/logger";
 
 let isBackupInProcess = false;
 
@@ -28,6 +29,7 @@ export const setIsBackupEnabled = async (uid, state) => {
 };
 
 export const getLastBackupTimestamp = (appMode) => {
+  Logger.log("Reading storage in getLastBackupTimestamp");
   return StorageService(appMode).getRecord(APP_CONSTANTS.LAST_BACKUP_TIMESTAMP);
 };
 
@@ -49,15 +51,13 @@ export const isNewBackupRequired = (backupTimestamp) => {
   return Boolean(!backupTimestamp && isExpired); // backuptimestamp is returned to cover case when no backup is present
 };
 
-export const updateLastBackupTimeStamp = (appMode, newTimestamp) => {
+export const updateLastBackupTimeStamp = async (appMode, newTimestamp) => {
   let timestamp = newTimestamp || Date.now();
-  return StorageService(appMode)
-    .saveRecord({
-      [APP_CONSTANTS.LAST_BACKUP_TIMESTAMP]: timestamp,
-    })
-    .then(() => {
-      return { success: true, time: timestamp };
-    });
+  Logger.log("Writing storage in updateLastBackupTimeStamp");
+  await StorageService(appMode).saveRecord({
+    [APP_CONSTANTS.LAST_BACKUP_TIMESTAMP]: timestamp,
+  });
+  return { success: true, time: timestamp };
 };
 
 export const createNewBackup = (appMode) => {
@@ -119,5 +119,6 @@ export const updateRecordWithBackup = (appMode, backupData) => {
   // const timestamp = backupData.timestamp;
   const backupArray = [...backup.groups, ...backup.rules]; // To also include groups that are empty
 
+  Logger.log("Writing storage in updateRecordWithBackup");
   return StorageService(appMode).saveMultipleRulesOrGroups(backupArray);
 };

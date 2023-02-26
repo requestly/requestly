@@ -6,6 +6,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import firebaseApp from "../firebase";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackRuleExecuted } from "modules/analytics/events/common/rules";
+import Logger from "lib/logger";
 
 const useRuleExecutionsSyncer = () => {
   //Global State
@@ -54,6 +55,7 @@ const useRuleExecutionsSyncer = () => {
   }, []);
 
   useEffect(() => {
+    Logger.log("Reading storage in useRuleExecutionsSyncer");
     StorageService(appMode)
       .getRecord("ec")
       .then((storageEC) => {

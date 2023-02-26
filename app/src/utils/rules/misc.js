@@ -3,6 +3,7 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import Logger from "lib/logger";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -38,6 +39,7 @@ export const getRulesAndGroupsFromRuleIds = (
     const groupIdsArr = [];
     const isGroupIdAlreadyAdded = {};
 
+    Logger.log("Reading storage in getRulesAndGroupsFromRuleIds");
     StorageService(appMode)
       .getAllRecords()
       .then((allRecords) => {
@@ -69,6 +71,7 @@ export const getRulesAndGroupsFromRuleIds = (
 
 export const getAllRulesAndGroups = (appMode, _sanitizeRules = true) => {
   return new Promise((resolve) => {
+    Logger.log("Reading storage in getAllRulesAndGroups");
     StorageService(appMode)
       .getAllRecords()
       .then((allRecords) => {

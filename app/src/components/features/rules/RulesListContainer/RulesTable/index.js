@@ -92,6 +92,7 @@ import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import "./rulesTable.css";
+import Logger from "lib/logger";
 
 //Lodash
 const set = require("lodash/set");
@@ -157,18 +158,14 @@ const RulesTable = ({
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
-  const [
-    isDeleteConfirmationModalActive,
-    setIsDeleteConfirmationModalActive,
-  ] = useState(false);
+  const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] =
+    useState(false);
   const [
     isUngroupOrDeleteRulesModalActive,
     setIsUngroupOrDeleteRulesModalActive,
   ] = useState(false);
-  const [
-    ungroupOrDeleteRulesModalData,
-    setUngroupOrDeleteRulesModalData,
-  ] = useState(null);
+  const [ungroupOrDeleteRulesModalData, setUngroupOrDeleteRulesModalData] =
+    useState(null);
   const [ruleToDelete, setRuleToDelete] = useState([]);
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [size, setSize] = useState(window.innerWidth);
@@ -336,6 +333,8 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(newGroup));
+
+    Logger.log("Writing storage in RulesTable toggleIncomingGroupStatus");
     StorageService(appMode)
       .saveRuleOrGroup(newGroup)
       .then(() => {
@@ -438,6 +437,7 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(updatedRule));
+    Logger.log("Writing storage in RulesTable changeFavouriteState");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, false)
       .then(() => {
@@ -495,6 +495,7 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(updatedRule));
+    Logger.log("Writing storage in RulesTable changeRuleStatus");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, false)
       .then((rule) => {

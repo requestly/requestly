@@ -7,6 +7,7 @@ import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { resetSyncDebounceTimerStart } from "hooks/DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
+import Logger from "lib/logger";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -60,7 +61,10 @@ export const switchWorkspace = async (
   )
     skipStorageClearing = true;
 
-  if (!skipStorageClearing) await StorageService(appMode).clearDB();
+  if (!skipStorageClearing) {
+    Logger.log("Clearing storage in switchWorkspace");
+    await StorageService(appMode).clearDB();
+  }
 
   dispatch(
     teamsActions.setCurrentlyActiveWorkspace({

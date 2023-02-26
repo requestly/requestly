@@ -23,6 +23,7 @@ import { isGroupsSanitizationPassed } from "./actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import CreateTeamRuleCTA from "../CreateTeamRuleCTA";
 import GettingStarted from "../GettingStarted";
+import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -51,10 +52,8 @@ const RulesIndexPage = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   //Component State
-  const [
-    fetchRulesAndGroupsComplete,
-    setFetchRulesAndGroupsComplete,
-  ] = useState(false);
+  const [fetchRulesAndGroupsComplete, setFetchRulesAndGroupsComplete] =
+    useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
 
   const stableDispatch = useCallback(dispatch, [dispatch]);
@@ -68,9 +67,11 @@ const RulesIndexPage = () => {
 
   useEffect(() => {
     if (hasIsRulesListHardRefreshPendingChanged) setIsTableLoading(true);
+    Logger.log("Reading storage in RulesIndexPage useEffect");
     const groupsPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP
     );
+    Logger.log("Reading storage in RulesIndexPage useEffect");
     const rulesPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
     );
