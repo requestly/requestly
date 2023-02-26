@@ -1424,6 +1424,7 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
     ruleId: rule.id,
   });
 
+  // Cache execution details until content script loads
   if (BG.Methods.isTopDocumentRequest(requestDetails)) {
     const appliedRuleDetails = window.tabService.getData(
       tabId,
