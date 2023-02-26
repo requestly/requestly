@@ -60,42 +60,39 @@ export const updateLastBackupTimeStamp = async (appMode, newTimestamp) => {
   return { success: true, time: timestamp };
 };
 
-export const createNewBackup = (appMode) => {
+export const createNewBackup = async (appMode) => {
   const currentTimestamp = Date.now();
-  return getAllRulesAndGroups(appMode).then((backupData) => {
-    const functions = getFunctions(firebaseApp);
-    const updateRulesBackup = httpsCallable(functions, "updateRulesBackup");
-    return updateRulesBackup({
-      records: backupData,
-      timestamp: currentTimestamp,
-    }).then(() => {
-      trackBackupCreated();
-      isBackupInProcess = false;
-      return updateLastBackupTimeStamp(appMode);
-    });
+  const backupData = await getAllRulesAndGroups(appMode);
+  const functions = getFunctions(firebaseApp);
+  const updateRulesBackup = httpsCallable(functions, "updateRulesBackup");
+  await updateRulesBackup({
+    records: backupData,
+    timestamp: currentTimestamp,
   });
+  trackBackupCreated();
+  isBackupInProcess = false;
+  return await updateLastBackupTimeStamp(appMode);
 };
 
-export const createBackupIfRequired = (appMode) => {
-  return getLastBackupTimestamp(appMode).then((timestamp) => {
-    let lastBackupTimestamp, timeDifference;
-    const currentTimestamp = Date.now();
-    if (timestamp) {
-      lastBackupTimestamp = timestamp;
-      timeDifference = getTimeDifferenceFromTimestamps(
-        currentTimestamp,
-        lastBackupTimestamp
-      );
-    }
-    const hoursDifference = Math.floor(timeDifference / 1000 / 60 / 60);
-    // Only send backups after at-least 6 hours
-    if ((!timestamp || hoursDifference > 6) && !isBackupInProcess) {
-      isBackupInProcess = true;
-      return createNewBackup(appMode);
-    } else {
-      return { success: false, time: timeDifference };
-    }
-  });
+export const createBackupIfRequired = async (appMode) => {
+  const timestamp = await getLastBackupTimestamp(appMode);
+  let lastBackupTimestamp, timeDifference;
+  const currentTimestamp = Date.now();
+  if (timestamp) {
+    lastBackupTimestamp = timestamp;
+    timeDifference = getTimeDifferenceFromTimestamps(
+      currentTimestamp,
+      lastBackupTimestamp
+    );
+  }
+  const hoursDifference = Math.floor(timeDifference / 1000 / 60 / 60);
+  // Only send backups after at-least 6 hours
+  if ((!timestamp || hoursDifference > 6) && !isBackupInProcess) {
+    isBackupInProcess = true;
+    return createNewBackup(appMode);
+  } else {
+    return { success: false, time: timeDifference };
+  }
 };
 
 export const getBackupFromFirestore = (uid) => {
