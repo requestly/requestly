@@ -35,6 +35,7 @@ import {
   trackHelpdeskClicked,
 } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
+import GitHubButton from "react-github-btn";
 
 const { Header } = Layout;
 
@@ -165,14 +166,17 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
             <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <Button
-                    className="text-sm"
-                    href={LINKS.REQUESTLY_GITHUB_ISSUES}
-                    target="_blank"
-                    onClick={() => trackHeaderClicked("request_a_feature")}
-                  >
-                    Request a feature
-                  </Button>
+                  <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                    <GitHubButton
+                      style={{display:"flex"}}
+                      className="github-star-button"
+                      href="https://github.com/requestly/requestly"
+                      data-color-scheme="dark_dimmed"
+                      data-text="Star"
+                      data-show-count="true"
+                      aria-label="Star Requestly on GitHub"
+                    />
+                  </span>
                   <Divider
                     type="vertical"
                     className="header-vertival-divider"
