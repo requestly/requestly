@@ -17,6 +17,7 @@
         that.map = {};
         for (var i = 0; i < tabs.length; i++) {
           var tab = tabs[i];
+          tab.data = {};
           that.map[tab.id] = tab;
         }
       });
@@ -39,7 +40,7 @@
       });
 
       chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-        that.map[tabId] = tab;
+        that.map[tabId] = { ...tab, data: that.map[tabId].data || {} };
       });
 
       chrome.webRequest.onBeforeRequest.addListener(
@@ -100,6 +101,35 @@
       }
 
       chrome.tabs.onRemoved.addListener(listener);
+    },
+
+    setData: function (tabId, key, value) {
+      if (!this.map.hasOwnProperty(tabId)) {
+        return;
+      }
+      // null safe for firefox as in firefox get/set happen before tab updation whereas
+      // in chrome get/set happens after tab updation
+      if (this.map[tabId].hasOwnProperty("data")) {
+        this.map[tabId].data[key] = value;
+      } else {
+        this.map[tabId].data = { [key]: value };
+      }
+    },
+
+    getData: function (tabId, key, defaultValue) {
+      if (!this.map.hasOwnProperty(tabId)) {
+        return null;
+      }
+
+      return this.map[tabId].data?.[key] || defaultValue;
+    },
+
+    removeData: function (tabId, key) {
+      if (!this.map.hasOwnProperty(tabId)) {
+        return;
+      }
+
+      delete this.map[tabId].data?.[key];
     },
   };
 
