@@ -20,6 +20,7 @@ import useRuleExecutionsSyncer from "hooks/useRuleExecutionsSyncer";
 import useFeatureUsageEvent from "hooks/useFeatureUsageEvent";
 import useActiveWorkspace from "hooks/useActiveWorkspace";
 import { CommandBar } from "components/misc/CommandBar";
+import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -78,6 +79,7 @@ const App = () => {
         }}
       >
         <CommandBar />
+        <PersonaSurveyModal />
         {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
           <FullScreenLayout />
         ) : (
