@@ -430,6 +430,15 @@ BG.Methods.getMainFrameUrl = function (details) {
   return window.tabService.getTabUrl(details.tabId);
 };
 
+BG.Methods.isTopDocumentRequest = (requestDetails) => {
+  // documentLifeCycle is only used by chrome
+  const isDocumentLifeCycleActive = requestDetails.documentLifecycle
+    ? requestDetails.documentLifecycle === "active"
+    : true;
+
+  return requestDetails.type === "main_frame" && isDocumentLifeCycleActive;
+};
+
 BG.Methods.getUserAgentHeaderModification = function (ruleModification) {
   return {
     target: RQ.HEADERS_TARGET.REQUEST,
@@ -635,7 +644,7 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
   BG.Methods.sendLogToConsoleLogger(rule, requestDetails, modification);
   BG.Methods.saveExecutionCount(rule);
-  BG.Methods.sendAppliedRuleIdToClient(rule.id, requestDetails.tabId);
+  BG.Methods.sendAppliedRuleDetailsToClient(rule, requestDetails);
 };
 
 BG.Methods.onBeforeRequest = (details) => {
@@ -752,30 +761,12 @@ BG.Methods.getPinnedGroups = function (populateChildren) {
   return Object.values(pinnedGroups);
 };
 
-BG.Methods.getRecentRules = function () {
-  const rules = RQ.StorageService.records.filter(function (record) {
-    return record.objectType === RQ.OBJECT_TYPES.RULE;
-  });
-  return rules
-    .sort((rule1, rule2) => rule2.modificationDate - rule1.modificationDate)
-    .slice(0, 5);
-};
-
 BG.Methods.checkIfNoRulesPresent = function () {
   const hasRules = RQ.StorageService.records.some(function (record) {
     return record.objectType === RQ.OBJECT_TYPES.RULE;
   });
 
   return !hasRules;
-};
-
-BG.Methods.checkIfRecordingConfigPresent = async function () {
-  const sessionRecordingConfig =
-    (await RQ.StorageService.getRecord(
-      RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-    )) || {};
-
-  return Object.keys(sessionRecordingConfig)?.length > 0;
 };
 
 BG.Methods.registerListeners = function () {
@@ -1113,17 +1104,9 @@ BG.Methods.addListenerForExtensionMessages = function () {
         sendResponse(BG.Methods.getPinnedGroups(message.populateChildren));
         break;
 
-      case RQ.EXTENSION_MESSAGES.GET_RECENT_RULES:
-        sendResponse(BG.Methods.getRecentRules());
-        break;
-
       case RQ.EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
         sendResponse(BG.Methods.checkIfNoRulesPresent());
         break;
-
-      case RQ.EXTENSION_MESSAGES.CHECK_IF_RECORDING_CONFIG_PRESENT:
-        BG.Methods.checkIfRecordingConfigPresent().then(sendResponse);
-        return true;
 
       case RQ.EXTENSION_MESSAGES.GET_FLAGS:
         sendResponse(RQ.flags);
@@ -1148,6 +1131,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.GET_EXECUTED_RULES:
         BG.Methods.getExecutedRules(message.tabId, sendResponse);
         return true;
+
+      case RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED:
+        BG.Methods.onContentScriptLoadedNotification(sender.tab.id);
+        break;
 
       case RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
         BG.Methods.checkIfExtensionEnabled().then(sendResponse);
@@ -1184,6 +1171,20 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
 };
 
+BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
+  chrome.tabs.sendMessage(
+    tabId,
+    {
+      action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
+      appliedRuleDetails: BG.Methods.getCachedAppliedRuleDetails(tabId),
+      isConsoleLoggerEnabled: await RQ.StorageService.getRecord(
+        RQ.CONSOLE_LOGGER_ENABLED
+      ),
+    },
+    () => window.tabService.removeData(tabId, "appliedRuleDetails")
+  );
+};
+
 BG.Methods.getExecutedRules = async (tabId, callback) => {
   chrome.tabs.sendMessage(
     tabId,
@@ -1198,6 +1199,16 @@ BG.Methods.getExecutedRules = async (tabId, callback) => {
       }
     }
   );
+};
+
+BG.Methods.getCachedAppliedRuleDetails = (tabId) => {
+  const appliedRuleDetails = window.tabService.getData(
+    tabId,
+    "appliedRuleDetails",
+    []
+  );
+
+  return appliedRuleDetails;
 };
 
 BG.devtools = {}; // tabId -> port
@@ -1405,11 +1416,28 @@ BG.Methods.getTabSession = (tabId, callback) => {
   );
 };
 
-BG.Methods.sendAppliedRuleIdToClient = async (ruleId, tabId) => {
+BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
+  const { tabId } = requestDetails;
+
   chrome.tabs.sendMessage(tabId, {
     action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
-    ruleId,
+    ruleId: rule.id,
   });
+
+  // Cache execution details until content script loads
+  if (BG.Methods.isTopDocumentRequest(requestDetails)) {
+    const appliedRuleDetails = window.tabService.getData(
+      tabId,
+      "appliedRuleDetails",
+      []
+    );
+    appliedRuleDetails?.push({
+      rule,
+      requestDetails,
+    });
+
+    window.tabService.setData(tabId, "appliedRuleDetails", appliedRuleDetails);
+  }
 };
 
 BG.Methods.init = function () {
