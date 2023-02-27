@@ -9,7 +9,7 @@ interface GroupMenuItemProps {
 }
 
 const GroupMenuItem: React.FC<GroupMenuItemProps> = ({
-  id,
+  id = "",
   name,
   currentGroupId,
   handleMenuItemClick,
