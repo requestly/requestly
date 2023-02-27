@@ -1,5 +1,10 @@
-import { Group, Rule, ObjectType, Status } from "./types";
-import { ChangeType, getAllRecords, onRecordChange } from "./storage";
+import { Group, Rule, RuleType, ObjectType, Status } from "./types";
+import {
+  ChangeType,
+  getAllRecords,
+  getRecord,
+  onRecordChange,
+} from "./storage";
 
 const isRule = (record: unknown): boolean => {
   return (
@@ -22,12 +27,20 @@ const getGroups = async (): Promise<Group[]> => {
   return records.filter(isGroup) as Group[];
 };
 
-export const getEnabledRules = async (): Promise<Rule[]> => {
+export const getRule = async (id: string): Promise<Rule> => {
+  return getRecord<Rule>(id);
+};
+
+export const getEnabledRules = async (ruleType?: RuleType): Promise<Rule[]> => {
   const rules = await getRules();
   const groups = await getGroups();
 
   return rules.filter((rule) => {
     if (rule.status === Status.INACTIVE) {
+      return false;
+    }
+
+    if (ruleType && rule.ruleType !== ruleType) {
       return false;
     }
 

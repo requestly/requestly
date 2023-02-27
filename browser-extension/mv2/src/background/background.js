@@ -701,11 +701,7 @@ BG.Methods.overrideResponse = function (details) {
       {
         action: RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE,
         url: details.url,
-        rule: {
-          id: finalResponseRule.id,
-          response: finalResponseRule.pairs[0].response,
-          source: finalResponseRule.pairs[0].source,
-        },
+        ruleId: finalResponseRule.id,
       },
       { frameId: details.frameId }
     );
@@ -1023,17 +1019,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
             BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT)
           );
         }
-        break;
-
-      case RQ.CLIENT_MESSAGES.GET_REQUEST_RULES:
-        const requestRules = BG.Methods.getEnabledRules()
-          .filter((rule) => rule.ruleType === RQ.RULE_TYPES.REQUEST)
-          .map((rule) => ({
-            id: rule.id,
-            modification: rule.pairs[0].request,
-            source: rule.pairs[0].source,
-          }));
-        sendResponse(requestRules);
         break;
 
       case RQ.CLIENT_MESSAGES.DO_REQUEST_RESPONSE_RULES_EXIST:
