@@ -1,5 +1,5 @@
 .survey-modal .ant-modal-body .rq-modal-content {
-  padding: 40px 60px;
+  padding: 40px 20px;
 }
 
 .survey-modal .survey-title {
@@ -17,4 +17,10 @@
 }
 .survey-modal .survey-lottie-animation {
   width: 80%;
+}
+.survey-modal .survey-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
 }

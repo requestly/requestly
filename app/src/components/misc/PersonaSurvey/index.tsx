@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RQModal } from "lib/design-system/components";
+import { SurveyOption } from "./components/Option";
 import { SurveyModalFooter } from "./components/ModalFooter";
 import { surveyConfig } from "./config";
 import { Option, PageConfig } from "./types";
@@ -7,8 +8,8 @@ import "./index.css";
 
 export const PersonaSurveyModal = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
-  // const roleType = "frontend";
-  const roleType = "backend";
+  const roleType = "frontend";
+  // const roleType = "backend";
   //   const roleType = "founder";
   //   const roleType = "manager";
   //   const roleType = "quality";
@@ -37,9 +38,13 @@ export const PersonaSurveyModal = () => {
         {renderPageHeader(page)}
         <>
           {page.options?.length ? (
-            <div>
-              {page.options.map((option: Option) => (
-                <div>{option.title}</div>
+            <div className="survey-options-container">
+              {page.options.map((option: Option, index) => (
+                <SurveyOption
+                  key={index}
+                  title={option.title}
+                  type={option.type}
+                />
               ))}
             </div>
           ) : (
@@ -61,11 +66,15 @@ export const PersonaSurveyModal = () => {
           {page.conditional.map((question, index) => (
             <>
               {question.condition(roleType) && (
-                <>
+                <div className="survey-options-container">
                   {question.options.map((option, index) => (
-                    <div key={index}>{option.title}</div>
+                    <SurveyOption
+                      key={index}
+                      title={option.title}
+                      type={option.type}
+                    />
                   ))}
-                </>
+                </div>
               )}
             </>
           ))}
@@ -84,28 +93,7 @@ export const PersonaSurveyModal = () => {
       <div className="rq-modal-content survey-content-wrapper">
         {surveyConfig.map((page: PageConfig) => (
           <>
-            {currentPage === page.pageId && (
-              //   <div>
-              //     <div className="text-center white text-bold survey-title">
-              //       {page.title}
-              //     </div>
-              //     <div className="text-gray text-center survey-sub-title">
-              //       {page.subTitle}
-              //     </div>
-              //     <>
-              //       {page.options?.length ? (
-              //         <div>
-              //           {page.options.map((option: Option) => (
-              //             <div>{option.title}</div>
-              //           ))}
-              //         </div>
-              //       ) : (
-              //         page.render
-              //       )}
-              //     </>
-              //   </div>
-              <>{renderPage(page, roleType)}</>
-            )}
+            {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
           </>
         ))}
       </div>

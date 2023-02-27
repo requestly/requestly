@@ -1,0 +1,28 @@
+.survey-modal .survey-option {
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background: var(--component-background);
+  padding: 15px 10px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+.survey-modal .survey-option.survey-select {
+  cursor: pointer;
+  width: 48%;
+  justify-content: space-between;
+  align-items: center;
+}
+.survey-modal .survey-option.survey-text {
+  width: 98%;
+}
+.survey-modal .survey-option.survey-text input.ant-input {
+  padding: 0;
+}
+.survey-modal .survey-option-title {
+  font-size: 13px;
+}
+.survey-modal .survey-text-prefix,
+.survey-modal .survey-text-suffix {
+  align-self: center;
+}

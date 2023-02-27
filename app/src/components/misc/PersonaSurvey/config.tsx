@@ -15,24 +15,31 @@ export const surveyConfig: PageConfig[] = [
     subTitle: "Please select one you closely relate to",
     options: [
       {
+        type: "select",
         title: "💻 Front end developer",
       },
       {
+        type: "select",
         title: "⌨️ Back end developer",
       },
       {
+        type: "select",
         title: "🖌 Product manager",
       },
       {
+        type: "select",
         title: "👑 Founder",
       },
       {
+        type: "select",
         title: "🏗 QA engineer",
       },
       {
+        type: "select",
         title: "😁 Customer success manager",
       },
       {
+        type: "text",
         title: "other",
       },
     ],
@@ -46,15 +53,19 @@ export const surveyConfig: PageConfig[] = [
         condition: (answer) => answer === "backend",
         options: [
           {
+            type: "select",
             title: "Test local API changes against production app/website",
           },
           {
+            type: "select",
             title: "Debug backend microservices",
           },
           {
+            type: "select",
             title: "Modify GraphQL Query & Server Response",
           },
           {
+            type: "text",
             title: "Other",
           },
         ],
@@ -63,22 +74,28 @@ export const surveyConfig: PageConfig[] = [
         condition: (answer) => answer === "quality",
         options: [
           {
+            type: "select",
             title:
               "Testing newly developed features on different hosts/environments",
           },
           {
+            type: "select",
             title: "Testing new features on client websites",
           },
           {
+            type: "select",
             title: "Simulate network conditions",
           },
           {
+            type: "select",
             title: "UI automation testing",
           },
           {
+            type: "select",
             title: "Recording issues & sharing with developers",
           },
           {
+            type: "text",
             title: "Other",
           },
         ],
@@ -87,15 +104,19 @@ export const surveyConfig: PageConfig[] = [
         condition: (answer) => answer === "founder" || answer === "manager",
         options: [
           {
+            type: "select",
             title: "Testing new features on client websites",
           },
           {
+            type: "select",
             title: "Showing new feature demos to clients",
           },
           {
+            type: "select",
             title: "Recording issues & sharing with developers ",
           },
           {
+            type: "text",
             title: "Other",
           },
         ],
@@ -104,18 +125,23 @@ export const surveyConfig: PageConfig[] = [
         condition: (answer) => answer === "marketer",
         options: [
           {
+            type: "select",
             title: "Replace production script with development script",
           },
           {
+            type: "select",
             title: "Debug analytics tags",
           },
           {
+            type: "select",
             title: "Showing new feature demos to clients",
           },
           {
+            type: "select",
             title: "Adding Query Params to URLs",
           },
           {
+            type: "text",
             title: "Other",
           },
         ],
@@ -124,33 +150,44 @@ export const surveyConfig: PageConfig[] = [
         condition: (answer) => answer === "frontend",
         options: [
           {
+            type: "select",
             title: "Local development before the backend is ready",
           },
           {
+            type: "select",
             title: "Redirect APIs/scripts from one environment to another",
           },
           {
+            type: "select",
             title: "Load scripts from local/dev environment (Map Local)",
           },
+
           {
-            title: "Inject custom scripts",
-          },
-          {
+            type: "select",
             title: "Modify existing network responses",
           },
           {
+            type: "select",
+            title: "Inject custom scripts",
+          },
+          {
+            type: "select",
             title: "Modify headers on a website",
           },
           {
+            type: "select",
             title: "Modify request payload ",
           },
           {
+            type: "select",
             title: "Simulate status codes",
           },
           {
+            type: "select",
             title: "Recording issues & sharing with team members",
           },
           {
+            type: "text",
             title: "Other",
           },
         ],
@@ -171,6 +208,49 @@ export const surveyConfig: PageConfig[] = [
     //     title: "Other",
     //   },
     // ],
+  },
+  {
+    pageId: 3,
+    title: "How did you hear about Requestly?",
+    subTitle: "Select one",
+    options: [
+      {
+        type: "select",
+        title: "Google search",
+      },
+      {
+        type: "select",
+        title: "Friend/Colleague",
+      },
+      {
+        type: "select",
+        title: "Online ads",
+      },
+      {
+        type: "select",
+        title: "Chrome webstore",
+      },
+      {
+        type: "select",
+        title: "Social media",
+      },
+      {
+        type: "select",
+        title: "Read an article",
+      },
+      {
+        type: "select",
+        title: "Reddit",
+      },
+      {
+        type: "select",
+        title: "HackerNews",
+      },
+      {
+        type: "select",
+        title: "Company internal documentation",
+      },
+    ],
   },
   // {
   //   pageId: 2,

@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 export interface Option {
+  type: string;
   title: string;
 }
 
