@@ -7,8 +7,8 @@ import "./index.css";
 
 export const PersonaSurveyModal = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const roleType = "frontend";
-  //   const roleType = "backend";
+  // const roleType = "frontend";
+  const roleType = "backend";
   //   const roleType = "founder";
   //   const roleType = "manager";
   //   const roleType = "quality";
@@ -31,7 +31,7 @@ export const PersonaSurveyModal = () => {
     );
   };
 
-  const renderQuestionaire = (page: PageConfig) => {
+  const renderDefaultQuestionaire = (page: PageConfig) => {
     return (
       <>
         {renderPageHeader(page)}
@@ -50,10 +50,33 @@ export const PersonaSurveyModal = () => {
     );
   };
 
+  const renderConditionalQuestionaire = (
+    page: PageConfig,
+    roleType: string
+  ) => {
+    return (
+      <>
+        {renderPageHeader(page)}
+        <>
+          {page.conditional.map((question, index) => (
+            <>
+              {question.condition(roleType) && (
+                <>
+                  {question.options.map((option, index) => (
+                    <div key={index}>{option.title}</div>
+                  ))}
+                </>
+              )}
+            </>
+          ))}
+        </>
+      </>
+    );
+  };
+
   const renderPage = (page: PageConfig, roleType: string) => {
-    if ((page.condition && page.condition(roleType)) || !page.condition) {
-      return renderQuestionaire(page);
-    } else return null;
+    if (page?.conditional) return renderConditionalQuestionaire(page, roleType);
+    else return renderDefaultQuestionaire(page);
   };
 
   return (
