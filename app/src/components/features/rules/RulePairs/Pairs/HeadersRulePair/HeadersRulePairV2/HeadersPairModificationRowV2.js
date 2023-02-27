@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { AutoComplete, Col, Dropdown, Input, Menu, Row, Tooltip } from "antd";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ImCross } from "react-icons/im";
 import HEADER_SUGGESTIONS from "../../../../../../../config/constants/sub/header-suggestions";
+
 const HeadersPairModificationRowV2 = ({
   modification,
   modificationIndex,
@@ -15,51 +16,50 @@ const HeadersPairModificationRowV2 = ({
 }) => {
   const { modifyPairAtGivenPath, deleteModification } = helperFunctions;
 
-  const pairTypeMenu = (
-    <Menu>
-      <Menu.Item key={1}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationType}][${modificationIndex}].type`,
-              GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD
-            )
-          }
-        >
-          ADD
-        </Text>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationType}][${modificationIndex}].type`,
-              GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE
-            )
-          }
-        >
-          REMOVE
-        </Text>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationType}][${modificationIndex}].type`,
-              GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY
-            )
-          }
-        >
-          OVERRIDE
-        </Text>
-      </Menu.Item>
-    </Menu>
+  const pairTypeMenuItems = useMemo(
+    () => [
+      {
+        title: "ADD",
+        type: GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD,
+      },
+      {
+        title: "REMOVE",
+        type: GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE,
+      },
+      {
+        title: "OVERRIDE",
+        type: GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY,
+      },
+    ],
+    []
+  );
+
+  const handlePairTypeMenuItemClick = useCallback(
+    (event, type) => {
+      return modifyPairAtGivenPath(
+        event,
+        pairIndex,
+        `modifications[${modificationType}][${modificationIndex}].type`,
+        type
+      );
+    },
+    [pairIndex, modifyPairAtGivenPath, modificationType, modificationIndex]
+  );
+
+  const pairTypeMenu = useMemo(
+    () => (
+      <Menu>
+        {pairTypeMenuItems.map(({ title, type }, index) => (
+          <Menu.Item
+            key={index}
+            onClick={(e) => handlePairTypeMenuItemClick(e, type)}
+          >
+            {title}
+          </Menu.Item>
+        ))}
+      </Menu>
+    ),
+    [pairTypeMenuItems, handlePairTypeMenuItemClick]
   );
 
   return (
