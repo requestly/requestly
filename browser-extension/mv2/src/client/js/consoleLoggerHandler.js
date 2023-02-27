@@ -73,7 +73,7 @@ RQ.ConsoleLogger.handleMessage = (message) => {
 RQ.ConsoleLogger.log = (text, ...args) => {
   console.log(
     `%cRequestly%c ${text}`,
-    "color:#1990ff; font-weight: bold; padding: 1px 5px; background-color: #fad408; border-radius: 4px; border: 1px solid #888;",
+    "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
     null,
     ...args
   );
