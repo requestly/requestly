@@ -37,6 +37,7 @@ const doSync = async (uid, appMode, dispatch) => {
   const allSyncedRecords = await getAllSyncedRecords(appMode);
   await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
   trackSyncCompleted(uid);
+  window.isFirstSyncComplete = true;
 
   // Refresh Rules
   dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
@@ -46,6 +47,8 @@ const doSync = async (uid, appMode, dispatch) => {
       type: "sessionRecordingConfig",
     })
   );
+
+  dispatch(actions.updateIsRulesListLoading(false));
 };
 const doSyncDebounced = _.debounce(doSync, 5000);
 
@@ -71,6 +74,8 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
     return onValue(syncNodeRef, async (snap) => {
       if (window.skipSyncListenerForNextOneTime) {
         window.skipSyncListenerForNextOneTime = false;
+        window.isFirstSyncComplete = true; // Just in case!
+        dispatch(actions.updateIsRulesListLoading(false));
         return;
       }
       animateSyncIcon();
@@ -78,6 +83,8 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
       if (!isLocalStoragePresent(appMode)) {
         // Just refresh the rules table in this case
         dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+        window.isFirstSyncComplete = true;
+        dispatch(actions.updateIsRulesListLoading(false));
         return;
       }
       if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {

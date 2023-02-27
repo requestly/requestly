@@ -25,6 +25,7 @@ export const switchWorkspace = async (
   appMode
 ) => {
   trackWorkspaceSwitched();
+  dispatch(actions.updateIsRulesListLoading(true));
 
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
 

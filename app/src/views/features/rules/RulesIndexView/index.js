@@ -94,7 +94,10 @@ const RulesIndexView = () => {
   };
   if (showLoader) {
     return (
-      <SpinnerCard customLoadingMessage="Loading Rules" skeletonType="list" />
+      <SpinnerCard
+        customLoadingMessage="Getting your rules ready"
+        skeletonType="list"
+      />
     );
   } else {
     return <>{renderRulesIndex()}</>;

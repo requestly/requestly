@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import MigrationCheckModal from "../../../misc/MigrationCheckModal";
 import StorageMigrationCheckModal from "components/misc/StorageMigrationCheckModal";
 import RulesListContainer from "../RulesListContainer";
-import SpinnerCard from "../../../misc/SpinnerCard";
+import SpinnerColumn from "../../../misc/SpinnerColumn";
 //Externals
 import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -18,6 +18,7 @@ import {
   getAppMode,
   getIsRefreshRulesPending,
   getIsHardRefreshRulesPending,
+  getIsRulesListLoading,
 } from "../../../../store/selectors";
 import { isGroupsSanitizationPassed } from "./actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -50,10 +51,13 @@ const RulesIndexPage = () => {
   );
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isRulesListLoading = useSelector(getIsRulesListLoading);
 
   //Component State
-  const [fetchRulesAndGroupsComplete, setFetchRulesAndGroupsComplete] =
-    useState(false);
+  const [
+    fetchRulesAndGroupsComplete,
+    setFetchRulesAndGroupsComplete,
+  ] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
 
   const stableDispatch = useCallback(dispatch, [dispatch]);
@@ -150,14 +154,20 @@ const RulesIndexPage = () => {
     <React.Fragment>
       <MigrationCheckModal />
       <StorageMigrationCheckModal />
-      {fetchRulesAndGroupsComplete ? (
+      {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
         rules.length !== 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
         ) : (
           <CreateFirstRule />
         )
       ) : (
-        <SpinnerCard customLoadingMessage="Loading Rules" skeletonType="list" />
+        <>
+          <br />{" "}
+          <SpinnerColumn
+            message="Getting your rules ready"
+            skeletonType="list"
+          />
+        </>
       )}
     </React.Fragment>
   );
