@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Row, Col, Input, Dropdown, Typography, Menu, Select } from "antd";
 //ACTIONS
 import { getAvailableUserAgents } from "./actions";
@@ -25,29 +25,32 @@ const UserAgentSelectionRow = ({
     ]);
   };
 
-  const deviceTypeDropdownOnChangeHandler = (event, newValue) => {
-    let extraModifications = [
-      {
-        path: "env",
-        value: "",
-      },
-    ];
+  const deviceTypeDropdownOnChangeHandler = useCallback(
+    (event, newValue) => {
+      let extraModifications = [
+        {
+          path: "env",
+          value: "",
+        },
+      ];
 
-    if (newValue === "custom") {
-      extraModifications.push({
-        path: "userAgent",
-        value: window.navigator.userAgent,
-      });
-    }
+      if (newValue === "custom") {
+        extraModifications.push({
+          path: "userAgent",
+          value: window.navigator.userAgent,
+        });
+      }
 
-    modifyPairAtGivenPath(
-      event,
-      pairIndex,
-      "envType",
-      newValue,
-      extraModifications
-    );
-  };
+      modifyPairAtGivenPath(
+        event,
+        pairIndex,
+        "envType",
+        newValue,
+        extraModifications
+      );
+    },
+    [modifyPairAtGivenPath, pairIndex]
+  );
 
   const getCurrentUserAgentValue = () => {
     return {
@@ -57,36 +60,43 @@ const UserAgentSelectionRow = ({
     };
   };
 
-  const envTypeOptions = (
-    <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            deviceTypeDropdownOnChangeHandler(event, "device")
-          }
-        >
-          DEVICE
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            deviceTypeDropdownOnChangeHandler(event, "browser")
-          }
-        >
-          BROWSER
-        </span>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            deviceTypeDropdownOnChangeHandler(event, "custom")
-          }
-        >
-          CUSTOM
-        </span>
-      </Menu.Item>
-    </Menu>
+  const envTypeOptions = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "DEVICE",
+        deviceType: "device",
+      },
+      {
+        id: 2,
+        name: "BROWSER",
+        deviceType: "browser",
+      },
+      {
+        id: 3,
+        name: "CUSTOM",
+        deviceType: "custom",
+      },
+    ],
+    []
+  );
+
+  const renderEnvOptions = useMemo(
+    () => (
+      <Menu>
+        {envTypeOptions.map(({ id, name, deviceType }) => (
+          <Menu.Item
+            key={id}
+            onClick={(event) => {
+              deviceTypeDropdownOnChangeHandler(event, deviceType);
+            }}
+          >
+            {name}
+          </Menu.Item>
+        ))}
+      </Menu>
+    ),
+    [envTypeOptions, deviceTypeDropdownOnChangeHandler]
   );
 
   const handleSelectChange = (newSelectedItemSet) => {
@@ -109,7 +119,7 @@ const UserAgentSelectionRow = ({
         <span>UserAgent</span>
       </Col>
       <Col className="my-auto" align="right">
-        <Dropdown overlay={envTypeOptions} disabled={isInputDisabled}>
+        <Dropdown overlay={renderEnvOptions} disabled={isInputDisabled}>
           <Text
             strong
             onClick={(e) => e.preventDefault()}

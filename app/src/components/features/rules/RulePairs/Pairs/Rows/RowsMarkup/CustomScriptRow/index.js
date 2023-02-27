@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Row,
   Col,
@@ -258,86 +258,92 @@ const CustomScriptRow = ({
     );
   };
 
-  const loadTimeOptions = (
+  const loadTimeMenuItems = useMemo(
+    () => [
+      {
+        title: "After Page Load",
+        type: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD,
+      },
+      {
+        title: "Before Page Load",
+        type: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
+      },
+    ],
+    []
+  );
+
+  const handleLoadTimeClick = useCallback(
+    (event, type) =>
+      modifyPairAtGivenPath(
+        event,
+        pairIndex,
+        `scripts[${scriptIndex}].loadTime`,
+        type
+      ),
+    [pairIndex, scriptIndex, modifyPairAtGivenPath]
+  );
+
+  const loadTimeMenu = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `scripts[${scriptIndex}].loadTime`,
-              GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
-            )
-          }
-        >
-          After Page Load
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `scripts[${scriptIndex}].loadTime`,
-              GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD
-            )
-          }
-        >
-          Before Page Load
-        </span>
-      </Menu.Item>
+      {loadTimeMenuItems.map(({ title, type }, index) => (
+        <Menu.Item key={index} onClick={(e) => handleLoadTimeClick(e, type)}>
+          {title}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
-  const scriptTimeOptions = (
+  const scriptTypeMenuItems = useMemo(
+    () => [
+      {
+        title: "URL",
+        type: GLOBAL_CONSTANTS.SCRIPT_TYPES.URL,
+      },
+      {
+        title: "Custom Code",
+        type: GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE,
+      },
+    ],
+    []
+  );
+
+  const scriptTypeMenu = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            scriptTypeChangeHandler(event, GLOBAL_CONSTANTS.SCRIPT_TYPES.URL)
-          }
+      {scriptTypeMenuItems.map(({ title, type }, index) => (
+        <Menu.Item
+          key={index}
+          onClick={(e) => scriptTypeChangeHandler(e, type)}
         >
-          URL
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            scriptTypeChangeHandler(event, GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE)
-          }
-        >
-          Custom Code
-        </span>
-      </Menu.Item>
+          {title}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
-  const scriptCodeTypes = (
+  const scriptCodeTypeMenuItems = useMemo(
+    () => [
+      {
+        title: "JavaScript",
+        type: GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS,
+      },
+      {
+        title: "CSS",
+        type: GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS,
+      },
+    ],
+    []
+  );
+
+  const scriptCodeTypeMenu = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={() =>
-            showCodeTypeChangeConfirmation(
-              GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
-            )
-          }
+      {scriptCodeTypeMenuItems.map(({ title, type }, index) => (
+        <Menu.Item
+          key={index}
+          onClick={() => showCodeTypeChangeConfirmation(type)}
         >
-          JavaScript
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={() =>
-            showCodeTypeChangeConfirmation(
-              GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS
-            )
-          }
-        >
-          CSS
-        </span>
-      </Menu.Item>
+          {title}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
@@ -356,7 +362,7 @@ const CustomScriptRow = ({
         cancelText="Cancel"
         visible={isCodeTypePopupVisible}
       >
-        <Dropdown overlay={scriptCodeTypes}>
+        <Dropdown overlay={scriptCodeTypeMenu}>
           <Text
             strong
             className="cursor-pointer uppercase ant-dropdown-link"
@@ -378,7 +384,7 @@ const CustomScriptRow = ({
         </Col>
         <Col span={6} align="left">
           <Text className="text-gray">Code Source: </Text>
-          <Dropdown overlay={scriptTimeOptions} disabled={isInputDisabled}>
+          <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
             <Text
               strong
               className="cursor-pointer uppercase ant-dropdown-link"
@@ -391,7 +397,7 @@ const CustomScriptRow = ({
         {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
           <Col span={7} align="left">
             <Text className="text-gray">Insert: </Text>
-            <Dropdown overlay={loadTimeOptions} disabled={isInputDisabled}>
+            <Dropdown overlay={loadTimeMenu} disabled={isInputDisabled}>
               <Text
                 strong
                 className="cursor-pointer ant-dropdown-link"
