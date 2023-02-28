@@ -108,6 +108,6 @@ For **payment/billing related issues**, feel free to contact us at [contact@requ
 
 ## Our Mission
 
-Our mission is to help developers ship web and mobile app faster and with confidence by giving then the tools to debug & resolve issues without them depending on some external dependency.
+Our mission is to help developers ship web and mobile apps faster and with confidence by giving then the tools to debug & resolve issues without external dependency.
 
 
