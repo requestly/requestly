@@ -12,7 +12,6 @@ import {
 } from "antd";
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
-// import HeaderNotifications from "./HeaderNotifications";
 import HeaderText from "./HeaderText";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
@@ -27,15 +26,19 @@ import {
   SnippetsOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
-import { redirectToProductUpdates } from "utils/RedirectionUtils";
+import {
+  redirectToSettings,
+  redirectToProductUpdates,
+} from "utils/RedirectionUtils";
 import { RQBreadcrumb } from "lib/design-system/components";
+import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
+import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import {
   trackHeaderClicked,
   trackHelpdeskClicked,
 } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
-import GitHubButton from "react-github-btn";
 
 const { Header } = Layout;
 
@@ -166,9 +169,12 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
             <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                  <span
+                    className="github-star-button"
+                    onClick={() => trackHeaderClicked("github_star_button")}
+                  >
                     <GitHubButton
-                      style={{display:"flex"}}
+                      style={{ display: "flex" }}
                       className="github-star-button"
                       href="https://github.com/requestly/requestly"
                       data-color-scheme="dark_dimmed"
@@ -218,6 +224,25 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                         onClick={() => {
                           trackHeaderClicked("product_updates");
                           redirectToProductUpdates(navigate);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+
+                  {/* settings */}
+                  <Col>
+                    <Tooltip
+                      title={
+                        <span className="text-gray text-sm">Settings</span>
+                      }
+                    >
+                      <Button
+                        type="text"
+                        className="header-icon-btn"
+                        icon={<Settings />}
+                        onClick={() => {
+                          trackHeaderClicked("settings");
+                          redirectToSettings(navigate);
                         }}
                       />
                     </Tooltip>
