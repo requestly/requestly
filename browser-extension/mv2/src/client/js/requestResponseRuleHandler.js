@@ -1,8 +1,29 @@
 RQ.RequestResponseRuleHandler = {};
-
+RQ.RequestResponseRuleHandler.isInitialized = false;
 RQ.RequestResponseRuleHandler.cachedResponseRuleIds = new Set();
 
-RQ.RequestResponseRuleHandler.setup = function () {
+RQ.RequestResponseRuleHandler.setup = () => {
+  RQ.RulesStore.getEnabledRules().then((rules) => {
+    const doRequestResponseRulesExist = rules.some((rule) => {
+      return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(
+        rule.ruleType
+      );
+    });
+
+    if (doRequestResponseRulesExist) {
+      RQ.RequestResponseRuleHandler.init();
+    }
+  });
+
+  RQ.RulesStore.onRuleOrGroupChange(() => {
+    if (!RQ.RequestResponseRuleHandler.isInitialized) {
+      RQ.RequestResponseRuleHandler.init();
+    }
+    RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges();
+  });
+};
+
+RQ.RequestResponseRuleHandler.init = function () {
   // we match request rules on client-side whereas response rules are still matched in background
   RQ.ClientUtils.executeJS(
     `(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`
@@ -18,8 +39,6 @@ RQ.RequestResponseRuleHandler.setup = function () {
       );
     }
   });
-
-  RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges();
 
   window.addEventListener("message", function (event) {
     // We only accept messages from ourselves
@@ -47,10 +66,12 @@ RQ.RequestResponseRuleHandler.setup = function () {
   RQ.ClientUtils.executeJS(
     `(${this.interceptAJAXRequests.toString()})('${RQ.PUBLIC_NAMESPACE}')`
   );
+
+  RQ.RequestResponseRuleHandler.isInitialized = true;
 };
 
 RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
-  RQ.RulesStore.getEnabledRules("Request").then((requestRules = []) => {
+  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
     RQ.ClientUtils.executeJS(
       `window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
         requestRules
@@ -85,18 +106,18 @@ RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
 };
 
 RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
-  RQ.RulesStore.onRuleOrGroupChange(() => {
-    RQ.RequestResponseRuleHandler.cacheRequestRules();
+  RQ.RequestResponseRuleHandler.cacheRequestRules();
 
-    RQ.RulesStore.getEnabledRules("Response").then((responseRules) => {
+  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then(
+    (responseRules) => {
       const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
       RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
         if (!enabledResponseRuleIds.includes(ruleId)) {
           RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
         }
       });
-    });
-  });
+    }
+  );
 };
 
 /**

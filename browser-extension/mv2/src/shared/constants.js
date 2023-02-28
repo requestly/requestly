@@ -33,7 +33,6 @@ RQ.RESOURCES = {
 
 RQ.CLIENT_MESSAGES = {
   GET_SCRIPT_RULES: "getScriptRules",
-  DO_REQUEST_RESPONSE_RULES_EXIST: "doRequestResponseRuleExist",
   GET_USER_AGENT_RULE_PAIRS: "getUserAgentRulePairs",
   OVERRIDE_RESPONSE: "overrideResponse",
   NOTIFY_RULES_APPLIED: "notifyRulesApplied",

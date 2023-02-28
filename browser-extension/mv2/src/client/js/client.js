@@ -7,19 +7,9 @@
   RQ.ScriptRuleHandler.setup();
   RQ.SessionRecorder.setup();
   RQ.UserAgentRuleHandler.setup();
+  RQ.RequestResponseRuleHandler.setup();
 
   chrome.runtime.sendMessage({
     action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
   });
-
-  chrome.runtime.sendMessage(
-    {
-      action: RQ.CLIENT_MESSAGES.DO_REQUEST_RESPONSE_RULES_EXIST,
-    },
-    function (doRequestResponseRulesExist) {
-      if (doRequestResponseRulesExist) {
-        RQ.RequestResponseRuleHandler.setup();
-      }
-    }
-  );
 })();

@@ -955,38 +955,6 @@ describe("Requestly Background Service - ", function () {
     // ToDo: Add More Test Cases for getMatchingRulePairs
   });
 
-  describe("#BG.Methods.doRequestResponseRulesExist", function () {
-    beforeEach(function () {
-      RQ.StorageService.records = [];
-    });
-
-    it("should not setup response rule handler when extension is disabled", function () {
-      const responseRule = getModifyResponseRule();
-      RQ.StorageService.records.push(responseRule);
-
-      BG.statusSettings.isExtensionEnabled = false;
-      expect(BG.Methods.doRequestResponseRulesExist()).toBe(false);
-    });
-
-    it("should not setup response rule handler when there is no active response rule", function () {
-      BG.statusSettings.isExtensionEnabled = true;
-      const responseRule = getModifyResponseRule();
-      responseRule.status = RQ.RULE_STATUS.INACTIVE;
-
-      RQ.StorageService.records.push(responseRule);
-      expect(BG.Methods.doRequestResponseRulesExist()).toBe(false);
-    });
-
-    it("should setup response rule handler when atleast there is atleast one active response rule", function () {
-      BG.statusSettings.isExtensionEnabled = true;
-
-      const responseRule = getModifyResponseRule();
-      RQ.StorageService.records.push(responseRule);
-
-      expect(BG.Methods.doRequestResponseRulesExist()).toBe(true);
-    });
-  });
-
   describe("#appendExecutionLog", function () {
     const originalNumberExecutionLogsLimit =
       RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS;

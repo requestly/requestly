@@ -997,15 +997,6 @@ BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
   Logger.log("Requestly: " + details.reason);
 };
 
-BG.Methods.doRequestResponseRulesExist = function () {
-  return (
-    BG.statusSettings.isExtensionEnabled &&
-    BG.Methods.getEnabledRules().some((rule) =>
-      [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(rule.ruleType)
-    )
-  );
-};
-
 BG.Methods.addListenerForExtensionMessages = function () {
   chrome.runtime.onMessage.addListener(function (
     message,
@@ -1019,10 +1010,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
             BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT)
           );
         }
-        break;
-
-      case RQ.CLIENT_MESSAGES.DO_REQUEST_RESPONSE_RULES_EXIST:
-        sendResponse(BG.Methods.doRequestResponseRulesExist());
         break;
 
       case RQ.CLIENT_MESSAGES.GET_USER_AGENT_RULE_PAIRS:
