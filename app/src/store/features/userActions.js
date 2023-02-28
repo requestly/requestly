@@ -34,3 +34,8 @@ export const updateUserPersona = (prevState, action) => {
 export const updatePersonaReferralChannel = (prevState, action) => {
   prevState.userPersona.referralChannel = action.payload;
 };
+
+export const updatePersonaUseCase = (prevState, action) => {
+  prevState.userPersona.useCase.indexOf(action.payload) < 0 &&
+    prevState.userPersona.useCase.push(action.payload);
+};

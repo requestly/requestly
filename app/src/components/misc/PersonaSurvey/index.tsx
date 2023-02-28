@@ -42,7 +42,7 @@ export const PersonaSurveyModal = () => {
                   key={index}
                   title={option.title}
                   type={option.type}
-                  isActive={option.isActive}
+                  isActive={page.isActive}
                   action={page.action}
                 />
               ))}
@@ -72,6 +72,7 @@ export const PersonaSurveyModal = () => {
                       key={index}
                       title={option.title}
                       type={option.type}
+                      isActive={page.isActive}
                       action={page.action}
                     />
                   ))}

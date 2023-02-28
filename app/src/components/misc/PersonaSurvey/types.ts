@@ -3,7 +3,6 @@ import { ReactNode } from "react";
 export interface Option {
   type: string;
   title: string;
-  isActive?: (props: ActiveProps) => boolean;
 }
 
 interface Conditional {
@@ -17,6 +16,7 @@ export interface PageConfig {
   subTitle: string;
   render?: ReactNode;
   action?: (dispatch: any, value: string) => void;
+  isActive?: (props: ActiveProps) => boolean;
   conditional?: Conditional[];
   options?: Option[];
 }
@@ -30,6 +30,7 @@ export interface ActiveProps {
   persona?: string;
   referralChannel?: string;
   useCase?: string[];
+  title: string;
 }
 
 export enum SurveyConstants {

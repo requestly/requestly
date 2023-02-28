@@ -1,6 +1,10 @@
 import { PageConfig } from "./types";
 import { GettingStartedWithSurvey } from "./components/GettingStartedWithSurvey";
-import { setPersonaReferralChannel, setUserPersona } from "./actions";
+import {
+  setPersonaReferralChannel,
+  setPersonaUseCase,
+  setUserPersona,
+} from "./actions";
 import { SurveyConstants } from "./types";
 
 export const surveyConfig: PageConfig[] = [
@@ -16,34 +20,29 @@ export const surveyConfig: PageConfig[] = [
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
     action: (dispatch, value) => setUserPersona(dispatch, value),
+    isActive: ({ persona, title }) => persona === title,
     options: [
       {
-        isActive: ({ persona }) => persona === SurveyConstants.FRONTEND,
         type: "select",
         title: SurveyConstants.FRONTEND,
       },
       {
-        isActive: ({ persona }) => persona === SurveyConstants.BACKEND,
         type: "select",
         title: SurveyConstants.BACKEND,
       },
       {
-        isActive: ({ persona }) => persona === SurveyConstants.PRODUCT,
         type: "select",
         title: SurveyConstants.PRODUCT,
       },
       {
-        isActive: ({ persona }) => persona === SurveyConstants.FOUNDER,
         type: "select",
         title: SurveyConstants.FOUNDER,
       },
       {
-        isActive: ({ persona }) => persona === SurveyConstants.QUALITY,
         type: "select",
         title: SurveyConstants.QUALITY,
       },
       {
-        isActive: ({ persona }) => persona === SurveyConstants.MARKETER,
         type: "select",
         title: SurveyConstants.MARKETER,
       },
@@ -53,6 +52,9 @@ export const surveyConfig: PageConfig[] = [
     pageId: 2,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
+    action: (dispatch, value) => setPersonaUseCase(dispatch, value),
+    isActive: ({ useCase, title }) =>
+      useCase.indexOf(title) < 0 ? false : true,
     conditional: [
       {
         condition: (answer) => answer === SurveyConstants.BACKEND,
@@ -206,53 +208,41 @@ export const surveyConfig: PageConfig[] = [
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
     action: (dispatch, value) => setPersonaReferralChannel(dispatch, value),
+    isActive: ({ referralChannel, title }) => referralChannel === title,
     options: [
       {
-        isActive: ({ referralChannel }) => referralChannel === "Google search",
         type: "select",
         title: "Google search",
       },
       {
-        isActive: ({ referralChannel }) =>
-          referralChannel === "Friend/Colleague",
         type: "select",
         title: "Friend/Colleague",
       },
       {
-        isActive: ({ referralChannel }) => referralChannel === "Online ads",
         type: "select",
         title: "Online ads",
       },
       {
-        isActive: ({ referralChannel }) =>
-          referralChannel === "Chrome webstore",
         type: "select",
         title: "Chrome webstore",
       },
       {
-        isActive: ({ referralChannel }) => referralChannel === "Social media",
         type: "select",
         title: "Social media",
       },
       {
-        isActive: ({ referralChannel }) =>
-          referralChannel === "Read an article",
         type: "select",
         title: "Read an article",
       },
       {
-        isActive: ({ referralChannel }) => referralChannel === "Reddit",
         type: "select",
         title: "Reddit",
       },
       {
-        isActive: ({ referralChannel }) => referralChannel === "HackerNews",
         type: "select",
         title: "HackerNews",
       },
       {
-        isActive: ({ referralChannel }) =>
-          referralChannel === "Company internal documentation",
         type: "select",
         title: "Company internal documentation",
       },
