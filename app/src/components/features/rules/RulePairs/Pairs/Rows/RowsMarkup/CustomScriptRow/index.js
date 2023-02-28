@@ -166,7 +166,8 @@ const CustomScriptRow = ({
           path: `scripts[${scriptIndex}].value`,
           value: "",
         },
-      ]
+      ],
+      !isJSPrettified
     );
   };
 

@@ -102,7 +102,7 @@ const ResponseBodyRow = ({
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
+  const responseBodyChangeHandler = (value, ev) => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
@@ -119,7 +119,8 @@ const ResponseBodyRow = ({
               ? minifyCode(value)
               : value,
         },
-      ]
+      ],
+      !isJSPrettified
     );
   };
 

@@ -49,12 +49,19 @@ const RequestBodyRow = ({
   };
 
   const requestBodyChangeHandler = (value) => {
-    modifyPairAtGivenPath(null, pairIndex, `request.type`, pair.request.type, [
-      {
-        path: `request.value`,
-        value: value,
-      },
-    ]);
+    modifyPairAtGivenPath(
+      null,
+      pairIndex,
+      `request.type`,
+      pair.request.type,
+      [
+        {
+          path: `request.value`,
+          value: value,
+        },
+      ],
+      !isJSPrettified
+    );
   };
 
   const handlePrettifyJS = () => {
