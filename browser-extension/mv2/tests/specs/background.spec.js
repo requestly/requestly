@@ -950,6 +950,7 @@ describe("Requestly Background Service - ", function () {
         BG.Methods.getMatchingRulePairs("www.example.com", RQ.RULE_TYPES.SCRIPT)
           .length
       ).toBe(0);
+      BG.statusSettings.isExtensionEnabled = true;
     });
 
     // ToDo: Add More Test Cases for getMatchingRulePairs
@@ -1104,7 +1105,7 @@ describe("Requestly Background Service - ", function () {
       });
     });
 
-    it("should return null if config exists and url does not matche", async () => {
+    it("should return null if config exists and url does not match", async () => {
       const testConfig = {
         pageSources: [
           {
