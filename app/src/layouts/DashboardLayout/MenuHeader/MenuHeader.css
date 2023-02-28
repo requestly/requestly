@@ -137,3 +137,8 @@
   margin-right: 12px;
   margin-left: 16px;
 }
+
+.github-star-button > span {
+  display: flex;
+  align-items: center;
+}

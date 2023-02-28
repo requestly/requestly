@@ -42,11 +42,11 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   // Component State
-  const [currentGroupId, setCurrentGroupId] = useState(rule?.groupId ?? "");
   const [showInput, setShowInput] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [modifiedGroups, setModifiedGroups] = useState(groupList ?? []);
+  const currentGroupId = rule?.groupId ?? "";
 
   useEffect(() => {
     StorageService(appMode)
@@ -101,7 +101,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   };
 
   const handleGroupChange = (groupId: string) => {
-    setCurrentGroupId(groupId);
+    dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
     updateGroupOfSelectedRules(
       appMode,
