@@ -33,6 +33,7 @@ Requestly also offers a library service which allows you to upload and host JS/C
 - [Documentation](#documentation-)
 - [Why Requestly](#why-requestly-)
 - [Features](#features-)
+- [Development](#development)
 - [Contributing](#contributing-%EF%B8%8F)
 - [Links](#links-)
 
@@ -98,6 +99,20 @@ Modify HTTP Request & Response headers. (Extremely helpful for web developers fo
 #### 🎥 Share debugging sessions
 
 Share debugging sessions with Video, console logs, network logs, and env details with teammates.
+
+## Development
+This repository contains the source code for Browser extension and UI application which make up the core of Requestly.
+Please follow the [Getting Started Guide](./getting-started.md) to get to know about the development process in this repository.
+
+Start working on individual modules:
+- [Browser extension](./browser-extension)
+- [UI application](./app)
+- [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
+- [Mobile SDK](https://github.com/requestly/requestly-android-sdk) (to debug mobile apps)
+- [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates Session Recording)
+- [Mock Server](https://github.com/requestly/requestly-mock-server)
+- [Backend](https://github.com/requestly/requestly-backend)
+
 
 ## Contributing ⌨️
 
