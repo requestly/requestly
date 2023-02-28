@@ -1,5 +1,7 @@
 import { PageConfig } from "./types";
 import { GettingStartedWithSurvey } from "./components/GettingStartedWithSurvey";
+import { setUserPersona } from "./actions";
+import { SurveyConstants } from "./types";
 
 export const surveyConfig: PageConfig[] = [
   {
@@ -13,34 +15,31 @@ export const surveyConfig: PageConfig[] = [
     pageId: 1,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
+    action: (dispatch, value) => setUserPersona(dispatch, value),
     options: [
       {
         type: "select",
-        title: "💻 Front end developer",
+        title: SurveyConstants.FRONTEND,
       },
       {
         type: "select",
-        title: "⌨️ Back end developer",
+        title: SurveyConstants.BACKEND,
       },
       {
         type: "select",
-        title: "🖌 Product manager",
+        title: SurveyConstants.PRODUCT,
       },
       {
         type: "select",
-        title: "👑 Founder",
+        title: SurveyConstants.FOUNDER,
       },
       {
         type: "select",
-        title: "🏗 QA engineer",
+        title: SurveyConstants.QUALITY,
       },
       {
         type: "select",
-        title: "😁 Customer success manager",
-      },
-      {
-        type: "text",
-        title: "other",
+        title: SurveyConstants.MARKETER,
       },
     ],
   },
@@ -50,7 +49,7 @@ export const surveyConfig: PageConfig[] = [
     subTitle: "Select as many as you like",
     conditional: [
       {
-        condition: (answer) => answer === "backend",
+        condition: (answer) => answer === SurveyConstants.BACKEND,
         options: [
           {
             type: "select",
@@ -71,7 +70,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === "quality",
+        condition: (answer) => answer === SurveyConstants.QUALITY,
         options: [
           {
             type: "select",
@@ -101,7 +100,9 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === "founder" || answer === "manager",
+        condition: (answer) =>
+          answer === SurveyConstants.FOUNDER ||
+          answer === SurveyConstants.PRODUCT,
         options: [
           {
             type: "select",
@@ -122,7 +123,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === "marketer",
+        condition: (answer) => answer === SurveyConstants.MARKETER,
         options: [
           {
             type: "select",
@@ -147,7 +148,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === "frontend",
+        condition: (answer) => answer === SurveyConstants.FRONTEND,
         options: [
           {
             type: "select",

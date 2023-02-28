@@ -25,3 +25,7 @@ export const updateUserPreferences = (prevState, action) => {
 export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };
+
+export const updateUserPersona = (prevState, action) => {
+  prevState.userPersona.persona = action.payload;
+};

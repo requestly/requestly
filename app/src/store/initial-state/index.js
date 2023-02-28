@@ -10,6 +10,12 @@ const INITIAL_STATE = {
     details: null,
   },
 
+  userPersona: {
+    persona: "",
+    useCase: [],
+    referralChannel: "",
+  },
+
   /* App Mode */
   appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { getUserPersona } from "store/selectors";
 import { RQModal } from "lib/design-system/components";
 import { SurveyOption } from "./components/Option";
 import { SurveyModalFooter } from "./components/ModalFooter";
@@ -8,12 +10,7 @@ import "./index.css";
 
 export const PersonaSurveyModal = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const roleType = "frontend";
-  // const roleType = "backend";
-  //   const roleType = "founder";
-  //   const roleType = "manager";
-  //   const roleType = "quality";
-  //   const roleType = "marketer";
+  const roleType = useSelector(getUserPersona);
 
   const updatePage = () => {
     setCurrentPage((current) => current + 1);
@@ -44,6 +41,7 @@ export const PersonaSurveyModal = () => {
                   key={index}
                   title={option.title}
                   type={option.type}
+                  action={page.action}
                 />
               ))}
             </div>

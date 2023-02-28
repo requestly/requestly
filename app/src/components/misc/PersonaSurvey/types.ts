@@ -15,7 +15,7 @@ export interface PageConfig {
   title: string;
   subTitle: string;
   render?: ReactNode;
-  action?: () => void;
+  action?: (dispatch: any, value: string) => void;
   conditional?: Conditional[];
   options?: Option[];
 }
@@ -23,4 +23,13 @@ export interface PageConfig {
 export interface FooterProps {
   page: number;
   handleNextPage: () => void;
+}
+
+export enum SurveyConstants {
+  FRONTEND = "💻 Front end developer",
+  BACKEND = "⌨️ Back end developer",
+  MARKETER = "🖌 Product manager",
+  FOUNDER = "👑 Founder",
+  QUALITY = "🏗 QA engineer",
+  PRODUCT = "📈 Digital Marketer",
 }
