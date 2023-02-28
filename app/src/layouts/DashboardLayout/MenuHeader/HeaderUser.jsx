@@ -6,12 +6,9 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
   redirectToLicenseIndexPage,
-  redirectToSettings,
   redirectToAccountDetails,
-  // redirectToDesktopPreferences,
 } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
-// import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
@@ -75,9 +72,7 @@ export default function HeaderUser() {
           ) : null}
         </div>
       </Menu.Item>
-
       <Divider className="profile-divider" />
-
       <Menu.Item
         key={1}
         className="profile-menu-items"
@@ -85,7 +80,6 @@ export default function HeaderUser() {
       >
         Profile
       </Menu.Item>
-
       <Menu.Item
         key={2}
         className="profile-menu-items"
@@ -93,16 +87,7 @@ export default function HeaderUser() {
       >
         Manage Workspaces
       </Menu.Item>
-
-      <Menu.Item
-        key={3}
-        className="profile-menu-items"
-        onClick={() => redirectToSettings(navigate)}
-      >
-        Settings
-      </Menu.Item>
       <Divider className="profile-divider" />
-
       <Menu.Item
         key={4}
         className="profile-menu-items profile-sign-out"
@@ -148,6 +133,7 @@ export default function HeaderUser() {
             trigger={["click"]}
             overlay={menu}
             placement="bottomLeft"
+            className="header-profile-dropdown-trigger"
             onOpenChange={(open) => {
               open && trackHeaderClicked("user_menu");
             }}
