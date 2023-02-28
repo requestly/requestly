@@ -169,20 +169,22 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
             <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <span
-                    className="github-star-button"
-                    onClick={() => trackHeaderClicked("github_star_button")}
-                  >
-                    <GitHubButton
-                      style={{ display: "flex" }}
+                  <Col>
+                    <span
                       className="github-star-button"
-                      href="https://github.com/requestly/requestly"
-                      data-color-scheme="dark_dimmed"
-                      data-text="Star"
-                      data-show-count="true"
-                      aria-label="Star Requestly on GitHub"
-                    />
-                  </span>
+                      onClick={() => trackHeaderClicked("github_star_button")}
+                    >
+                      <GitHubButton
+                        style={{ display: "flex" }}
+                        className="github-star-button"
+                        href="https://github.com/requestly/requestly"
+                        data-color-scheme="dark_dimmed"
+                        data-text="Star"
+                        data-show-count="true"
+                        aria-label="Star Requestly on GitHub"
+                      />
+                    </span>
+                  </Col>
                   <Divider
                     type="vertical"
                     className="header-vertival-divider"
