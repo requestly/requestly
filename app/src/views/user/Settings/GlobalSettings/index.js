@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
 import * as ExtensionActions from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
@@ -9,6 +11,7 @@ import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DataCollection from "./DataCollection";
 
 const GlobalSettings = ({ appMode }) => {
+  const user = useSelector(getUserAuthDetails);
   const [storageType, setStorageType] = useState("");
 
   useEffect(() => {
@@ -49,11 +52,12 @@ const GlobalSettings = ({ appMode }) => {
           </>
         )}
 
-        {/* <RulesSyncing />
-        <RulesBackup /> */}
-
-        <WorkspaceStatusSyncing />
-        <DataCollection />
+        {user?.loggedIn ? (
+          <>
+            <WorkspaceStatusSyncing />
+            <DataCollection />
+          </>
+        ) : null}
       </div>
     </>
   );
