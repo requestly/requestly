@@ -21,7 +21,7 @@ const RequestBodyRow = ({
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
-  const [isJSPrettified, setIsJSPrettified] = useState(false);
+  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const onChangeRequestType = (requestType) => {
     if (
@@ -60,14 +60,14 @@ const RequestBodyRow = ({
           value: value,
         },
       ],
-      !isJSPrettified
+      !isCodeFormatted
     );
   };
 
-  const handlePrettifyJS = () => {
-    setIsJSPrettified(true);
+  const handleCodeFormattedFlag = () => {
+    setIsCodeFormatted(true);
     setTimeout(() => {
-      setIsJSPrettified(false);
+      setIsCodeFormatted(false);
     }, 2000);
   };
 
@@ -130,7 +130,7 @@ const RequestBodyRow = ({
                     ? "off"
                     : "editable"
                 }
-                isJSPrettified={isJSPrettified}
+                isCodeFormatted={isCodeFormatted}
               />
             </Col>
           </Row>
@@ -142,7 +142,7 @@ const RequestBodyRow = ({
             <Col align="left">
               {pair.request.type ===
               GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? (
-                <Button type="link" onClick={handlePrettifyJS}>
+                <Button type="link" onClick={handleCodeFormattedFlag}>
                   Pretty Print {"{ }"}
                 </Button>
               ) : null}
