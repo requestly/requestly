@@ -87,15 +87,22 @@
   align-items: center;
   justify-content: center;
   color: var(--text-gray);
+  transition: color 0.3s, background-color 0.3s;
 }
 
 .ant-btn.header-icon-btn svg {
-  font-size: 1.1rem;
+  width: 18px;
+  height: 18px;
 }
 
 .ant-btn.header-icon-btn .anticon {
   margin: 0px;
   color: var(--text-gray);
+}
+
+.ant-btn.header-icon-btn:hover svg,
+.ant-btn.header-icon-btn:focus svg {
+  color: var(--white);
 }
 
 .ant-btn.header-icon-btn:hover,
@@ -138,7 +145,11 @@
   margin-left: 16px;
 }
 
-.github-star-button > span {
+.github-star-button > span > span {
   display: flex;
   align-items: center;
+}
+
+.header-profile-dropdown-trigger.ant-avatar {
+  margin-top: -2px;
 }
