@@ -156,3 +156,13 @@ export interface ScriptRule extends Rule {
   pairs: ScriptRulePair[];
   removeCSPHeader?: boolean;
 }
+
+// Group
+export interface Group extends Record<string, unknown> {
+  id: string;
+  name: string;
+  objectType: ObjectType.GROUP;
+  status: Status;
+  children: Rule[];
+  isFavourite?: boolean;
+}
