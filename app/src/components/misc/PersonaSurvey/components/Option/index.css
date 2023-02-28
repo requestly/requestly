@@ -6,6 +6,7 @@
   cursor: pointer;
   display: flex;
   gap: 10px;
+  transition: 0.2s ease-in-out;
 }
 .survey-modal .survey-option.survey-select {
   cursor: pointer;
@@ -25,4 +26,7 @@
 .survey-modal .survey-text-prefix,
 .survey-modal .survey-text-suffix {
   align-self: center;
+}
+.survey-modal .outline-active-option {
+  border: 1px solid var(--primary);
 }

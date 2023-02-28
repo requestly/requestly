@@ -1,6 +1,6 @@
 import { PageConfig } from "./types";
 import { GettingStartedWithSurvey } from "./components/GettingStartedWithSurvey";
-import { setUserPersona } from "./actions";
+import { setPersonaReferralChannel, setUserPersona } from "./actions";
 import { SurveyConstants } from "./types";
 
 export const surveyConfig: PageConfig[] = [
@@ -18,26 +18,32 @@ export const surveyConfig: PageConfig[] = [
     action: (dispatch, value) => setUserPersona(dispatch, value),
     options: [
       {
+        isActive: ({ persona }) => persona === SurveyConstants.FRONTEND,
         type: "select",
         title: SurveyConstants.FRONTEND,
       },
       {
+        isActive: ({ persona }) => persona === SurveyConstants.BACKEND,
         type: "select",
         title: SurveyConstants.BACKEND,
       },
       {
+        isActive: ({ persona }) => persona === SurveyConstants.PRODUCT,
         type: "select",
         title: SurveyConstants.PRODUCT,
       },
       {
+        isActive: ({ persona }) => persona === SurveyConstants.FOUNDER,
         type: "select",
         title: SurveyConstants.FOUNDER,
       },
       {
+        isActive: ({ persona }) => persona === SurveyConstants.QUALITY,
         type: "select",
         title: SurveyConstants.QUALITY,
       },
       {
+        isActive: ({ persona }) => persona === SurveyConstants.MARKETER,
         type: "select",
         title: SurveyConstants.MARKETER,
       },
@@ -194,171 +200,62 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
     ],
-    // condition: (answer) => answer === "backend",
-    // options: [
-    //   {
-    //     title: "Test local API changes against production app/website",
-    //   },
-    //   {
-    //     title: "Debug backend microservices",
-    //   },
-    //   {
-    //     title: "Modify GraphQL Query & Server Response",
-    //   },
-    //   {
-    //     title: "Other",
-    //   },
-    // ],
   },
   {
     pageId: 3,
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
+    action: (dispatch, value) => setPersonaReferralChannel(dispatch, value),
     options: [
       {
+        isActive: ({ referralChannel }) => referralChannel === "Google search",
         type: "select",
         title: "Google search",
       },
       {
+        isActive: ({ referralChannel }) =>
+          referralChannel === "Friend/Colleague",
         type: "select",
         title: "Friend/Colleague",
       },
       {
+        isActive: ({ referralChannel }) => referralChannel === "Online ads",
         type: "select",
         title: "Online ads",
       },
       {
+        isActive: ({ referralChannel }) =>
+          referralChannel === "Chrome webstore",
         type: "select",
         title: "Chrome webstore",
       },
       {
+        isActive: ({ referralChannel }) => referralChannel === "Social media",
         type: "select",
         title: "Social media",
       },
       {
+        isActive: ({ referralChannel }) =>
+          referralChannel === "Read an article",
         type: "select",
         title: "Read an article",
       },
       {
+        isActive: ({ referralChannel }) => referralChannel === "Reddit",
         type: "select",
         title: "Reddit",
       },
       {
+        isActive: ({ referralChannel }) => referralChannel === "HackerNews",
         type: "select",
         title: "HackerNews",
       },
       {
+        isActive: ({ referralChannel }) =>
+          referralChannel === "Company internal documentation",
         type: "select",
         title: "Company internal documentation",
       },
     ],
   },
-  // {
-  //   pageId: 2,
-  //   title: "What is your primary goal for using Requestly?",
-  //   subTitle: "Select as many as you like",
-  //   condition: (answer) => answer === "quality",
-  //   options: [
-  //     {
-  //       title:
-  //         "Testing newly developed features on different hosts/environments",
-  //     },
-  //     {
-  //       title: "Testing new features on client websites",
-  //     },
-  //     {
-  //       title: "Simulate network conditions",
-  //     },
-  //     {
-  //       title: "UI automation testing",
-  //     },
-  //     {
-  //       title: "Recording issues & sharing with developers",
-  //     },
-  //     {
-  //       title: "Other",
-  //     },
-  //   ],
-  // },
-  // {
-  //   pageId: 2,
-  //   title: "What is your primary goal for using Requestly?",
-  //   subTitle: "Select as many as you like",
-  //   condition: (answer) => answer === "founder" || answer === "manager",
-  //   options: [
-  //     {
-  //       title: "Testing new features on client websites",
-  //     },
-  //     {
-  //       title: "Showing new feature demos to clients",
-  //     },
-  //     {
-  //       title: "Recording issues & sharing with developers ",
-  //     },
-  //     {
-  //       title: "Other",
-  //     },
-  //   ],
-  // },
-  // {
-  //   pageId: 2,
-  //   title: "What is your primary goal for using Requestly?",
-  //   subTitle: "Select as many as you like",
-  //   condition: (answer) => answer === "marketer",
-  //   options: [
-  //     {
-  //       title: "Replace production script with development script",
-  //     },
-  //     {
-  //       title: "Debug analytics tags",
-  //     },
-  //     {
-  //       title: "Showing new feature demos to clients",
-  //     },
-  //     {
-  //       title: "Adding Query Params to URLs",
-  //     },
-  //     {
-  //       title: "Other",
-  //     },
-  //   ],
-  // },
-  // {
-  //   pageId: 2,
-  //   title: "What is your primary goal for using Requestly?",
-  //   subTitle: "Select as many as you like",
-  //   condition: (answer) => answer === "frontend",
-  //   options: [
-  //     {
-  //       title: "Local development before the backend is ready",
-  //     },
-  //     {
-  //       title: "Redirect APIs/scripts from one environment to another",
-  //     },
-  //     {
-  //       title: "Load scripts from local/dev environment (Map Local)",
-  //     },
-  //     {
-  //       title: "Inject custom scripts",
-  //     },
-  //     {
-  //       title: "Modify existing network responses",
-  //     },
-  //     {
-  //       title: "Modify headers on a website",
-  //     },
-  //     {
-  //       title: "Modify request payload ",
-  //     },
-  //     {
-  //       title: "Simulate status codes",
-  //     },
-  //     {
-  //       title: "Recording issues & sharing with team members",
-  //     },
-  //     {
-  //       title: "Other",
-  //     },
-  //   ],
-  // },
 ];

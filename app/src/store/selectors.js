@@ -190,6 +190,6 @@ export const getUserPreferences = (state) => {
   return getGlobalState(state)["userPreferences"];
 };
 
-export const getUserPersona = (state) => {
-  return getGlobalState(state)["userPersona"]["persona"];
+export const getUserPersonaSurveyDetails = (state) => {
+  return getGlobalState(state)["userPersona"];
 };

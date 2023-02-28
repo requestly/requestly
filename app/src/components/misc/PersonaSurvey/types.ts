@@ -3,10 +3,11 @@ import { ReactNode } from "react";
 export interface Option {
   type: string;
   title: string;
+  isActive?: (props: ActiveProps) => boolean;
 }
 
 interface Conditional {
-  condition: (answer: string) => Boolean;
+  condition: (answer: string) => boolean;
   options: Option[];
 }
 
@@ -23,6 +24,12 @@ export interface PageConfig {
 export interface FooterProps {
   page: number;
   handleNextPage: () => void;
+}
+
+export interface ActiveProps {
+  persona?: string;
+  referralChannel?: string;
+  useCase?: string[];
 }
 
 export enum SurveyConstants {
