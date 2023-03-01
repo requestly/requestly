@@ -3,7 +3,7 @@ RQ.RequestResponseRuleHandler.isInitialized = false;
 RQ.RequestResponseRuleHandler.cachedResponseRuleIds = new Set();
 
 RQ.RequestResponseRuleHandler.setup = () => {
-  RQ.RulesStore.getEnabledRules().then((rules) => {
+  RQ.RulesStore.getRules().then((rules) => {
     const doRequestResponseRulesExist = rules.some((rule) => {
       return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(
         rule.ruleType

@@ -17,12 +17,12 @@ const isGroup = (record: unknown): boolean => {
   return (record as Group).objectType === ObjectType.GROUP;
 };
 
-const getRules = async (): Promise<Rule[]> => {
+export const getRules = async (): Promise<Rule[]> => {
   const records = await getAllRecords();
   return records.filter(isRule) as Rule[];
 };
 
-const getGroups = async (): Promise<Group[]> => {
+export const getGroups = async (): Promise<Group[]> => {
   const records = (await getAllRecords()) as Group[];
   return records.filter(isGroup) as Group[];
 };
