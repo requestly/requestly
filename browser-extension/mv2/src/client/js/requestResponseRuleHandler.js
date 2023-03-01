@@ -1,40 +1,42 @@
 RQ.RequestResponseRuleHandler = {};
+RQ.RequestResponseRuleHandler.isInitialized = false;
+RQ.RequestResponseRuleHandler.cachedResponseRuleIds = new Set();
 
-RQ.RequestResponseRuleHandler.setupRequestRules = function (requestRules) {
-  RQ.ClientUtils.executeJS(
-    `window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
-      requestRules
-    )};`,
-    true
-  );
+RQ.RequestResponseRuleHandler.setup = () => {
+  RQ.RulesStore.getRules().then((rules) => {
+    const doRequestResponseRulesExist = rules.some((rule) => {
+      return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(
+        rule.ruleType
+      );
+    });
+
+    if (doRequestResponseRulesExist) {
+      RQ.RequestResponseRuleHandler.init();
+    }
+  });
+
+  RQ.RulesStore.onRuleOrGroupChange(() => {
+    if (!RQ.RequestResponseRuleHandler.isInitialized) {
+      RQ.RequestResponseRuleHandler.init();
+    }
+    RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges();
+  });
 };
 
-RQ.RequestResponseRuleHandler.setup = function () {
+RQ.RequestResponseRuleHandler.init = function () {
   // we match request rules on client-side whereas response rules are still matched in background
   RQ.ClientUtils.executeJS(
     `(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`
   );
 
-  chrome.runtime.sendMessage(
-    {
-      action: RQ.CLIENT_MESSAGES.GET_REQUEST_RULES,
-    },
-    (rules) => {
-      if (rules?.length) {
-        RQ.RequestResponseRuleHandler.setupRequestRules(rules);
-      }
-    }
-  );
+  RQ.RequestResponseRuleHandler.cacheRequestRules();
 
-  chrome.runtime.onMessage.addListener(function (
-    message,
-    sender,
-    sendResponse
-  ) {
+  chrome.runtime.onMessage.addListener((message) => {
     if (message.action === RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE) {
-      RQ.RequestResponseRuleHandler.handleOverrideResponseMessage(message);
-      sendResponse();
-      return true;
+      RQ.RequestResponseRuleHandler.cacheResponseRule(
+        message.url,
+        message.ruleId
+      );
     }
   });
 
@@ -64,25 +66,58 @@ RQ.RequestResponseRuleHandler.setup = function () {
   RQ.ClientUtils.executeJS(
     `(${this.interceptAJAXRequests.toString()})('${RQ.PUBLIC_NAMESPACE}')`
   );
+
+  RQ.RequestResponseRuleHandler.isInitialized = true;
 };
 
-RQ.RequestResponseRuleHandler.handleOverrideResponseMessage = function (
-  message
-) {
+RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
+  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
+    RQ.ClientUtils.executeJS(
+      `window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
+        requestRules
+      )};`,
+      true
+    );
+  });
+};
+
+RQ.RequestResponseRuleHandler.cacheResponseRule = (url, ruleId) => {
+  RQ.RulesStore.getRule(ruleId).then((responseRule) => {
+    RQ.ClientUtils.executeJS(
+      `window.${
+        RQ.PUBLIC_NAMESPACE
+      }.responseRulesByUrl['${url}'] = ${JSON.stringify(responseRule)};`,
+      true
+    );
+    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.add(ruleId);
+  });
+};
+
+RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
   RQ.ClientUtils.executeJS(
-    `window.${RQ.PUBLIC_NAMESPACE}.responseRulesByUrl['${
-      message.url
-    }'] = ${JSON.stringify(message.rule)};`,
+    `Object.entries(window.${RQ.PUBLIC_NAMESPACE}.responseRulesByUrl).forEach(([url, rule]) => {
+      if (rule.id === '${ruleId}') {
+        delete window.${RQ.PUBLIC_NAMESPACE}.responseRulesByUrl[url];
+      }
+    });`,
     true
   );
+  RQ.RequestResponseRuleHandler.cachedResponseRuleIds.delete(ruleId);
+};
 
-  // Set evaluator function in global scope when user selects code(or function)
-  // We don't need this in case when user selects JSON response directly
-  if (message.rule.response.type === "code") {
-    RQ.ClientUtils.executeJS(
-      `window.${RQ.PUBLIC_NAMESPACE}.responseRulesByUrl['${message.url}'].evaluator = ${message.rule.response.value};`
-    );
-  }
+RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
+  RQ.RequestResponseRuleHandler.cacheRequestRules();
+
+  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then(
+    (responseRules) => {
+      const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
+      RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
+        if (!enabledResponseRuleIds.includes(ruleId)) {
+          RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
+        }
+      });
+    }
+  );
 };
 
 /**
@@ -199,18 +234,20 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     const absoluteUrl = getAbsoluteUrl(url);
 
     return window[namespace].requestRules.findLast((rule) =>
-      window[namespace].matchSourceUrl(rule.source, absoluteUrl)
+      window[namespace].matchSourceUrl(rule.pairs[0].source, absoluteUrl)
     );
   };
 
+  const getFunctionFromCode = (code) => {
+    return new Function("args", `return (${code})(args);`);
+  };
+
   const getCustomRequestBody = (requestRule, args) => {
-    if (requestRule.modification.type === "static") {
-      requestBody = requestRule.modification.value;
+    const modification = requestRule.pairs[0].request;
+    if (modification.type === "static") {
+      requestBody = modification.value;
     } else {
-      requestBody = new Function(
-        "args",
-        `return (${requestRule.modification.value})(args);`
-      )(args);
+      requestBody = getFunctionFromCode(modification.value)(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -288,7 +325,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       {
         from: "requestly",
         type: "response_rule_applied",
-        id: message.ruleDetails.id,
+        id: message.rule.id,
         requestDetails: message["requestDetails"],
       },
       window.location.href
@@ -319,8 +356,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         return;
       }
 
-      const responseRuleData = getResponseRule(url);
-      const { response: responseModification, source } = responseRuleData;
+      const responseRule = getResponseRule(url);
+      const { response: responseModification, source } = responseRule.pairs[0];
       const responseType = this.responseType;
       const contentType = this.getResponseHeader("content-type");
 
@@ -362,7 +399,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
-            ? responseRuleData.evaluator({
+            ? getFunctionFromCode(responseModification.value)({
                 method: this.method,
                 url,
                 requestHeaders: this.requestHeaders,
@@ -432,7 +469,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         };
 
         notifyResponseRuleApplied({
-          ruleDetails: responseRuleData,
+          rule: responseRule,
           requestDetails,
         });
       }
@@ -578,7 +615,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       return fetchedResponse;
     }
 
-    const responseRuleData = getResponseRule(url);
+    const responseRule = getResponseRule(url);
+    const { response: responseModification, source } = responseRule.pairs[0];
 
     if (fetchedResponse?.status === 204) {
       // Return the same response when status is 204. fetch doesn't allow to create new response with empty body
@@ -604,7 +642,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     if (
       !isRequestPayloadFilterApplicable(
         { requestData, method },
-        responseRuleData.source?.filters
+        source?.filters
       )
     ) {
       return fetchedResponse;
@@ -612,7 +650,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
     let customResponse;
 
-    if (responseRuleData.response.type === "code") {
+    if (responseModification.type === "code") {
       const requestHeaders =
         request.headers &&
         Array.from(request.headers).reduce((obj, [key, val]) => {
@@ -643,7 +681,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         };
       }
 
-      customResponse = responseRuleData.evaluator(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseModification.value)(
+        evaluatorArgs
+      );
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object
@@ -658,7 +698,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         customResponse = JSON.stringify(customResponse);
       }
     } else {
-      customResponse = responseRuleData.response.value;
+      customResponse = responseModification.value;
     }
 
     const requestDetails = {
@@ -669,16 +709,15 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     };
 
     notifyResponseRuleApplied({
-      ruleDetails: responseRuleData,
+      rule: responseRule,
       requestDetails,
     });
 
     return new Response(new Blob([customResponse]), {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      status:
-        responseRuleData.response.statusCode || fetchedResponse?.status || 200,
+      status: responseModification.statusCode || fetchedResponse?.status || 200,
       statusText:
-        responseRuleData.response.statusText || fetchedResponse?.statusText,
+        responseModification.statusText || fetchedResponse?.statusText,
       headers: fetchedResponse?.headers,
     });
   };

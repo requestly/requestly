@@ -22,8 +22,9 @@ export const saveRecord = async <T>(key: string, record: T): Promise<void> => {
 };
 
 export const getRecord = async <T>(key: string): Promise<T> => {
-  const records = await chrome.storage[STORAGE_TYPE].get(key);
-  return records[key];
+  return new Promise((resolve) => {
+    chrome.storage[STORAGE_TYPE].get(key, (records) => resolve(records[key]));
+  });
 };
 
 export const getRecords = async <T>(keys: string[]): Promise<T[]> => {

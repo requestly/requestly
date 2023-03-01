@@ -19,6 +19,7 @@
   "client": [
     "../config/dist/config.js",
     "../../common/constants.js",
+    "../common/dist/rulesStore.js",
     "src/shared/constants.js",
     "src/client/js/utils.js",
     "src/client/js/ruleMatcher.js",
