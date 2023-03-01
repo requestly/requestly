@@ -36,6 +36,9 @@
   position: relative;
   top: 2px;
 }
+.survey-modal .survey-modal-emoji.emoji-gap {
+  margin-right: 8px;
+}
 .survey-modal .survey-subtitle-wrapper {
   display: flex;
   justify-content: center;

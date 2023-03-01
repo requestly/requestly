@@ -42,9 +42,8 @@ export const PersonaSurveyModal = () => {
               {page.options.map((option: Option, index) => (
                 <SurveyOption
                   key={index}
-                  title={option.title}
+                  option={option}
                   questionType={page.questionType}
-                  type={option.type}
                   isActive={page.isActive}
                   action={page.action}
                 />
@@ -73,9 +72,8 @@ export const PersonaSurveyModal = () => {
                   {question.options.map((option, index) => (
                     <SurveyOption
                       key={index}
-                      title={option.title}
+                      option={option}
                       questionType={page.questionType}
-                      type={option.type}
                       isActive={page.isActive}
                       action={page.action}
                     />
@@ -95,7 +93,13 @@ export const PersonaSurveyModal = () => {
   };
 
   return (
-    <RQModal centered open={true} closable={false} className="survey-modal">
+    <RQModal
+      bodyStyle={{ width: "492px" }}
+      centered
+      open={true}
+      closable={false}
+      className="survey-modal"
+    >
       <div className="rq-modal-content survey-content-wrapper">
         {surveyConfig.map((page: PageConfig) => (
           <>

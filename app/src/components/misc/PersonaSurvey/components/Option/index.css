@@ -1,3 +1,8 @@
+.survey-modal.ant-modal {
+  min-width: 492px !important;
+  width: 492px !important;
+}
+
 .survey-modal .survey-option {
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -5,7 +10,7 @@
   padding: 12px;
   cursor: pointer;
   display: flex;
-  gap: 8px;
+  gap: 4px;
   transition: 0.2s ease-in-out;
 }
 .survey-modal .survey-option.survey-select {
@@ -22,6 +27,9 @@
 }
 .survey-modal .survey-option-title {
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .survey-modal .survey-text-prefix,
 .survey-modal .survey-text-suffix {

@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 export interface Option {
   type: string;
   title: string;
+  icon?: string | ReactNode;
 }
 
 interface Conditional {
@@ -35,10 +36,10 @@ export interface ActiveProps {
 }
 
 export enum SurveyConstants {
-  FRONTEND = "💻 Front end developer",
-  BACKEND = "⌨️ Back end developer",
-  MARKETER = "🖌 Product manager",
-  FOUNDER = "👑 Founder",
-  QUALITY = "🏗 QA engineer",
-  PRODUCT = "📈 Digital Marketer",
+  FRONTEND = "Front end developer",
+  BACKEND = "Back end developer",
+  MARKETER = "Product manager",
+  FOUNDER = "Founder",
+  QUALITY = "QA engineer",
+  PRODUCT = "Digital Marketer",
 }

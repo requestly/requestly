@@ -4,19 +4,17 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Checkbox } from "antd";
 import "./index.css";
 import { RQInput } from "lib/design-system/components";
-import { ActiveProps } from "../../types";
+import { ActiveProps, Option } from "../../types";
 
 interface OptionProps {
-  title: string;
-  type: string;
+  option: Option;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
   action?: (dispatch: any, value: string, clear: boolean) => void;
 }
 
 export const SurveyOption: React.FC<OptionProps> = ({
-  title,
-  type,
+  option,
   questionType,
   isActive,
   action,
@@ -25,6 +23,8 @@ export const SurveyOption: React.FC<OptionProps> = ({
   const persona = userPersona.persona;
   const referralChannel = userPersona.referralChannel;
   const useCase = userPersona.useCase;
+
+  const { title, type, icon } = option;
 
   const dispatch = useDispatch();
   return (
@@ -43,7 +43,18 @@ export const SurveyOption: React.FC<OptionProps> = ({
             )
           }
         >
-          <div className="white text-bold survey-option-title">{title}</div>
+          <div className="white text-bold survey-option-title">
+            {
+              <span
+                className={`${
+                  typeof icon === "string" && "survey-modal-emoji"
+                }`}
+              >
+                {icon}
+              </span>
+            }
+            {title}
+          </div>
           <Checkbox
             className={
               questionType === "single"

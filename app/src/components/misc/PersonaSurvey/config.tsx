@@ -7,6 +7,15 @@ import {
 } from "./actions";
 import { SurveyConstants } from "./types";
 
+//@ts-ignore
+import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
+//@ts-ignore
+import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
+//@ts-ignore
+import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
+//@ts-ignore
+import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+
 export const surveyConfig: PageConfig[] = [
   {
     pageId: 0,
@@ -26,26 +35,32 @@ export const surveyConfig: PageConfig[] = [
       {
         type: "select",
         title: SurveyConstants.FRONTEND,
+        icon: "😁",
       },
       {
         type: "select",
         title: SurveyConstants.BACKEND,
+        icon: "⌨️",
       },
       {
         type: "select",
         title: SurveyConstants.PRODUCT,
+        icon: "📊",
       },
       {
         type: "select",
         title: SurveyConstants.FOUNDER,
+        icon: "👑",
       },
       {
         type: "select",
         title: SurveyConstants.QUALITY,
+        icon: "🏗",
       },
       {
         type: "select",
         title: SurveyConstants.MARKETER,
+        icon: "📈",
       },
     ],
   },
@@ -218,38 +233,47 @@ export const surveyConfig: PageConfig[] = [
       {
         type: "select",
         title: "Google search",
+        icon: <img src={chromeIcon} alt="google chrome" />,
       },
       {
         type: "select",
         title: "Friend/Colleague",
+        icon: "🙂",
       },
       {
         type: "select",
         title: "Online ads",
+        icon: "📢",
       },
       {
         type: "select",
         title: "Chrome webstore",
+        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
       },
       {
         type: "select",
         title: "Social media",
+        icon: "🌐",
       },
       {
         type: "select",
         title: "Read an article",
+        icon: "📄",
       },
       {
         type: "select",
         title: "Reddit",
+        icon: <img src={redditIcon} alt="reddit" />,
       },
       {
         type: "select",
         title: "HackerNews",
+        icon: <img src={hackerNewsIcon} alt="hacker news" />,
       },
       {
         type: "select",
         title: "Company internal documentation",
+        icon: "📋",
       },
     ],
   },
