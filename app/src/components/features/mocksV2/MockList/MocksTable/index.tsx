@@ -119,7 +119,11 @@ const MocksTable: React.FC<Props> = ({
       title: (
         <div className="rq-col-title">
           <AppstoreOutlined />
-          Method/Type
+          {mockType
+            ? mockType === MockType.FILE
+              ? "Type"
+              : "Method"
+            : "Method/Type"}
         </div>
       ),
       dataIndex: "method",
