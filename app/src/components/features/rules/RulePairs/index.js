@@ -95,7 +95,8 @@ const RulePairs = (props) => {
     pairIndex,
     objectPath,
     customValue,
-    arrayOfOtherValuesToModify
+    arrayOfOtherValuesToModify,
+    triggerUnsavedChangesIndication = true
   ) => {
     event && event.preventDefault && event.preventDefault();
     let newValue = null;
@@ -118,7 +119,11 @@ const RulePairs = (props) => {
       });
     }
 
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
+    setCurrentlySelectedRule(
+      dispatch,
+      copyOfCurrentlySelectedRule,
+      triggerUnsavedChangesIndication
+    );
   };
 
   const getPairMarkup = (pair, pairIndex) => {
