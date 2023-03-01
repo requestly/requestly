@@ -18,9 +18,9 @@ export const validateEndpoint = (endpoint: string) => {
 };
 
 export const validateStatusCode = (statusCode: string) => {
-  const pattern = /^\d{3}$/;
   if (!statusCode) return "Status code is required";
 
+  const pattern = /^\d{3}$/;
   if (!statusCode.match(pattern)) return "Invalid status code";
 
   return null;
