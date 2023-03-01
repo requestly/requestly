@@ -34,7 +34,11 @@ module.exports = {
     configure: {
       resolve: {
         extensions: [".d.ts", ".ts", ".tsx", ".js", ".jsx"],
+        fallback: {
+          "process/browser": require.resolve("process/browser"),
+        },
       },
+      externals: "worker_threads", // a transitive dependency in @requestly/web-sdk depends on worker_threads in Node environment
       stats: {
         errorDetails: true,
       },
