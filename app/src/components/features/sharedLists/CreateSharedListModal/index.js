@@ -211,14 +211,13 @@ const CreateSharedListModal = (props) => {
               Copied!
             </Typography.Text>
           )}
-          <Button type="primary">
+          <Button type="primary" onClick={onCopyHandler}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
               }}
-              onClick={onCopyHandler}
             >
               <AiOutlineLink />
               Copy Link

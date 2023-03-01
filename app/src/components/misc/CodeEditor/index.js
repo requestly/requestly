@@ -23,9 +23,9 @@ const CodeEditor = ({
   value,
   readOnly,
   handleChange,
-  unlockCodePrettify,
+  unlockJsonPrettify,
   isCodeMinified,
-  isJSPrettified,
+  isCodeFormatted,
   validation = "editable",
 }) => {
   const appTheme = useSelector(getAppTheme);
@@ -63,20 +63,14 @@ const CodeEditor = ({
   }, []);
 
   useEffect(() => {
-    if (editorRef && unlockCodePrettify) {
-      if (!isCodeMinified && language === "json") {
-        handleCodePrettify("json");
-      }
-    }
-  }, [isCodeMinified, language, unlockCodePrettify]);
-
-  useEffect(() => {
-    if (isJSPrettified) {
-      if (language === "javascript" && editorRef) {
+    if (editorRef && isCodeFormatted) {
+      if (language === "javascript") {
         handleCodePrettify("babel");
+      } else if (unlockJsonPrettify && language === "json") {
+        !isCodeMinified && handleCodePrettify("json");
       }
     }
-  }, [isJSPrettified, language]);
+  }, [isCodeMinified, isCodeFormatted, language, unlockJsonPrettify]);
 
   return (
     <>
