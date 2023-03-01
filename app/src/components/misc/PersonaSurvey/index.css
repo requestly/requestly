@@ -18,6 +18,7 @@
 }
 .survey-modal .survey-lottie-animation {
   width: 80%;
+  margin-bottom: -43px;
 }
 .survey-modal .survey-options-container {
   display: flex;

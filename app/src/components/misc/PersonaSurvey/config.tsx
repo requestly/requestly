@@ -35,7 +35,7 @@ export const surveyConfig: PageConfig[] = [
       {
         type: "select",
         title: SurveyConstants.FRONTEND,
-        icon: "😁",
+        icon: "💻",
       },
       {
         type: "select",
