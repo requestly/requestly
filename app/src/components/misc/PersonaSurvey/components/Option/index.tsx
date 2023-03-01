@@ -11,7 +11,7 @@ interface OptionProps {
   type: string;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (dispatch: any, value: string) => void;
+  action?: (dispatch: any, value: string, clear: boolean) => void;
 }
 
 export const SurveyOption: React.FC<OptionProps> = ({
@@ -35,7 +35,13 @@ export const SurveyOption: React.FC<OptionProps> = ({
             isActive?.({ persona, referralChannel, useCase, title }) &&
             "outline-active-option"
           }`}
-          onClick={() => action(dispatch, title)}
+          onClick={() =>
+            action(
+              dispatch,
+              title,
+              isActive?.({ persona, referralChannel, useCase, title })
+            )
+          }
         >
           <div className="white text-bold survey-option-title">{title}</div>
           <Checkbox
@@ -60,7 +66,13 @@ export const SurveyOption: React.FC<OptionProps> = ({
             bordered={false}
             size="middle"
             placeholder="Enter your inputs here..."
-            onChange={(e) => action(dispatch, e.target.value)}
+            onChange={(e) =>
+              action(
+                dispatch,
+                e.target.value,
+                isActive?.({ persona, referralChannel, useCase, title })
+              )
+            }
           />
           <Checkbox
             checked={isActive?.({ persona, referralChannel, useCase, title })}

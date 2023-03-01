@@ -39,3 +39,9 @@ export const updatePersonaUseCase = (prevState, action) => {
   prevState.userPersona.useCase.indexOf(action.payload) < 0 &&
     prevState.userPersona.useCase.push(action.payload);
 };
+
+export const removePersonaUseCase = (prevState, action) => {
+  prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
+    (useCase) => useCase !== action.payload
+  );
+};
