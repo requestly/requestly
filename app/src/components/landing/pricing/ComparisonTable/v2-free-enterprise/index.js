@@ -11,6 +11,7 @@ import Plans from "./PricingPlan.json";
 import underlineIcon from "../../../../../assets/img/icons/common/underline.svg";
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
+import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 
 const FreeAndEnterprisePlanTable = () => {
   // Component State
@@ -132,10 +133,22 @@ const FreeAndEnterprisePlanTable = () => {
           </Col>
         </Row>
         <div className="note-container text-gray text-center">
-          Note: Requestly is an open-source platform. Downloading the source
-          code from GitHub allows you to use the basic plan without any
-          limitations, but sharing and other collaboration features will be
-          unavailable.
+          <span>
+            <img
+              alt="StripeClimateBadge"
+              src={StripeClimateBadge}
+              style={{ height: "1em" }}
+            />{" "}
+            At Requestly, we contribute 1% of our revenue to carbon
+            removal.&nbsp;
+            <a
+              href="https://climate.stripe.com/Ve5kOs"
+              target={"_blank"}
+              rel="noreferrer"
+            >
+              See how
+            </a>
+          </span>
         </div>
         <div onClick={trackViewGithubClicked}>
           <GitHubButton
@@ -145,7 +158,7 @@ const FreeAndEnterprisePlanTable = () => {
             data-show-count="false"
             aria-label="Star requestly/requestly on GitHub"
           >
-            View on Github
+            Requestly on Github
           </GitHubButton>
         </div>
       </div>

@@ -77,4 +77,22 @@ export default [
       }),
     ],
   },
+  {
+    input: "src/constants.ts",
+    output: {
+      file: `${OUTPUT_DIR}/constants.js`,
+      name: "RQ.Constants",
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
+  {
+    input: "src/rulesStore.ts",
+    output: {
+      file: `${OUTPUT_DIR}/rulesStore.js`,
+      name: "RQ.RulesStore",
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
 ];
