@@ -1,11 +1,11 @@
 .survey-modal .survey-option {
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background: var(--component-background);
-  padding: 15px 10px;
+  background: var(--body-background);
+  padding: 12px;
   cursor: pointer;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   transition: 0.2s ease-in-out;
 }
 .survey-modal .survey-option.survey-select {
@@ -29,6 +29,7 @@
 }
 .survey-modal .outline-active-option {
   border: 1px solid var(--primary);
+  background: var(--component-background);
 }
 .survey-modal .hide-option-checkbox {
   visibility: hidden;

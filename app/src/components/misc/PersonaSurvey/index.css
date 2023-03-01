@@ -22,8 +22,9 @@
 .survey-modal .survey-options-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin-top: 20px;
+  margin-left: 8px;
 }
 .survey-modal .survey-disable-continue {
   opacity: 0.4;
