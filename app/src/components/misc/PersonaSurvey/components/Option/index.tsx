@@ -9,6 +9,7 @@ import { ActiveProps } from "../../types";
 interface OptionProps {
   title: string;
   type: string;
+  questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
   action?: (dispatch: any, value: string) => void;
 }
@@ -16,6 +17,7 @@ interface OptionProps {
 export const SurveyOption: React.FC<OptionProps> = ({
   title,
   type,
+  questionType,
   isActive,
   action,
 }) => {
@@ -37,6 +39,12 @@ export const SurveyOption: React.FC<OptionProps> = ({
         >
           <div className="white text-bold survey-option-title">{title}</div>
           <Checkbox
+            className={
+              questionType === "single"
+                ? !isActive?.({ persona, referralChannel, useCase, title }) &&
+                  "hide-option-checkbox"
+                : null
+            }
             checked={isActive?.({ persona, referralChannel, useCase, title })}
           />
         </div>

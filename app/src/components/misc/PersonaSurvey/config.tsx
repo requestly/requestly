@@ -19,6 +19,7 @@ export const surveyConfig: PageConfig[] = [
     pageId: 1,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
+    questionType: "single",
     action: (dispatch, value) => setUserPersona(dispatch, value),
     isActive: ({ persona, title }) => persona === title,
     options: [
@@ -52,6 +53,7 @@ export const surveyConfig: PageConfig[] = [
     pageId: 2,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
+    questionType: "multiple",
     action: (dispatch, value) => setPersonaUseCase(dispatch, value),
     isActive: ({ useCase, title }) =>
       useCase.indexOf(title) < 0 ? false : true,
@@ -207,6 +209,7 @@ export const surveyConfig: PageConfig[] = [
     pageId: 3,
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
+    questionType: "single",
     action: (dispatch, value) => setPersonaReferralChannel(dispatch, value),
     isActive: ({ referralChannel, title }) => referralChannel === title,
     options: [

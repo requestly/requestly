@@ -15,6 +15,7 @@ export interface PageConfig {
   title: string;
   subTitle: string;
   render?: ReactNode;
+  questionType?: "single" | "multiple";
   action?: (dispatch: any, value: string) => void;
   isActive?: (props: ActiveProps) => boolean;
   conditional?: Conditional[];

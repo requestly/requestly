@@ -30,3 +30,6 @@
 .survey-modal .outline-active-option {
   border: 1px solid var(--primary);
 }
+.survey-modal .hide-option-checkbox {
+  visibility: hidden;
+}

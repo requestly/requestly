@@ -43,6 +43,7 @@ export const PersonaSurveyModal = () => {
                 <SurveyOption
                   key={index}
                   title={option.title}
+                  questionType={page.questionType}
                   type={option.type}
                   isActive={page.isActive}
                   action={page.action}
@@ -73,6 +74,7 @@ export const PersonaSurveyModal = () => {
                     <SurveyOption
                       key={index}
                       title={option.title}
+                      questionType={page.questionType}
                       type={option.type}
                       isActive={page.isActive}
                       action={page.action}
