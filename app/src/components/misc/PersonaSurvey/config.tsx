@@ -248,4 +248,10 @@ export const surveyConfig: PageConfig[] = [
       },
     ],
   },
+  {
+    pageId: 4,
+    title: "✨ Where would you like to start?",
+    subTitle:
+      "Choose a use can you want to work on and we will help you get started",
+  },
 ];

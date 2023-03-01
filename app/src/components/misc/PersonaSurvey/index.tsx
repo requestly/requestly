@@ -23,8 +23,10 @@ export const PersonaSurveyModal = () => {
         <div className="text-center white text-bold survey-title">
           {page.title}
         </div>
-        <div className="text-gray text-center survey-sub-title">
-          {page.subTitle}
+        <div className="w-full survey-subtitle-wrapper">
+          <div className="text-gray text-center survey-sub-title">
+            {page.subTitle}
+          </div>
         </div>
       </>
     );

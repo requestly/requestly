@@ -6,6 +6,7 @@
   font-size: 1.5rem;
 }
 .survey-modal .survey-sub-title {
+  max-width: 380px;
   line-height: 25px;
   margin-top: 8px;
 }
@@ -23,4 +24,18 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 20px;
+}
+.survey-modal .survey-disable-continue {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.survey-modal .survey-modal-emoji {
+  font-size: 1.1rem;
+  position: relative;
+  top: 2px;
+}
+.survey-modal .survey-subtitle-wrapper {
+  display: flex;
+  justify-content: center;
 }
