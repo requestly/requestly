@@ -44,7 +44,7 @@ const CustomScriptRow = ({
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(
     false
   );
-  const [isJSPrettified, setIsJSPrettified] = useState(false);
+  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const scriptEditorBoilerCode = useMemo(
     () => ({
@@ -180,14 +180,16 @@ const CustomScriptRow = ({
         undefined,
         pairIndex,
         `scripts[${scriptIndex}].value`,
-        value
+        value,
+        null,
+        !isCodeFormatted
       );
     };
 
-    const handlePrettifyJS = () => {
-      setIsJSPrettified(true);
+    const handleCodeFormattedFlag = () => {
+      setIsCodeFormatted(true);
       setTimeout(() => {
-        setIsJSPrettified(false);
+        setIsCodeFormatted(false);
       }, 2000);
     };
 
@@ -216,7 +218,7 @@ const CustomScriptRow = ({
               value={script.value}
               handleChange={scriptBodyChangeHandler}
               readOnly={isInputDisabled}
-              isJSPrettified={isJSPrettified}
+              isCodeFormatted={isCodeFormatted}
             />
           </Col>
         </Row>
@@ -228,7 +230,7 @@ const CustomScriptRow = ({
         >
           <Col align="left">
             {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
-              <Button type="link" onClick={handlePrettifyJS}>
+              <Button type="link" onClick={handleCodeFormattedFlag}>
                 Pretty Print {"{ }"}
               </Button>
             ) : null}
