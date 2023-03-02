@@ -4,8 +4,15 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-
 import { surveyConfig } from "./config";
+import APP_CONSTANTS from "config/constants";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import {
+  trackPersonaQ1Completed,
+  trackPersonaQ2Completed,
+  trackPersonaQ3Completed,
+  trackPersonaRecommendationSkipped,
+} from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
 interface FooterProps {
@@ -52,13 +59,46 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
     } else return null;
   };
 
+  const handleMoveToNextPage = () => {
+    switch (page) {
+      case 1:
+        trackPersonaQ1Completed(userPersona.persona);
+        submitAttrUtil(
+          APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA,
+          userPersona.persona
+        );
+        break;
+      case 2:
+        trackPersonaQ2Completed(userPersona.useCase);
+        submitAttrUtil(
+          APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASE,
+          userPersona.useCase
+        );
+        break;
+      case 3:
+        trackPersonaQ3Completed(userPersona.referralChannel);
+        submitAttrUtil(
+          APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
+          userPersona.referralChannel
+        );
+        break;
+    }
+    dispatch(actions.updatePersonaSurveyPage(page + 1));
+  };
+
   return (
     <div className="rq-modal-footer w-full">
       <Row justify="space-between" align="middle" className="w-full">
         <Col className="text-gray">{renderModalLeftSection()}</Col>
         <Col>
           {page === surveyLength - 1 ? (
-            <RQButton type="default" onClick={togglePersonaSurveyModal}>
+            <RQButton
+              type="default"
+              onClick={() => {
+                togglePersonaSurveyModal();
+                trackPersonaRecommendationSkipped();
+              }}
+            >
               Skip
             </RQButton>
           ) : (
@@ -67,9 +107,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
               className={`text-bold ${
                 disableContinue() && "survey-disable-continue"
               }`}
-              onClick={() =>
-                dispatch(actions.updatePersonaSurveyPage(page + 1))
-              }
+              onClick={handleMoveToNextPage}
             >
               {page === surveyLength - 2 ? "Get started" : "Continue"}
             </RQButton>

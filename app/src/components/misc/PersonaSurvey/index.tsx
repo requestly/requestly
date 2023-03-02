@@ -11,6 +11,7 @@ import {
   isFreshExtensionInstall,
 } from "actions/ExtensionActions";
 import { Option, PageConfig } from "./types";
+import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
 interface PersonaModalProps {
@@ -101,6 +102,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     if (page?.conditional) return renderConditionalQuestionaire(page, roleType);
     else return renderDefaultQuestionaire(page);
   };
+
+  useEffect(() => {
+    trackPersonaSurveyViewed();
+  }, []);
 
   useEffect(() => {
     if (!isSurveyCompleted)

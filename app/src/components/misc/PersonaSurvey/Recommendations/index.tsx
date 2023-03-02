@@ -5,7 +5,7 @@ import { actions } from "store";
 import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { allFeatures, recommendation } from "./personalizations";
-
+import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
 export const UserRecommendations = () => {
@@ -35,6 +35,7 @@ export const UserRecommendations = () => {
         className="recommended-feature-container"
         onClick={() => {
           featureDetails.action(navigate);
+          trackPersonaRecommendationSelected(featureDetails?.title);
           togglePersonaSurveyModal();
         }}
       >
@@ -61,6 +62,7 @@ export const UserRecommendations = () => {
                     className="recommended-feature-title"
                     onClick={() => {
                       feature.action(navigate);
+                      trackPersonaRecommendationSelected(feature.title);
                       togglePersonaSurveyModal();
                     }}
                   >
