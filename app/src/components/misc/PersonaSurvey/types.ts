@@ -41,8 +41,8 @@ export interface Feature {
 export enum SurveyConstants {
   FRONTEND = "Front end developer",
   BACKEND = "Back end developer",
-  MARKETER = "Product manager",
+  MARKETER = "Digital Marketer",
   FOUNDER = "Founder",
   QUALITY = "QA engineer",
-  PRODUCT = "Digital Marketer",
+  PRODUCT = "Product manager",
 }

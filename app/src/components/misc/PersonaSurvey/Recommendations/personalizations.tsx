@@ -7,7 +7,7 @@ import { BsCameraVideo } from "react-icons/bs";
 import { Feature, SurveyConstants } from "../types";
 
 const allRules = Object.values(RULE_TYPES_CONFIG)
-  .filter((ruleConfig) => ruleConfig.ID !== 11)
+  .filter((ruleConfig) => ruleConfig.ID !== 11 && ruleConfig.ID !== 8)
   .map(({ TYPE, ICON, NAME, DESCRIPTION }): any => {
     return {
       id: NAME,
@@ -60,18 +60,28 @@ export const recommendation = [
   },
   {
     id: SurveyConstants.PRODUCT,
-    recommended: ["Bug Reporting", "Insert Scripts", "Redirect Request"],
+    recommended: [
+      "Bug Reporting",
+      "Insert Scripts",
+      "Redirect Request",
+      "Replace String",
+    ],
   },
   {
     id: SurveyConstants.FOUNDER,
-    recommended: ["Bug Reporting", "Insert Scripts", "Redirect Request"],
+    recommended: [
+      "Bug Reporting",
+      "Insert Scripts",
+      "Redirect Request",
+      "Replace String",
+    ],
   },
   {
     id: SurveyConstants.MARKETER,
     recommended: [
       "Redirect Request",
-      "Replace Strings",
-      "Modify Query Params",
+      "Replace String",
+      "Query Param",
       "Insert Scripts",
     ],
   },

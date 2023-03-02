@@ -76,7 +76,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
         {renderPageHeader(page)}
         <>
           {page.conditional.map((question, index) => (
-            <>
+            <React.Fragment key={index}>
               {question.condition(roleType) && (
                 <div className="survey-options-container">
                   {question.options.map((option, index) => (
@@ -90,7 +90,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
                   ))}
                 </div>
               )}
-            </>
+            </React.Fragment>
           ))}
         </>
       </>
@@ -103,7 +103,6 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   };
 
   useEffect(() => {
-    console.log("DEBUG");
     if (!isSurveyCompleted)
       if (
         isExtensionInstalled &&
@@ -121,10 +120,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       className="survey-modal"
     >
       <div className="rq-modal-content survey-content-wrapper">
-        {surveyConfig.map((page: PageConfig) => (
-          <>
+        {surveyConfig.map((page: PageConfig, index) => (
+          <React.Fragment key={index}>
             {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
-          </>
+          </React.Fragment>
         ))}
       </div>
       <SurveyModalFooter page={currentPage} />
