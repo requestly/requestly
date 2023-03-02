@@ -9,6 +9,7 @@ import EditableTable from "./editableTable";
 import { PostConfirmationModal } from "./PostConfirmationModal";
 //UTILS
 import {
+  getAllRules,
   getAppMode,
   getGroupwiseRulesToPopulate,
   getUserAuthDetails,
@@ -29,14 +30,14 @@ import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 
 const CreateSharedListModal = (props) => {
   const { toggle: toggleModal, isOpen, rulesToShare } = props;
+  const rulesCount = rulesToShare.length;
 
   //Global State
-
-  // const rulesToPopulate = getRulesToPopulate(state);
-  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
-  const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
+  const rules = useSelector(getAllRules);
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
   //Component State
   const [createSharedListConfirmed, setCreateSharedListConfirmed] = useState(
@@ -44,20 +45,27 @@ const CreateSharedListModal = (props) => {
   );
   const [isSharedListCreated, setIsSharedListCreated] = useState(false);
   const [sharedListURL, setSharedListURL] = useState(null);
-  const [sharedListName, setSharedListName] = useState(() => {
-    const firstName = user.details.profile.displayName.split(" ")[0];
-    const date = new Date().toLocaleDateString().split("/").join("-");
-    const finalName = firstName + "-shared-list-" + date;
-    return finalName;
-  });
   const [permittedEmailValue, setPermittedEmailValue] = useState("");
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListVisibility, setSharedListVisibility] = useState(
     Visibility.PUBLIC
   );
   const [copiedText, setCopiedText] = useState("");
+  const [sharedListName, setSharedListName] = useState(() => {
+    const rule =
+      rulesCount === 1
+        ? rules.find((rule) => rule.id === rulesToShare[0])
+        : null;
 
-  const rulesCount = rulesToShare.length;
+    if (rule) {
+      return rule.name;
+    }
+
+    const firstName = user.details.profile.displayName.split(" ")[0];
+    const date = new Date().toLocaleDateString().split("/").join("-");
+    const finalName = firstName + "-shared-list-" + date;
+    return finalName;
+  });
 
   const nameColumns = [
     {
@@ -396,7 +404,7 @@ const CreateSharedListModal = (props) => {
     <div>
       <Modal
         className="modal-dialog-centered"
-        visible={isOpen}
+        open={isOpen}
         onCancel={() => {
           toggleModal();
           unselectAllRules(dispatch);
