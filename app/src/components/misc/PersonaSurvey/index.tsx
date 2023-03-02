@@ -1,14 +1,24 @@
-import { useState } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { RQModal } from "lib/design-system/components";
 import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, PageConfig } from "./types";
 import "./index.css";
 
-export const PersonaSurveyModal = () => {
+interface PersonaModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
+  isOpen,
+  toggle,
+}) => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const roleType = userPersona.persona;
@@ -92,11 +102,16 @@ export const PersonaSurveyModal = () => {
     else return renderDefaultQuestionaire(page);
   };
 
+  useEffect(() => {
+    console.log("HELLOO");
+    if (isExtensionInstalled) toggle();
+  }, []);
+
   return (
     <RQModal
       bodyStyle={{ width: "550px" }}
       centered
-      open={true}
+      open={isOpen}
       closable={false}
       className="survey-modal"
     >

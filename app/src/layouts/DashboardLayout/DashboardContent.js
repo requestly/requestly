@@ -22,6 +22,7 @@ import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
+import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -44,6 +45,9 @@ const DashboardContent = () => {
   };
   const toggleSyncConsentModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "syncConsentModal" }));
+  };
+  const togglePersonaSurveyModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
   };
 
   const usePrevious = (value) => {
@@ -191,6 +195,11 @@ const DashboardContent = () => {
           {...activeModals.syncConsentModal.props}
         />
       ) : null}
+      <PersonaSurveyModal
+        isOpen={activeModals.personaSurveyModal.isActive}
+        toggle={togglePersonaSurveyModal}
+        {...activeModals.personaSurveyModal.props}
+      />
     </>
   );
 };

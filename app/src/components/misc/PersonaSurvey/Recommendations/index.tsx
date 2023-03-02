@@ -1,4 +1,5 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
 import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { allFeatures, recommendation } from "./personalizations";
@@ -7,11 +8,16 @@ import "./index.css";
 
 export const UserRecommendations = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userPersonaDetails = useSelector(getUserPersonaSurveyDetails);
   const userRole = userPersonaDetails.persona;
   const recommendedFeatures = recommendation.find(
     (feature) => feature.id === userRole
   );
+
+  const togglePersonaSurveyModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  };
 
   const renderRecommendedFeature = (feature: string) => {
     const featureDetails = allFeatures.find(
@@ -21,7 +27,10 @@ export const UserRecommendations = () => {
     return (
       <div
         className="recommended-feature-container"
-        onClick={() => featureDetails.action(navigate)}
+        onClick={() => {
+          featureDetails.action(navigate);
+          togglePersonaSurveyModal();
+        }}
       >
         <div className="recommended-feature-title">
           <>{featureDetails?.icon?.()}</>
@@ -42,7 +51,10 @@ export const UserRecommendations = () => {
             {!recommendedFeatures.recommended.includes(feature.id) && (
               <div
                 className="recommended-feature-container"
-                onClick={() => feature.action(navigate)}
+                onClick={() => {
+                  feature.action(navigate);
+                  togglePersonaSurveyModal();
+                }}
               >
                 <div className="recommended-feature-title">
                   <>{feature?.icon?.()}</>

@@ -1,6 +1,7 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
+import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { FooterProps } from "./types";
@@ -11,8 +12,13 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
   page,
   handleNextPage,
 }) => {
+  const dispatch = useDispatch();
   const surveyLength = surveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+
+  const togglePersonaSurveyModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  };
 
   const disableContinue = () => {
     switch (page) {
@@ -51,7 +57,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
         <Col className="text-gray">{renderModalLeftSection()}</Col>
         <Col>
           {page === surveyLength - 1 ? (
-            <RQButton type="default">Skip</RQButton>
+            <RQButton type="default" onClick={togglePersonaSurveyModal}>
+              Skip
+            </RQButton>
           ) : (
             <RQButton
               type="primary"
