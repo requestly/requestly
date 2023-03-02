@@ -23,11 +23,6 @@ export interface PageConfig {
   options?: Option[];
 }
 
-export interface FooterProps {
-  page: number;
-  handleNextPage: () => void;
-}
-
 export interface ActiveProps {
   persona?: string;
   referralChannel?: string;

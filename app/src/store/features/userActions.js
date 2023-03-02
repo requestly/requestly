@@ -45,3 +45,10 @@ export const removePersonaUseCase = (prevState, action) => {
     (useCase) => useCase !== action.payload
   );
 };
+
+export const updateIsPersonaSurveyCompleted = (prevState, action) => {
+  prevState.userPersona.isSurveyCompleted = action.payload;
+};
+export const updatePersonaSurveyPage = (prevState, action) => {
+  prevState.userPersona.page = action.payload;
+};

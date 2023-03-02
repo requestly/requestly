@@ -11,9 +11,11 @@ const INITIAL_STATE = {
   },
 
   userPersona: {
+    page: 0,
     persona: "",
     useCase: [],
     referralChannel: "",
+    isSurveyCompleted: false,
   },
 
   /* App Mode */

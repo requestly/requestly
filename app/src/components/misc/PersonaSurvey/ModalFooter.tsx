@@ -4,14 +4,15 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { FooterProps } from "./types";
+
 import { surveyConfig } from "./config";
 import "./index.css";
 
-export const SurveyModalFooter: React.FC<FooterProps> = ({
-  page,
-  handleNextPage,
-}) => {
+interface FooterProps {
+  page: number;
+}
+
+export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
   const surveyLength = surveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -66,7 +67,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
               className={`text-bold ${
                 disableContinue() && "survey-disable-continue"
               }`}
-              onClick={handleNextPage}
+              onClick={() =>
+                dispatch(actions.updatePersonaSurveyPage(page + 1))
+              }
             >
               {page === surveyLength - 2 ? "Get started" : "Continue"}
             </RQButton>

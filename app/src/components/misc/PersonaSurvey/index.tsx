@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { RQModal } from "lib/design-system/components";
@@ -19,13 +19,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   isOpen,
   toggle,
 }) => {
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const currentPage = userPersona.page;
   const roleType = userPersona.persona;
-
-  const updatePage = () => {
-    setCurrentPage((current) => current + 1);
-  };
+  const isSurveyCompleted = userPersona.isSurveyCompleted;
 
   const renderPageHeader = (page: PageConfig) => {
     return (
@@ -103,9 +100,9 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   };
 
   useEffect(() => {
-    console.log("HELLOO");
-    if (isExtensionInstalled) toggle();
-  }, []);
+    console.log("DEBUG");
+    if (!isSurveyCompleted) if (isExtensionInstalled) toggle();
+  }, [isSurveyCompleted]);
 
   return (
     <RQModal
@@ -122,7 +119,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
           </>
         ))}
       </div>
-      <SurveyModalFooter page={currentPage} handleNextPage={updatePage} />
+      <SurveyModalFooter page={currentPage} />
     </RQModal>
   );
 };

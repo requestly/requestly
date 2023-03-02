@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,10 @@ export const UserRecommendations = () => {
   const togglePersonaSurveyModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
   };
+
+  useEffect(() => {
+    dispatch(actions.updateIsPersonaSurveyCompleted(true));
+  }, [dispatch]);
 
   const renderRecommendedFeature = (feature: string) => {
     const featureDetails = allFeatures.find(
