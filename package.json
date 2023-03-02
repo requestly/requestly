@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Requestly app, extension and other components",
   "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "start": "http-server -p 3000",
     "deploy-beta": "./build.sh beta && firebase deploy --only hosting -P requestly-beta",
