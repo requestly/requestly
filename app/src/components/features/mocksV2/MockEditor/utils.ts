@@ -17,6 +17,15 @@ export const validateEndpoint = (endpoint: string) => {
   }
 };
 
+export const validateStatusCode = (statusCode: string) => {
+  if (!statusCode) return "Status code is required";
+
+  const pattern = /^\d{3}$/;
+  if (!statusCode.match(pattern)) return "Invalid status code";
+
+  return null;
+};
+
 export const getEditorLanguage = (fileType?: FileType) => {
   switch (fileType) {
     case FileType.JS:
