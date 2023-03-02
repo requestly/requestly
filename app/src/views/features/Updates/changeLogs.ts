@@ -2,6 +2,35 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.3.2",
+    logs: [
+      {
+        title:
+          "Show modifications on top URL in extension popup and browser console.",
+      },
+      {
+        title:
+          "No need to refresh website after modifying or toggling Modify Request/Response rules.",
+      },
+      {
+        title:
+          "Added support for capturing cross-origin iframes in Session Recording.",
+      },
+      {
+        title:
+          'Bug fix: Clicking on View Recording showed "Something went wrong" error.',
+      },
+      {
+        title:
+          "Bug fix: Early console logs were not captured in Session Recording.",
+      },
+      {
+        title:
+          "Bug fix: Rules with bad regex conditions impacted execution of other rules.",
+      },
+    ],
+  },
+  {
     version: "23.2.6",
     logs: [
       {
