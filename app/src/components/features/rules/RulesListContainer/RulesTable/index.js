@@ -657,18 +657,15 @@ const RulesTable = ({
           };
         }
       },
-      render: (_, record) => {
+      render: (recordName, record) => {
         if (record.objectType === "group") {
           return (
             <span>
-              <strong>{_}</strong>{" "}
+              <strong>{recordName}</strong>{" "}
               <i>({getGroupRulesCount(record.id)} Rules)</i>
             </span>
           );
         } else {
-          const name = _;
-          const description = record.description;
-
           return (
             <div
               style={{
@@ -678,7 +675,7 @@ const RulesTable = ({
               }}
             >
               <Link onClick={(e) => handleRuleNameOnClick(e, record)}>
-                {name}
+                {recordName}
               </Link>
               <br />
               <Text
@@ -689,7 +686,7 @@ const RulesTable = ({
                   textOverflow: "ellipsis",
                 }}
               >
-                {description}
+                {record.description}
               </Text>
             </div>
           );
@@ -1241,9 +1238,13 @@ const RulesTable = ({
           ),
         }}
         rowClassName={(record, index) => {
-          return record.objectType === "group"
-            ? `rule-group-row ${!!record.expanded && "expanded-row"}`
-            : null;
+          if (record.objectType === "group" && record.id === "") {
+            return "hidden";
+          } else if (record.objectType === "group") {
+            return `rule-group-row ${!!record.expanded && "expanded-row"}`;
+          } else if ((record.objectType === "rule") & (record.groupId === "")) {
+            return "ungroup-rule-row";
+          }
         }}
         columnsState={{
           persistenceKey: "rules-index-table",
