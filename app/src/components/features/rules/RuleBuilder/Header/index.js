@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Layout, Divider } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { getGroupwiseRulesToPopulate } from "store/selectors";
+import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Status from "./ActionButtons/Status";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -19,6 +22,9 @@ const Header = ({
   currentlySelectedRuleData,
   currentlySelectedRuleConfig,
 }) => {
+  const dispatch = useDispatch();
+  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
+
   const isDisabled =
     currentlySelectedRuleData?.ruleType ===
       GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
@@ -29,6 +35,19 @@ const Header = ({
       mode === "create" ? "new rule" : "rule"
     }`;
   };
+
+  useEffect(() => {
+    // groupwise rules are already created
+    if (Object.keys(groupwiseRulesToPopulate).length > 0) return;
+
+    const groupwiseRule = {
+      [currentlySelectedRuleData.groupId]: {
+        group_rules: [{ ...currentlySelectedRuleData }],
+      },
+    };
+
+    dispatch(actions.updateGroupwiseRulesToPopulate(groupwiseRule));
+  }, [dispatch, currentlySelectedRuleData, groupwiseRulesToPopulate]);
 
   return (
     <Layout.Header

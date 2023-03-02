@@ -1,13 +1,12 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-//ACTIONS
-import { deleteGroupsFromStorage, deleteRulesFromStorage } from "./actions";
+import { deleteRulesFromStorage } from "./actions";
 import { unselectAllRules } from "../actions";
 import { toast } from "utils/Toast.js";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
 import { actions } from "store";
-import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -29,42 +28,10 @@ const DeleteRulesModal = (props) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
   //Component State
   const [areRulesMovingToTrash, setAreRulesMovingToTrash] = useState(false);
   const [areRulesBeingDeleted, setAreRulesBeingDeleted] = useState(false);
-
-  const getGroupsIdsToDelete = () => {
-    const groupwiseRulesToPopulateCopy = JSON.parse(
-      JSON.stringify(groupwiseRulesToPopulate)
-    );
-    const groupIdsToDelete = new Set();
-
-    const groupwiseRules = { ...groupwiseRulesToPopulateCopy };
-
-    recordsToDelete.forEach((record) => {
-      const rulesGroupArray = groupwiseRules[record.groupId]["group_rules"];
-      const ruleIndex = rulesGroupArray.findIndex((rule) => {
-        return rule.id === record.id;
-      });
-      if (ruleIndex !== -1) {
-        rulesGroupArray.splice(ruleIndex, 1);
-      }
-    });
-
-    for (const groupId in groupwiseRules) {
-      const groupRulesArray = groupwiseRules[groupId]["group_rules"];
-      if (groupRulesArray.length === 0) {
-        groupIdsToDelete.add(groupId);
-      }
-    }
-    return [...groupIdsToDelete];
-  };
-
-  const handleGroupsDeletion = async (groupIdsToDelete) => {
-    return deleteGroupsFromStorage(appMode, groupIdsToDelete);
-  };
 
   const handleRulesDeletion = async (uid) => {
     if (!uid) return;
@@ -86,31 +53,20 @@ const DeleteRulesModal = (props) => {
         }
       });
     });
-
-    // // Reachable Code since now user must always be authenticated
-    // setAreRulesBeingDeleted(true);
-    // deleteRulesFromStorage(appMode, ruleIdsToDelete, stablePostDeletionSteps);
-    // toast.info(`Deleted selected rules.`);
   };
 
   const handleDeleteRulesPermanently = async () => {
-    const groupIdsToDelete = getGroupsIdsToDelete();
-
     await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
       toast.info(`Rules deleted permanently!`);
       trackRQLastActivity("rules_deleted");
       trackRulesDeletedEvent(ruleIdsToDelete.length);
     });
 
-    await deleteGroupsFromStorage(appMode, groupIdsToDelete);
     stablePostDeletionSteps();
   };
 
   const handleRecordsDeletion = async (uid) => {
-    const groupIdsToDelete = getGroupsIdsToDelete();
-
     await handleRulesDeletion(uid);
-    await handleGroupsDeletion(groupIdsToDelete);
     stablePostDeletionSteps();
   };
 
@@ -157,10 +113,6 @@ const DeleteRulesModal = (props) => {
     handleNavigationAfterDelete,
     clearSearch,
   ]);
-
-  // useEffect(() => {
-  //   return stablePostDeletionSteps;
-  // }, [deleteRulesCompleted, ruleIdsToDelete, stablePostDeletionSteps, appMode]);
 
   return (
     <DeleteConfirmationModal
