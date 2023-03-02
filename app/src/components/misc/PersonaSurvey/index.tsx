@@ -6,7 +6,10 @@ import { RQModal } from "lib/design-system/components";
 import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import {
+  isExtensionInstalled,
+  isFreshExtensionInstall,
+} from "actions/ExtensionActions";
 import { Option, PageConfig } from "./types";
 import "./index.css";
 
@@ -101,8 +104,13 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   useEffect(() => {
     console.log("DEBUG");
-    if (!isSurveyCompleted) if (isExtensionInstalled) toggle();
-  }, [isSurveyCompleted]);
+    if (!isSurveyCompleted)
+      if (
+        isExtensionInstalled &&
+        isFreshExtensionInstall(new Date("2022-09-01")) //change this date on release
+      )
+        toggle();
+  }, [isSurveyCompleted, toggle]);
 
   return (
     <RQModal

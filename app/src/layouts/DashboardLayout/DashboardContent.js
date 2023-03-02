@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Route,
@@ -46,9 +46,9 @@ const DashboardContent = () => {
   const toggleSyncConsentModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "syncConsentModal" }));
   };
-  const togglePersonaSurveyModal = () => {
+  const togglePersonaSurveyModal = useCallback(() => {
     dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
-  };
+  }, [dispatch]);
 
   const usePrevious = (value) => {
     const ref = useRef();
