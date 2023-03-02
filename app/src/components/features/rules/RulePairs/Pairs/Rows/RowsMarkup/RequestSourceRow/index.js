@@ -163,7 +163,11 @@ const RequestSourceRow = ({
           placeholder={
             ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
               ? "Enter url here or leave this field empty to apply rule to all url’s..."
-              : generatePlaceholderText(pair.source.operator, "source-value")
+              : generatePlaceholderText(
+                  pair.source.operator,
+                  "source-value",
+                  pair.source.key
+                )
           }
           type="text"
           onChange={(event) =>
