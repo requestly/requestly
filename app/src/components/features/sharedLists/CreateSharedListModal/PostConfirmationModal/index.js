@@ -4,19 +4,16 @@ import { toast } from "utils/Toast.js";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { AiFillInfoCircle } from "react-icons/ai";
 import SpinnerColumn from "../../../../misc/SpinnerColumn";
-
 import { getUserAuthDetails } from "store/selectors";
-
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { createSharedList } from "../actions";
-
 import * as Sentry from "@sentry/react";
+import { Visibility } from "utils/sharedListUtils";
 import {
   trackSharedListCreatedEvent,
   trackSharedListNotifyClicked,
 } from "modules/analytics/events/features/sharedList";
 import { trackRQLastActivity } from "../../../../../utils/AnalyticsUtils";
-
 import { Typography } from "antd";
 import { getSharedListURL } from "utils/PathUtils";
 
@@ -32,6 +29,10 @@ export const PostConfirmationModal = ({
 
   const user = useSelector(getUserAuthDetails);
   const rulesCount = sharedListAttributes.rulesCount;
+  const sharedListAccessType =
+    Visibility.PUBLIC === sharedListAttributes.sharedListVisibility
+      ? "public_link"
+      : "specific_people";
 
   let modalTriggerPage,
     modalTriggerSource = "";
@@ -66,15 +67,16 @@ export const PostConfirmationModal = ({
     });
   }, [sharedListAttributes.sharedListRecipients, sharedListData]);
 
-  const postCreationSteps = (
+  const postCreationSteps = ({
     sharedListId,
     sharedListName,
     sharedListData,
     nonRQEmails,
     rulesCount,
     modalTriggerPage,
-    modalTriggerSource
-  ) => {
+    modalTriggerSource,
+    sharedListAccessType,
+  }) => {
     const publicUrlOfList = getSharedListURL(sharedListId, sharedListName);
     setCreatedSharedListId(sharedListId);
     setSharedListPublicURL(publicUrlOfList);
@@ -86,7 +88,8 @@ export const PostConfirmationModal = ({
     trackSharedListCreatedEvent(
       rulesCount,
       modalTriggerSource,
-      modalTriggerPage
+      modalTriggerPage,
+      sharedListAccessType
     );
   };
 
@@ -107,15 +110,16 @@ export const PostConfirmationModal = ({
           user.details.profile.uid
         ).then(
           ({ sharedListId, sharedListName, sharedListData, nonRQEmails }) => {
-            stablePostCreationSteps(
+            stablePostCreationSteps({
               sharedListId,
               sharedListName,
               sharedListData,
               nonRQEmails,
               rulesCount,
               modalTriggerPage,
-              modalTriggerSource
-            );
+              modalTriggerSource,
+              sharedListAccessType,
+            });
           }
         );
       } catch (e) {
@@ -129,6 +133,7 @@ export const PostConfirmationModal = ({
     rulesCount,
     sharedListAttributes,
     stablePostCreationSteps,
+    sharedListAccessType,
     user.details.profile,
   ]);
 
