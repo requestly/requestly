@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { RQModal } from "lib/design-system/components";
-import { SurveyOption } from "./components/Option";
-import { SurveyModalFooter } from "./components/ModalFooter";
+import { SurveyOption } from "./Option";
+import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { Option, PageConfig } from "./types";
 import "./index.css";
@@ -94,7 +94,7 @@ export const PersonaSurveyModal = () => {
 
   return (
     <RQModal
-      bodyStyle={{ width: "492px" }}
+      bodyStyle={{ width: "550px" }}
       centered
       open={true}
       closable={false}

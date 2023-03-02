@@ -1,0 +1,27 @@
+.survey-modal .recommendations-container .recommended-feature-container {
+  background: var(--component-background);
+  padding: 1rem;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  width: 48%;
+}
+.survey-modal .recommendations-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.survey-modal .recommended-feature-description {
+  margin-top: 14px;
+  font-size: 13px;
+}
+.survey-modal .recommended-feature-title {
+  display: flex;
+  align-self: center;
+  gap: 8px;
+}
+
+.survey-modal .recommended-feature-title .white,
+.survey-modal .recommended-feature-title svg {
+  align-self: center;
+}

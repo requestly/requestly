@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Checkbox } from "antd";
 import "./index.css";
 import { RQInput } from "lib/design-system/components";
-import { ActiveProps, Option } from "../../types";
+import { ActiveProps, Option } from "../types";
 
 interface OptionProps {
   option: Option;

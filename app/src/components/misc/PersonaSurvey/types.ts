@@ -35,6 +35,14 @@ export interface ActiveProps {
   title: string;
 }
 
+export interface Feature {
+  id: string;
+  title: string;
+  icon: () => ReactNode | ReactNode;
+  description: string;
+  action: (navigate: any) => void;
+}
+
 export enum SurveyConstants {
   FRONTEND = "Front end developer",
   BACKEND = "Back end developer",

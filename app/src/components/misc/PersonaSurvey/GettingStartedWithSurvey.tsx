@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import welcomeAnimation from "assets/lottie/welcome.json";
 import lottie from "lottie-web/build/player/lottie_light";
 import Logger from "lib/logger";
-import "../index.css";
+import "./index.css";
 
 export const GettingStartedWithSurvey = () => {
   useEffect(() => {

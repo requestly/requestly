@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { FooterProps } from "../types";
-import { surveyConfig } from "../config";
-import "../index.css";
+import { FooterProps } from "./types";
+import { surveyConfig } from "./config";
+import "./index.css";
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({
   page,
