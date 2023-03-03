@@ -27,7 +27,7 @@
     "release": "BUILD_MODE='production' npm run build && node scripts/createZip"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.12.0",
+    "@requestly/web-sdk": "0.12.1",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/chrome": "^0.0.200",
