@@ -173,7 +173,7 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [size, setSize] = useState(window.innerWidth);
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
-  const [expandedGroups, setExpandedGroups] = useState([""]);
+  const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
 
   //Global State
@@ -196,6 +196,14 @@ const RulesTable = ({
   );
 
   const selectedRules = getSelectedRules(rulesSelection);
+
+  const isRemoveFromGroupDisabled = useMemo(
+    () =>
+      rules
+        .filter((rule) => rulesSelection[rule.id])
+        .every((rule) => rule.groupId === UNGROUPED_GROUP_ID),
+    [rules, rulesSelection]
+  );
 
   const showGroupPinIcon = isFeatureCompatible(
     FEATURES.EXTENSION_GROUP_PIN_ICON
@@ -1257,7 +1265,7 @@ const RulesTable = ({
           defaultExpandAllRows: options.isSharedListRuleTable,
           defaultExpandedRowKeys: options.isSharedListRuleTable
             ? handleDefaultExpandAllRowKeys()
-            : expandedGroupRowKeys.concat([""]), // "Ungroup" group should always be expanded
+            : expandedGroupRowKeys.concat([UNGROUPED_GROUP_ID]), // "Ungroup" group should always be expanded
           expandRowByClick: true,
           rowExpandable: true,
           expandedRowClassName: "expanded-row",
@@ -1287,6 +1295,7 @@ const RulesTable = ({
             <Space style={{ margin: "-5px" }}>
               <Tooltip title={isScreenSmall ? "Remove from Group" : null}>
                 <Button
+                  disabled={isRemoveFromGroupDisabled}
                   onClick={(e) => ungroupSelectedRulesOnClickHandler(e)}
                   shape={isScreenSmall ? "circle" : null}
                   icon={<UngroupOutlined />}
