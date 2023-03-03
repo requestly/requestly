@@ -27,40 +27,36 @@ export const SurveyOption: React.FC<OptionProps> = ({
   fieldKey,
 }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const persona = userPersona.persona;
-  const referralChannel = userPersona.referralChannel;
-  const useCase = userPersona.useCase;
+  // const persona = userPersona.persona;
+  // const referralChannel = userPersona.referralChannel;
+  // const useCase = userPersona.useCase;
 
   const { title, type, icon } = option;
   const dispatch = useDispatch();
 
   const [customInput, setCustomInput] = useState<string>(null);
 
+  const key = userPersona[fieldKey];
+
   useEffect(() => {
     if (type === "text") {
-      const option = userPersona[fieldKey].find(
+      const option = key.find(
         (option: useCaseOptions) => option.optionType === "other"
       );
       if (option) setCustomInput(option.value);
       else setCustomInput(null);
     }
-  }, [fieldKey, type, userPersona]);
+  }, [fieldKey, type, key]);
 
   return (
     <>
       {type === "select" ? (
         <div
           className={`survey-option survey-select ${
-            isActive?.({ persona, referralChannel, useCase, title }) &&
-            "outline-active-option"
+            isActive?.({ key, title }) && "outline-active-option"
           }`}
           onClick={() =>
-            action(
-              dispatch,
-              title,
-              isActive?.({ persona, referralChannel, useCase, title }),
-              "select"
-            )
+            action(dispatch, title, isActive?.({ key, title }), "select")
           }
         >
           <div className="white text-bold survey-option-title">
@@ -78,20 +74,17 @@ export const SurveyOption: React.FC<OptionProps> = ({
           <Checkbox
             className={
               questionType === "single"
-                ? !isActive?.({ persona, referralChannel, useCase, title }) &&
-                  "hide-option-checkbox"
+                ? !isActive?.({ key, title }) && "hide-option-checkbox"
                 : null
             }
-            checked={isActive?.({ persona, referralChannel, useCase, title })}
+            checked={isActive?.({ key, title })}
           />
         </div>
       ) : (
         <div
           className={`survey-option survey-text ${
             isActive?.({
-              persona,
-              referralChannel,
-              useCase,
+              key,
               title,
               optionType: "other",
             }) && "outline-active-option"
@@ -106,19 +99,12 @@ export const SurveyOption: React.FC<OptionProps> = ({
             onChange={(e) => {
               setCustomInput(e.target.value);
               let title = e.target.value;
-              action(
-                dispatch,
-                title,
-                isActive?.({ persona, referralChannel, useCase, title }),
-                "other"
-              );
+              action(dispatch, title, isActive?.({ key, title }), "other");
             }}
           />
           <>
             {isActive?.({
-              persona,
-              referralChannel,
-              useCase,
+              key,
               title,
               optionType: "other",
             }) && <Checkbox checked={true} className="survey-text-suffix" />}

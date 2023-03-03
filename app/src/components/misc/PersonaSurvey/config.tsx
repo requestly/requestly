@@ -34,7 +34,7 @@ export const surveyConfig: PageConfig[] = [
     questionType: "single",
     key: "persona",
     action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
-    isActive: ({ persona, title }) => persona === title,
+    isActive: ({ key, title }) => key === title,
     options: [
       {
         type: "select",
@@ -76,8 +76,8 @@ export const surveyConfig: PageConfig[] = [
     key: "useCase",
     action: (dispatch, value, clear, optionType) =>
       setPersonaUseCase(dispatch, value, clear, optionType),
-    isActive: ({ useCase, title, optionType }) =>
-      handleUseCaseActiveOption(useCase, title, optionType),
+    isActive: ({ key, title, optionType }) =>
+      handleUseCaseActiveOption(key, title, optionType),
     conditional: [
       {
         condition: (answer) => answer === SurveyConstants.BACKEND,
@@ -234,7 +234,7 @@ export const surveyConfig: PageConfig[] = [
     key: "referralChannel",
     action: (dispatch, value, clear) =>
       setPersonaReferralChannel(dispatch, value, clear),
-    isActive: ({ referralChannel, title }) => referralChannel === title,
+    isActive: ({ key, title }) => key === title,
     options: [
       {
         type: "select",

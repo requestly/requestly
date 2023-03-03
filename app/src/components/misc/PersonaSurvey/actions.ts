@@ -29,18 +29,22 @@ export const setPersonaUseCase = (
 };
 
 export const handleUseCaseActiveOption = (
-  useCase: useCaseOptions[],
+  key: string | useCaseOptions[],
   title: string,
   optionType: "select" | "other"
 ) => {
-  if (optionType === "other") {
-    const otherUserCase = useCase.find(
-      (option) => option.optionType === "other"
+  if (typeof key === "object") {
+    if (optionType === "other") {
+      const otherUserCase = key.find(
+        (option: useCaseOptions) => option.optionType === "other"
+      );
+      if (otherUserCase) return true;
+      else return false;
+    }
+    const selectedUseCase = key.find(
+      (option: useCaseOptions) => option.value === title
     );
-    if (otherUserCase) return true;
+    if (selectedUseCase) return true;
     else return false;
-  }
-  const selectedUseCase = useCase.find((option) => option.value === title);
-  if (selectedUseCase) return true;
-  else return false;
+  } else return false;
 };

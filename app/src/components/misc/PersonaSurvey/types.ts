@@ -34,9 +34,7 @@ export interface useCaseOptions {
   value: "string";
 }
 export interface ActiveProps {
-  persona?: string;
-  referralChannel?: string;
-  useCase?: useCaseOptions[];
+  key: string | useCaseOptions[];
   title: string;
   optionType?: "select" | "other";
 }
