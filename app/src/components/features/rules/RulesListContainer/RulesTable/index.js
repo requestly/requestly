@@ -173,7 +173,7 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [size, setSize] = useState(window.innerWidth);
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
-  const [expandedGroups, setExpandedGroups] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState([""]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
 
   //Global State
@@ -635,6 +635,7 @@ const RulesTable = ({
       );
     else return <BlankIcon />;
   };
+
   const LastModified = (props) => {
     const { beautifiedDate, uid } = props;
     return (
@@ -643,6 +644,7 @@ const RulesTable = ({
       </span>
     );
   };
+
   const columns = [
     {
       title: "Rule Details",
@@ -1255,7 +1257,7 @@ const RulesTable = ({
           defaultExpandAllRows: options.isSharedListRuleTable,
           defaultExpandedRowKeys: options.isSharedListRuleTable
             ? handleDefaultExpandAllRowKeys()
-            : expandedGroupRowKeys,
+            : expandedGroupRowKeys.concat([""]), // "Ungroup" group should always be expanded
           expandRowByClick: true,
           rowExpandable: true,
           expandedRowClassName: "expanded-row",
