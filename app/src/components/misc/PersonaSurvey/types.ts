@@ -17,17 +17,27 @@ export interface PageConfig {
   subTitle: string;
   render?: ReactNode;
   questionType?: "single" | "multiple";
-  action?: (dispatch: any, value: string, clear: boolean) => void;
+  action?: (
+    dispatch: any,
+    value: string,
+    clear: boolean,
+    optionType?: string
+  ) => void;
   isActive?: (props: ActiveProps) => boolean;
   conditional?: Conditional[];
   options?: Option[];
 }
 
+export interface useCaseOptions {
+  optionType: "select" | "other";
+  value: "string";
+}
 export interface ActiveProps {
   persona?: string;
   referralChannel?: string;
-  useCase?: string[];
+  useCase?: useCaseOptions[];
   title: string;
+  optionType?: "select" | "other";
 }
 
 export interface Feature {

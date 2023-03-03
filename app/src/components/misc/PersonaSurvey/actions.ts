@@ -1,4 +1,5 @@
 import { actions } from "store";
+import { useCaseOptions } from "./types";
 
 export const setUserPersona = (
   dispatch: any,
@@ -19,8 +20,27 @@ export const setPersonaReferralChannel = (
 export const setPersonaUseCase = (
   dispatch: any,
   value: string,
-  clear: boolean
+  clear: boolean,
+  optionType: string
 ) => {
-  if (clear) dispatch(actions.removePersonaUseCase(value));
-  else dispatch(actions.updatePersonaUseCase(value));
+  if (optionType === "select")
+    dispatch(actions.updateSelectedPersonaUseCase({ value, optionType }));
+  else dispatch(actions.updateOtherPersonaUseCase({ value, optionType }));
+};
+
+export const handleUseCaseActiveOption = (
+  useCase: useCaseOptions[],
+  title: string,
+  optionType: "select" | "other"
+) => {
+  if (optionType === "other") {
+    const otherUserCase = useCase.find(
+      (option) => option.optionType === "other"
+    );
+    if (otherUserCase) return true;
+    else return false;
+  }
+  const selectedUseCase = useCase.find((option) => option.value === title);
+  if (selectedUseCase) return true;
+  else return false;
 };

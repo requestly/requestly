@@ -2,6 +2,7 @@ import { PageConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { UserRecommendations } from "./Recommendations";
 import {
+  handleUseCaseActiveOption,
   setPersonaReferralChannel,
   setPersonaUseCase,
   setUserPersona,
@@ -70,10 +71,10 @@ export const surveyConfig: PageConfig[] = [
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
     questionType: "multiple",
-    action: (dispatch, value, clear) =>
-      setPersonaUseCase(dispatch, value, clear),
-    isActive: ({ useCase, title }) =>
-      useCase.indexOf(title) < 0 ? false : true,
+    action: (dispatch, value, clear, optionType) =>
+      setPersonaUseCase(dispatch, value, clear, optionType),
+    isActive: ({ useCase, title, optionType }) =>
+      handleUseCaseActiveOption(useCase, title, optionType),
     conditional: [
       {
         condition: (answer) => answer === SurveyConstants.BACKEND,

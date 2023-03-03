@@ -26,7 +26,8 @@ export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };
 
-//Persona Survey
+//Persona Survey actions
+
 export const updateUserPersona = (prevState, action) => {
   prevState.userPersona.persona = action.payload;
 };
@@ -35,15 +36,42 @@ export const updatePersonaReferralChannel = (prevState, action) => {
   prevState.userPersona.referralChannel = action.payload;
 };
 
-export const updatePersonaUseCase = (prevState, action) => {
-  prevState.userPersona.useCase.indexOf(action.payload) < 0 &&
-    prevState.userPersona.useCase.push(action.payload);
+export const updateSelectedPersonaUseCase = (prevState, action) => {
+  let flag = false;
+  for (const option of prevState.userPersona.useCase) {
+    if (JSON.stringify(option) === JSON.stringify(action.payload)) {
+      flag = true;
+      break;
+    }
+  }
+  if (!flag) prevState.userPersona.useCase.push(action.payload);
+  else {
+    prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
+      (useCase) => JSON.stringify(useCase) !== JSON.stringify(action.payload)
+    );
+  }
 };
 
-export const removePersonaUseCase = (prevState, action) => {
-  prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
-    (useCase) => useCase !== action.payload
-  );
+export const updateOtherPersonaUseCase = (prevState, action) => {
+  let flag = false;
+  for (const option of prevState.userPersona.useCase) {
+    if (option.optionType === "other") {
+      flag = true;
+      break;
+    }
+  }
+  if (!flag) prevState.userPersona.useCase.push(action.payload);
+  else {
+    if (action.payload.value.length) {
+      for (const option of prevState.userPersona.useCase) {
+        if (option.optionType === "other") option.value = action.payload.value;
+      }
+    } else {
+      prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
+        (useCase) => useCase.optionType !== "other"
+      );
+    }
+  }
 };
 
 export const updateIsPersonaSurveyCompleted = (prevState, action) => {

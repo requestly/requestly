@@ -10,7 +10,12 @@ interface OptionProps {
   option: Option;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (dispatch: any, value: string, clear: boolean) => void;
+  action?: (
+    dispatch: any,
+    value: string,
+    clear: boolean,
+    optionType?: string
+  ) => void;
 }
 
 export const SurveyOption: React.FC<OptionProps> = ({
@@ -39,7 +44,8 @@ export const SurveyOption: React.FC<OptionProps> = ({
             action(
               dispatch,
               title,
-              isActive?.({ persona, referralChannel, useCase, title })
+              isActive?.({ persona, referralChannel, useCase, title }),
+              "select"
             )
           }
         >
@@ -68,8 +74,13 @@ export const SurveyOption: React.FC<OptionProps> = ({
       ) : (
         <div
           className={`survey-option survey-text ${
-            isActive?.({ persona, referralChannel, useCase, title }) &&
-            "outline-active-option"
+            isActive?.({
+              persona,
+              referralChannel,
+              useCase,
+              title,
+              optionType: "other",
+            }) && "outline-active-option"
           }`}
         >
           <div className="white text-bold survey-text-prefix">Other:</div>
@@ -77,18 +88,25 @@ export const SurveyOption: React.FC<OptionProps> = ({
             bordered={false}
             size="middle"
             placeholder="Enter your inputs here..."
-            onChange={(e) =>
+            onChange={(e) => {
+              let title = e.target.value;
               action(
                 dispatch,
-                e.target.value,
-                isActive?.({ persona, referralChannel, useCase, title })
-              )
-            }
+                title,
+                isActive?.({ persona, referralChannel, useCase, title }),
+                "other"
+              );
+            }}
           />
-          <Checkbox
-            checked={isActive?.({ persona, referralChannel, useCase, title })}
-            className="survey-text-suffix"
-          />
+          <>
+            {isActive?.({
+              persona,
+              referralChannel,
+              useCase,
+              title,
+              optionType: "other",
+            }) && <Checkbox checked={true} className="survey-text-suffix" />}
+          </>
         </div>
       )}
     </>

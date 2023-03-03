@@ -10,7 +10,7 @@
   padding: 12px;
   cursor: pointer;
   display: flex;
-  gap: 4px;
+  gap: 6px;
   transition: 0.2s ease-in-out;
 }
 .survey-modal .survey-option.survey-select {
