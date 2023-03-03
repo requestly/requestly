@@ -133,7 +133,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
           </React.Fragment>
         ))}
       </div>
-      <SurveyModalFooter page={currentPage} />
+      <SurveyModalFooter
+        page={currentPage}
+        fieldKey={surveyConfig[currentPage].key}
+      />
     </RQModal>
   );
 };
