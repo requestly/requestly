@@ -2,7 +2,7 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
-    version: "23.3.2",
+    version: "23.3.3",
     logs: [
       {
         title:

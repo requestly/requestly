@@ -1,6 +1,19 @@
 @import "../../lib/design-system/custom/variables.css";
 @import "../../lib/design-system/custom/base.css";
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 1rem;
+  background-color: rgba(164, 164, 164, 0.227);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
 input.ant-input {
   padding: 8px;
 }

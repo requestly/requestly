@@ -65,7 +65,7 @@ const RuleList: React.FC<RuleListProps> = ({
 
   return (
     <div className="rule-list-container">
-      <Row className="header" align="middle" gutter={15}>
+      <Row className="header" align="middle">
         <Col>
           <Button
             icon={<ArrowLeftOutlined />}
