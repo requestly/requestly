@@ -213,7 +213,7 @@ const RulesTable = ({
   const selectedRowKeys = selectedRules;
 
   const expandedGroupRowKeys = useMemo(() => {
-    return JSON.parse(window.localStorage.getItem("expandedGroups"));
+    return JSON.parse(window.localStorage.getItem("expandedGroups")) ?? [];
   }, []);
 
   const toggleSharedListRuleViewerModal = () => {
@@ -1248,7 +1248,10 @@ const RulesTable = ({
           ),
         }}
         rowClassName={(record, index) => {
-          if (record.objectType === "group" && record.id === "") {
+          if (
+            record.objectType === "group" &&
+            record.id === UNGROUPED_GROUP_ID
+          ) {
             return "hidden";
           } else if (record.objectType === "group") {
             return `rule-group-row ${!!record.expanded && "expanded-row"}`;
