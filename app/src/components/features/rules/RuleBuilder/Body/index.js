@@ -5,6 +5,7 @@ import { Row, Col, Alert } from "antd";
 //SUB COMPONENTS
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
+import { ReactComponent as QuestionMarkIcon } from "assets/icons/rule-types/queryparam.svg";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
@@ -109,42 +110,28 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
                 <Row style={{ marginBottom: 5 }}>
                   <Col span={24}>
                     <Alert
-                      style={{ fontSize: 13, padding: 5 }}
+                      className="rule-alert"
                       message={
                         <>
-                          <li>
-                            Only API Responses triggered by XHR/fetch can be
-                            modified by Chrome Extension.
-                            <a
-                              target="_blank"
-                              href="https://docs.requestly.io/using-rules/modify-ajax-response-rule/modify-response-faqs"
-                              rel="noreferrer"
-                            >
-                              {" "}
-                              Read FAQ.
-                            </a>{" "}
-                          </li>
-                          <li>
-                            To Modify Response for every request type, Use{" "}
+                          <li className="rule-alert-text">
+                            Note: API responses triggered by XHR/fetch can be
+                            modified using chrome extension. To modify
+                            <br /> response for every request type, use{" "}
                             <a
                               target="_blank"
                               href="https://requestly.io/desktop/"
                               rel="noreferrer"
                             >
-                              Requestly Desktop App.
-                            </a>
-                            <a
-                              target="_blank"
-                              href="https://www.youtube.com/watch?v=xUdwViRtiY0"
-                              rel="noreferrer"
-                            >
-                              {" "}
-                              Watch Demo.
+                              Desktop App.
                             </a>
                           </li>
                         </>
                       }
-                      type="info"
+                      icon={
+                        <div className="rule-alert-icon">
+                          <QuestionMarkIcon />
+                        </div>
+                      }
                       showIcon
                       closable
                     />
@@ -158,12 +145,35 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
                 <Row>
                   <Col span={24}>
                     <Alert
+                      className="rule-alert"
                       closable
                       showIcon
                       type="info"
                       style={{ marginBottom: "1rem" }}
-                      message="Delay is capped automatically to avoid browsing performance degradation."
-                      description={`For XHR/Fetch, max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_XHR}ms & for other resources (JS, CSS, Images etc), max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_NON_XHR}ms`}
+                      message={
+                        <li className="rule-alert-text">
+                          Delay is capped automatically to avoid browsing
+                          performance degradation.
+                          <br />
+                          For XHR/Fetch, max delay is $
+                          {
+                            GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS
+                              .MAX_DELAY_VALUE_XHR
+                          }
+                          ms & for other resources (JS, CSS, Images etc), max
+                          delay is $
+                          {
+                            GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS
+                              .MAX_DELAY_VALUE_NON_XHR
+                          }
+                          ms
+                        </li>
+                      }
+                      icon={
+                        <div className="rule-alert-icon">
+                          <QuestionMarkIcon />
+                        </div>
+                      }
                     />
                   </Col>
                 </Row>

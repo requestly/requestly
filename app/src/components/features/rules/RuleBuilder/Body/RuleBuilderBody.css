@@ -11,3 +11,26 @@
 .rule-builder-body > .ant-col {
   margin-bottom: 4rem;
 }
+
+.rule-alert.ant-alert {
+  padding: 8px;
+  background-color: rgba(var(--danger-border), 0.03);
+  border: 1px dashed rgb(var(--danger-border));
+  border-radius: var(--border-radius-sm);
+}
+
+.rule-alert.ant-alert .rule-alert-icon {
+  color: var(--text-gray);
+  padding-bottom: 20px;
+}
+
+.rule-alert.ant-alert .rule-alert-icon svg {
+  height: 13px;
+  width: 13px;
+}
+
+.rule-alert .rule-alert-text {
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--text-gray);
+}
