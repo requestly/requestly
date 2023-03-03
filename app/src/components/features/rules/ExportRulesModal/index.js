@@ -102,7 +102,7 @@ const ExportRulesModal = (props) => {
   return (
     <Modal
       className="modal-dialog-centered "
-      visible={isOpen}
+      open={isOpen}
       onCancel={toggleExportRulesModal}
       footer={null}
       style={{ textAlign: "center" }}
