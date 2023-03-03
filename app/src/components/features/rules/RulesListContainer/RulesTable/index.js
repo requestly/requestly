@@ -844,7 +844,7 @@ const RulesTable = ({
                         type={isHovering ? "primary" : "secondary"}
                         style={{ cursor: "pointer" }}
                       >
-                        <Tooltip title="Ungroup Selected Rules">
+                        <Tooltip title="Remove selected rules from group">
                           <Tag
                             onClick={(e) =>
                               ungroupSelectedRulesOnClickHandler(e)
@@ -1285,13 +1285,13 @@ const RulesTable = ({
           const isScreenSmall = size < 1150;
           return isAlertOptionsAllowed ? (
             <Space style={{ margin: "-5px" }}>
-              <Tooltip title={isScreenSmall ? "Ungroup Rules" : null}>
+              <Tooltip title={isScreenSmall ? "Remove from Group" : null}>
                 <Button
                   onClick={(e) => ungroupSelectedRulesOnClickHandler(e)}
                   shape={isScreenSmall ? "circle" : null}
                   icon={<UngroupOutlined />}
                 >
-                  {isScreenSmall ? null : "Ungroup Rules"}
+                  {isScreenSmall ? null : "Remove from Group"}
                 </Button>
               </Tooltip>
               <Tooltip title={isScreenSmall ? "Change Group" : null}>
