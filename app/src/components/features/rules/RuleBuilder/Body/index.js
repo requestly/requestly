@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardBody } from "reactstrap";
-import { Row, Col, Alert } from "antd";
+import { Row, Col, Alert, Typography } from "antd";
 //SUB COMPONENTS
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
@@ -113,7 +113,10 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
                       className="rule-alert"
                       message={
                         <>
-                          <li className="rule-alert-text">
+                          <Typography.Text
+                            type="secondary"
+                            className="rule-alert-text"
+                          >
                             Note: API responses triggered by XHR/fetch can be
                             modified using chrome extension. To modify
                             <br /> response for every request type, use{" "}
@@ -124,7 +127,7 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
                             >
                               Desktop App.
                             </a>
-                          </li>
+                          </Typography.Text>
                         </>
                       }
                       icon={

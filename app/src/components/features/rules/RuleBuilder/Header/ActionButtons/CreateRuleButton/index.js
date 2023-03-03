@@ -19,6 +19,7 @@ import {
 } from "../../../actions";
 import { fixSourceRegexFormat, validateRule } from "./actions";
 //Constants
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { ruleModifiedAnalytics } from "./actions";
@@ -28,6 +29,8 @@ import {
   trackRuleEditedEvent,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
+import ruleInfoDialog from "./RuleInfoDialog";
+import { isDesktopMode } from "utils/AppUtils";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -73,10 +76,20 @@ const CreateRuleButton = ({ isDisabled, location }) => {
           lastModifiedBy,
         },
         navigate
-      ).then(async () => {
+      ).then(() => {
         toast.success(
           `Successfully ${currentActionText.toLowerCase()}d the rule`
         );
+        if (
+          (isDesktopMode() &&
+            currentlySelectedRuleData.ruleType ===
+              GLOBAL_CONSTANTS.RULE_TYPES.REQUEST) ||
+          (!isDesktopMode() &&
+            currentlySelectedRuleData.ruleType ===
+              GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE)
+        ) {
+          ruleInfoDialog(currentlySelectedRuleData.ruleType);
+        }
 
         setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
 

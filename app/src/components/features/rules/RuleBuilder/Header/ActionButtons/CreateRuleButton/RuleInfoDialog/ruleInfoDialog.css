@@ -1,0 +1,28 @@
+.rule-info-dialog-container.ant-row {
+  flex-direction: column;
+}
+
+.rule-info-dialog-container.ant-row .rule-info-dialog-title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 26px;
+}
+
+.rule-info-dialog-container.ant-row .rule-info-dialog-description {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 21px;
+  color: var(--text-gray);
+}
+
+.ant-col .rule-info-dialog-icon {
+  color: var(--text-gray);
+}
+
+.rule-info-dialog-btn.ant-col {
+  margin-top: 12px;
+}
+
+.rule-info-dialog-box.ant-notification-notice {
+  padding: 20px 20px 14px 20px;
+}
