@@ -14,6 +14,7 @@ interface Conditional {
 export interface PageConfig {
   pageId: number;
   title: string;
+  key: string | null;
   subTitle: string;
   render?: ReactNode;
   questionType?: "single" | "multiple";

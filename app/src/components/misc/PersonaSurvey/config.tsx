@@ -24,6 +24,7 @@ export const surveyConfig: PageConfig[] = [
     title: "Welcome to Requestly!",
     subTitle:
       "Help us personalise your experience by answering the following questionnaire",
+    key: null,
     render: <GettingStartedWithSurvey />,
   },
   {
@@ -31,6 +32,7 @@ export const surveyConfig: PageConfig[] = [
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
     questionType: "single",
+    key: "persona",
     action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
     isActive: ({ persona, title }) => persona === title,
     options: [
@@ -71,6 +73,7 @@ export const surveyConfig: PageConfig[] = [
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
     questionType: "multiple",
+    key: "useCase",
     action: (dispatch, value, clear, optionType) =>
       setPersonaUseCase(dispatch, value, clear, optionType),
     isActive: ({ useCase, title, optionType }) =>
@@ -228,6 +231,7 @@ export const surveyConfig: PageConfig[] = [
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
     questionType: "single",
+    key: "referralChannel",
     action: (dispatch, value, clear) =>
       setPersonaReferralChannel(dispatch, value, clear),
     isActive: ({ referralChannel, title }) => referralChannel === title,
@@ -284,6 +288,7 @@ export const surveyConfig: PageConfig[] = [
     title: "✨ Where would you like to start?",
     subTitle:
       "Choose a use case you want to work on and we will help you get started",
+    key: null,
     render: <UserRecommendations />,
   },
 ];

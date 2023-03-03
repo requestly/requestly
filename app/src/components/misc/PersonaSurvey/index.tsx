@@ -53,6 +53,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               {page.options.map((option: Option, index) => (
                 <SurveyOption
                   key={index}
+                  fieldKey={page.key}
                   option={option}
                   questionType={page.questionType}
                   isActive={page.isActive}
@@ -83,6 +84,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
                   {question.options.map((option, index) => (
                     <SurveyOption
                       key={index}
+                      fieldKey={page.key}
                       option={option}
                       questionType={page.questionType}
                       isActive={page.isActive}

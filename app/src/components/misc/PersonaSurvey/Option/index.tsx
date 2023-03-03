@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Checkbox } from "antd";
 import "./index.css";
 import { RQInput } from "lib/design-system/components";
-import { ActiveProps, Option } from "../types";
+import { ActiveProps, Option, useCaseOptions } from "../types";
 
 interface OptionProps {
   option: Option;
@@ -16,6 +16,7 @@ interface OptionProps {
     clear: boolean,
     optionType?: string
   ) => void;
+  fieldKey: string;
 }
 
 export const SurveyOption: React.FC<OptionProps> = ({
@@ -23,6 +24,7 @@ export const SurveyOption: React.FC<OptionProps> = ({
   questionType,
   isActive,
   action,
+  fieldKey,
 }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const persona = userPersona.persona;
@@ -30,8 +32,20 @@ export const SurveyOption: React.FC<OptionProps> = ({
   const useCase = userPersona.useCase;
 
   const { title, type, icon } = option;
-
   const dispatch = useDispatch();
+
+  const [customInput, setCustomInput] = useState<string>(null);
+
+  useEffect(() => {
+    if (type === "text") {
+      const option = userPersona[fieldKey].find(
+        (option: useCaseOptions) => option.optionType === "other"
+      );
+      if (option) setCustomInput(option.value);
+      else setCustomInput(null);
+    }
+  }, [fieldKey, type, userPersona]);
+
   return (
     <>
       {type === "select" ? (
@@ -88,7 +102,9 @@ export const SurveyOption: React.FC<OptionProps> = ({
             bordered={false}
             size="middle"
             placeholder="Enter your inputs here..."
+            value={customInput}
             onChange={(e) => {
+              setCustomInput(e.target.value);
               let title = e.target.value;
               action(
                 dispatch,
