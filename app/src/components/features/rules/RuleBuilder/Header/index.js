@@ -36,6 +36,9 @@ const Header = ({
     }`;
   };
 
+  // If user directly lands on rule editor, it ensures that
+  // groupwise rules object is created for the current rule shown in the
+  // editor, so that rule actions can be performed eg delete & export.
   useEffect(() => {
     // groupwise rules are already created
     if (Object.keys(groupwiseRulesToPopulate).length > 0) return;
