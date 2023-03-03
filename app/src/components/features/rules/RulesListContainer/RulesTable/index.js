@@ -113,7 +113,7 @@ const isGroupSwitchDisabled = (record, groupwiseRulesToPopulate) => {
   if (!record.groupId) return false;
   if (!groupwiseRulesToPopulate[record.groupId]) return false;
   if (
-    groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]["status"] ===
+    groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] ===
     GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
   )
     return true;
