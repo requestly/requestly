@@ -16,7 +16,6 @@ interface TitleProps {
   nameChangeCallback: (name: string) => void;
   descriptionChangeCallback: (desc: string) => void;
   errors?: ValidationErrors;
-  divider?: boolean;
   mode?: "create" | "edit";
 }
 
@@ -30,7 +29,6 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   descriptionPlaceholder,
   descriptionChangeCallback,
   mode = "edit",
-  divider = true,
   errors,
 }) => {
   const [isNameEditable, setIsNameEditable] = useState<boolean>(false);
@@ -54,11 +52,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   }, [isDescriptionEditable]);
 
   return (
-    <Row
-      className={`editor-title-container ${
-        divider ? "editor-title-container-divider" : ""
-      }`}
-    >
+    <Row className="editor-title-container">
       <Col
         span={22}
         offset={1}
