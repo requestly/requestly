@@ -112,7 +112,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   useEffect(() => {
     if (!isSurveyCompleted)
       if (
-        isExtensionInstalled &&
+        isExtensionInstalled() &&
         isFreshExtensionInstall(new Date("2020-01-01")) //change this date on release
       )
         toggle();
