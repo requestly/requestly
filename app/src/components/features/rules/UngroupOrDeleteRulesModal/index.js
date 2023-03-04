@@ -162,7 +162,7 @@ const UngroupOrDeleteRulesModal = ({
   return (
     <Modal
       className="modal-dialog-centered modal-danger"
-      visible={isOpen}
+      open={isOpen}
       contentClassName="bg-gradient-danger bg-gradient-blue"
       title="Delete Group"
       confirmLoading={loadingSomething}
@@ -186,17 +186,16 @@ const UngroupOrDeleteRulesModal = ({
           loading={loadingSomething}
           icon={<DeleteOutlined />}
         >
-          Delete them
+          Delete rules
         </Button>
         <Button
-          icon={<DeleteOutlined />}
           type="default"
           data-dismiss="modal"
           key="submit"
           loading={loadingSomething}
           onClick={moveToUngrouped}
         >
-          Move them to Ungrouped
+          Keep the rules
         </Button>
       </div>
     </Modal>
