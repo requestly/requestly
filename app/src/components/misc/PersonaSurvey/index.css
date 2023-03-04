@@ -9,6 +9,7 @@
   max-width: 380px;
   line-height: 25px;
   margin-top: 8px;
+  opacity: 0.7;
 }
 
 .survey-modal .survey-lottie-animation-container {

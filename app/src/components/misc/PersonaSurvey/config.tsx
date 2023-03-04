@@ -48,16 +48,6 @@ export const surveyConfig: PageConfig[] = [
       },
       {
         type: "select",
-        title: SurveyConstants.PRODUCT,
-        icon: "📊",
-      },
-      {
-        type: "select",
-        title: SurveyConstants.FOUNDER,
-        icon: "👑",
-      },
-      {
-        type: "select",
         title: SurveyConstants.QUALITY,
         icon: "🏗",
       },
@@ -65,6 +55,16 @@ export const surveyConfig: PageConfig[] = [
         type: "select",
         title: SurveyConstants.MARKETER,
         icon: "📈",
+      },
+      {
+        type: "select",
+        title: SurveyConstants.PRODUCT,
+        icon: "📊",
+      },
+      {
+        type: "select",
+        title: SurveyConstants.FOUNDER,
+        icon: "👑",
       },
     ],
   },
@@ -278,7 +278,7 @@ export const surveyConfig: PageConfig[] = [
       },
       {
         type: "select",
-        title: "Company internal documentation",
+        title: "Company documentation",
         icon: "📋",
       },
     ],

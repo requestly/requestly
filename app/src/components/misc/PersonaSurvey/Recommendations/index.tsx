@@ -88,7 +88,6 @@ export const UserRecommendations = () => {
         ))}
       </div>
       <div className="divider"></div>
-      <div className="white title">All rules</div>
       <div>{renderOtherFeatures()}</div>
     </div>
   );

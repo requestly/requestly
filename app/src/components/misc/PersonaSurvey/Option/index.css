@@ -13,6 +13,9 @@
   gap: 6px;
   transition: 0.2s ease-in-out;
 }
+.survey-modal .survey-option:hover {
+  border: 1px solid #4f5257;
+}
 .survey-modal .survey-option.survey-select {
   cursor: pointer;
   width: 48%;
