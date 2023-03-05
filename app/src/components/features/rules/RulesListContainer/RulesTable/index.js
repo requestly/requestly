@@ -114,7 +114,7 @@ const isGroupSwitchDisabled = (record, groupwiseRulesToPopulate) => {
   if (!record.groupId) return false;
   if (!groupwiseRulesToPopulate[record.groupId]) return false;
   if (
-    groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]["status"] ===
+    groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] ===
     GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
   )
     return true;
@@ -170,7 +170,7 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [size, setSize] = useState(window.innerWidth);
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
-  const [expandedGroups, setExpandedGroups] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
 
   //Global State
@@ -194,6 +194,14 @@ const RulesTable = ({
 
   const selectedRules = getSelectedRules(rulesSelection);
 
+  const isRemoveFromGroupDisabled = useMemo(
+    () =>
+      rules
+        .filter((rule) => rulesSelection[rule.id])
+        .every((rule) => rule.groupId === UNGROUPED_GROUP_ID),
+    [rules, rulesSelection]
+  );
+
   const showGroupPinIcon = isFeatureCompatible(
     FEATURES.EXTENSION_GROUP_PIN_ICON
   );
@@ -202,7 +210,7 @@ const RulesTable = ({
   const selectedRowKeys = selectedRules;
 
   const expandedGroupRowKeys = useMemo(() => {
-    return JSON.parse(window.localStorage.getItem("expandedGroups"));
+    return JSON.parse(window.localStorage.getItem("expandedGroups")) ?? [];
   }, []);
 
   const toggleSharedListRuleViewerModal = () => {
@@ -636,6 +644,7 @@ const RulesTable = ({
       );
     else return <BlankIcon />;
   };
+
   const LastModified = (props) => {
     const { beautifiedDate, uid } = props;
     return (
@@ -644,6 +653,7 @@ const RulesTable = ({
       </span>
     );
   };
+
   const columns = [
     {
       title: "Rule Details",
@@ -658,18 +668,15 @@ const RulesTable = ({
           };
         }
       },
-      render: (_, record) => {
+      render: (recordName, record) => {
         if (record.objectType === "group") {
           return (
             <span>
-              <strong>{_}</strong>{" "}
+              <strong>{recordName}</strong>{" "}
               <i>({getGroupRulesCount(record.id)} Rules)</i>
             </span>
           );
         } else {
-          const name = _;
-          const description = record.description;
-
           return (
             <div
               style={{
@@ -679,7 +686,7 @@ const RulesTable = ({
               }}
             >
               <Link onClick={(e) => handleRuleNameOnClick(e, record)}>
-                {name}
+                {recordName}
               </Link>
               <br />
               <Text
@@ -690,7 +697,7 @@ const RulesTable = ({
                   textOverflow: "ellipsis",
                 }}
               >
-                {description}
+                {record.description}
               </Text>
             </div>
           );
@@ -846,7 +853,7 @@ const RulesTable = ({
                         type={isHovering ? "primary" : "secondary"}
                         style={{ cursor: "pointer" }}
                       >
-                        <Tooltip title="Ungroup Selected Rules">
+                        <Tooltip title="Remove selected rules from group">
                           <Tag
                             onClick={(e) =>
                               ungroupSelectedRulesOnClickHandler(e)
@@ -1242,9 +1249,16 @@ const RulesTable = ({
           ),
         }}
         rowClassName={(record, index) => {
-          return record.objectType === "group"
-            ? `rule-group-row ${!!record.expanded && "expanded-row"}`
-            : null;
+          if (
+            record.objectType === "group" &&
+            record.id === UNGROUPED_GROUP_ID
+          ) {
+            return "hidden";
+          } else if (record.objectType === "group") {
+            return `rule-group-row ${!!record.expanded && "expanded-row"}`;
+          } else if ((record.objectType === "rule") & (record.groupId === "")) {
+            return "ungroup-rule-row";
+          }
         }}
         columnsState={{
           persistenceKey: "rules-index-table",
@@ -1255,7 +1269,7 @@ const RulesTable = ({
           defaultExpandAllRows: options.isSharedListRuleTable,
           defaultExpandedRowKeys: options.isSharedListRuleTable
             ? handleDefaultExpandAllRowKeys()
-            : expandedGroupRowKeys,
+            : expandedGroupRowKeys.concat([UNGROUPED_GROUP_ID]), // "Ungroup" group should always be expanded
           expandRowByClick: true,
           rowExpandable: true,
           expandedRowClassName: "expanded-row",
@@ -1283,13 +1297,14 @@ const RulesTable = ({
           const isScreenSmall = size < 1150;
           return isAlertOptionsAllowed ? (
             <Space style={{ margin: "-5px" }}>
-              <Tooltip title={isScreenSmall ? "Ungroup Rules" : null}>
+              <Tooltip title={isScreenSmall ? "Remove from Group" : null}>
                 <Button
+                  disabled={isRemoveFromGroupDisabled}
                   onClick={(e) => ungroupSelectedRulesOnClickHandler(e)}
                   shape={isScreenSmall ? "circle" : null}
                   icon={<UngroupOutlined />}
                 >
-                  {isScreenSmall ? null : "Ungroup Rules"}
+                  {isScreenSmall ? null : "Remove from Group"}
                 </Button>
               </Tooltip>
               <Tooltip title={isScreenSmall ? "Change Group" : null}>
