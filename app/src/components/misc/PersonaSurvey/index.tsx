@@ -12,6 +12,8 @@ import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isNewInstall } from "./utils";
+import featureFlag from "utils/feature-flag";
+import APP_CONSTANTS from "config/constants";
 import { Option, PageConfig } from "./types";
 import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
@@ -121,29 +123,33 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   return (
     <>
-      {!userPersona.isSurveyCompleted && (
-        <RQModal
-          bodyStyle={{ width: "550px" }}
-          centered
-          open={isOpen}
-          closable={false}
-          className="survey-modal"
-        >
-          <div className="rq-modal-content survey-content-wrapper">
-            {surveyConfig.map((page: PageConfig, index) => (
-              <React.Fragment key={index}>
-                {currentPage === page.pageId && (
-                  <>{renderPage(page, roleType)}</>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-          <SurveyModalFooter
-            page={currentPage}
-            fieldKey={surveyConfig[currentPage].key}
-          />
-        </RQModal>
-      )}
+      {featureFlag.getValue(APP_CONSTANTS.FEATURES.PERSONA_SURVEY) ? (
+        <>
+          {!userPersona.isSurveyCompleted && (
+            <RQModal
+              bodyStyle={{ width: "550px" }}
+              centered
+              open={isOpen}
+              closable={false}
+              className="survey-modal"
+            >
+              <div className="rq-modal-content survey-content-wrapper">
+                {surveyConfig.map((page: PageConfig, index) => (
+                  <React.Fragment key={index}>
+                    {currentPage === page.pageId && (
+                      <>{renderPage(page, roleType)}</>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              <SurveyModalFooter
+                page={currentPage}
+                fieldKey={surveyConfig[currentPage].key}
+              />
+            </RQModal>
+          )}
+        </>
+      ) : null}
     </>
   );
 };
