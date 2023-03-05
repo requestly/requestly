@@ -98,10 +98,3 @@ export function getTabSession(tabId) {
     tabId,
   });
 }
-
-export const isFreshExtensionInstall = (releaseDate) => {
-  const installDate = new Date(window.localStorage.getItem("install_date"));
-  if (!installDate) return false;
-  if (installDate > releaseDate) return true;
-  else return false;
-};

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Tooltip } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
@@ -20,11 +20,6 @@ export const UserRecommendations = () => {
   const togglePersonaSurveyModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
   };
-
-  useEffect(() => {
-    dispatch(actions.updateIsPersonaSurveyCompleted(true));
-  }, [dispatch]);
-
   const renderRecommendedFeature = (feature: string) => {
     const featureDetails = allFeatures.find(
       (personalization) => personalization.title === feature
@@ -37,6 +32,7 @@ export const UserRecommendations = () => {
           featureDetails.action(navigate);
           trackPersonaRecommendationSelected(featureDetails?.title);
           togglePersonaSurveyModal();
+          dispatch(actions.updateIsPersonaSurveyCompleted(true));
         }}
       >
         <div className="recommended-feature-title">
@@ -64,6 +60,7 @@ export const UserRecommendations = () => {
                       feature.action(navigate);
                       trackPersonaRecommendationSelected(feature.title);
                       togglePersonaSurveyModal();
+                      dispatch(actions.updateIsPersonaSurveyCompleted(true));
                     }}
                   >
                     <>{feature?.icon?.()}</>

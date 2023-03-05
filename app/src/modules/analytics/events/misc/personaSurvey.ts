@@ -1,6 +1,5 @@
-import { PERSONA_SURVEY } from "../constants";
+import { PERSONA_SURVEY } from "./constants";
 import { trackEvent } from "modules/analytics";
-import { useCaseOptions } from "components/misc/PersonaSurvey/types";
 
 export const trackPersonaSurveyViewed = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_VIEWED);
@@ -11,7 +10,7 @@ export const trackPersonaQ1Completed = (option: string) => {
   trackEvent(PERSONA_SURVEY.PERSONA_Q1_COMPLETED, params);
 };
 
-export const trackPersonaQ2Completed = (option: useCaseOptions[]) => {
+export const trackPersonaQ2Completed = (option: string[]) => {
   const params = { option };
   trackEvent(PERSONA_SURVEY.PERSONA_Q2_COMPLETED, params);
 };

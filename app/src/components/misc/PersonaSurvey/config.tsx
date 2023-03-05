@@ -7,7 +7,7 @@ import {
   setPersonaUseCase,
   setUserPersona,
 } from "./actions";
-import { SurveyConstants } from "./types";
+import { PersonaType } from "./types";
 
 //@ts-ignore
 import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
@@ -38,32 +38,32 @@ export const surveyConfig: PageConfig[] = [
     options: [
       {
         type: "select",
-        title: SurveyConstants.FRONTEND,
+        title: PersonaType.FRONTEND,
         icon: "💻",
       },
       {
         type: "select",
-        title: SurveyConstants.BACKEND,
+        title: PersonaType.BACKEND,
         icon: "⌨️",
       },
       {
         type: "select",
-        title: SurveyConstants.QUALITY,
+        title: PersonaType.QUALITY,
         icon: "🏗",
       },
       {
         type: "select",
-        title: SurveyConstants.MARKETER,
+        title: PersonaType.MARKETER,
         icon: "📈",
       },
       {
         type: "select",
-        title: SurveyConstants.PRODUCT,
+        title: PersonaType.PRODUCT,
         icon: "📊",
       },
       {
         type: "select",
-        title: SurveyConstants.FOUNDER,
+        title: PersonaType.FOUNDER,
         icon: "👑",
       },
     ],
@@ -73,14 +73,14 @@ export const surveyConfig: PageConfig[] = [
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
     questionType: "multiple",
-    key: "useCase",
+    key: "useCases",
     action: (dispatch, value, clear, optionType) =>
       setPersonaUseCase(dispatch, value, clear, optionType),
     isActive: ({ key, title, optionType }) =>
       handleUseCaseActiveOption(key, title, optionType),
     conditional: [
       {
-        condition: (answer) => answer === SurveyConstants.BACKEND,
+        condition: (answer) => answer === PersonaType.BACKEND,
         options: [
           {
             type: "select",
@@ -101,7 +101,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === SurveyConstants.QUALITY,
+        condition: (answer) => answer === PersonaType.QUALITY,
         options: [
           {
             type: "select",
@@ -132,8 +132,7 @@ export const surveyConfig: PageConfig[] = [
       },
       {
         condition: (answer) =>
-          answer === SurveyConstants.FOUNDER ||
-          answer === SurveyConstants.PRODUCT,
+          answer === PersonaType.FOUNDER || answer === PersonaType.PRODUCT,
         options: [
           {
             type: "select",
@@ -154,7 +153,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === SurveyConstants.MARKETER,
+        condition: (answer) => answer === PersonaType.MARKETER,
         options: [
           {
             type: "select",
@@ -179,7 +178,7 @@ export const surveyConfig: PageConfig[] = [
         ],
       },
       {
-        condition: (answer) => answer === SurveyConstants.FRONTEND,
+        condition: (answer) => answer === PersonaType.FRONTEND,
         options: [
           {
             type: "select",

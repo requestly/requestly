@@ -38,15 +38,15 @@ export const updatePersonaReferralChannel = (prevState, action) => {
 
 export const updateSelectedPersonaUseCase = (prevState, action) => {
   let flag = false;
-  for (const option of prevState.userPersona.useCase) {
+  for (const option of prevState.userPersona.useCases) {
     if (JSON.stringify(option) === JSON.stringify(action.payload)) {
       flag = true;
       break;
     }
   }
-  if (!flag) prevState.userPersona.useCase.push(action.payload);
+  if (!flag) prevState.userPersona.useCases.push(action.payload);
   else {
-    prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
+    prevState.userPersona.useCases = prevState.userPersona.useCases.filter(
       (useCase) => JSON.stringify(useCase) !== JSON.stringify(action.payload)
     );
   }
@@ -54,20 +54,20 @@ export const updateSelectedPersonaUseCase = (prevState, action) => {
 
 export const updateOtherPersonaUseCase = (prevState, action) => {
   let flag = false;
-  for (const option of prevState.userPersona.useCase) {
+  for (const option of prevState.userPersona.useCases) {
     if (option.optionType === "other") {
       flag = true;
       break;
     }
   }
-  if (!flag) prevState.userPersona.useCase.push(action.payload);
+  if (!flag) prevState.userPersona.useCases.push(action.payload);
   else {
     if (action.payload.value.length) {
-      for (const option of prevState.userPersona.useCase) {
+      for (const option of prevState.userPersona.useCases) {
         if (option.optionType === "other") option.value = action.payload.value;
       }
     } else {
-      prevState.userPersona.useCase = prevState.userPersona.useCase.filter(
+      prevState.userPersona.useCases = prevState.userPersona.useCases.filter(
         (useCase) => useCase.optionType !== "other"
       );
     }

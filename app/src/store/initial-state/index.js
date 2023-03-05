@@ -13,7 +13,7 @@ const INITIAL_STATE = {
   userPersona: {
     page: 0,
     persona: "",
-    useCase: [],
+    useCases: [],
     referralChannel: "",
     isSurveyCompleted: false,
   },

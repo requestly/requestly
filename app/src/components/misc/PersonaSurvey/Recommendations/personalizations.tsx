@@ -4,7 +4,7 @@ import {
 } from "utils/RedirectionUtils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { BsCameraVideo } from "react-icons/bs";
-import { Feature, SurveyConstants } from "../types";
+import { Feature, PersonaType } from "../types";
 
 const allRules = Object.values(RULE_TYPES_CONFIG)
   .filter((ruleConfig) => ruleConfig.ID !== 11 && ruleConfig.ID !== 8)
@@ -32,7 +32,7 @@ export const allFeatures: Feature[] = [
 
 export const recommendation = [
   {
-    id: SurveyConstants.FRONTEND,
+    id: PersonaType.FRONTEND,
     recommended: [
       "Redirect Request",
       "Modify Headers",
@@ -41,7 +41,7 @@ export const recommendation = [
     ],
   },
   {
-    id: SurveyConstants.BACKEND,
+    id: PersonaType.BACKEND,
     recommended: [
       "Redirect Request",
       "Modify Headers",
@@ -50,7 +50,7 @@ export const recommendation = [
     ],
   },
   {
-    id: SurveyConstants.QUALITY,
+    id: PersonaType.QUALITY,
     recommended: [
       "Bug Reporting",
       "Redirect Request",
@@ -59,7 +59,7 @@ export const recommendation = [
     ],
   },
   {
-    id: SurveyConstants.PRODUCT,
+    id: PersonaType.PRODUCT,
     recommended: [
       "Bug Reporting",
       "Insert Scripts",
@@ -68,7 +68,7 @@ export const recommendation = [
     ],
   },
   {
-    id: SurveyConstants.FOUNDER,
+    id: PersonaType.FOUNDER,
     recommended: [
       "Bug Reporting",
       "Insert Scripts",
@@ -77,7 +77,7 @@ export const recommendation = [
     ],
   },
   {
-    id: SurveyConstants.MARKETER,
+    id: PersonaType.MARKETER,
     recommended: [
       "Redirect Request",
       "Replace String",

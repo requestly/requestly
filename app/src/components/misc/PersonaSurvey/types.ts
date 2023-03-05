@@ -47,7 +47,7 @@ export interface Feature {
   action: (navigate: any) => void;
 }
 
-export enum SurveyConstants {
+export enum PersonaType {
   FRONTEND = "Front-end developer",
   BACKEND = "Back-end developer",
   MARKETER = "Digital Marketer",

@@ -5,6 +5,7 @@ import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { surveyConfig } from "./config";
+import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
@@ -67,10 +68,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
         );
         break;
       case 2:
-        trackPersonaQ2Completed(userPersona.useCase);
+        trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
         submitAttrUtil(
           APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASE,
-          userPersona.useCase
+          getFormattedUserUseCases(userPersona.useCases)
         );
         break;
       case 3:
@@ -95,6 +96,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
               onClick={() => {
                 togglePersonaSurveyModal();
                 trackPersonaRecommendationSkipped();
+                dispatch(actions.updateIsPersonaSurveyCompleted(true));
               }}
             >
               Skip

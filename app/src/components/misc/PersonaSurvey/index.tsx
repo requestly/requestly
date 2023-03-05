@@ -1,15 +1,17 @@
 import React from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getUserPersonaSurveyDetails } from "store/selectors";
+import {
+  getAppMode,
+  getUserAuthDetails,
+  getUserPersonaSurveyDetails,
+} from "store/selectors";
 import { RQModal } from "lib/design-system/components";
 import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
-import {
-  isExtensionInstalled,
-  isFreshExtensionInstall,
-} from "actions/ExtensionActions";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isNewInstall } from "./utils";
 import { Option, PageConfig } from "./types";
 import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
@@ -23,6 +25,8 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   isOpen,
   toggle,
 }) => {
+  const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
   const roleType = userPersona.persona;
@@ -111,32 +115,35 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   useEffect(() => {
     if (!isSurveyCompleted)
-      if (
-        isExtensionInstalled() &&
-        isFreshExtensionInstall(new Date("2020-01-01")) //change this date on release
-      )
+      if (isExtensionInstalled() && isNewInstall(appMode, user.loggedIn))
         toggle();
-  }, [isSurveyCompleted, toggle]);
+  }, [isSurveyCompleted, toggle, appMode, user.loggedIn]);
 
   return (
-    <RQModal
-      bodyStyle={{ width: "550px" }}
-      centered
-      open={isOpen}
-      closable={false}
-      className="survey-modal"
-    >
-      <div className="rq-modal-content survey-content-wrapper">
-        {surveyConfig.map((page: PageConfig, index) => (
-          <React.Fragment key={index}>
-            {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
-          </React.Fragment>
-        ))}
-      </div>
-      <SurveyModalFooter
-        page={currentPage}
-        fieldKey={surveyConfig[currentPage].key}
-      />
-    </RQModal>
+    <>
+      {!userPersona.isSurveyCompleted && (
+        <RQModal
+          bodyStyle={{ width: "550px" }}
+          centered
+          open={isOpen}
+          closable={false}
+          className="survey-modal"
+        >
+          <div className="rq-modal-content survey-content-wrapper">
+            {surveyConfig.map((page: PageConfig, index) => (
+              <React.Fragment key={index}>
+                {currentPage === page.pageId && (
+                  <>{renderPage(page, roleType)}</>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          <SurveyModalFooter
+            page={currentPage}
+            fieldKey={surveyConfig[currentPage].key}
+          />
+        </RQModal>
+      )}
+    </>
   );
 };

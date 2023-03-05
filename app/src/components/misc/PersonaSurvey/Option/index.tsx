@@ -27,9 +27,6 @@ export const SurveyOption: React.FC<OptionProps> = ({
   fieldKey,
 }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  // const persona = userPersona.persona;
-  // const referralChannel = userPersona.referralChannel;
-  // const useCase = userPersona.useCase;
 
   const { title, type, icon } = option;
   const dispatch = useDispatch();
