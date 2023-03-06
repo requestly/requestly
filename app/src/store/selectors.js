@@ -194,3 +194,7 @@ export const getAuthInitialization = (state) => {
 export const getUserPreferences = (state) => {
   return getGlobalState(state)["userPreferences"];
 };
+
+export const getUserPersonaSurveyDetails = (state) => {
+  return getGlobalState(state)["userPersona"];
+};
