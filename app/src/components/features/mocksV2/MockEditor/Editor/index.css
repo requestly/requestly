@@ -1,5 +1,6 @@
 .mock-editor-container {
-  overflow: auto;
+  overflow-y: auto;
+  height: 80vh;
 }
 .mock-editor-body {
   padding: 1.25rem;
