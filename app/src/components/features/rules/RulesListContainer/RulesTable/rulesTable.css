@@ -42,3 +42,8 @@
   color: var(--link);
   transition: color 0.1s;
 }
+
+.ungroup-rule-row .ant-table-cell.rule-name-col span.ant-table-row-indent,
+.ungroup-rule-row .ant-table-cell.rule-name-col .ant-table-row-expand-icon {
+  display: none;
+}

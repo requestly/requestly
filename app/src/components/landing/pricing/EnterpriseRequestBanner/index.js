@@ -56,17 +56,19 @@ export default function EnterpriseRequestBanner({ user }) {
       if (Object.keys(enterpriseContactDetails).length === 0) {
         getEnterpriseAdminDetails({}).then((response) => {
           setEnterpriseContactDetails(response);
-          if (enterpriseContactDetails.data.success) {
+          if (response.data.success) {
             trackTeamPlanCardShown(
-              enterpriseContactDetails.data?.enterpriseData?.admin?.email?.split(
-                "@"
-              )?.[1]
+              response.data?.enterpriseData?.admin?.email?.split("@")?.[1]
             );
           }
         });
       }
     }
-  });
+  }, [
+    enterpriseContactDetails,
+    getEnterpriseAdminDetails,
+    user?.details?.isLoggedIn,
+  ]);
 
   if (user?.details?.isPremium) return null;
 

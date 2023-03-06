@@ -33,8 +33,6 @@ RQ.RESOURCES = {
 
 RQ.CLIENT_MESSAGES = {
   GET_SCRIPT_RULES: "getScriptRules",
-  GET_REQUEST_RULES: "getRequestRules",
-  DO_REQUEST_RESPONSE_RULES_EXIST: "doRequestResponseRuleExist",
   GET_USER_AGENT_RULE_PAIRS: "getUserAgentRulePairs",
   OVERRIDE_RESPONSE: "overrideResponse",
   NOTIFY_RULES_APPLIED: "notifyRulesApplied",
@@ -49,4 +47,6 @@ RQ.CLIENT_MESSAGES = {
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
+  SYNC_APPLIED_RULES: "syncAppliedRules",
+  NOTIFY_CONTENT_SCRIPT_LOADED: "notifyContentScriptLoaded",
 };

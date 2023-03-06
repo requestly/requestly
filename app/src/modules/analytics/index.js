@@ -16,7 +16,6 @@ const waitPeriod = 10000; // ms
 
 export const trackEvent = (name, params) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;
-  if (Date.now() - timerStart > waitPeriod) return; // 10 secs has passed. No more hope for script to load
   if (
     localStorage.getItem("dataCollectionStatus") &&
     localStorage.getItem("dataCollectionStatus") === "disabled"
@@ -49,7 +48,6 @@ export const trackAttr = (name, value) => {
   )
     return;
 
-  if (Date.now() - timerStart > waitPeriod) return; // 10 secs has passed. No more hope for script to load
   setTimeout(() => {
     trackAttr(name, value);
   }, 5000);

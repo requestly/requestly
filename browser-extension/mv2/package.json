@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.2.10",
+  "version": "23.3.3",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,
@@ -24,7 +24,7 @@
     "test": "grunt test"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.11.2",
+    "@requestly/web-sdk": "0.12.1",
     "archiver": "^5.3.1",
     "babel-polyfill": "^6.26.0",
     "chokidar-cli": "^3.0.0",

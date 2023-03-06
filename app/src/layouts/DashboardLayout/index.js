@@ -15,6 +15,7 @@ import { Col, Layout, Row } from "antd";
 import Sidebar from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { Content } from "antd/lib/layout/layout";
+import "./dashboardLayout.scss";
 
 const DashboardLayout = () => {
   const location = useLocation();

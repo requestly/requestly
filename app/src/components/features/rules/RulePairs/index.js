@@ -22,40 +22,23 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getCurrentlySelectedRuleData } from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import { FaTrash } from "react-icons/fa";
-import "./RulePairs.css";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
+import {
+  sourceRuleOperatorPlaceholders,
+  destinationRuleOperatorPlaceholders,
+} from "./utils";
+import "./RulePairs.css";
 
 const set = require("lodash/set");
 const get = require("lodash/get");
 
-const generatePlaceholderText = (operator, type) => {
+const generatePlaceholderText = (operator, type, sourceKey = "") => {
   if (type === "source-value") {
-    switch (operator) {
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS:
-        return "e.g. http://www.example.com";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS:
-        return "e.g. facebook";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES:
-        return "e.g. *://*.mydomain.com/*";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES:
-        return "e.g. /example-([0-9]+)/ig";
-      default:
-        return "";
-    }
+    return sourceRuleOperatorPlaceholders[sourceKey]?.[operator];
   } else if (type === "destination") {
-    switch (operator) {
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS:
-        return "e.g. http://www.new-example.com";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS:
-        return "e.g. http://www.new-example.com";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES:
-        return "e.g. $1://$2.newdomain.com/$3 (Each * can be replaced with respective $)";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES:
-        return "e.g. http://www.new-example.com?queryParam=$1&searchParam=$2";
-      default:
-        return "";
-    }
+    return destinationRuleOperatorPlaceholders[operator];
   }
+
   return "";
 };
 
@@ -95,7 +78,8 @@ const RulePairs = (props) => {
     pairIndex,
     objectPath,
     customValue,
-    arrayOfOtherValuesToModify
+    arrayOfOtherValuesToModify,
+    triggerUnsavedChangesIndication = true
   ) => {
     event && event.preventDefault && event.preventDefault();
     let newValue = null;
@@ -118,7 +102,11 @@ const RulePairs = (props) => {
       });
     }
 
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
+    setCurrentlySelectedRule(
+      dispatch,
+      copyOfCurrentlySelectedRule,
+      triggerUnsavedChangesIndication
+    );
   };
 
   const getPairMarkup = (pair, pairIndex) => {

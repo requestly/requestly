@@ -7,7 +7,11 @@ import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
-import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
+import {
+  getAppMode,
+  getCurrentlySelectedRuleData,
+  getCurrentlySelectedRuleErrors,
+} from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isDesktopMode } from "../../../../../utils/AppUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -21,6 +25,7 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
 
   const getEventObject = (name, value) => ({ target: { name, value } });
@@ -82,13 +87,13 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
       {!isSharedListView && (
         <RQEditorTitle
           mode={mode}
-          divider={false}
           name={currentlySelectedRuleData.name}
           namePlaceholder="Enter rule name"
           nameChangeCallback={handleRuleNameChange}
           descriptionPlaceholder="Add description (optional)"
           description={currentlySelectedRuleData.description}
           descriptionChangeCallback={handleDescriptionChange}
+          errors={ruleErrors}
         />
       )}
       <Row className="rule-builder-body">
