@@ -10,7 +10,7 @@ import APP_CONSTANTS from "../../../../../config/constants";
 import {
   getAppMode,
   getCurrentlySelectedRuleData,
-  getIsCurrentlySelectedRuleErrors,
+  getCurrentlySelectedRuleErrors,
 } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isDesktopMode } from "../../../../../utils/AppUtils";
@@ -25,7 +25,7 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const ruleErrors = useSelector(getIsCurrentlySelectedRuleErrors);
+  const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
 
   const getEventObject = (name, value) => ({ target: { name, value } });

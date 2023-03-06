@@ -72,7 +72,7 @@ export const getIsCurrentlySelectedRuleHasUnsavedChanges = (state) => {
   return currentlySelectedRule["hasUnsavedChanges"];
 };
 
-export const getIsCurrentlySelectedRuleErrors = (state) => {
+export const getCurrentlySelectedRuleErrors = (state) => {
   const currentlySelectedRule = getCurrentlySelectedRule(state);
   return currentlySelectedRule["errors"];
 };
