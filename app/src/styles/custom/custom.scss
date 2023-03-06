@@ -1247,3 +1247,12 @@ input[id^="react-select-"] {
     transform: rotate(1turn);
   } // or 360deg
 }
+
+//mock type tag
+.mock-tag {
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: var(--component-background);
+  padding: 5px;
+}
