@@ -129,7 +129,9 @@ const MockEditor: React.FC<Props> = ({
     let focusedInvalidFieldRef = null;
 
     if (!data.name) {
-      updatedErrors.name = "Name is required";
+      updatedErrors.name = `${
+        mockType === MockType.FILE ? "File" : "Mock"
+      } name is required`;
     }
     const statusCodeValidationError = validateStatusCode(
       data.statusCode.toString()
