@@ -11,8 +11,8 @@ const BLACKLISTED_EVENTS = [
   SYNCING.BACKUP.CREATED,
 ];
 
-const timerStart = Date.now();
-const waitPeriod = 10000; // ms
+// const timerStart = Date.now();
+// const waitPeriod = 10000; // ms
 
 export const trackEvent = (name, params) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;

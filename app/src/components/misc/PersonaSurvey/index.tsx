@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   getAppMode,
@@ -32,7 +31,6 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
   const roleType = userPersona.persona;
-  const isSurveyCompleted = userPersona.isSurveyCompleted;
 
   const renderPageHeader = (page: PageConfig) => {
     return (
@@ -112,20 +110,20 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   };
 
   useEffect(() => {
-    trackPersonaSurveyViewed();
-  }, []);
-
-  useEffect(() => {
-    if (!isSurveyCompleted)
-      if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-        if (showPersonaSurvey(appMode, user.loggedIn)) {
+    showPersonaSurvey(appMode).then((result) => {
+      if (result) {
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
           toggle();
+          trackPersonaSurveyViewed();
+        } else {
+          if (isExtensionInstalled()) {
+            toggle();
+            trackPersonaSurveyViewed();
+          }
         }
-      } else {
-        if (isExtensionInstalled() && showPersonaSurvey(appMode, user.loggedIn))
-          toggle();
       }
-  }, [isSurveyCompleted, toggle, appMode, user.loggedIn]);
+    });
+  }, [appMode, user.loggedIn, toggle]);
 
   return (
     <RQModal

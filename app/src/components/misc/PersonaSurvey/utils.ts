@@ -1,17 +1,9 @@
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import { useCaseOptions } from "./types";
 
-export const showPersonaSurvey = async (
-  appMode: string,
-  isLoggedIn: boolean
-) => {
-  const installDate = await getAndUpdateInstallationDate(
-    appMode,
-    false,
-    isLoggedIn
-  );
-  //change this date on release
-  if (installDate > new Date("2023-03-06")) return true;
+export const showPersonaSurvey = async (appMode: string) => {
+  const installDate = await getAndUpdateInstallationDate(appMode, false, false);
+  if (new Date(installDate) > new Date("2023-03-06")) return true;
   else return false;
 };
 
