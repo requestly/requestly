@@ -19,7 +19,6 @@ import {
 } from "../../../actions";
 import { fixSourceRegexFormat, validateRule } from "./actions";
 //Constants
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { ruleModifiedAnalytics } from "./actions";
@@ -30,7 +29,6 @@ import {
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
-import { isDesktopMode } from "utils/AppUtils";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -80,16 +78,6 @@ const CreateRuleButton = ({ isDisabled, location }) => {
         toast.success(
           `Successfully ${currentActionText.toLowerCase()}d the rule`
         );
-        if (
-          (isDesktopMode() &&
-            currentlySelectedRuleData.ruleType ===
-              GLOBAL_CONSTANTS.RULE_TYPES.REQUEST) ||
-          (!isDesktopMode() &&
-            currentlySelectedRuleData.ruleType ===
-              GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE)
-        ) {
-          ruleInfoDialog(currentlySelectedRuleData.ruleType);
-        }
 
         setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
 
@@ -101,6 +89,8 @@ const CreateRuleButton = ({ isDisabled, location }) => {
           rule_type = currentlySelectedRuleData.ruleType;
         }
         if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+          ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
+
           trackRuleCreatedEvent(
             rule_type,
             currentlySelectedRuleData.description
