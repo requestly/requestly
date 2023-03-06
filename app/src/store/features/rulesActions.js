@@ -97,7 +97,6 @@ export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
     config: false,
     data: false,
     hasUnsavedChanges: false,
-    isRuleNameInvalid: false,
   };
 };
 
