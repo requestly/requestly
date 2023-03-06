@@ -26,7 +26,7 @@ const INITIAL_STATE = {
       data: false,
       config: false,
       hasUnsavedChanges: false,
-      isRuleNameInvalid: false,
+      errors: {},
     },
     rulesToPopulate: [],
     groupwiseRulesToPopulate: {},

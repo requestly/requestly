@@ -11,7 +11,11 @@ import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/
 export const validateRule = (rule, dispatch) => {
   let output;
   if (isEmpty(rule.name)) {
-    dispatch(actions.updateCurrentlySelectedRuleNameIsInvalid(true));
+    dispatch(
+      actions.updateCurrentlySelectedRuleErrors({
+        name: "Rule name is required",
+      })
+    );
     return {
       result: false,
       message: `Please provide a rule name`,

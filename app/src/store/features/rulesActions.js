@@ -88,8 +88,8 @@ export const updateCurrentlySelectedRuleHasUnsavedChanges = (
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = action.payload;
 };
 
-export const updateCurrentlySelectedRuleNameIsInvalid = (prevState, action) => {
-  prevState.rules.currentlySelectedRule.isRuleNameInvalid = action.payload;
+export const updateCurrentlySelectedRuleErrors = (prevState, action) => {
+  prevState.rules.currentlySelectedRule.errors = action.payload;
 };
 
 export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
