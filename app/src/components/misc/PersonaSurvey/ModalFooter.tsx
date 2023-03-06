@@ -61,24 +61,26 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
   const handleMoveToNextPage = () => {
     switch (page) {
       case 1:
-        trackPersonaQ1Completed(userPersona.persona);
+        trackPersonaQ1Completed(userPersona?.[fieldKey]);
         submitAttrUtil(
           APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA,
-          userPersona.persona
+          userPersona?.[fieldKey]
         );
         break;
       case 2:
-        trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
+        trackPersonaQ2Completed(
+          getFormattedUserUseCases(userPersona?.[fieldKey])
+        );
         submitAttrUtil(
           APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASE,
-          getFormattedUserUseCases(userPersona.useCases)
+          getFormattedUserUseCases(userPersona?.[fieldKey])
         );
         break;
       case 3:
-        trackPersonaQ3Completed(userPersona.referralChannel);
+        trackPersonaQ3Completed(userPersona?.[fieldKey]);
         submitAttrUtil(
           APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
-          userPersona.referralChannel
+          userPersona?.[fieldKey]
         );
         break;
     }
