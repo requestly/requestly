@@ -37,6 +37,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   const [isDescriptionEditable, setIsDescriptionEditable] = useState<boolean>(
     false
   );
+
   const textAreaRef = useRef<TextAreaRef | null>(null);
   const nameInputRef = useRef<InputRef | null>(null);
 
