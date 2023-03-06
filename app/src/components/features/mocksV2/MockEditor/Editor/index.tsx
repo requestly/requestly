@@ -432,6 +432,7 @@ const MockEditor: React.FC<Props> = ({
         descriptionPlaceholder="Add your description here."
         nameChangeCallback={onNameChange}
         descriptionChangeCallback={onDescriptionChange}
+        tagText={fileType}
         errors={errors}
       />
       <Row className="mock-editor-container">
