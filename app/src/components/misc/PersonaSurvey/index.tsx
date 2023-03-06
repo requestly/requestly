@@ -11,9 +11,11 @@ import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { isNewInstall } from "./utils";
+import { showPersonaSurvey } from "./utils";
 import { Option, PageConfig } from "./types";
 import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 
 interface PersonaModalProps {
@@ -115,8 +117,14 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   useEffect(() => {
     if (!isSurveyCompleted)
-      if (isExtensionInstalled() && isNewInstall(appMode, user.loggedIn))
-        toggle();
+      if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        if (showPersonaSurvey(appMode, user.loggedIn)) {
+          toggle();
+        }
+      } else {
+        if (isExtensionInstalled() && showPersonaSurvey(appMode, user.loggedIn))
+          toggle();
+      }
   }, [isSurveyCompleted, toggle, appMode, user.loggedIn]);
 
   return (

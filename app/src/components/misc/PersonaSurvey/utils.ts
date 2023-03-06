@@ -1,7 +1,10 @@
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import { useCaseOptions } from "./types";
 
-export const isNewInstall = async (appMode: string, isLoggedIn: boolean) => {
+export const showPersonaSurvey = async (
+  appMode: string,
+  isLoggedIn: boolean
+) => {
   const installDate = await getAndUpdateInstallationDate(
     appMode,
     false,
