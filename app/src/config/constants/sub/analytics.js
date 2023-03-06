@@ -141,7 +141,7 @@ export const GA_EVENTS = {
     ONBOARDING_V1_DONE: "ONBOARDING_V1_DONE",
 
     PERSONA: "persona",
-    USE_CASE: "use_case",
+    USE_CASES: "use_cases",
     REFERRAL_CHANNEL: "referral_channel",
 
     SIGNUP_DATE: "SIGNUP_DATE",

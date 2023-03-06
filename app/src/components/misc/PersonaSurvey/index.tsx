@@ -128,30 +128,24 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   }, [isSurveyCompleted, toggle, appMode, user.loggedIn]);
 
   return (
-    <>
-      {!userPersona.isSurveyCompleted && (
-        <RQModal
-          bodyStyle={{ width: "550px" }}
-          centered
-          open={isOpen}
-          closable={false}
-          className="survey-modal"
-        >
-          <div className="rq-modal-content survey-content-wrapper">
-            {surveyConfig.map((page: PageConfig, index) => (
-              <React.Fragment key={index}>
-                {currentPage === page.pageId && (
-                  <>{renderPage(page, roleType)}</>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-          <SurveyModalFooter
-            page={currentPage}
-            fieldKey={surveyConfig[currentPage].key}
-          />
-        </RQModal>
-      )}
-    </>
+    <RQModal
+      bodyStyle={{ width: "550px" }}
+      centered
+      open={isOpen}
+      closable={false}
+      className="survey-modal"
+    >
+      <div className="rq-modal-content survey-content-wrapper">
+        {surveyConfig.map((page: PageConfig, index) => (
+          <React.Fragment key={index}>
+            {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
+          </React.Fragment>
+        ))}
+      </div>
+      <SurveyModalFooter
+        page={currentPage}
+        fieldKey={surveyConfig[currentPage].key}
+      />
+    </RQModal>
   );
 };

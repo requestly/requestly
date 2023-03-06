@@ -16,7 +16,7 @@ import AuthModal from "components/authentication/AuthModal";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 //UTILS
-import { getActiveModals } from "store/selectors";
+import { getActiveModals, getUserPersonaSurveyDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -33,6 +33,7 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -197,11 +198,14 @@ const DashboardContent = () => {
       ) : null}
       {/* TODO: This feature flag does not work as component mounts before posthog inits */}
       {/* {featureFlag.getValue(APP_CONSTANTS.FEATURES.PERSONA_SURVEY) ? ( */}
-      <PersonaSurveyModal
-        isOpen={activeModals.personaSurveyModal.isActive}
-        toggle={togglePersonaSurveyModal}
-        {...activeModals.personaSurveyModal.props}
-      />
+      {!userPersona.isSurveyCompleted ? (
+        <PersonaSurveyModal
+          isOpen={activeModals.personaSurveyModal.isActive}
+          toggle={togglePersonaSurveyModal}
+          {...activeModals.personaSurveyModal.props}
+        />
+      ) : null}
+
       {/* ) : null} */}
     </>
   );

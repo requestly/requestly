@@ -13,7 +13,7 @@
   gap: 6px;
   transition: 0.2s ease-in-out;
 }
-.survey-modal .survey-option:hover {
+.survey-modal .survey-option:not(.outline-active-option):hover {
   border: 1px solid #4f5257;
 }
 .survey-modal .survey-option.survey-select {
