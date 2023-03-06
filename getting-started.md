@@ -1,3 +1,4 @@
+English | [简体中文](./getting-started.zh-CN.md)
 # Getting Started
 
 This repository contains most of the modules that make up Requestly.

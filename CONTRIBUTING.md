@@ -1,3 +1,4 @@
+English | [简体中文](./CONTRIBUTING.zh-CN.md)
 # Contributing to Requestly
 
 First off, thank you for considering to contribute! It’s people like you that make Requestly such a great tool. We look forward to improve the lives of web engineers together. 
