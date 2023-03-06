@@ -29,7 +29,11 @@ import {
   RequestMethod,
   ValidationErrors,
 } from "../types";
-import { getEditorLanguage, validateEndpoint } from "../utils";
+import {
+  getEditorLanguage,
+  validateEndpoint,
+  validateStatusCode,
+} from "../utils";
 import "./index.css";
 import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 
@@ -129,10 +133,14 @@ const MockEditor: React.FC<Props> = ({
         mockType === MockType.FILE ? "File" : "Mock"
       } name is required`;
     }
-    if (!data.statusCode) {
-      updatedErrors.statusCode = "Status Code is required";
+    const statusCodeValidationError = validateStatusCode(
+      data.statusCode.toString()
+    );
+    if (statusCodeValidationError) {
+      updatedErrors.statusCode = statusCodeValidationError;
       if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
     }
+
     // TODO: Add more validations here for special characters, //, etc.
     const endpointValidationError = validateEndpoint(data.endpoint);
     if (endpointValidationError) {
@@ -227,11 +235,11 @@ const MockEditor: React.FC<Props> = ({
               return option.value.includes(inputValue);
             }
           }}
-          status={errors.statusCode && !statusCode ? "error" : ""}
+          status={errors.statusCode ? "error" : ""}
           placeholder="Response Code"
         />
         <span className="field-error-prompt">
-          {errors.statusCode && !statusCode ? errors.statusCode : null}
+          {errors.statusCode ? errors.statusCode : null}
         </span>
       </Col>
     );
@@ -282,11 +290,11 @@ const MockEditor: React.FC<Props> = ({
           value={endpoint}
           name="path"
           onChange={(e) => setEndpoint(e.target.value)}
-          status={errors.endpoint && !endpoint ? "error" : ""}
+          status={errors.endpoint ? "error" : ""}
           placeholder={errors.endpoint ? errors.endpoint : "Enter endpoint"}
         />
         <span className="field-error-prompt">
-          {errors.endpoint && !endpoint ? errors.endpoint : null}
+          {errors.endpoint ? errors.endpoint : null}
         </span>
       </Col>
     );
@@ -370,7 +378,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {mockType === MockType.FILE && <h4>Response Body</h4>}
+          {mockType === MockType.FILE && <h4>File Content</h4>}
           {/* @ts-ignore */}
           <CodeEditor
             language={getEditorLanguage(fileType)}
@@ -426,6 +434,7 @@ const MockEditor: React.FC<Props> = ({
         descriptionPlaceholder="Add your description here."
         nameChangeCallback={onNameChange}
         descriptionChangeCallback={onDescriptionChange}
+        tagText={fileType}
         errors={errors}
       />
       <Row className="mock-editor-container">

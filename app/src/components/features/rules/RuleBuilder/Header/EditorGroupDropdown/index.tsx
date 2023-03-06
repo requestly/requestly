@@ -23,6 +23,7 @@ import {
   trackGroupChangedEvent,
   trackGroupCreatedEvent,
 } from "modules/analytics/events/common/groups";
+import { Group } from "types/rules";
 import "./EditorGroupDropdown.css";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
@@ -41,16 +42,31 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   // Component State
-  const [currentGroupId, setCurrentGroupId] = useState(rule?.groupId ?? "");
   const [showInput, setShowInput] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [modifiedGroups, setModifiedGroups] = useState(groupList ?? []);
+  const currentGroupId = rule?.groupId ?? "";
 
   useEffect(() => {
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
       .then((groups) => dispatch(actions.updateGroups(groups)));
   }, [appMode, dispatch]);
+
+  useEffect(() => {
+    if (!showDropdown) return;
+
+    const selectedGroup = groupList.filter(
+      (group: Group) => group.id === currentGroupId
+    );
+
+    const remainingGroups = groupList.filter(
+      (group: Group) => group.id !== currentGroupId
+    );
+
+    setModifiedGroups(selectedGroup.concat(remainingGroups));
+  }, [groupList, currentGroupId, showDropdown]);
 
   const handleGroupInputNameChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -85,7 +101,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   };
 
   const handleGroupChange = (groupId: string) => {
-    setCurrentGroupId(groupId);
+    dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
     updateGroupOfSelectedRules(
       appMode,
@@ -171,7 +187,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
 
       {!showInput && (
         <div className="editor-group-menu-name-container">
-          {groupList.map(({ id, name }: { id: string; name: string }) => (
+          {modifiedGroups.map(({ id, name }: Group) => (
             <GroupMenuItem
               key={id}
               id={id}
@@ -214,6 +230,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   return (
     <div className="editor-group-list-container">
       <Dropdown
+        destroyPopupOnHide
         trigger={["click"]}
         placement="bottomRight"
         open={showDropdown}

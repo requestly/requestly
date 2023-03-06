@@ -38,7 +38,7 @@ const ResponseBodyRow = ({
     pair.response.value
   );
   const [isCodeMinified, setIsCodeMinified] = useState(true);
-  const [isJSPrettified, setIsJSPrettified] = useState(false);
+  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const onChangeResponseType = (responseType) => {
     if (
@@ -103,6 +103,7 @@ const ResponseBodyRow = ({
   };
 
   const responseBodyChangeHandler = (value) => {
+    let triggerUnsavedChangesIndication = !isCodeFormatted;
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
@@ -119,7 +120,8 @@ const ResponseBodyRow = ({
               ? minifyCode(value)
               : value,
         },
-      ]
+      ],
+      triggerUnsavedChangesIndication
     );
   };
 
@@ -130,12 +132,13 @@ const ResponseBodyRow = ({
       setIsCodeMinified(true);
       setEditorStaticValue(minifyCode(editorStaticValue));
     }
+    handleCodeFormattedFlag();
   };
 
-  const handlePrettifyJS = () => {
-    setIsJSPrettified(true);
+  const handleCodeFormattedFlag = () => {
+    setIsCodeFormatted(true);
     setTimeout(() => {
-      setIsJSPrettified(false);
+      setIsCodeFormatted(false);
     }, 2000);
   };
 
@@ -247,9 +250,9 @@ const ResponseBodyRow = ({
                     ? "off"
                     : "editable"
                 }
-                unlockCodePrettify={true}
+                unlockJsonPrettify={true}
                 isCodeMinified={isCodeMinified}
-                isJSPrettified={isJSPrettified}
+                isCodeFormatted={isCodeFormatted}
               />
             </Col>
           </Row>
@@ -271,7 +274,7 @@ const ResponseBodyRow = ({
                   </Button>
                 </>
               ) : (
-                <Button type="link" onClick={handlePrettifyJS}>
+                <Button type="link" onClick={handleCodeFormattedFlag}>
                   Pretty Print {"{ }"}
                 </Button>
               )}

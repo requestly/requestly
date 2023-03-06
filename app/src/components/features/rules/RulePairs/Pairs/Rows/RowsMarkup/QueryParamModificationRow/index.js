@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Row, Col, Input, Tooltip, Dropdown, Menu } from "antd";
 import { ImCross } from "react-icons/im";
 import Text from "antd/lib/typography/Text";
@@ -14,57 +14,49 @@ const QueryParamModificationRow = ({
 }) => {
   const { modifyPairAtGivenPath, deleteModification } = helperFunctions;
 
-  const modificationTypeOptions = (
+  const modificationTypeMenuItems = useMemo(
+    () => [
+      {
+        title: "ADD / REPLACE",
+        type: "Add",
+      },
+      {
+        title: "REMOVE",
+        type: "Remove",
+      },
+      {
+        title: "REMOVE ALL",
+        type: "Remove All",
+      },
+    ],
+    []
+  );
+
+  const handleModificationTypeClick = (event, type) =>
+    modifyPairAtGivenPath(
+      event,
+      pairIndex,
+      `modifications[${modificationIndex}].type`,
+      type
+    );
+
+  const modificationTypeMenu = (
     <Menu>
-      <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationIndex}].type`,
-              "Add"
-            )
-          }
+      {modificationTypeMenuItems.map(({ title, type }, index) => (
+        <Menu.Item
+          key={index}
+          onClick={(e) => handleModificationTypeClick(e, type)}
         >
-          ADD / REPLACE
-        </span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationIndex}].type`,
-              "Remove"
-            )
-          }
-        >
-          REMOVE
-        </span>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationIndex}].type`,
-              "Remove All"
-            )
-          }
-        >
-          REMOVE ALL
-        </span>
-      </Menu.Item>
+          {title}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
   return (
     <Row gutter={16} key={rowIndex} align="middle" className="margin-top-one">
       <Col span={3} align="right" className="min-dropdown-tile-width-lg">
-        <Dropdown overlay={modificationTypeOptions}>
+        <Dropdown overlay={modificationTypeMenu}>
           <Text
             strong
             className="uppercase ant-dropdown-link cursor-pointer"

@@ -87,7 +87,6 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
       {!isSharedListView && (
         <RQEditorTitle
           mode={mode}
-          divider={false}
           name={currentlySelectedRuleData.name}
           namePlaceholder="Enter rule name"
           nameChangeCallback={handleRuleNameChange}

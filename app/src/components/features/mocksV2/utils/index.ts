@@ -11,7 +11,25 @@ import {
 } from "../MockEditor/constants";
 
 import { MockEditorDataSchema } from "../MockEditor/types";
-import { RQMockSchema } from "../types";
+import { RQMockSchema, FileType } from "../types";
+
+export const fileTypeColorMap = {
+  [FileType.JS]: "#FFCA5F",
+  [FileType.HTML]: "#FF6905",
+  [FileType.CSS]: "#57BEE6",
+  [FileType.IMAGE]: "#00C8AF",
+};
+
+export const mockMethodColorMap: { [key: string]: string } = {
+  GET: "#00C8AF",
+  POST: "#1E69FF",
+  PUT: "#FF6905",
+  DELETE: "#FC6675",
+  PATCH: "#FFCA5F",
+  HEAD: "#BEAAFF",
+  OPTIONS: "#57BEE6",
+  default: "#00C8AF",
+};
 
 export const editorDataToMockDataConverter = (
   mockEditorData: MockEditorDataSchema
@@ -85,13 +103,11 @@ export const generateFinalUrl = (
 ) => {
   let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}?rq_uid=${uid}`;
 
-  if(isEnvBeta()) {
+  if (isEnvBeta()) {
     finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}?rq_uid=${uid}`;
-  }
-  else if(isEnvEmulator()) {
+  } else if (isEnvEmulator()) {
     finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}?rq_uid=${uid}`;
-  }
-  else {
+  } else {
     if (username) {
       finalUrl = `https://${username}.requestly.dev/${endpoint}`;
     }
