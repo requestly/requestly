@@ -42,6 +42,7 @@ const globalReducer = getReducerWithLocalStorageSync(
     "appTheme",
     // "rules",
     // "desktopSpecificDetails.appsList",
+    "userPersona",
     "country",
     "mobileDebugger",
     "initializations",

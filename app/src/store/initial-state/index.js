@@ -10,6 +10,14 @@ const INITIAL_STATE = {
     details: null,
   },
 
+  userPersona: {
+    page: 0,
+    persona: "",
+    useCases: [],
+    referralChannel: "",
+    isSurveyCompleted: false,
+  },
+
   /* App Mode */
   appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
 
@@ -82,6 +90,10 @@ const INITIAL_STATE = {
       props: {},
     },
     syncConsentModal: {
+      isActive: false,
+      props: {},
+    },
+    personaSurveyModal: {
       isActive: false,
       props: {},
     },
