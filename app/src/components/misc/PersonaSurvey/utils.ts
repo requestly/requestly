@@ -11,7 +11,7 @@ export const showPersonaSurvey = async (
     isLoggedIn
   );
   //change this date on release
-  if (installDate > new Date("2020-01-01")) return true;
+  if (installDate > new Date("2023-03-06")) return true;
   else return false;
 };
 
