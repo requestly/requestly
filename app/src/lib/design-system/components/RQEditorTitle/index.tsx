@@ -3,8 +3,6 @@ import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { BiPencil } from "react-icons/bi";
 import { TextAreaRef } from "antd/lib/input/TextArea";
-import { fileTypeColorMap } from "components/features/mocksV2/utils";
-import { FileType } from "components/features/mocksV2/types";
 import "./RQEditorTitle.css";
 
 interface ValidationErrors {
@@ -19,7 +17,7 @@ interface TitleProps {
   descriptionChangeCallback: (desc: string) => void;
   errors?: ValidationErrors;
   mode?: "create" | "edit";
-  fileType?: FileType;
+  tagText?: string;
 }
 
 const { TextArea } = Input;
@@ -32,7 +30,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   descriptionPlaceholder,
   descriptionChangeCallback,
   mode = "edit",
-  fileType = null,
+  tagText,
   errors,
 }) => {
   const [isNameEditable, setIsNameEditable] = useState<boolean>(false);
@@ -142,15 +140,8 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
           </Row>
         </Col>
         <>
-          {fileType && (
-            <Col
-              className="mock-tag editor-title-tag"
-              style={{
-                color: fileTypeColorMap[fileType],
-              }}
-            >
-              {fileType}
-            </Col>
+          {tagText?.length && (
+            <Col className="mock-tag editor-title-tag">{tagText}</Col>
           )}
         </>
       </Row>
