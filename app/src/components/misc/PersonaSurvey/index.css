@@ -1,0 +1,47 @@
+.survey-modal .ant-modal-body .rq-modal-content {
+  padding: 40px 20px;
+}
+
+.survey-modal .survey-title {
+  font-size: 1.5rem;
+}
+.survey-modal .survey-sub-title {
+  max-width: 380px;
+  line-height: 25px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.survey-modal .survey-lottie-animation-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.survey-modal .survey-lottie-animation {
+  width: 80%;
+  margin-bottom: -43px;
+}
+.survey-modal .survey-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  margin-left: 8px;
+}
+.survey-modal .survey-disable-continue {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.survey-modal .survey-modal-emoji {
+  font-size: 1.1rem;
+  position: relative;
+  top: 2px;
+}
+.survey-modal .survey-modal-emoji.emoji-gap {
+  margin-right: 8px;
+}
+.survey-modal .survey-subtitle-wrapper {
+  display: flex;
+  justify-content: center;
+}
