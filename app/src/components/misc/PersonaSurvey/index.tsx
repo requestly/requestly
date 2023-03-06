@@ -10,7 +10,7 @@ import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { showPersonaSurvey } from "./utils";
+import { shouldShowPersonaSurvey } from "./utils";
 import { Option, PageConfig } from "./types";
 import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
@@ -110,7 +110,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   };
 
   useEffect(() => {
-    showPersonaSurvey(appMode).then((result) => {
+    shouldShowPersonaSurvey(appMode).then((result) => {
       if (result) {
         if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
           toggle();
