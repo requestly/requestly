@@ -19,8 +19,12 @@ import { IoMdLink } from "react-icons/io";
 
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { FileType, MockType, RQMockMetadataSchema } from "../../types";
-import { generateFinalUrl } from "../../utils";
+import { MockType, RQMockMetadataSchema } from "../../types";
+import {
+  generateFinalUrl,
+  fileTypeColorMap,
+  mockMethodColorMap,
+} from "../../utils";
 import CopyButton from "components/misc/CopyButton";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -40,24 +44,6 @@ interface Props {
   handleSelectAction?: (url: string) => void;
   handleUploadAction?: () => void;
 }
-
-const fileTypeColorMap = {
-  [FileType.JS]: "#FFCA5F",
-  [FileType.HTML]: "#FF6905",
-  [FileType.CSS]: "#57BEE6",
-  [FileType.IMAGE]: "#00C8AF",
-};
-
-const mockMethodColorMap: { [key: string]: string } = {
-  GET: "#00C8AF",
-  POST: "#1E69FF",
-  PUT: "#FF6905",
-  DELETE: "#FC6675",
-  PATCH: "#FFCA5F",
-  HEAD: "#BEAAFF",
-  OPTIONS: "#57BEE6",
-  default: "#00C8AF",
-};
 
 const MocksTable: React.FC<Props> = ({
   mocks,
