@@ -8,8 +8,13 @@ import {
   parseRemoteRecords,
   getRecordsSyncPath,
   syncToLocalFromFirebase,
+  mergeRecords,
+  getAllLocalRecords,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
+import { StorageService } from "init";
+import { doSyncRecords } from "utils/syncing/SyncUtils";
+import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 
 export const resetSyncDebounceTimerStart = () =>
   (window.syncDebounceTimerStart = Date.now());
@@ -30,16 +35,67 @@ const animateSyncIcon = () => {
   }
 };
 
-const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords) => {
+const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
+  let desiredValue;
+  if (syncTarget === "teamSync") desiredValue = team_id;
+  if (syncTarget === "sync") desiredValue = uid;
+
+  await StorageService(appMode).saveRecord({
+    "last-sync-target": desiredValue,
+  });
+};
+
+const doSync = async (
+  uid,
+  appMode,
+  dispatch,
+  updatedFirebaseRecords,
+  syncTarget,
+  team_id
+) => {
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
-  const allSyncedRecords = await parseRemoteRecords(
+
+  // Consistency check. Merge records if inconsistent
+  const lastSyncTarget = await StorageService(appMode).getRecord(
+    "last-sync-target"
+  );
+  let consistencyCheckPassed = false;
+  if (syncTarget === "teamSync") {
+    if (lastSyncTarget === team_id) consistencyCheckPassed = true;
+  } else if (syncTarget === "sync") {
+    if (lastSyncTarget === uid) consistencyCheckPassed = true;
+  }
+
+  let allSyncedRecords = await parseRemoteRecords(
     appMode,
     updatedFirebaseRecords
   );
 
+  if (!consistencyCheckPassed) {
+    // Merge records
+    const localRecords = await getAllLocalRecords(appMode);
+    const mergedRecords = mergeRecords(allSyncedRecords, localRecords);
+    allSyncedRecords = mergedRecords;
+
+    // Write to firebase
+    const formattedObject = {};
+    mergedRecords.forEach((object) => {
+      if (object && object.id) formattedObject[object.id] = object;
+    });
+    await doSyncRecords(
+      formattedObject,
+      SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
+      appMode
+    );
+
+    await setLastSyncTarget(appMode, syncTarget, uid, team_id);
+  }
+
+  // Write to local
   await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
+
   trackSyncCompleted(uid);
   window.isFirstSyncComplete = true;
 
@@ -80,9 +136,23 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
         return;
       }
       if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-        doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords);
+        doSyncDebounced(
+          uid,
+          appMode,
+          dispatch,
+          updatedFirebaseRecords,
+          syncTarget,
+          team_id
+        );
       } else {
-        doSync(uid, appMode, dispatch, updatedFirebaseRecords);
+        doSync(
+          uid,
+          appMode,
+          dispatch,
+          updatedFirebaseRecords,
+          syncTarget,
+          team_id
+        );
       }
     });
   } catch (e) {
