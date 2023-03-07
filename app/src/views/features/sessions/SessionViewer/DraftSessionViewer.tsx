@@ -50,8 +50,20 @@ import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 //@ts-ignore
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
+import { SessionMetadataOptions } from "./types";
 
-const defaultMetadataOptions = ["networkLogs", "consoleLogs"];
+interface Metadata {
+  checkboxValues: CheckboxValueType[];
+  sessionMetadataOptions: SessionMetadataOptions;
+}
+
+const defaultMetadataOptions: Metadata = {
+  checkboxValues: ["networkLogs", "consoleLogs"],
+  sessionMetadataOptions: {
+    networkLogs: true,
+    consoleLogs: true,
+  },
+};
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -68,7 +80,7 @@ const DraftSessionViewer: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
-  const [metadataOptions, setMetadataOptions] = useState<CheckboxValueType[]>(
+  const [metadataOptions, setMetadataOptions] = useState<Metadata>(
     defaultMetadataOptions
   );
 
@@ -153,7 +165,8 @@ const DraftSessionViewer: React.FC = () => {
     saveRecording(
       user?.details?.profile?.uid,
       sessionRecording,
-      compressEvents(sessionEvents)
+      compressEvents(sessionEvents),
+      metadataOptions.sessionMetadataOptions
     ).then((response) => {
       if (response?.success) {
         setIsSaveModalVisible(false);
@@ -180,6 +193,7 @@ const DraftSessionViewer: React.FC = () => {
     dispatch,
     AUTH_ACTION_LABELS.SIGN_UP,
     navigate,
+    metadataOptions.sessionMetadataOptions,
   ]);
 
   const handleNameChangeEvent = useCallback(
@@ -200,6 +214,22 @@ const DraftSessionViewer: React.FC = () => {
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
+    });
+  };
+
+  const onCheckboxChange = (checkboxValues: CheckboxValueType[]) => {
+    const sessionMetadataOptions =
+      defaultMetadataOptions.sessionMetadataOptions;
+    let option: keyof SessionMetadataOptions;
+    for (option in defaultMetadataOptions.sessionMetadataOptions) {
+      if (!checkboxValues.includes(option)) {
+        sessionMetadataOptions[option] = false;
+      }
+    }
+
+    setMetadataOptions({
+      checkboxValues,
+      sessionMetadataOptions,
     });
   };
 
@@ -265,8 +295,8 @@ const DraftSessionViewer: React.FC = () => {
                 </Col>
                 <Col span={24}>
                   <Checkbox.Group
-                    onChange={setMetadataOptions}
-                    value={metadataOptions}
+                    onChange={onCheckboxChange}
+                    value={metadataOptions.checkboxValues}
                     options={[
                       {
                         label: "Network Logs",
