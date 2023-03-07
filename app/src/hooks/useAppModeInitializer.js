@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../store";
 // UTILS
@@ -28,7 +28,9 @@ import {
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
-// import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
+import { makeOriginalLog } from "capture-console-logs";
+import { convertProxyLogToUILog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils/logUtils";
+import { desktopLogsActions } from "store/features/desktop-network-logs/slice";
 
 const useAppModeInitializer = () => {
   const usePrevious = (value) => {
@@ -58,6 +60,18 @@ const useAppModeInitializer = () => {
   useEffect(() => {
     appsListRef.current = appsList;
   }, [appsList]);
+
+  // todo: move out
+  const [consoleLogsShown, setConsoleLogsShown] = useState([]);
+  const printLogsToConsole = useCallback(
+    (log) => {
+      if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
+        log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
+        setConsoleLogsShown((c) => [...c, log.id]);
+      }
+    },
+    [setConsoleLogsShown, consoleLogsShown] // ignore
+  );
 
   useEffect(() => {
     // Setup Desktop App specific things here
@@ -143,12 +157,22 @@ const useAppModeInitializer = () => {
                   trackProxyReStartedEvent();
                 }
               );
+
+              window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(
+                "log-network-request-v2",
+                (payload) => {
+                  const rqLog = convertProxyLogToUILog(payload);
+                  printLogsToConsole(rqLog);
+                  // upsertNetworkLogMap(rqLog);// todo: replace with store dispatch
+                  dispatch(desktopLogsActions.addNetworkLog({ log: rqLog }));
+                }
+              );
             });
           }
         });
       }
     }
-  }, [appMode, isBackgroundProcessActive, dispatch]);
+  }, [appMode, isBackgroundProcessActive, dispatch, printLogsToConsole]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

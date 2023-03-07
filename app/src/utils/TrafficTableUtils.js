@@ -7,25 +7,27 @@ import parser from "ua-parser-js";
  * @returns {Object} Contains all the domains and request logs for each domain
  */
 export const groupByDomain = (requestsLog) => {
-  const domainSet = new Set();
   const domainLogs = {};
-
-  requestsLog.forEach((element) => {
-    const domain = element.request.host;
-    domainSet.add(domain);
-    if (!(domain in domainLogs)) {
-      domainLogs[domain] = [];
-    }
-    domainLogs[domain].push(element);
-  });
-
   const domainArray = [];
-  domainSet.forEach((domain) => {
-    domainArray.push({
-      domain,
-    });
-  });
 
+  if (requestsLog) {
+    const domainSet = new Set();
+
+    requestsLog.forEach((element) => {
+      const domain = element.request.host;
+      domainSet.add(domain);
+      if (!(domain in domainLogs)) {
+        domainLogs[domain] = [];
+      }
+      domainLogs[domain].push(element);
+    });
+
+    domainSet.forEach((domain) => {
+      domainArray.push({
+        domain,
+      });
+    });
+  }
   return {
     domainArray,
     domainLogs,
@@ -40,28 +42,28 @@ export const groupByDomain = (requestsLog) => {
  */
 
 export const groupByApp = (requestsLog) => {
-  const appSet = new Set();
   const appLogs = {};
-
-  requestsLog.forEach((element) => {
-    const ua = element.request.headers["user-agent"];
-    if (ua) {
-      const appName = getAppNameFromUA(ua);
-      appSet.add(appName);
-      if (!(appName in appLogs)) {
-        appLogs[appName] = [];
-      }
-      appLogs[appName].push(element);
-    }
-  });
-
   const appArray = [];
-  appSet.forEach((appName) => {
-    appArray.push({
-      appName,
+  if (requestsLog) {
+    const appSet = new Set();
+    requestsLog.forEach((element) => {
+      const ua = element.request.headers["user-agent"];
+      if (ua) {
+        const appName = getAppNameFromUA(ua);
+        appSet.add(appName);
+        if (!(appName in appLogs)) {
+          appLogs[appName] = [];
+        }
+        appLogs[appName].push(element);
+      }
     });
-  });
 
+    appSet.forEach((appName) => {
+      appArray.push({
+        appName,
+      });
+    });
+  }
   return {
     appArray,
     appLogs,
@@ -91,4 +93,47 @@ export const getAppNameFromUA = (userAgent) => {
     appName = browser.name;
   }
   return appName;
+};
+
+const deduplicateLogs = (logsArr) => {
+  let existsMap = {};
+
+  return logsArr.filter((log) => {
+    if (existsMap[log.id]) {
+      if (existsMap[log.id].timestamp > log.timestamp) {
+        existsMap[log.id] = log;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      existsMap[log.id] = log;
+      return true;
+    }
+  });
+};
+
+export const getFinalLogs = (networkLogsArray, searchKeyword) => {
+  console.time("GettingLogs");
+
+  let localMap = [...networkLogsArray];
+  const logs = deduplicateLogs(localMap).sort(
+    (log1, log2) => log2.timestamp - log1.timestamp
+  );
+
+  console.log("total logs", logs.length);
+
+  if (searchKeyword) {
+    const reg = new RegExp(searchKeyword, "i");
+    const filteredLogs = logs.filter((log) => {
+      return log.url.match(reg);
+    });
+
+    console.log("total filtered logs", filteredLogs.length);
+    console.timeEnd("GettingLogs");
+    return filteredLogs;
+  }
+
+  console.timeEnd("GettingLogs");
+  return logs;
 };

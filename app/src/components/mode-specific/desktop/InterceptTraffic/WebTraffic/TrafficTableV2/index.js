@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { isEqual, sortBy } from "lodash";
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  // useEffect, useCallback, useRef
+} from "react";
+// import { isEqual, sortBy } from "lodash";
 // Styles
 import "./css/draggable.css";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import {
+  getFinalLogs,
   groupByApp,
   groupByDomain,
 } from "../../../../../../utils/TrafficTableUtils";
@@ -15,10 +21,12 @@ import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal"
 import { Row } from "antd";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
-import { convertProxyLogToUILog } from "./utils/logUtils";
-import { makeOriginalLog } from "capture-console-logs";
+import { desktopLogsActions } from "store/features/desktop-network-logs/slice";
+import { useDispatch, useSelector } from "react-redux";
+import { getDesktopLogs } from "store/features/desktop-network-logs/selectors";
+
 const CurrentTrafficTable = ({
-  logs = [],
+  // logs = [],
   emptyCtaText,
   emptyCtaAction,
   emptyDesc,
@@ -28,11 +36,10 @@ const CurrentTrafficTable = ({
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
-  // Component State
-  const previousLogsRef = useRef(logs);
 
-  // {id: log, ...}
-  const [networkLogsMap, setNetworkLogsMap] = useState({});
+  const dispatch = useDispatch();
+  const networkLogsMap = useSelector(getDesktopLogs);
+
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -41,27 +48,6 @@ const CurrentTrafficTable = ({
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(
     false
   );
-
-  const [consoleLogsShown, setConsoleLogsShown] = useState([]);
-  const upsertLogs = (logs) => {
-    let _networkLogsMap = { ...networkLogsMap };
-    logs?.forEach((log) => {
-      if (log) {
-        _networkLogsMap[log.id] = log;
-      }
-    });
-
-    setNetworkLogsMap(_networkLogsMap);
-  };
-
-  const stableUpsertLogs = useCallback(upsertLogs, [networkLogsMap]);
-
-  useEffect(() => {
-    if (!isEqual(sortBy(previousLogsRef.current), sortBy(logs))) {
-      stableUpsertLogs(logs);
-      previousLogsRef.current = logs;
-    }
-  }, [logs, stableUpsertLogs]);
 
   const handlePreviewVisibility = (visible = false) => {
     setIsPreviewOpen(visible);
@@ -150,120 +136,98 @@ const CurrentTrafficTable = ({
     }
   }
 
-  const upsertNetworkLogMap = useCallback(
-    (log) => {
-      let _networkLogsMap = { ...networkLogsMap };
-      _networkLogsMap[log.id] = log;
-      setNetworkLogsMap(_networkLogsMap);
-    },
-    [networkLogsMap]
-  );
-
-  const printLogsToConsole = useCallback(
-    (log) => {
-      if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
-        log.consoleLogs.forEach((consoleLog) => [makeOriginalLog(consoleLog)]);
-        setConsoleLogsShown((c) => [...c, log.id]);
-      }
-    },
-    [consoleLogsShown]
-  );
-
   const clearLogs = () => {
-    setNetworkLogsMap({});
+    // setNetworkLogsMap({});
+    dispatch(desktopLogsActions.resetState());
     if (clearLogsCallback) clearLogsCallback();
   };
 
-  useEffect(() => {
-    // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(
-      "log-network-request",
-      (payload) => {
-        // TODO: @sahil865gupta Fix this multiple time registering
-        upsertNetworkLogMap(payload);
-      }
-    );
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(
-      "log-network-request-v2",
-      (payload) => {
-        const rqLog = convertProxyLogToUILog(payload);
-        printLogsToConsole(rqLog);
-        upsertNetworkLogMap(rqLog);
-      }
-    );
+  // const deduplicate_logs = (logArr) => {
+  //   let existsMap = {};
 
-    return () => {
-      if (window.RQ && window.RQ.DESKTOP) {
-        // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent(
-          "log-network-request-v2"
-        );
-      }
-    };
-  }, [upsertNetworkLogMap, printLogsToConsole]);
+  //   return logArr.filter((log) => {
+  //     if (existsMap[log.id]) {
+  //       if (existsMap[log.id].timestamp > log.timestamp) {
+  //         existsMap[log.id] = log;
+  //         return true;
+  //       } else {
+  //         return false;
+  //       }
+  //     } else {
+  //       existsMap[log.id] = log;
+  //       return true;
+  //     }
+  //   });
+  // };
 
-  useEffect(() => {
-    if (window.RQ && window.RQ.DESKTOP) {
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-        "enable-request-logger"
-      ).then(() => {});
-    }
+  // // const finalLogs = useMemo(
+  // const finalLogs = useCallback(
+  //   (desc = true) => {
+  //     // const logs = Object.values(networkLogsMap).sort(
+  //     let localMap = [...networkLogsMap];
+  //     let toSort = deduplicate_logs(localMap);
+  //     const logs = toSort.sort((log1, log2) => log2.timestamp - log1.timestamp);
 
-    return () => {
-      if (window.RQ && window.RQ.DESKTOP) {
-        // Disable sending logs from bg window
-        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-          "disable-request-logger"
-        ).then(() => {});
-      }
-    };
-  }, []);
+  //     console.log("total logs", logs.length);
 
-  const getRequestLogs = (desc = true) => {
-    const logs = Object.values(networkLogsMap).sort(
-      (log1, log2) => log2.timestamp - log1.timestamp
-    );
+  //     if (searchKeyword) {
+  //       const reg = new RegExp(searchKeyword, "i");
+  //       const filteredLogs = logs.filter((log) => {
+  //         return log.url.match(reg);
+  //       });
 
-    if (searchKeyword) {
-      const reg = new RegExp(searchKeyword, "i");
-      const filteredLogs = logs.filter((log) => {
-        return log.url.match(reg);
-      });
+  //       console.log("total filtered logs", filteredLogs.length);
+  //       return filteredLogs;
+  //     }
+  //     return logs;
+  //   },
+  //   [networkLogsMap, searchKeyword]
+  // );
 
-      return filteredLogs;
-    }
-    return logs;
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const finalLogs = useMemo(() => getFinalLogs(networkLogsMap, searchKeyword), [
+    networkLogsMap,
+    searchKeyword,
+  ]);
 
-  const getDomainLogs = () => {
-    const logs = getRequestLogs();
+  const finalDomainLogs = () => {
+    const logs = finalLogs;
+    // const logs = getFinalLogs(networkLogsMap, searchKeyword)
     const { domainArray: domainList, domainLogs } = groupByDomain(logs);
     return { domainLogs, domainList };
   };
 
-  const getAppLogs = () => {
-    const logs = getRequestLogs();
+  const finalAppLogs = () => {
+    const logs = finalLogs;
+    // const logs = getFinalLogs(networkLogsMap, searchKeyword)
     const { appArray: appList, appLogs } = groupByApp(logs);
     return { appLogs, appList };
   };
 
   const upsertRequestAction = (log_id, action) => {
-    let _networkLogsMap = { ...networkLogsMap };
-    if (_networkLogsMap[log_id].actions) {
-      _networkLogsMap[log_id].actions.push(action);
+    let localMap = [...networkLogsMap];
+    // let _networkLogsMap = { ...networkLogsMap };
+    // todo: needs rewrite
+    // if (_networkLogsMap[log_id].actions) {
+    let idx = localMap.findIndex((log) => log.id === log_id);
+    if (idx !== 1) {
+      const newLog = localMap[idx];
+      newLog.action = action;
+      newLog.timestamp = Date.now(); //hacky for now
+      dispatch(desktopLogsActions.addNetworkLog(newLog));
     }
-    setNetworkLogsMap(_networkLogsMap);
+    // setNetworkLogsMap(_networkLogsMap);
   };
 
   const getGroupLogs = () => {
     return groupByParameter === "domain" ? (
-      <GroupByDomain handleRowClick={handleRowClick} {...getDomainLogs()} />
+      <GroupByDomain handleRowClick={handleRowClick} {...finalDomainLogs()} />
     ) : groupByParameter === "app" ? (
-      <GroupByApp handleRowClick={handleRowClick} {...getAppLogs()} />
+      <GroupByApp handleRowClick={handleRowClick} {...finalAppLogs()} />
     ) : (
       <GroupByNone
-        requestsLog={getRequestLogs()}
+        requestsLog={finalLogs}
+        // requestsLog={getFinalLogs(networkLogsMap, searchKeyword)}
         handleRowClick={handleRowClick}
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}

@@ -15,6 +15,7 @@ import { teamsReducer } from "./features/teams/slice";
 
 import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
+import { desktopLogsReducer } from "./features/desktop-network-logs/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -54,6 +55,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.GLOBAL]: globalReducer,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
+    [ReducerKeys.DESKTOP_TRAFFIC]: desktopLogsReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
