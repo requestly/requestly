@@ -24,11 +24,13 @@ import "./index.css";
 interface PersonaModalProps {
   isOpen: boolean;
   toggle: () => void;
+  toggleImportRulesModal: () => void;
 }
 
 export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   isOpen,
   toggle,
+  toggleImportRulesModal,
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -84,7 +86,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               ))}
             </div>
           ) : (
-            page.render
+            page.render(toggleImportRulesModal)
           )}
         </>
       </>
