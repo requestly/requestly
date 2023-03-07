@@ -129,7 +129,9 @@ const MockEditor: React.FC<Props> = ({
     let focusedInvalidFieldRef = null;
 
     if (!data.name) {
-      updatedErrors.name = "Name is required";
+      updatedErrors.name = `${
+        mockType === MockType.FILE ? "File" : "Mock"
+      } name is required`;
     }
     const statusCodeValidationError = validateStatusCode(
       data.statusCode.toString()
@@ -432,6 +434,7 @@ const MockEditor: React.FC<Props> = ({
         descriptionPlaceholder="Add your description here."
         nameChangeCallback={onNameChange}
         descriptionChangeCallback={onDescriptionChange}
+        tagText={fileType}
         errors={errors}
       />
       <Row className="mock-editor-container">

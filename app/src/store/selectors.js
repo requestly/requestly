@@ -77,6 +77,11 @@ export const getIsCurrentlySelectedRuleHasUnsavedChanges = (state) => {
   return currentlySelectedRule["hasUnsavedChanges"];
 };
 
+export const getCurrentlySelectedRuleErrors = (state) => {
+  const currentlySelectedRule = getCurrentlySelectedRule(state);
+  return currentlySelectedRule["errors"];
+};
+
 export const getLastBackupTimeStamp = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["lastBackupTimeStamp"];
@@ -193,4 +198,8 @@ export const getAuthInitialization = (state) => {
 // userPreferences
 export const getUserPreferences = (state) => {
   return getGlobalState(state)["userPreferences"];
+};
+
+export const getUserPersonaSurveyDetails = (state) => {
+  return getGlobalState(state)["userPersona"];
 };
