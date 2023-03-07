@@ -3,7 +3,7 @@ import { Col, notification, Row, Space } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //@ts-ignore
-import { ReactComponent as QuestionMarkIcon } from "assets/icons/rule-types/queryparam.svg";
+import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RQButton } from "lib/design-system/components";
 import "./ruleInfoDialog.css";
 

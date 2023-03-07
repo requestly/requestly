@@ -1,7 +1,7 @@
 import React from "react";
 import { Alert, Col, Row, Typography } from "antd";
 //@ts-ignore
-import { ReactComponent as QuestionMarkIcon } from "assets/icons/rule-types/queryparam.svg";
+import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./ruleInfoBanner.css";
