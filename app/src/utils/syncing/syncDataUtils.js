@@ -25,15 +25,30 @@ export const getMetadataSyncPath = () => {
     return ["sync", window.uid, "metadata"];
   }
 };
-export const getRecordsSyncPath = () => {
-  if (window.currentlyActiveWorkspaceTeamId) {
-    // This is a team workspace syncing
-    return ["teamSync", window.currentlyActiveWorkspaceTeamId, "records"];
-  } else {
-    // This is personal syncing
-    return ["sync", window.uid, "records"];
+
+const getTeamSyncPath = (team_id) => {
+  const teamId = team_id || window.currentlyActiveWorkspaceTeamId;
+  return ["teamSync", teamId, "records"];
+};
+const getIndividualSyncPath = (uid) => {
+  const userId = uid || window.uid;
+  return ["sync", userId, "records"];
+};
+
+export const getRecordsSyncPath = (syncTarget, uid, team_id) => {
+  switch (syncTarget) {
+    case "teamSync":
+      return getTeamSyncPath(team_id);
+    case "sync":
+      return getIndividualSyncPath(uid);
+
+    default:
+      if (window.currentlyActiveWorkspaceTeamId) {
+        return getTeamSyncPath(team_id);
+      } else return getIndividualSyncPath(uid);
   }
 };
+
 export const getAllTeamUserRulesConfigPath = () => {
   return [
     "teamSync",
@@ -184,10 +199,8 @@ export const processRecordsArrayIntoObject = (recordsArray) => {
   return formattedObject;
 };
 
-export const getAllSyncedRecords = async (appMode) => {
+export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
   try {
-    const allRemoteRecords =
-      (await getValueAsPromise(getRecordsSyncPath())) || {};
     const remoteRecords = {};
     Object.keys(allRemoteRecords).forEach((key) => {
       if (!isEmpty(allRemoteRecords[key]?.id)) {

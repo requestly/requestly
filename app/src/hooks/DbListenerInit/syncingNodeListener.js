@@ -1,12 +1,12 @@
 import { onValue } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
-import APP_CONSTANTS from "config/constants";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import _ from "lodash";
 import Logger from "lib/logger";
 import {
-  getAllSyncedRecords,
+  parseRemoteRecords,
+  getRecordsSyncPath,
   syncToLocalFromFirebase,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
@@ -30,11 +30,15 @@ const animateSyncIcon = () => {
   }
 };
 
-const doSync = async (uid, appMode, dispatch) => {
+const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords) => {
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
-  const allSyncedRecords = await getAllSyncedRecords(appMode);
+  const allSyncedRecords = await parseRemoteRecords(
+    appMode,
+    updatedFirebaseRecords
+  );
+
   await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
   trackSyncCompleted(uid);
   window.isFirstSyncComplete = true;
@@ -54,25 +58,12 @@ const doSyncDebounced = _.debounce(doSync, 5000);
 
 const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
   try {
-    let syncNodeRef;
-    if (syncTarget === "teamSync") {
-      syncNodeRef = getNodeRef([
-        syncTarget,
-        team_id,
-        "metadata",
-        APP_CONSTANTS.LAST_SYNC_TIMESTAMP,
-      ]);
-    } else if (syncTarget === "sync") {
-      syncNodeRef = getNodeRef([
-        syncTarget,
-        uid,
-        "metadata",
-        APP_CONSTANTS.LAST_SYNC_TIMESTAMP,
-      ]);
-    } else return;
+    const syncNodeRef = getNodeRef(
+      getRecordsSyncPath(syncTarget, uid, team_id)
+    );
 
     return onValue(syncNodeRef, async (snap) => {
-      console.log("syncNodeRef onValue");
+      const updatedFirebaseRecords = snap.val();
       if (window.skipSyncListenerForNextOneTime) {
         window.skipSyncListenerForNextOneTime = false;
         window.isFirstSyncComplete = true; // Just in case!
@@ -89,9 +80,9 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
         return;
       }
       if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-        doSyncDebounced(uid, appMode, dispatch);
+        doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords);
       } else {
-        doSync(uid, appMode, dispatch);
+        doSync(uid, appMode, dispatch, updatedFirebaseRecords);
       }
     });
   } catch (e) {
