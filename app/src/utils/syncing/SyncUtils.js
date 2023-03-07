@@ -5,7 +5,6 @@ import {
 import {
   updateUserSyncRecords,
   removeUserSyncRecords,
-  setLastSyncTimestamp,
   updateSessionRecordingPageConfig,
   getTeamUserRuleConfigPath,
 } from "./syncDataUtils";
@@ -84,7 +83,6 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
       }
     }
 
-    setLastSyncTimestamp(window.uid, appMode);
     trackSyncCompleted(window.uid);
   } catch (e) {
     trackSyncFailed(
@@ -99,7 +97,6 @@ const syncSessionRecordingPageConfig = async (object, appMode) => {
   trackSyncTriggered(window.uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
   updateSessionRecordingPageConfig(window.uid, object)
     .then(() => {
-      setLastSyncTimestamp(window.uid, appMode);
       trackSyncCompleted(window.uid);
     })
     .catch((e) =>

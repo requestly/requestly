@@ -72,6 +72,7 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
     } else return;
 
     return onValue(syncNodeRef, async (snap) => {
+      console.log("syncNodeRef onValue");
       if (window.skipSyncListenerForNextOneTime) {
         window.skipSyncListenerForNextOneTime = false;
         window.isFirstSyncComplete = true; // Just in case!
