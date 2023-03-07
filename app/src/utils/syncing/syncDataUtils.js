@@ -2,7 +2,6 @@ import {
   getValueAsPromise,
   updateValueAsPromise,
 } from "../../actions/FirebaseActions";
-import APP_CONSTANTS from "../../config/constants";
 import { StorageService } from "../../init";
 import {
   trackSyncCompleted,
