@@ -1,7 +1,17 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Input, Modal, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  Input,
+  Modal,
+  Row,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
@@ -37,6 +47,11 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import PageError from "components/misc/PageError";
 import { addToApolloSequence } from "backend/sessionRecording/addToApolloSequence";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
+//@ts-ignore
+import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
+
+const defaultMetadataOptions = ["networkLogs", "consoleLogs"];
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -53,6 +68,9 @@ const DraftSessionViewer: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+  const [metadataOptions, setMetadataOptions] = useState<CheckboxValueType[]>(
+    defaultMetadataOptions
+  );
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -221,13 +239,48 @@ const DraftSessionViewer: React.FC = () => {
             maskClosable={false}
             confirmLoading={isSaving}
           >
-            <p>Please provide a name to the recording before save:</p>
-            <Input
-              status={!sessionRecordingName ? "error" : ""}
-              value={sessionRecordingName}
-              onChange={handleNameChangeEvent}
-              onBlur={trackDraftSessionNamed}
-            />
+            <Space direction="vertical">
+              <Row>
+                <p>Recording Name:</p>
+                <Input
+                  status={!sessionRecordingName ? "error" : ""}
+                  value={sessionRecordingName}
+                  onChange={handleNameChangeEvent}
+                  onBlur={trackDraftSessionNamed}
+                />
+              </Row>
+              <Row>
+                <Col>
+                  <p>Options</p>
+                </Col>
+                <Col className="session-metadata-icon">
+                  <Tooltip
+                    title={
+                      "Select the options to save. These cannot be changed after saving."
+                    }
+                    placement="right"
+                  >
+                    <QuestionMarkIcon />
+                  </Tooltip>
+                </Col>
+                <Col span={24}>
+                  <Checkbox.Group
+                    onChange={setMetadataOptions}
+                    value={metadataOptions}
+                    options={[
+                      {
+                        label: "Network Logs",
+                        value: "networkLogs",
+                      },
+                      {
+                        label: "Console Logs",
+                        value: "consoleLogs",
+                      },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            </Space>
           </Modal>
         </div>
       </div>
