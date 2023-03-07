@@ -12,6 +12,7 @@ import {
   trackPersonaQ1Completed,
   trackPersonaQ2Completed,
   trackPersonaQ3Completed,
+  trackPersonaQuestionnaireStarted,
 } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
@@ -55,6 +56,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
 
   const handleMoveToNextPage = () => {
     switch (page) {
+      case 0:
+        trackPersonaQuestionnaireStarted();
+        break;
       case 1:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(

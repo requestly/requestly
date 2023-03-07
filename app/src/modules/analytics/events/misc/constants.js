@@ -76,6 +76,7 @@ export const PERSONA_SURVEY = {
   PERSONA_Q1_COMPLETED: "persona_q1_completed",
   PERSONA_Q2_COMPLETED: "persona_q2_completed",
   PERSONA_Q3_COMPLETED: "persona_q3_completed",
+  PERSONA_QUESTIONNAIRE_STARTED: "persona_questionnaire_started",
   PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
   PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
 };
