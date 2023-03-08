@@ -1,31 +1,38 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   getAppMode,
   getUserAuthDetails,
   getUserPersonaSurveyDetails,
 } from "store/selectors";
-import { RQModal } from "lib/design-system/components";
+import { RQButton, RQModal } from "lib/design-system/components";
 import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey } from "./utils";
 import { Option, PageConfig } from "./types";
-import { trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
+import {
+  trackPersonaSurveyViewed,
+  trackPersonaRecommendationSkipped,
+} from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { actions } from "store";
 import "./index.css";
 
 interface PersonaModalProps {
   isOpen: boolean;
   toggle: () => void;
+  toggleImportRulesModal: () => void;
 }
 
 export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   isOpen,
   toggle,
+  toggleImportRulesModal,
 }) => {
+  const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -35,6 +42,19 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const renderPageHeader = (page: PageConfig) => {
     return (
       <>
+        {currentPage === surveyConfig.length - 1 && (
+          <RQButton
+            type="link"
+            onClick={() => {
+              toggle();
+              dispatch(actions.updateIsPersonaSurveyCompleted(true));
+              trackPersonaRecommendationSkipped();
+            }}
+            className="white skip-recommendation"
+          >
+            Skip
+          </RQButton>
+        )}
         <div className="text-center white text-bold survey-title">
           {page.title}
         </div>
@@ -66,7 +86,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               ))}
             </div>
           ) : (
-            page.render
+            page.render(toggleImportRulesModal)
           )}
         </>
       </>
@@ -133,7 +153,12 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       closable={false}
       className="survey-modal"
     >
-      <div className="rq-modal-content survey-content-wrapper">
+      <div
+        className={`rq-modal-content survey-content-wrapper ${
+          currentPage === surveyConfig.length - 1 &&
+          "survey-modal-border-radius"
+        }`}
+      >
         {surveyConfig.map((page: PageConfig, index) => (
           <React.Fragment key={index}>
             {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}

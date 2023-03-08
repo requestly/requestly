@@ -3,14 +3,29 @@ import { Tooltip } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { useNavigate } from "react-router-dom";
-import { getUserPersonaSurveyDetails } from "store/selectors";
+import {
+  getUserPersonaSurveyDetails,
+  getUserAuthDetails,
+} from "store/selectors";
 import { allFeatures, recommendation } from "./personalizations";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
+import { RQButton } from "lib/design-system/components";
+import { AiOutlineCloudUpload } from "react-icons/ai";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { AUTH } from "modules/analytics/events/common/constants";
+import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 
-export const UserRecommendations = () => {
+interface RecommendationsProps {
+  toggleImportRulesModal: () => void;
+}
+
+export const UserRecommendations: React.FC<RecommendationsProps> = ({
+  toggleImportRulesModal,
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const userPersonaDetails = useSelector(getUserPersonaSurveyDetails);
   const userRole = userPersonaDetails.persona;
   const recommendedFeatures = recommendation.find(
@@ -84,8 +99,35 @@ export const UserRecommendations = () => {
           </React.Fragment>
         ))}
       </div>
-      <div className="divider"></div>
       <div>{renderOtherFeatures()}</div>
+      <div className="divider"></div>
+      <div className="text-gray survey-upload-rule-text">
+        If you have existing rule, click here to upload them.{" "}
+      </div>
+      <AuthConfirmationPopover
+        title="You need to sign up to upload rules"
+        callback={() => {
+          toggleImportRulesModal();
+          dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        }}
+        source={AUTH.SOURCE.UPLOAD_RULES}
+      >
+        <RQButton
+          type="default"
+          className="survey-upload-btn"
+          icon={<AiOutlineCloudUpload />}
+          onClick={() => {
+            if (user?.loggedIn) {
+              toggleImportRulesModal();
+              dispatch(actions.updateIsPersonaSurveyCompleted(true));
+              trackUploadRulesButtonClicked(AUTH.SOURCE.PERSONA_SURVEY);
+            }
+          }}
+        >
+          {" "}
+          Upload rules
+        </RQButton>
+      </AuthConfirmationPopover>
     </div>
   );
 };

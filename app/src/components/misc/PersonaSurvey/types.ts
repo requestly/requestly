@@ -16,7 +16,7 @@ export interface PageConfig {
   title: string;
   key: string | null;
   subTitle: string;
-  render?: ReactNode;
+  render?: (toggleImportRulesModal?: () => void) => ReactNode;
   questionType?: "single" | "multiple";
   action?: (
     dispatch: any,

@@ -28,3 +28,7 @@ export const trackPersonaRecommendationSelected = (feature: string) => {
 export const trackPersonaRecommendationSkipped = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_RECOMMENDATION_SKIPPED);
 };
+
+export const trackPersonaQuestionnaireStarted = () => {
+  trackEvent(PERSONA_SURVEY.PERSONA_QUESTIONNAIRE_STARTED);
+};

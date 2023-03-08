@@ -64,6 +64,7 @@ export const AUTH = {
     COMMAND_BAR: "command_bar",
     WORKSPACE_SIDEBAR: "workspace_sidebar",
     RULES_LIST: "rules_list",
+    PERSONA_SURVEY: "persona-survey",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
