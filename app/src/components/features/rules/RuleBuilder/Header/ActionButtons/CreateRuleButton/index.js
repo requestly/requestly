@@ -28,6 +28,7 @@ import {
   trackRuleEditedEvent,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
+import ruleInfoDialog from "./RuleInfoDialog";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -73,7 +74,7 @@ const CreateRuleButton = ({ isDisabled, location }) => {
           lastModifiedBy,
         },
         navigate
-      ).then(async () => {
+      ).then(() => {
         toast.success(
           `Successfully ${currentActionText.toLowerCase()}d the rule`
         );
@@ -88,6 +89,8 @@ const CreateRuleButton = ({ isDisabled, location }) => {
           rule_type = currentlySelectedRuleData.ruleType;
         }
         if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+          ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
+
           trackRuleCreatedEvent(
             rule_type,
             currentlySelectedRuleData.description
