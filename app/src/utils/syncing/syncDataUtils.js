@@ -430,12 +430,10 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
   ];
   let mergedPageSources;
 
-  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(
-    uid
-  );
-  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(
-    appMode
-  );
+  const firebaseSessionRecordingPageConfig =
+    await getSyncedSessionRecordingPageConfig(uid);
+  const localSessionRecordingPageConfig =
+    await getLocalSessionRecordingPageConfig(appMode);
 
   const firebasePageSources =
     firebaseSessionRecordingPageConfig?.pageSources || [];
