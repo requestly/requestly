@@ -49,6 +49,7 @@ const ruleInfoDialog = (ruleType: string, appMode: string): void => {
     top: 60,
     className: "rule-info-dialog-box",
     duration: 0,
+    closeIcon: <></>,
   });
 };
 
