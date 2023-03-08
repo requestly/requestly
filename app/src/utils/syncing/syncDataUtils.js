@@ -145,6 +145,7 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
   }
 
   try {
+    window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
     await updateValueAsPromise(getRecordsSyncPath(), localRecords);
   } catch (error) {
     Logger.error("err update sync records", error);

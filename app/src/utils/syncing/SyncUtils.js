@@ -75,6 +75,7 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
   );
 
   try {
+    window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
     await removeUserSyncRecords(window.uid, recordIds);
     // If Team Workspace - Delete user specific rule/group config
     if (window.currentlyActiveWorkspaceTeamId) {
