@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Popconfirm, Radio, Tooltip } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
@@ -49,14 +50,20 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   };
 
   const handleResourceTypeChange = (type: ResourceType) => {
-    setResourceType(type);
+    if (responseRuleResourceType === ResourceType.UNKNOWN) {
+      setResourceType(type);
+      setResponseRuleResourceType(type);
+      return;
+    }
+
     setResponseTypePopupVisible(true);
+    setResourceType(type);
   };
 
   return (
-    <div className="response-rule-resource-types">
-      <div>Select Resource Type</div>
-      <div>
+    <div className="resource-types-container">
+      <div className="subtitle">Select Resource Type</div>
+      <div className="resource-types-radio-group">
         <Popconfirm
           title="This will clear the existing body content"
           okText="Confirm"
@@ -85,6 +92,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               >
                 <Radio value={ResourceType.HTML_BODY} disabled={!isDesktop}>
                   HTML Body
+                  <QuestionCircleOutlined className="resource-disable-option-info-icon" />
                 </Radio>
               </Tooltip>
             )}
@@ -102,6 +110,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               >
                 <Radio value={ResourceType.JS_OR_CSS} disabled={!isDesktop}>
                   JS/CSS
+                  <QuestionCircleOutlined className="resource-disable-option-info-icon" />
                 </Radio>
               </Tooltip>
             )}
