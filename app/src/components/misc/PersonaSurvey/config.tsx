@@ -25,7 +25,7 @@ export const surveyConfig: PageConfig[] = [
     subTitle:
       "Help us personalise your experience by answering the following questionnaire",
     key: null,
-    render: <GettingStartedWithSurvey />,
+    render: () => <GettingStartedWithSurvey />,
   },
   {
     pageId: 1,
@@ -288,6 +288,8 @@ export const surveyConfig: PageConfig[] = [
     subTitle:
       "Choose a use case you want to work on and we will help you get started",
     key: null,
-    render: <UserRecommendations />,
+    render: (toggleImportRulesModal) => (
+      <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />
+    ),
   },
 ];
