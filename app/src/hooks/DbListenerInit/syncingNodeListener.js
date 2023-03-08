@@ -45,6 +45,23 @@ const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
   });
 };
 
+const mergeRecordsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
+  const localRecords = await getAllLocalRecords(appMode);
+  const mergedRecords = mergeRecords(recordsOnFirebase, localRecords);
+
+  // Write to firebase
+  const formattedObject = {};
+  mergedRecords.forEach((object) => {
+    if (object && object.id) formattedObject[object.id] = object;
+  });
+  await doSyncRecords(
+    formattedObject,
+    SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
+    appMode
+  );
+  return mergedRecords;
+};
+
 const doSync = async (
   uid,
   appMode,
@@ -75,20 +92,11 @@ const doSync = async (
 
   if (!consistencyCheckPassed) {
     // Merge records
-    const localRecords = await getAllLocalRecords(appMode);
-    const mergedRecords = mergeRecords(allSyncedRecords, localRecords);
-    allSyncedRecords = mergedRecords;
-
-    // Write to firebase
-    const formattedObject = {};
-    mergedRecords.forEach((object) => {
-      if (object && object.id) formattedObject[object.id] = object;
-    });
-    await doSyncRecords(
-      formattedObject,
-      SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-      appMode
+    const recordsOnFirebaseAfterMerge = await mergeRecordsAndSaveToFirebase(
+      appMode,
+      allSyncedRecords
     );
+    allSyncedRecords = recordsOnFirebaseAfterMerge;
 
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
   }
