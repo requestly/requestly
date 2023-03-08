@@ -24,8 +24,13 @@
 }
 
 .rule-info-dialog-box.ant-notification-notice {
-  padding: 20px 20px 14px 20px;
+  padding: 20px;
   background-color: var(--body-background);
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
+}
+
+.rule-info-dialog-box.ant-notification-notice .ant-notification-notice-message {
+  margin-bottom: 0;
+  padding-right: 0;
 }
