@@ -12,7 +12,7 @@ import {
   trackPersonaQ1Completed,
   trackPersonaQ2Completed,
   trackPersonaQ3Completed,
-  trackPersonaRecommendationSkipped,
+  trackPersonaQuestionnaireStarted,
 } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
@@ -28,10 +28,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
   const dispatch = useDispatch();
   const surveyLength = surveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-
-  const togglePersonaSurveyModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
-  };
 
   const disableContinue = () => {
     if (page === 0) return false;
@@ -60,6 +56,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
 
   const handleMoveToNextPage = () => {
     switch (page) {
+      case 0:
+        trackPersonaQuestionnaireStarted();
+        break;
       case 1:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(
@@ -86,34 +85,25 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
   };
 
   return (
-    <div className="rq-modal-footer w-full">
-      <Row justify="space-between" align="middle" className="w-full">
-        <Col className="text-gray">{renderModalLeftSection()}</Col>
-        <Col>
-          {page === surveyLength - 1 ? (
-            <RQButton
-              type="default"
-              onClick={() => {
-                togglePersonaSurveyModal();
-                trackPersonaRecommendationSkipped();
-                dispatch(actions.updateIsPersonaSurveyCompleted(true));
-              }}
-            >
-              Skip
-            </RQButton>
-          ) : (
-            <RQButton
-              type="primary"
-              className={`text-bold ${
-                disableContinue() && "survey-disable-continue"
-              }`}
-              onClick={handleMoveToNextPage}
-            >
-              {page === surveyLength - 2 ? "Get started" : "Continue"}
-            </RQButton>
-          )}
-        </Col>
-      </Row>
-    </div>
+    <>
+      {page !== surveyLength - 1 && (
+        <div className="rq-modal-footer w-full">
+          <Row justify="space-between" align="middle" className="w-full">
+            <Col className="text-gray">{renderModalLeftSection()}</Col>
+            <Col>
+              <RQButton
+                type="primary"
+                className={`text-bold ${
+                  disableContinue() && "survey-disable-continue"
+                }`}
+                onClick={handleMoveToNextPage}
+              >
+                {page === surveyLength - 2 ? "Get started" : "Continue"}
+              </RQButton>
+            </Col>
+          </Row>
+        </div>
+      )}
+    </>
   );
 };

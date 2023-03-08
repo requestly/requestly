@@ -1,7 +1,20 @@
 .survey-modal .ant-modal-body .rq-modal-content {
   padding: 40px 20px;
 }
-
+.survey-modal .skip-recommendation {
+  display: flex;
+  justify-content: flex-end;
+  cursor: pointer;
+  margin-top: -20px;
+  color: var(--white);
+  float: right;
+}
+.survey-modal .skip-recommendation:hover {
+  color: inherit;
+}
+.survey-modal .survey-modal-border-radius {
+  border-radius: var(--border-radius-md);
+}
 .survey-modal .survey-title {
   font-size: 1.5rem;
 }
