@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
-import { Input } from "antd";
+import { Input, Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import getObjectValue from "../../../Filters/actions/getObjectValue";
 import "./GraphqlRequestPayload.css";
@@ -23,36 +23,42 @@ const GraphqlRequestPayload = ({
 
   return (
     <>
-      <div>GraphQL Operation</div>
-      <Input
-        placeholder="Type"
-        name="key"
-        type="text"
-        value={getInputValue(
-          APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
-        )}
-        onChange={(e) =>
-          handleModifyPair(
-            e,
+      <label className="subtitle graphql-operation-label">
+        GraphQL Operation
+      </label>
+      <Row wrap={false}>
+        <Input
+          name="key"
+          type="text"
+          placeholder="Type"
+          className="graphql-operation-type-input"
+          value={getInputValue(
             APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
-          )
-        }
-      />
+          )}
+          onChange={(e) =>
+            handleModifyPair(
+              e,
+              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
+            )
+          }
+        />
 
-      <Input
-        placeholder="Name"
-        name="value"
-        type="text"
-        value={getInputValue(
-          APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
-        )}
-        onChange={(e) =>
-          handleModifyPair(
-            e,
+        <Input
+          name="value"
+          type="text"
+          placeholder="Name"
+          className="graphql-operation-type-name"
+          value={getInputValue(
             APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
-          )
-        }
-      />
+          )}
+          onChange={(e) =>
+            handleModifyPair(
+              e,
+              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
+            )
+          }
+        />
+      </Row>
     </>
   );
 };

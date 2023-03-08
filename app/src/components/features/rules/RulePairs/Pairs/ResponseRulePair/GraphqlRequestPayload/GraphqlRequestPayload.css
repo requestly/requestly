@@ -1,0 +1,10 @@
+.graphql-operation-label {
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--white);
+  display: inline-block;
+}
+
+.graphql-operation-type-input.ant-input {
+  margin-right: 5px;
+}
