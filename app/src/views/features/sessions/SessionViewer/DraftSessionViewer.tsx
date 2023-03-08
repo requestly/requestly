@@ -16,7 +16,7 @@ import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
-import { RQSession } from "@requestly/web-sdk";
+import { RQSession, RQSessionEvents } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
@@ -135,6 +135,15 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email]);
 
+  const getSessionEventsToSave = useCallback((): RQSessionEvents => {
+    if (metadataOptions.sessionMetadataOptions.networkLogs === false) {
+      return {
+        rrweb: sessionEvents.rrweb,
+      };
+    }
+    return sessionEvents;
+  }, [metadataOptions.sessionMetadataOptions.networkLogs, sessionEvents]);
+
   const saveDraftSession = useCallback(() => {
     if (!user?.loggedIn) {
       // Prompt to login
@@ -165,7 +174,7 @@ const DraftSessionViewer: React.FC = () => {
     saveRecording(
       user?.details?.profile?.uid,
       sessionRecording,
-      compressEvents(sessionEvents),
+      compressEvents(getSessionEventsToSave()),
       metadataOptions.sessionMetadataOptions
     ).then((response) => {
       if (response?.success) {
@@ -189,11 +198,11 @@ const DraftSessionViewer: React.FC = () => {
     sessionRecording,
     sessionRecordingName,
     sessionAttributes,
-    sessionEvents,
     dispatch,
     AUTH_ACTION_LABELS.SIGN_UP,
     navigate,
     metadataOptions.sessionMetadataOptions,
+    getSessionEventsToSave,
   ]);
 
   const handleNameChangeEvent = useCallback(
