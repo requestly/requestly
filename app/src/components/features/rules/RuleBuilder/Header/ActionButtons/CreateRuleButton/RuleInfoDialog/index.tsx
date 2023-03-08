@@ -21,7 +21,7 @@ const ruleInfoDialogContent: Record<string, RuleInfoDialogContent> = {
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
     readMoreLink:
-      "https://docs.requestly.tech/browser-extension/chrome/http-modifications/response-rule",
+      "https://docs.requestly.io/browser-extension/chrome/http-modifications/response-rule",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
   },
   [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: {
@@ -30,7 +30,7 @@ const ruleInfoDialogContent: Record<string, RuleInfoDialogContent> = {
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
     readMoreLink:
-      "https://docs.requestly.tech/desktop-app/mac/http-modifications/request-body-rule",
+      "https://docs.requestly.io/desktop-app/mac/http-modifications/request-body-rule",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.DESKTOP],
   },
 };
