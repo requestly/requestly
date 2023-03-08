@@ -1,3 +1,22 @@
+.download-desktop-app-link {
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+}
+
+.download-desktop-app-link:hover {
+  opacity: 0.7;
+  color: var(--white);
+}
+
+.download-desktop-app-link svg {
+  margin-right: 5px;
+}
+
+.download-desktop-app-link span {
+  text-decoration: underline;
+}
+
 .resource-types-container {
   margin: 1rem 0;
   border: 1px solid var(--border-dark);
@@ -38,4 +57,27 @@
 
 .resource-disable-option-info-icon.anticon {
   margin-left: 5px;
+}
+
+.response-rule-resource-type-tooltip.ant-tooltip
+  .ant-tooltip-content
+  .ant-tooltip-inner,
+.resource-types-popconfirm.ant-popover
+  .ant-popover-content
+  .ant-popover-inner-content {
+  color: var(--text-gray);
+  background-color: var(--border-dark);
+  border-radius: var(--border-radius-sm);
+}
+
+.response-rule-resource-type-tooltip.ant-tooltip
+  .ant-tooltip-content
+  .ant-tooltip-arrow,
+.resource-types-popconfirm.ant-popover .ant-popover-content .ant-popover-arrow {
+  display: none;
+}
+
+.response-rule-resource-type-tooltip .ant-tooltip-content .ant-tooltip-inner,
+.resource-types-popconfirm.ant-popover .ant-popover-content .ant-popover-inner {
+  color: inherit;
 }

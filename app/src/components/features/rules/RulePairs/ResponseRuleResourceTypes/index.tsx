@@ -11,9 +11,10 @@ const DownloadDesktopAppLink: React.FC = () => (
   <a
     target="_blank"
     rel="noreferrer"
+    className="download-desktop-app-link"
     href={APP_CONSTANTS.LINKS.REQUESTLY_DESKTOP_APP}
   >
-    <DesktopIcon /> Download desktop app
+    <DesktopIcon /> <span>Download desktop app</span>
   </a>
 );
 
@@ -70,6 +71,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
           cancelText="Cancel"
           open={responseTypePopupVisible}
           onConfirm={handleOnConfirm}
+          overlayClassName="resource-types-popconfirm"
           onCancel={() => setResponseTypePopupVisible(false)}
         >
           <Radio.Group
@@ -82,6 +84,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               <Radio value={ResourceType.HTML_BODY}>HTML Body</Radio>
             ) : (
               <Tooltip
+                overlayClassName="response-rule-resource-type-tooltip"
                 title={
                   <span>
                     HTML Body option is available only in desktop app due to
@@ -100,6 +103,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               <Radio value={ResourceType.JS_OR_CSS}>JS/CSS</Radio>
             ) : (
               <Tooltip
+                overlayClassName="response-rule-resource-type-tooltip"
                 title={
                   <span>
                     JS/CSS option is available only in desktop app due to
