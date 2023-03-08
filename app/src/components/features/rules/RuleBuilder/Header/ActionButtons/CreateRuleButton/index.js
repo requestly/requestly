@@ -62,7 +62,7 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     //Prevalidation regex fix
     fixSourceRegexFormat(dispatch, currentlySelectedRuleData);
     //Validation
-    const ruleValidation = validateRule(currentlySelectedRuleData);
+    const ruleValidation = validateRule(currentlySelectedRuleData, dispatch);
     if (ruleValidation.result) {
       saveRule(
         appMode,

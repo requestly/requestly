@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Route,
@@ -16,13 +16,15 @@ import AuthModal from "components/authentication/AuthModal";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 //UTILS
-import { getActiveModals } from "store/selectors";
+import { getActiveModals, getUserPersonaSurveyDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-
+import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
+import ImportRulesModal from "components/features/rules/ImportRulesModal";
+// import featureFlag from "utils/feature-flag";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -32,6 +34,10 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(
+    false
+  );
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -44,6 +50,13 @@ const DashboardContent = () => {
   };
   const toggleSyncConsentModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "syncConsentModal" }));
+  };
+  const togglePersonaSurveyModal = useCallback(() => {
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  }, [dispatch]);
+
+  const toggleImportRulesModal = () => {
+    setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
 
   const usePrevious = (value) => {
@@ -189,6 +202,24 @@ const DashboardContent = () => {
           isOpen={activeModals.syncConsentModal.isActive}
           toggle={toggleSyncConsentModal}
           {...activeModals.syncConsentModal.props}
+        />
+      ) : null}
+      {/* TODO: This feature flag does not work as component mounts before posthog inits */}
+      {/* {featureFlag.getValue(APP_CONSTANTS.FEATURES.PERSONA_SURVEY) ? ( */}
+      {!userPersona.isSurveyCompleted ? (
+        <PersonaSurveyModal
+          isOpen={activeModals.personaSurveyModal.isActive}
+          toggle={togglePersonaSurveyModal}
+          toggleImportRulesModal={toggleImportRulesModal}
+          {...activeModals.personaSurveyModal.props}
+        />
+      ) : null}
+
+      {/* ) : null} */}
+      {isImportRulesModalActive ? (
+        <ImportRulesModal
+          isOpen={isImportRulesModalActive}
+          toggle={toggleImportRulesModal}
         />
       ) : null}
     </>
