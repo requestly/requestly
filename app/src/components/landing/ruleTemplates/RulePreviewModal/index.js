@@ -11,6 +11,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
+import { generateObjectId } from "utils/FormattingHelper";
 
 const RulePreviewModal = ({ rule, isOpen, toggle }) => {
   const navigate = useNavigate();
@@ -36,16 +37,18 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
     }
     const lastModifiedBy = Date.now();
     const modificationDate = Date.now();
-    ruleObj.appMode = appMode;
-    saveRule(ruleObj.appMode, dispatch, {
+    const ruleToSave = {
       ...ruleObj.ruleDefinition,
+      id: `${ruleObj.ruleDefinition.ruleType}_${generateObjectId()}`,
       createdBy,
       currentOwner,
       lastModifiedBy,
       modificationDate,
-    }).then(() => {
-      trackTemplateImportCompleted(snakeCase(ruleObj.ruleDefinition.name));
-      redirectToRuleEditor(navigate, ruleObj.ruleDefinition.id);
+    };
+
+    saveRule(appMode, dispatch, ruleToSave).then(() => {
+      trackTemplateImportCompleted(snakeCase(ruleToSave.name));
+      redirectToRuleEditor(navigate, ruleToSave.id);
     });
   };
 

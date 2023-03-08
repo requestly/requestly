@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - about: "Find detailed guides about common support issues in our forum"
+    name: "💬 GitHub Discussions"
+    url: "https://github.com/requestly/requestly/discussions"
+  - about: "Ask a question on our forum"
+    name: "❓ Question."
+    url: "https://github.com/requestly/requestly/discussions"
+  - about: "Get instant support from the Requestly Community Slack"
+    name: "👋 Slack"
+    url: "https://bit.ly/requestly-slack"
