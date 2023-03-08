@@ -67,6 +67,10 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
+  // Just in case
+  window.skipSyncListenerForNextOneTime = false;
+  window.isFirstSyncComplete = false;
+
   dispatch(
     teamsActions.setCurrentlyActiveWorkspace({
       id: teamId,
