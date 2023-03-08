@@ -100,7 +100,7 @@ const TeamViewer = ({ teamId }) => {
                 icon={name ? name?.[0]?.toUpperCase() : "P"}
               />{" "}
               <span className="header">
-                Manage your {name ?? "private"} workspace
+                Manage {name ?? "private"} workspace
               </span>
             </Row>
           </Col>
