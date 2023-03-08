@@ -18,7 +18,7 @@
 }
 
 .resource-types-container {
-  margin: 1rem 0;
+  margin-bottom: 1rem;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
 }
