@@ -99,12 +99,11 @@ export const UserRecommendations: React.FC<RecommendationsProps> = ({
           </React.Fragment>
         ))}
       </div>
-      <div className="divider"></div>
       <div>{renderOtherFeatures()}</div>
+      <div className="divider"></div>
       <div className="text-gray survey-upload-rule-text">
         If you have existing rule, click here to upload them.{" "}
       </div>
-
       <AuthConfirmationPopover
         title="You need to sign up to upload rules"
         callback={() => {
