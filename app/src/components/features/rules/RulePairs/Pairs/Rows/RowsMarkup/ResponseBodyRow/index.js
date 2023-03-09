@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { Row, Col, Radio, Typography, Popover, Button } from "antd";
+import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 // Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // Utils
 import { getAppMode } from "../../../../../../../../store/selectors";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-
-import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -24,6 +22,7 @@ const ResponseBodyRow = ({
   helperFunctions,
   ruleDetails,
   isInputDisabled,
+  responseRuleResourceType,
 }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const appMode = useSelector(getAppMode);
@@ -40,26 +39,31 @@ const ResponseBodyRow = ({
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const onChangeResponseType = (responseType) => {
-    if (
-      Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(responseType)
-    ) {
-      let value = "";
-      if (responseType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
-        value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
-      } else {
-        setIsCodeMinified(true);
-        setEditorStaticValue(value);
-      }
+  const onChangeResponseType = useCallback(
+    (responseType) => {
+      if (
+        Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
+          responseType
+        )
+      ) {
+        let value = "{}";
+        if (responseType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
+          value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
+        } else {
+          setIsCodeMinified(true);
+          setEditorStaticValue(value);
+        }
 
-      modifyPairAtGivenPath(null, pairIndex, `response.type`, responseType, [
-        {
-          path: `response.value`,
-          value: value,
-        },
-      ]);
-    }
-  };
+        modifyPairAtGivenPath(null, pairIndex, `response.type`, responseType, [
+          {
+            path: `response.value`,
+            value: value,
+          },
+        ]);
+      }
+    },
+    [ruleDetails, pairIndex, modifyPairAtGivenPath]
+  );
 
   const handleFileSelectCallback = (selectedFile) => {
     modifyPairAtGivenPath(
@@ -143,6 +147,17 @@ const ResponseBodyRow = ({
   };
 
   useEffect(() => {
+    if (responseRuleResourceType) {
+      onChangeResponseType(
+        responseRuleResourceType === "graphqlApi"
+          ? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+          : GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [responseRuleResourceType]);
+
+  useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
     }
@@ -169,7 +184,7 @@ const ResponseBodyRow = ({
             onCancel={() => setResponseTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            visible={responseTypePopupVisible}
+            open={responseTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}
@@ -223,6 +238,7 @@ const ResponseBodyRow = ({
           >
             <Col xl="12" span={24}>
               <CodeEditor
+                key={pair.response.type}
                 language={
                   pair.response.type ===
                   GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
@@ -291,4 +307,4 @@ const ResponseBodyRow = ({
   );
 };
 
-export default ResponseBodyRow;
+export default React.memo(ResponseBodyRow);
