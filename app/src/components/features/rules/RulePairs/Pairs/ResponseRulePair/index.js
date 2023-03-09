@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Row, Col } from "antd";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
@@ -6,6 +6,7 @@ import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import GraphqlRequestPayload from "./GraphqlRequestPayload";
+import "./ResponseRulePair.css";
 
 const ResponseRulePair = ({
   pair,
@@ -14,6 +15,7 @@ const ResponseRulePair = ({
   ruleDetails,
   isInputDisabled,
   responseRuleResourceType = "",
+  // setResponseRuleResourceType,
 }) => {
   console.log("from editor", responseRuleResourceType, pair);
   const canOverrideStatus = useMemo(() => {
@@ -22,6 +24,13 @@ const ResponseRulePair = ({
       window?.RQ?.DESKTOP?.VERSION !== "1.0"
     );
   }, []);
+
+  // TODO: IMP
+  useEffect(() => {
+    // confirm when should the radio buttons should be visible
+    // while creation or always
+    // setResponseRuleResourceType();
+  }, [pair.response.type]);
 
   return (
     <React.Fragment>
@@ -38,16 +47,18 @@ const ResponseRulePair = ({
         </Col>
       </Row>
 
-      {responseRuleResourceType === "graphqlApi" && (
-        <GraphqlRequestPayload
-          pairIndex={pairIndex}
-          modifyPairAtGivenPath={helperFunctions?.modifyPairAtGivenPath}
-        />
-      )}
+      <Row wrap={false} gutter={[20]} className="response-rule-inputs">
+        {responseRuleResourceType === "graphqlApi" && (
+          <Col span={12}>
+            <GraphqlRequestPayload
+              pairIndex={pairIndex}
+              modifyPairAtGivenPath={helperFunctions?.modifyPairAtGivenPath}
+            />
+          </Col>
+        )}
 
-      {canOverrideStatus ? (
-        <Row>
-          <Col span={24}>
+        {canOverrideStatus ? (
+          <Col span={12}>
             <ResponseStatusCodeRow
               rowIndex={2}
               pair={pair}
@@ -57,8 +68,8 @@ const ResponseRulePair = ({
               isInputDisabled={isInputDisabled}
             />
           </Col>
-        </Row>
-      ) : null}
+        ) : null}
+      </Row>
       <Row>
         <Col span={24}>
           <ResponseBodyRow

@@ -194,6 +194,7 @@ const RulePairs = (props) => {
             ruleDetails={props.currentlySelectedRuleConfig}
             isInputDisabled={isInputDisabled}
             responseRuleResourceType={responseRuleResourceType}
+            setResponseRuleResourceType={setResponseRuleResourceType}
           />
         );
       case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
@@ -361,8 +362,6 @@ const RulePairs = (props) => {
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
   const rulePairHeading =
     currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
-
-  console.log("currentlySelectedRuleData", currentlySelectedRuleData);
 
   return (
     <>
