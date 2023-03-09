@@ -5,6 +5,8 @@ import NetworkLogRow from "./NetworkLogRow";
 import Split from "react-split";
 import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
+import { useSelector } from "react-redux";
+import { getSessionRecordingMetadataOptions } from "store/features/session-recording/selectors";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -25,6 +27,10 @@ const NetworkLogsPanel: React.FC<Props> = ({
 
   const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(
     visibleNetworkLogs
+  );
+
+  const sessionMetadataOptions = useSelector(
+    getSessionRecordingMetadataOptions
   );
   const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
@@ -78,7 +84,13 @@ const NetworkLogsPanel: React.FC<Props> = ({
         )
       ) : (
         <div className="placeholder">
-          <Empty description="Network logs appear here as video plays." />
+          <Empty
+            description={
+              sessionMetadataOptions.networkLogs === false
+                ? "Network logs have not been shared. You can chose to share them while saving."
+                : "Network logs appear here as video plays."
+            }
+          />
         </div>
       )}
     </div>
