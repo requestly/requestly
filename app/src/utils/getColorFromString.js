@@ -1,5 +1,5 @@
 export const getColorFromString = (
-  string = "#ffffff4d",
+  string = "",
   saturation = 60,
   lightness = 40
 ) => {
@@ -9,5 +9,5 @@ export const getColorFromString = (
     return hash;
   }, 0);
 
-  return `hsl(${(hue + 50) % 360}, ${saturation}%, ${lightness}%)`;
+  return `hsl(${(hue + 20) % 360}, ${saturation}%, ${lightness}%)`;
 };
