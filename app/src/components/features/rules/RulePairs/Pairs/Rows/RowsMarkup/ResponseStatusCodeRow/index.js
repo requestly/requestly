@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Row, Col, Select, AutoComplete } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { statusCodes } from "config/constants/sub/statusCode";
-import { DownOutlined } from "@ant-design/icons";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import "./ResponseStatusCodeRow.css";
 
