@@ -35,7 +35,7 @@ export const saveRecording = async (
     visibility: "public",
     accessEmails: [],
     accessDomains: [],
-    metadata: metadataOptions,
+    metadataOptions: metadataOptions,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)

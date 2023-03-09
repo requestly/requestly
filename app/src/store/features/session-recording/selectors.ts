@@ -2,6 +2,7 @@ import { RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
 import { RootState } from "store/types";
 import {
+  SessionMetadataOptions,
   SessionRecording,
   Visibility,
 } from "views/features/sessions/SessionViewer/types";
@@ -61,4 +62,15 @@ export const getSessionRecordingDescription = (state: RootState): string => {
 
 export const getIsReadOnly = (state: RootState): boolean => {
   return getIsRequestedByAuthor(state) === false; // for draft, isRequestedByAuthor is undefined
+};
+
+export const getSessionRecordingMetadataOptions = (
+  state: RootState
+): SessionMetadataOptions => {
+  return (
+    getSessionRecording(state)?.metadataOptions || {
+      networkLogs: true,
+      consoleLogs: true,
+    }
+  );
 };

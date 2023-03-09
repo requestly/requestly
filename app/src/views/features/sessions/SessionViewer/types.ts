@@ -21,7 +21,7 @@ export interface SessionRecording {
   filePath?: string;
   startTimeOffset?: number;
   description?: string;
-  metadata?: SessionMetadataOptions;
+  metadataOptions?: SessionMetadataOptions;
 }
 
 export interface SessionMetadataOptions {
