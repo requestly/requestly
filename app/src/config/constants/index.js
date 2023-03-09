@@ -134,6 +134,7 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
   SOURCE_PAGE_URL_VALUE: "source.filters.pageUrl.value",
   SOURCE_RESOURCE_TYPE: "source.filters.resourceType",
   SOURCE_REQUEST_METHOD: "source.filters.requestMethod",
+  SOURCE_REQUEST_PAYLOAD: "source.filters.requestPayload",
   SOURCE_REQUEST_PAYLOAD_KEY: "source.filters.requestPayload.key",
   SOURCE_REQUEST_PAYLOAD_VALUE: "source.filters.requestPayload.value",
 };
@@ -144,12 +145,13 @@ APP_CONSTANTS.url = {
   prod: "app.requestly.io",
   beta: "beta.requestly.io",
   local: "localhost:3000",
-}
+};
 
 APP_CONSTANTS.mock_base_url = {
   prod: "https://requestly.dev/api/mockv2",
   beta: "https://beta.requestly.io/api/mockv2",
-  local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2" // Change port depending upon you firebase functions emulator port
-}
+  local:
+    "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
+};
 
 export default APP_CONSTANTS;
