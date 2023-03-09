@@ -231,9 +231,7 @@ const DraftSessionViewer: React.FC = () => {
       defaultMetadataOptions.sessionMetadataOptions;
     let option: keyof SessionMetadataOptions;
     for (option in defaultMetadataOptions.sessionMetadataOptions) {
-      if (!checkboxValues.includes(option)) {
-        sessionMetadataOptions[option] = false;
-      }
+      sessionMetadataOptions[option] = checkboxValues.includes(option);
     }
 
     setMetadataOptions({
