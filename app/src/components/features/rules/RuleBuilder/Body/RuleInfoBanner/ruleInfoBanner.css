@@ -1,0 +1,26 @@
+.rule-info-banner-container.ant-row {
+  margin-bottom: 5px;
+}
+
+.rule-info-banner.ant-alert {
+  padding: 8px;
+  background-color: rgba(var(--danger-border), 0.03);
+  border: 1px dashed rgb(var(--danger-border));
+  border-radius: var(--border-radius-sm);
+}
+
+.rule-info-banner.ant-alert .rule-info-banner-icon {
+  color: var(--text-gray);
+  padding-bottom: 20px;
+}
+
+.rule-info-banner.ant-alert .rule-info-banner-icon svg {
+  height: 13px;
+  width: 13px;
+}
+
+.rule-info-banner .rule-info-banner-text {
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--text-gray);
+}
