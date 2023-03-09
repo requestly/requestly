@@ -125,19 +125,12 @@ const Filters = (props) => {
     }
   };
 
-  const clearRequestPayload = (e) => {
-    if (e === "") {
+  const clearRequestPayload = (value) => {
+    if (value === "") {
       deleteObjectAtPath(
         currentlySelectedRuleData,
         setCurrentlySelectedRule,
-        `source.filters.requestPayload`,
-        pairIndex,
-        dispatch
-      );
-      deleteObjectAtPath(
-        currentlySelectedRuleData,
-        setCurrentlySelectedRule,
-        `source.filters.requestPayload`,
+        APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD,
         pairIndex,
         dispatch
       );
