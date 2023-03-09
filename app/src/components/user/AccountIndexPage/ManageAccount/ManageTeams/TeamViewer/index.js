@@ -7,6 +7,7 @@ import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import { getColorFromString } from "utils/getColorFromString";
 import "./TeamViewer.css";
 
 const TeamViewer = ({ teamId }) => {
@@ -16,21 +17,8 @@ const TeamViewer = ({ teamId }) => {
 
   // Global State
   const availableTeams = useSelector(getAvailableTeams);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId);
+  const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const { name } = teamDetails;
-
-  // const params = new URLSearchParams(window.location.search);
-  // const redirectBackToMyTeams = params.has("redirectBackToMyTeams")
-  //   ? params.get("redirectBackToMyTeams") === "true"
-  //   : false;
-
-  // const handleBackButton = () => {
-  //   if (redirectBackToMyTeams) {
-  //     redirectToMyTeams(navigate);
-  //   } else {
-  //     redirectToRules(navigate);
-  //   }
-  // };
 
   useEffect(() => {
     const functions = getFunctions();
@@ -98,6 +86,9 @@ const TeamViewer = ({ teamId }) => {
                 size={28}
                 shape="square"
                 icon={name ? name?.[0]?.toUpperCase() : "P"}
+                style={{
+                  backgroundColor: `${getColorFromString(name)}`,
+                }}
               />{" "}
               <span className="header">
                 Manage your {name ?? "private"} workspace

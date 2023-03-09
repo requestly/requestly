@@ -34,8 +34,9 @@ import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { AUTH } from "modules/analytics/events/common/constants";
-import "./WorkSpaceSelector.css";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { getColorFromString } from "utils/getColorFromString";
+import "./WorkSpaceSelector.css";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -81,6 +82,14 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
             shape="square"
             icon={getWorkspaceIcon(activeWorkspaceName)}
             className="workspace-avatar"
+            style={{
+              backgroundColor: user.loggedIn
+                ? activeWorkspaceName ===
+                  APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                  ? "#1E69FF"
+                  : getColorFromString(activeWorkspaceName)
+                : "#ffffff4d",
+            }}
           />
           <span className={isCollapsed ? "hidden" : "items-center"}>
             <span className="active-workspace-name">
@@ -253,6 +262,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                 APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
               )}
               className="workspace-avatar"
+              style={{ backgroundColor: "#1E69FF" }}
             />
           }
           className={`workspace-menu-item ${
@@ -284,6 +294,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                     shape="square"
                     icon={team.name?.[0]?.toUpperCase() ?? "P"}
                     className="workspace-avatar"
+                    style={{
+                      backgroundColor: `${getColorFromString(team.name)}`,
+                    }}
                   />
                 }
                 className={`workspace-menu-item ${
