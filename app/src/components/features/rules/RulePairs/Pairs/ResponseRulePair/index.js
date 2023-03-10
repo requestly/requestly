@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Row, Col } from "antd";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
@@ -15,22 +15,13 @@ const ResponseRulePair = ({
   ruleDetails,
   isInputDisabled,
   responseRuleResourceType = "",
-  // setResponseRuleResourceType,
 }) => {
-  console.log("from editor", responseRuleResourceType, pair);
   const canOverrideStatus = useMemo(() => {
     return (
       isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) &&
       window?.RQ?.DESKTOP?.VERSION !== "1.0"
     );
   }, []);
-
-  // TODO: IMP
-  useEffect(() => {
-    // confirm when should the radio buttons should be visible
-    // while creation or always
-    // setResponseRuleResourceType();
-  }, [pair.response.type]);
 
   return (
     <React.Fragment>
