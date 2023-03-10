@@ -290,7 +290,7 @@ const DraftSessionViewer: React.FC = () => {
                 <Col>
                   <p>Options</p>
                 </Col>
-                <Col className="session-metadata-icon">
+                <Col className="session-metadata-tooltip-icon">
                   <Tooltip
                     title={
                       "Select the options to save. These cannot be changed after saving."
