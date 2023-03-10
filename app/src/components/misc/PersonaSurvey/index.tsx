@@ -98,6 +98,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       open={isOpen}
       closable={false}
       className="survey-modal"
+      maskStyle={{ background: "#0d0d10" }}
     >
       <div
         className={`rq-modal-content survey-content-wrapper ${
