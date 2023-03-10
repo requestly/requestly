@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Popconfirm, Radio, Tooltip } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
 import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
+import { ResponseRule, ResponseRuleResourceType } from "types/rules";
 import "./ResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
@@ -18,25 +19,21 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-enum ResourceType {
-  UNKNOWN = "",
-  REST_API = "restApi",
-  GRAPHQL_API = "graphqlApi",
-  HTML_BODY = "htmlBody",
-  JS_OR_CSS = "jsOrCss",
+interface ResponseRuleResourceTypesProps {
+  currentlySelectedRuleData: ResponseRule;
+  responseRuleResourceType: ResponseRuleResourceType;
+  setResponseRuleResourceType: (type: ResponseRuleResourceType) => void;
 }
 
-interface ResponseRuleResourceTypesProps {
-  responseRuleResourceType: ResourceType;
-  setResponseRuleResourceType: (type: ResourceType) => void;
-}
+let i = 0;
 
 const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
+  currentlySelectedRuleData,
   responseRuleResourceType,
   setResponseRuleResourceType,
 }) => {
-  const [resourceType, setResourceType] = useState<ResourceType>(
-    ResourceType.UNKNOWN
+  const [resourceType, setResourceType] = useState<ResponseRuleResourceType>(
+    ResponseRuleResourceType.UNKNOWN
   );
   const [
     responseTypePopupVisible,
@@ -45,13 +42,24 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
 
   const isDesktop = useMemo(isDesktopMode, []);
 
+  // useEffect(() => {
+  //   const resourceType =
+  //     currentlySelectedRuleData?.pairs?.[0].response?.resourceType;
+
+  //   console.log("logging :: rendering :: ", i++, resourceType);
+
+  //   if (resourceType) {
+  //     // setResponseRuleResourceType(resourceType);
+  //   }
+  // }, [currentlySelectedRuleData, setResponseRuleResourceType]);
+
   const handleOnConfirm = () => {
     setResponseTypePopupVisible(false);
     setResponseRuleResourceType(resourceType);
   };
 
-  const handleResourceTypeChange = (type: ResourceType) => {
-    if (responseRuleResourceType === ResourceType.UNKNOWN) {
+  const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
+    if (responseRuleResourceType === ResponseRuleResourceType.UNKNOWN) {
       setResourceType(type);
       setResponseRuleResourceType(type);
       return;
@@ -78,10 +86,14 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
             value={responseRuleResourceType}
             onChange={(e) => handleResourceTypeChange(e.target.value)}
           >
-            <Radio value={ResourceType.REST_API}>Rest API</Radio>
-            <Radio value={ResourceType.GRAPHQL_API}>GraphQL API</Radio>
+            <Radio value={ResponseRuleResourceType.REST_API}>Rest API</Radio>
+            <Radio value={ResponseRuleResourceType.GRAPHQL_API}>
+              GraphQL API
+            </Radio>
             {isDesktop ? (
-              <Radio value={ResourceType.HTML_BODY}>HTML Body</Radio>
+              <Radio value={ResponseRuleResourceType.HTML_BODY}>
+                HTML Body
+              </Radio>
             ) : (
               <Tooltip
                 overlayClassName="response-rule-resource-type-tooltip"
@@ -93,14 +105,17 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
                   </span>
                 }
               >
-                <Radio value={ResourceType.HTML_BODY} disabled={!isDesktop}>
+                <Radio
+                  disabled={!isDesktop}
+                  value={ResponseRuleResourceType.HTML_BODY}
+                >
                   HTML Body
                   <QuestionCircleOutlined className="resource-disable-option-info-icon" />
                 </Radio>
               </Tooltip>
             )}
             {isDesktop ? (
-              <Radio value={ResourceType.JS_OR_CSS}>JS/CSS</Radio>
+              <Radio value={ResponseRuleResourceType.JS_OR_CSS}>JS/CSS</Radio>
             ) : (
               <Tooltip
                 overlayClassName="response-rule-resource-type-tooltip"
@@ -112,7 +127,10 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
                   </span>
                 }
               >
-                <Radio value={ResourceType.JS_OR_CSS} disabled={!isDesktop}>
+                <Radio
+                  disabled={!isDesktop}
+                  value={ResponseRuleResourceType.JS_OR_CSS}
+                >
                   JS/CSS
                   <QuestionCircleOutlined className="resource-disable-option-info-icon" />
                 </Radio>

@@ -58,6 +58,19 @@ export enum HeaderRuleActionType {
   MODIFY = "Modify",
 }
 
+export enum ResponseRuleBodyType {
+  CODE = "code",
+  STATIC = "static",
+}
+
+export enum ResponseRuleResourceType {
+  UNKNOWN = "",
+  REST_API = "restApi",
+  GRAPHQL_API = "graphqlApi",
+  HTML_BODY = "htmlBody",
+  JS_OR_CSS = "jsOrCss",
+}
+
 export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
@@ -68,6 +81,19 @@ export interface RulePairSource {
   operator: SourceOperator;
   value: string;
   filters?: SourceFilter[];
+}
+
+export interface RulePairResponse {
+  value: string;
+  statusCode: string;
+  type: ResponseRuleBodyType;
+  resourceType?: ResponseRuleResourceType;
+}
+
+export interface ResponseRulePair {
+  id: string;
+  source: RulePairSource;
+  response: RulePairResponse;
 }
 
 export interface RedirectRulePair {
@@ -155,6 +181,10 @@ export interface ScriptRulePair {
 export interface ScriptRule extends Rule {
   pairs: ScriptRulePair[];
   removeCSPHeader?: boolean;
+}
+
+export interface ResponseRule extends Rule {
+  pairs: ResponseRulePair[];
 }
 
 // Group
