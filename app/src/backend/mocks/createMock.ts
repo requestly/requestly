@@ -8,14 +8,19 @@ import {
 } from "firebase/firestore";
 import { RQMockSchema } from "components/features/mocksV2/types";
 
-import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
+import {
+  getOwnerId,
+  updateUserMockSelectorsMap,
+  uploadResponseBodyFiles,
+} from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 import { updateMockFromFirebase } from "./updateMock";
 
 export const createMock = async (
   uid: string,
-  mockData: RQMockSchema
+  mockData: RQMockSchema,
+  teamId?: string
 ): Promise<string> => {
   if (!uid) {
     return null;
@@ -25,22 +30,21 @@ export const createMock = async (
   if (BODY_IN_BUCKET_ENABLED) {
     responsesWithBody = [];
     // Update body to null and filePath
-    mockData.responses.map((response) => {
+    mockData.responses.forEach((response) => {
       response.filePath = "true"; // TODO: Assigning it true for now. This should be actual filePath of the bucket.
       responsesWithBody.push({ ...response });
       response.body = null;
-      return null;
     });
   }
 
-  const mockId = await createMockFromFirebase(uid, mockData);
+  const mockId = await createMockFromFirebase(uid, mockData, teamId);
 
   if (mockId) {
-    await updateUserMockSelectorsMap(uid, mockId, mockData);
+    await updateUserMockSelectorsMap(uid, mockId, mockData, teamId);
     if (BODY_IN_BUCKET_ENABLED) {
-      await uploadResponseBodyFiles(responsesWithBody, uid, mockId);
+      await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
       mockData.id = mockId;
-      updateResponseFilePath(uid, mockData);
+      updateResponseFilePath(uid, mockData, teamId);
     }
 
     return mockId;
@@ -51,14 +55,18 @@ export const createMock = async (
 
 const createMockFromFirebase = async (
   uid: string,
-  mockData: RQMockSchema
+  mockData: RQMockSchema,
+  teamId?: string
 ): Promise<string | null> => {
   const db = getFirestore(firebaseApp);
   const rootMocksCollectionRef = collection(db, "mocks");
 
+  const ownerId = getOwnerId(uid, teamId);
+
   const mockId: string | null = await addDoc(rootMocksCollectionRef, {
     ...mockData,
-    ownerId: uid,
+    createdBy: uid,
+    ownerId: ownerId,
     deleted: false,
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
@@ -70,18 +78,24 @@ const createMockFromFirebase = async (
       return docRef.id;
     })
     .catch((err) => {
+      console.error("error while creating mock", err);
       return null;
     });
 
   return mockId;
 };
 
-const updateResponseFilePath = async (uid: string, mockData: RQMockSchema) => {
+const updateResponseFilePath = async (
+  uid: string,
+  mockData: RQMockSchema,
+  teamId?: string
+) => {
   mockData.responses.map((response) => {
     response.filePath = createResponseBodyFilepath(
       uid,
       mockData.id,
-      response.id
+      response.id,
+      teamId
     );
     return null;
   });

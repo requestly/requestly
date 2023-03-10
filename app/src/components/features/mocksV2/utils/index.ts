@@ -99,7 +99,8 @@ export const mockDataToEditorDataAdapter = (
 export const generateFinalUrl = (
   endpoint: string,
   uid: string,
-  username: string = null
+  username: string = null,
+  teamId?: string
 ) => {
   let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}?rq_uid=${uid}`;
 
@@ -110,9 +111,12 @@ export const generateFinalUrl = (
   } else {
     if (username) {
       finalUrl = `https://${username}.requestly.dev/${endpoint}`;
+      if (teamId) finalUrl += `?teamId=${teamId}`;
+      return finalUrl;
     }
   }
 
+  if (teamId) finalUrl += `&teamId=${teamId}`;
   return finalUrl;
 };
 

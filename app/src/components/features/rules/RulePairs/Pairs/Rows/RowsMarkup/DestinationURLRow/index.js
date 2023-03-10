@@ -52,6 +52,7 @@ const DestinationURLRow = ({
   };
 
   const handleMockPickerSelectionCallback = (url) => {
+    console.log("mock url", url);
     trackSelectMock(url);
     setIsMockPickerVisible(false);
     modifyPairAtGivenPath(undefined, pairIndex, "destination", url);

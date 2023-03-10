@@ -11,24 +11,29 @@ import {
 import { createFile } from "services/firebaseStorageService";
 import { createResponseBodyFilepath } from "./utils";
 
+export const getOwnerId = (uid: string, teamId?: string) => {
+  if (teamId) {
+    return `team-${teamId}`;
+  }
+  return uid;
+};
+
 export const updateUserMockSelectorsMap = async (
   uid: string,
   mockId: string,
-  mockData: RQMockSchema
+  mockData: RQMockSchema,
+  teamId?: string
 ) => {
   const db = getFirestore(firebaseApp);
-
-  if (!mockId || !mockData || !uid) {
-    // console.error("mockId or mockData or uid not present");
-  }
 
   const selectorData = {
     endpoint: mockData.endpoint,
     method: mockData.method,
   };
 
+  const ownerId = getOwnerId(uid, teamId);
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
-  const rootUserDocRef = doc(rootUserMocksMetadataRef, uid);
+  const rootUserDocRef = doc(rootUserMocksMetadataRef, ownerId);
 
   await setDoc(
     rootUserDocRef,
@@ -41,14 +46,16 @@ export const updateUserMockSelectorsMap = async (
   );
 };
 
-export const removeUserMockSelector = async (uid: string, mockId: string) => {
+export const removeUserMockSelector = async (
+  uid: string,
+  mockId: string,
+  teamId?: string
+) => {
   const db = getFirestore(firebaseApp);
-  if (!mockId || !uid) {
-    // console.error("mockId or uid not present");
-  }
 
+  const ownerId = getOwnerId(uid, teamId);
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
-  const rootUserDocRef = doc(rootUserMocksMetadataRef, uid);
+  const rootUserDocRef = doc(rootUserMocksMetadataRef, ownerId);
 
   await updateDoc(rootUserDocRef, {
     [`mockSelectors.${mockId}`]: deleteField(),
@@ -58,7 +65,8 @@ export const removeUserMockSelector = async (uid: string, mockId: string) => {
 export const uploadResponseBodyFiles = async (
   responses: any[] = [],
   uid: string,
-  mockId: string
+  mockId: string,
+  teamId?: string
 ) => {
   return Promise.all(
     responses.map(async (response) => {
@@ -66,7 +74,7 @@ export const uploadResponseBodyFiles = async (
         response.id,
         response.headers["content-type"],
         response.body,
-        createResponseBodyFilepath(uid, mockId, response.id)
+        createResponseBodyFilepath(uid, mockId, response.id, teamId)
       );
     })
   );

@@ -95,6 +95,7 @@ const useDatabase = () => {
     user?.details?.profile?.uid,
     user?.loggedIn,
   ]);
+  //todo: update custom claims. Also handle old users
 };
 
 export default useDatabase;

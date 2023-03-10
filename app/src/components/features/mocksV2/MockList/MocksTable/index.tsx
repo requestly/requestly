@@ -30,6 +30,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import "../../../../../styles/custom/RQTable.css";
 import "./index.css";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
@@ -57,6 +58,8 @@ const MocksTable: React.FC<Props> = ({
   handleDeleteAction,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
 
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>(
     mocks
@@ -216,7 +219,8 @@ const MocksTable: React.FC<Props> = ({
                     : generateFinalUrl(
                         record.endpoint,
                         user?.details?.profile?.uid,
-                        user?.details?.username
+                        user?.details?.username,
+                        teamId
                       )
                 }
                 disableTooltip={true}
@@ -238,7 +242,9 @@ const MocksTable: React.FC<Props> = ({
                     // Not sending username as it might change
                     url = generateFinalUrl(
                       record.endpoint,
-                      user?.details?.profile?.uid
+                      user?.details?.profile?.uid,
+                      null,
+                      teamId
                     );
                   }
                   handleSelectAction(url);
