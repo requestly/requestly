@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Popconfirm, Radio, Tooltip } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
@@ -30,17 +33,37 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   responseRuleResourceType,
   setResponseRuleResourceType,
 }) => {
+  const dispatch = useDispatch();
+  const { pathname } = useLocation();
+  const isDesktop = useMemo(isDesktopMode, []);
+  const isCreateMode = pathname.includes("create");
+  const currentResourceType =
+    currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+
   const [resourceType, setResourceType] = useState<ResponseRuleResourceType>(
-    ResponseRuleResourceType.UNKNOWN
+    currentResourceType ?? ResponseRuleResourceType.UNKNOWN
   );
   const [
     responseTypePopupVisible,
     setResponseTypePopupVisible,
   ] = useState<boolean>(false);
 
-  const isDesktop = useMemo(isDesktopMode, []);
-  const currentResourceType =
-    currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+  const updateResourceType = (resourceType: ResponseRuleResourceType) => {
+    const updatedRule = {
+      ...currentlySelectedRuleData,
+      pairs: [
+        {
+          ...currentlySelectedRuleData.pairs[0],
+          response: {
+            ...currentlySelectedRuleData.pairs[0].response,
+            resourceType,
+          },
+        },
+      ],
+    };
+
+    setCurrentlySelectedRule(dispatch, updatedRule, true);
+  };
 
   useEffect(() => {
     if (currentResourceType) {
@@ -51,12 +74,17 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   const handleOnConfirm = () => {
     setResponseTypePopupVisible(false);
     setResponseRuleResourceType(resourceType);
+    updateResourceType(resourceType);
   };
 
   const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
-    if (responseRuleResourceType === ResponseRuleResourceType.UNKNOWN) {
+    if (
+      !isCreateMode ||
+      responseRuleResourceType === ResponseRuleResourceType.UNKNOWN
+    ) {
       setResourceType(type);
       setResponseRuleResourceType(type);
+      updateResourceType(type);
       return;
     }
 
@@ -74,6 +102,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
           cancelText="Cancel"
           open={responseTypePopupVisible}
           onConfirm={handleOnConfirm}
+          disabled={!isCreateMode}
           overlayClassName="resource-types-popconfirm"
           onCancel={() => setResponseTypePopupVisible(false)}
         >
