@@ -21,12 +21,12 @@ export interface SessionRecording {
   filePath?: string;
   startTimeOffset?: number;
   description?: string;
-  metadataOptions?: SessionMetadataOptions;
+  includedDebugInfo?: IncludedDebugInfo;
 }
 
-export interface SessionMetadataOptions {
-  networkLogs: boolean;
-  consoleLogs: boolean;
+export interface IncludedDebugInfo {
+  includeNetworkLogs: boolean;
+  includeConsoleLogs: boolean;
 }
 
 export interface ConsoleLog extends LogData {

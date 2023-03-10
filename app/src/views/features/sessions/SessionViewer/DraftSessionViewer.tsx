@@ -50,20 +50,12 @@ import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 //@ts-ignore
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
-import { SessionMetadataOptions } from "./types";
+import { IncludedDebugInfo } from "./types";
 
-interface Metadata {
-  checkboxValues: CheckboxValueType[];
-  sessionMetadataOptions: SessionMetadataOptions;
-}
-
-const defaultMetadataOptions: Metadata = {
-  checkboxValues: ["networkLogs", "consoleLogs"],
-  sessionMetadataOptions: {
-    networkLogs: true,
-    consoleLogs: true,
-  },
-};
+const defaultDebugInfo: CheckboxValueType[] = [
+  "includeNetworkLogs",
+  "includeConsoleLogs",
+];
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -80,9 +72,9 @@ const DraftSessionViewer: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
-  const [metadataOptions, setMetadataOptions] = useState<Metadata>(
-    defaultMetadataOptions
-  );
+  const [includedDebugInfo, setIncludedDebugInfo] = useState<
+    CheckboxValueType[]
+  >(defaultDebugInfo);
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -135,14 +127,30 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email]);
 
-  const getSessionEventsToSave = useCallback((): RQSessionEvents => {
-    if (metadataOptions.sessionMetadataOptions.networkLogs === false) {
-      return {
-        rrweb: sessionEvents.rrweb,
-      };
+  const getSessionEventsToSave = useCallback(
+    (debugInfo: IncludedDebugInfo): RQSessionEvents => {
+      if (debugInfo.includeNetworkLogs === false) {
+        return {
+          rrweb: sessionEvents.rrweb,
+        };
+      }
+      return sessionEvents;
+    },
+    [sessionEvents]
+  );
+
+  const getIncludedDebugInfoToSave = useCallback((): IncludedDebugInfo => {
+    const sessionDebugInfo: IncludedDebugInfo = {
+      includeConsoleLogs: true,
+      includeNetworkLogs: true,
+    };
+    let option: keyof IncludedDebugInfo;
+    for (option in sessionDebugInfo) {
+      sessionDebugInfo[option] = includedDebugInfo.includes(option);
     }
-    return sessionEvents;
-  }, [metadataOptions.sessionMetadataOptions.networkLogs, sessionEvents]);
+
+    return sessionDebugInfo;
+  }, [includedDebugInfo]);
 
   const saveDraftSession = useCallback(() => {
     if (!user?.loggedIn) {
@@ -170,12 +178,14 @@ const DraftSessionViewer: React.FC = () => {
       return;
     }
 
+    const includedDebugInfoToSave = getIncludedDebugInfoToSave();
+
     setIsSaving(true);
     saveRecording(
       user?.details?.profile?.uid,
       sessionRecording,
-      compressEvents(getSessionEventsToSave()),
-      metadataOptions.sessionMetadataOptions
+      compressEvents(getSessionEventsToSave(includedDebugInfoToSave)),
+      includedDebugInfoToSave
     ).then((response) => {
       if (response?.success) {
         setIsSaveModalVisible(false);
@@ -201,8 +211,8 @@ const DraftSessionViewer: React.FC = () => {
     dispatch,
     AUTH_ACTION_LABELS.SIGN_UP,
     navigate,
-    metadataOptions.sessionMetadataOptions,
     getSessionEventsToSave,
+    getIncludedDebugInfoToSave,
   ]);
 
   const handleNameChangeEvent = useCallback(
@@ -223,20 +233,6 @@ const DraftSessionViewer: React.FC = () => {
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
-    });
-  };
-
-  const onCheckboxChange = (checkboxValues: CheckboxValueType[]) => {
-    const sessionMetadataOptions =
-      defaultMetadataOptions.sessionMetadataOptions;
-    let option: keyof SessionMetadataOptions;
-    for (option in defaultMetadataOptions.sessionMetadataOptions) {
-      sessionMetadataOptions[option] = checkboxValues.includes(option);
-    }
-
-    setMetadataOptions({
-      checkboxValues,
-      sessionMetadataOptions,
     });
   };
 
@@ -302,16 +298,16 @@ const DraftSessionViewer: React.FC = () => {
                 </Col>
                 <Col span={24}>
                   <Checkbox.Group
-                    onChange={onCheckboxChange}
-                    value={metadataOptions.checkboxValues}
+                    onChange={setIncludedDebugInfo}
+                    value={includedDebugInfo}
                     options={[
                       {
                         label: "Network Logs",
-                        value: "networkLogs",
+                        value: "includeNetworkLogs",
                       },
                       {
                         label: "Console Logs",
-                        value: "consoleLogs",
+                        value: "includeConsoleLogs",
                       },
                     ]}
                   />

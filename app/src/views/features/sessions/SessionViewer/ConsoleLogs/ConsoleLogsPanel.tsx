@@ -52,7 +52,7 @@ const ConsoleLogsPanel: React.FC<Props> = ({
         <div className="placeholder">
           <Empty
             description={
-              sessionMetadataOptions.consoleLogs === false
+              sessionMetadataOptions.includeConsoleLogs === false
                 ? "Console logs have not been shared. You can choose to share them while saving."
                 : "Console logs appear here as video plays."
             }

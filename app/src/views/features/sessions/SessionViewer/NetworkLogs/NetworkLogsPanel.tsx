@@ -86,7 +86,7 @@ const NetworkLogsPanel: React.FC<Props> = ({
         <div className="placeholder">
           <Empty
             description={
-              sessionMetadataOptions.networkLogs === false
+              sessionMetadataOptions.includeNetworkLogs === false
                 ? "Network logs have not been shared. You can choose to share them while saving."
                 : "Network logs appear here as video plays."
             }
