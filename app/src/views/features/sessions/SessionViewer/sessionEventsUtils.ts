@@ -84,7 +84,7 @@ export const filterOutSessionEvents = (
 ): RQSessionEvents => {
   let filteredSessionEvents = cloneDeep(sessionEvents);
   if (includedDebugInfo.includeNetworkLogs === false) {
-    delete filteredSessionEvents[RQSessionEventType.RRWEB];
+    delete filteredSessionEvents[RQSessionEventType.NETWORK];
   }
   if (includedDebugInfo.includeConsoleLogs === false) {
     const filteredRRWebEvent = filterOutConsoleLogs(
