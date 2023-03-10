@@ -11,7 +11,6 @@ import React, {
   useState,
 } from "react";
 import Replayer from "rrweb-player";
-import { EventType, IncrementalSource, LogData } from "rrweb";
 import { Badge, Input, Tabs } from "antd";
 import "rrweb-player/dist/style.css";
 import ProCard from "@ant-design/pro-card";
@@ -28,6 +27,7 @@ import {
 } from "store/features/session-recording/selectors";
 import { useSelector } from "react-redux";
 import { cloneDeep } from "lodash";
+import { getConsoleLogs } from "./sessionEventsUtils";
 
 const SessionDetails: React.FC = () => {
   const attributes = useSelector(getSessionRecordingAttributes);
@@ -44,30 +44,7 @@ const SessionDetails: React.FC = () => {
 
   const consoleLogs = useMemo<ConsoleLog[]>(() => {
     const rrwebEvents = events[RQSessionEventType.RRWEB] as RRWebEventData[];
-    return rrwebEvents
-      .map((event) => {
-        let logData: LogData = null;
-        if (
-          event.type === EventType.IncrementalSnapshot &&
-          // @ts-ignore
-          event.data.source === IncrementalSource.Log
-        ) {
-          logData = (event.data as unknown) as LogData;
-        } else if (
-          event.type === EventType.Plugin &&
-          event.data.plugin === "rrweb/console@1"
-        ) {
-          logData = event.data.payload as LogData;
-        }
-
-        return (
-          logData && {
-            ...logData,
-            timeOffset: Math.floor((event.timestamp - startTime) / 1000),
-          }
-        );
-      })
-      .filter((event) => !!event);
+    return getConsoleLogs(rrwebEvents, startTime);
   }, [events, startTime]);
 
   const networkLogs = useMemo<NetworkLog[]>(() => {

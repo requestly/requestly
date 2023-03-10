@@ -23,6 +23,7 @@ import mockSession from "./mockData/mockSession";
 import {
   compressEvents,
   filterOutLargeNetworkResponses,
+  filterOutSessionEvents,
 } from "./sessionEventsUtils";
 import {
   trackDraftSessionDiscarded,
@@ -129,12 +130,7 @@ const DraftSessionViewer: React.FC = () => {
 
   const getSessionEventsToSave = useCallback(
     (debugInfo: IncludedDebugInfo): RQSessionEvents => {
-      if (debugInfo.includeNetworkLogs === false) {
-        return {
-          rrweb: sessionEvents.rrweb,
-        };
-      }
-      return sessionEvents;
+      return filterOutSessionEvents(sessionEvents, debugInfo);
     },
     [sessionEvents]
   );

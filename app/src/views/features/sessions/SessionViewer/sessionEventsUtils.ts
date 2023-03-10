@@ -3,7 +3,11 @@ import {
   NetworkEventData,
   RQSessionEvents,
   RQSessionEventType,
+  RRWebEventData,
 } from "@requestly/web-sdk";
+import { ConsoleLog, IncludedDebugInfo } from "./types";
+import { EventType, IncrementalSource, LogData } from "rrweb";
+import { cloneDeep } from "lodash";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
 
@@ -29,4 +33,65 @@ export const filterOutLargeNetworkResponses = (
       networkEvent.response = "Response too large";
     }
   });
+};
+
+const isConsoleLogEvent = (rrwebEvent: RRWebEventData): boolean => {
+  if (rrwebEvent.type === EventType.IncrementalSnapshot) {
+    //@ts-ignore
+    return rrwebEvent.data.source === IncrementalSource.Log;
+  }
+  if (rrwebEvent.type === EventType.Plugin) {
+    return rrwebEvent.data.plugin === "rrweb/console@1";
+  }
+
+  return false;
+};
+
+export const getConsoleLogs = (
+  rrwebEvents: RRWebEventData[],
+  startTime: number
+): ConsoleLog[] => {
+  return rrwebEvents
+    .map((event) => {
+      let logData: LogData = null;
+      if (isConsoleLogEvent(event)) {
+        if (event.type === EventType.IncrementalSnapshot) {
+          logData = (event.data as unknown) as LogData;
+        } else if (event.type === EventType.Plugin) {
+          logData = event.data.payload as LogData;
+        }
+      }
+
+      return (
+        logData && {
+          ...logData,
+          timeOffset: Math.floor((event.timestamp - startTime) / 1000),
+        }
+      );
+    })
+    .filter((event) => !!event);
+};
+
+export const filterOutConsoleLogs = (
+  rrwebEvents: RRWebEventData[]
+): RRWebEventData[] => {
+  return rrwebEvents.filter((event) => isConsoleLogEvent(event));
+};
+
+export const filterOutSessionEvents = (
+  sessionEvents: RQSessionEvents,
+  includedDebugInfo: IncludedDebugInfo
+): RQSessionEvents => {
+  let filteredSessionEvents = cloneDeep(sessionEvents);
+  if (includedDebugInfo.includeNetworkLogs === false) {
+    delete filteredSessionEvents[RQSessionEventType.RRWEB];
+  }
+  if (includedDebugInfo.includeConsoleLogs === false) {
+    const filteredRRWebEvent = filterOutConsoleLogs(
+      sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]
+    );
+    filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
+  }
+
+  return filteredSessionEvents;
 };
