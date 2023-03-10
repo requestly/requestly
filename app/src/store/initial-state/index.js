@@ -40,6 +40,7 @@ const INITIAL_STATE = {
     groupwiseRulesToPopulate: {},
     selectedRules: {},
     lastBackupTimeStamp: "",
+    isRulesListLoading: false,
   },
 
   /* Search */

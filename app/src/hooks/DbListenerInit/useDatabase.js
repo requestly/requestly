@@ -9,6 +9,9 @@ import userNodeListener from "./userNodeListener";
 import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { actions } from "store";
+
+window.isFirstSyncComplete = false;
 
 const useDatabase = () => {
   const dispatch = useDispatch();
@@ -16,8 +19,23 @@ const useDatabase = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   let unsubscribeUserNodeRef = useRef(null);
-  let unsubscribeSyncingNodeRef = useRef(null);
+  window.unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
+
+  const useHasChanged = (val) => {
+    const prevVal = usePrevious(val);
+    return prevVal !== val;
+  };
+
+  const usePrevious = (value) => {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  };
+
+  const hasAuthStateChanged = useHasChanged(user?.loggedIn);
 
   // Listens to /users/{id} changes
   useEffect(() => {
@@ -35,12 +53,16 @@ const useDatabase = () => {
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
-    if (unsubscribeSyncingNodeRef.current) unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
-    if (user?.loggedIn && user?.details) {
+    if (hasAuthStateChanged || !window.isFirstSyncComplete)
+      dispatch(actions.updateIsRulesListLoading(true));
+
+    if (window.unsubscribeSyncingNodeRef.current)
+      window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
+    if (user?.loggedIn && user?.details?.profile?.uid) {
       if (currentlyActiveWorkspace.id) {
         // This is a team sync
         // Set the db node listener
-        unsubscribeSyncingNodeRef.current = syncingNodeListener(
+        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           "teamSync",
           user?.details?.profile.uid,
@@ -53,21 +75,31 @@ const useDatabase = () => {
       ) {
         // This is individual syncing
         // Set the db node listener
-        unsubscribeSyncingNodeRef.current = syncingNodeListener(
+        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           "sync",
           user?.details?.profile.uid,
           null,
           appMode
         );
+      } else {
+        // Do it here if syncing is not enabled. Else syncing would have triggered this.
+        window.isFirstSyncComplete = true;
+        dispatch(actions.updateIsRulesListLoading(false));
       }
+    } else {
+      // Do it here if syncing is not enabled. Else syncing would have triggered this.
+      window.isFirstSyncComplete = true;
+      dispatch(actions.updateIsRulesListLoading(false));
     }
   }, [
     appMode,
     currentlyActiveWorkspace.id,
     dispatch,
-    user,
+    user?.loggedIn,
+    user?.details?.profile.uid,
     user?.details?.isSyncEnabled,
+    hasAuthStateChanged,
   ]);
 
   // Listens to teams available to the user

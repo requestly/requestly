@@ -10,6 +10,7 @@ import { getExecutionLogsId } from "../../../../utils/rules/misc";
 import { epochToLocaleDate, epochToLocaleTime } from "utils/DateTimeUtils";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { trackExecutionLogs } from "modules/analytics/events/features/executionLogs";
+import Logger from "lib/logger";
 
 const requestTypeMap = {
   main_frame: "html",
@@ -69,6 +70,7 @@ const ExecutionLogs = () => {
 
   const fetchExecutionLogs = () => {
     setIsLoading(true);
+    Logger.log("Reading storage in fetchExecutionLogs");
     StorageService(appMode)
       .getRecord(executionLogsId)
       .then((fetchedExecutionLogs) => {

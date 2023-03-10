@@ -13,9 +13,6 @@ class StorageServiceWrapper {
     this.appMode = options.appMode || GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     this.StorageHelper = getStorageHelper(this.appMode);
     this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
-    this.records = [];
-    this.isRecordsFetched = false;
-    this.cachingEnabled = options["cacheRecords"];
 
     this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
@@ -55,37 +52,6 @@ class StorageServiceWrapper {
     return this.StorageHelper.getStorageSuperObject();
   }
 
-  getRecords(objectType, forceFetch) {
-    const self = this;
-    return new Promise((resolve, reject) => {
-      /* If records have been read from storage, return the cached values */
-      if (
-        self.cachingEnabled &&
-        self.isRecordsFetched &&
-        !forceFetch &&
-        this.appMode !== GLOBAL_CONSTANTS.APP_MODES.REMOTE
-      ) {
-        resolve(self.filterRecordsByType(self.records, objectType));
-        return;
-      }
-
-      function filterCallback(superObject) {
-        // Clear the existing records
-        self.records.length = 0;
-        for (let key in superObject) {
-          if (self.hasPrimaryKey(superObject[key])) {
-            self.records.push(superObject[key]);
-          }
-        }
-
-        self.isRecordsFetched = true;
-
-        resolve(self.filterRecordsByType(self.records, objectType));
-      }
-      this.StorageHelper.getStorageSuperObject().then(filterCallback);
-    });
-  }
-
   hasPrimaryKey(record) {
     if (
       typeof record === "object" &&
@@ -99,6 +65,22 @@ class StorageServiceWrapper {
       }
     }
     return false;
+  }
+
+  getRecords(objectType) {
+    const self = this;
+    return new Promise((resolve) => {
+      this.StorageHelper.getStorageSuperObject().then((superObject) => {
+        const myArr = [];
+        for (let key in superObject) {
+          // clear out everything that is not an object with a primary key - eventually allows only rules & groups
+          if (self.hasPrimaryKey(superObject[key])) {
+            myArr.push(superObject[key]);
+          }
+        }
+        resolve(self.filterRecordsByType(myArr, objectType));
+      });
+    });
   }
 
   filterRecordsByType(records, requestedObjectType) {
@@ -117,12 +99,11 @@ class StorageServiceWrapper {
       Logger.log("Storage service rejected this record to be saved", object);
       return;
     }
-    await this.StorageHelper.saveStorageObject(object);
-    this.updateRecord(object);
+    await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
     return Object.values(object)[0];
   }
 
-  saveRuleOrGroup(object, updateLastModified = true) {
+  async saveRuleOrGroup(object, updateLastModified = true) {
     const formattedObject = {
       [object.id]: {
         ...object,
@@ -131,20 +112,20 @@ class StorageServiceWrapper {
           : object?.modificationDate,
       },
     };
-    doSyncRecords(
+    await doSyncRecords(
       formattedObject,
       SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
       this.appMode
     );
-    return this.saveRecord(formattedObject);
+    return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
   }
 
-  saveMultipleRulesOrGroups(array) {
+  async saveMultipleRulesOrGroups(array) {
     const formattedObject = {};
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
     });
-    doSyncRecords(
+    await doSyncRecords(
       formattedObject,
       SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
       this.appMode
@@ -157,8 +138,8 @@ class StorageServiceWrapper {
     return this.saveRecord(formattedObject);
   }
 
-  saveSessionRecordingPageConfig(config) {
-    doSyncRecords(
+  async saveSessionRecordingPageConfig(config) {
+    await doSyncRecords(
       config,
       SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG,
       this.appMode
@@ -177,7 +158,6 @@ class StorageServiceWrapper {
       return;
     }
     await this.StorageHelper.saveStorageObject({ [object.id]: object });
-    this.updateRecord(object);
   }
 
   getRecord(key) {
@@ -186,16 +166,15 @@ class StorageServiceWrapper {
 
   async removeRecord(key) {
     await this.StorageHelper.removeStorageObject(key);
-    doSyncRecords(
+    await doSyncRecords(
       [key],
       SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS,
       this.appMode
     );
-    this.deleteRecord(key);
   }
 
-  removeRecords(array) {
-    doSyncRecords(
+  async removeRecords(array) {
+    await doSyncRecords(
       array,
       SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS,
       this.appMode
@@ -204,49 +183,7 @@ class StorageServiceWrapper {
   }
 
   removeRecordsWithoutSyncing(array) {
-    // Seems useless
     return this.StorageHelper.removeStorageObjects(array);
-  }
-
-  getCachedRecordIndex(keyToFind) {
-    for (
-      let recordIndex = 0;
-      recordIndex < this.records.length;
-      recordIndex++
-    ) {
-      const recordKey = this.records[recordIndex].id;
-
-      if (recordKey === keyToFind) {
-        return recordIndex;
-      }
-    }
-
-    return -1;
-  }
-
-  updateRecord(changedObject) {
-    const changedObjectKey = changedObject.id,
-      changedObjectIndex = this.getCachedRecordIndex(changedObjectKey),
-      objectExists = changedObjectIndex !== -1;
-
-    // Add/Update Object operation
-    if (typeof changedObject !== "undefined") {
-      // Don't cache records when objects do not contain primaryKeys
-      if (!this.hasPrimaryKey(changedObject)) {
-        return;
-      }
-
-      objectExists
-        ? (this.records[
-            changedObjectIndex
-          ] = changedObject) /* Update existing object (Edit) */
-        : this.records.push(changedObject); /* Create New Object */
-    }
-  }
-
-  deleteRecord(deletedObjectKey) {
-    const deletedObjectIndex = this.getCachedRecordIndex(deletedObjectKey);
-    this.records.splice(deletedObjectIndex, 1);
   }
 
   printRecords() {
@@ -259,7 +196,6 @@ class StorageServiceWrapper {
     await this.StorageHelper.clearStorage();
     if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
       await setStorageType("local");
-    this.records = [];
   }
 
   saveConsoleLoggerState(state) {
