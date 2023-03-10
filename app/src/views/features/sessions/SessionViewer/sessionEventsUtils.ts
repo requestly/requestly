@@ -75,7 +75,7 @@ export const getConsoleLogs = (
 export const filterOutConsoleLogs = (
   rrwebEvents: RRWebEventData[]
 ): RRWebEventData[] => {
-  return rrwebEvents.filter((event) => isConsoleLogEvent(event));
+  return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
 };
 
 export const filterOutSessionEvents = (
