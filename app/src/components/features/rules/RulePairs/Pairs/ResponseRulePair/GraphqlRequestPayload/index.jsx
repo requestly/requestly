@@ -70,7 +70,7 @@ const GraphqlRequestPayload = ({
         <Input
           name="key"
           type="text"
-          placeholder="Type"
+          placeholder="key"
           className="graphql-operation-type-input"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_KEY)}
           onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_KEY)}
@@ -78,7 +78,7 @@ const GraphqlRequestPayload = ({
         <Input
           name="value"
           type="text"
-          placeholder="Name"
+          placeholder="value"
           className="graphql-operation-type-name"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_VALUE)}
           onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_VALUE)}
