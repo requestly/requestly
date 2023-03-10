@@ -2,6 +2,7 @@ import { PERSONA_SURVEY } from "./constants";
 import { trackEvent } from "modules/analytics";
 
 export const trackPersonaSurveyViewed = () => {
+  console.log("VIEWED");
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_VIEWED);
 };
 

@@ -6,12 +6,11 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey } from "./utils";
-import { Option, PageConfig } from "./types";
+import { PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
@@ -37,7 +36,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
-  const roleType = userPersona.persona;
+  const persona = userPersona.persona;
 
   const renderPageHeader = (page: PageConfig) => {
     return (
@@ -67,66 +66,13 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     );
   };
 
-  const renderDefaultQuestionaire = (page: PageConfig) => {
+  const renderPage = (page: PageConfig, persona: string) => {
     return (
       <>
         {renderPageHeader(page)}
-        <>
-          {page.options?.length ? (
-            <div className="survey-options-container">
-              {page.options.map((option: Option, index) => (
-                <SurveyOption
-                  key={index}
-                  fieldKey={page.key}
-                  option={option}
-                  questionType={page.questionType}
-                  isActive={page.isActive}
-                  action={page.action}
-                />
-              ))}
-            </div>
-          ) : (
-            page.render(toggleImportRulesModal)
-          )}
-        </>
+        <>{page.render({ toggleImportRulesModal, persona })}</>
       </>
     );
-  };
-
-  const renderConditionalQuestionaire = (
-    page: PageConfig,
-    roleType: string
-  ) => {
-    return (
-      <>
-        {renderPageHeader(page)}
-        <>
-          {page.conditional.map((question, index) => (
-            <React.Fragment key={index}>
-              {question.condition(roleType) && (
-                <div className="survey-options-container">
-                  {question.options.map((option, index) => (
-                    <SurveyOption
-                      key={index}
-                      fieldKey={page.key}
-                      option={option}
-                      questionType={page.questionType}
-                      isActive={page.isActive}
-                      action={page.action}
-                    />
-                  ))}
-                </div>
-              )}
-            </React.Fragment>
-          ))}
-        </>
-      </>
-    );
-  };
-
-  const renderPage = (page: PageConfig, roleType: string) => {
-    if (page?.conditional) return renderConditionalQuestionaire(page, roleType);
-    else return renderDefaultQuestionaire(page);
   };
 
   useEffect(() => {
@@ -161,14 +107,11 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       >
         {surveyConfig.map((page: PageConfig, index) => (
           <React.Fragment key={index}>
-            {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
+            {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
           </React.Fragment>
         ))}
       </div>
-      <SurveyModalFooter
-        page={currentPage}
-        fieldKey={surveyConfig[currentPage].key}
-      />
+      <SurveyModalFooter page={currentPage} />
     </RQModal>
   );
 };
