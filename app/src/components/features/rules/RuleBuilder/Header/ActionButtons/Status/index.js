@@ -57,12 +57,12 @@ const Status = ({ isDisabled, location }) => {
     !isCreateMode &&
       saveRule(
         appMode,
-        null,
+
         {
           ...currentlySelectedRuleData,
           status: newValue,
         },
-        null,
+
         callback
       );
 

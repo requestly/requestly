@@ -4,6 +4,7 @@ import APP_CONSTANTS from "config/constants";
 //REDUCER ACTION OBJECTS
 import { actions } from "store";
 import { StorageService } from "../../../../../../init";
+import Logger from "lib/logger";
 //Utils
 
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
@@ -27,6 +28,7 @@ export const ungroupSelectedRules = (appMode, selectedRuleIds, user) => {
     if (isEmpty(selectedRuleIds)) {
       reject(new Error("No Rules were Selected"));
     } else {
+      Logger.log("Reading storage in RulesTable ungroupSelectedRules");
       StorageService(appMode)
         .getAllRecords()
         .then((allRules) => {
@@ -35,6 +37,7 @@ export const ungroupSelectedRules = (appMode, selectedRuleIds, user) => {
               ...allRules[ruleId],
               groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
             };
+            Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
             allPromises.push(
               StorageService(appMode).saveRuleOrGroup(updatedRule)
             );
@@ -52,12 +55,16 @@ export const deleteGroup = (
   groupwiseRulesToPopulate,
   forceDelete
 ) => {
-  if (forceDelete) return StorageService(appMode).removeRecord(groupId);
+  if (forceDelete) {
+    Logger.log("Removing from storage in deleteGroup");
+    return StorageService(appMode).removeRecord(groupId);
+  }
 
   if (!groupwiseRulesToPopulate[groupId]) {
     return Promise.reject("Invalid Group");
   }
   if (isEmpty(groupwiseRulesToPopulate[groupId]["group_rules"])) {
+    Logger.log("Removing from storage in deleteGroup");
     return StorageService(appMode).removeRecord(groupId);
   } else {
     return Promise.resolve({ err: "ungroup-rules-first" });

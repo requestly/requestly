@@ -8,6 +8,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //ACTIONS
 import { getSelectedRules } from "../../actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import Logger from "lib/logger";
 
 export const createNewGroup = (appMode, newGroupName, callback, user) => {
   const newGroupId = `Group_${generateObjectId()}`;
@@ -21,6 +22,7 @@ export const createNewGroup = (appMode, newGroupName, callback, user) => {
     status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
   };
 
+  Logger.log("Writing storage in createNewGroup");
   StorageService(appMode)
     .saveRuleOrGroup(newGroupObject)
     .then(async () => {
@@ -43,6 +45,7 @@ export const updateGroupOfSelectedRules = (
       reject();
     }
 
+    Logger.log("Reading storage in updateGroupOfSelectedRules");
     // Fetch all records to get rule data
     StorageService(appMode)
       .getAllRecords()

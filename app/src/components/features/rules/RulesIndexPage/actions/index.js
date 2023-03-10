@@ -1,5 +1,6 @@
 import APP_CONSTANTS from "config/constants";
 import { StorageService } from "init";
+import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const UNGROUPED_GROUP_ID =
@@ -31,6 +32,7 @@ export const isGroupsSanitizationPassed = async ({
           };
 
           // Save the rule
+          Logger.log("Writing to storage in RulesIndexPage actions");
           await StorageService(appMode).saveRuleOrGroup(ruleToSave);
           // Save to in-memory Rules array
           updatedRules[index] = ruleToSave;

@@ -36,6 +36,7 @@ import {
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
+import Logger from "lib/logger";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -71,10 +72,8 @@ const RuleBuilder = (props) => {
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [
-    isChangeRuleGroupModalActive,
-    setIsChangeRuleGroupModalActive,
-  ] = useState(false);
+  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] =
+    useState(false);
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
@@ -189,6 +188,7 @@ const RuleBuilder = (props) => {
           navigate
         );
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
+        Logger.log("Reading to storage in RuleBuilder");
         StorageService(appMode)
           .getRecord(RULE_TO_EDIT_ID)
           .then((rule) => {
@@ -241,6 +241,7 @@ const RuleBuilder = (props) => {
 
   //If "all rules" are not already there in state, fetch them.
   if (!fetchAllRulesComplete && isEmpty(allRules)) {
+    Logger.log("Reading to storage in RuleBuilder");
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
       .then((rules) => {

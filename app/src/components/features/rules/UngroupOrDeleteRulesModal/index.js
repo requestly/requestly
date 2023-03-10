@@ -19,6 +19,7 @@ import {
 } from "../DeleteRulesModal/actions";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
+import Logger from "lib/logger";
 
 const UNGROUPED_GROUP_ID =
   APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
@@ -44,6 +45,7 @@ const UngroupOrDeleteRulesModal = ({
 
     return new Promise((resolve) => {
       // Fetch all records to get rule data
+      Logger.log("Reading storage in doMoveToUngrouped");
       StorageService(appMode)
         .getAllRecords()
         .then((allRecords) => {
@@ -57,6 +59,7 @@ const UngroupOrDeleteRulesModal = ({
             };
             updatedRules.push(newRule);
           });
+          Logger.log("Writing storage in doMoveToUngrouped");
           StorageService(appMode)
             .saveMultipleRulesOrGroups(updatedRules)
             .then(() => resolve());

@@ -37,7 +37,6 @@ import UpdateSubscriptionContactUsView from "./views/misc/payments/UpdateSubscri
 import MySourcesView from "./views/mode-specific/desktop/MySourcesView";
 import InterceptTrafficView from "./views/mode-specific/desktop/InterceptTrafficView";
 import ManualSetupView from "./views/mode-specific/desktop/ManualSetupView";
-import SendDebugReport from "views/misc/SendDebugReport";
 // import MyOrganizationView from "views/user/Organization/MyOrganization"
 import MobileDebuggerCreateApp from "views/features/mobileDebugger/createApp";
 import MobileDebuggerHomeView from "views/features/mobileDebugger/home";
@@ -219,12 +218,6 @@ var routes = [
     name: "Pricing",
     icon: "ni ni-lock-circle-open text-red",
     component: Pricing,
-  },
-  {
-    path: PATHS.SEND_DEBUG_REPORT.RELATIVE,
-    name: "Send Debug Report",
-    icon: "ni ni-lock-circle-open text-red",
-    component: SendDebugReport,
   },
   {
     path: PATHS.LICENSE.MANAGE.RELATIVE,

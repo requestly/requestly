@@ -2,7 +2,6 @@ import {
   getValueAsPromise,
   updateValueAsPromise,
 } from "../../actions/FirebaseActions";
-import APP_CONSTANTS from "../../config/constants";
 import { StorageService } from "../../init";
 import {
   trackSyncCompleted,
@@ -25,15 +24,30 @@ export const getMetadataSyncPath = () => {
     return ["sync", window.uid, "metadata"];
   }
 };
-export const getRecordsSyncPath = () => {
-  if (window.currentlyActiveWorkspaceTeamId) {
-    // This is a team workspace syncing
-    return ["teamSync", window.currentlyActiveWorkspaceTeamId, "records"];
-  } else {
-    // This is personal syncing
-    return ["sync", window.uid, "records"];
+
+const getTeamSyncPath = (team_id) => {
+  const teamId = team_id || window.currentlyActiveWorkspaceTeamId;
+  return ["teamSync", teamId, "records"];
+};
+const getIndividualSyncPath = (uid) => {
+  const userId = uid || window.uid;
+  return ["sync", userId, "records"];
+};
+
+export const getRecordsSyncPath = (syncTarget, uid, team_id) => {
+  switch (syncTarget) {
+    case "teamSync":
+      return getTeamSyncPath(team_id);
+    case "sync":
+      return getIndividualSyncPath(uid);
+
+    default:
+      if (window.currentlyActiveWorkspaceTeamId) {
+        return getTeamSyncPath(team_id);
+      } else return getIndividualSyncPath(uid);
   }
 };
+
 export const getAllTeamUserRulesConfigPath = () => {
   return [
     "teamSync",
@@ -57,6 +71,8 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
 export const updateUserSyncMetadata = (uid, metadata, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(getMetadataSyncPath(uid), metadata);
+
+    Logger.log("Writing storage in updateUserSyncMetadata");
     StorageService(appMode)
       .saveRecord(metadata)
       .then(() => resolve())
@@ -129,6 +145,7 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
   }
 
   try {
+    window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
     await updateValueAsPromise(getRecordsSyncPath(), localRecords);
   } catch (error) {
     Logger.error("err update sync records", error);
@@ -165,29 +182,6 @@ export const removeUserSyncRecords = (uid, recordIds) => {
   });
 };
 
-export const getSyncTimestamp = (uid, appMode) => {
-  const syncTimestamp = {};
-  return new Promise((resolve) => {
-    (async () => {
-      try {
-        const val = await getValueAsPromise(getMetadataSyncPath(uid));
-        syncTimestamp["firebaseTimestamp"] =
-          val[APP_CONSTANTS.LAST_SYNC_TIMESTAMP];
-      } catch {
-        syncTimestamp["firebaseTimestamp"] = null;
-      }
-      try {
-        syncTimestamp["localTimestamp"] = await StorageService(
-          appMode
-        ).getRecord(APP_CONSTANTS.LAST_SYNC_TIMESTAMP);
-      } catch {
-        syncTimestamp["localTimestamp"] = null;
-      }
-      resolve(syncTimestamp);
-    })().catch((e) => Logger.log("Caught: " + e));
-  });
-};
-
 export const processRecordsObjectIntoArray = (records) => {
   const recordsArray = [];
   Object.keys(records).forEach((key) => {
@@ -205,10 +199,8 @@ export const processRecordsArrayIntoObject = (recordsArray) => {
   return formattedObject;
 };
 
-export const getAllSyncedRecords = async (appMode) => {
+export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
   try {
-    const allRemoteRecords =
-      (await getValueAsPromise(getRecordsSyncPath())) || {};
     const remoteRecords = {};
     Object.keys(allRemoteRecords).forEach((key) => {
       if (!isEmpty(allRemoteRecords[key]?.id)) {
@@ -267,35 +259,14 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
   return [...rules, ...groups];
 };
 
-export const syncAllRulesAndGroupsToFirebase = async (
-  uid,
-  appMode,
-  timestamp
-) => {
-  const { rules, groups } = await getAllRulesAndGroups(appMode);
-  const allRecords = [...rules, ...groups];
-  const recordsObject = processRecordsArrayIntoObject(allRecords);
-
-  trackSyncTriggered(
-    uid,
-    allRecords.length,
-    SYNC_CONSTANTS.SYNC_ALL_RECORDS_TO_FIREBASE
-  );
-
-  updateUserSyncRecords(uid, recordsObject).then(() => {
-    trackSyncCompleted(uid);
-  });
-  setLastSyncTimestamp(uid, appMode, timestamp);
-};
-
 export const saveRecords = (records, appMode) => {
+  Logger.log("Writing storage in saveRecords");
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };
 
 export const syncToLocalFromFirebase = async (
   allSyncedRecords,
   appMode,
-  timestamp,
   uid
 ) => {
   // dump the entire firebase node in the storage
@@ -311,9 +282,13 @@ export const syncToLocalFromFirebase = async (
   const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter(
     (x) => !recordIdsOnFirebase.includes(x)
   );
-  await StorageService(appMode).removeRecordsWithoutSyncing(
-    recordsThatShouldBeDeletedFromLocal
-  );
+  if (!isEmpty(recordsThatShouldBeDeletedFromLocal)) {
+    Logger.log("Removing storage in syncToLocalFromFirebase");
+    await StorageService(appMode).removeRecordsWithoutSyncing(
+      recordsThatShouldBeDeletedFromLocal
+    );
+  }
+
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
 
   // Todo - @sagar - Fix duplicate code - src/utils/syncing/syncDataUtils.js
@@ -356,46 +331,10 @@ export const syncToLocalFromFirebase = async (
   }
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
-  setLastSyncTimestampInLocalStorage(appMode, timestamp);
+  Logger.log("Writing storage in syncToLocalFromFirebase");
   return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(
     allSyncedRecords
   );
-};
-
-/**
- * Sets current time as last-synced timestamp in firebase as well as appMode local storage
- * @param {String} uid
- * @param {String} appMode-const appmode from globalstore
- * @param {Number} timestampToUse epoce timestamp
- */
-export const setLastSyncTimestamp = async (uid, appMode, timestampToUse) => {
-  const timestamp = timestampToUse || getCurrentTimestamp();
-  const syncTimestampObject = {
-    [APP_CONSTANTS.LAST_SYNC_TIMESTAMP]: timestamp,
-  };
-
-  window.skipSyncListenerForNextOneTime = true; // Prevents syncing infinite loop
-  updateUserSyncMetadata(uid, syncTimestampObject, appMode); // update in firebase db and local storage
-};
-
-/**
- * Sets firebase timestamp as last-synced timestamp in local storage
- * @param {String} appMode-const appmode from globalstore
- * @param {Number} timestampToUse epoch timestamp
- */
-export const setLastSyncTimestampInLocalStorage = (
-  appMode,
-  timestampToUse = null
-) => {
-  const syncTimestampObject = {
-    [APP_CONSTANTS.LAST_SYNC_TIMESTAMP]: timestampToUse,
-  };
-
-  StorageService(appMode).saveRecord(syncTimestampObject);
-};
-
-const getCurrentTimestamp = () => {
-  return Date.now();
 };
 
 export const mergeRecords = (firebaseRecords, localRecords) => {
@@ -431,6 +370,9 @@ const saveSessionRecordingPageConfigLocallyWithoutSync = async (
   object,
   appMode
 ) => {
+  Logger.log(
+    "Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync"
+  );
   await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
 
@@ -445,6 +387,7 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 };
 
 export const getLocalSessionRecordingPageConfig = (appMode) => {
+  Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
   return new Promise((resolve) => {
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
@@ -464,7 +407,6 @@ export const syncSessionRecordingPageConfigToFirebase = async (
   updateSessionRecordingPageConfig(uid, pageConfig).then(() => {
     trackSyncCompleted(uid);
   });
-  setLastSyncTimestamp(uid, appMode, timestamp);
 };
 
 export const updateSessionRecordingPageConfig = (uid, recordObject) => {
@@ -488,12 +430,10 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
   ];
   let mergedPageSources;
 
-  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(
-    uid
-  );
-  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(
-    appMode
-  );
+  const firebaseSessionRecordingPageConfig =
+    await getSyncedSessionRecordingPageConfig(uid);
+  const localSessionRecordingPageConfig =
+    await getLocalSessionRecordingPageConfig(appMode);
 
   const firebasePageSources =
     firebaseSessionRecordingPageConfig?.pageSources || [];

@@ -12,6 +12,7 @@ import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
 import "./RuleEditor.css";
+import Logger from "lib/logger";
 
 const RuleEditor = (props) => {
   //Constants
@@ -30,6 +31,7 @@ const RuleEditor = (props) => {
       appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ||
       appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
     ) {
+      Logger.log("Reading storage in RuleEditor useEffect");
       StorageService(appMode)
         .getRecord(APP_CONSTANTS.RQ_SETTINGS)
         .then((value) => {

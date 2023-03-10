@@ -16,6 +16,7 @@ import APP_CONSTANTS from "config/constants";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import SpinnerCard from "components/misc/SpinnerCard";
+import Logger from "lib/logger";
 
 const RulesIndexView = () => {
   //Global State
@@ -50,6 +51,7 @@ const RulesIndexView = () => {
   useEffect(() => {
     // setting if extension is disabled
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      Logger.log("Reading storage in RulesIndexView useEffect");
       StorageService(appMode)
         .getRecord(APP_CONSTANTS.RQ_SETTINGS)
         .then((value) => {
@@ -92,7 +94,10 @@ const RulesIndexView = () => {
   };
   if (showLoader) {
     return (
-      <SpinnerCard customLoadingMessage="Loading Rules" skeletonType="list" />
+      <SpinnerCard
+        customLoadingMessage="Getting your rules ready"
+        skeletonType="list"
+      />
     );
   } else {
     return <>{renderRulesIndex()}</>;

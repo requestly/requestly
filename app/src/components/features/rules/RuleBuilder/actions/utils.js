@@ -37,7 +37,7 @@ export const createResponseRule = (appMode, source_url, response_body) => {
 
   let rule = generate_blank_rule_format(rule_type);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, null, rule, null);
+  saveRule(appMode, rule);
   return rule;
 };
 
@@ -65,7 +65,7 @@ export const updateResponseRule = (
 
   let rule = generate_blank_rule_format(rule_type, rule_id);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, null, rule, null);
+  saveRule(appMode, rule);
 };
 
 export const getRuleLevelInitialConfigs = (ruleType) => {

@@ -21,6 +21,7 @@ import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
+import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -57,6 +58,7 @@ const SharedListsIndexPage = () => {
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      Logger.log("Reading storage in sharedlist index page useEffect");
       StorageService(appMode)
         .getRecord(APP_CONSTANTS.RQ_SETTINGS)
         .then((value) => {

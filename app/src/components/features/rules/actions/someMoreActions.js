@@ -9,31 +9,31 @@ import { generateObjectId } from "utils/FormattingHelper";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { getExecutionLogsId } from "utils/rules/misc";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import Logger from "lib/logger";
 //DOWNLOAD.JS
 const fileDownload = require("js-file-download");
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
-export const deleteRule = (
+export const deleteRule = async (
   appMode,
   dispatch,
   ruleId,
   isRulesListRefreshPending
 ) => {
-  return StorageService(appMode)
-    .removeRecord(ruleId)
-    .then(() => deleteRuleMetaData(appMode, ruleId))
-    .then(() => {
-      dispatch(
-        actions.updateRefreshPendingStatus({
-          type: "rules",
-          newValue: !isRulesListRefreshPending,
-        })
-      );
-    });
+  Logger.log("Removing from storage in deleteRule");
+  await StorageService(appMode).removeRecord(ruleId);
+  deleteRuleMetaData(appMode, ruleId);
+  dispatch(
+    actions.updateRefreshPendingStatus({
+      type: "rules",
+      newValue: !isRulesListRefreshPending,
+    })
+  );
 };
 
 const deleteRuleExecutionLog = (appMode, ruleId) => {
+  Logger.log("Removing from storage in deleteRuleExecutionLog");
   return StorageService(appMode).removeRecord(getExecutionLogsId(ruleId));
 };
 
@@ -41,7 +41,7 @@ const deleteRuleMetaData = (appMode, ruleId) => {
   deleteRuleExecutionLog(appMode, ruleId);
 };
 
-export const copyRule = (appMode, rule, navigate, callback) => {
+export const copyRule = async (appMode, rule, navigate, callback) => {
   const newRule = {
     ...rule,
     creationDate: generateObjectCreationDate(),
@@ -51,13 +51,11 @@ export const copyRule = (appMode, rule, navigate, callback) => {
     isFavourite: false,
     status: "Inactive",
   };
+  Logger.log("Writing storage in copyRule");
 
-  return StorageService(appMode)
-    .saveRuleOrGroup(newRule)
-    .then(() => {
-      redirectToRuleEditor(navigate, newRule.id);
-      callback?.();
-    });
+  await StorageService(appMode).saveRuleOrGroup(newRule);
+  redirectToRuleEditor(navigate, newRule.id);
+  callback?.();
 };
 
 export const exportRule = (rule, groupwiseRules) => {

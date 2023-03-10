@@ -32,6 +32,7 @@ import OnboardingView from "./OnboardingView";
 import { actions } from "../../../../../store";
 import CreateSessionGuide from "./CreateFirstSessionGuide";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import Logger from "lib/logger";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -157,6 +158,7 @@ const SessionsIndexPage = () => {
 
   const handleSaveConfig = useCallback(
     async (newConfig) => {
+      Logger.log("Writing storage in handleSaveConfig");
       await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
       setConfig(newConfig);
       closeConfigModal(false);
@@ -182,6 +184,7 @@ const SessionsIndexPage = () => {
   );
 
   useEffect(() => {
+    Logger.log("Reading storage in SessionsIndexPage");
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
       .then((savedConfig) => setConfig(savedConfig || {}));

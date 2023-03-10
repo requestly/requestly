@@ -5,10 +5,12 @@ import APP_CONSTANTS from "../../../../../config/constants";
 //FUNCTIONS
 import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-rules-pairs";
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
+import Logger from "lib/logger";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
 export const addRulesAndGroupsToStorage = (appMode, array) => {
+  Logger.log("Writing to storage in addRulesAndGroupsToStorage");
   return StorageService(appMode).saveMultipleRulesOrGroups(array);
 };
 
