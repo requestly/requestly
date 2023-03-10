@@ -35,7 +35,7 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getColorFromString } from "utils/getColorFromString";
+import { getUniqueColorForWorkspace } from "utils/teams";
 import "./WorkSpaceSelector.css";
 
 export const isWorkspacesFeatureEnabled = (email) => {
@@ -87,7 +87,10 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
                 ? activeWorkspaceName ===
                   APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
                   ? "#1E69FF"
-                  : getColorFromString(activeWorkspaceName)
+                  : getUniqueColorForWorkspace(
+                      currentlyActiveWorkspace?.id,
+                      activeWorkspaceName
+                    )
                 : "#ffffff4d",
             }}
           />
@@ -295,7 +298,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                     icon={team.name?.[0]?.toUpperCase() ?? "P"}
                     className="workspace-avatar"
                     style={{
-                      backgroundColor: `${getColorFromString(team.name)}`,
+                      backgroundColor: `${getUniqueColorForWorkspace(
+                        team.id,
+                        team.name
+                      )}`,
                     }}
                   />
                 }

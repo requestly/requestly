@@ -22,7 +22,7 @@ const MembersDetails = ({ teamId }) => {
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId);
+  const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const { accessCount } = teamDetails;
 
   // To handle refresh in TeamMembersTable

@@ -1,7 +1,7 @@
 export const getColorFromString = (
   string = "",
   saturation = 60,
-  lightness = 40
+  lightness = 38
 ) => {
   const hue = string.split("").reduce((hue, char) => {
     let hash = char.charCodeAt(0) + ((hue << 5) - hue);
@@ -9,5 +9,5 @@ export const getColorFromString = (
     return hash;
   }, 0);
 
-  return `hsl(${(hue + 20) % 360}, ${saturation}%, ${lightness}%)`;
+  return `hsl(${hue % 360}, ${saturation}%, ${lightness}%)`;
 };

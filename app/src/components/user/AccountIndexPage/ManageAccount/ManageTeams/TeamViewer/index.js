@@ -7,12 +7,11 @@ import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { getColorFromString } from "utils/getColorFromString";
+import { getUniqueColorForWorkspace } from "utils/teams";
 import "./TeamViewer.css";
 
 const TeamViewer = ({ teamId }) => {
   // Component State
-  // const navigate = useNavigate();
   const [isTeamAdmin, setIsTeamAdmin] = useState(false);
 
   // Global State
@@ -87,7 +86,10 @@ const TeamViewer = ({ teamId }) => {
                 shape="square"
                 icon={name ? name?.[0]?.toUpperCase() : "P"}
                 style={{
-                  backgroundColor: `${getColorFromString(name)}`,
+                  backgroundColor: `${getUniqueColorForWorkspace(
+                    teamId,
+                    name
+                  )}`,
                 }}
               />{" "}
               <span className="header">
