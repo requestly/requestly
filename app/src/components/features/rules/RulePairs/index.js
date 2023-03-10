@@ -194,7 +194,6 @@ const RulePairs = (props) => {
             ruleDetails={props.currentlySelectedRuleConfig}
             isInputDisabled={isInputDisabled}
             responseRuleResourceType={responseRuleResourceType}
-            setResponseRuleResourceType={setResponseRuleResourceType}
           />
         );
       case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
@@ -367,6 +366,7 @@ const RulePairs = (props) => {
     <>
       {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
         <ResponseRuleResourceTypes
+          currentlySelectedRuleData={currentlySelectedRuleData}
           responseRuleResourceType={responseRuleResourceType}
           setResponseRuleResourceType={setResponseRuleResourceType}
         />

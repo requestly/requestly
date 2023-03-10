@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 // Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -27,12 +28,13 @@ const ResponseBodyRow = ({
 }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const appMode = useSelector(getAppMode);
+  const { pathname } = useLocation();
 
   const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(
     false
   );
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
-    GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+    pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
   const [editorStaticValue, setEditorStaticValue] = useState(
     pair.response.value
@@ -41,26 +43,32 @@ const ResponseBodyRow = ({
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const onChangeResponseType = useCallback(
-    (responseType) => {
+    (responseBodyType) => {
       if (
         Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
-          responseType
+          responseBodyType
         )
       ) {
         let value = "{}";
-        if (responseType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
+        if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
           value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
         } else {
           setIsCodeMinified(true);
           setEditorStaticValue(value);
         }
 
-        modifyPairAtGivenPath(null, pairIndex, `response.type`, responseType, [
-          {
-            path: `response.value`,
-            value: value,
-          },
-        ]);
+        modifyPairAtGivenPath(
+          null,
+          pairIndex,
+          `response.type`,
+          responseBodyType,
+          [
+            {
+              path: `response.value`,
+              value: value,
+            },
+          ]
+        );
       }
     },
     [ruleDetails, pairIndex, modifyPairAtGivenPath]
@@ -148,15 +156,16 @@ const ResponseBodyRow = ({
   };
 
   useEffect(() => {
-    if (responseRuleResourceType) {
-      onChangeResponseType(
-        responseRuleResourceType === "graphqlApi"
-          ? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
-          : GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-      );
-    }
+    if (!pathname.includes("create")) return;
+
+    onChangeResponseType(
+      responseRuleResourceType === "graphqlApi"
+        ? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+        : GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+    );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [responseRuleResourceType]);
+  }, [pathname, responseRuleResourceType]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {

@@ -64,7 +64,6 @@ const ResponseRulePair = ({
       <Row>
         <Col span={24}>
           <ResponseBodyRow
-            key={responseRuleResourceType}
             rowIndex={2}
             pair={pair}
             pairIndex={pairIndex}
