@@ -45,7 +45,10 @@ const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
   });
 };
 
-const mergeRecordsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
+export const mergeRecordsAndSaveToFirebase = async (
+  appMode,
+  recordsOnFirebase
+) => {
   const localRecords = await getAllLocalRecords(appMode);
   const mergedRecords = mergeRecords(recordsOnFirebase, localRecords);
 

@@ -19,7 +19,7 @@ const useDatabase = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   let unsubscribeUserNodeRef = useRef(null);
-  let unsubscribeSyncingNodeRef = useRef(null);
+  window.unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
 
   const useHasChanged = (val) => {
@@ -56,12 +56,13 @@ const useDatabase = () => {
     if (hasAuthStateChanged || !window.isFirstSyncComplete)
       dispatch(actions.updateIsRulesListLoading(true));
 
-    if (unsubscribeSyncingNodeRef.current) unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
+    if (window.unsubscribeSyncingNodeRef.current)
+      window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
     if (user?.loggedIn && user?.details?.profile?.uid) {
       if (currentlyActiveWorkspace.id) {
         // This is a team sync
         // Set the db node listener
-        unsubscribeSyncingNodeRef.current = syncingNodeListener(
+        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           "teamSync",
           user?.details?.profile.uid,
@@ -74,7 +75,7 @@ const useDatabase = () => {
       ) {
         // This is individual syncing
         // Set the db node listener
-        unsubscribeSyncingNodeRef.current = syncingNodeListener(
+        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           "sync",
           user?.details?.profile.uid,
