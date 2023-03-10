@@ -263,10 +263,10 @@ const DraftSessionViewer: React.FC = () => {
             icon={<SaveOutlined />}
             onClick={() => setIsSaveModalVisible(true)}
           >
-            Save Recording
+            Save Session
           </Button>
           <Modal
-            title="Save Recording"
+            title="Save Session"
             open={isSaveModalVisible}
             onCancel={() => setIsSaveModalVisible(false)}
             width="500px"
@@ -278,7 +278,7 @@ const DraftSessionViewer: React.FC = () => {
           >
             <Space direction="vertical">
               <Row>
-                <p>Recording Name:</p>
+                <p>Session Name:</p>
                 <Input
                   status={!sessionRecordingName ? "error" : ""}
                   value={sessionRecordingName}
@@ -288,12 +288,12 @@ const DraftSessionViewer: React.FC = () => {
               </Row>
               <Row>
                 <Col>
-                  <p>Options</p>
+                  <p>Information to include in session:</p>
                 </Col>
                 <Col className="session-metadata-tooltip-icon">
                   <Tooltip
                     title={
-                      "Select the options to save. These cannot be changed after saving."
+                      "This setting cannot be updated once the session is saved."
                     }
                     placement="right"
                   >
