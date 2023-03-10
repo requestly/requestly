@@ -40,3 +40,11 @@
   width: 100%;
   margin: 20px 0;
 }
+.survey-upload-rule-text {
+  margin-top: 20px;
+}
+.survey-upload-btn {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
