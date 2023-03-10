@@ -61,10 +61,10 @@ export const recommendation = [
   {
     id: PersonaType.QUALITY,
     recommended: [
-      "Bug Reporting",
+      "Modify API Response",
       "Redirect Request",
-      "Insert Scripts",
-      "Delay Network Requests",
+      "Modify Headers",
+      "Replace String",
     ],
   },
   {
