@@ -25,8 +25,6 @@ interface ResponseRuleResourceTypesProps {
   setResponseRuleResourceType: (type: ResponseRuleResourceType) => void;
 }
 
-let i = 0;
-
 const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   currentlySelectedRuleData,
   responseRuleResourceType,
@@ -41,17 +39,14 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   ] = useState<boolean>(false);
 
   const isDesktop = useMemo(isDesktopMode, []);
+  const currentResourceType =
+    currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
 
-  // useEffect(() => {
-  //   const resourceType =
-  //     currentlySelectedRuleData?.pairs?.[0].response?.resourceType;
-
-  //   console.log("logging :: rendering :: ", i++, resourceType);
-
-  //   if (resourceType) {
-  //     // setResponseRuleResourceType(resourceType);
-  //   }
-  // }, [currentlySelectedRuleData, setResponseRuleResourceType]);
+  useEffect(() => {
+    if (currentResourceType) {
+      setResponseRuleResourceType(currentResourceType);
+    }
+  }, [currentResourceType, setResponseRuleResourceType]);
 
   const handleOnConfirm = () => {
     setResponseTypePopupVisible(false);
