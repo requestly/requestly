@@ -17,7 +17,7 @@ const TeamViewer = ({ teamId }) => {
   // Global State
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
-  const { name } = teamDetails;
+  const name = teamDetails?.name;
 
   // const params = new URLSearchParams(window.location.search);
   // const redirectBackToMyTeams = params.has("redirectBackToMyTeams")

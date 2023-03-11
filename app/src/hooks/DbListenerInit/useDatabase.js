@@ -1,7 +1,10 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  getCurrentlyActiveWorkspace,
+  getCurrentlyActiveWorkspaceMembers,
+} from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
@@ -9,12 +12,18 @@ import userNodeListener from "./userNodeListener";
 import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { getAuth, getIdTokenResult } from "firebase/auth";
+import firebaseApp from "../../firebase";
 
 const useDatabase = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const currentlyActiveWorkspaceMembers = useSelector(
+    getCurrentlyActiveWorkspaceMembers
+  );
   let unsubscribeUserNodeRef = useRef(null);
   let unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
@@ -95,7 +104,38 @@ const useDatabase = () => {
     user?.details?.profile?.uid,
     user?.loggedIn,
   ]);
+
+  const isUserWorkspaceAdmin = (uid, currentWorkspaceMembersMap) => {
+    const userDetails = currentWorkspaceMembersMap[uid];
+    if (userDetails) {
+      return userDetails.isAdmin;
+    }
+    return false;
+  };
+
   //todo: update custom claims. Also handle old users
+  const functions = getFunctions();
+  const updateCustomClaims = httpsCallable(functions, "updateCustomClaims");
+  useEffect(() => {
+    console.log("workspace", currentlyActiveWorkspace);
+    const uid = user?.details?.profile.uid;
+    const role = isUserWorkspaceAdmin(uid, currentlyActiveWorkspaceMembers)
+      ? "Admin"
+      : "Reader";
+    updateCustomClaims({
+      uid,
+      role,
+      teamId: currentlyActiveWorkspace?.id,
+    }).then(() => {
+      // refresh client token to get the updated claims
+      getIdTokenResult(getAuth(firebaseApp).currentUser, true);
+    });
+  }, [
+    user,
+    currentlyActiveWorkspace,
+    updateCustomClaims,
+    currentlyActiveWorkspaceMembers,
+  ]);
 };
 
 export default useDatabase;
