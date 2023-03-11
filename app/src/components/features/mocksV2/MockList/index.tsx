@@ -48,7 +48,6 @@ const MockListIndex: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
@@ -105,9 +104,10 @@ const MockListIndex: React.FC<Props> = ({
     });
   }, [type, uid]);
 
-  const fetchMocks = useCallback(() => {
+  const fetchMocks = useCallback(async () => {
+    // console.log("current token", await getAuth(firebaseApp)?.currentUser?.getIdTokenResult())
     // API|FILE|null
-    getMocks(uid, type, teamId)
+    getMocks(uid, type, workspace?.id)
       .then((data) => {
         setMocksList(data);
         setIsLoading(false);
@@ -116,7 +116,7 @@ const MockListIndex: React.FC<Props> = ({
         setMocksList([]);
         setIsLoading(false);
       });
-  }, [type, uid, teamId]);
+  }, [type, uid, workspace]);
 
   useEffect(() => {
     fetchMocks();

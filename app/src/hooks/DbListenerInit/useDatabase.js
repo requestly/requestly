@@ -1,10 +1,7 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getCurrentlyActiveWorkspace,
-  getCurrentlyActiveWorkspaceMembers,
-} from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
@@ -21,9 +18,6 @@ const useDatabase = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const currentlyActiveWorkspaceMembers = useSelector(
-    getCurrentlyActiveWorkspaceMembers
-  );
   let unsubscribeUserNodeRef = useRef(null);
   let unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
@@ -105,36 +99,22 @@ const useDatabase = () => {
     user?.loggedIn,
   ]);
 
-  const isUserWorkspaceAdmin = (uid, currentWorkspaceMembersMap) => {
-    const userDetails = currentWorkspaceMembersMap[uid];
-    if (userDetails) {
-      return userDetails.isAdmin;
-    }
-    return false;
-  };
-
-  //todo: update custom claims. Also handle old users
+  /* Update and refresh custom claims in auth token */
   const functions = getFunctions();
   const updateCustomClaims = httpsCallable(functions, "updateCustomClaims");
   useEffect(() => {
-    console.log("workspace", currentlyActiveWorkspace);
     const uid = user?.details?.profile.uid;
-    const role = isUserWorkspaceAdmin(uid, currentlyActiveWorkspaceMembers)
-      ? "Admin"
-      : "Reader";
-    updateCustomClaims({
-      uid,
-      role,
-      teamId: currentlyActiveWorkspace?.id,
-    }).then(() => {
-      // refresh client token to get the updated claims
+    updateCustomClaims({ uid }).then(() => {
+      /* Force refresh client token to get the updated claims */
       getIdTokenResult(getAuth(firebaseApp).currentUser, true);
+      console.log("force updated");
     });
   }, [
-    user,
+    user?.details?.profile?.uid,
+    user?.loggedIn,
     currentlyActiveWorkspace,
     updateCustomClaims,
-    currentlyActiveWorkspaceMembers,
+    dispatch,
   ]);
 };
 

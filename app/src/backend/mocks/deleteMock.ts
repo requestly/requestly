@@ -4,7 +4,8 @@ import { removeUserMockSelector } from "./common";
 
 export const deleteMock = async (
   uid: string,
-  mockId: string
+  mockId: string,
+  teamId?: string
 ): Promise<boolean> => {
   if (!uid) {
     return false;
@@ -12,7 +13,7 @@ export const deleteMock = async (
 
   const success = await deleteMockFromFirebase(mockId);
   if (success) {
-    await removeUserMockSelector(uid, mockId);
+    await removeUserMockSelector(uid, mockId, teamId);
     return true;
   }
   return false;
