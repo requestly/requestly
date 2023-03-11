@@ -30,7 +30,6 @@ const slice = createSlice({
         state.currentlyActiveWorkspace.membersCount = payload.membersCount;
     },
     setCurrentlyActiveWorkspaceMembers: (state, action) => {
-      console.log("team members", action.payload);
       state.currentlyActiveWorkspaceMembers = action.payload;
     },
   },
