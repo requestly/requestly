@@ -1,4 +1,4 @@
-import { onValue } from "firebase/database";
+import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
 import { isLocalStoragePresent } from "utils/AppUtils";
@@ -129,8 +129,17 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
       getRecordsSyncPath(syncTarget, uid, team_id)
     );
 
-    return onValue(syncNodeRef, async (snap) => {
-      const updatedFirebaseRecords = snap.val();
+    const invokeSyncingIfRequired = async (latestFirebaseRecords) => {
+      let updatedFirebaseRecords;
+      if (latestFirebaseRecords) {
+        // Means invoked for the newer time
+        updatedFirebaseRecords = latestFirebaseRecords;
+      } else {
+        // Means invoked for the first time
+        const syncNodeRefNode = await get(syncNodeRef);
+        updatedFirebaseRecords = syncNodeRefNode.val();
+      }
+
       if (window.skipSyncListenerForNextOneTime) {
         window.skipSyncListenerForNextOneTime = false;
         window.isFirstSyncComplete = true; // Just in case!
@@ -165,6 +174,11 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
           team_id
         );
       }
+    };
+    invokeSyncingIfRequired();
+
+    return onValue(syncNodeRef, async (snap) => {
+      await invokeSyncingIfRequired(snap);
     });
   } catch (e) {
     Logger.log(e);
