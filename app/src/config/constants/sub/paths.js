@@ -28,7 +28,7 @@ PATHS.OVERVIEW.RELATIVE = "/overview";
 PATHS.OVERVIEW.ABSOLUTE = joinPaths(PATHS.DASHBOARD, PATHS.OVERVIEW.RELATIVE);
 
 // Getting started
-PATHS.GETTING_STARTED = "/getting-started";
+PATHS.GETTING_STARTED = "/fb-vs-gh/getting-started";
 
 // Onboarding
 PATHS.ONBOARDING = {};
