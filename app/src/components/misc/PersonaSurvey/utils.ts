@@ -1,5 +1,5 @@
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { useCaseOptions } from "./types";
+import { multipleChoiceOption } from "./types";
 
 export const shouldShowPersonaSurvey = async (appMode: string) => {
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
@@ -7,8 +7,8 @@ export const shouldShowPersonaSurvey = async (appMode: string) => {
   else return false;
 };
 
-export const getFormattedUserUseCases = (useCases: useCaseOptions[]) => {
-  const result = useCases.map((useCase: useCaseOptions) => {
+export const getFormattedUserUseCases = (useCases: multipleChoiceOption[]) => {
+  const result = useCases.map((useCase: multipleChoiceOption) => {
     if (useCase.optionType === "other") return "OTHER:" + useCase.value;
     else return useCase.value;
   });

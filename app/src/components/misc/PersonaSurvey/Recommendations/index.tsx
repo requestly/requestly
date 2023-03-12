@@ -12,6 +12,8 @@ import { trackPersonaRecommendationSelected } from "modules/analytics/events/mis
 import "./index.css";
 import { RQButton } from "lib/design-system/components";
 import { AiOutlineCloudUpload } from "react-icons/ai";
+//@ts-ignore
+import arrowRightSm from "assets/icons/arrow-right-sm.svg";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
@@ -81,6 +83,12 @@ export const UserRecommendations: React.FC<RecommendationsProps> = ({
                     <>{feature?.icon?.()}</>
                     <div className="white">{feature.title}</div>
                   </div>
+                  <img
+                    alt="arrow"
+                    width="16px"
+                    height="16px"
+                    src={arrowRightSm}
+                  />
                 </Tooltip>
               </div>
             )}
