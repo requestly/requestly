@@ -5,9 +5,10 @@
   display: flex;
   justify-content: flex-end;
   cursor: pointer;
-  margin-top: -20px;
+  margin-top: -30px;
+  margin-left: 10px;
   color: var(--white);
-  float: right;
+  width: 100%;
 }
 .survey-modal .skip-recommendation:hover {
   color: inherit;

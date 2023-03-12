@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Checkbox } from "antd";
 import "./index.css";
 import { RQInput } from "lib/design-system/components";
-import { ActiveProps, Option, useCaseOptions } from "../types";
+import { ActiveProps, Option, multipleChoiceOption } from "../types";
 
 interface OptionProps {
   option: Option;
@@ -30,15 +30,29 @@ export const SurveyOption: React.FC<OptionProps> = ({
 
   const { title, type, icon } = option;
   const dispatch = useDispatch();
+  const key = userPersona[fieldKey];
 
   const [customInput, setCustomInput] = useState<string>(null);
+  const [isOptionActive, setIsOptionActive] = useState<boolean>(false);
 
-  const key = userPersona[fieldKey];
+  useEffect(() => {
+    if (type === "text") {
+      setIsOptionActive(
+        isActive?.({
+          key,
+          title,
+          optionType: "other",
+        })
+      );
+    } else {
+      setIsOptionActive(isActive?.({ key, title }));
+    }
+  }, [isActive, title, key, type]);
 
   useEffect(() => {
     if (type === "text") {
       const option = key.find(
-        (option: useCaseOptions) => option.optionType === "other"
+        (option: multipleChoiceOption) => option.optionType === "other"
       );
       if (option) setCustomInput(option.value);
       else setCustomInput(null);
@@ -47,14 +61,13 @@ export const SurveyOption: React.FC<OptionProps> = ({
 
   return (
     <>
-      {type === "select" ? (
+      {type !== "text" ? (
+        // predefined options
         <div
           className={`survey-option survey-select ${
-            isActive?.({ key, title }) && "outline-active-option"
+            isOptionActive && "outline-active-option"
           }`}
-          onClick={() =>
-            action(dispatch, title, isActive?.({ key, title }), "select")
-          }
+          onClick={() => action(dispatch, title, isOptionActive, "select")}
         >
           <div className="white text-bold survey-option-title">
             {
@@ -71,20 +84,17 @@ export const SurveyOption: React.FC<OptionProps> = ({
           <Checkbox
             className={
               questionType === "single"
-                ? !isActive?.({ key, title }) && "hide-option-checkbox"
+                ? !isOptionActive && "hide-option-checkbox"
                 : null
             }
-            checked={isActive?.({ key, title })}
+            checked={isOptionActive}
           />
         </div>
       ) : (
+        //Other: custom input option
         <div
           className={`survey-option survey-text ${
-            isActive?.({
-              key,
-              title,
-              optionType: "other",
-            }) && "outline-active-option"
+            isOptionActive && "outline-active-option"
           }`}
         >
           <div className="white text-bold survey-text-prefix">Other:</div>
@@ -96,15 +106,13 @@ export const SurveyOption: React.FC<OptionProps> = ({
             onChange={(e) => {
               setCustomInput(e.target.value);
               let title = e.target.value;
-              action(dispatch, title, isActive?.({ key, title }), "other");
+              action(dispatch, title, false, "other");
             }}
           />
           <>
-            {isActive?.({
-              key,
-              title,
-              optionType: "other",
-            }) && <Checkbox checked={true} className="survey-text-suffix" />}
+            {isOptionActive && (
+              <Checkbox checked={true} className="survey-text-suffix" />
+            )}
           </>
         </div>
       )}
