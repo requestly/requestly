@@ -178,7 +178,7 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
     invokeSyncingIfRequired();
 
     return onValue(syncNodeRef, async (snap) => {
-      await invokeSyncingIfRequired(snap);
+      await invokeSyncingIfRequired(snap.val());
     });
   } catch (e) {
     Logger.log(e);
