@@ -1,23 +1,36 @@
 .survey-modal .recommendations-container .recommended-feature-container,
 .other-recommended-feature-container {
-  background: var(--component-background);
   padding: 1rem;
   border-radius: var(--border-radius-md);
   cursor: pointer;
-  width: 48%;
+  width: 100%;
+  transition: 0.2s ease-in-out;
 }
+.survey-modal .recommendations-container .recommended-feature-container {
+  border: 1px solid var(--border-dark);
+}
+.survey-modal .recommendations-container .recommended-feature-container:hover {
+  background: var(--component-background);
+}
+
 .survey-modal .recommendations-container .other-recommended-feature-container {
-  background: transparent;
   padding: 0;
-  width: 48%;
   margin-top: 5px;
 }
-.survey-modal .recommendations-card-container {
+.survey-modal
+  .recommendations-container
+  .other-recommended-feature-container
+  span {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 10px;
-  margin-left: 5px;
+  align-items: center;
+  gap: 4px;
+}
+.survey-modal .recommendations-card-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+  width: 100%;
+  margin-top: 20px;
 }
 .survey-modal .recommended-feature-description {
   margin-top: 14px;
