@@ -37,39 +37,38 @@ export const updatePersonaReferralChannel = (prevState, action) => {
 };
 
 export const updateSelectedPersonaUseCase = (prevState, action) => {
-  let flag = false;
-  for (const option of prevState.userPersona.useCases) {
-    if (JSON.stringify(option) === JSON.stringify(action.payload)) {
-      flag = true;
-      break;
-    }
-  }
-  if (!flag) prevState.userPersona.useCases.push(action.payload);
-  else {
-    prevState.userPersona.useCases = prevState.userPersona.useCases.filter(
-      (useCase) => JSON.stringify(useCase) !== JSON.stringify(action.payload)
-    );
+  const { useCases } = prevState.userPersona;
+  const { payload } = action;
+
+  const index = useCases.findIndex(
+    (option) => JSON.stringify(option) === JSON.stringify(payload)
+  );
+
+  if (index === -1) {
+    prevState.userPersona.useCases = [...useCases, payload];
+  } else {
+    prevState.userPersona.useCases = [
+      ...useCases.slice(0, index),
+      ...useCases.slice(index + 1),
+    ];
   }
 };
 
 export const updateOtherPersonaUseCase = (prevState, action) => {
-  let flag = false;
-  for (const option of prevState.userPersona.useCases) {
-    if (option.optionType === "other") {
-      flag = true;
-      break;
+  const { useCases } = prevState.userPersona;
+  const { payload } = action;
+
+  const index = useCases.findIndex((option) => option.optionType === "other");
+
+  if (index === -1) {
+    if (payload.value.length) {
+      prevState.userPersona.useCases.push(payload);
     }
-  }
-  if (!flag) prevState.userPersona.useCases.push(action.payload);
-  else {
-    if (action.payload.value.length) {
-      for (const option of prevState.userPersona.useCases) {
-        if (option.optionType === "other") option.value = action.payload.value;
-      }
+  } else {
+    if (payload.value.length) {
+      prevState.userPersona.useCases[index].value = payload.value;
     } else {
-      prevState.userPersona.useCases = prevState.userPersona.useCases.filter(
-        (useCase) => useCase.optionType !== "other"
-      );
+      prevState.userPersona.useCases.splice(index, 1);
     }
   }
 };
