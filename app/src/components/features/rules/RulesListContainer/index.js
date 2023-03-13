@@ -155,14 +155,14 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType);
     else trackNewRuleButtonClicked();
     user.loggedIn
-      ? redirectToCreateNewRule(navigate, ruleType)
+      ? redirectToCreateNewRule(navigate, ruleType, "my_rules")
       : (await isSignUpRequired(allRules, appMode, user))
       ? promptUserToSignup(
-          () => redirectToCreateNewRule(navigate, ruleType),
+          () => redirectToCreateNewRule(navigate, ruleType, "my_rules"),
           "Sign up to continue",
           AUTH.SOURCE.CREATE_NEW_RULE
         )
-      : redirectToCreateNewRule(navigate, ruleType);
+      : redirectToCreateNewRule(navigate, ruleType, "my_rules");
   };
 
   const handleShareRulesOnClick = () => {

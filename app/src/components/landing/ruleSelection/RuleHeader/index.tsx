@@ -38,7 +38,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
         <Row align="middle" justify="end">
           <NavLink
             replace
-            to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
+            to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}?source=rule_selection`}
           >
             <Button
               size="large"

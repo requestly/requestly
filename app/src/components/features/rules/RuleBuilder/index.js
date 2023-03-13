@@ -1,5 +1,11 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import { actions } from "../../../../../../app/src/store";
 //COMPONENTS
@@ -37,6 +43,7 @@ import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
+import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -50,6 +57,8 @@ const RuleBuilder = (props) => {
   const navigate = useNavigate();
 
   //Global State
+  const { search } = useLocation();
+  const params = useMemo(() => new URLSearchParams(search), [search]);
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(
@@ -72,8 +81,10 @@ const RuleBuilder = (props) => {
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] =
-    useState(false);
+  const [
+    isChangeRuleGroupModalActive,
+    setIsChangeRuleGroupModalActive,
+  ] = useState(false);
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
@@ -251,6 +262,12 @@ const RuleBuilder = (props) => {
         dispatch(actions.updateRulesAndGroups({ rules, groups: [] }));
       });
   }
+  useEffect(() => {
+    const source = params.get("source");
+    const ruleType = currentlySelectedRuleConfig.TYPE;
+    if (!ruleType) return;
+    trackRuleEditorViewed(source, ruleType);
+  }, [params, currentlySelectedRuleConfig.TYPE]);
 
   useEffect(() => {
     return () => {

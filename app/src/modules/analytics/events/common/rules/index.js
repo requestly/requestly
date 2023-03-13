@@ -118,6 +118,12 @@ export const trackErrorInRuleCreation = (description, rule_type) => {
   trackEvent(RULES.ERROR_IN_RULE_CREATION, params);
 };
 
+export const trackRuleEditorViewed = (source, ruleType) => {
+  const params = { source, ruleType };
+  console.log("EDITOR VIEWED", params);
+  trackEvent(RULES.RULE_EDITOR_VIEWED);
+};
+
 export const trackRuleEditorClosed = (reason, rule_type, mode) => {
   const params = { reason, rule_type, mode };
   trackEvent(RULES.RULE_EDITOR_CLOSED, params);
