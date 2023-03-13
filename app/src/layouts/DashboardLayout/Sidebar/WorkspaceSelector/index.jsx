@@ -215,7 +215,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     () => ({
       rules: PATHS.RULES.MY_RULES.ABSOLUTE,
       mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-      files: PATHS.FILE_SERVER_V2.RELATIVE,
+      files: PATHS.FILE_SERVER_V2.ABSOLUTE,
       sessions: PATHS.SESSIONS.ABSOLUTE,
     }),
     []
