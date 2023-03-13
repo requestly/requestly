@@ -214,8 +214,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   const redirects = useMemo(
     () => ({
       rules: PATHS.RULES.MY_RULES.ABSOLUTE,
-      mocks: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-      filesv2: PATHS.FILE_SERVER_V2.RELATIVE,
+      mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
+      files: PATHS.FILE_SERVER_V2.RELATIVE,
       sessions: PATHS.SESSIONS.ABSOLUTE,
     }),
     []
