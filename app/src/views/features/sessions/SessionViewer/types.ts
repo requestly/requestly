@@ -21,10 +21,10 @@ export interface SessionRecording {
   filePath?: string;
   startTimeOffset?: number;
   description?: string;
-  includedDebugInfo?: IncludedDebugInfo;
+  options?: RecordingOptions;
 }
 
-export interface IncludedDebugInfo {
+export interface RecordingOptions {
   includeNetworkLogs: boolean;
   includeConsoleLogs: boolean;
 }

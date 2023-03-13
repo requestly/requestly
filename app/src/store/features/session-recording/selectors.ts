@@ -2,7 +2,7 @@ import { RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
 import { RootState } from "store/types";
 import {
-  IncludedDebugInfo,
+  RecordingOptions,
   SessionRecording,
   Visibility,
 } from "views/features/sessions/SessionViewer/types";
@@ -66,9 +66,9 @@ export const getIsReadOnly = (state: RootState): boolean => {
 
 export const getSessionRecordingMetadataOptions = (
   state: RootState
-): IncludedDebugInfo => {
+): RecordingOptions => {
   return (
-    getSessionRecording(state)?.includedDebugInfo || {
+    getSessionRecording(state)?.options || {
       includeNetworkLogs: true,
       includeConsoleLogs: true,
     }

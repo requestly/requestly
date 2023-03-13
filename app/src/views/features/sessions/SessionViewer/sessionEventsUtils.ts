@@ -5,9 +5,8 @@ import {
   RQSessionEventType,
   RRWebEventData,
 } from "@requestly/web-sdk";
-import { ConsoleLog, IncludedDebugInfo } from "./types";
+import { ConsoleLog } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
-import { cloneDeep } from "lodash";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
 
@@ -76,22 +75,4 @@ export const filterOutConsoleLogs = (
   rrwebEvents: RRWebEventData[]
 ): RRWebEventData[] => {
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
-};
-
-export const filterOutSessionEvents = (
-  sessionEvents: RQSessionEvents,
-  includedDebugInfo: IncludedDebugInfo
-): RQSessionEvents => {
-  let filteredSessionEvents = cloneDeep(sessionEvents);
-  if (includedDebugInfo.includeNetworkLogs === false) {
-    delete filteredSessionEvents[RQSessionEventType.NETWORK];
-  }
-  if (includedDebugInfo.includeConsoleLogs === false) {
-    const filteredRRWebEvent = filterOutConsoleLogs(
-      sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]
-    );
-    filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
-  }
-
-  return filteredSessionEvents;
 };

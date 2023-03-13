@@ -16,14 +16,19 @@ import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
-import { RQSession, RQSessionEvents } from "@requestly/web-sdk";
+import {
+  RQSession,
+  RQSessionEvents,
+  RQSessionEventType,
+  RRWebEventData,
+} from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import {
   compressEvents,
+  filterOutConsoleLogs,
   filterOutLargeNetworkResponses,
-  filterOutSessionEvents,
 } from "./sessionEventsUtils";
 import {
   trackDraftSessionDiscarded,
@@ -51,7 +56,7 @@ import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 //@ts-ignore
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
-import { IncludedDebugInfo } from "./types";
+import { RecordingOptions } from "./types";
 
 const defaultDebugInfo: CheckboxValueType[] = [
   "includeNetworkLogs",
@@ -129,23 +134,39 @@ const DraftSessionViewer: React.FC = () => {
   }, [dispatch, tabId, user?.details?.profile?.email]);
 
   const getSessionEventsToSave = useCallback(
-    (debugInfo: IncludedDebugInfo): RQSessionEvents => {
-      return filterOutSessionEvents(sessionEvents, debugInfo);
+    (options: RecordingOptions): RQSessionEvents => {
+      const filteredSessionEvents: RQSessionEvents = {
+        [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
+        [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
+      };
+
+      if (options.includeNetworkLogs === false) {
+        delete filteredSessionEvents[RQSessionEventType.NETWORK];
+      }
+
+      if (options.includeConsoleLogs === false) {
+        const filteredRRWebEvent = filterOutConsoleLogs(
+          sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]
+        );
+        filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
+      }
+
+      return filteredSessionEvents;
     },
     [sessionEvents]
   );
 
-  const getIncludedDebugInfoToSave = useCallback((): IncludedDebugInfo => {
-    const sessionDebugInfo: IncludedDebugInfo = {
+  const getRecordingOptionsToSave = useCallback((): RecordingOptions => {
+    const recordingOptions: RecordingOptions = {
       includeConsoleLogs: true,
       includeNetworkLogs: true,
     };
-    let option: keyof IncludedDebugInfo;
-    for (option in sessionDebugInfo) {
-      sessionDebugInfo[option] = includedDebugInfo.includes(option);
+    let option: keyof RecordingOptions;
+    for (option in recordingOptions) {
+      recordingOptions[option] = includedDebugInfo.includes(option);
     }
 
-    return sessionDebugInfo;
+    return recordingOptions;
   }, [includedDebugInfo]);
 
   const saveDraftSession = useCallback(() => {
@@ -174,14 +195,14 @@ const DraftSessionViewer: React.FC = () => {
       return;
     }
 
-    const includedDebugInfoToSave = getIncludedDebugInfoToSave();
+    const recordingOptionsToSave = getRecordingOptionsToSave();
 
     setIsSaving(true);
     saveRecording(
       user?.details?.profile?.uid,
       sessionRecording,
-      compressEvents(getSessionEventsToSave(includedDebugInfoToSave)),
-      includedDebugInfoToSave
+      compressEvents(getSessionEventsToSave(recordingOptionsToSave)),
+      recordingOptionsToSave
     ).then((response) => {
       if (response?.success) {
         setIsSaveModalVisible(false);
@@ -208,7 +229,7 @@ const DraftSessionViewer: React.FC = () => {
     AUTH_ACTION_LABELS.SIGN_UP,
     navigate,
     getSessionEventsToSave,
-    getIncludedDebugInfoToSave,
+    getRecordingOptionsToSave,
   ]);
 
   const handleNameChangeEvent = useCallback(
