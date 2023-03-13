@@ -14,6 +14,7 @@ import { PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
+  trackPersonaSurveySignInClicked,
 } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -42,6 +43,35 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   const SkippableButton = () => {
     switch (currentPage) {
+      case 0:
+        return (
+          <div className="skip-recommendation-wrapper">
+            Existing user?
+            <RQButton
+              className="skip-recommendation-btn persona-login-btn"
+              type="link"
+              onClick={() => {
+                trackPersonaSurveySignInClicked();
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newProps: {
+                      callback: () => {
+                        toggle();
+                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                      },
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+                    },
+                  })
+                );
+              }}
+            >
+              Sign in
+            </RQButton>
+          </div>
+        );
+
       case surveyConfig.length - 1:
         return (
           <div className="skip-recommendation-wrapper">
@@ -55,35 +85,6 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               className="white skip-recommendation-btn"
             >
               Skip
-            </RQButton>
-          </div>
-        );
-
-      case 0:
-        return (
-          <div className="skip-recommendation-wrapper">
-            Existing user?
-            <RQButton
-              className="skip-recommendation-btn persona-login-btn"
-              type="link"
-              onClick={() => {
-                dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newProps: {
-                      callback: () => {
-                        toggle();
-                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                        trackPersonaRecommendationSkipped();
-                      },
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
-                    },
-                  })
-                );
-              }}
-            >
-              Sign in
             </RQButton>
           </div>
         );
