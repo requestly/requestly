@@ -17,6 +17,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import Logger from "lib/logger";
 
 const TrashIndexPage = () => {
   //Global State
@@ -64,6 +65,7 @@ const TrashIndexPage = () => {
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      Logger.log("Reading storage in TrashIndexPage useEffect");
       StorageService(appMode)
         .getRecord(APP_CONSTANTS.RQ_SETTINGS)
         .then((value) => {

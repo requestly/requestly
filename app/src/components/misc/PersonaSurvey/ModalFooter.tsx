@@ -18,22 +18,26 @@ import "./index.css";
 
 interface FooterProps {
   page: number;
-  fieldKey: string;
 }
 
-export const SurveyModalFooter: React.FC<FooterProps> = ({
-  page,
-  fieldKey,
-}) => {
+export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
   const surveyLength = surveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const disableContinue = () => {
-    if (page === 0) return false;
-    if (userPersona[fieldKey]?.length) {
-      return false;
-    } else return true;
+    switch (page) {
+      case 0:
+        return false;
+      case 1:
+        return userPersona.persona ? false : true;
+      case 2:
+        return userPersona.useCases.length ? false : true;
+      case 3:
+        return userPersona.referralChannel ? false : true;
+      default:
+        return true;
+    }
   };
 
   const renderModalLeftSection = () => {

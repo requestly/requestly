@@ -59,22 +59,17 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
-    //Prevalidation regex fix
+    //Pre-validation regex fix
     fixSourceRegexFormat(dispatch, currentlySelectedRuleData);
     //Validation
     const ruleValidation = validateRule(currentlySelectedRuleData, dispatch);
     if (ruleValidation.result) {
-      saveRule(
-        appMode,
-        dispatch,
-        {
-          ...currentlySelectedRuleData,
-          createdBy,
-          currentOwner,
-          lastModifiedBy,
-        },
-        navigate
-      ).then(() => {
+      saveRule(appMode, {
+        ...currentlySelectedRuleData,
+        createdBy,
+        currentOwner,
+        lastModifiedBy,
+      }).then(async () => {
         toast.success(
           `Successfully ${currentActionText.toLowerCase()}d the rule`
         );

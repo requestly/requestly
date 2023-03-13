@@ -3,7 +3,6 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRulesModal/actions";
 import Logger from "lib/logger";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
@@ -40,6 +39,7 @@ export const getRulesAndGroupsFromRuleIds = (
     const groupIdsArr = [];
     const isGroupIdAlreadyAdded = {};
 
+    Logger.log("Reading storage in getRulesAndGroupsFromRuleIds");
     StorageService(appMode)
       .getAllRecords()
       .then((allRecords) => {
@@ -71,6 +71,7 @@ export const getRulesAndGroupsFromRuleIds = (
 
 export const getAllRulesAndGroups = (appMode, _sanitizeRules = true) => {
   return new Promise((resolve) => {
+    Logger.log("Reading storage in getAllRulesAndGroups");
     StorageService(appMode)
       .getAllRecords()
       .then((allRecords) => {
@@ -161,74 +162,6 @@ export const compareGroupToPopulateByModificationDate = (array1, array2) => {
     return -1;
   }
   return 0;
-};
-
-export const updateCurrentOwnerForAllRules = async (uid, appMode) => {
-  try {
-    const { rules, groups } = await StorageService(appMode)
-      .getAllRecords()
-      .then((allRecords) => {
-        const groups = [];
-        const groupIdsArr = [];
-        const isGroupIdAlreadyAdded = {};
-        let allRules = [],
-          allGroups = {};
-        for (let recordId in allRecords) {
-          if (allRecords[recordId] && allRecords[recordId].objectType) {
-            switch (allRecords[recordId].objectType) {
-              case GLOBAL_CONSTANTS.OBJECT_TYPES.RULE:
-                allRules.push(allRecords[recordId]);
-                break;
-
-              case GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP:
-                allGroups[recordId] = allRecords[recordId];
-                break;
-
-              default:
-                break;
-            }
-          }
-        }
-
-        const rules = allRules.map((rule) => {
-          if (rule.groupId !== RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID) {
-            if (!isGroupIdAlreadyAdded[rule.groupId]) {
-              groupIdsArr.push(rule.groupId);
-              isGroupIdAlreadyAdded[rule.groupId] = true;
-            }
-          }
-          return rule;
-        });
-
-        //Fetch Required Groups
-        groupIdsArr.forEach((groupId) => {
-          groups.push(allGroups[groupId]);
-        });
-
-        return {
-          rules,
-          groups,
-        };
-      });
-
-    if (rules.length || groups.length) {
-      const updatedRulesAndGroups = [];
-
-      rules.forEach((rule) => {
-        const updatedRule = { ...rule, currentOwner: uid };
-        updatedRulesAndGroups.push(updatedRule);
-      });
-
-      groups.forEach((group) => {
-        const updatedGroup = { ...group, currentOwner: uid };
-        updatedRulesAndGroups.push(updatedGroup);
-      });
-
-      await addRulesAndGroupsToStorage(appMode, updatedRulesAndGroups);
-    }
-  } catch (error) {
-    Logger.error(error);
-  }
 };
 
 export const getExecutionLogsId = (ruleId) => {

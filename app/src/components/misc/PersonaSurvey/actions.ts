@@ -1,5 +1,5 @@
 import { actions } from "store";
-import { useCaseOptions } from "./types";
+import { multipleChoiceOption } from "./types";
 
 export const setUserPersona = (
   dispatch: any,
@@ -29,20 +29,20 @@ export const setPersonaUseCase = (
 };
 
 export const handleUseCaseActiveOption = (
-  key: string | useCaseOptions[],
+  key: string | multipleChoiceOption[],
   title: string,
   optionType: "select" | "other"
 ) => {
   if (typeof key === "object") {
     if (optionType === "other") {
       const otherUserCase = key.find(
-        (option: useCaseOptions) => option.optionType === "other"
+        (option: multipleChoiceOption) => option.optionType === "other"
       );
       if (otherUserCase) return true;
       else return false;
     }
     const selectedUseCase = key.find(
-      (option: useCaseOptions) => option.value === title
+      (option: multipleChoiceOption) => option.value === title
     );
     if (selectedUseCase) return true;
     else return false;
