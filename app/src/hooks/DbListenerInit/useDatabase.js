@@ -53,8 +53,13 @@ const useDatabase = () => {
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
-    if (hasAuthStateChanged || !window.isFirstSyncComplete)
+    if (hasAuthStateChanged || !window.isFirstSyncComplete) {
       dispatch(actions.updateIsRulesListLoading(true));
+      // just to safe
+      setTimeout(() => {
+        dispatch(actions.updateIsRulesListLoading(false));
+      }, 6000);
+    }
 
     if (window.unsubscribeSyncingNodeRef.current)
       window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
