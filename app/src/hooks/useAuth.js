@@ -14,7 +14,6 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getEmailType } from "utils/FormattingHelper";
 import { getAppMode } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
-import { updateCurrentOwnerForAllRules } from "utils/rules/misc";
 import {
   resetUserDetails,
   setAndUpdateUserDetails,
@@ -40,10 +39,6 @@ const useAuth = (onComplete) => {
         const authData = getAuthData(user);
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
-        // Hotfix - Timeout to prevent clashes with syncing
-        setTimeout(() => {
-          updateCurrentOwnerForAllRules(user.uid, appMode);
-        }, 20000);
 
         submitAttrUtil(
           TRACKING.ATTR.EMAIL_DOMAIN,

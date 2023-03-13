@@ -29,6 +29,10 @@ export const updateGroupwiseRulesToPopulate = (prevState, action) => {
   prevState.rules.groupwiseRulesToPopulate = action.payload;
 };
 
+export const updateIsRulesListLoading = (prevState, action) => {
+  prevState.rules.isRulesListLoading = action.payload;
+};
+
 export const updateRefreshPendingStatus = (prevState, action) => {
   prevState.pendingRefresh[action.payload.type] = action.payload.newValue
     ? action.payload.newValue

@@ -8,12 +8,14 @@ import { StorageService } from "init";
 import { toast } from "utils/Toast";
 import { trackConsoleLoggerToggled } from "modules/analytics/events/features/consoleLogger";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import Logger from "lib/logger";
 
 const ConsoleLogger = ({ isCompatible }) => {
   const appMode = useSelector(getAppMode);
   const [consoleLoggerStatus, setConsoleLoggerStatus] = useState(false);
 
   useEffect(() => {
+    Logger.log("Reading storage in ConsoleLogger");
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.CONSOLE_LOGGER_ENABLED)
       .then((status) => setConsoleLoggerStatus(status));
@@ -22,6 +24,7 @@ const ConsoleLogger = ({ isCompatible }) => {
   const handleConsoleLoggerStatus = (status) => {
     setConsoleLoggerStatus(status);
     trackConsoleLoggerToggled(window.uid, status);
+    Logger.log("Writing storage in saveConsoleLoggerState");
     StorageService(appMode).saveConsoleLoggerState(status);
     toast.success(`Console logging ${status ? "enabled" : "disabled"}`);
     trackSettingsToggled("console_logger", status);

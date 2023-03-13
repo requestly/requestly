@@ -18,6 +18,7 @@ import {
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
+import Logger from "lib/logger";
 
 const CreateNewRuleGroupModal = (props) => {
   //Global State
@@ -52,6 +53,7 @@ const CreateNewRuleGroupModal = (props) => {
       currentOwner,
       lastModifiedBy,
     };
+    Logger.log("Writing storage in createNewGroup");
     StorageService(appMode)
       .saveRuleOrGroup(newGroup)
       .then(async () => {

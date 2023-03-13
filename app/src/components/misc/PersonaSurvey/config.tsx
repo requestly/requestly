@@ -1,4 +1,10 @@
-import { PageConfig } from "./types";
+import React from "react";
+import {
+  Conditional,
+  PageConfig,
+  PersonaType,
+  SurveyOptionsConfig,
+} from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { UserRecommendations } from "./Recommendations";
 import {
@@ -7,7 +13,6 @@ import {
   setPersonaUseCase,
   setUserPersona,
 } from "./actions";
-import { PersonaType } from "./types";
 
 //@ts-ignore
 import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
@@ -17,6 +22,211 @@ import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
 import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
 //@ts-ignore
 import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+import { SurveyOption } from "./Option";
+
+const OptionsConfig: Record<number, SurveyOptionsConfig> = {
+  1: {
+    isActive: ({ key, title }) => key === title,
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
+    options: [
+      {
+        title: PersonaType.FRONTEND,
+        icon: "💻",
+      },
+      {
+        title: PersonaType.BACKEND,
+        icon: "⌨️",
+      },
+      {
+        title: PersonaType.QUALITY,
+        icon: "🏗",
+      },
+      {
+        title: PersonaType.MARKETER,
+        icon: "📈",
+      },
+      {
+        title: PersonaType.PRODUCT,
+        icon: "📊",
+      },
+      {
+        title: PersonaType.FOUNDER,
+        icon: "👑",
+      },
+    ],
+  },
+  2: {
+    isActive: ({ key, title, optionType }) =>
+      handleUseCaseActiveOption(key, title, optionType),
+    action: (dispatch, value, clear, optionType) =>
+      setPersonaUseCase(dispatch, value, clear, optionType),
+    conditional: [
+      {
+        condition: (answer: string) => answer === PersonaType.BACKEND,
+        options: [
+          {
+            title: "Test local API changes against production app/website",
+          },
+          {
+            title: "Debug backend microservices",
+          },
+          {
+            title: "Modify GraphQL Query & Server Response",
+          },
+          {
+            type: "text",
+            title: "other",
+          },
+        ],
+      },
+      {
+        condition: (answer: string) => answer === PersonaType.QUALITY,
+        options: [
+          {
+            title:
+              "Testing newly developed features on different hosts/environments",
+          },
+          {
+            title: "Testing new features on client websites",
+          },
+          {
+            title: "Simulate network conditions",
+          },
+          {
+            title: "UI automation testing",
+          },
+          {
+            title: "Recording issues & sharing with developers",
+          },
+          {
+            type: "text",
+            title: "other",
+          },
+        ],
+      },
+      {
+        condition: (answer: string) =>
+          answer === PersonaType.FOUNDER || answer === PersonaType.PRODUCT,
+        options: [
+          {
+            title: "Testing new features on client websites",
+          },
+          {
+            title: "Showing new feature demos to clients",
+          },
+          {
+            title: "Recording issues & sharing with developers ",
+          },
+          {
+            type: "text",
+            title: "other",
+          },
+        ],
+      },
+      {
+        condition: (answer: string) => answer === PersonaType.MARKETER,
+        options: [
+          {
+            title: "Replace production script with development script",
+          },
+          {
+            title: "Debug analytics tags",
+          },
+          {
+            title: "Showing new feature demos to clients",
+          },
+          {
+            title: "Adding Query Params to URLs",
+          },
+          {
+            type: "text",
+            title: "other",
+          },
+        ],
+      },
+      {
+        condition: (answer: string) => answer === PersonaType.FRONTEND,
+        options: [
+          {
+            title: "Local development before the backend is ready",
+          },
+          {
+            title: "Redirect APIs/scripts from one environment to another",
+          },
+          {
+            title: "Load scripts from local/dev environment (Map Local)",
+          },
+
+          {
+            title: "Modify existing network responses",
+          },
+          {
+            title: "Inject custom scripts",
+          },
+          {
+            title: "Modify headers on a website",
+          },
+          {
+            title: "Modify request payload ",
+          },
+          {
+            title: "Simulate status codes",
+          },
+          {
+            title: "Recording issues & sharing with team members",
+          },
+          {
+            type: "text",
+            title: "other",
+          },
+        ],
+      },
+    ],
+  },
+  3: {
+    isActive: ({ key, title }) => key === title,
+    action: (dispatch, value, clear) =>
+      setPersonaReferralChannel(dispatch, value, clear),
+    options: [
+      {
+        title: "Google search",
+        icon: <img src={chromeIcon} alt="google chrome" />,
+      },
+      {
+        title: "Friend/Colleague",
+        icon: "🙂",
+      },
+      {
+        title: "Online ads",
+        icon: "📢",
+      },
+      {
+        title: "Chrome webstore",
+        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+      },
+      {
+        title: "Social media",
+        icon: "🌐",
+      },
+      {
+        title: "Read an article",
+        icon: "📄",
+      },
+      {
+        title: "Reddit",
+        icon: <img src={redditIcon} alt="reddit" />,
+      },
+      {
+        title: "HackerNews",
+        icon: <img src={hackerNewsIcon} alt="hacker news" />,
+      },
+      {
+        title: "Company documentation",
+        icon: "📋",
+      },
+    ],
+  },
+};
 
 export const surveyConfig: PageConfig[] = [
   {
@@ -24,271 +234,83 @@ export const surveyConfig: PageConfig[] = [
     title: "Welcome to Requestly!",
     subTitle:
       "Help us personalise your experience by answering the following questionnaire",
-    key: null,
     render: () => <GettingStartedWithSurvey />,
   },
   {
     pageId: 1,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
-    questionType: "single",
-    key: "persona",
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
-    isActive: ({ key, title }) => key === title,
-    options: [
-      {
-        type: "select",
-        title: PersonaType.FRONTEND,
-        icon: "💻",
-      },
-      {
-        type: "select",
-        title: PersonaType.BACKEND,
-        icon: "⌨️",
-      },
-      {
-        type: "select",
-        title: PersonaType.QUALITY,
-        icon: "🏗",
-      },
-      {
-        type: "select",
-        title: PersonaType.MARKETER,
-        icon: "📈",
-      },
-      {
-        type: "select",
-        title: PersonaType.PRODUCT,
-        icon: "📊",
-      },
-      {
-        type: "select",
-        title: PersonaType.FOUNDER,
-        icon: "👑",
-      },
-    ],
+    render: () => {
+      return (
+        <div className="survey-options-container">
+          {OptionsConfig[1].options.map((option: any, index: number) => (
+            <SurveyOption
+              key={index}
+              option={option}
+              isActive={OptionsConfig[1].isActive}
+              action={OptionsConfig[1].action}
+              questionType="single"
+              fieldKey="persona"
+            />
+          ))}
+        </div>
+      );
+    },
   },
   {
     pageId: 2,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
-    questionType: "multiple",
-    key: "useCases",
-    action: (dispatch, value, clear, optionType) =>
-      setPersonaUseCase(dispatch, value, clear, optionType),
-    isActive: ({ key, title, optionType }) =>
-      handleUseCaseActiveOption(key, title, optionType),
-    conditional: [
-      {
-        condition: (answer) => answer === PersonaType.BACKEND,
-        options: [
-          {
-            type: "select",
-            title: "Test local API changes against production app/website",
-          },
-          {
-            type: "select",
-            title: "Debug backend microservices",
-          },
-          {
-            type: "select",
-            title: "Modify GraphQL Query & Server Response",
-          },
-          {
-            type: "text",
-            title: "Other",
-          },
-        ],
-      },
-      {
-        condition: (answer) => answer === PersonaType.QUALITY,
-        options: [
-          {
-            type: "select",
-            title:
-              "Testing newly developed features on different hosts/environments",
-          },
-          {
-            type: "select",
-            title: "Testing new features on client websites",
-          },
-          {
-            type: "select",
-            title: "Simulate network conditions",
-          },
-          {
-            type: "select",
-            title: "UI automation testing",
-          },
-          {
-            type: "select",
-            title: "Recording issues & sharing with developers",
-          },
-          {
-            type: "text",
-            title: "Other",
-          },
-        ],
-      },
-      {
-        condition: (answer) =>
-          answer === PersonaType.FOUNDER || answer === PersonaType.PRODUCT,
-        options: [
-          {
-            type: "select",
-            title: "Testing new features on client websites",
-          },
-          {
-            type: "select",
-            title: "Showing new feature demos to clients",
-          },
-          {
-            type: "select",
-            title: "Recording issues & sharing with developers ",
-          },
-          {
-            type: "text",
-            title: "Other",
-          },
-        ],
-      },
-      {
-        condition: (answer) => answer === PersonaType.MARKETER,
-        options: [
-          {
-            type: "select",
-            title: "Replace production script with development script",
-          },
-          {
-            type: "select",
-            title: "Debug analytics tags",
-          },
-          {
-            type: "select",
-            title: "Showing new feature demos to clients",
-          },
-          {
-            type: "select",
-            title: "Adding Query Params to URLs",
-          },
-          {
-            type: "text",
-            title: "Other",
-          },
-        ],
-      },
-      {
-        condition: (answer) => answer === PersonaType.FRONTEND,
-        options: [
-          {
-            type: "select",
-            title: "Local development before the backend is ready",
-          },
-          {
-            type: "select",
-            title: "Redirect APIs/scripts from one environment to another",
-          },
-          {
-            type: "select",
-            title: "Load scripts from local/dev environment (Map Local)",
-          },
-
-          {
-            type: "select",
-            title: "Modify existing network responses",
-          },
-          {
-            type: "select",
-            title: "Inject custom scripts",
-          },
-          {
-            type: "select",
-            title: "Modify headers on a website",
-          },
-          {
-            type: "select",
-            title: "Modify request payload ",
-          },
-          {
-            type: "select",
-            title: "Simulate status codes",
-          },
-          {
-            type: "select",
-            title: "Recording issues & sharing with team members",
-          },
-          {
-            type: "text",
-            title: "Other",
-          },
-        ],
-      },
-    ],
+    render: ({ persona }) => (
+      <>
+        {OptionsConfig[2].conditional.map((set: Conditional, index: number) => (
+          <React.Fragment key={index}>
+            {set.condition(persona) && (
+              <div className="survey-options-container">
+                {set.options.map((option, index) => (
+                  <SurveyOption
+                    key={index}
+                    option={option}
+                    questionType="multiple"
+                    isActive={OptionsConfig[2].isActive}
+                    action={OptionsConfig[2].action}
+                    fieldKey="useCases"
+                  />
+                ))}
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </>
+    ),
   },
   {
     pageId: 3,
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
-    questionType: "single",
-    key: "referralChannel",
-    action: (dispatch, value, clear) =>
-      setPersonaReferralChannel(dispatch, value, clear),
-    isActive: ({ key, title }) => key === title,
-    options: [
-      {
-        type: "select",
-        title: "Google search",
-        icon: <img src={chromeIcon} alt="google chrome" />,
-      },
-      {
-        type: "select",
-        title: "Friend/Colleague",
-        icon: "🙂",
-      },
-      {
-        type: "select",
-        title: "Online ads",
-        icon: "📢",
-      },
-      {
-        type: "select",
-        title: "Chrome webstore",
-        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
-      },
-      {
-        type: "select",
-        title: "Social media",
-        icon: "🌐",
-      },
-      {
-        type: "select",
-        title: "Read an article",
-        icon: "📄",
-      },
-      {
-        type: "select",
-        title: "Reddit",
-        icon: <img src={redditIcon} alt="reddit" />,
-      },
-      {
-        type: "select",
-        title: "HackerNews",
-        icon: <img src={hackerNewsIcon} alt="hacker news" />,
-      },
-      {
-        type: "select",
-        title: "Company documentation",
-        icon: "📋",
-      },
-    ],
+    render: () => {
+      return (
+        <div className="survey-options-container">
+          {OptionsConfig[3].options.map((option: any, index: number) => (
+            <SurveyOption
+              key={index}
+              option={option}
+              isActive={OptionsConfig[3].isActive}
+              action={OptionsConfig[3].action}
+              questionType="single"
+              fieldKey="referralChannel"
+            />
+          ))}
+        </div>
+      );
+    },
   },
   {
     pageId: 4,
     title: "✨ Where would you like to start?",
     subTitle:
       "Choose a use case you want to work on and we will help you get started",
-    key: null,
-    render: (toggleImportRulesModal) => (
+    render: ({ toggleImportRulesModal }) => (
       <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />
     ),
   },

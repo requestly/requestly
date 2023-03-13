@@ -37,6 +37,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
     }
     const lastModifiedBy = Date.now();
     const modificationDate = Date.now();
+
     const ruleToSave = {
       ...ruleObj.ruleDefinition,
       id: `${ruleObj.ruleDefinition.ruleType}_${generateObjectId()}`,

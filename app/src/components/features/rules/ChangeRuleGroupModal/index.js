@@ -23,6 +23,7 @@ import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
 import { unselectAllRules } from "../actions";
 import { trackGroupChangedEvent } from "modules/analytics/events/common/groups";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
+import Logger from "lib/logger";
 
 const ChangeRuleGroupModal = (props) => {
   //Accepted Modes
@@ -112,6 +113,7 @@ const ChangeRuleGroupModal = (props) => {
   };
 
   useEffect(() => {
+    Logger.log("Reading storage in ChangeRuleGroupModal");
     StorageService(appMode)
       .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
       .then((groups) => {

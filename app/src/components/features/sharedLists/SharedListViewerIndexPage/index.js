@@ -21,6 +21,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./sharedListViewerIndexPage.css";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
+import Logger from "lib/logger";
 
 const SharedListViewerIndexPage = () => {
   //Global State
@@ -40,9 +41,11 @@ const SharedListViewerIndexPage = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
 
   useEffect(() => {
+    Logger.log("Reading storage (groups) in SharedListViewerIndexPage");
     const groupsPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP
     );
+    Logger.log("Reading storage (rules) in SharedListViewerIndexPage");
     const rulesPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
     );

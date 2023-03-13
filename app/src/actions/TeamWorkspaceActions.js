@@ -4,9 +4,18 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
 import { actions } from "store";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
-import { resetSyncDebounceTimerStart } from "hooks/DbListenerInit/syncingNodeListener";
+import {
+  mergeRecordsAndSaveToFirebase,
+  resetSyncDebounceTimerStart,
+} from "hooks/DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
+import Logger from "lib/logger";
+import { getValueAsPromise } from "./FirebaseActions";
+import {
+  getRecordsSyncPath,
+  parseRemoteRecords,
+} from "utils/syncing/syncDataUtils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -24,6 +33,11 @@ export const switchWorkspace = async (
   appMode
 ) => {
   trackWorkspaceSwitched();
+  dispatch(actions.updateIsRulesListLoading(true));
+  // just to safe
+  setTimeout(() => {
+    dispatch(actions.updateIsRulesListLoading(false));
+  }, 6000);
 
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
 
@@ -33,20 +47,23 @@ export const switchWorkspace = async (
     if (!isWorkspaceMode) {
       // User is currently on private workspace
       if (!isSyncEnabled) {
-        const message =
-          "You're currently working locally. To make sure your current rules don't get deleted, please Turn on Syncing using the icon on top right and try again. If you want to proceed anyway, click Cancel. Else click Ok to close this message. ";
-        if (window.confirm(message) === true) {
+        const message = "Turn on syncing?";
+        if (window.confirm(message) !== true) {
           return;
-        } else {
-          const message =
-            "Sure you want to delete Rules in your private workspace? Click Ok to confirm and Cancel to dismiss the message";
-          if (!window.confirm(message)) {
-            return;
-          }
         }
       }
     }
   }
+
+  // These merge steps are optional - just to ensure consistency
+  // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off
+  // Unsubscribe any existing listener - To prevent race of sync node listener once merged records are set on the firebase
+  if (window.unsubscribeSyncingNodeRef.current)
+    window.unsubscribeSyncingNodeRef.current();
+  const allRemoteRecords =
+    (await getValueAsPromise(getRecordsSyncPath())) || {};
+  let parsedFirebaseRules = await parseRemoteRecords(appMode, allRemoteRecords);
+  await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
@@ -60,7 +77,14 @@ export const switchWorkspace = async (
   )
     skipStorageClearing = true;
 
-  if (!skipStorageClearing) await StorageService(appMode).clearDB();
+  if (!skipStorageClearing) {
+    Logger.log("Clearing storage in switchWorkspace");
+    await StorageService(appMode).clearDB();
+  }
+
+  // Just in case
+  window.skipSyncListenerForNextOneTime = false;
+  window.isFirstSyncComplete = false;
 
   dispatch(
     teamsActions.setCurrentlyActiveWorkspace({
