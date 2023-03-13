@@ -49,7 +49,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
 
     saveRule(appMode, dispatch, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name));
-      redirectToRuleEditor(navigate, ruleToSave.id);
+      redirectToRuleEditor(navigate, ruleToSave.id, "templates");
     });
   };
 
@@ -72,7 +72,11 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       }
       width="90%"
     >
-      <RuleBuilder rule={rule.ruleDefinition} isSharedListViewRule={true} />
+      <RuleBuilder
+        rule={rule.ruleDefinition}
+        isSharedListViewRule={true}
+        source="template_preview"
+      />
     </Modal>
   );
 };

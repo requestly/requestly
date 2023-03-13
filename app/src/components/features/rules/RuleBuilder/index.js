@@ -263,11 +263,11 @@ const RuleBuilder = (props) => {
       });
   }
   useEffect(() => {
-    const source = params.get("source");
+    const source = props.source ? props.source : params.get("source");
     const ruleType = currentlySelectedRuleConfig.TYPE;
     if (!ruleType) return;
     trackRuleEditorViewed(source, ruleType);
-  }, [params, currentlySelectedRuleConfig.TYPE]);
+  }, [params, currentlySelectedRuleConfig.TYPE, props.source]);
 
   useEffect(() => {
     return () => {

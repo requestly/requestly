@@ -310,7 +310,7 @@ const userRulesPage: PageConfig = {
             </div>
           ),
           action: ({ navigate }: ActionProps) => {
-            redirectToRuleEditor(navigate, rule?.id);
+            redirectToRuleEditor(navigate, rule?.id, "command_bar");
           },
         };
       }
