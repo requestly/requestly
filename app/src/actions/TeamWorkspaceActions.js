@@ -34,6 +34,10 @@ export const switchWorkspace = async (
 ) => {
   trackWorkspaceSwitched();
   dispatch(actions.updateIsRulesListLoading(true));
+  // just to safe
+  setTimeout(() => {
+    dispatch(actions.updateIsRulesListLoading(false));
+  }, 6000);
 
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
 
