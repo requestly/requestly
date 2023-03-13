@@ -56,7 +56,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
   return (
     <Modal
       className="modal-dialog-centered max-width-80-percent "
-      visible={isOpen}
+      open={isOpen}
       onCancel={toggle}
       footer={null}
       title={
