@@ -17,6 +17,8 @@ import {
 } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from "config/constants";
+import { AUTH } from "modules/analytics/events/common/constants";
 import { actions } from "store";
 import "./index.css";
 
@@ -38,22 +40,63 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const currentPage = userPersona.page;
   const persona = userPersona.persona;
 
+  const SkippableButton = () => {
+    switch (currentPage) {
+      case surveyConfig.length - 1:
+        return (
+          <div className="skip-recommendation-wrapper">
+            <RQButton
+              type="link"
+              onClick={() => {
+                toggle();
+                dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                trackPersonaRecommendationSkipped();
+              }}
+              className="white skip-recommendation-btn"
+            >
+              Skip
+            </RQButton>
+          </div>
+        );
+
+      case 0:
+        return (
+          <div className="skip-recommendation-wrapper">
+            Existing user?
+            <RQButton
+              className="skip-recommendation-btn persona-login-btn"
+              type="link"
+              onClick={() => {
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newProps: {
+                      callback: () => {
+                        toggle();
+                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                        trackPersonaRecommendationSkipped();
+                      },
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+                    },
+                  })
+                );
+              }}
+            >
+              Sign in
+            </RQButton>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const renderPageHeader = (page: PageConfig) => {
     return (
       <>
-        {currentPage === surveyConfig.length - 1 && (
-          <RQButton
-            type="link"
-            onClick={() => {
-              toggle();
-              dispatch(actions.updateIsPersonaSurveyCompleted(true));
-              trackPersonaRecommendationSkipped();
-            }}
-            className="white skip-recommendation"
-          >
-            Skip
-          </RQButton>
-        )}
+        <SkippableButton />
         <div className="text-center white text-bold survey-title">
           {page.title}
         </div>
