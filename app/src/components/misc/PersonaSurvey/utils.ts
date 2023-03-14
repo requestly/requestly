@@ -17,10 +17,8 @@ export const getFormattedUserUseCases = (useCases: multipleChoiceOption[]) => {
 
 export const shuffleOptions = (options: Option[]) => {
   for (let i = options.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    let temp = options[i];
-    options[i] = options[j];
-    options[j] = temp;
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
   }
   return options;
 };
