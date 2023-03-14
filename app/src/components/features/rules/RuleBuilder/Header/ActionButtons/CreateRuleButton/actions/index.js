@@ -246,6 +246,17 @@ export const validateRule = (rule, dispatch) => {
           error: "missing source",
         };
       }
+      // graphql operation data should be empty
+      else if (
+        pair.response?.resourceType === "graphqlApi" &&
+        Object.keys(pair.source?.filters?.[0]?.requestPayload ?? {}).length < 2
+      ) {
+        output = {
+          result: false,
+          message: `Please enter both key and value for GraphQL operation`,
+          error: "missing source",
+        };
+      }
       //Response body shouldn't be empty
       else if (isEmpty(pair.response.value)) {
         let message = `Please specify response body`;
