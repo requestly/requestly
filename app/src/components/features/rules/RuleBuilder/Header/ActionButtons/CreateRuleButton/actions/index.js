@@ -230,8 +230,16 @@ export const validateRule = (rule, dispatch) => {
   //Modify Response Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
     rule.pairs.forEach((pair) => {
+      // should have resource type
+      if (isEmpty(pair.response.resourceType)) {
+        output = {
+          result: false,
+          message: "Please select a resource type to continue",
+          error: "missing resource type",
+        };
+      }
       //Source shouldn't be empty
-      if (isEmpty(pair.source.value)) {
+      else if (isEmpty(pair.source.value)) {
         output = {
           result: false,
           message: `Please enter a source`,
@@ -252,13 +260,6 @@ export const validateRule = (rule, dispatch) => {
           result: false,
           message: message,
           error,
-        };
-        // should have resource type
-      } else if (isEmpty(pair.response.resourceType)) {
-        output = {
-          result: false,
-          message: "Please select a resource type to continue",
-          error: "missing resource type",
         };
       }
     });
