@@ -207,7 +207,10 @@ const DraftSessionViewer: React.FC = () => {
       if (response?.success) {
         setIsSaveModalVisible(false);
         toast.success("Recording saved successfully");
-        trackDraftSessionSaved(sessionAttributes.duration);
+        trackDraftSessionSaved(
+          sessionAttributes.duration,
+          recordingOptionsToSave
+        );
         navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
           replace: true,
           state: { fromApp: true, viewAfterSave: true },
