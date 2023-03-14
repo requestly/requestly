@@ -253,6 +253,13 @@ export const validateRule = (rule, dispatch) => {
           message: message,
           error,
         };
+        // should have resource type
+      } else if (isEmpty(pair.response.resourceType)) {
+        output = {
+          result: false,
+          message: "Please select a resource type to continue",
+          error: "missing resource type",
+        };
       }
     });
   }
