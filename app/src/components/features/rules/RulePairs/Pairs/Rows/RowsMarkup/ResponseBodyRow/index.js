@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -37,37 +37,34 @@ const ResponseBodyRow = ({
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const onChangeResponseType = useCallback(
-    (responseBodyType) => {
-      if (
-        Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
-          responseBodyType
-        )
-      ) {
-        let value = "{}";
-        if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
-          value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
-        } else {
-          setIsCodeMinified(true);
-          setEditorStaticValue(value);
-        }
-
-        modifyPairAtGivenPath(
-          null,
-          pairIndex,
-          `response.type`,
-          responseBodyType,
-          [
-            {
-              path: `response.value`,
-              value: value,
-            },
-          ]
-        );
+  const onChangeResponseType = (responseBodyType) => {
+    if (
+      Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
+        responseBodyType
+      )
+    ) {
+      let value = "{}";
+      if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
+        value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
+      } else {
+        setIsCodeMinified(true);
+        setEditorStaticValue(value);
       }
-    },
-    [ruleDetails, pairIndex, modifyPairAtGivenPath]
-  );
+
+      modifyPairAtGivenPath(
+        null,
+        pairIndex,
+        `response.type`,
+        responseBodyType,
+        [
+          {
+            path: `response.value`,
+            value: value,
+          },
+        ]
+      );
+    }
+  };
 
   const handleFileSelectCallback = (selectedFile) => {
     modifyPairAtGivenPath(
@@ -299,4 +296,4 @@ const ResponseBodyRow = ({
   );
 };
 
-export default React.memo(ResponseBodyRow);
+export default ResponseBodyRow;
