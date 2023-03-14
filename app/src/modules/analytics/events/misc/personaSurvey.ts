@@ -32,3 +32,7 @@ export const trackPersonaRecommendationSkipped = () => {
 export const trackPersonaQuestionnaireStarted = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_QUESTIONNAIRE_STARTED);
 };
+
+export const trackPersonaSurveySignInClicked = () => {
+  trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_SIGN_IN_CLICKED);
+};
