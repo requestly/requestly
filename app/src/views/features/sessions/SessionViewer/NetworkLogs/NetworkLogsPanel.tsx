@@ -7,6 +7,7 @@ import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
 import { useSelector } from "react-redux";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
+import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -86,7 +87,12 @@ const NetworkLogsPanel: React.FC<Props> = ({
             <Typography.Text>
               This session does not contain any network requests. <br />
               Check out this{" "}
-              <a href="/sessions/draft/mock/" target="_blank" rel="noreferrer">
+              <a
+                href="/sessions/draft/mock/"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackSampleSessionClicked("network")}
+              >
                 sample session
               </a>{" "}
               to see the type of information you can send with a session.

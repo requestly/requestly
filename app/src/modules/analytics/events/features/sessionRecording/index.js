@@ -86,3 +86,9 @@ export const trackSessionRecordingPanelTabClicked = (tab, session_type) => {
     session_type,
   });
 };
+
+export const trackSampleSessionClicked = (log_type) => {
+  trackEvent(SESSION_RECORDING.session_recording_panel_sample_session_clicked, {
+    log_type,
+  });
+};

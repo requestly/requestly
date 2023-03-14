@@ -21,6 +21,8 @@ export const SESSION_RECORDING = {
   session_recording_deleted: "session_recording_deleted",
   session_recording_description_added: "session_recording_description_added",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
+  session_recording_panel_sample_session_clicked:
+    "session_recording_panel_sample_session_clicked",
 };
 
 export const SHARED_LIST = {

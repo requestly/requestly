@@ -6,6 +6,7 @@ import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
 import { ThemeProvider } from "@devtools-ds/themes";
 import { useSelector } from "react-redux";
 import { getIncludeConsoleLogs } from "store/features/session-recording/selectors";
+import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 
 interface Props {
   consoleLogs: ConsoleLog[];
@@ -29,7 +30,6 @@ const ConsoleLogsPanel: React.FC<Props> = ({
   );
 
   const includeConsoleLogs = useSelector(getIncludeConsoleLogs);
-  console.log("!!!debug", "component", includeConsoleLogs);
 
   useEffect(() => {
     updateCount(visibleConsoleLogs.length);
@@ -51,11 +51,16 @@ const ConsoleLogsPanel: React.FC<Props> = ({
         <div className="placeholder">
           {includeConsoleLogs === false ? (
             <Typography.Text>
-              This session does not contain any network requests. <br />
-              Check out this
-              <a href="/sessions/draft/mock/" target="_blank" rel="noreferrer">
+              This session does not contain any console logs. <br />
+              Check out this{" "}
+              <a
+                href="/sessions/draft/mock/"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackSampleSessionClicked("console")}
+              >
                 sample session
-              </a>
+              </a>{" "}
               to see the type of information you can send with a session.
             </Typography.Text>
           ) : (
