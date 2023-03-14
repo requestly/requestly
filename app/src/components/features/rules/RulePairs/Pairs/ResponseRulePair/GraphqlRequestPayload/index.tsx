@@ -47,28 +47,25 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  const handleModifyPayloadKey = (e: React.ChangeEvent<HTMLInputElement>) => {
-    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
+  const handleModifyPair = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    payloadPath: string
+  ) => {
+    modifyPairAtGivenPath(e, pairIndex, payloadPath);
 
     if (e?.target?.value === "") {
-      clearRequestPayload(SOURCE_REQUEST_PAYLOAD_KEY);
+      clearRequestPayload(payloadPath);
     }
 
-    trackRequestPayloadKeyFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
-  };
-
-  const handleModifyPayloadValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
-
-    if (e?.target?.value === "") {
-      clearRequestPayload(SOURCE_REQUEST_PAYLOAD_VALUE);
+    if (payloadPath === SOURCE_REQUEST_PAYLOAD_KEY) {
+      trackRequestPayloadKeyFilterModifiedEvent(
+        currentlySelectedRuleData.ruleType
+      );
+    } else {
+      trackRequestPayloadValueFilterModifiedEvent(
+        currentlySelectedRuleData.ruleType
+      );
     }
-
-    trackRequestPayloadValueFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
   };
 
   return (
@@ -83,7 +80,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           placeholder="key"
           className="graphql-operation-type-input"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_KEY)}
-          onChange={handleModifyPayloadKey}
+          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_KEY)}
         />
         <Input
           name="value"
@@ -91,7 +88,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           placeholder="value"
           className="graphql-operation-type-name"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_VALUE)}
-          onChange={handleModifyPayloadValue}
+          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_VALUE)}
         />
       </Row>
     </>
