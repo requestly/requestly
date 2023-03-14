@@ -37,7 +37,7 @@ const CreateWorkspace = () => {
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        redirectToTeam({ navigate, teamId });
+        redirectToTeam(navigate, teamId);
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })
       .catch((err) => {

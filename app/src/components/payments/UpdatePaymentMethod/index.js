@@ -147,7 +147,7 @@ const UpdatePaymentMethod = () => {
             if (mode === "individual") {
               redirectToPersonalSubscription(navigate, true, true);
             } else {
-              redirectToTeam({ navigate, teamId });
+              redirectToTeam(navigate, teamId);
             }
           } else {
             throw new Error("Unable to update. Please contact us");

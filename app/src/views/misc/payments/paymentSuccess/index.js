@@ -38,11 +38,7 @@ const PaymentSuccess = () => {
               <Button
                 type="primary"
                 onClick={() =>
-                  redirectToTeam({
-                    navigate,
-                    teamId,
-                    hardRedirect: true,
-                  })
+                  redirectToTeam(navigate, teamId, { hardRedirect: true })
                 }
                 key="go-to-teams"
               >

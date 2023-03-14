@@ -287,15 +287,8 @@ export const redirectToBackups = (navigate, hardRedirect) => {
 };
 
 /* ACCOUNT - TEAM */
-export const redirectToTeam = (args) => {
-  const {
-    navigate,
-    teamId,
-    hardRedirect,
-    autoRefresh,
-    redirectBackToMyTeams,
-    state,
-  } = args;
+export const redirectToTeam = (navigate, teamId, options = {}) => {
+  const { hardRedirect, autoRefresh, redirectBackToMyTeams, state } = options;
   const url = new URL(window.location.href);
   url.pathname = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
   if (autoRefresh) {

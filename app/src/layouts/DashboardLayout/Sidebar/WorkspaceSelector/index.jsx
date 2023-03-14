@@ -199,7 +199,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       setIsInviteModalOpen(true);
       trackInviteTeammatesClicked("sidebar_dropdown");
       if (isWorkspaceMode) {
-        redirectToTeam({ navigate, teamId: currentlyActiveWorkspace.id });
+        redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
         redirectToMyTeams(navigate, false);
       }
@@ -416,10 +416,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
             className="workspace-menu-item"
             onClick={() => {
               if (isWorkspaceMode) {
-                redirectToTeam({
-                  navigate,
-                  teamId: currentlyActiveWorkspace.id,
-                });
+                redirectToTeam(navigate, currentlyActiveWorkspace.id);
               } else {
                 redirectToMyTeams(navigate, false);
               }

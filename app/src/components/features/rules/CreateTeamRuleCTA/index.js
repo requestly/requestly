@@ -83,10 +83,7 @@ const CreateTeamRuleCTA = () => {
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam({
-                      navigate,
-                      teamId: currentlyActiveWorkspace.id,
-                    });
+                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
                   }}
                 >
                   here
