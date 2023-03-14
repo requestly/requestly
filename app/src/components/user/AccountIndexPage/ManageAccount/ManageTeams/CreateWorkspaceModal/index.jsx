@@ -64,7 +64,13 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
           },
           appMode
         );
-        redirectToTeam(navigate, teamId);
+        redirectToTeam({
+          navigate,
+          teamId,
+          state: {
+            isNewTeam: true,
+          },
+        });
         handleModalClose();
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })

@@ -37,7 +37,13 @@ const PaymentSuccess = () => {
             usersCount > 1 ? (
               <Button
                 type="primary"
-                onClick={() => redirectToTeam(navigate, teamId, true, false)}
+                onClick={() =>
+                  redirectToTeam({
+                    navigate,
+                    teamId,
+                    hardRedirect: true,
+                  })
+                }
                 key="go-to-teams"
               >
                 Manage your Team

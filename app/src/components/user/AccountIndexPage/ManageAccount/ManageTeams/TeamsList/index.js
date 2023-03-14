@@ -23,7 +23,7 @@ const TeamsList = ({ teams = [] }) => {
         return (
           <span
             style={{ width: "300px" }}
-            onClick={() => redirectToTeam(navigate, teamId)}
+            onClick={() => redirectToTeam({ navigate, teamId })}
           >
             <Badge status="success" /> Active
           </span>
@@ -36,7 +36,7 @@ const TeamsList = ({ teams = [] }) => {
             color="primary"
             size="sm"
             type="button"
-            onClick={() => redirectToTeam(navigate, teamId)}
+            onClick={() => redirectToTeam({ navigate, teamId })}
           >
             <span>Pay now</span>
           </Button>
@@ -58,7 +58,11 @@ const TeamsList = ({ teams = [] }) => {
       render: (_, record) => (
         <span
           onClick={() => {
-            redirectToTeam(navigate, record.id, false, false, true);
+            redirectToTeam({
+              navigate,
+              teamId: record.id,
+              redirectBackToMyTeams: true,
+            });
           }}
           style={{
             cursor: "pointer",
@@ -89,7 +93,7 @@ const TeamsList = ({ teams = [] }) => {
         <span
           style={{ width: "300px", cursor: "pointer" }}
           onClick={() => {
-            redirectToTeam(navigate, record.id);
+            redirectToTeam({ navigate, teamId: record.id });
           }}
         >
           <EditOutlined />

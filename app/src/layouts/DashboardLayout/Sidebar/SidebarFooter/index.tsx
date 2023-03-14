@@ -26,7 +26,10 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({
   const handleInviteTeammatesClick = () => {
     trackInviteTeammatesClicked("sidebar_footer");
     if (isWorkspaceMode) {
-      redirectToTeam(navigate, currentlyActiveWorkspace.id);
+      redirectToTeam({
+        navigate,
+        teamId: currentlyActiveWorkspace.id,
+      });
     } else {
       redirectToMyTeams(navigate, false);
     }
