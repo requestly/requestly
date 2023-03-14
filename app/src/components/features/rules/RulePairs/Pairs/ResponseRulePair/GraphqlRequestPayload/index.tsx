@@ -13,53 +13,62 @@ import {
 import "./GraphqlRequestPayload.css";
 
 const {
-  PATH_FROM_PAIR: {
-    SOURCE_REQUEST_PAYLOAD,
-    SOURCE_REQUEST_PAYLOAD_KEY,
-    SOURCE_REQUEST_PAYLOAD_VALUE,
-  },
+  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
 } = APP_CONSTANTS;
 
-const GraphqlRequestPayload = ({
+interface GraphqlRequestPayloadProps {
+  pairIndex: number;
+  modifyPairAtGivenPath: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    pairIndex: number,
+    payloadPath: string
+  ) => void;
+}
+
+const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   pairIndex,
   modifyPairAtGivenPath = () => {},
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const getInputValue = (payloadType) => {
-    return getObjectValue(currentlySelectedRuleData, pairIndex, payloadType);
+  const getInputValue = (payloadPath: string) => {
+    return getObjectValue(currentlySelectedRuleData, pairIndex, payloadPath);
   };
 
-  const clearRequestPayload = () => {
+  // SOURCE_REQUEST_PAYLOAD,
+  const clearRequestPayload = (payloadPath: string) => {
     deleteObjectAtPath(
       currentlySelectedRuleData,
       setCurrentlySelectedRule,
-      SOURCE_REQUEST_PAYLOAD,
+      payloadPath,
       pairIndex,
       dispatch
     );
   };
 
-  const handleModifyPair = (e, path) => {
-    let payloadType = path?.split(".");
-    payloadType = payloadType[payloadType.length - 1];
-
-    modifyPairAtGivenPath(e, pairIndex, path);
+  const handleModifyPayloadKey = (e: React.ChangeEvent<HTMLInputElement>) => {
+    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
 
     if (e?.target?.value === "") {
-      clearRequestPayload();
+      clearRequestPayload(SOURCE_REQUEST_PAYLOAD_KEY);
     }
 
-    if (payloadType === "key") {
-      trackRequestPayloadKeyFilterModifiedEvent(
-        currentlySelectedRuleData.ruleType
-      );
-    } else {
-      trackRequestPayloadValueFilterModifiedEvent(
-        currentlySelectedRuleData.ruleType
-      );
+    trackRequestPayloadKeyFilterModifiedEvent(
+      currentlySelectedRuleData.ruleType
+    );
+  };
+
+  const handleModifyPayloadValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
+
+    if (e?.target?.value === "") {
+      clearRequestPayload(SOURCE_REQUEST_PAYLOAD_VALUE);
     }
+
+    trackRequestPayloadValueFilterModifiedEvent(
+      currentlySelectedRuleData.ruleType
+    );
   };
 
   return (
@@ -74,7 +83,7 @@ const GraphqlRequestPayload = ({
           placeholder="key"
           className="graphql-operation-type-input"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_KEY)}
-          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_KEY)}
+          onChange={handleModifyPayloadKey}
         />
         <Input
           name="value"
@@ -82,7 +91,7 @@ const GraphqlRequestPayload = ({
           placeholder="value"
           className="graphql-operation-type-name"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_VALUE)}
-          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_VALUE)}
+          onChange={handleModifyPayloadValue}
         />
       </Row>
     </>
