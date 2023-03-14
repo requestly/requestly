@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
-// Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// Utils
 import { getAppMode } from "../../../../../../../../store/selectors";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
@@ -24,11 +21,9 @@ const ResponseBodyRow = ({
   helperFunctions,
   ruleDetails,
   isInputDisabled,
-  responseRuleResourceType,
 }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const appMode = useSelector(getAppMode);
-  const { pathname } = useLocation();
 
   const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(
     false
@@ -154,18 +149,6 @@ const ResponseBodyRow = ({
       setIsCodeFormatted(false);
     }, 2000);
   };
-
-  useEffect(() => {
-    if (!pathname.includes("create")) return;
-
-    onChangeResponseType(
-      responseRuleResourceType === "graphqlApi"
-        ? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
-        : GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-    );
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, responseRuleResourceType]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
