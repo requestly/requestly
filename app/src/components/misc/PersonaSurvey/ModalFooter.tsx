@@ -83,6 +83,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
           APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
           userPersona.referralChannel
         );
+        if (window.location.href.includes("/shared-lists/viewer")) {
+          //don't show recommendation screen for shared list users
+          dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        }
         break;
     }
     dispatch(actions.updatePersonaSurveyPage(page + 1));
