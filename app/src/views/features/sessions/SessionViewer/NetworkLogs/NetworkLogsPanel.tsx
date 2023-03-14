@@ -1,4 +1,4 @@
-import { Empty } from "antd";
+import { Empty, Typography } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { NetworkLog } from "../types";
 import NetworkLogRow from "./NetworkLogRow";
@@ -6,7 +6,7 @@ import Split from "react-split";
 import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
 import { useSelector } from "react-redux";
-import { getSessionRecordingMetadataOptions } from "store/features/session-recording/selectors";
+import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -29,9 +29,7 @@ const NetworkLogsPanel: React.FC<Props> = ({
     visibleNetworkLogs
   );
 
-  const sessionMetadataOptions = useSelector(
-    getSessionRecordingMetadataOptions
-  );
+  const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
   const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
   useEffect(() => {
@@ -84,13 +82,18 @@ const NetworkLogsPanel: React.FC<Props> = ({
         )
       ) : (
         <div className="placeholder">
-          <Empty
-            description={
-              sessionMetadataOptions.includeNetworkLogs === false
-                ? "Network logs have not been shared. You can choose to share them while saving."
-                : "Network logs appear here as video plays."
-            }
-          />
+          {includeNetworkLogs === false ? (
+            <Typography.Text>
+              This session does not contain any network requests. <br />
+              Check out this{" "}
+              <a href="/sessions/draft/mock/" target="_blank" rel="noreferrer">
+                sample session
+              </a>{" "}
+              to see the type of information you can send with a session.
+            </Typography.Text>
+          ) : (
+            <Empty description={"Network logs appear here as video plays."} />
+          )}
         </div>
       )}
     </div>
