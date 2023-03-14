@@ -74,6 +74,7 @@ export enum ResponseRuleResourceType {
 export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
+  requestPayload?: { key: string; value: string };
 }
 
 export interface RulePairSource {

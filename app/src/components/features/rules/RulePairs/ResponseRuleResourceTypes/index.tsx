@@ -37,8 +37,6 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   const isDesktop = useMemo(isDesktopMode, []);
   const currentResourceType =
     currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
-  const isPopConfirmDisabled =
-    currentResourceType !== ResponseRuleResourceType.GRAPHQL_API;
 
   const [resourceType, setResourceType] = useState<ResponseRuleResourceType>(
     currentResourceType ?? ResponseRuleResourceType.UNKNOWN
@@ -47,6 +45,13 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     responseTypePopupVisible,
     setResponseTypePopupVisible,
   ] = useState<boolean>(false);
+
+  const filters =
+    currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
+
+  const isPopConfirmDisabled =
+    currentResourceType !== ResponseRuleResourceType.GRAPHQL_API ||
+    Object.keys(filters ?? {}).length === 0;
 
   useEffect(() => {
     if (currentResourceType) {
