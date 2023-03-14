@@ -31,16 +31,14 @@ const GraphqlRequestPayload = ({
     return getObjectValue(currentlySelectedRuleData, pairIndex, payloadType);
   };
 
-  const clearRequestPayload = (value) => {
-    if (value === "") {
-      deleteObjectAtPath(
-        currentlySelectedRuleData,
-        setCurrentlySelectedRule,
-        SOURCE_REQUEST_PAYLOAD,
-        pairIndex,
-        dispatch
-      );
-    }
+  const clearRequestPayload = () => {
+    deleteObjectAtPath(
+      currentlySelectedRuleData,
+      setCurrentlySelectedRule,
+      SOURCE_REQUEST_PAYLOAD,
+      pairIndex,
+      dispatch
+    );
   };
 
   const handleModifyPair = (e, path) => {
@@ -48,7 +46,10 @@ const GraphqlRequestPayload = ({
     payloadType = payloadType[payloadType.length - 1];
 
     modifyPairAtGivenPath(e, pairIndex, path);
-    clearRequestPayload(e.target.value);
+
+    if (e?.target?.value === "") {
+      clearRequestPayload();
+    }
 
     if (payloadType === "key") {
       trackRequestPayloadKeyFilterModifiedEvent(
