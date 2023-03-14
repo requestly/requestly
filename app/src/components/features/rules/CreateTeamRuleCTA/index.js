@@ -10,7 +10,7 @@ import { getAppMode } from "store/selectors";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import lottie from "lottie-web/build/player/lottie_light";
 import teamSolvingPuzzle from "assets/lottie/team-solving-puzzle.json";
@@ -21,7 +21,7 @@ const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
   //Component State
   const [
@@ -83,7 +83,10 @@ const CreateTeamRuleCTA = () => {
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam({ navigate, teamId: isWorkspaceMode });
+                    redirectToTeam({
+                      navigate,
+                      teamId: currentlyActiveWorkspace.id,
+                    });
                   }}
                 >
                   here
