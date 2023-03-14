@@ -132,15 +132,15 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               GraphQL API
             </Radio>
             {isDesktop ? (
-              <Radio value={ResponseRuleResourceType.HTML_BODY}>
-                HTML Body
+              <Radio value={ResponseRuleResourceType.STATIC}>
+                HTML / JS / CSS
               </Radio>
             ) : (
               <Tooltip
                 overlayClassName="response-rule-resource-type-tooltip"
                 title={
                   <span>
-                    HTML Body option is available only in desktop app due to
+                    This option is available only in desktop app due to
                     technical constraints of chrome extension.{" "}
                     <DownloadDesktopAppLink />
                   </span>
@@ -148,31 +148,9 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
               >
                 <Radio
                   disabled={!isDesktop}
-                  value={ResponseRuleResourceType.HTML_BODY}
+                  value={ResponseRuleResourceType.STATIC}
                 >
-                  HTML Body
-                  <QuestionCircleOutlined className="resource-disable-option-info-icon" />
-                </Radio>
-              </Tooltip>
-            )}
-            {isDesktop ? (
-              <Radio value={ResponseRuleResourceType.JS_OR_CSS}>JS/CSS</Radio>
-            ) : (
-              <Tooltip
-                overlayClassName="response-rule-resource-type-tooltip"
-                title={
-                  <span>
-                    JS/CSS option is available only in desktop app due to
-                    technical constraints of chrome extension.{" "}
-                    <DownloadDesktopAppLink />
-                  </span>
-                }
-              >
-                <Radio
-                  disabled={!isDesktop}
-                  value={ResponseRuleResourceType.JS_OR_CSS}
-                >
-                  JS/CSS
+                  HTML / JS / CSS
                   <QuestionCircleOutlined className="resource-disable-option-info-icon" />
                 </Radio>
               </Tooltip>

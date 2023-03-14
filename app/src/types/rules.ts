@@ -67,8 +67,7 @@ export enum ResponseRuleResourceType {
   UNKNOWN = "",
   REST_API = "restApi",
   GRAPHQL_API = "graphqlApi",
-  HTML_BODY = "htmlBody",
-  JS_OR_CSS = "jsOrCss",
+  STATIC = "static", //  HTML / JS / CSS
 }
 
 export interface SourceFilter {
