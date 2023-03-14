@@ -28,6 +28,7 @@ import {
 import { useSelector } from "react-redux";
 import { cloneDeep } from "lodash";
 import { getConsoleLogs } from "./sessionEventsUtils";
+import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 
 const SessionDetails: React.FC = () => {
   const attributes = useSelector(getSessionRecordingAttributes);
@@ -185,7 +186,16 @@ const SessionDetails: React.FC = () => {
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
       </div>
       <ProCard className="primary-card session-panels-container">
-        <Tabs defaultActiveKey="consoleLogs" items={getSessionPanelTabs} />
+        <Tabs
+          defaultActiveKey="consoleLogs"
+          items={getSessionPanelTabs}
+          onTabClick={(key) => {
+            trackSessionRecordingPanelTabClicked(
+              key,
+              window.location.pathname.split("/")?.[2]
+            );
+          }}
+        />
       </ProCard>
     </>
   );
