@@ -76,6 +76,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         <Input
           name="key"
           type="text"
+          autoComplete="off"
           placeholder="key"
           className="graphql-operation-type-input"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_KEY)}
@@ -84,6 +85,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         <Input
           name="value"
           type="text"
+          autoComplete="off"
           placeholder="value"
           className="graphql-operation-type-name"
           value={getInputValue(SOURCE_REQUEST_PAYLOAD_VALUE)}
