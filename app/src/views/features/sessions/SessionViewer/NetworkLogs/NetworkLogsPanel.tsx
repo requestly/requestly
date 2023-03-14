@@ -81,25 +81,25 @@ const NetworkLogsPanel: React.FC<Props> = ({
             />
           </Split>
         )
+      ) : includeNetworkLogs === false ? (
+        <div>
+          <Typography.Text className="recording-options-message">
+            This session does not contain any network requests. <br />
+            Check out this{" "}
+            <a
+              href="/sessions/draft/mock/"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSampleSessionClicked("network")}
+            >
+              sample session
+            </a>{" "}
+            to see the type of information you can send with a session.
+          </Typography.Text>
+        </div>
       ) : (
-        <div className="placeholder">
-          {includeNetworkLogs === false ? (
-            <Typography.Text>
-              This session does not contain any network requests. <br />
-              Check out this{" "}
-              <a
-                href="/sessions/draft/mock/"
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => trackSampleSessionClicked("network")}
-              >
-                sample session
-              </a>{" "}
-              to see the type of information you can send with a session.
-            </Typography.Text>
-          ) : (
-            <Empty description={"Network logs appear here as video plays."} />
-          )}
+        <div className={"placeholder"}>
+          <Empty description={"Network logs appear here as video plays."} />
         </div>
       )}
     </div>

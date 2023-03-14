@@ -47,25 +47,25 @@ const ConsoleLogsPanel: React.FC<Props> = ({
             <ConsoleLogRow key={i} {...log} />
           ))}
         </ThemeProvider>
+      ) : includeConsoleLogs === false ? (
+        <div>
+          <Typography.Text className="recording-options-message">
+            This session does not contain any console logs. <br />
+            Check out this{" "}
+            <a
+              href="/sessions/draft/mock/"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSampleSessionClicked("console")}
+            >
+              sample session
+            </a>{" "}
+            to see the type of information you can send with a session.
+          </Typography.Text>
+        </div>
       ) : (
-        <div className="placeholder">
-          {includeConsoleLogs === false ? (
-            <Typography.Text>
-              This session does not contain any console logs. <br />
-              Check out this{" "}
-              <a
-                href="/sessions/draft/mock/"
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => trackSampleSessionClicked("console")}
-              >
-                sample session
-              </a>{" "}
-              to see the type of information you can send with a session.
-            </Typography.Text>
-          ) : (
-            <Empty description={"Console logs appear here as video plays."} />
-          )}
+        <div className={"placeholder"}>
+          <Empty description={"Console logs appear here as video plays."} />
         </div>
       )}
     </div>

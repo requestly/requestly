@@ -99,11 +99,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+      }
 
-        span.ant-typography {
-          font-size: 14px;
-          text-align: center;
-        }
+      span.ant-typography.recording-options-message {
+        font-size: 14px;
       }
 
       .session-details-panel-row {
