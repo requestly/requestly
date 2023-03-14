@@ -68,18 +68,6 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
   ];
 };
 
-export const updateUserSyncMetadata = (uid, metadata, appMode) => {
-  return new Promise((resolve, reject) => {
-    updateValueAsPromise(getMetadataSyncPath(uid), metadata);
-
-    Logger.log("Writing storage in updateUserSyncMetadata");
-    StorageService(appMode)
-      .saveRecord(metadata)
-      .then(() => resolve())
-      .catch(() => reject("err update sync metadata"));
-  });
-};
-
 const preventWorkspaceSyncWrite = async (
   key,
   localRecords,
@@ -430,10 +418,12 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
   ];
   let mergedPageSources;
 
-  const firebaseSessionRecordingPageConfig =
-    await getSyncedSessionRecordingPageConfig(uid);
-  const localSessionRecordingPageConfig =
-    await getLocalSessionRecordingPageConfig(appMode);
+  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(
+    uid
+  );
+  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(
+    appMode
+  );
 
   const firebasePageSources =
     firebaseSessionRecordingPageConfig?.pageSources || [];
