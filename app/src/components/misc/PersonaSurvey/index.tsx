@@ -54,7 +54,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       );
       const otherOption = options.pop();
       const shuffled = shuffleOptions(options);
-
+      //others options to remain at last always
       return [...shuffled, otherOption];
     }
     return null;
