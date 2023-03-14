@@ -10,7 +10,7 @@ import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey, shuffleOptions } from "./utils";
-import { Option, PageConfig } from "./types";
+import { Conditional, Option, PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
@@ -48,15 +48,14 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
 
   const shuffledUseCases = useMemo(() => {
     if (persona) {
-      const index = OptionsConfig[2].conditional.findIndex((option: any) =>
+      const { conditional } = OptionsConfig[2];
+      const { options } = conditional.find((option: Conditional) =>
         option.condition(persona)
       );
-      let otherOption = OptionsConfig[2].conditional[index].options.pop();
-      const shuffled = shuffleOptions(
-        OptionsConfig[2].conditional[index].options
-      );
-      shuffled.push(otherOption);
-      return shuffled;
+      const otherOption = options.pop();
+      const shuffled = shuffleOptions(options);
+
+      return [...shuffled, otherOption];
     }
     return null;
   }, [persona]);
