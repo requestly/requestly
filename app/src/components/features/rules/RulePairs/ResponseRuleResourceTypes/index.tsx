@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
 import { Popconfirm, Radio, Tooltip } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
@@ -8,6 +7,7 @@ import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
 import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
+import { omit, set } from "lodash";
 import { ResponseRule, ResponseRuleResourceType } from "types/rules";
 import "./ResponseRuleResourceTypes.css";
 
@@ -34,11 +34,11 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
   setResponseRuleResourceType,
 }) => {
   const dispatch = useDispatch();
-  const { pathname } = useLocation();
   const isDesktop = useMemo(isDesktopMode, []);
-  const isCreateMode = pathname.includes("create");
   const currentResourceType =
     currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+  const isPopConfirmDisabled =
+    currentResourceType !== ResponseRuleResourceType.GRAPHQL_API;
 
   const [resourceType, setResourceType] = useState<ResponseRuleResourceType>(
     currentResourceType ?? ResponseRuleResourceType.UNKNOWN
@@ -48,40 +48,51 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     setResponseTypePopupVisible,
   ] = useState<boolean>(false);
 
-  const updateResourceType = (resourceType: ResponseRuleResourceType) => {
-    const updatedRule = {
-      ...currentlySelectedRuleData,
-      pairs: [
-        {
-          ...currentlySelectedRuleData.pairs[0],
-          response: {
-            ...currentlySelectedRuleData.pairs[0].response,
-            resourceType,
-          },
-        },
-      ],
-    };
-
-    setCurrentlySelectedRule(dispatch, updatedRule, true);
-  };
-
   useEffect(() => {
     if (currentResourceType) {
       setResponseRuleResourceType(currentResourceType);
     }
   }, [currentResourceType, setResponseRuleResourceType]);
 
+  const updateResourceType = (
+    resourceType: ResponseRuleResourceType,
+    clearGraphqlRequestPayload = false
+  ) => {
+    const pairIndex = 0; // response rule will only have one pair
+    const copyOfCurrentlySelectedRule = JSON.parse(
+      JSON.stringify(currentlySelectedRuleData)
+    );
+
+    let updatedPair = set(
+      copyOfCurrentlySelectedRule.pairs[pairIndex],
+      "response.resourceType",
+      resourceType
+    );
+
+    if (clearGraphqlRequestPayload) {
+      // clear graphql request payload on resource type change
+      updatedPair = omit(updatedPair, ["source.filters[0].requestPayload"]);
+    }
+
+    const updatedRule = {
+      ...currentlySelectedRuleData,
+      pairs: [{ ...updatedPair }],
+    };
+
+    setCurrentlySelectedRule(dispatch, updatedRule, true);
+  };
+
   const handleOnConfirm = () => {
+    const clearGraphqlRequestPayload =
+      resourceType !== ResponseRuleResourceType.GRAPHQL_API;
+
     setResponseTypePopupVisible(false);
     setResponseRuleResourceType(resourceType);
-    updateResourceType(resourceType);
+    updateResourceType(resourceType, clearGraphqlRequestPayload);
   };
 
   const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
-    if (
-      !isCreateMode ||
-      responseRuleResourceType === ResponseRuleResourceType.UNKNOWN
-    ) {
+    if (isPopConfirmDisabled) {
       setResourceType(type);
       setResponseRuleResourceType(type);
       updateResourceType(type);
@@ -97,12 +108,13 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Popconfirm
-          title="This will clear the existing body content"
+          title="This will clear the existing GraphQL operation data"
           okText="Confirm"
           cancelText="Cancel"
+          placement="topLeft"
           open={responseTypePopupVisible}
           onConfirm={handleOnConfirm}
-          disabled={!isCreateMode}
+          disabled={isPopConfirmDisabled}
           overlayClassName="resource-types-popconfirm"
           onCancel={() => setResponseTypePopupVisible(false)}
         >

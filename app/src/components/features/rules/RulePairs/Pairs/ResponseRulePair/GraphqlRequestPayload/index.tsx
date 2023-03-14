@@ -36,7 +36,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     return getObjectValue(currentlySelectedRuleData, pairIndex, payloadPath);
   };
 
-  // SOURCE_REQUEST_PAYLOAD,
   const clearRequestPayload = (payloadPath: string) => {
     deleteObjectAtPath(
       currentlySelectedRuleData,
