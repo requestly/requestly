@@ -42,7 +42,7 @@ const TeamViewer = ({ teamId }) => {
       },
       {
         key: "1",
-        label: "Settings",
+        label: "Workspace settings",
         children: <TeamSettings key={teamId} teamId={teamId} />,
       },
       {
