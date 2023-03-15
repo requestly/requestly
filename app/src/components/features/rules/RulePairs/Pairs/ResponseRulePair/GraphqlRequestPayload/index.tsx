@@ -66,19 +66,20 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setPayloadkey(payloadKey);
     setPayloadValue(payloadValue);
 
-    modifyPairAtGivenPath(
-      null,
-      pairIndex,
-      SOURCE_REQUEST_PAYLOAD_KEY,
-      payloadKey,
-      [
-        {
-          path: "source.filters[0].requestPayload.value",
-          value: payloadValue,
-        },
-      ],
-      false
-    );
+    if (payloadKey && payloadValue)
+      modifyPairAtGivenPath(
+        null,
+        pairIndex,
+        SOURCE_REQUEST_PAYLOAD_KEY,
+        payloadKey,
+        [
+          {
+            path: "source.filters[0].requestPayload.value",
+            value: payloadValue,
+          },
+        ],
+        false
+      );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestPayloadKey, requestPayloadValue]);
