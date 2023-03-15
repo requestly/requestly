@@ -105,7 +105,6 @@ const MockListIndex: React.FC<Props> = ({
   }, [type, uid]);
 
   const fetchMocks = useCallback(async () => {
-    // console.log("current token", await getAuth(firebaseApp)?.currentUser?.getIdTokenResult())
     // API|FILE|null
     getMocks(uid, type, workspace?.id)
       .then((data) => {

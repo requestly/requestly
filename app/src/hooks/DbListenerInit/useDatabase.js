@@ -1,7 +1,10 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  getCurrentlyActiveWorkspace,
+  getCurrentlyActiveWorkspaceMembers,
+} from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
@@ -18,6 +21,7 @@ const useDatabase = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   let unsubscribeUserNodeRef = useRef(null);
   let unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
@@ -110,6 +114,7 @@ const useDatabase = () => {
     user?.details?.profile?.uid,
     user?.loggedIn,
     currentlyActiveWorkspace,
+    currentTeamMembers,
     dispatch,
   ]);
 };
