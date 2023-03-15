@@ -65,12 +65,6 @@ const Status = ({ isDisabled, location }) => {
 
         callback
       );
-
-    trackRuleEditorHeaderClicked(
-      "toggle_status",
-      currentlySelectedRuleData.ruleType,
-      isCreateMode ? "create" : "edit"
-    );
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [
@@ -121,6 +115,13 @@ const Status = ({ isDisabled, location }) => {
         checked={isChecked}
         onChange={toggleRuleStatus}
         disabled={isDisabled}
+        onClick={() => {
+          trackRuleEditorHeaderClicked(
+            "toggle_status",
+            currentlySelectedRuleData.ruleType,
+            location.pathname.indexOf("create") !== -1 ? "create" : "edit"
+          );
+        }}
       />
     </div>
   );
