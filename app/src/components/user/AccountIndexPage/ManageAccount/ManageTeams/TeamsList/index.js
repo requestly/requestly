@@ -58,7 +58,9 @@ const TeamsList = ({ teams = [] }) => {
       render: (_, record) => (
         <span
           onClick={() => {
-            redirectToTeam(navigate, record.id, false, false, true);
+            redirectToTeam(navigate, record.id, {
+              redirectBackToMyTeams: true,
+            });
           }}
           style={{
             cursor: "pointer",

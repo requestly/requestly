@@ -13,11 +13,21 @@ import {
 } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./CreateWorkspaceModal.css";
 import Logger from "lib/logger";
+import { useDispatch, useSelector } from "react-redux";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
 const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
   const [isLoading, setIsLoading] = useState(false);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
     workspaceName: "",
@@ -41,7 +51,24 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
-        redirectToTeam(navigate, teamId);
+        switchWorkspace(
+          {
+            teamId: teamId,
+            teamName: newTeamName,
+            teamMembersCount: 1,
+          },
+          dispatch,
+          {
+            isSyncEnabled: user?.details?.isSyncEnabled,
+            isWorkspaceMode,
+          },
+          appMode
+        );
+        redirectToTeam(navigate, teamId, {
+          state: {
+            isNewTeam: true,
+          },
+        });
         handleModalClose();
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })

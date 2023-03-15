@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography, Input, Switch, Divider } from "antd";
 import { getAvailableTeams } from "store/features/teams/selectors";
 //Firebase
@@ -14,6 +15,8 @@ import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import "./MembersDetails.css";
 
 const MembersDetails = ({ teamId }) => {
+  const location = useLocation();
+  const isNewTeam = location.state?.isNewTeam;
   // Component state
   const [seats, setSeats] = useState({});
   const [showSeatStatus, setShowSeatStatus] = useState(false);
@@ -38,6 +41,12 @@ const MembersDetails = ({ teamId }) => {
     setIsAddMemberModalActive(true);
     trackAddMemberClicked();
   };
+
+  useEffect(() => {
+    if (isNewTeam) {
+      setIsAddMemberModalActive(true);
+    }
+  }, [isNewTeam]);
 
   useEffect(() => {
     const functions = getFunctions();
