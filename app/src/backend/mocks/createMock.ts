@@ -16,6 +16,7 @@ import {
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 import { updateMockFromFirebase } from "./updateMock";
+import Logger from "lib/logger";
 
 export const createMock = async (
   uid: string,
@@ -78,7 +79,7 @@ const createMockFromFirebase = async (
       return docRef.id;
     })
     .catch((err) => {
-      console.error("error while creating mock", err);
+      Logger.error("error while creating mock", err);
       return null;
     });
 

@@ -90,7 +90,6 @@ const MockEditorIndex: React.FC<Props> = ({
           }
           return redirectToMockEditorEditMock(navigate, mockId);
         }
-        console.log("herererer");
         toast.error("Mock Create Error");
       });
     }

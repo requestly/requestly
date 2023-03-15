@@ -13,6 +13,7 @@ import { deleteMock } from "backend/mocks/deleteMock";
 import { RQMockMetadataSchema } from "../types";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getOwnerId } from "backend/mocks/common";
 
 interface DeleteModalProps {
   visible: boolean;
@@ -32,12 +33,13 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const ownerId = getOwnerId(uid, workspace?.id);
+
   const handleOnConfirm = () => {
     setIsDeleting(true);
     if (mock.isOldMock) {
       const functions = getFunctions();
       const deleteMock = httpsCallable(functions, "deleteMock");
-
       deleteMock(mock.id).then((res: any) => {
         if (res?.data?.success) {
           setIsDeleting(false);
@@ -53,7 +55,7 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
         }
       });
     } else {
-      deleteMock(uid, mock.id, workspace?.id)
+      deleteMock(ownerId, mock.id)
         .then(() => {
           trackDeleteMockEvent(mock.id, mock.type, mock.fileType);
           callbackOnSuccess();
