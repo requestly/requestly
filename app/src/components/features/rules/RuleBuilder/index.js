@@ -256,7 +256,7 @@ const RuleBuilder = (props) => {
       });
   }
   useEffect(() => {
-    const source = !state?.source ? null : state.source;
+    const source = state?.source ?? null;
     const ruleType = currentlySelectedRuleConfig.TYPE;
     if (!ruleType || !source) return;
     trackRuleEditorViewed(source, ruleType);
