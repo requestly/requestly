@@ -1,17 +1,33 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Input, Modal, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  Input,
+  Modal,
+  Row,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
-import { RQSession } from "@requestly/web-sdk";
+import {
+  RQSession,
+  RQSessionEvents,
+  RQSessionEventType,
+  RRWebEventData,
+} from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import {
   compressEvents,
+  filterOutConsoleLogs,
   filterOutLargeNetworkResponses,
 } from "./sessionEventsUtils";
 import {
@@ -37,6 +53,15 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import PageError from "components/misc/PageError";
 import { addToApolloSequence } from "backend/sessionRecording/addToApolloSequence";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
+//@ts-ignore
+import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
+import { RecordingOptions } from "./types";
+
+const defaultDebugInfo: CheckboxValueType[] = [
+  "includeNetworkLogs",
+  "includeConsoleLogs",
+];
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -53,6 +78,9 @@ const DraftSessionViewer: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+  const [includedDebugInfo, setIncludedDebugInfo] = useState<
+    CheckboxValueType[]
+  >(defaultDebugInfo);
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -105,6 +133,42 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email]);
 
+  const getSessionEventsToSave = useCallback(
+    (options: RecordingOptions): RQSessionEvents => {
+      const filteredSessionEvents: RQSessionEvents = {
+        [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
+        [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
+      };
+
+      if (options.includeNetworkLogs === false) {
+        delete filteredSessionEvents[RQSessionEventType.NETWORK];
+      }
+
+      if (options.includeConsoleLogs === false) {
+        const filteredRRWebEvent = filterOutConsoleLogs(
+          sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]
+        );
+        filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
+      }
+
+      return filteredSessionEvents;
+    },
+    [sessionEvents]
+  );
+
+  const getRecordingOptionsToSave = useCallback((): RecordingOptions => {
+    const recordingOptions: RecordingOptions = {
+      includeConsoleLogs: true,
+      includeNetworkLogs: true,
+    };
+    let option: keyof RecordingOptions;
+    for (option in recordingOptions) {
+      recordingOptions[option] = includedDebugInfo.includes(option);
+    }
+
+    return recordingOptions;
+  }, [includedDebugInfo]);
+
   const saveDraftSession = useCallback(() => {
     if (!user?.loggedIn) {
       // Prompt to login
@@ -131,16 +195,22 @@ const DraftSessionViewer: React.FC = () => {
       return;
     }
 
+    const recordingOptionsToSave = getRecordingOptionsToSave();
+
     setIsSaving(true);
     saveRecording(
       user?.details?.profile?.uid,
       sessionRecording,
-      compressEvents(sessionEvents)
+      compressEvents(getSessionEventsToSave(recordingOptionsToSave)),
+      recordingOptionsToSave
     ).then((response) => {
       if (response?.success) {
         setIsSaveModalVisible(false);
         toast.success("Recording saved successfully");
-        trackDraftSessionSaved(sessionAttributes.duration);
+        trackDraftSessionSaved(
+          sessionAttributes.duration,
+          recordingOptionsToSave
+        );
         navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
           replace: true,
           state: { fromApp: true, viewAfterSave: true },
@@ -158,10 +228,11 @@ const DraftSessionViewer: React.FC = () => {
     sessionRecording,
     sessionRecordingName,
     sessionAttributes,
-    sessionEvents,
     dispatch,
     AUTH_ACTION_LABELS.SIGN_UP,
     navigate,
+    getSessionEventsToSave,
+    getRecordingOptionsToSave,
   ]);
 
   const handleNameChangeEvent = useCallback(
@@ -208,10 +279,10 @@ const DraftSessionViewer: React.FC = () => {
             icon={<SaveOutlined />}
             onClick={() => setIsSaveModalVisible(true)}
           >
-            Save Recording
+            Save Session
           </Button>
           <Modal
-            title="Save Recording"
+            title="Save Session"
             open={isSaveModalVisible}
             onCancel={() => setIsSaveModalVisible(false)}
             width="500px"
@@ -221,13 +292,48 @@ const DraftSessionViewer: React.FC = () => {
             maskClosable={false}
             confirmLoading={isSaving}
           >
-            <p>Please provide a name to the recording before save:</p>
-            <Input
-              status={!sessionRecordingName ? "error" : ""}
-              value={sessionRecordingName}
-              onChange={handleNameChangeEvent}
-              onBlur={trackDraftSessionNamed}
-            />
+            <Space direction="vertical">
+              <Row>
+                <p>Session Name:</p>
+                <Input
+                  status={!sessionRecordingName ? "error" : ""}
+                  value={sessionRecordingName}
+                  onChange={handleNameChangeEvent}
+                  onBlur={trackDraftSessionNamed}
+                />
+              </Row>
+              <Row>
+                <Col>
+                  <p>Information to include in session:</p>
+                </Col>
+                <Col className="session-metadata-tooltip-icon">
+                  <Tooltip
+                    title={
+                      "This setting cannot be updated once the session is saved."
+                    }
+                    placement="right"
+                  >
+                    <QuestionMarkIcon />
+                  </Tooltip>
+                </Col>
+                <Col span={24}>
+                  <Checkbox.Group
+                    onChange={setIncludedDebugInfo}
+                    value={includedDebugInfo}
+                    options={[
+                      {
+                        label: "Network Logs",
+                        value: "includeNetworkLogs",
+                      },
+                      {
+                        label: "Console Logs",
+                        value: "includeConsoleLogs",
+                      },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            </Space>
           </Modal>
         </div>
       </div>

@@ -1,10 +1,13 @@
-import { Empty } from "antd";
+import { Empty, Typography } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { NetworkLog } from "../types";
 import NetworkLogRow from "./NetworkLogRow";
 import Split from "react-split";
 import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
+import { useSelector } from "react-redux";
+import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
+import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -26,6 +29,8 @@ const NetworkLogsPanel: React.FC<Props> = ({
   const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(
     visibleNetworkLogs
   );
+
+  const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
   const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
   useEffect(() => {
@@ -76,9 +81,25 @@ const NetworkLogsPanel: React.FC<Props> = ({
             />
           </Split>
         )
+      ) : includeNetworkLogs === false ? (
+        <div>
+          <Typography.Text className="recording-options-message">
+            This session does not contain any network requests. <br />
+            Check out this{" "}
+            <a
+              href="/sessions/draft/mock/"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSampleSessionClicked("network")}
+            >
+              sample session
+            </a>{" "}
+            to see the type of information you can send with a session.
+          </Typography.Text>
+        </div>
       ) : (
-        <div className="placeholder">
-          <Empty description="Network logs appear here as video plays." />
+        <div className={"placeholder"}>
+          <Empty description={"Network logs appear here as video plays."} />
         </div>
       )}
     </div>

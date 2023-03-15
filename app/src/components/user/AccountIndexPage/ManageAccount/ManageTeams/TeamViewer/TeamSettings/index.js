@@ -7,6 +7,7 @@ import { redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import SwitchWorkspaceButton from "../SwitchWorkspaceButton";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
+import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import { toast } from "utils/Toast";
 import "./TeamSettings.css";
 
@@ -61,16 +62,6 @@ const TeamSettings = ({ teamId }) => {
   };
 
   const stableFetchTeamInfo = useCallback(fetchTeamInfo, [navigate, teamId]);
-
-  // const handleRenameOnClick = (e) => {
-  //   if (renameInProgress) {
-  //     handleTeamRename();
-  //     setRenameInProgress(false);
-  //   } else {
-  //     setRenameInProgress(true);
-  //   }
-  //   e.stopPropagation();
-  // };
 
   const handleTeamNameChange = (e) => {
     setName(e.target.value);
@@ -152,14 +143,6 @@ const TeamSettings = ({ teamId }) => {
   //   );
   // };
 
-  // const renderLoader = () => {
-  //   return (
-  //     <div>
-  //       <SpinnerColumn message="Loading Team Info" />
-  //     </div>
-  //   );
-  // };
-
   useEffect(() => {
     stableFetchTeamInfo();
 
@@ -236,6 +219,8 @@ const TeamSettings = ({ teamId }) => {
                 </Button>
               </div>
             </form>
+
+            <WorkspaceStatusSyncing />
           </>
         )}
       </div>

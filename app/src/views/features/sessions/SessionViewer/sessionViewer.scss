@@ -101,6 +101,10 @@
         align-items: center;
       }
 
+      span.ant-typography.recording-options-message {
+        font-size: 14px;
+      }
+
       .session-details-panel-row {
         display: flex;
         flex-direction: column;
@@ -284,5 +288,15 @@ body.dark {
         background: transparent;
       }
     }
+  }
+}
+
+.session-metadata-tooltip-icon {
+  margin: 4.8px 0 0 4px;
+  svg {
+    display: block;
+    height: 13px;
+    width: 13px;
+    cursor: pointer;
   }
 }
