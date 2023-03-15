@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { surveyConfig } from "./config";
 import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
+import PATHS from "config/constants/sub/paths";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
   trackPersonaQ1Completed,
@@ -83,7 +84,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
           APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
           userPersona.referralChannel
         );
-        if (window.location.href.includes("/shared-lists/viewer")) {
+        if (window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE)) {
           //don't show recommendation screen for shared list users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
         }
