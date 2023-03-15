@@ -2,7 +2,15 @@
   font-weight: 500;
   margin-bottom: 12px;
   color: var(--white);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+}
+
+.graphql-operation-label a {
+  margin-left: 6px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-gray);
 }
 
 .graphql-operation-type-input.ant-input {
