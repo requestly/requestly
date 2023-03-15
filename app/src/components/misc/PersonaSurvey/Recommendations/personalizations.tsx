@@ -15,7 +15,8 @@ const allRules = Object.values(RULE_TYPES_CONFIG)
       title: NAME,
       icon: ICON,
       description: DESCRIPTION,
-      action: (navigate: any) => redirectToCreateNewRule(navigate, TYPE),
+      action: (navigate: any) =>
+        redirectToCreateNewRule(navigate, TYPE, "persona_recommendation"),
     };
   });
 

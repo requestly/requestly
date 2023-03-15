@@ -39,6 +39,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
           <NavLink
             replace
             to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
+            state={{ source: "rule_selection" }}
           >
             <Button
               size="large"

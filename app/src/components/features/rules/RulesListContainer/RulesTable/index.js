@@ -158,14 +158,18 @@ const RulesTable = ({
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
-  const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] =
-    useState(false);
+  const [
+    isDeleteConfirmationModalActive,
+    setIsDeleteConfirmationModalActive,
+  ] = useState(false);
   const [
     isUngroupOrDeleteRulesModalActive,
     setIsUngroupOrDeleteRulesModalActive,
   ] = useState(false);
-  const [ungroupOrDeleteRulesModalData, setUngroupOrDeleteRulesModalData] =
-    useState(null);
+  const [
+    ungroupOrDeleteRulesModalData,
+    setUngroupOrDeleteRulesModalData,
+  ] = useState(null);
   const [ruleToDelete, setRuleToDelete] = useState([]);
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [size, setSize] = useState(window.innerWidth);
@@ -482,7 +486,7 @@ const RulesTable = ({
   const handleRuleNameOnClick = (e, rule) => {
     e.stopPropagation();
     if (isEditingEnabled) {
-      redirectToRuleEditor(navigate, rule.id);
+      redirectToRuleEditor(navigate, rule.id, "my_rules");
     } else if (openRuleViewerInModal) {
       openRuleViewerInModal(rule);
     }

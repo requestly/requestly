@@ -100,7 +100,7 @@ const CreateRuleButton = ({ isDisabled, location }) => {
         trackRQLastActivity("rule_saved");
 
         const ruleId = currentlySelectedRuleData.id;
-        redirectToRuleEditor(navigate, ruleId);
+        redirectToRuleEditor(navigate, ruleId, "create");
       });
     } else {
       toast.warn(ruleValidation.message, {
