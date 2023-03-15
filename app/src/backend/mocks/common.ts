@@ -47,13 +47,11 @@ export const updateUserMockSelectorsMap = async (
 };
 
 export const removeUserMockSelector = async (
-  uid: string,
-  mockId: string,
-  teamId?: string
+  ownerId: string,
+  mockId: string
 ) => {
   const db = getFirestore(firebaseApp);
 
-  const ownerId = getOwnerId(uid, teamId);
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
   const rootUserDocRef = doc(rootUserMocksMetadataRef, ownerId);
 
