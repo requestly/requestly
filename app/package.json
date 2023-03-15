@@ -22,7 +22,7 @@
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "start": "craco start",
-    "test": "craco test --watchAll=false",
+    "test": "craco test --watchAll=false --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
     "dev": "REACT_APP_ENV=DEV npm start",
     "emulated-dev": "REACT_APP_ENV=EMULATOR npm start"

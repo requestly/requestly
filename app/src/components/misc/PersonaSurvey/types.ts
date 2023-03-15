@@ -1,40 +1,44 @@
 import { ReactNode } from "react";
 
 export interface Option {
-  type: string;
+  type?: string;
   title: string;
   icon?: string | ReactNode;
 }
 
-interface Conditional {
+export interface Conditional {
   condition: (answer: string) => boolean;
   options: Option[];
 }
-
+interface renderProps {
+  toggleImportRulesModal?: () => void;
+  persona?: string;
+}
 export interface PageConfig {
   pageId: number;
   title: string;
-  key: string | null;
   subTitle: string;
-  render?: (toggleImportRulesModal?: () => void) => ReactNode;
-  questionType?: "single" | "multiple";
+  render?: (props: renderProps) => ReactNode;
+}
+
+export interface SurveyOptionsConfig {
+  isActive?: (props: ActiveProps) => boolean;
   action?: (
     dispatch: any,
     value: string,
     clear: boolean,
     optionType?: string
   ) => void;
-  isActive?: (props: ActiveProps) => boolean;
-  conditional?: Conditional[];
+  conditional?: any;
   options?: Option[];
 }
 
-export interface useCaseOptions {
+export interface multipleChoiceOption {
   optionType: "select" | "other";
   value: "string";
 }
 export interface ActiveProps {
-  key: string | useCaseOptions[];
+  key: string | multipleChoiceOption[];
   title: string;
   optionType?: "select" | "other";
 }

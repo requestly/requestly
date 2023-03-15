@@ -1,7 +1,7 @@
-import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import React, { useState } from "react";
 import { toast } from "utils/Toast";
-import SettingsItem from "../../SettingsItem";
+import SettingsItem from "views/user/Settings/SettingsItem";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const WorkspaceStatusSyncing = () => {
   const [syncRuleStatus, setSyncRuleStatus] = useState(

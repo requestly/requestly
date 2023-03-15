@@ -13,7 +13,9 @@ export const deleteRulesFromStorage = async (
       getExecutionLogsId(ruleId)
     );
 
+    Logger.log("Removing from storage in deleteRulesFromStorage");
     await StorageService(appMode).removeRecords(rulesToDelete);
+    Logger.log("Removing from storage in deleteRulesFromStorage");
     await StorageService(appMode).removeRecordsWithoutSyncing(
       executionLogsToDelete
     );
@@ -25,5 +27,6 @@ export const deleteRulesFromStorage = async (
 };
 
 export const deleteGroupsFromStorage = async (appMode, groupIdsToDelete) => {
+  Logger.log("Removing from storage in deleteGroupsFromStorage");
   return StorageService(appMode).removeRecords(groupIdsToDelete);
 };

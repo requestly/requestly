@@ -1,16 +1,30 @@
 .survey-modal .ant-modal-body .rq-modal-content {
   padding: 40px 20px;
 }
-.survey-modal .skip-recommendation {
+.survey-modal .skip-recommendation-wrapper {
   display: flex;
   justify-content: flex-end;
-  cursor: pointer;
-  margin-top: -20px;
-  color: var(--white);
-  float: right;
+  align-items: center;
+  margin-top: -30px;
+  margin-left: 10px;
+  width: 100%;
+  color: var(--text-gray);
 }
-.survey-modal .skip-recommendation:hover {
-  color: inherit;
+
+.survey-modal .skip-recommendation-btn {
+  color: var(--white);
+  padding: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.survey-modal .skip-recommendation-btn.persona-login-btn {
+  text-decoration: underline;
+}
+.survey-modal .skip-recommendation-btn.persona-login-btn:hover {
+  text-decoration: underline;
+}
+.survey-modal .skip-recommendation-btn:hover {
+  color: var(--white);
 }
 .survey-modal .survey-modal-border-radius {
   border-radius: var(--border-radius-md);
