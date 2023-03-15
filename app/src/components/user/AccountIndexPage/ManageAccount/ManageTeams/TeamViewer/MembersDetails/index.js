@@ -14,7 +14,7 @@ import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import "./MembersDetails.css";
 
-const MembersDetails = ({ teamId }) => {
+const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const location = useLocation();
   const isNewTeam = location.state?.isNewTeam;
   // Component state
@@ -126,7 +126,11 @@ const MembersDetails = ({ teamId }) => {
       </Row>
       <Row>
         <Col>
-          <Button type="primary" onClick={handleAddMemberClick}>
+          <Button
+            disabled={!isTeamAdmin}
+            type="primary"
+            onClick={handleAddMemberClick}
+          >
             <PlusOutlined />{" "}
             <span className="text-bold caption">Add Member</span>
           </Button>
@@ -136,40 +140,46 @@ const MembersDetails = ({ teamId }) => {
       <div className="members-table-container">
         <TeamMembersTable
           teamId={teamId}
+          isTeamAdmin={isTeamAdmin}
           refresh={refreshTeamMembersTable}
           callback={doRefreshTeamMembersTable}
         />
-
-        {accessCount === 1 ? (
-          <p className="members-invite-message">
-            You are the only member in this workspace, add more members to
-            collaborate.
-          </p>
-        ) : 1 < accessCount && accessCount <= 3 ? (
-          <p className="members-invite-message">
-            There are only a few members in this workspace, add more members to
-            collaborate.
-          </p>
-        ) : null}
+        {isTeamAdmin && (
+          <>
+            {accessCount === 1 ? (
+              <p className="members-invite-message">
+                You are the only member in this workspace, add more members to
+                collaborate.
+              </p>
+            ) : 1 < accessCount && accessCount <= 3 ? (
+              <p className="members-invite-message">
+                There are only a few members in this workspace, add more members
+                to collaborate.
+              </p>
+            ) : null}
+          </>
+        )}
 
         {/* invite banner */}
-        <div
-          onClick={handleAddMemberClick}
-          className="members-invite-empty-container"
-        >
-          <div>
-            <img
-              alt="smiles"
-              width="48px"
-              height="44px"
-              src="/assets/img/workspaces/smiles.svg"
-            />
+        {isTeamAdmin && (
+          <div
+            onClick={handleAddMemberClick}
+            className="members-invite-empty-container"
+          >
+            <div>
+              <img
+                alt="smiles"
+                width="48px"
+                height="44px"
+                src="/assets/img/workspaces/smiles.svg"
+              />
+            </div>
+            <span className="header text-gray">Invite people</span>
+            <span className="text-gray">
+              Get the most out of Requestly by inviting your teammates.
+            </span>
           </div>
-          <span className="header text-gray">Invite people</span>
-          <span className="text-gray">
-            Get the most out of Requestly by inviting your teammates.
-          </span>
-        </div>
+        )}
       </div>
 
       <Row align="middle" justify="center" className="members-quantity-info">

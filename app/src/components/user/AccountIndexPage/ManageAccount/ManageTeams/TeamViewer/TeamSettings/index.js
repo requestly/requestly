@@ -11,7 +11,7 @@ import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import { toast } from "utils/Toast";
 import "./TeamSettings.css";
 
-const TeamSettings = ({ teamId }) => {
+const TeamSettings = ({ teamId, isTeamAdmin }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   // const inputRef = useRef(null);
@@ -157,6 +157,8 @@ const TeamSettings = ({ teamId }) => {
       <div className="team-settings-container">
         {isTeamInfoLoading ? (
           <SpinnerColumn message="Fetching workspace settings" />
+        ) : !isTeamAdmin ? (
+          <div>Only admins can view the workspace settings!</div>
         ) : (
           <>
             <Row align="middle" justify="space-between">

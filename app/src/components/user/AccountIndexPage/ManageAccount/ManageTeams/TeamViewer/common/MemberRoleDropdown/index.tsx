@@ -97,15 +97,17 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           isHoverEffect ? "member-role-dropdown-trigger" : ""
         }`}
       >
-        <Typography.Text className="cursor-pointer">
+        <Typography.Text className={!props.disabled && "cursor-pointer"}>
           {isAdmin ? "Admin" : "Member"} access{" "}
-          <img
-            width="10px"
-            height="6px"
-            alt="downoutlined"
-            src="/assets/img/workspaces/downoutlined.svg"
-            className="dropdown-down-arrow-icon"
-          />
+          {!props.disabled && (
+            <img
+              width="10px"
+              height="6px"
+              alt="downoutlined"
+              src="/assets/img/workspaces/downoutlined.svg"
+              className="dropdown-down-arrow-icon"
+            />
+          )}
         </Typography.Text>
 
         {showLoader && isLoading ? (
