@@ -133,12 +133,8 @@ const AddMemberModal = ({
             placeholder="Email Address"
             type="email"
             value={userEmail}
-            onChange={(emails) => {
-              setUserEmail(emails);
-            }}
-            validateEmail={(email) => {
-              return validateEmail(email);
-            }}
+            onChange={setUserEmail}
+            validateEmail={validateEmail}
             getLabel={(email, index, removeEmail) => (
               <div data-tag key={index} className="multi-email-tag">
                 {email}
