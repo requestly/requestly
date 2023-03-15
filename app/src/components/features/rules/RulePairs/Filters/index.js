@@ -93,10 +93,7 @@ const Filters = (props) => {
   };
 
   const isRequestPayloadFilterCompatible =
-    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) &&
-    currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE &&
-    isResponseRule();
+    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) && isResponseRule();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
