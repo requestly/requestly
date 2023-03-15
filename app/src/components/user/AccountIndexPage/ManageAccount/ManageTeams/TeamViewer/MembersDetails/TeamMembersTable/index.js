@@ -8,16 +8,11 @@ import React, {
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Badge, Table } from "antd";
-//CONSTANTS
 import APP_CONSTANTS from "config/constants";
-
 import { isEmpty } from "lodash";
-// Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
-// Sub Components
 import SpinnerColumn from "../../../../../../../misc/SpinnerColumn";
 import { toast } from "utils/Toast.js";
-// Utils
 import { redirectToMyTeams } from "../../../../../../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "../../../../../../../../store/selectors";
 import RemoveUserModal from "./RemoveUserModal";
@@ -31,6 +26,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const loggedInUserId = user?.details?.profile?.uid;
 
   // Component State
   const [members, setMembers] = useState([]);
@@ -120,7 +116,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
           />
 
           {member.displayName}
-          {(user.details.profile.uid === member.id ? " (You) " : "") +
+          {(loggedInUserId === member.id ? " (You) " : "") +
             (billingExclude.includes(member.id) ? " (Free) " : "")}
         </span>
       ),
@@ -262,21 +258,27 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
   useEffect(() => {
     setDataSource([]);
-    members.map((member, idx) => {
-      return setDataSource((prevVal) => {
-        return [
-          ...prevVal,
-          {
-            key: idx + 1,
-            img: member,
-            member: member,
-            role: member,
-            actions: member,
-          },
-        ];
-      });
-    });
-  }, [members]);
+
+    const currentUser = members.filter(
+      (member) => member.id === loggedInUserId
+    );
+
+    const otherMembers = members.filter(
+      (member) => member.id !== loggedInUserId
+    );
+
+    const membersData = [...currentUser, ...otherMembers].map(
+      (member, idx) => ({
+        key: idx + 1,
+        img: member,
+        member: member,
+        role: member,
+        actions: member,
+      })
+    );
+
+    setDataSource(membersData);
+  }, [members, loggedInUserId]);
 
   useEffect(() => {
     if (user.details.isLoggedIn) {
