@@ -266,7 +266,6 @@ const TrashTableContainer = ({ records, updateTrash }) => {
           isOpen={isSharedListRuleViewerModalActive}
           toggle={toggleSharedListRuleViewerModal}
           rule={ruleToViewInModal}
-          previewType="trash"
         />
       ) : null}
       <ProCard className="primary-card github-like-border" title={null}>

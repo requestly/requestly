@@ -72,11 +72,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       }
       width="90%"
     >
-      <RuleBuilder
-        rule={rule.ruleDefinition}
-        isSharedListViewRule={true}
-        source="template_preview"
-      />
+      <RuleBuilder rule={rule.ruleDefinition} isSharedListViewRule={true} />
     </Modal>
   );
 };
