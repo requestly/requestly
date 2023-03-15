@@ -18,7 +18,7 @@ interface MemberRoleDropdownProps extends DropDownProps {
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   isAdmin,
   showLoader,
-  isHoverEffect = false,
+  isHoverEffect,
   handleMemberRoleChange,
   handleRemoveMember,
   ...props
