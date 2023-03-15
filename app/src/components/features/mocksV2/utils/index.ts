@@ -102,21 +102,21 @@ export const generateFinalUrl = (
   username: string = null,
   teamId?: string
 ) => {
-  let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}?rq_uid=${uid}`;
+  let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}`;
 
   if (isEnvBeta()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}?rq_uid=${uid}`;
+    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}`;
   } else if (isEnvEmulator()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}?rq_uid=${uid}`;
+    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}`;
   } else {
     if (username) {
       finalUrl = `https://${username}.requestly.dev/${endpoint}`;
-      if (teamId) finalUrl += `?teamId=${teamId}`;
-      return finalUrl;
     }
   }
 
-  if (teamId) finalUrl += `&teamId=${teamId}`;
+  if (teamId) finalUrl += `?teamId=${teamId}`;
+  else finalUrl += `?rq_uid=${uid}`;
+
   return finalUrl;
 };
 
