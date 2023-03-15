@@ -144,7 +144,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
         ) : (
           <MemberRoleDropdown
             showLoader
-            isHoverEffect={isTeamAdmin ? true : false}
+            isHoverEffect={isTeamAdmin}
             placement="bottomLeft"
             isAdmin={member.isAdmin}
             disabled={!isTeamAdmin}
