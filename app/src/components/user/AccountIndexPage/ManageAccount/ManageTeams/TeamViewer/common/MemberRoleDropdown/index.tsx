@@ -7,6 +7,7 @@ interface MemberRoleDropdownProps extends DropDownProps {
   isAdmin: boolean;
   isHoverEffect?: boolean;
   showLoader?: boolean;
+  isLoggedInUserAdmin: boolean;
   handleMemberRoleChange: (
     makeUserAdmin: boolean,
     updatedRole: "admin" | "user",
@@ -19,6 +20,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   isAdmin,
   showLoader,
   isHoverEffect = false,
+  isLoggedInUserAdmin,
   handleMemberRoleChange,
   handleRemoveMember,
   ...props
@@ -30,6 +32,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
       <Menu className="dropdown-menu">
         <Menu.Item
           key="admin"
+          disabled={!isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
           onClick={() => handleMemberRoleChange(true, "admin", setIsLoading)}
         >
@@ -49,6 +52,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
         </Menu.Item>
         <Menu.Item
           key="member"
+          disabled={!isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
           onClick={() => handleMemberRoleChange(false, "user", setIsLoading)}
         >
@@ -67,7 +71,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
           />
         </Menu.Item>
 
-        {handleRemoveMember ? (
+        {isLoggedInUserAdmin && handleRemoveMember ? (
           <>
             <Divider className="member-role-dropdown" />
             <Menu.Item key="remove" onClick={handleRemoveMember}>
@@ -82,7 +86,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
         ) : null}
       </Menu>
     ),
-    [isAdmin, handleMemberRoleChange, handleRemoveMember]
+    [isAdmin, isLoggedInUserAdmin, handleMemberRoleChange, handleRemoveMember]
   );
 
   return (

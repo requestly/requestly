@@ -27,6 +27,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
+  const [isLoggedInUserAdmin, setIsLoggedInUserAdmin] = useState(false);
 
   // Component State
   const [members, setMembers] = useState([]);
@@ -143,6 +144,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
             isHoverEffect
             placement="bottomLeft"
             isAdmin={member.isAdmin}
+            isLoggedInUserAdmin={isLoggedInUserAdmin}
             handleRemoveMember={() =>
               setDeleteUserModal({
                 ...deleteUserModal,
@@ -278,6 +280,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
     );
 
     setDataSource(membersData);
+    setIsLoggedInUserAdmin(currentUser[0]?.isAdmin);
   }, [members, loggedInUserId]);
 
   useEffect(() => {
