@@ -35,6 +35,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
   const [deleteUserModal, setDeleteUserModal] = useState({
     isActive: false,
     userId: false,
+    isLeaveRequested: false,
   });
   const [contactUsModal, setContactUsModal] = useState(false);
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
@@ -144,12 +145,15 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
             isHoverEffect
             placement="bottomLeft"
             isAdmin={member.isAdmin}
+            memberId={member.id}
+            loggedInUserId={loggedInUserId}
             isLoggedInUserAdmin={isLoggedInUserAdmin}
-            handleRemoveMember={() =>
+            handleRemoveMember={(isLeaveRequested = false) =>
               setDeleteUserModal({
                 ...deleteUserModal,
                 isActive: true,
                 userId: member.id,
+                isLeaveRequested,
               })
             }
             handleMemberRoleChange={(_, role, setIsLoading) =>
@@ -300,6 +304,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
         toggleModal={toggleDeleteUserModal}
         userId={deleteUserModal.userId}
         callbackOnSuccess={modifyMembersCallback}
+        isLeaveRequested={deleteUserModal.isLeaveRequested}
       />
 
       <ContactUsModal
