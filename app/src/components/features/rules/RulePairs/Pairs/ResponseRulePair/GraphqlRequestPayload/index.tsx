@@ -32,7 +32,8 @@ interface GraphqlRequestPayloadProps {
     pairIndex: number,
     payloadPath: string,
     customValue?: string | unknown,
-    otherValuesToModify?: { path: string; value: string | unknown }[]
+    otherValuesToModify?: { path: string; value: string | unknown }[],
+    triggerUnsavedChangesIndication?: boolean
   ) => void;
 }
 
@@ -70,7 +71,8 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           path: "source.filters[0].requestPayload.value",
           value: payloadValue,
         },
-      ]
+      ],
+      false
     );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
