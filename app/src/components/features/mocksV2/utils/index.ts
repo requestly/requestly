@@ -109,8 +109,9 @@ export const generateFinalUrl = (
   } else if (isEnvEmulator()) {
     finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}`;
   } else {
-    if (username) {
+    if (username && !teamId) {
       finalUrl = `https://${username}.requestly.dev/${endpoint}`;
+      return finalUrl;
     }
   }
 
