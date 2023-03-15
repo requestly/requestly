@@ -49,14 +49,14 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
 
     saveRule(appMode, dispatch, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name));
-      redirectToRuleEditor(navigate, ruleToSave.id);
+      redirectToRuleEditor(navigate, ruleToSave.id, "templates");
     });
   };
 
   return (
     <Modal
       className="modal-dialog-centered max-width-80-percent "
-      visible={isOpen}
+      open={isOpen}
       onCancel={toggle}
       footer={null}
       title={
