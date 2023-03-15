@@ -2,7 +2,6 @@
 import { MODES } from "components/misc/VerifyEmail";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
-import { createSearchParams } from "react-router-dom";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
@@ -28,9 +27,8 @@ export const redirectToRules = (navigate, hardRedirect) => {
 /* FEATURE - RULES - Create New Rule */
 export const redirectToCreateNewRule = (navigate, ruleType, source) => {
   if (ruleType) {
-    navigate({
-      pathname: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`,
-      search: `?${createSearchParams({ source })}`,
+    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
+      state: { source },
     });
   } else {
     navigate(PATHS.RULES.CREATE);
@@ -44,9 +42,8 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 
 /* FEATURE - RULES - Edit a Rule */
 export const redirectToRuleEditor = (navigate, ruleId, source) => {
-  navigate({
-    pathname: `${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`,
-    search: `?${createSearchParams({ source })}`,
+  navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
+    state: { source },
   });
 };
 

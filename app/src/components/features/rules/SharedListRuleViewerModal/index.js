@@ -2,7 +2,7 @@ import React from "react";
 import { Modal } from "antd";
 import RuleBuilder from "../RuleBuilder";
 
-const SharedListViewerModal = ({ rule, isOpen, toggle, previewType }) => {
+const SharedListViewerModal = ({ rule, isOpen, toggle }) => {
   if (!rule) {
     return <span></span>;
   }
@@ -15,13 +15,7 @@ const SharedListViewerModal = ({ rule, isOpen, toggle, previewType }) => {
       title={`${rule.name} (Preview Mode)`}
       width="80%"
     >
-      <RuleBuilder
-        rule={rule}
-        isSharedListViewRule={true}
-        source={
-          previewType === "trash" ? "trash_preview" : "shared_list_preview"
-        }
-      />
+      <RuleBuilder rule={rule} isSharedListViewRule={true} />
     </Modal>
   );
 };

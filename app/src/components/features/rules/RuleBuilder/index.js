@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import { actions } from "../../../../../../app/src/store";
@@ -57,8 +51,7 @@ const RuleBuilder = (props) => {
   const navigate = useNavigate();
 
   //Global State
-  const { search } = useLocation();
-  const params = useMemo(() => new URLSearchParams(search), [search]);
+  const { state } = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(
@@ -263,11 +256,11 @@ const RuleBuilder = (props) => {
       });
   }
   useEffect(() => {
-    const source = props.source ? props.source : params.get("source");
+    const source = !state?.source ? null : state.source;
     const ruleType = currentlySelectedRuleConfig.TYPE;
-    if (!ruleType) return;
+    if (!ruleType || !source) return;
     trackRuleEditorViewed(source, ruleType);
-  }, [params, currentlySelectedRuleConfig.TYPE, props.source]);
+  }, [currentlySelectedRuleConfig.TYPE, state]);
 
   useEffect(() => {
     return () => {
