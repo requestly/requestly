@@ -8,6 +8,7 @@ import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import getObjectValue from "../../../Filters/actions/getObjectValue";
 import {
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
@@ -58,6 +59,25 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   const [payloadValue, setPayloadValue] = useState<string>(
     localStorage.getItem(requestPayloadValue) ?? ""
   );
+
+  // update local state if request payload is
+  // modified from source filter dialog
+  useEffect(() => {
+    const payloadKey = getObjectValue(
+      currentlySelectedRuleData,
+      pairIndex,
+      SOURCE_REQUEST_PAYLOAD_KEY
+    );
+
+    const payloadValue = getObjectValue(
+      currentlySelectedRuleData,
+      pairIndex,
+      SOURCE_REQUEST_PAYLOAD_VALUE
+    );
+
+    setPayloadkey(payloadKey);
+    setPayloadValue(payloadValue);
+  }, [pairIndex, currentlySelectedRuleData]);
 
   useEffect(() => {
     const payloadKey = localStorage.getItem(requestPayloadKey) ?? "";
