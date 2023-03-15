@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   DownOutlined,
@@ -9,13 +9,14 @@ import {
   PlusSquareOutlined,
   SettingOutlined,
   UserOutlined,
+  ExclamationCircleFilled,
 } from "@ant-design/icons";
 import {
   clearCurrentlyActiveWorkspace,
   showSwitchWorkspaceSuccessToast,
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
-import { Avatar, Divider, Dropdown, Menu, Row, Spin } from "antd";
+import { Avatar, Divider, Dropdown, Menu, Modal, Row, Spin } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackCreateNewWorkspaceLinkClicked,
@@ -25,7 +26,11 @@ import {
   getAvailableTeams,
   getIsWorkspaceMode,
 } from "store/features/teams/selectors";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import {
+  getAppMode,
+  getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getUserAuthDetails,
+} from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
@@ -37,6 +42,8 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import "./WorkSpaceSelector.css";
+
+const { PATHS } = APP_CONSTANTS;
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -109,12 +116,17 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
 const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { pathname } = useLocation();
+
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
+    getIsCurrentlySelectedRuleHasUnsavedChanges
+  );
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -199,6 +211,60 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     }
   };
 
+  const redirects = useMemo(
+    () => ({
+      rules: PATHS.RULES.MY_RULES.ABSOLUTE,
+      mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
+      files: PATHS.FILE_SERVER_V2.ABSOLUTE,
+      sessions: PATHS.SESSIONS.ABSOLUTE,
+    }),
+    []
+  );
+
+  const path = useMemo(
+    () =>
+      Object.keys(redirects).find(
+        (path) =>
+          pathname.includes(path) &&
+          (pathname.includes("editor") ||
+            pathname.includes("viewer") ||
+            pathname.includes("saved"))
+      ),
+    [redirects, pathname]
+  );
+
+  const confirmWorkspaceSwitch = (callback = () => {}) => {
+    const handleCallback = () => {
+      callback();
+
+      if (path) {
+        navigate(redirects[path]);
+      }
+    };
+
+    if (!isCurrentlySelectedRuleHasUnsavedChanges) {
+      handleCallback();
+      return;
+    }
+
+    Modal.confirm({
+      title: "Discard changes?",
+      icon: <ExclamationCircleFilled />,
+      content: "Changes you made on a rule may not be saved.",
+      okText: "Switch",
+      onOk: handleCallback,
+    });
+  };
+
+  const handleSwitchToPrivateWorkspace = async () => {
+    setIsModalOpen(true);
+    await clearCurrentlyActiveWorkspace(dispatch, appMode);
+    setTimeout(() => {
+      setIsModalOpen(false);
+      showSwitchWorkspaceSuccessToast();
+    }, 2 * 1000);
+  };
+
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
     switchWorkspace(
@@ -271,14 +337,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           className={`workspace-menu-item ${
             !currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
           }`}
-          onClick={async () => {
-            setIsModalOpen(true);
-            await clearCurrentlyActiveWorkspace(dispatch, appMode);
-            setTimeout(() => {
-              setIsModalOpen(false);
-              showSwitchWorkspaceSuccessToast();
-            }, 2 * 1000);
-          }}
+          onClick={() => confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace)}
         >
           <div className="workspace-name-container">
             {APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE} (Default)
@@ -310,7 +369,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                     ? "active-workspace-dropdownItem"
                     : ""
                 }`}
-                onClick={() => handleWorkspaceSwitch(team)}
+                onClick={() =>
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team))
+                }
               >
                 <div className="workspace-name-container">
                   <div className="workspace-name">{team.name}</div>
