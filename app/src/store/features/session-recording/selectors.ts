@@ -62,3 +62,11 @@ export const getSessionRecordingDescription = (state: RootState): string => {
 export const getIsReadOnly = (state: RootState): boolean => {
   return getIsRequestedByAuthor(state) === false; // for draft, isRequestedByAuthor is undefined
 };
+
+export const getIncludeConsoleLogs = (state: RootState): boolean => {
+  return getSessionRecording(state)?.options?.includeConsoleLogs ?? true;
+};
+
+export const getIncludeNetworkLogs = (state: RootState): boolean => {
+  return getSessionRecording(state)?.options?.includeNetworkLogs ?? true;
+};

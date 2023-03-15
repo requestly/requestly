@@ -4,12 +4,16 @@ import firebaseApp from "../../firebase";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
-import { SessionRecording } from "views/features/sessions/SessionViewer/types";
+import {
+  RecordingOptions,
+  SessionRecording,
+} from "views/features/sessions/SessionViewer/types";
 
 export const saveRecording = async (
   uid: string,
   payload: SessionRecording,
-  events: any
+  events: any,
+  options: RecordingOptions
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
 
@@ -31,6 +35,7 @@ export const saveRecording = async (
     visibility: "public",
     accessEmails: [],
     accessDomains: [],
+    options,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)
