@@ -92,6 +92,7 @@ import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import "./rulesTable.css";
+import Logger from "lib/logger";
 
 //Lodash
 const set = require("lodash/set");
@@ -344,6 +345,8 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(newGroup));
+
+    Logger.log("Writing storage in RulesTable toggleIncomingGroupStatus");
     StorageService(appMode)
       .saveRuleOrGroup(newGroup)
       .then(() => {
@@ -446,6 +449,7 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(updatedRule));
+    Logger.log("Writing storage in RulesTable changeFavouriteState");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, false)
       .then(() => {
@@ -482,7 +486,7 @@ const RulesTable = ({
   const handleRuleNameOnClick = (e, rule) => {
     e.stopPropagation();
     if (isEditingEnabled) {
-      redirectToRuleEditor(navigate, rule.id);
+      redirectToRuleEditor(navigate, rule.id, "my_rules");
     } else if (openRuleViewerInModal) {
       openRuleViewerInModal(rule);
     }
@@ -503,6 +507,7 @@ const RulesTable = ({
     };
 
     dispatch(actions.updateRecord(updatedRule));
+    Logger.log("Writing storage in RulesTable changeRuleStatus");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, false)
       .then((rule) => {

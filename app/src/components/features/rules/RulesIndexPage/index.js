@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import MigrationCheckModal from "../../../misc/MigrationCheckModal";
 import StorageMigrationCheckModal from "components/misc/StorageMigrationCheckModal";
 import RulesListContainer from "../RulesListContainer";
-import SpinnerCard from "../../../misc/SpinnerCard";
+import SpinnerColumn from "../../../misc/SpinnerColumn";
 //Externals
 import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -18,11 +18,13 @@ import {
   getAppMode,
   getIsRefreshRulesPending,
   getIsHardRefreshRulesPending,
+  getIsRulesListLoading,
 } from "../../../../store/selectors";
 import { isGroupsSanitizationPassed } from "./actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import CreateTeamRuleCTA from "../CreateTeamRuleCTA";
 import GettingStarted from "../GettingStarted";
+import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -49,6 +51,7 @@ const RulesIndexPage = () => {
   );
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isRulesListLoading = useSelector(getIsRulesListLoading);
 
   //Component State
   const [
@@ -68,9 +71,11 @@ const RulesIndexPage = () => {
 
   useEffect(() => {
     if (hasIsRulesListHardRefreshPendingChanged) setIsTableLoading(true);
+    Logger.log("Reading storage in RulesIndexPage useEffect");
     const groupsPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP
     );
+    Logger.log("Reading storage in RulesIndexPage useEffect");
     const rulesPromise = StorageService(appMode).getRecords(
       GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
     );
@@ -149,14 +154,20 @@ const RulesIndexPage = () => {
     <React.Fragment>
       <MigrationCheckModal />
       <StorageMigrationCheckModal />
-      {fetchRulesAndGroupsComplete ? (
+      {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
         rules.length !== 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
         ) : (
           <CreateFirstRule />
         )
       ) : (
-        <SpinnerCard customLoadingMessage="Loading Rules" skeletonType="list" />
+        <>
+          <br />{" "}
+          <SpinnerColumn
+            message="Getting your rules ready"
+            skeletonType="list"
+          />
+        </>
       )}
     </React.Fragment>
   );

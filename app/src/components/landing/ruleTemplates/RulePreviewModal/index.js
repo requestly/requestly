@@ -37,6 +37,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
     }
     const lastModifiedBy = Date.now();
     const modificationDate = Date.now();
+
     const ruleToSave = {
       ...ruleObj.ruleDefinition,
       id: `${ruleObj.ruleDefinition.ruleType}_${generateObjectId()}`,
@@ -48,14 +49,14 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
 
     saveRule(appMode, dispatch, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name));
-      redirectToRuleEditor(navigate, ruleToSave.id);
+      redirectToRuleEditor(navigate, ruleToSave.id, "templates");
     });
   };
 
   return (
     <Modal
       className="modal-dialog-centered max-width-80-percent "
-      visible={isOpen}
+      open={isOpen}
       onCancel={toggle}
       footer={null}
       title={

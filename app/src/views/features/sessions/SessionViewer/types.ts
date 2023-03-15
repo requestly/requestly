@@ -21,6 +21,12 @@ export interface SessionRecording {
   filePath?: string;
   startTimeOffset?: number;
   description?: string;
+  options?: RecordingOptions;
+}
+
+export interface RecordingOptions {
+  includeNetworkLogs: boolean;
+  includeConsoleLogs: boolean;
 }
 
 export interface ConsoleLog extends LogData {

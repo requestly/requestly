@@ -9,10 +9,13 @@
 
 /* form */
 .team-settings-form {
-  max-width: 26.25rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-dark);
 }
 
 .team-settings-form-item {
+  max-width: 26.25rem;
   margin-bottom: 1.25rem;
 }
 

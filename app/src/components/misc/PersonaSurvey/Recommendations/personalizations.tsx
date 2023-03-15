@@ -1,9 +1,10 @@
 import {
   redirectToCreateNewRule,
   redirectToSessionRecordingHome,
+  redirectToMocksList,
 } from "utils/RedirectionUtils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { BsCameraVideo } from "react-icons/bs";
+import { Document, Video } from "react-iconly";
 import { Feature, PersonaType } from "../types";
 
 const allRules = Object.values(RULE_TYPES_CONFIG)
@@ -14,15 +15,24 @@ const allRules = Object.values(RULE_TYPES_CONFIG)
       title: NAME,
       icon: ICON,
       description: DESCRIPTION,
-      action: (navigate: any) => redirectToCreateNewRule(navigate, TYPE),
+      action: (navigate: any) =>
+        redirectToCreateNewRule(navigate, TYPE, "persona_recommendation"),
     };
   });
 
 export const allFeatures: Feature[] = [
   {
+    id: "Mock API",
+    title: "Mock API",
+    icon: () => <Document set="curved" />,
+    description:
+      "Mock APIs with different status codes, delay, response headers or body.",
+    action: (navigate: any) => redirectToMocksList(navigate),
+  },
+  {
     id: "Bug Reporting",
     title: "Bug Reporting",
-    icon: () => <BsCameraVideo />,
+    icon: () => <Video set="curved" />,
     description:
       "Capture and replay interactions with a website for debugging and testing purposes.",
     action: (navigate: any) => redirectToSessionRecordingHome(navigate),
@@ -52,10 +62,10 @@ export const recommendation = [
   {
     id: PersonaType.QUALITY,
     recommended: [
-      "Bug Reporting",
+      "Modify API Response",
       "Redirect Request",
-      "Insert Scripts",
-      "Delay Network Requests",
+      "Modify Headers",
+      "Replace String",
     ],
   },
   {

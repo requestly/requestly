@@ -47,6 +47,11 @@ export const getGroupwiseRulesToPopulate = (state) => {
   return rulesNode["groupwiseRulesToPopulate"];
 };
 
+export const getIsRulesListLoading = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["isRulesListLoading"];
+};
+
 export const getRulesSelection = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["selectedRules"];

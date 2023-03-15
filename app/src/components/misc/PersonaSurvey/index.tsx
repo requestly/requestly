@@ -6,18 +6,20 @@ import {
   getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { SurveyOption } from "./Option";
 import { SurveyModalFooter } from "./ModalFooter";
 import { surveyConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey } from "./utils";
-import { Option, PageConfig } from "./types";
+import { PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
+  trackPersonaSurveySignInClicked,
 } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from "config/constants";
+import { AUTH } from "modules/analytics/events/common/constants";
 import { actions } from "store";
 import "./index.css";
 
@@ -37,24 +39,65 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
-  const roleType = userPersona.persona;
+  const persona = userPersona.persona;
+
+  const SkippableButton = () => {
+    switch (currentPage) {
+      case 0:
+        return (
+          <div className="skip-recommendation-wrapper">
+            Existing user?
+            <RQButton
+              className="skip-recommendation-btn persona-login-btn"
+              type="link"
+              onClick={() => {
+                trackPersonaSurveySignInClicked();
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newProps: {
+                      callback: () => {
+                        toggle();
+                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                      },
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+                    },
+                  })
+                );
+              }}
+            >
+              Sign in
+            </RQButton>
+          </div>
+        );
+
+      case surveyConfig.length - 1:
+        return (
+          <div className="skip-recommendation-wrapper">
+            <RQButton
+              type="link"
+              onClick={() => {
+                toggle();
+                dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                trackPersonaRecommendationSkipped();
+              }}
+              className="white skip-recommendation-btn"
+            >
+              Skip
+            </RQButton>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   const renderPageHeader = (page: PageConfig) => {
     return (
       <>
-        {currentPage === surveyConfig.length - 1 && (
-          <RQButton
-            type="link"
-            onClick={() => {
-              toggle();
-              dispatch(actions.updateIsPersonaSurveyCompleted(true));
-              trackPersonaRecommendationSkipped();
-            }}
-            className="white skip-recommendation"
-          >
-            Skip
-          </RQButton>
-        )}
+        <SkippableButton />
         <div className="text-center white text-bold survey-title">
           {page.title}
         </div>
@@ -67,66 +110,13 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     );
   };
 
-  const renderDefaultQuestionaire = (page: PageConfig) => {
+  const renderPage = (page: PageConfig, persona: string) => {
     return (
       <>
         {renderPageHeader(page)}
-        <>
-          {page.options?.length ? (
-            <div className="survey-options-container">
-              {page.options.map((option: Option, index) => (
-                <SurveyOption
-                  key={index}
-                  fieldKey={page.key}
-                  option={option}
-                  questionType={page.questionType}
-                  isActive={page.isActive}
-                  action={page.action}
-                />
-              ))}
-            </div>
-          ) : (
-            page.render(toggleImportRulesModal)
-          )}
-        </>
+        <>{page.render({ toggleImportRulesModal, persona })}</>
       </>
     );
-  };
-
-  const renderConditionalQuestionaire = (
-    page: PageConfig,
-    roleType: string
-  ) => {
-    return (
-      <>
-        {renderPageHeader(page)}
-        <>
-          {page.conditional.map((question, index) => (
-            <React.Fragment key={index}>
-              {question.condition(roleType) && (
-                <div className="survey-options-container">
-                  {question.options.map((option, index) => (
-                    <SurveyOption
-                      key={index}
-                      fieldKey={page.key}
-                      option={option}
-                      questionType={page.questionType}
-                      isActive={page.isActive}
-                      action={page.action}
-                    />
-                  ))}
-                </div>
-              )}
-            </React.Fragment>
-          ))}
-        </>
-      </>
-    );
-  };
-
-  const renderPage = (page: PageConfig, roleType: string) => {
-    if (page?.conditional) return renderConditionalQuestionaire(page, roleType);
-    else return renderDefaultQuestionaire(page);
   };
 
   useEffect(() => {
@@ -152,6 +142,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       open={isOpen}
       closable={false}
       className="survey-modal"
+      maskStyle={{ background: "#0d0d10" }}
     >
       <div
         className={`rq-modal-content survey-content-wrapper ${
@@ -161,14 +152,11 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
       >
         {surveyConfig.map((page: PageConfig, index) => (
           <React.Fragment key={index}>
-            {currentPage === page.pageId && <>{renderPage(page, roleType)}</>}
+            {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
           </React.Fragment>
         ))}
       </div>
-      <SurveyModalFooter
-        page={currentPage}
-        fieldKey={surveyConfig[currentPage].key}
-      />
+      <SurveyModalFooter page={currentPage} />
     </RQModal>
   );
 };

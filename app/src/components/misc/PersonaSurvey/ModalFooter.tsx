@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { surveyConfig } from "./config";
 import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
+import PATHS from "config/constants/sub/paths";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
   trackPersonaQ1Completed,
@@ -18,22 +19,26 @@ import "./index.css";
 
 interface FooterProps {
   page: number;
-  fieldKey: string;
 }
 
-export const SurveyModalFooter: React.FC<FooterProps> = ({
-  page,
-  fieldKey,
-}) => {
+export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
   const surveyLength = surveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const disableContinue = () => {
-    if (page === 0) return false;
-    if (userPersona[fieldKey]?.length) {
-      return false;
-    } else return true;
+    switch (page) {
+      case 0:
+        return false;
+      case 1:
+        return userPersona.persona ? false : true;
+      case 2:
+        return userPersona.useCases.length ? false : true;
+      case 3:
+        return userPersona.referralChannel ? false : true;
+      default:
+        return true;
+    }
   };
 
   const renderModalLeftSection = () => {
@@ -79,6 +84,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({
           APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
           userPersona.referralChannel
         );
+        if (window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE)) {
+          //don't show recommendation screen for shared list users
+          dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        }
         break;
     }
     dispatch(actions.updatePersonaSurveyPage(page + 1));
