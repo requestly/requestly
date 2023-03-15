@@ -95,6 +95,7 @@ export const RULES = {
   RULE_TUTORIAL_MODAL_SHOWN: "rule_tutorial_modal_shown",
   RULE_FEATURE_USAGE: "rule_feature_usage",
   ERROR_IN_RULE_CREATION: "error_in_rule_creation",
+  RULE_EDITOR_VIEWED: "rule_editor_viewed",
   RULE_EDITOR_CLOSED: "rule_editor_closed",
   RULE_EDITOR_HEADER_CLICKED: "rule_editor_header_clicked",
   NEW_RULE_BUTTON_CLICKED: "new_rule_button_clicked",
