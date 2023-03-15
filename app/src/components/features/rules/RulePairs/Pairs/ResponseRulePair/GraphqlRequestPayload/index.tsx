@@ -13,7 +13,11 @@ import {
 import "./GraphqlRequestPayload.css";
 
 const {
-  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
+  PATH_FROM_PAIR: {
+    SOURCE_REQUEST_PAYLOAD,
+    SOURCE_REQUEST_PAYLOAD_KEY,
+    SOURCE_REQUEST_PAYLOAD_VALUE,
+  },
 } = APP_CONSTANTS;
 
 const requestPayload = {
@@ -61,7 +65,12 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
       pairIndex,
       SOURCE_REQUEST_PAYLOAD_KEY,
       payloadKey,
-      [{ path: "source.filters[0].requestPayload.value", value: payloadValue }]
+      [
+        {
+          path: "source.filters[0].requestPayload.value",
+          value: payloadValue,
+        },
+      ]
     );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,11 +81,11 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     localStorage.setItem(requestPayloadValue, payloadValue);
   }, [payloadkey, payloadValue, requestPayloadKey, requestPayloadValue]);
 
-  const clearRequestPayload = (payloadPath: string) => {
+  const clearRequestPayload = () => {
     deleteObjectAtPath(
       currentlySelectedRuleData,
       setCurrentlySelectedRule,
-      payloadPath,
+      SOURCE_REQUEST_PAYLOAD,
       pairIndex,
       dispatch
     );
@@ -90,7 +99,9 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     const value = e.target.value;
 
     if (value === "") {
-      clearRequestPayload(payloadPath);
+      clearRequestPayload();
+      setPayloadkey("");
+      setPayloadValue("");
     }
 
     if (payloadPath === SOURCE_REQUEST_PAYLOAD_KEY) {
