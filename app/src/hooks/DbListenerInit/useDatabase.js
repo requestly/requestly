@@ -9,9 +9,9 @@ import userNodeListener from "./userNodeListener";
 import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { getAuth, getIdTokenResult } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
+import Logger from "lib/logger";
 
 const useDatabase = () => {
   const dispatch = useDispatch();
@@ -99,21 +99,17 @@ const useDatabase = () => {
     user?.loggedIn,
   ]);
 
-  /* Update and refresh custom claims in auth token */
-  const functions = getFunctions();
-  const updateCustomClaims = httpsCallable(functions, "updateCustomClaims");
+  /* Force refresh custom claims in auth token */
   useEffect(() => {
-    const uid = user?.details?.profile.uid;
-    updateCustomClaims({ uid }).then(() => {
-      /* Force refresh client token to get the updated claims */
-      getIdTokenResult(getAuth(firebaseApp).currentUser, true);
-      console.log("force updated");
-    });
+    getAuth(firebaseApp)
+      .currentUser?.getIdTokenResult(true)
+      ?.then((status) => {
+        Logger.log("force updated auth token");
+      });
   }, [
     user?.details?.profile?.uid,
     user?.loggedIn,
     currentlyActiveWorkspace,
-    updateCustomClaims,
     dispatch,
   ]);
 };
