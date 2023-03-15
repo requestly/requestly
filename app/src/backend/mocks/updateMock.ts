@@ -2,7 +2,11 @@ import firebaseApp from "../../firebase";
 import { doc, getFirestore, Timestamp, updateDoc } from "firebase/firestore";
 import { RQMockSchema } from "components/features/mocksV2/types";
 
-import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
+import {
+  getOwnerId,
+  updateUserMockSelectorsMap,
+  uploadResponseBodyFiles,
+} from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 
@@ -15,6 +19,7 @@ export const updateMock = async (
   if (!uid) {
     return null;
   }
+  const ownerId = getOwnerId(uid, teamId);
 
   let responsesWithBody: any[] = [];
   if (BODY_IN_BUCKET_ENABLED) {
@@ -38,7 +43,7 @@ export const updateMock = async (
   );
 
   if (success) {
-    await updateUserMockSelectorsMap(uid, mockId, mockData, teamId);
+    await updateUserMockSelectorsMap(ownerId, mockId, mockData);
     if (BODY_IN_BUCKET_ENABLED) {
       await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
     }

@@ -13,7 +13,6 @@ import { deleteMock } from "backend/mocks/deleteMock";
 import { RQMockMetadataSchema } from "../types";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getOwnerId } from "backend/mocks/common";
 
 interface DeleteModalProps {
   visible: boolean;
@@ -32,8 +31,6 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const ownerId = getOwnerId(uid, workspace?.id);
 
   const handleOnConfirm = () => {
     setIsDeleting(true);
@@ -55,7 +52,7 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
         }
       });
     } else {
-      deleteMock(ownerId, mock.id)
+      deleteMock(uid, mock.id, workspace?.id)
         .then(() => {
           trackDeleteMockEvent(mock.id, mock.type, mock.fileType);
           callbackOnSuccess();

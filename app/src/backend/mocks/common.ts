@@ -19,10 +19,9 @@ export const getOwnerId = (uid: string, teamId?: string) => {
 };
 
 export const updateUserMockSelectorsMap = async (
-  uid: string,
+  ownerId: string,
   mockId: string,
-  mockData: RQMockSchema,
-  teamId?: string
+  mockData: RQMockSchema
 ) => {
   const db = getFirestore(firebaseApp);
 
@@ -31,7 +30,6 @@ export const updateUserMockSelectorsMap = async (
     method: mockData.method,
   };
 
-  const ownerId = getOwnerId(uid, teamId);
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
   const rootUserDocRef = doc(rootUserMocksMetadataRef, ownerId);
 

@@ -1,14 +1,16 @@
 import firebaseApp from "../../firebase";
 import { doc, updateDoc, getFirestore, Timestamp } from "firebase/firestore";
-import { removeUserMockSelector } from "./common";
+import { getOwnerId, removeUserMockSelector } from "./common";
 
 export const deleteMock = async (
-  ownerId: string,
-  mockId: string
+  uid: string,
+  mockId: string,
+  teamId?: string
 ): Promise<boolean> => {
-  if (!ownerId) {
+  if (!uid) {
     return false;
   }
+  const ownerId = getOwnerId(uid, teamId);
 
   const success = await deleteMockFromFirebase(mockId);
   if (success) {
