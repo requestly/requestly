@@ -158,7 +158,7 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
         {isTeamInfoLoading ? (
           <SpinnerColumn message="Fetching workspace settings" />
         ) : !isTeamAdmin ? (
-          <div>Only admins can view the workspace settings!</div>
+          <div>Only admins can view the workspace settings.</div>
         ) : (
           <>
             <Row align="middle" justify="space-between">
