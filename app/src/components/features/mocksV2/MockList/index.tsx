@@ -119,8 +119,11 @@ const MockListIndex: React.FC<Props> = ({
 
   useEffect(() => {
     fetchMocks();
-    fetchOldMocks();
-  }, [fetchMocks, fetchOldMocks]);
+    if (!workspace?.id) {
+      /* only fetch old mocks in private workspace */
+      fetchOldMocks();
+    }
+  }, [fetchMocks, fetchOldMocks, workspace]);
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
