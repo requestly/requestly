@@ -2,7 +2,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SYNC_CONSTANTS } from "./syncing/syncConstants";
 import { setStorageType } from "actions/ExtensionActions";
-import Logger from "lib/logger";
 //UTILS
 import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";

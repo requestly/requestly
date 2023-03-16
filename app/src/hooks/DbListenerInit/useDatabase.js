@@ -1,4 +1,3 @@
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
