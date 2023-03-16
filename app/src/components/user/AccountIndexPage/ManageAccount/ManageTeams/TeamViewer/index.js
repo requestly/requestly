@@ -8,6 +8,7 @@ import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import "./TeamViewer.css";
 
 const TeamViewer = ({ teamId }) => {
@@ -103,6 +104,7 @@ const TeamViewer = ({ teamId }) => {
           defaultActiveKey="0"
           items={manageWorkspaceItems}
           className="manage-workspace-tabs"
+          onChange={trackWorkspaceSettingToggled}
         />
       </Col>
     </Row>
