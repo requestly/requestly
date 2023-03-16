@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { surveyConfig } from "./config";
+import { SurveyConfig } from "./config";
 import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
@@ -23,7 +23,7 @@ interface FooterProps {
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
-  const surveyLength = surveyConfig.length;
+  const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const disableContinue = () => {

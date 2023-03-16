@@ -1,5 +1,5 @@
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { multipleChoiceOption } from "./types";
+import { multipleChoiceOption, Option } from "./types";
 
 export const shouldShowPersonaSurvey = async (appMode: string) => {
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
@@ -13,4 +13,12 @@ export const getFormattedUserUseCases = (useCases: multipleChoiceOption[]) => {
     else return useCase.value;
   });
   return result;
+};
+
+export const shuffleOptions = (options: Option[]) => {
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return options;
 };
