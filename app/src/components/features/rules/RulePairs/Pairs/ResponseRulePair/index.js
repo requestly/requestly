@@ -6,6 +6,7 @@ import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import GraphqlRequestPayload from "./GraphqlRequestPayload";
+import { ResponseRuleResourceType } from "types/rules";
 import "./ResponseRulePair.css";
 
 const ResponseRulePair = ({
@@ -39,7 +40,7 @@ const ResponseRulePair = ({
       </Row>
 
       <Row wrap={false} gutter={[20]} className="response-rule-inputs">
-        {responseRuleResourceType === "graphqlApi" && (
+        {responseRuleResourceType === ResponseRuleResourceType.GRAPHQL_API && (
           <Col span={12}>
             <GraphqlRequestPayload
               pairIndex={pairIndex}

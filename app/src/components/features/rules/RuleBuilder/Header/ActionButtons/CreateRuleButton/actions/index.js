@@ -7,6 +7,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { ResponseRuleResourceType } from "types/rules";
 
 export const validateRule = (rule, dispatch) => {
   let output;
@@ -248,7 +249,7 @@ export const validateRule = (rule, dispatch) => {
       }
       // graphql operation data shouldn't be empty
       else if (
-        pair.response?.resourceType === "graphqlApi" &&
+        pair.response?.resourceType === ResponseRuleResourceType.GRAPHQL_API &&
         Object.keys(pair.source?.filters?.[0]?.requestPayload ?? {}).length < 2
       ) {
         output = {
