@@ -58,22 +58,31 @@ export const switchWorkspace = async (
   }, 6000);
 
   setLoader?.();
-
-  // These merge steps are optional - just to ensure consistency
-  // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off
-  // Unsubscribe any existing listener - To prevent race of sync node listener once merged records are set on the firebase
   if (window.unsubscribeSyncingNodeRef.current)
     window.unsubscribeSyncingNodeRef.current();
-  const allRemoteRecords =
-    (await getValueAsPromise(getRecordsSyncPath())) || {};
-  let parsedFirebaseRules = await parseRemoteRecords(appMode, allRemoteRecords);
-  await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
+
+  const mergeLocalRecords = async () => {
+    if (
+      appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
+      !isExtensionInstalled()
+    )
+      return;
+    // These merge steps are optional - just to ensure consistency
+    // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off
+    // Unsubscribe any existing listener - To prevent race of sync node listener once merged records are set on the firebase
+    const allRemoteRecords =
+      (await getValueAsPromise(getRecordsSyncPath())) || {};
+    let parsedFirebaseRules = await parseRemoteRecords(
+      appMode,
+      allRemoteRecords
+    );
+    await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
+  };
+  await mergeLocalRecords();
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
 
-  // Don't clear when appMode is Remote as it could clear the database!
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE) skipStorageClearing = true;
   // Don't clear when appMode is Extension but user has not installed it!
   if (
     appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&

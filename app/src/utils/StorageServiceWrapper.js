@@ -20,34 +20,6 @@ class StorageServiceWrapper {
     this.getRecords = this.getRecords.bind(this);
   }
 
-  isSavingThisObjectAllowed(object) {
-    // If appMode is Remote, reject everything except Rules & Groups
-    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE) {
-      // First, it must be an object
-      if (
-        !(
-          typeof object === "object" &&
-          !Array.isArray(object) &&
-          object !== null
-        )
-      )
-        return false;
-      // Now check if its Rule/Group
-      for (const objectDefinition of Object.values(object)) {
-        if (
-          !(
-            objectDefinition.objectType ===
-              GLOBAL_CONSTANTS.OBJECT_TYPES.RULE ||
-            objectDefinition.objectType === GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP
-          )
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   getAllRecords() {
     return this.StorageHelper.getStorageSuperObject();
   }
@@ -95,10 +67,6 @@ class StorageServiceWrapper {
   }
 
   async saveRecord(object) {
-    if (!this.isSavingThisObjectAllowed(object)) {
-      Logger.log("Storage service rejected this record to be saved", object);
-      return;
-    }
     await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
     return Object.values(object)[0];
   }
@@ -153,10 +121,6 @@ class StorageServiceWrapper {
    * @returns {Promise<any>}
    */
   async saveRecordWithID(object) {
-    if (!this.isSavingThisObjectAllowed(object)) {
-      Logger.log("Storage service rejected this record to be saved", object);
-      return;
-    }
     await this.StorageHelper.saveStorageObject({ [object.id]: object });
   }
 
@@ -199,10 +163,6 @@ class StorageServiceWrapper {
   }
 
   saveConsoleLoggerState(state) {
-    if (!this.isSavingThisObjectAllowed(state)) {
-      Logger.log("Storage service rejected this record to be saved", state);
-      return;
-    }
     const consoleLoggerState = {
       [GLOBAL_CONSTANTS.CONSOLE_LOGGER_ENABLED]: state,
     };
