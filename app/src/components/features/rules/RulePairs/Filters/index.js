@@ -92,8 +92,25 @@ const Filters = (props) => {
     );
   };
 
+  const checkIfGraphqlRequestPayloadCanBeShown = () => {
+    const requestPayload =
+      currentlySelectedRuleData?.pairs?.[pairIndex].source?.filters?.[0]
+        ?.requestPayload;
+
+    if (requestPayload?.key && requestPayload?.value) {
+      return (
+        new Date(currentlySelectedRuleData.modificationDate) <
+        new Date("Thu Mar 16 2023 11:49:04 GMT+0530") // date of new Modify response rule UI release
+      );
+    }
+
+    return false;
+  };
+
   const isRequestPayloadFilterCompatible =
-    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) && isResponseRule();
+    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) &&
+    isResponseRule() &&
+    checkIfGraphqlRequestPayloadCanBeShown();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
@@ -235,7 +252,7 @@ const Filters = (props) => {
     </Menu>
   );
 
-  const renderResponsePayloadInput = () => {
+  const renderRequestPayloadInput = () => {
     return isRequestPayloadFilterCompatible ? (
       <Row
         className="one-padding-bottom"
@@ -522,7 +539,7 @@ const Filters = (props) => {
           {renderPageUrlInput()}
           {renderResourceTypeInput()}
           {renderHTTPMethodInput()}
-          {renderResponsePayloadInput()}
+          {renderRequestPayloadInput()}
         </>
       </Modal>
     </React.Fragment>
