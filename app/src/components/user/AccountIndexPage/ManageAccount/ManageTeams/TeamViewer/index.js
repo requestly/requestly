@@ -106,8 +106,8 @@ const TeamViewer = ({ teamId }) => {
           defaultActiveKey="0"
           items={manageWorkspaceItems}
           className="manage-workspace-tabs"
-          onChange={(activeKey) => {
-            trackWorkspaceSettingToggled(activeKey);
+          onChange={(activeTab) => {
+            trackWorkspaceSettingToggled(activeTab);
           }}
         />
       </Col>
