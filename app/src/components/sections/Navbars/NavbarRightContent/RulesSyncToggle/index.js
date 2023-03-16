@@ -157,10 +157,7 @@ const RulesSyncToggle = () => {
       );
     }
 
-    if (
-      appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE ||
-      currentlyActiveWorkspace?.id
-    ) {
+    if (currentlyActiveWorkspace?.id) {
       return (
         <Col className="display-row-center">
           <Tooltip title="Syncing is on" placement="bottomRight">
