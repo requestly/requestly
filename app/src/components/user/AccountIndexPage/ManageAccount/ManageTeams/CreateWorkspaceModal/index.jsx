@@ -11,7 +11,10 @@ import {
   trackNewTeamCreateFailure,
   trackNewTeamCreateSuccess,
 } from "modules/analytics/events/features/teams";
-import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
+import {
+  trackNewWorkspaceCreated,
+  trackAddWorkspaceNameModalViewed,
+} from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./CreateWorkspaceModal.css";
@@ -96,6 +99,10 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
       autoplay: true, // boolean
     });
   }, []);
+
+  useEffect(() => {
+    if (isOpen) trackAddWorkspaceNameModalViewed();
+  }, [isOpen]);
 
   return (
     <RQModal centered open={isOpen} onCancel={handleModalClose}>

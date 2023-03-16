@@ -19,7 +19,8 @@ import {
 import { Avatar, Divider, Dropdown, Menu, Modal, Row, Spin } from "antd";
 import {
   trackInviteTeammatesClicked,
-  trackCreateNewWorkspaceLinkClicked,
+  trackCreateNewWorkspaceClicked,
+  trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
 import {
   getCurrentlyActiveWorkspace,
@@ -37,7 +38,6 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
@@ -79,9 +79,6 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
         overlay={menu}
         trigger={["click"]}
         className="workspace-dropdown"
-        onOpenChange={(open) => {
-          open && trackSidebarClicked("workspace");
-        }}
       >
         <div className="cursor-pointer items-center">
           <Avatar
@@ -184,9 +181,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
-      trackCreateNewWorkspaceLinkClicked();
       setIsCreateWorkspaceModalOpen(true);
       handleMobileSidebarClose?.();
+      trackCreateNewWorkspaceClicked("workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -294,7 +291,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Menu.Item
         key="0"
         className="workspace-menu-item"
-        onClick={handleCreateNewWorkspaceRedirect}
+        onClick={() => {
+          handleCreateNewWorkspaceRedirect();
+          trackWorkspaceDropdownClicked("create_new_workspace");
+        }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
         Create New Workspace
@@ -302,7 +302,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Menu.Item
         key="1"
         className="workspace-menu-item"
-        onClick={handleInviteTeammatesClick}
+        onClick={() => {
+          handleInviteTeammatesClick();
+          trackWorkspaceDropdownClicked("invite_teammates");
+        }}
         icon={<PlusSquareOutlined className="icon-wrapper" />}
       >
         Invite teammates
@@ -310,9 +313,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Menu.Item
         key="2"
         className="workspace-menu-item"
-        onClick={() =>
-          promptUserSignupModal(() => {}, AUTH.SOURCE.WORKSPACE_SIDEBAR)
-        }
+        onClick={() => {
+          promptUserSignupModal(() => {}, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+          trackWorkspaceDropdownClicked("sign_in");
+        }}
         icon={<UserOutlined className="icon-wrapper" />}
       >
         Sign in
@@ -371,9 +375,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                     ? "active-workspace-dropdownItem"
                     : ""
                 }`}
-                onClick={() =>
-                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team))
-                }
+                onClick={() => {
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
+                  trackWorkspaceDropdownClicked("switch_workspace");
+                }}
               >
                 <div className="workspace-name-container">
                   <div className="workspace-name">{team.name}</div>
@@ -395,7 +400,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Menu.Item
         key="3"
         className="workspace-menu-item"
-        onClick={handleCreateNewWorkspaceRedirect}
+        onClick={() => {
+          handleCreateNewWorkspaceRedirect();
+          trackWorkspaceDropdownClicked("create_new_workspace");
+        }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
         Create New Workspace
@@ -406,7 +414,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           <Menu.Item
             key="4"
             className="workspace-menu-item"
-            onClick={handleInviteTeammatesClick}
+            onClick={() => {
+              handleInviteTeammatesClick();
+              trackWorkspaceDropdownClicked("invite_teammates");
+            }}
             icon={<PlusSquareOutlined className="icon-wrapper" />}
           >
             Invite teammates
@@ -422,6 +433,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
               } else {
                 redirectToMyTeams(navigate, false);
               }
+              trackWorkspaceDropdownClicked("manage_workspace");
             }}
           >
             Manage Workspace
