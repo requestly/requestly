@@ -37,7 +37,7 @@ const DesktopSignIn = () => {
 
   const handleDoneSignIn = async (firebaseUser, isNewUser = "false") => {
     const params = new URLSearchParams(window.location.search);
-    const token = await firebaseUser.getIdToken();
+    const token = await firebaseUser?.getIdToken();
     const code = params.get("ot-auth-code");
     const source = params.get("source").replace(/ /g, "_");
     const functions = getFunctions();
