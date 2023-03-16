@@ -36,6 +36,7 @@ import {
 } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 interface Props {
   isNew?: boolean;
@@ -58,6 +59,9 @@ const MockEditor: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
+
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
 
   const [id] = useState<string>(mockData.id); // No need to edit this. Set by firebase
   const [type] = useState<MockType>(mockData?.type || mockType);
@@ -314,7 +318,8 @@ const MockEditor: React.FC<Props> = ({
               copyText={generateFinalUrl(
                 endpoint,
                 user?.details?.profile?.uid,
-                username
+                username,
+                teamId
               )}
             />
           }
@@ -322,7 +327,8 @@ const MockEditor: React.FC<Props> = ({
           value={generateFinalUrl(
             endpoint,
             user?.details?.profile?.uid,
-            username
+            username,
+            teamId
           )}
           name="url"
           disabled={true}

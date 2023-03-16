@@ -1,7 +1,10 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  getCurrentlyActiveWorkspace,
+  getCurrentlyActiveWorkspaceMembers,
+} from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
@@ -9,6 +12,9 @@ import userNodeListener from "./userNodeListener";
 import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "../../firebase";
+import Logger from "lib/logger";
 import { actions } from "store";
 
 window.isFirstSyncComplete = false;
@@ -18,6 +24,7 @@ const useDatabase = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
@@ -131,6 +138,21 @@ const useDatabase = () => {
     dispatch,
     user?.details?.profile?.uid,
     user?.loggedIn,
+  ]);
+
+  /* Force refresh custom claims in auth token */
+  useEffect(() => {
+    getAuth(firebaseApp)
+      .currentUser?.getIdTokenResult(true)
+      ?.then((status) => {
+        Logger.log("force updated auth token");
+      });
+  }, [
+    user?.details?.profile?.uid,
+    user?.loggedIn,
+    currentlyActiveWorkspace,
+    currentTeamMembers,
+    dispatch,
   ]);
 };
 
