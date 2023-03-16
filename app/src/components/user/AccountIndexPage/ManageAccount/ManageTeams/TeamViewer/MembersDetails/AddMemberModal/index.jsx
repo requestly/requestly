@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { Button, Row, Col } from "antd";
@@ -19,6 +19,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
+import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 
 const AddMemberModal = ({
   isOpen,
@@ -104,6 +105,10 @@ const AddMemberModal = ({
         }
       });
   };
+
+  useEffect(() => {
+    if (isOpen) trackAddMembersInWorkspaceModalViewed();
+  }, [isOpen]);
 
   return (
     <>
