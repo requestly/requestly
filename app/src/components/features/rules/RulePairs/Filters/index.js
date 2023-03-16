@@ -92,7 +92,7 @@ const Filters = (props) => {
     );
   };
 
-  const checkIfGraphqlRequestPayloadCanBeShown = () => {
+  const hasLegacyPayloadFilter = () => {
     const requestPayload =
       currentlySelectedRuleData?.pairs?.[pairIndex].source?.filters?.[0]
         ?.requestPayload;
@@ -110,7 +110,7 @@ const Filters = (props) => {
   const isRequestPayloadFilterCompatible =
     isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) &&
     isResponseRule() &&
-    checkIfGraphqlRequestPayloadCanBeShown();
+    hasLegacyPayloadFilter();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
