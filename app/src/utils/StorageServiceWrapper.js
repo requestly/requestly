@@ -103,13 +103,20 @@ class StorageServiceWrapper {
     return Object.values(object)[0];
   }
 
-  async saveRuleOrGroup(object, updateLastModified = true) {
+  /**
+   *
+   * @param ruleOrGroup rule or group
+   * @param options options for save operation
+   * @param {boolean} options.silentUpdate do not update last modified timestamp
+   * @returns a promise on save of the rule or group
+   */
+  async saveRuleOrGroup(ruleOrGroup, options = {}) {
     const formattedObject = {
-      [object.id]: {
-        ...object,
-        modificationDate: updateLastModified
-          ? new Date().getTime()
-          : object?.modificationDate,
+      [ruleOrGroup.id]: {
+        ...ruleOrGroup,
+        modificationDate: options.silentUpdate
+          ? ruleOrGroup?.modificationDate
+          : new Date().getTime(),
       },
     };
     await doSyncRecords(

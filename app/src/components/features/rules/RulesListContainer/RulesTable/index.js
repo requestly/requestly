@@ -63,7 +63,6 @@ import {
   ungroupSelectedRules,
   updateRulesListRefreshPendingStatus,
 } from "./actions";
-import { copyRule } from "../../actions/someMoreActions";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -71,6 +70,7 @@ import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
 import UngroupOrDeleteRulesModal from "../../UngroupOrDeleteRulesModal";
+import DuplicateRuleModal from "../../DuplicateRuleModal";
 import {
   trackGroupDeleted,
   trackGroupStatusToggled,
@@ -79,7 +79,6 @@ import { trackUploadRulesButtonClicked } from "modules/analytics/events/features
 import {
   trackRuleActivatedStatusEvent,
   trackRuleDeactivatedStatus,
-  trackRuleDuplicatedEvent,
   trackRulePinToggled,
   trackRulesUngrouped,
 } from "modules/analytics/events/common/rules";
@@ -166,12 +165,16 @@ const RulesTable = ({
     isUngroupOrDeleteRulesModalActive,
     setIsUngroupOrDeleteRulesModalActive,
   ] = useState(false);
+  const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(
+    false
+  );
   const [
     ungroupOrDeleteRulesModalData,
     setUngroupOrDeleteRulesModalData,
   ] = useState(null);
   const [ruleToDelete, setRuleToDelete] = useState([]);
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
+  const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
@@ -451,7 +454,7 @@ const RulesTable = ({
     dispatch(actions.updateRecord(updatedRule));
     Logger.log("Writing storage in RulesTable changeFavouriteState");
     StorageService(appMode)
-      .saveRuleOrGroup(updatedRule, false)
+      .saveRuleOrGroup(updatedRule, { silentUpdate: true })
       .then(() => {
         trackRulePinToggled(newValue);
       })
@@ -509,7 +512,7 @@ const RulesTable = ({
     dispatch(actions.updateRecord(updatedRule));
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     StorageService(appMode)
-      .saveRuleOrGroup(updatedRule, false)
+      .saveRuleOrGroup(updatedRule, { silentUpdate: true })
       .then((rule) => {
         //Push Notify
         newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
@@ -589,13 +592,24 @@ const RulesTable = ({
       : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
-  const copyIconOnClickHandler = async (event, rule) => {
+  const copyIconOnClickHandler = useCallback(async (event, rule) => {
     event.stopPropagation();
-    trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rules.ruleType);
+    setRuleToDuplicate(rule);
+    setIsDuplicateRuleModalActive(true);
+  }, []);
 
-    copyRule(appMode, rule, navigate);
-  };
+  const closeDuplicateRuleModal = useCallback(() => {
+    setRuleToDuplicate(null);
+    setIsDuplicateRuleModalActive(false);
+  }, []);
+
+  const onRuleDuplicated = useCallback(
+    (newRule) => {
+      closeDuplicateRuleModal();
+      redirectToRuleEditor(navigate, newRule.id);
+    },
+    [closeDuplicateRuleModal, navigate]
+  );
 
   const deleteIconOnClickHandler = async (event, rule) => {
     event.stopPropagation();
@@ -1557,6 +1571,14 @@ const RulesTable = ({
           toggle={toggleUngroupOrDeleteRulesModal}
           data={ungroupOrDeleteRulesModalData}
           setData={setUngroupOrDeleteRulesModalData}
+        />
+      ) : null}
+      {isDuplicateRuleModalActive ? (
+        <DuplicateRuleModal
+          isOpen={isDuplicateRuleModalActive}
+          close={closeDuplicateRuleModal}
+          rule={ruleToDuplicate}
+          onDuplicate={onRuleDuplicated}
         />
       ) : null}
     </>

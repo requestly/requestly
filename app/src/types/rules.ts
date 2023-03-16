@@ -26,6 +26,7 @@ export enum RuleType {
 
 export interface Rule extends Record<string, unknown> {
   id: string;
+  name: string;
   objectType?: ObjectType.RULE;
   ruleType: RuleType;
   status: Status;
