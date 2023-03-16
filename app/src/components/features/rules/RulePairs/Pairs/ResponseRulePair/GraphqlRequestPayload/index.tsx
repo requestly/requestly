@@ -53,7 +53,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     FEATURES.REQUEST_PAYLOAD_FILTER
   );
 
-  const [payloadkey, setPayloadkey] = useState<string>(
+  const [payloadKey, setPayloadKey] = useState<string>(
     localStorage.getItem(requestPayloadKey) ?? ""
   );
   const [payloadValue, setPayloadValue] = useState<string>(
@@ -75,15 +75,25 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
       SOURCE_REQUEST_PAYLOAD_VALUE
     );
 
-    setPayloadkey(payloadKey);
+    if (payloadKey && payloadValue) {
+      localStorage.setItem(requestPayloadKey, payloadKey);
+      localStorage.setItem(requestPayloadValue, payloadValue);
+    }
+
+    setPayloadKey(payloadKey);
     setPayloadValue(payloadValue);
-  }, [pairIndex, currentlySelectedRuleData]);
+  }, [
+    pairIndex,
+    requestPayloadKey,
+    requestPayloadValue,
+    currentlySelectedRuleData,
+  ]);
 
   useEffect(() => {
     const payloadKey = localStorage.getItem(requestPayloadKey) ?? "";
     const payloadValue = localStorage.getItem(requestPayloadValue) ?? "";
 
-    setPayloadkey(payloadKey);
+    setPayloadKey(payloadKey);
     setPayloadValue(payloadValue);
 
     if (payloadKey && payloadValue)
@@ -104,11 +114,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestPayloadKey, requestPayloadValue]);
 
-  useEffect(() => {
-    localStorage.setItem(requestPayloadKey, payloadkey);
-    localStorage.setItem(requestPayloadValue, payloadValue);
-  }, [payloadkey, payloadValue, requestPayloadKey, requestPayloadValue]);
-
   const clearRequestPayload = () => {
     deleteObjectAtPath(
       currentlySelectedRuleData,
@@ -128,12 +133,12 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 
     if (value === "") {
       clearRequestPayload();
-      setPayloadkey("");
+      setPayloadKey("");
       setPayloadValue("");
     }
 
     if (payloadPath === SOURCE_REQUEST_PAYLOAD_KEY) {
-      setPayloadkey(value);
+      setPayloadKey(value);
       trackRequestPayloadKeyFilterModifiedEvent(
         currentlySelectedRuleData.ruleType
       );
@@ -165,7 +170,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           autoComplete="off"
           placeholder="key"
           className="graphql-operation-type-input"
-          value={payloadkey}
+          value={payloadKey}
           onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_KEY)}
         />
         <Input
