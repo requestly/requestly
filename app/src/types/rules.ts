@@ -83,17 +83,15 @@ export interface RulePairSource {
   filters?: SourceFilter[];
 }
 
-export interface RulePairResponse {
-  value: string;
-  statusCode: string;
-  type: ResponseRuleBodyType;
-  resourceType?: ResponseRuleResourceType;
-}
-
 export interface ResponseRulePair {
   id: string;
   source: RulePairSource;
-  response: RulePairResponse;
+  response: {
+    value: string;
+    statusCode: string;
+    type: ResponseRuleBodyType;
+    resourceType?: ResponseRuleResourceType;
+  };
 }
 
 export interface RedirectRulePair {
