@@ -27,10 +27,7 @@ const RuleEditor = (props) => {
   const appMode = useSelector(getAppMode);
 
   useEffect(() => {
-    if (
-      appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ||
-      appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
-    ) {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       Logger.log("Reading storage in RuleEditor useEffect");
       StorageService(appMode)
         .getRecord(APP_CONSTANTS.RQ_SETTINGS)
@@ -49,10 +46,7 @@ const RuleEditor = (props) => {
   const collapseRulesPlane = () => setRulePaneSizes([92, 8]);
 
   const renderRuleEditor = () => {
-    if (
-      appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ||
-      appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
-    ) {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       // PATCH
       // Sometimes RULE_TYPE_TO_CREATE contains the rule id.
       // For time being, split the string to extract Rule Type. Ex: Redirect_ke4mv -> Redirect
@@ -127,7 +121,6 @@ const RuleEditor = (props) => {
           return <ExtensionDeactivationMessage />;
         }
         return renderRuleEditor();
-      case GLOBAL_CONSTANTS.APP_MODES.REMOTE:
       case GLOBAL_CONSTANTS.APP_MODES.DESKTOP:
       default:
         return renderRuleEditor();

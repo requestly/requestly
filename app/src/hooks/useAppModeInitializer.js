@@ -156,22 +156,8 @@ const useAppModeInitializer = () => {
     }
   }, [appMode]);
 
-  // Set app mode - "REMOTE" || "DESKTOP" if required. Default is "EXTENSION"
+  // Set app mode to "DESKTOP" if required. Default is "EXTENSION"
   useEffect(() => {
-    const ifPossibleSetAppModeRemote = async () => {
-      return false;
-      // if (user?.loggedIn) {
-      //   if (await isUserUsingAndroidDebugger(user?.details?.profile?.uid)) {
-      //     dispatch(
-      //       actions.updateAppMode({
-      //         appMode: GLOBAL_CONSTANTS.APP_MODES.REMOTE,
-      //       })
-      //     );
-      //     return true;
-      //   } else return false;
-      // } else return false;
-    };
-
     const asyncUseEffect = async () => {
       if (!hasAppModeBeenSet || hasAuthChanged) {
         if (!isExtensionInstalled()) {
@@ -181,19 +167,6 @@ const useAppModeInitializer = () => {
                 appMode: GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
               })
             );
-          } else {
-            const settingAppModeRemoteSuccess = await ifPossibleSetAppModeRemote();
-            if (
-              !settingAppModeRemoteSuccess &&
-              appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
-            ) {
-              // Fallback to default value
-              dispatch(
-                actions.updateAppMode({
-                  appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
-                })
-              );
-            }
           }
         } else {
           if (appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {

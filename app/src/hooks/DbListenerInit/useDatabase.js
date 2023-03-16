@@ -81,10 +81,7 @@ const useDatabase = () => {
           currentlyActiveWorkspace.id,
           appMode
         );
-      } else if (
-        user?.details?.isSyncEnabled ||
-        appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
-      ) {
+      } else if (user?.details?.isSyncEnabled) {
         // This is individual syncing
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
