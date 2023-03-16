@@ -83,8 +83,6 @@ export const switchWorkspace = async (
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
 
-  // Don't clear when appMode is Remote as it could clear the database!
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE) skipStorageClearing = true;
   // Don't clear when appMode is Extension but user has not installed it!
   if (
     appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
