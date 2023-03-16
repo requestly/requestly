@@ -14,7 +14,7 @@ export const getAppDetails = () => {
     app_mode = window.RQ.MODE;
     app_version = window?.RQ?.DESKTOP?.VERSION;
   } else {
-    app_mode = GLOBAL_CONSTANTS.APP_MODES.REMOTE;
+    app_mode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     app_version = "0.0.1"; // DUMMY VERSION for compatibility check
   }
 
@@ -29,8 +29,6 @@ export const isProductionUI =
 
 export const isLocalStoragePresent = (appMode) => {
   return !(
-    (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-      !isExtensionInstalled()) ||
-    appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
+    appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()
   );
 };

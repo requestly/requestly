@@ -53,12 +53,7 @@ const RulesBackup = () => {
     trackBackupToggled(status);
   };
 
-  if (
-    currentlyActiveWorkspace?.id ||
-    appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE
-  ) {
-    return null;
-  }
+  if (currentlyActiveWorkspace?.id) return;
 
   // TODO: add existing backup link
   return (

@@ -16,7 +16,6 @@ import HeaderText from "./HeaderText";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage } from "utils/PathUtils";
-import RemoteStorageWarning from "components/misc/AppMode/RemoteStorageWarning";
 import {
   GithubOutlined,
   NotificationOutlined,
@@ -165,7 +164,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               </div>
             </Col>
 
-            <RemoteStorageWarning />
             <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>

@@ -7,7 +7,7 @@
       "imageURL": "",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "version": 2,
           "creationDate": 1643724819721,
@@ -51,7 +51,7 @@
       "isSharedList": false,
       "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643717688716,
           "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
@@ -85,7 +85,7 @@
       "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643755328278,
           "description": "You can Bypass CORS by turning this on",
@@ -145,7 +145,7 @@
       "tags": ["Redirect", "Script"],
       "imageURL": "https://www.gstatic.com/analytics-suite/header/suite/v2/ic_analytics.svg",
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "shareId": "1643984301107",
         "sharedListName": "Load Google Analytics in Debug Mode"
       }
@@ -157,7 +157,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643752821159,
           "description": "Highlights Ads in Google Search Result to avoid clicking on them",
@@ -201,7 +201,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643723253038,
           "description": "Can load Quora in Incognito Mode without signing in",
@@ -245,7 +245,7 @@
       "imageURL": "",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643986033516,
           "description": "Turn it on and try opening example.com?utm_source=gmail",
@@ -310,7 +310,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/bing/bing-icon.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643725370294,
           "description": "Turn it on and your chrome address bar will show results from Bing",
@@ -344,7 +344,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/twitter/twitter-official.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643749070407,
           "description": "Block Twitter and do something and do something productive",
@@ -377,7 +377,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/instagram/instagram-icon.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643752540500,
           "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
@@ -410,7 +410,7 @@
       "imageURL": "",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643753300929,
           "description": "",
@@ -542,7 +542,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/youtube/youtube-icon.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643753954887,
           "description": "Avoid distractions",
@@ -575,7 +575,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643754300535,
           "description": "Block Facebook to stay focused",
@@ -608,7 +608,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643754671488,
           "description": "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
@@ -642,7 +642,7 @@
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
       "isSharedList": false,
       "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP", "REMOTE"],
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
           "creationDate": 1643757615673,
           "description": "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
