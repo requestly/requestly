@@ -25,9 +25,11 @@ export const redirectToRules = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - RULES - Create New Rule */
-export const redirectToCreateNewRule = (navigate, ruleType) => {
+export const redirectToCreateNewRule = (navigate, ruleType, source) => {
   if (ruleType) {
-    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`);
+    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
+      state: { source },
+    });
   } else {
     navigate(PATHS.RULES.CREATE);
   }
@@ -39,8 +41,10 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (navigate, ruleId) => {
-  navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`);
+export const redirectToRuleEditor = (navigate, ruleId, source) => {
+  navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
+    state: { source },
+  });
 };
 
 /* FEATURE - SHARED LIST */
@@ -287,13 +291,8 @@ export const redirectToBackups = (navigate, hardRedirect) => {
 };
 
 /* ACCOUNT - TEAM */
-export const redirectToTeam = (
-  navigate,
-  teamId,
-  hardRedirect,
-  autoRefresh,
-  redirectBackToMyTeams
-) => {
+export const redirectToTeam = (navigate, teamId, options = {}) => {
+  const { hardRedirect, autoRefresh, redirectBackToMyTeams, state } = options;
   const url = new URL(window.location.href);
   url.pathname = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
   if (autoRefresh) {
@@ -304,6 +303,8 @@ export const redirectToTeam = (
   }
   if (hardRedirect) {
     window.location = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
+  } else if (state) {
+    navigate(url.pathname + url.search, { state });
   } else {
     navigate(url.pathname + url.search);
   }

@@ -7,7 +7,6 @@ import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import ConsoleLogger from "./ConsoleLogger";
-import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DataCollection from "./DataCollection";
 
 const GlobalSettings = ({ appMode }) => {
@@ -52,12 +51,7 @@ const GlobalSettings = ({ appMode }) => {
           </>
         )}
 
-        {user?.loggedIn ? (
-          <>
-            <WorkspaceStatusSyncing />
-            <DataCollection />
-          </>
-        ) : null}
+        {user?.loggedIn ? <DataCollection /> : null}
       </div>
     </>
   );

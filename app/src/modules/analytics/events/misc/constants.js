@@ -79,4 +79,5 @@ export const PERSONA_SURVEY = {
   PERSONA_QUESTIONNAIRE_STARTED: "persona_questionnaire_started",
   PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
   PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
+  PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
 };

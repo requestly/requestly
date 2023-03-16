@@ -1,7 +1,5 @@
-import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import React, { useState } from "react";
 import { toast } from "utils/Toast";
-import SettingsItem from "../../SettingsItem";
 import { doSyncDebounced } from "hooks/DbListenerInit/syncingNodeListener";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
@@ -9,6 +7,8 @@ import { get } from "firebase/database";
 import { getNodeRef } from "actions/FirebaseActions";
 import { getRecordsSyncPath } from "utils/syncing/syncDataUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import SettingsItem from "views/user/Settings/SettingsItem";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const WorkspaceStatusSyncing = () => {
   const dispatch = useDispatch();

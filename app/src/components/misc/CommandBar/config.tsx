@@ -255,7 +255,8 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
         title: NAME,
         icon: <ICON />,
         action: async ({ navigate, dispatch, user, appMode, rules }) => {
-          if (user.loggedIn) redirectToCreateNewRule(navigate, TYPE);
+          if (user.loggedIn)
+            redirectToCreateNewRule(navigate, TYPE, "command_bar");
           else {
             if (await isSignUpRequired(rules, appMode, user))
               dispatch(
@@ -263,13 +264,14 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
                   modalName: "authModal",
                   newValue: true,
                   newProps: {
-                    callback: () => redirectToCreateNewRule(navigate, TYPE),
+                    callback: () =>
+                      redirectToCreateNewRule(navigate, TYPE, "command_bar"),
                     authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
                     eventSource: AUTH.SOURCE.COMMAND_BAR,
                   },
                 })
               );
-            else redirectToCreateNewRule(navigate, TYPE);
+            else redirectToCreateNewRule(navigate, TYPE, "command_bar");
           }
         },
       };
@@ -308,7 +310,7 @@ const userRulesPage: PageConfig = {
             </div>
           ),
           action: ({ navigate }: ActionProps) => {
-            redirectToRuleEditor(navigate, rule?.id);
+            redirectToRuleEditor(navigate, rule?.id, "command_bar");
           },
         };
       }

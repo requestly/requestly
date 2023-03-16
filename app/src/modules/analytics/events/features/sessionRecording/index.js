@@ -33,9 +33,10 @@ export const trackDraftSessionDiscarded = () =>
 export const trackDraftSessionNamed = () =>
   trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength) => {
+export const trackDraftSessionSaved = (sessionLength, options) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
     sessionLength,
+    options,
   });
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
 };
@@ -78,3 +79,16 @@ export const trackSessionRecordingDeleted = () => {
 
 export const trackSessionRecordingDescriptionUpdated = () =>
   trackEvent(SESSION_RECORDING.session_recording_description_added);
+
+export const trackSessionRecordingPanelTabClicked = (tab, session_type) => {
+  trackEvent(SESSION_RECORDING.session_recording_panel_tab_clicked, {
+    tab,
+    session_type,
+  });
+};
+
+export const trackSampleSessionClicked = (log_type) => {
+  trackEvent(SESSION_RECORDING.session_recording_panel_sample_session_clicked, {
+    log_type,
+  });
+};
