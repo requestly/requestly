@@ -80,10 +80,12 @@ const preventWorkspaceSyncWrite = async (
     await updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
     });
-    // Replace the values (if exists on Firebase)
-    if (typeof remoteRecords?.[objectId]?.[key] !== "undefined")
-      localRecords[objectId][key] = remoteRecords[objectId][key];
   }
+  // Replace the values (if exists on Firebase)
+  if (typeof remoteRecords?.[objectId]?.[key] !== "undefined")
+    localRecords[objectId][key] = remoteRecords[objectId][key];
+  else delete localRecords[objectId][key];
+
   return localRecords;
 };
 
