@@ -60,12 +60,13 @@ export const mergeRecordsAndSaveToFirebase = async (
   await doSyncRecords(
     formattedObject,
     SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-    appMode
+    appMode,
+    true
   );
   return mergedRecords;
 };
 
-const doSync = async (
+export const doSync = async (
   uid,
   appMode,
   dispatch,
@@ -121,7 +122,7 @@ const doSync = async (
 
   dispatch(actions.updateIsRulesListLoading(false));
 };
-const doSyncDebounced = _.debounce(doSync, 5000);
+export const doSyncDebounced = _.debounce(doSync, 5000);
 
 const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
   try {

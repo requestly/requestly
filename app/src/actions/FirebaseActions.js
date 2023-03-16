@@ -65,6 +65,7 @@ import {
 import { sanitizeDataForFirebase } from "utils/Misc";
 import { createNewUsername } from "backend/auth/username";
 import Logger from "lib/logger";
+import { StorageService } from "init";
 
 const dummyUserImg =
   "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
@@ -468,6 +469,11 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
       syncStatus = true;
     } else {
       syncStatus = profile.isSyncEnabled;
+      // Optional - Just in case!
+      if (!syncStatus)
+        await StorageService(appMode).removeRecordsWithoutSyncing([
+          "last-sync-target",
+        ]);
     }
   } else {
     // Profile has not been created yet - user must have signed up recently
@@ -477,14 +483,6 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
     }, 2000);
   }
 
-  // if (isUserPremium) {
-  //   if (profile.isSyncEnabled === undefined) {
-  //     await update(userProfileRef, { isSyncEnabled: true });
-  //     syncStatus = true;
-  //   } else {
-  //     syncStatus = profile.isSyncEnabled;
-  //   }
-  // }
   return syncStatus;
 }
 
