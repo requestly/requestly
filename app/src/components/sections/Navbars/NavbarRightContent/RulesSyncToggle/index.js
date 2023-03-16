@@ -46,7 +46,7 @@ const RulesSyncToggle = () => {
 
     const proceedChangingStatus = async () => {
       setIsSyncStatusChangeProcessing(true);
-      setSyncState(user.details.profile.uid, syncState)
+      setSyncState(user.details.profile.uid, syncState, appMode)
         .then(() => {
           toast.info(
             `We ${
