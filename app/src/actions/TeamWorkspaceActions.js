@@ -16,6 +16,7 @@ import {
   getRecordsSyncPath,
   parseRemoteRecords,
 } from "utils/syncing/syncDataUtils";
+import { setSyncState } from "utils/syncing/SyncUtils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -30,15 +31,9 @@ export const switchWorkspace = async (
   newWorkspaceDetails,
   dispatch,
   currentSyncingState,
-  appMode
+  appMode,
+  setLoader
 ) => {
-  trackWorkspaceSwitched();
-  dispatch(actions.updateIsRulesListLoading(true));
-  // just to safe
-  setTimeout(() => {
-    dispatch(actions.updateIsRulesListLoading(false));
-  }, 6000);
-
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
 
   if (teamId !== null) {
@@ -48,12 +43,21 @@ export const switchWorkspace = async (
       // User is currently on private workspace
       if (!isSyncEnabled) {
         const message = "Turn on syncing?";
-        if (window.confirm(message) !== true) {
-          return;
-        }
+        const confirmationResponse = window.confirm(message);
+        if (confirmationResponse !== true) return;
+        setSyncState(window.uid, true, appMode);
       }
     }
   }
+
+  trackWorkspaceSwitched();
+  dispatch(actions.updateIsRulesListLoading(true));
+  // just to be safe
+  setTimeout(() => {
+    dispatch(actions.updateIsRulesListLoading(false));
+  }, 6000);
+
+  setLoader?.();
 
   // These merge steps are optional - just to ensure consistency
   // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off

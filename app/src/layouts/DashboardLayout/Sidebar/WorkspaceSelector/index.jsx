@@ -200,7 +200,6 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   };
 
   const handleWorkspaceSwitch = async (team) => {
-    setIsModalOpen(true);
     switchWorkspace(
       {
         teamId: team.id,
@@ -212,12 +211,15 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         isSyncEnabled: user?.details?.isSyncEnabled,
         isWorkspaceMode,
       },
-      appMode
+      appMode,
+      () => {
+        setIsModalOpen(true);
+        setTimeout(() => {
+          if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
+          setIsModalOpen(false);
+        }, 2 * 1000);
+      }
     );
-    setTimeout(() => {
-      setIsModalOpen(false);
-      showSwitchWorkspaceSuccessToast(team.name);
-    }, 2 * 1000);
     handleMobileSidebarClose?.();
   };
 
