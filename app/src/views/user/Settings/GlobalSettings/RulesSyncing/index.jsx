@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { toast } from "utils/Toast";
@@ -11,6 +10,7 @@ import SettingsItem from "../../SettingsItem";
 const RulesSyncing = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
 
   const [syncStatus, setSyncStatus] = useState();
   const [
@@ -35,7 +35,7 @@ const RulesSyncing = () => {
 
     setSyncStatus(status);
     setIsSyncStatusChangeProcessing(true);
-    setSyncState(user.details.profile.uid, status)
+    setSyncState(user.details.profile.uid, status, appMode)
       .then(() => {
         toast.info(
           `We ${
