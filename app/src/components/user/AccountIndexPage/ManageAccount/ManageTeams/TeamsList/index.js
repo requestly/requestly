@@ -5,7 +5,7 @@ import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
 import CreateWorkspaceModal from "../CreateWorkspaceModal";
-import { trackCreateNewWorkspaceButtonClicked } from "modules/analytics/events/common/teams";
+import { trackCreateNewWorkspaceClicked } from "modules/analytics/events/common/teams";
 
 const TeamsList = ({ teams = [] }) => {
   const navigate = useNavigate();
@@ -128,7 +128,7 @@ const TeamsList = ({ teams = [] }) => {
           <Button
             type="primary"
             onClick={() => {
-              trackCreateNewWorkspaceButtonClicked();
+              trackCreateNewWorkspaceClicked("my_teams");
               setIsCreateTeamModalOpen(true);
             }}
             icon={<PlusOutlined />}
