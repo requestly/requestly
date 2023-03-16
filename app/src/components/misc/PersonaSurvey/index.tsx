@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getAppMode,
@@ -7,10 +7,10 @@ import {
 } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SurveyModalFooter } from "./ModalFooter";
-import { surveyConfig } from "./config";
+import { SurveyConfig, OptionsConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { shouldShowPersonaSurvey } from "./utils";
-import { PageConfig } from "./types";
+import { shouldShowPersonaSurvey, shuffleOptions } from "./utils";
+import { Conditional, Option, PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
@@ -22,6 +22,7 @@ import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { actions } from "store";
 import "./index.css";
+import { SurveyOption } from "./Option";
 
 interface PersonaModalProps {
   isOpen: boolean;
@@ -40,6 +41,28 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
   const persona = userPersona.persona;
+
+  const shuffledPersonas = useMemo(() => {
+    return shuffleOptions(OptionsConfig[1].options);
+  }, []);
+
+  const shuffledUseCases = useMemo(() => {
+    if (persona) {
+      const { conditional } = OptionsConfig[2];
+      const { options } = conditional.find((option: Conditional) =>
+        option.condition(persona)
+      );
+      const otherOption = options.pop();
+      const shuffled = shuffleOptions(options);
+      //others options to remain at last always
+      return [...shuffled, otherOption];
+    }
+    return null;
+  }, [persona]);
+
+  const shuffledReferrals = useMemo(() => {
+    return shuffleOptions(OptionsConfig[3].options);
+  }, []);
 
   const SkippableButton = () => {
     switch (currentPage) {
@@ -72,7 +95,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
           </div>
         );
 
-      case surveyConfig.length - 1:
+      case SurveyConfig.length - 1:
         return (
           <div className="skip-recommendation-wrapper">
             <RQButton
@@ -110,11 +133,46 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     );
   };
 
+  const renderQuestionnaire = (optionSet: number) => {
+    switch (optionSet) {
+      case 1:
+        return renderOptions(shuffledPersonas, optionSet);
+      case 2:
+        return renderOptions(shuffledUseCases, optionSet);
+      case 3:
+        return renderOptions(shuffledReferrals, optionSet);
+      default:
+        return null;
+    }
+  };
+  const renderOptions = (options: Option[], optionSet: number) => {
+    return (
+      <>
+        <div className="survey-options-container">
+          {options.map((option: Option, index: number) => (
+            <SurveyOption
+              key={index}
+              option={option}
+              questionType={OptionsConfig[optionSet].questionType}
+              isActive={OptionsConfig[optionSet].isActive}
+              action={OptionsConfig[optionSet].action}
+              fieldKey={OptionsConfig[optionSet].key}
+            />
+          ))}
+        </div>
+      </>
+    );
+  };
+
   const renderPage = (page: PageConfig, persona: string) => {
     return (
       <>
         {renderPageHeader(page)}
-        <>{page.render({ toggleImportRulesModal, persona })}</>
+        <>
+          {typeof page.render === "function"
+            ? page.render({ toggleImportRulesModal })
+            : renderQuestionnaire(page.render)}
+        </>
       </>
     );
   };
@@ -146,11 +204,11 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     >
       <div
         className={`rq-modal-content survey-content-wrapper ${
-          currentPage === surveyConfig.length - 1 &&
+          currentPage === SurveyConfig.length - 1 &&
           "survey-modal-border-radius"
         }`}
       >
-        {surveyConfig.map((page: PageConfig, index) => (
+        {SurveyConfig.map((page: PageConfig, index) => (
           <React.Fragment key={index}>
             {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
           </React.Fragment>

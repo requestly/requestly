@@ -1,10 +1,4 @@
-import React from "react";
-import {
-  Conditional,
-  PageConfig,
-  PersonaType,
-  SurveyOptionsConfig,
-} from "./types";
+import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { UserRecommendations } from "./Recommendations";
 import {
@@ -22,10 +16,11 @@ import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
 import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
 //@ts-ignore
 import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
-import { SurveyOption } from "./Option";
 
-const OptionsConfig: Record<number, SurveyOptionsConfig> = {
+export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   1: {
+    key: "persona",
+    questionType: "single",
     isActive: ({ key, title }) => key === title,
     action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
     options: [
@@ -56,6 +51,8 @@ const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     ],
   },
   2: {
+    key: "useCases",
+    questionType: "multiple",
     isActive: ({ key, title, optionType }) =>
       handleUseCaseActiveOption(key, title, optionType),
     action: (dispatch, value, clear, optionType) =>
@@ -184,6 +181,8 @@ const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     ],
   },
   3: {
+    key: "referralChannel",
+    questionType: "single",
     isActive: ({ key, title }) => key === title,
     action: (dispatch, value, clear) =>
       setPersonaReferralChannel(dispatch, value, clear),
@@ -228,7 +227,7 @@ const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   },
 };
 
-export const surveyConfig: PageConfig[] = [
+export const SurveyConfig: PageConfig[] = [
   {
     pageId: 0,
     title: "Welcome to Requestly!",
@@ -240,70 +239,19 @@ export const surveyConfig: PageConfig[] = [
     pageId: 1,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
-    render: () => {
-      return (
-        <div className="survey-options-container">
-          {OptionsConfig[1].options.map((option: any, index: number) => (
-            <SurveyOption
-              key={index}
-              option={option}
-              isActive={OptionsConfig[1].isActive}
-              action={OptionsConfig[1].action}
-              questionType="single"
-              fieldKey="persona"
-            />
-          ))}
-        </div>
-      );
-    },
+    render: 1,
   },
   {
     pageId: 2,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
-    render: ({ persona }) => (
-      <>
-        {OptionsConfig[2].conditional.map((set: Conditional, index: number) => (
-          <React.Fragment key={index}>
-            {set.condition(persona) && (
-              <div className="survey-options-container">
-                {set.options.map((option, index) => (
-                  <SurveyOption
-                    key={index}
-                    option={option}
-                    questionType="multiple"
-                    isActive={OptionsConfig[2].isActive}
-                    action={OptionsConfig[2].action}
-                    fieldKey="useCases"
-                  />
-                ))}
-              </div>
-            )}
-          </React.Fragment>
-        ))}
-      </>
-    ),
+    render: 2,
   },
   {
     pageId: 3,
     title: "How did you hear about Requestly?",
     subTitle: "Select one",
-    render: () => {
-      return (
-        <div className="survey-options-container">
-          {OptionsConfig[3].options.map((option: any, index: number) => (
-            <SurveyOption
-              key={index}
-              option={option}
-              isActive={OptionsConfig[3].isActive}
-              action={OptionsConfig[3].action}
-              questionType="single"
-              fieldKey="referralChannel"
-            />
-          ))}
-        </div>
-      );
-    },
+    render: 3,
   },
   {
     pageId: 4,
