@@ -3,7 +3,7 @@ import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
-import { trackUpgradeClickedWorkspaces } from "modules/analytics/events/common/teams";
+import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   const [isContactUsModalActive, setIsContactUsModalActive] = useState(false);
@@ -32,7 +32,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
           type="primary"
           onClick={() => {
             setIsContactUsModalActive(true);
-            trackUpgradeClickedWorkspaces();
+            trackUpgradeWorkspaceClicked();
           }}
         >
           Upgrade

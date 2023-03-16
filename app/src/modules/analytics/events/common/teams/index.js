@@ -46,15 +46,16 @@ export const trackTeamPlanInterestCaptured = (domain) => {
   trackEvent(TEAMS.TEAM_PLAN_INTEREST_CAPTURED, params);
 };
 
-export const trackWorkspaceSettingToggled = () => {
-  trackEvent(TEAMS.WORKSPACE_SETTING_TOGGLED);
+export const trackWorkspaceSettingToggled = (active_tab) => {
+  const params = { active_tab };
+  trackEvent(TEAMS.WORKSPACE_SETTING_TOGGLED, params);
 };
 export const trackWorkspaceDropdownClicked = (action) => {
   const params = { action };
   trackEvent(TEAMS.WORKSPACE_DROPDOWN_CLICKED, params);
 };
-export const trackUpgradeClickedWorkspaces = () => {
-  trackEvent(TEAMS.UPGRADE_CLICKED_WORKSPACES);
+export const trackUpgradeWorkspaceClicked = () => {
+  trackEvent(TEAMS.UPGRADE_WORKSPACE_CLICKED);
 };
 
 export const trackAddWorkspaceNameModalViewed = () => {

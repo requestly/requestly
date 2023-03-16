@@ -132,7 +132,7 @@ export const TEAMS = {
   TEAM_PLAN_INTEREST_CAPTURED: "team_plan_interest_captured",
   WORKSPACE_SETTING_TOGGLED: "workspace_setting_toggled",
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
-  UPGRADE_CLICKED_WORKSPACES: "upgrade_clicked_workspaces",
+  UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED:
     "add_members_in_worskpace_modal_viewed",
