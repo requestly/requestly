@@ -184,7 +184,7 @@ const ResponseBodyRow = ({
                 Static Data
               </Radio>
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-                Dynamic (JS Script)
+                Dynamic (JavaScript)
               </Radio>
               {getAppDetails().app_mode ===
               GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
