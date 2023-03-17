@@ -58,13 +58,15 @@ export const getAllTeamUserRulesConfigPath = () => {
   ];
 };
 export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
+  return getTeamUserRuleAllConfigsPath.push(ruleOrGroupId);
+};
+export const getTeamUserRuleAllConfigsPath = () => {
   return [
     "teamSync",
     window.currentlyActiveWorkspaceTeamId,
     "userConfig",
     window.uid,
     "rulesConfig",
-    ruleOrGroupId,
   ];
 };
 
@@ -200,12 +202,13 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
     if (window.currentlyActiveWorkspaceTeamId) {
       const syncRuleStatus = localStorage.getItem("syncRuleStatus") || false;
       // Get current values from local storage and use them xD
+      const personalRuleConfigs = await getValueAsPromise(
+        getTeamUserRuleAllConfigsPath()
+      );
       for (const objectId in remoteRecords) {
         // Get a copy of user's own value
         try {
-          const ownRuleConfig = await getValueAsPromise(
-            getTeamUserRuleConfigPath(objectId)
-          );
+          const ownRuleConfig = personalRuleConfigs[objectId];
 
           // Key - "isFavourite"
           if (
@@ -229,7 +232,6 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
         }
       }
     }
-
     const recordsArr = processRecordsObjectIntoArray(remoteRecords);
     return recordsArr;
   } catch (e) {
@@ -281,14 +283,14 @@ export const syncToLocalFromFirebase = async (
     allSyncedRecords = processRecordsArrayIntoObject(allSyncedRecords);
     const syncRuleStatus =
       localStorage.getItem("syncRuleStatus") === "true" || false;
-
+    const personalRuleConfigs = await getValueAsPromise(
+      getAllTeamUserRulesConfigPath()
+    );
     // Get current values from local storage and use them xD
     for (const objectId in allSyncedRecords) {
       // Get a copy of user's own value
       try {
-        const ownRuleConfig = await getValueAsPromise(
-          getTeamUserRuleConfigPath(objectId)
-        );
+        const ownRuleConfig = personalRuleConfigs[objectId];
 
         // Key - "isFavourite"
         if (

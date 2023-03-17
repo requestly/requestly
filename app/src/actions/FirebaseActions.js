@@ -30,8 +30,6 @@ import {
 import md5 from "md5";
 import isEmpty from "is-empty";
 import { v4 as uuidv4 } from "uuid";
-// GLOBAL CONSTANTS
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { setEmailVerified, setSignupDate } from "../utils/AuthUtils";
 import { getDesktopSignInAuthPath } from "../utils/PathUtils";
