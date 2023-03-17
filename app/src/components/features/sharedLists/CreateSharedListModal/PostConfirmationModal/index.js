@@ -16,18 +16,25 @@ import {
 import { trackRQLastActivity } from "../../../../../utils/AnalyticsUtils";
 import { Typography } from "antd";
 import { getSharedListURL } from "utils/PathUtils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { redirectToSharedList } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 export const PostConfirmationModal = ({
   sharedListAttributes,
   onSharedListCreation,
 }) => {
+  const navigate = useNavigate();
+
+  const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+
   const [createdSharedListId, setCreatedSharedListId] = useState(null);
   const [sharedListPublicURL, setSharedListPublicURL] = useState("");
   const [sharedListData, setSharedListData] = useState("");
   const [sharedListCreationDone, setSharedListCreationDone] = useState(false);
   const [nonRQUserEmails, setNonRQUserEmails] = useState([]);
 
-  const user = useSelector(getUserAuthDetails);
   const rulesCount = sharedListAttributes.rulesCount;
   const sharedListAccessType =
     Visibility.PUBLIC === sharedListAttributes.sharedListVisibility
@@ -107,7 +114,8 @@ export const PostConfirmationModal = ({
           sharedListAttributes.groupwiseRulesToPopulate,
           sharedListAttributes.sharedListVisibility,
           sharedListAttributes.sharedListRecipients,
-          user.details.profile.uid
+          user.details.profile.uid,
+          workspace?.id
         ).then(
           ({ sharedListId, sharedListName, sharedListData, nonRQEmails }) => {
             stablePostCreationSteps({
@@ -135,6 +143,7 @@ export const PostConfirmationModal = ({
     stablePostCreationSteps,
     sharedListAccessType,
     user.details.profile,
+    workspace,
   ]);
 
   useEffect(() => {
@@ -187,13 +196,9 @@ export const PostConfirmationModal = ({
           </div>
           <Typography align="center">
             You can view previously created links{" "}
-            <a
-              href="https://app.requestly.io/shared-lists/my-lists"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Typography.Link onClick={() => redirectToSharedList(navigate)}>
               here
-            </a>
+            </Typography.Link>
           </Typography>
           {nonRQUserEmails.length ? (
             <div

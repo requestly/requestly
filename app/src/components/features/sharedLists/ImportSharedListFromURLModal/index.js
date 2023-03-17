@@ -26,8 +26,8 @@ const ImportSharedListFromURLModal = ({ isOpen, toggle }) => {
     }
     const sharedListName = getSharedListNameFromUrl(inputURL);
 
-    fetchSharedListData(sharedListId).then((incomingData) => {
-      if (incomingData !== null) {
+    fetchSharedListData(sharedListId).then((result) => {
+      if (result.data.success && result.data.sharedList) {
         redirectToSharedListViewer(navigate, sharedListId, sharedListName);
       } else {
         message.error("Shared List does not exist");

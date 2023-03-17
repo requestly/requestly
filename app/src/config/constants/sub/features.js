@@ -55,6 +55,7 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 // WORKSPACES
 FEATURES.WORKSPACES = "workspaces";
 FEATURES.WORKSPACE_MOCKS = "teams-mocks";
+FEATURES.WORKSPACE_SHARED_LISTS = "teams-shared-lists";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 
 // PERSONA SURVEY

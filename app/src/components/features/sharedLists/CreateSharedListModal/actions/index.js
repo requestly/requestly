@@ -8,6 +8,7 @@ import { getRulesAndGroupsFromRuleIds } from "../../../../../utils/rules/misc";
 // import DataStoreUtils from "../../../../../utils/DataStoreUtils";
 // import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { getOwnerId } from "backend/mocks/common";
 
 export const createSharedList = (
   appMode,
@@ -16,8 +17,10 @@ export const createSharedList = (
   groupwiseRules,
   sharedListVisibility,
   sharedListRecipients,
-  uid
+  uid,
+  teamId
 ) => {
+  const ownerId = getOwnerId(uid, teamId);
   return new Promise((resolve) => {
     //Fetch rules and groups that would be stored in this shared list
     getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare, groupwiseRules).then(
@@ -27,7 +30,7 @@ export const createSharedList = (
           children: [],
         }));
 
-        generateSharedList({
+        generateSharedList(ownerId, {
           rules,
           updatedGroups,
           sharedListName,
@@ -48,6 +51,7 @@ export const createSharedList = (
   });
 };
 
+/* currently not used anywhere */
 export const modifySharedList = async (
   listProperty,
   updatedValue,
@@ -62,9 +66,9 @@ export const modifySharedList = async (
   });
 };
 
-const generateSharedList = async (sharedListData) => {
+const generateSharedList = async (ownerId, sharedListData) => {
   const functions = getFunctions();
   const createSharedList = httpsCallable(functions, "sharedLists-create");
-  const res = await createSharedList(sharedListData);
+  const res = await createSharedList({ ownerId, sharedListData });
   return res.data;
 };

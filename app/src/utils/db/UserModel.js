@@ -12,12 +12,12 @@ const FIREBASE_NODES = {
   FILES: "files",
 };
 
-export const getUserNodePath = (uid) => {
-  return uid ? [FIREBASE_NODES.USERS, uid] : null;
+export const getOwnerNodePath = (ownerId) => {
+  return ownerId ? [FIREBASE_NODES.USERS, ownerId] : null;
 };
 
-export const getUserSharedListsPath = (uid) => {
-  var currentUserPath = getUserNodePath(uid);
+export const getSharedListsPath = (ownerId) => {
+  var currentUserPath = getOwnerNodePath(ownerId);
   if (currentUserPath) {
     currentUserPath.push(FIREBASE_NODES.SHARED_LISTS);
   }
@@ -25,7 +25,7 @@ export const getUserSharedListsPath = (uid) => {
 };
 
 export const getSpecificUserSharedListPath = (userId, sharedListId) => {
-  return getUserSharedListsPath(userId).concat(sharedListId);
+  return getSharedListsPath(userId).concat(sharedListId);
 };
 
 export const getPublicSharedListPath = (sharedListId) => {

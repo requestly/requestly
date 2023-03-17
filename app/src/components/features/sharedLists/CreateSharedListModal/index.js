@@ -27,6 +27,7 @@ import { Visibility } from "utils/sharedListUtils";
 
 import { trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const CreateSharedListModal = (props) => {
   const { toggle: toggleModal, isOpen, rulesToShare } = props;
@@ -36,6 +37,7 @@ const CreateSharedListModal = (props) => {
   const dispatch = useDispatch();
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
@@ -275,38 +277,44 @@ const CreateSharedListModal = (props) => {
       <React.Fragment>
         <Row>
           <Col span={24}>
-            <Radio.Group
-              value={sharedListVisibility}
-              onChange={handleVisibilityChange}
-            >
-              <Space direction="vertical">
-                {allOptions.map((option) => {
-                  return (
-                    <Col
-                      span={24}
-                      className="radio-share-option"
-                      key={option.key}
-                    >
-                      <Radio disabled={option.disabled} value={option.key}>
-                        {renderHeroIcon(option.key)} {option.label}
-                        {option.tag && (
-                          <Tag style={{ marginLeft: "0.5rem" }}>
-                            {option.tag}
-                          </Tag>
+            {/*temporarily hiding selective sharing for workspaces*/}
+            {!workspace?.id ? (
+              <Radio.Group
+                value={sharedListVisibility}
+                onChange={handleVisibilityChange}
+              >
+                <Space direction="vertical">
+                  {allOptions.map((option) => {
+                    return (
+                      <Col
+                        span={24}
+                        className="radio-share-option"
+                        key={option.key}
+                      >
+                        <Radio disabled={option.disabled} value={option.key}>
+                          {renderHeroIcon(option.key)} {option.label}
+                          {option.tag && (
+                            <Tag style={{ marginLeft: "0.5rem" }}>
+                              {option.tag}
+                            </Tag>
+                          )}
+                        </Radio>
+                        {sharedListVisibility === option.key && (
+                          <div className="share-option-description">
+                            <p className="hp-p1-body hp-text-color-black-60">
+                              {getPrettyDescription(option.key)}
+                            </p>
+                          </div>
                         )}
-                      </Radio>
-                      {sharedListVisibility === option.key && (
-                        <div className="share-option-description">
-                          <p className="hp-p1-body hp-text-color-black-60">
-                            {getPrettyDescription(option.key)}
-                          </p>
-                        </div>
-                      )}
-                    </Col>
-                  );
-                })}
-              </Space>
-            </Radio.Group>
+                      </Col>
+                    );
+                  })}
+                </Space>
+              </Radio.Group>
+            ) : (
+              // todo: Needs design improvements
+              <p> Anyone in the workspace can access this list</p>
+            )}
             {renderModalFooter({
               showConfirmationBtn: false,
               showNotifyBtn: true,
@@ -321,6 +329,7 @@ const CreateSharedListModal = (props) => {
             }}
           >
             <Col align="center" span={24}>
+              {/* todo: broken email input. Can refer `ShareRecordingModal` for existing fix */}
               <CreatableSelect
                 components={{ DropdownIndicator: null }}
                 inputValue={permittedEmailValue}

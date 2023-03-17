@@ -550,7 +550,10 @@ const RulesTable = ({
       })
     );
 
-    fetchSharedLists(user.details.profile.uid).then((result) => {
+    fetchSharedLists(
+      user.details.profile.uid,
+      currentlyActiveWorkspace?.id
+    ).then((_result) => {
       //Continue creating new shared list
       setSharedListModalRuleIDs([rule.id]);
       setIsShareRulesModalActive(true);

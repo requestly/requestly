@@ -15,6 +15,7 @@ import { actions } from "store";
 const DeleteSharedListModal = ({
   sharedListIdsToDeleteArray,
   userId,
+  workspaceId,
   isOpen,
   toggle,
 }) => {
@@ -125,14 +126,15 @@ const DeleteSharedListModal = ({
   const doDeleteSharedLists = (cb) => {
     const allPromises = [];
     sharedListIdsToDeleteArray.forEach((sharedListId) => {
-      allPromises.push(deleteSharedList(sharedListId, dispatch));
+      allPromises.push(deleteSharedList(userId, workspaceId, sharedListId));
     });
     return Promise.all(allPromises);
   };
 
   const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [
-    dispatch,
     sharedListIdsToDeleteArray,
+    userId,
+    workspaceId,
   ]);
 
   const updateCurrentlySelectedLists = (dispatch, newValue) => {

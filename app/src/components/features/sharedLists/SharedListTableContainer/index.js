@@ -31,6 +31,7 @@ import {
   trackSharedListUrlCopied,
 } from "modules/analytics/events/features/sharedList";
 import { getSharedListURL } from "utils/PathUtils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const { Link } = Typography;
 const Search = Input.Search;
@@ -38,6 +39,7 @@ const Search = Input.Search;
 const SharedListTableContainer = ({ sharedLists }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
 
   // Component State
@@ -162,27 +164,28 @@ const SharedListTableContainer = ({ sharedLists }) => {
         return moment(dateToDisplay).format("MMM DD, YYYY");
       },
     },
-    {
-      title: "Imported",
-      align: "center",
-      width: "12%",
-      responsive: ["xl"],
-      dataIndex: "importCount",
-      render: (_, record) => {
-        if (Object.prototype.hasOwnProperty.call(record, "importCount")) {
-          if (record.importCount > 1) {
-            let e = record.importCount + " times";
-            return e;
-          } else {
-            let e = "Not yet";
-            return e;
-          }
-        } else {
-          let e = "Not yet";
-          return e;
-        }
-      },
-    },
+    /* todo fix: SHARED LIST IMPORT COUNT DOES NOT WORK */
+    // {
+    //   title: "Imported",
+    //   align: "center",
+    //   width: "12%",
+    //   responsive: ["xl"],
+    //   dataIndex: "importCount",
+    //   render: (_, record) => {
+    //     if (Object.prototype.hasOwnProperty.call(record, "importCount")) {
+    //       if (record.importCount > 1) {
+    //         let e = record.importCount + " times";
+    //         return e;
+    //       } else {
+    //         let e = "Not yet";
+    //         return e;
+    //       }
+    //     } else {
+    //       let e = "Not yet";
+    //       return e;
+    //     }
+    //   },
+    // },
 
     {
       title: "Actions",
@@ -303,7 +306,8 @@ const SharedListTableContainer = ({ sharedLists }) => {
           isOpen={isDeleteSharedListModalActive}
           toggle={toggleDeleteSharedListModal}
           sharedListIdsToDeleteArray={sharedListsToDeleteIdArray}
-          userId={user.details.profile.uid}
+          userId={user?.details?.profile?.uid}
+          workspaceId={workspace?.id}
         />
       ) : null}
       {isImportSharedListFromURLModalVisible ? (
