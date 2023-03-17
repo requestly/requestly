@@ -15,7 +15,6 @@ import {
   UsergroupAddOutlined,
   GroupOutlined,
   SearchOutlined,
-  UserOutlined,
   DownOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
@@ -27,7 +26,6 @@ import {
   Switch,
   Input,
   Empty,
-  Avatar,
   Dropdown,
   Menu,
 } from "antd";
@@ -67,6 +65,7 @@ import { copyRule } from "../../actions/someMoreActions";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { UserIcon } from "components/common/UserIcon";
 import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -85,7 +84,6 @@ import {
 } from "modules/analytics/events/common/rules";
 import {
   getCurrentlyActiveWorkspace,
-  getCurrentlyActiveWorkspaceMembers,
   getIsWorkspaceMode,
 } from "store/features/teams/selectors";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
@@ -192,9 +190,6 @@ const RulesTable = ({
   const rulesSelection = useSelector(getRulesSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspaceMembers = useSelector(
-    getCurrentlyActiveWorkspaceMembers
-  );
 
   const selectedRules = getSelectedRules(rulesSelection);
 
@@ -625,28 +620,6 @@ const RulesTable = ({
     selectedRowKeys,
     onChange: onSelectChange,
     checkStrictly: false,
-  };
-
-  const BlankIcon = () => (
-    <Tooltip title="Anonymous">
-      <Avatar size={22} icon={<UserOutlined />} />
-    </Tooltip>
-  );
-
-  const UserIcon = (props) => {
-    const { uid } = props;
-    if (uid && currentlyActiveWorkspaceMembers[uid])
-      return (
-        <>
-          <Tooltip title={currentlyActiveWorkspaceMembers[uid]?.displayName}>
-            <Avatar
-              size={24}
-              src={currentlyActiveWorkspaceMembers[uid]?.photoUrl}
-            />
-          </Tooltip>
-        </>
-      );
-    else return <BlankIcon />;
   };
 
   const LastModified = (props) => {

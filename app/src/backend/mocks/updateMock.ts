@@ -38,7 +38,7 @@ export const updateMock = async (
     });
   }
 
-  const success = await updateMockFromFirebase(mockId, mockData).catch(
+  const success = await updateMockFromFirebase(uid, mockId, mockData).catch(
     () => false
   );
 
@@ -54,6 +54,7 @@ export const updateMock = async (
 };
 
 export const updateMockFromFirebase = async (
+  updaterId: string,
   mockId: string,
   mockData: RQMockSchema
 ): Promise<boolean> => {
@@ -61,6 +62,7 @@ export const updateMockFromFirebase = async (
   const docRef = doc(db, "mocks", mockId);
 
   const success = await updateDoc(docRef, {
+    lastUpdatedBy: updaterId,
     ...mockData,
     updatedTs: Timestamp.now().toMillis(),
   })
