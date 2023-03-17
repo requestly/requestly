@@ -102,5 +102,5 @@ const updateResponseFilePath = async (
     return null;
   });
 
-  await updateMockFromFirebase(mockData.id, mockData, uid);
+  await updateMockFromFirebase(uid, mockData.id, mockData);
 };

@@ -189,7 +189,7 @@ const MocksTable: React.FC<Props> = ({
               (record.isOldMock ? "." : "")}{" "}
             {isWorkspaceMode && (
               <>
-                by <UserIcon uid={record.lastModifiedBy ?? record.createdBy} />
+                by <UserIcon uid={record.lastUpdatedBy ?? record.createdBy} />
               </>
             )}
           </>
@@ -282,6 +282,7 @@ const MocksTable: React.FC<Props> = ({
   ];
 
   if (!isWorkspaceMode) {
+    //remove created by column from mock table in private workspace
     columns.splice(3, 1);
   }
 

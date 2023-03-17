@@ -38,7 +38,7 @@ export const updateMock = async (
     });
   }
 
-  const success = await updateMockFromFirebase(mockId, mockData, uid).catch(
+  const success = await updateMockFromFirebase(uid, mockId, mockData).catch(
     () => false
   );
 
@@ -54,15 +54,15 @@ export const updateMock = async (
 };
 
 export const updateMockFromFirebase = async (
+  updaterId: string,
   mockId: string,
-  mockData: RQMockSchema,
-  uid: string
+  mockData: RQMockSchema
 ): Promise<boolean> => {
   const db = getFirestore(firebaseApp);
   const docRef = doc(db, "mocks", mockId);
 
   const success = await updateDoc(docRef, {
-    lastModifiedBy: uid,
+    lastUpdatedBy: updaterId,
     ...mockData,
     updatedTs: Timestamp.now().toMillis(),
   })
