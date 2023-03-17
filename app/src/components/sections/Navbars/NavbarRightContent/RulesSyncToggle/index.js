@@ -7,7 +7,6 @@ import { MdSyncDisabled, MdSync } from "react-icons/md";
 import { actions } from "store";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { toast } from "../../../../../utils/Toast";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { AUTH } from "modules/analytics/events/common/constants";
 
