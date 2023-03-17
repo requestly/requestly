@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { Input, Row } from "antd";
@@ -23,13 +23,12 @@ const {
   },
 } = APP_CONSTANTS;
 
-const requestPayload = {
-  key: "graphql_request_payload_key",
-  value: "graphql_request_payload_value",
-};
+type RequestPayload = { key: string; value: string };
 
 interface GraphqlRequestPayloadProps {
   pairIndex: number;
+  payloadBackup: RequestPayload;
+  setPayloadBackup: (payload: RequestPayload) => void;
   modifyPairAtGivenPath: (
     e: React.ChangeEvent<HTMLInputElement>,
     pairIndex: number,
@@ -42,77 +41,75 @@ interface GraphqlRequestPayloadProps {
 
 const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   pairIndex,
+  payloadBackup,
+  setPayloadBackup,
   modifyPairAtGivenPath = () => {},
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const ruleId = currentlySelectedRuleData.id;
-  const requestPayloadKey = `${requestPayload.key}_${ruleId}`;
-  const requestPayloadValue = `${requestPayload.value}_${ruleId}`;
   const isRequestPayloadFilterCompatible = isFeatureCompatible(
     FEATURES.REQUEST_PAYLOAD_FILTER
   );
+  const currentPayloadKey = useMemo(
+    () =>
+      getObjectValue(
+        currentlySelectedRuleData,
+        pairIndex,
+        SOURCE_REQUEST_PAYLOAD_KEY
+      ),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const currentPayloadValue = useMemo(
+    () =>
+      getObjectValue(
+        currentlySelectedRuleData,
+        pairIndex,
+        SOURCE_REQUEST_PAYLOAD_VALUE
+      ),
+    [pairIndex, currentlySelectedRuleData]
+  );
 
   const [payloadKey, setPayloadKey] = useState<string>(
-    localStorage.getItem(requestPayloadKey) ?? ""
+    payloadBackup?.key ?? ""
   );
   const [payloadValue, setPayloadValue] = useState<string>(
-    localStorage.getItem(requestPayloadValue) ?? ""
+    payloadBackup?.value ?? ""
   );
 
-  // update local state if request payload is
-  // modified from source filter dialog
   useEffect(() => {
-    const payloadKey = getObjectValue(
-      currentlySelectedRuleData,
-      pairIndex,
-      SOURCE_REQUEST_PAYLOAD_KEY
-    );
-
-    const payloadValue = getObjectValue(
-      currentlySelectedRuleData,
-      pairIndex,
-      SOURCE_REQUEST_PAYLOAD_VALUE
-    );
-
     if (payloadKey && payloadValue) {
-      localStorage.setItem(requestPayloadKey, payloadKey);
-      localStorage.setItem(requestPayloadValue, payloadValue);
+      setPayloadBackup({ key: payloadKey, value: payloadValue });
     }
-
-    setPayloadKey(payloadKey);
-    setPayloadValue(payloadValue);
-  }, [
-    pairIndex,
-    requestPayloadKey,
-    requestPayloadValue,
-    currentlySelectedRuleData,
-  ]);
+  }, [payloadKey, payloadValue, setPayloadBackup]);
 
   useEffect(() => {
-    const payloadKey = localStorage.getItem(requestPayloadKey) ?? "";
-    const payloadValue = localStorage.getItem(requestPayloadValue) ?? "";
+    if (!payloadBackup) return;
 
-    setPayloadKey(payloadKey);
-    setPayloadValue(payloadValue);
-
-    if (payloadKey && payloadValue)
+    if (payloadBackup.key && payloadBackup.value)
       modifyPairAtGivenPath(
         null,
         pairIndex,
         SOURCE_REQUEST_PAYLOAD_KEY,
-        payloadKey,
+        payloadBackup.key,
         [
           {
             path: "source.filters[0].requestPayload.value",
-            value: payloadValue,
+            value: payloadBackup.value,
           },
         ],
         false
       );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestPayloadKey, requestPayloadValue]);
+  }, [payloadBackup]);
+
+  useEffect(() => {
+    if (currentPayloadKey && currentPayloadValue) {
+      setPayloadKey(currentPayloadKey);
+      setPayloadValue(currentPayloadValue);
+    }
+  }, [currentPayloadKey, currentPayloadValue]);
 
   const clearRequestPayload = () => {
     deleteObjectAtPath(
@@ -124,30 +121,36 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  const handleModifyPair = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    payloadPath: string
+  const handleRequestPayloadKeyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    modifyPairAtGivenPath(e, pairIndex, payloadPath);
+    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
     const value = e.target.value;
 
     if (value === "") {
       clearRequestPayload();
-      setPayloadKey("");
-      setPayloadValue("");
     }
 
-    if (payloadPath === SOURCE_REQUEST_PAYLOAD_KEY) {
-      setPayloadKey(value);
-      trackRequestPayloadKeyFilterModifiedEvent(
-        currentlySelectedRuleData.ruleType
-      );
-    } else {
-      setPayloadValue(value);
-      trackRequestPayloadValueFilterModifiedEvent(
-        currentlySelectedRuleData.ruleType
-      );
+    setPayloadKey(value);
+    trackRequestPayloadKeyFilterModifiedEvent(
+      currentlySelectedRuleData.ruleType
+    );
+  };
+
+  const handleRequestPayloadValueChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
+    const value = e.target.value;
+
+    if (value === "") {
+      clearRequestPayload();
     }
+
+    setPayloadValue(value);
+    trackRequestPayloadValueFilterModifiedEvent(
+      currentlySelectedRuleData.ruleType
+    );
   };
 
   return isRequestPayloadFilterCompatible ? (
@@ -171,7 +174,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           placeholder="key"
           className="graphql-operation-type-input"
           value={payloadKey}
-          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_KEY)}
+          onChange={handleRequestPayloadKeyChange}
         />
         <Input
           name="value"
@@ -180,7 +183,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           placeholder="value"
           className="graphql-operation-type-name"
           value={payloadValue}
-          onChange={(e) => handleModifyPair(e, SOURCE_REQUEST_PAYLOAD_VALUE)}
+          onChange={handleRequestPayloadValueChange}
         />
       </Row>
     </>

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Row, Col } from "antd";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
@@ -17,6 +17,7 @@ const ResponseRulePair = ({
   isInputDisabled,
   responseRuleResourceType = "",
 }) => {
+  const [payloadBackup, setPayloadBackup] = useState(null);
   const canOverrideStatus = useMemo(() => {
     return (
       isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) &&
@@ -44,6 +45,8 @@ const ResponseRulePair = ({
           <Col span={12}>
             <GraphqlRequestPayload
               pairIndex={pairIndex}
+              payloadBackup={payloadBackup}
+              setPayloadBackup={setPayloadBackup}
               modifyPairAtGivenPath={helperFunctions?.modifyPairAtGivenPath}
             />
           </Col>
