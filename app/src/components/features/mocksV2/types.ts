@@ -20,6 +20,7 @@ export interface RQMockMetadataSchema extends MockMetadataSchema {
   oldMockFilePath?: string;
   url?: string;
   createdBy?: string;
+  lastModifiedBy?: string;
 }
 
 export interface RQMockSchema extends MockSchema, RQMockMetadataSchema {}

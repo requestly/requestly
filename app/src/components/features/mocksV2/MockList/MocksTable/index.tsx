@@ -31,7 +31,10 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import "../../../../../styles/custom/RQTable.css";
 import "./index.css";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  getCurrentlyActiveWorkspace,
+  getIsWorkspaceMode,
+} from "store/features/teams/selectors";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
@@ -59,6 +62,7 @@ const MocksTable: React.FC<Props> = ({
   handleDeleteAction,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
@@ -180,8 +184,15 @@ const MocksTable: React.FC<Props> = ({
       valueType: "date",
       render: (_: any, record: RQMockMetadataSchema) => {
         return (
-          moment(record.updatedTs).format("MMM DD, YYYY") +
-          (record.isOldMock ? "." : "")
+          <>
+            {moment(record.updatedTs).format("MMM DD, YYYY") +
+              (record.isOldMock ? "." : "")}{" "}
+            {isWorkspaceMode && (
+              <>
+                by <UserIcon uid={record.lastModifiedBy ?? record.createdBy} />
+              </>
+            )}
+          </>
         );
       },
     },
@@ -269,6 +280,10 @@ const MocksTable: React.FC<Props> = ({
       },
     },
   ];
+
+  if (!isWorkspaceMode) {
+    columns.splice(3, 1);
+  }
 
   const handleSearch = (searchQuery: string) => {
     if (searchQuery) {
