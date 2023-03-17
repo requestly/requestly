@@ -16,6 +16,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { IoMdLink } from "react-icons/io";
+import { UserIcon } from "components/common/UserIcon";
 
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -154,6 +155,16 @@ const MocksTable: React.FC<Props> = ({
             {"/" + record.endpoint}
           </Typography.Text>
         );
+      },
+    },
+    {
+      title: <div className="rq-col-title">Created by</div>,
+      width: "auto",
+      responsive: ["lg"],
+      className: "text-gray mock-table-user-icon",
+      textAlign: "center",
+      render: (_: any, record: RQMockMetadataSchema) => {
+        return <UserIcon uid={record.createdBy} />;
       },
     },
     {
