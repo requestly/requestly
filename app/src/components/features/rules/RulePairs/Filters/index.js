@@ -35,6 +35,7 @@ import {
   trackRequestPayloadValueFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
+import { ResponseRuleResourceType } from "types/rules";
 
 const { Text, Link } = Typography;
 
@@ -93,18 +94,10 @@ const Filters = (props) => {
   };
 
   const hasLegacyPayloadFilter = () => {
-    const requestPayload =
-      currentlySelectedRuleData?.pairs?.[pairIndex].source?.filters?.[0]
-        ?.requestPayload;
-
-    if (requestPayload?.key && requestPayload?.value) {
-      return (
-        new Date(currentlySelectedRuleData.modificationDate) <
-        new Date("Thu Mar 16 2023 11:49:04 GMT+0530") // date of new Modify response rule UI release
-      );
-    }
-
-    return false;
+    return (
+      ResponseRuleResourceType.UNKNOWN ===
+      currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType
+    );
   };
 
   const isRequestPayloadFilterCompatible =
