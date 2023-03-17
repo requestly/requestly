@@ -36,8 +36,19 @@ import {
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
+import { debounce } from "lodash";
 
 const { Text, Link } = Typography;
+
+const debouncedTrackPayloadKeyModifiedEvent = debounce(
+  trackRequestPayloadKeyFilterModifiedEvent,
+  500
+);
+
+const debouncedTrackPayloadValueModifiedEvent = debounce(
+  trackRequestPayloadValueFilterModifiedEvent,
+  500
+);
 
 const RESOURCE_TYPE_OPTIONS = [
   { label: "All (default)", value: "all", isDisabled: true },
@@ -174,14 +185,10 @@ const Filters = (props) => {
     trackRequestMethodFilterModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.KEY = () => {
-    trackRequestPayloadKeyFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
+    debouncedTrackPayloadKeyModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.VALUE = () => {
-    trackRequestPayloadValueFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
+    debouncedTrackPayloadValueModifiedEvent(currentlySelectedRuleData.ruleType);
   };
 
   const urlOperatorOptions = (

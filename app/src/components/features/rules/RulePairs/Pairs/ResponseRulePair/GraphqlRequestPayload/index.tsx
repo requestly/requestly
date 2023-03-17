@@ -9,6 +9,7 @@ import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import getObjectValue from "../../../Filters/actions/getObjectValue";
+import { debounce } from "lodash";
 import {
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
@@ -22,6 +23,16 @@ const {
     SOURCE_REQUEST_PAYLOAD_VALUE,
   },
 } = APP_CONSTANTS;
+
+const debouncedTrackPayloadKeyModifiedEvent = debounce(
+  trackRequestPayloadKeyFilterModifiedEvent,
+  500
+);
+
+const debouncedTrackPayloadValueModifiedEvent = debounce(
+  trackRequestPayloadValueFilterModifiedEvent,
+  500
+);
 
 type RequestPayload = { key: string; value: string };
 
@@ -132,9 +143,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     }
 
     setPayloadKey(value);
-    trackRequestPayloadKeyFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
+    debouncedTrackPayloadKeyModifiedEvent(currentlySelectedRuleData.ruleType);
   };
 
   const handleRequestPayloadValueChange = (
@@ -148,9 +157,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     }
 
     setPayloadValue(value);
-    trackRequestPayloadValueFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
-    );
+    debouncedTrackPayloadValueModifiedEvent(currentlySelectedRuleData.ruleType);
   };
 
   return isRequestPayloadFilterCompatible ? (

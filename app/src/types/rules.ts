@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ExtensionRule } from "modules/extension/types";
 
 export enum ObjectType {
