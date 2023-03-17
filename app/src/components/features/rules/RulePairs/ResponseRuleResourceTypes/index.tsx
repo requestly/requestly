@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Popconfirm, Radio, Tooltip } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -46,12 +46,12 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     setResponseTypePopupVisible,
   ] = useState<boolean>(false);
 
-  const filters =
+  const requestPayloadFilter =
     currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
   const isPopConfirmDisabled =
     currentResourceType !== ResponseRuleResourceType.GRAPHQL_API ||
-    Object.keys(filters ?? {}).length === 0;
+    Object.keys(requestPayloadFilter ?? {}).length === 0;
 
   useEffect(() => {
     if (currentResourceType) {
@@ -59,33 +59,45 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     }
   }, [currentResourceType, setResponseRuleResourceType]);
 
-  const updateResourceType = (
-    resourceType: ResponseRuleResourceType,
-    clearGraphqlRequestPayload = false
-  ) => {
-    const pairIndex = 0; // response rule will only have one pair
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
+  const updateResourceType = useCallback(
+    (
+      resourceType: ResponseRuleResourceType,
+      clearGraphqlRequestPayload = false
+    ) => {
+      const pairIndex = 0; // response rule will only have one pair
+      const copyOfCurrentlySelectedRule = JSON.parse(
+        JSON.stringify(currentlySelectedRuleData)
+      );
 
-    let updatedPair = set(
-      copyOfCurrentlySelectedRule.pairs[pairIndex],
-      "response.resourceType",
-      resourceType
-    );
+      let updatedPair = set(
+        copyOfCurrentlySelectedRule.pairs[pairIndex],
+        "response.resourceType",
+        resourceType
+      );
 
-    if (clearGraphqlRequestPayload) {
-      // clear graphql request payload on resource type change
-      updatedPair = omit(updatedPair, ["source.filters[0].requestPayload"]);
-    }
+      if (clearGraphqlRequestPayload) {
+        // clear graphql request payload on resource type change
+        updatedPair = omit(updatedPair, ["source.filters[0].requestPayload"]);
+      }
 
-    const updatedRule = {
-      ...currentlySelectedRuleData,
-      pairs: [{ ...updatedPair }],
-    };
+      const updatedRule = {
+        ...currentlySelectedRuleData,
+        pairs: [{ ...updatedPair }],
+      };
 
-    setCurrentlySelectedRule(dispatch, updatedRule, true);
-  };
+      setCurrentlySelectedRule(dispatch, updatedRule, true);
+    },
+    [dispatch, currentlySelectedRuleData]
+  );
+
+  const isNewResponseRule = !!currentResourceType;
+
+  useEffect(() => {
+    if (isNewResponseRule) return;
+
+    // legacy rules will have "unknown" resource type
+    updateResourceType(ResponseRuleResourceType.UNKNOWN);
+  }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
   const handleOnConfirm = () => {
     const clearGraphqlRequestPayload =
@@ -108,7 +120,8 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     setResourceType(type);
   };
 
-  return (
+  return isNewResponseRule &&
+    currentResourceType !== ResponseRuleResourceType.UNKNOWN ? (
     <div className="resource-types-container">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
@@ -159,7 +172,7 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
         </Popconfirm>
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default ResponseRuleResourceTypes;

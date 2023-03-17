@@ -64,7 +64,7 @@ export enum ResponseRuleBodyType {
 }
 
 export enum ResponseRuleResourceType {
-  UNKNOWN = "",
+  UNKNOWN = "unknown",
   REST_API = "restApi",
   GRAPHQL_API = "graphqlApi",
   STATIC = "static", //  HTML / JS / CSS
