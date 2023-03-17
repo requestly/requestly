@@ -61,10 +61,11 @@ const useDatabase = () => {
   useEffect(() => {
     if (hasAuthStateChanged || !window.isFirstSyncComplete) {
       dispatch(actions.updateIsRulesListLoading(true));
+
       // just to safe
       setTimeout(() => {
         dispatch(actions.updateIsRulesListLoading(false));
-      }, 6000);
+      }, 30 * 1000);
     }
 
     if (window.unsubscribeSyncingNodeRef.current)
