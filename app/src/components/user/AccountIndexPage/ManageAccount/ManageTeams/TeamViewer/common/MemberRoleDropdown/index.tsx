@@ -1,24 +1,30 @@
 import React, { useMemo, useState } from "react";
 import { Divider, Dropdown, DropDownProps, Menu, Spin, Typography } from "antd";
-import "./MemberRoleDropdown.css";
 import { LoadingOutlined } from "@ant-design/icons";
+import "./MemberRoleDropdown.css";
 
 interface MemberRoleDropdownProps extends DropDownProps {
   isAdmin: boolean;
   isHoverEffect?: boolean;
   showLoader?: boolean;
+  isLoggedInUserAdmin?: boolean;
+  memberId?: string;
+  loggedInUserId?: string;
   handleMemberRoleChange: (
     makeUserAdmin: boolean,
     updatedRole: "admin" | "user",
     setIsLoading: (status: boolean) => void
   ) => void;
-  handleRemoveMember?: () => void;
+  handleRemoveMember?: (isLeaveRequested?: boolean) => void;
 }
 
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   isAdmin,
   showLoader,
+  memberId,
+  loggedInUserId,
   isHoverEffect = false,
+  isLoggedInUserAdmin = false,
   handleMemberRoleChange,
   handleRemoveMember,
   ...props
@@ -30,6 +36,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
       <Menu className="dropdown-menu">
         <Menu.Item
           key="admin"
+          disabled={!!memberId && !isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
           onClick={() => handleMemberRoleChange(true, "admin", setIsLoading)}
         >
@@ -49,6 +56,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
         </Menu.Item>
         <Menu.Item
           key="member"
+          disabled={!!memberId && !isLoggedInUserAdmin}
           className="dropdown-access-type-menu-item"
           onClick={() => handleMemberRoleChange(false, "user", setIsLoading)}
         >
@@ -69,20 +77,46 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
 
         {handleRemoveMember ? (
           <>
-            <Divider className="member-role-dropdown" />
-            <Menu.Item key="remove" onClick={handleRemoveMember}>
-              <Typography.Text
-                type="danger"
-                className="remove-user-menu-item-text"
-              >
-                Remove from workspace
-              </Typography.Text>
-            </Menu.Item>
+            {memberId === loggedInUserId ? (
+              <>
+                <Divider className="member-role-dropdown" />
+                <Menu.Item
+                  key="remove"
+                  onClick={() => handleRemoveMember(true)}
+                >
+                  <Typography.Text
+                    type="danger"
+                    className="remove-user-menu-item-text"
+                  >
+                    Leave workspace
+                  </Typography.Text>
+                </Menu.Item>
+              </>
+            ) : isLoggedInUserAdmin ? (
+              <>
+                <Divider className="member-role-dropdown" />
+                <Menu.Item key="remove" onClick={() => handleRemoveMember()}>
+                  <Typography.Text
+                    type="danger"
+                    className="remove-user-menu-item-text"
+                  >
+                    Remove from workspace
+                  </Typography.Text>
+                </Menu.Item>
+              </>
+            ) : null}
           </>
         ) : null}
       </Menu>
     ),
-    [isAdmin, handleMemberRoleChange, handleRemoveMember]
+    [
+      isAdmin,
+      memberId,
+      loggedInUserId,
+      isLoggedInUserAdmin,
+      handleMemberRoleChange,
+      handleRemoveMember,
+    ]
   );
 
   return (
