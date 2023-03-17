@@ -1,4 +1,3 @@
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -62,10 +61,11 @@ const useDatabase = () => {
   useEffect(() => {
     if (hasAuthStateChanged || !window.isFirstSyncComplete) {
       dispatch(actions.updateIsRulesListLoading(true));
+
       // just to safe
       setTimeout(() => {
         dispatch(actions.updateIsRulesListLoading(false));
-      }, 6000);
+      }, 30 * 1000);
     }
 
     if (window.unsubscribeSyncingNodeRef.current)
