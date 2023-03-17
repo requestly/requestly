@@ -90,7 +90,8 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     [dispatch, currentlySelectedRuleData]
   );
 
-  const isNewResponseRule = !!currentResourceType;
+  const isNewResponseRule =
+    "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
 
   useEffect(() => {
     if (isNewResponseRule) return;
