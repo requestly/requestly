@@ -1,8 +1,6 @@
 //CONFIG
+import { getFunctions, httpsCallable } from "firebase/functions";
 import APP_CONSTANTS from "../../../../../config/constants";
-//UTILS
-import DataStoreUtils from "../../../../../utils/DataStoreUtils";
-import { getPublicSharedListPath } from "../../../../../utils/db/UserModel";
 
 //CONSTANTS
 const { PATHS } = APP_CONSTANTS;
@@ -24,8 +22,11 @@ export const getSharedListIdFromURL = (url) => {
 };
 
 export const fetchSharedListData = (sharedListId) => {
-  const publicSharedListPath = getPublicSharedListPath(sharedListId);
-  return DataStoreUtils.getValue(publicSharedListPath);
+  const getSharedListFromId = httpsCallable(
+    getFunctions(),
+    "sharedLists-getSharedListFromId"
+  );
+  return getSharedListFromId({ sharedListId });
 };
 
 export const getSharedListIdFromImportURL = (url) => {

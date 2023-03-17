@@ -19,8 +19,10 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
+import {
+  getCurrentlyActiveWorkspace,
+  getIsWorkspaceMode,
+} from "store/features/teams/selectors";
 import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
@@ -28,33 +30,48 @@ const TRACKING = APP_CONSTANTS.GA_EVENTS;
 const SharedListsIndexPage = () => {
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
   let isRefreshSharesListsPending = useSelector(getIsRefreshSharesListsPending);
+
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   //Component State
   const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
   const [loadingSharedLists, setLoadingSharedLists] = useState(true);
   const [sharedLists, setSharedLists] = useState({});
 
-  const updateCollection = (user) => {
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      setSharedLists(result);
-      setLoadingSharedLists(false);
-
-      //ANALYTICS
-      if (result)
-        submitAttrUtil(
-          TRACKING.ATTR.NUM_SHARED_LISTS,
-          Object.keys(result).length
-        );
-      //TO SET NUM OF SHARED LIST TO ZERO IF USER HAVE NOT MADE ANY OR HAVE DELETED ALL
-      if (!result) {
-        submitAttrUtil(TRACKING.ATTR.NUM_SHARED_LISTS, 0);
+  const updateCollection = () => {
+    fetchSharedLists(user?.details?.profile?.uid, workspace?.id).then(
+      (result) => {
+        console.log("res", result);
+        if (result.data.success) {
+          const sharedLists = result.data.sharedLists;
+          console.log("got lists", sharedLists);
+          setSharedLists(sharedLists);
+          setLoadingSharedLists(false);
+          //ANALYTICS
+          if (!isWorkspaceMode) {
+            // don't update user attribute when private workspace
+            if (sharedLists)
+              submitAttrUtil(
+                TRACKING.ATTR.NUM_SHARED_LISTS,
+                Object.keys(sharedLists).length
+              );
+            //TO SET NUM OF SHARED LIST TO ZERO IF USER HAVE NOT MADE ANY OR HAVE DELETED ALL
+            if (!sharedLists) {
+              submitAttrUtil(TRACKING.ATTR.NUM_SHARED_LISTS, 0);
+            }
+          }
+        }
       }
-    });
+    );
   };
 
-  const stableUpdateCollection = useCallback(updateCollection, []);
+  const stableUpdateCollection = useCallback(updateCollection, [
+    user,
+    workspace,
+    isWorkspaceMode,
+  ]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
@@ -73,17 +90,15 @@ const SharedListsIndexPage = () => {
 
   useEffect(() => {
     if (user.loggedIn && user.details.profile) {
-      stableUpdateCollection(user);
+      stableUpdateCollection();
     } else {
       setLoadingSharedLists(false);
     }
-  }, [user, stableUpdateCollection, isRefreshSharesListsPending]);
+  }, [user, stableUpdateCollection, isRefreshSharesListsPending, workspace]);
 
   if (!isExtensionEnabled) {
     return <ExtensionDeactivationMessage />;
   }
-
-  if (isWorkspaceMode) return <TeamFeatureComingSoon title="Shared lists" />;
 
   return loadingSharedLists ? (
     <SpinnerCard customLoadingMessage="Loading Shared Lists" />

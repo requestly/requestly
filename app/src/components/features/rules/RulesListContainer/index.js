@@ -41,6 +41,10 @@ import {
   trackUploadRulesButtonClicked,
 } from "modules/analytics/events/features/rules";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
+import {
+  getCurrentlyActiveWorkspace,
+  getIsWorkspaceMode,
+} from "store/features/teams/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -51,6 +55,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const dispatch = useDispatch();
   const rulesSelection = useSelector(getRulesSelection);
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
@@ -172,14 +178,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
   };
 
-  const getCurrentSharedListsCount = (result) => {
-    if (result) {
-      return Object.keys(result).length;
-    } else {
-      return 0;
-    }
-  };
-
   const verifySharedListsLimit = () => {
     //Continue creating new shared list
     setSelectedRules(getSelectedRules(rulesSelection));
@@ -242,21 +240,28 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     get false status on onboarding page */
 
     if (user && user.details && user.details.profile) {
-      fetchSharedLists(user.details.profile.uid).then((result) => {
-        const currentSharedListsCount = getCurrentSharedListsCount(result);
-        submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SHARED_LISTS,
-          currentSharedListsCount
-        );
-        if (currentSharedListsCount > 0) {
-          submitAttrUtil("iscreatesharedlisttask", true);
+      fetchSharedLists(user.details.profile.uid, workspace?.id).then(
+        (result) => {
+          if (result.data.success) {
+            if (!isWorkspaceMode) {
+              const currentSharedListsCount =
+                Object.keys(result.data.sharedLists).length || 0;
+              submitAttrUtil(
+                APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SHARED_LISTS,
+                currentSharedListsCount
+              );
+              if (currentSharedListsCount > 0) {
+                submitAttrUtil("iscreatesharedlisttask", true);
+              }
+            }
+          }
         }
-      });
+      );
     } else {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SHARED_LISTS, 0);
       submitAttrUtil("iscreatesharedlisttask", false);
     }
-  }, [allRules, availableRuleTypeArray, user]);
+  }, [allRules, availableRuleTypeArray, user, workspace, isWorkspaceMode]);
 
   //TO SET COUNT OF RULES MADE BY USER TO DISPLAY ON TOP OF RULES PAGE
   useEffect(() => {

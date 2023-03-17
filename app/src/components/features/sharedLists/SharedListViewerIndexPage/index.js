@@ -22,6 +22,7 @@ import "./sharedListViewerIndexPage.css";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 const SharedListViewerIndexPage = () => {
   //Global State
@@ -39,6 +40,8 @@ const SharedListViewerIndexPage = () => {
   const stableDispatch = useCallback(dispatch, [dispatch]);
 
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
+
+  console.log("sharedlistid", sharedListId);
 
   useEffect(() => {
     Logger.log("Reading storage (groups) in SharedListViewerIndexPage");
@@ -58,16 +61,22 @@ const SharedListViewerIndexPage = () => {
     });
   }, [stableDispatch, isRulesListRefreshPending, appMode]);
 
-  const updateCollection = () => {
-    fetchSharedListData(sharedListId).then((incomingData) => {
-      if (incomingData !== null) {
-        setRulesFromSharedList(incomingData.rules || []);
-        setGroupsFromSharedList(incomingData.groups || []);
-        setDataLoading(false);
+  const updateCollection = async () => {
+    await fetchSharedListData(sharedListId).then((result) => {
+      console.log("got result", result);
+      if (result.data.success) {
+        const sharedListData = result.data.sharedList;
+        if (sharedListData !== null) {
+          setRulesFromSharedList(sharedListData.rules || []);
+          setGroupsFromSharedList(sharedListData.groups || []);
+        } else {
+          setSharedListPresent(false);
+        }
       } else {
+        toast.error(result.data.message || "Could not load shared list");
         setSharedListPresent(false);
-        setDataLoading(false);
       }
+      setDataLoading(false);
     });
   };
 

@@ -38,6 +38,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -64,6 +65,7 @@ const RuleBuilder = (props) => {
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -131,19 +133,21 @@ const RuleBuilder = (props) => {
       })
     );
 
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Create new shared list
-      setSelectedRules(getSelectedRules(ruleSelection));
-      setIsShareRulesModalActive(true);
+    fetchSharedLists(user.details.profile.uid, workspace?.id).then(
+      (_result) => {
+        //Create new shared list
+        setSelectedRules(getSelectedRules(ruleSelection));
+        setIsShareRulesModalActive(true);
 
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
+        //Deactivate loading modal
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "loadingModal",
+            newValue: false,
+          })
+        );
+      }
+    );
   };
   const stableSetCurrentlySelectedRuleConfig = useCallback(
     setCurrentlySelectedRuleConfig,
