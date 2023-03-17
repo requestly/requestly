@@ -101,10 +101,8 @@ const InterceptorUI = ({ appId }) => {
       setIsDeviceSelectorVisible(false);
     }
   }, [
-    deviceId,
     mobileDebuggerAppDetails,
     mobileDebuggerInterceptorDetails,
-    sdkId,
   ]);
 
   return (
