@@ -58,13 +58,15 @@ export const getAllTeamUserRulesConfigPath = () => {
   ];
 };
 export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
+  return getTeamUserRuleAllConfigsPath.push(ruleOrGroupId);
+};
+export const getTeamUserRuleAllConfigsPath = () => {
   return [
     "teamSync",
     window.currentlyActiveWorkspaceTeamId,
     "userConfig",
     window.uid,
     "rulesConfig",
-    ruleOrGroupId,
   ];
 };
 
@@ -92,10 +94,7 @@ const preventWorkspaceSyncWrite = async (
 export const updateUserSyncRecords = async (uid, records, appMode) => {
   const localRecords = _.cloneDeep(records);
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
-  if (
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.REMOTE &&
-    window.currentlyActiveWorkspaceTeamId
-  ) {
+  if (window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus =
       localStorage.getItem("syncRuleStatus") === "true" || false;
     // Get current values from db and use them xD
@@ -200,18 +199,16 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
 
     // Todo - @sagar - Fix duplicate code - src/hooks/DbListenerInit/syncingNodeListener.js
     // Check if it's team syncing. We might not want to read some props like "isFavourite" from this not. Instead we an read from userConfig node
-    if (
-      appMode !== GLOBAL_CONSTANTS.APP_MODES.REMOTE &&
-      window.currentlyActiveWorkspaceTeamId
-    ) {
+    if (window.currentlyActiveWorkspaceTeamId) {
       const syncRuleStatus = localStorage.getItem("syncRuleStatus") || false;
       // Get current values from local storage and use them xD
+      const personalRuleConfigs = await getValueAsPromise(
+        getTeamUserRuleAllConfigsPath()
+      );
       for (const objectId in remoteRecords) {
         // Get a copy of user's own value
         try {
-          const ownRuleConfig = await getValueAsPromise(
-            getTeamUserRuleConfigPath(objectId)
-          );
+          const ownRuleConfig = personalRuleConfigs[objectId];
 
           // Key - "isFavourite"
           if (
@@ -235,7 +232,6 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
         }
       }
     }
-
     const recordsArr = processRecordsObjectIntoArray(remoteRecords);
     return recordsArr;
   } catch (e) {
@@ -283,21 +279,18 @@ export const syncToLocalFromFirebase = async (
 
   // Todo - @sagar - Fix duplicate code - src/utils/syncing/syncDataUtils.js
   // START - Handle prevention of syncing of isFavourite and syncRuleStatus in Team Workspaces
-  if (
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.REMOTE &&
-    window.currentlyActiveWorkspaceTeamId
-  ) {
+  if (window.currentlyActiveWorkspaceTeamId) {
     allSyncedRecords = processRecordsArrayIntoObject(allSyncedRecords);
     const syncRuleStatus =
       localStorage.getItem("syncRuleStatus") === "true" || false;
-
+    const personalRuleConfigs = await getValueAsPromise(
+      getAllTeamUserRulesConfigPath()
+    );
     // Get current values from local storage and use them xD
     for (const objectId in allSyncedRecords) {
       // Get a copy of user's own value
       try {
-        const ownRuleConfig = await getValueAsPromise(
-          getTeamUserRuleConfigPath(objectId)
-        );
+        const ownRuleConfig = personalRuleConfigs[objectId];
 
         // Key - "isFavourite"
         if (

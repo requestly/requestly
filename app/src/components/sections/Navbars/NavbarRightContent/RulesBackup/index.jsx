@@ -185,12 +185,7 @@ const RulesBackupToggle = () => {
       );
     }
 
-    if (
-      appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE ||
-      currentlyActiveWorkspace?.id
-    ) {
-      return null;
-    }
+    if (currentlyActiveWorkspace?.id) return;
 
     if (
       (user.details.profile || user.details || user.loggedIn) &&

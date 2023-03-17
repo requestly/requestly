@@ -30,8 +30,6 @@ import {
 import md5 from "md5";
 import isEmpty from "is-empty";
 import { v4 as uuidv4 } from "uuid";
-// GLOBAL CONSTANTS
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { setEmailVerified, setSignupDate } from "../utils/AuthUtils";
 import { getDesktopSignInAuthPath } from "../utils/PathUtils";
@@ -454,9 +452,6 @@ export async function checkUserBackupState(uid) {
 
 /* Syncing is not enable when storage is remote */
 export async function getOrUpdateUserSyncState(uid, appMode) {
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE) {
-    return false;
-  }
   const database = getDatabase();
   const userProfileRef = ref(database, getUserProfilePath(uid));
   let syncStatus = null;

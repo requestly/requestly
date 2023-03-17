@@ -124,11 +124,16 @@ export const TEAMS = {
   INVITE_TEAMMATES_CLICKED: "invite_teammates_clicked",
   INVITE_TEAMMATES_BANNER_CLICKED: "invite_teammates_banner_clicked",
   INVITE_MORE_TEAMMATES_BUTTON_CLICKED: "invite_more_teammates_button_clicked",
-  CREATE_NEW_WORKSPACE_LINK_CLICKED: "create_new_workspace_link_clicked",
-  CREATE_NEW_WORKSPACE_BUTTON_CLICKED: "create_new_workspace_button_clicked",
+  CREATE_NEW_WORKSPACE_CLICKED: "create_new_worskpace_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
   ADD_MEMBER_CLICKED: "add_member_clicked",
   REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
   TEAM_PLAN_INTEREST_CAPTURED: "team_plan_interest_captured",
+  WORKSPACE_SETTING_TOGGLED: "workspace_setting_toggled",
+  WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
+  UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
+  ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
+  ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED:
+    "add_members_in_worskpace_modal_viewed",
 };

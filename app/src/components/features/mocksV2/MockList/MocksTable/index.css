@@ -62,3 +62,6 @@
   font-weight: 500;
   font-size: 1.25rem;
 }
+.mock-table-user-icon span {
+  margin-left: 15px;
+}
