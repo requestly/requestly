@@ -16,6 +16,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { IoMdLink } from "react-icons/io";
+import { UserIcon } from "components/common/UserIcon";
 
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -30,7 +31,10 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import "../../../../../styles/custom/RQTable.css";
 import "./index.css";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  getCurrentlyActiveWorkspace,
+  getIsWorkspaceMode,
+} from "store/features/teams/selectors";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
@@ -58,6 +62,7 @@ const MocksTable: React.FC<Props> = ({
   handleDeleteAction,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
@@ -157,6 +162,16 @@ const MocksTable: React.FC<Props> = ({
       },
     },
     {
+      title: <div className="rq-col-title">Created by</div>,
+      width: "auto",
+      responsive: ["lg"],
+      className: "text-gray mock-table-user-icon",
+      textAlign: "center",
+      render: (_: any, record: RQMockMetadataSchema) => {
+        return <UserIcon uid={record.createdBy} />;
+      },
+    },
+    {
       title: (
         <div className="rq-col-title">
           <CalendarOutlined />
@@ -169,8 +184,15 @@ const MocksTable: React.FC<Props> = ({
       valueType: "date",
       render: (_: any, record: RQMockMetadataSchema) => {
         return (
-          moment(record.updatedTs).format("MMM DD, YYYY") +
-          (record.isOldMock ? "." : "")
+          <>
+            {moment(record.updatedTs).format("MMM DD, YYYY") +
+              (record.isOldMock ? "." : "")}{" "}
+            {isWorkspaceMode && (
+              <>
+                by <UserIcon uid={record.lastUpdatedBy ?? record.createdBy} />
+              </>
+            )}
+          </>
         );
       },
     },
@@ -258,6 +280,11 @@ const MocksTable: React.FC<Props> = ({
       },
     },
   ];
+
+  if (!isWorkspaceMode) {
+    //remove created by column from mock table in private workspace
+    columns.splice(3, 1);
+  }
 
   const handleSearch = (searchQuery: string) => {
     if (searchQuery) {
