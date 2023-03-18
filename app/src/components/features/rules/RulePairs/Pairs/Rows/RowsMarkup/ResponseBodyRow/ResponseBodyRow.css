@@ -1,0 +1,19 @@
+.response-body-row-header {
+  margin-top: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--white);
+  display: inline-block;
+}
+
+.response-body-type-radio-group.ant-radio-group {
+  margin-left: 1.25rem;
+}
+
+.response-body-type-radio-group.ant-radio-group .ant-radio-wrapper {
+  margin-right: 1.75rem;
+}
+
+.response-body-type-radio-group.ant-radio-group .ant-radio-wrapper .ant-radio {
+  padding-right: 4px;
+}

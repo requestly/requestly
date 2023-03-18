@@ -1,0 +1,21 @@
+.response-rule-inputs.ant-row {
+  margin: 1.25rem 0 4px 0;
+}
+
+.response-rule-inputs .ant-input,
+.response-rule-inputs.ant-row .ant-select .ant-select-selector,
+.response-rule-inputs .ant-input:focus,
+.response-rule-inputs.ant-row .ant-select-selector:focus {
+  border: none;
+  box-shadow: var(--input-box-shadow);
+}
+
+.response-rule-inputs
+  .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  box-shadow: var(--input-box-shadow);
+}
+
+.response-rule-inputs.ant-row .ant-select-selector {
+  width: 100%;
+}

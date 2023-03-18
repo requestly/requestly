@@ -82,6 +82,12 @@ export const getCurrentlySelectedRuleErrors = (state) => {
   return currentlySelectedRule["errors"];
 };
 
+// response rule resource type
+export const getResponseRuleResourceType = (state) => {
+  const rule = getCurrentlySelectedRuleData(state);
+  return rule?.pairs?.[0]?.response?.resourceType ?? "";
+};
+
 export const getLastBackupTimeStamp = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["lastBackupTimeStamp"];

@@ -17,6 +17,9 @@
   --body-background: #242529;
   --hover-color: #3c3d42;
   --dropdown-active-border-color: #0361ff;
+  --input-hover-border-color: #2051b4;
+  --input-focus-border-color: #1e69ff;
+  --input-focus-box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
 
   /* utils */
   --space: 2px;

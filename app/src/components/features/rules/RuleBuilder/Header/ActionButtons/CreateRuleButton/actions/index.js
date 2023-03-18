@@ -7,6 +7,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { ResponseRuleResourceType } from "types/rules";
 
 export const validateRule = (rule, dispatch) => {
   let output;
@@ -230,11 +231,30 @@ export const validateRule = (rule, dispatch) => {
   //Modify Response Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
     rule.pairs.forEach((pair) => {
+      // should have resource type
+      if (isEmpty(pair.response.resourceType)) {
+        output = {
+          result: false,
+          message: "Please select a resource type to continue",
+          error: "missing resource type",
+        };
+      }
       //Source shouldn't be empty
-      if (isEmpty(pair.source.value)) {
+      else if (isEmpty(pair.source.value)) {
         output = {
           result: false,
           message: `Please enter a source`,
+          error: "missing source",
+        };
+      }
+      // graphql operation data shouldn't be empty
+      else if (
+        pair.response?.resourceType === ResponseRuleResourceType.GRAPHQL_API &&
+        Object.keys(pair.source?.filters?.[0]?.requestPayload ?? {}).length < 2
+      ) {
+        output = {
+          result: false,
+          message: `Please enter both key and value for GraphQL operation`,
           error: "missing source",
         };
       }
