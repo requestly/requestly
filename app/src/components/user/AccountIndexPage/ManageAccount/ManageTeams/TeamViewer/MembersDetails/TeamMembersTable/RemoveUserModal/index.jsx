@@ -11,6 +11,7 @@ const RemoveUserModal = ({
   userId,
   teamId,
   callbackOnSuccess,
+  isLeaveRequested = false,
 }) => {
   const [showLoader, setShowLoader] = useState(false);
 
@@ -23,9 +24,12 @@ const RemoveUserModal = ({
       teamId: teamId,
       userId: userId,
       role: "remove",
+      isLeaveRequested,
     })
       .then((res) => {
-        toast.info("Member removed");
+        if (!isLeaveRequested) {
+          toast.info("Member removed");
+        }
         callbackOnSuccess?.();
       })
       .catch((err) => {
@@ -40,10 +44,25 @@ const RemoveUserModal = ({
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <div className="rq-modal-content">
-        <div className="header">Remove Member</div>
+        <div className="header">
+          {isLeaveRequested ? "Leave workspace" : "Remove Member"}
+        </div>
         <div className="text-gray text-sm remove-user-message">
-          <p>Do you really want to remove this user from the team?</p>
-          <p>They would no longer be able to access shared workspace items.</p>
+          {isLeaveRequested ? (
+            <>
+              <p>Do you really want to leave this workspace?</p>
+              <p>
+                You would no longer be able to access shared workspace items.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>Do you really want to remove this user from the team?</p>
+              <p>
+                They would no longer be able to access shared workspace items.
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -60,7 +79,13 @@ const RemoveUserModal = ({
             onClick={removeUserFromTeam}
             className="remove-user-btn"
           >
-            {showLoader ? "Removing user..." : "Remove"}
+            {isLeaveRequested
+              ? showLoader
+                ? "Leaving..."
+                : "Leave"
+              : showLoader
+              ? "Removing user..."
+              : "Remove"}
           </Button>
         </Col>
       </Row>

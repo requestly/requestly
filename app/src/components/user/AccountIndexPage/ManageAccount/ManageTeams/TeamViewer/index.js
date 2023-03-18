@@ -8,6 +8,7 @@ import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import "./TeamViewer.css";
 
 const TeamViewer = ({ teamId }) => {
@@ -17,7 +18,7 @@ const TeamViewer = ({ teamId }) => {
   // Global State
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
-  const { name } = teamDetails;
+  const name = teamDetails?.name;
 
   useEffect(() => {
     const functions = getFunctions();
@@ -36,7 +37,7 @@ const TeamViewer = ({ teamId }) => {
   const manageWorkspaceItems = useMemo(
     () => [
       {
-        key: "0",
+        key: "Members",
         label: "Members",
         children: (
           <MembersDetails
@@ -47,7 +48,7 @@ const TeamViewer = ({ teamId }) => {
         ),
       },
       {
-        key: "1",
+        key: "Workspace settings",
         label: "Workspace settings",
         children: (
           <TeamSettings
@@ -58,10 +59,12 @@ const TeamViewer = ({ teamId }) => {
         ),
       },
       {
-        key: "2",
+        key: "Plans & Billings",
         label: (
           <span className="billing-tab-label">
-            Plans & Billings <QuestionCircleOutlined />
+            <>
+              Plans & Billings <QuestionCircleOutlined />
+            </>
           </span>
         ),
         children: (
@@ -115,6 +118,9 @@ const TeamViewer = ({ teamId }) => {
           defaultActiveKey="0"
           items={manageWorkspaceItems}
           className="manage-workspace-tabs"
+          onChange={(activeTab) => {
+            trackWorkspaceSettingToggled(activeTab);
+          }}
         />
       </Col>
     </Row>

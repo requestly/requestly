@@ -81,14 +81,7 @@ export const SurveyOption: React.FC<OptionProps> = ({
             }
             {title}
           </div>
-          <Checkbox
-            className={
-              questionType === "single"
-                ? !isOptionActive && "hide-option-checkbox"
-                : null
-            }
-            checked={isOptionActive}
-          />
+          {questionType === "multiple" && <Checkbox checked={isOptionActive} />}
         </div>
       ) : (
         //Other: custom input option

@@ -60,12 +60,13 @@ export const mergeRecordsAndSaveToFirebase = async (
   await doSyncRecords(
     formattedObject,
     SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-    appMode
+    appMode,
+    true
   );
   return mergedRecords;
 };
 
-const doSync = async (
+export const doSync = async (
   uid,
   appMode,
   dispatch,
@@ -76,7 +77,6 @@ const doSync = async (
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
-
   // Consistency check. Merge records if inconsistent
   const lastSyncTarget = await StorageService(appMode).getRecord(
     "last-sync-target"
@@ -87,12 +87,10 @@ const doSync = async (
   } else if (syncTarget === "sync") {
     if (lastSyncTarget === uid) consistencyCheckPassed = true;
   }
-
   let allSyncedRecords = await parseRemoteRecords(
     appMode,
     updatedFirebaseRecords
   );
-
   if (!consistencyCheckPassed) {
     // Merge records
     const recordsOnFirebaseAfterMerge = await mergeRecordsAndSaveToFirebase(
@@ -103,10 +101,8 @@ const doSync = async (
 
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
   }
-
   // Write to local
   await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
-
   trackSyncCompleted(uid);
   window.isFirstSyncComplete = true;
 
@@ -118,10 +114,9 @@ const doSync = async (
       type: "sessionRecordingConfig",
     })
   );
-
   dispatch(actions.updateIsRulesListLoading(false));
 };
-const doSyncDebounced = _.debounce(doSync, 5000);
+export const doSyncDebounced = _.debounce(doSync, 5000);
 
 const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
   try {

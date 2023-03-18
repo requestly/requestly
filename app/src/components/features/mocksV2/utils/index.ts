@@ -99,19 +99,24 @@ export const mockDataToEditorDataAdapter = (
 export const generateFinalUrl = (
   endpoint: string,
   uid: string,
-  username: string = null
+  username: string = null,
+  teamId?: string
 ) => {
-  let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}?rq_uid=${uid}`;
+  let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}`;
 
   if (isEnvBeta()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}?rq_uid=${uid}`;
+    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}`;
   } else if (isEnvEmulator()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}?rq_uid=${uid}`;
+    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}`;
   } else {
-    if (username) {
+    if (username && !teamId) {
       finalUrl = `https://${username}.requestly.dev/${endpoint}`;
+      return finalUrl;
     }
   }
+
+  if (teamId) finalUrl += `?teamId=${teamId}`;
+  else finalUrl += `?rq_uid=${uid}`;
 
   return finalUrl;
 };

@@ -15,6 +15,7 @@ import {
   trackSyncTriggered,
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
+import { StorageService } from "init";
 
 /**
  * This functions triggers syncing process
@@ -24,9 +25,14 @@ import { SYNC_CONSTANTS } from "./syncConstants";
  *
  * syncing is disabled when storage is remote
  */
-export const doSyncRecords = async (records, syncType, appMode) => {
+export const doSyncRecords = async (records, syncType, appMode, forceSync) => {
   if (!window.uid) return; // If user is not logged in
-  if (!window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return; // If personal syncing is disabled and user has no active workspace
+  if (
+    !forceSync &&
+    !window.isSyncEnabled &&
+    !window.currentlyActiveWorkspaceTeamId
+  )
+    return; // If personal syncing is disabled and user has no active workspace
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
@@ -48,10 +54,14 @@ export const doSyncRecords = async (records, syncType, appMode) => {
   }
 };
 
-export const setSyncState = async (uid, state) => {
+export const setSyncState = async (uid, state, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
-      .then(() => {
+      .then(async () => {
+        if (!state)
+          await StorageService(appMode).removeRecordsWithoutSyncing([
+            "last-sync-target",
+          ]);
         trackSyncToggled(uid, state);
         resolve(true);
       })

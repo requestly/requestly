@@ -16,6 +16,7 @@ import {
   getRecordsSyncPath,
   parseRemoteRecords,
 } from "utils/syncing/syncDataUtils";
+import { setSyncState } from "utils/syncing/SyncUtils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -30,15 +31,9 @@ export const switchWorkspace = async (
   newWorkspaceDetails,
   dispatch,
   currentSyncingState,
-  appMode
+  appMode,
+  setLoader
 ) => {
-  trackWorkspaceSwitched();
-  dispatch(actions.updateIsRulesListLoading(true));
-  // just to safe
-  setTimeout(() => {
-    dispatch(actions.updateIsRulesListLoading(false));
-  }, 6000);
-
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
 
   if (teamId !== null) {
@@ -48,28 +43,46 @@ export const switchWorkspace = async (
       // User is currently on private workspace
       if (!isSyncEnabled) {
         const message = "Turn on syncing?";
-        if (window.confirm(message) !== true) {
-          return;
-        }
+        const confirmationResponse = window.confirm(message);
+        if (confirmationResponse !== true) return;
+        setSyncState(window.uid, true, appMode);
       }
     }
   }
 
-  // These merge steps are optional - just to ensure consistency
-  // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off
-  // Unsubscribe any existing listener - To prevent race of sync node listener once merged records are set on the firebase
+  trackWorkspaceSwitched();
+  dispatch(actions.updateIsRulesListLoading(true));
+  // just to be safe
+  setTimeout(() => {
+    dispatch(actions.updateIsRulesListLoading(false));
+  }, 30 * 1000);
+
+  setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current)
     window.unsubscribeSyncingNodeRef.current();
-  const allRemoteRecords =
-    (await getValueAsPromise(getRecordsSyncPath())) || {};
-  let parsedFirebaseRules = await parseRemoteRecords(appMode, allRemoteRecords);
-  await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
+
+  const mergeLocalRecords = async () => {
+    if (
+      appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
+      !isExtensionInstalled()
+    )
+      return;
+    // These merge steps are optional - just to ensure consistency
+    // These merge steps are  however mandated if we are switching to a given workspace from private and has syncing off
+    // Unsubscribe any existing listener - To prevent race of sync node listener once merged records are set on the firebase
+    const allRemoteRecords =
+      (await getValueAsPromise(getRecordsSyncPath())) || {};
+    let parsedFirebaseRules = await parseRemoteRecords(
+      appMode,
+      allRemoteRecords
+    );
+    await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
+  };
+  await mergeLocalRecords();
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
 
-  // Don't clear when appMode is Remote as it could clear the database!
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.REMOTE) skipStorageClearing = true;
   // Don't clear when appMode is Extension but user has not installed it!
   if (
     appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&

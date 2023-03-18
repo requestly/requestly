@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { Button, Row, Col } from "antd";
@@ -19,6 +19,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
+import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 
 const AddMemberModal = ({
   isOpen,
@@ -42,7 +43,7 @@ const AddMemberModal = ({
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = currentTeamId ?? activeWorkspaceId;
-  const teamsDetails = availableTeams?.find((team) => team.id === teamId);
+  const teamDetails = availableTeams?.find((team) => team.id === teamId);
 
   const toggleInviteEmailModal = () => {
     setIsInviteEmailModalActive(!isInviteEmailModalActive);
@@ -105,6 +106,10 @@ const AddMemberModal = ({
       });
   };
 
+  useEffect(() => {
+    if (isOpen) trackAddMembersInWorkspaceModalViewed();
+  }, [isOpen]);
+
   return (
     <>
       <RQModal centered open={isOpen} onCancel={handleModalClose}>
@@ -118,7 +123,7 @@ const AddMemberModal = ({
             />
           </div>
           <div className="header add-member-modal-header">
-            Add people to {currentTeamId ? `${teamsDetails?.name}'s` : ""}{" "}
+            Add people to {currentTeamId ? `${teamDetails?.name}'s` : ""}{" "}
             workspace
           </div>
           <p className="text-gray">

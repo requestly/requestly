@@ -18,10 +18,12 @@ export interface PageConfig {
   pageId: number;
   title: string;
   subTitle: string;
-  render?: (props: renderProps) => ReactNode;
+  render?: number | ((props: renderProps) => ReactNode);
 }
 
 export interface SurveyOptionsConfig {
+  key: string;
+  questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
   action?: (
     dispatch: any,

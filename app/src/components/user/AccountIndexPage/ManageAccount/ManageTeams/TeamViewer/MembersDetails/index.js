@@ -26,7 +26,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
-  const { accessCount } = teamDetails;
+  const accessCount = teamDetails?.accessCount;
 
   // To handle refresh in TeamMembersTable
   const doRefreshTeamMembersTable = () => {
