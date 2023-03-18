@@ -1,4 +1,6 @@
 import { Col, Row } from "antd";
+import { RQButton } from "lib/design-system/components";
+import { useNavigate } from "react-router-dom";
 import "./index.css";
 
 interface Props {
@@ -9,6 +11,8 @@ interface Props {
 }
 
 const AcceptedInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Props) => {
+  const navigate = useNavigate();
+  
   return (
     <Row className="invite-container" justify={"center"}>
       <Col
@@ -25,6 +29,9 @@ const AcceptedInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
             <p className="text-gray invite-subheader">
                 If you think this is a mistake or if you have trouble logging into the workspace, please contact the workspace admins or Requestly support.
             </p>
+            <RQButton className="invite-button" type="primary" size="large" onClick={() => navigate("/")}>
+              Go Back
+            </RQButton>
         </div>
       </Col>
     </Row>
