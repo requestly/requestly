@@ -9,7 +9,8 @@ import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import getObjectValue from "../../../Filters/actions/getObjectValue";
-import { debounce } from "lodash";
+import { debounce, snakeCase } from "lodash";
+import { ResponseRuleResourceType } from "types/rules";
 import {
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
@@ -143,7 +144,10 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     }
 
     setPayloadKey(value);
-    debouncedTrackPayloadKeyModifiedEvent(currentlySelectedRuleData.ruleType);
+    debouncedTrackPayloadKeyModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+    );
   };
 
   const handleRequestPayloadValueChange = (
@@ -157,7 +161,10 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     }
 
     setPayloadValue(value);
-    debouncedTrackPayloadValueModifiedEvent(currentlySelectedRuleData.ruleType);
+    debouncedTrackPayloadValueModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+    );
   };
 
   return isRequestPayloadFilterCompatible ? (

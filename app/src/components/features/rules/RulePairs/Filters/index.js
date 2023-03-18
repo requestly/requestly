@@ -36,7 +36,7 @@ import {
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
-import { debounce } from "lodash";
+import { debounce, snakeCase } from "lodash";
 
 const { Text, Link } = Typography;
 
@@ -185,10 +185,16 @@ const Filters = (props) => {
     trackRequestMethodFilterModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.KEY = () => {
-    debouncedTrackPayloadKeyModifiedEvent(currentlySelectedRuleData.ruleType);
+    debouncedTrackPayloadKeyModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.UNKNOWN)
+    );
   };
   LOG_ANALYTICS.VALUE = () => {
-    debouncedTrackPayloadValueModifiedEvent(currentlySelectedRuleData.ruleType);
+    debouncedTrackPayloadValueModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.UNKNOWN)
+    );
   };
 
   const urlOperatorOptions = (
