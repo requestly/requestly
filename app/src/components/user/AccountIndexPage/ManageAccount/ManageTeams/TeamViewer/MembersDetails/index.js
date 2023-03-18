@@ -128,7 +128,7 @@ const MembersDetails = ({ teamId }) => {
         <Col>
           <Button type="primary" onClick={handleAddMemberClick}>
             <PlusOutlined />{" "}
-            <span className="text-bold caption">Add Member</span>
+            <span className="text-bold caption">Invite People</span>
           </Button>
         </Col>
       </Row>

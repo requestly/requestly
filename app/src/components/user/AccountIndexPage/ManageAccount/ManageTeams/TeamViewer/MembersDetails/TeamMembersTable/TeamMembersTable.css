@@ -51,3 +51,7 @@
   .ant-table-cell {
   padding: 1.25rem 4px 1.25rem 2px;
 }
+
+.pending-tag {
+  margin-left: 8px;
+}

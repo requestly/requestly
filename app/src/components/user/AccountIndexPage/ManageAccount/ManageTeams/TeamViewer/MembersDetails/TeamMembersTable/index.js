@@ -7,7 +7,8 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Badge, Table } from "antd";
+import { Avatar, Badge, Table, Tag } from "antd";
+//CONSTANTS
 import APP_CONSTANTS from "config/constants";
 import { isEmpty } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -31,6 +32,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
   // Component State
   const [members, setMembers] = useState([]);
+  const [pendingMembers, setPendingMembers] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [deleteUserModal, setDeleteUserModal] = useState({
     isActive: false,
@@ -43,6 +45,11 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
   const getTeamUsers = useMemo(
     () => httpsCallable(getFunctions(), "getTeamUsers"),
+    []
+  );
+
+  const getPendingUsers = useMemo(
+    () => httpsCallable(getFunctions(), "getPendingUsers"),
     []
   );
 
@@ -120,6 +127,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
           {member.displayName}
           {(loggedInUserId === member.id ? " (You) " : "") +
             (billingExclude.includes(member.id) ? " (Free) " : "")}
+          { member?.isPending ? <span className="pending-tag"><Tag color="#4f5053">Pending</Tag></span> : null}
         </span>
       ),
     },
@@ -135,6 +143,14 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
       dataIndex: "role",
       align: "center",
       render: (member) => {
+        if(member.isPending) {
+          return (
+            <span>
+              {member?.isAdmin ? "Admin access": "Member Access"}
+            </span>
+          );
+        }
+
         return member.isOwner ? (
           <span>
             <Badge status="success" /> Owner
@@ -146,6 +162,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
             placement="bottomLeft"
             isAdmin={member.isAdmin}
             memberId={member.id}
+            isPending={member.isPending}
             loggedInUserId={loggedInUserId}
             isLoggedInUserAdmin={isLoggedInUserAdmin}
             handleRemoveMember={(isLeaveRequested = false) =>
@@ -202,6 +219,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
       .then((res) => {
         if (!mountedRef.current) return null;
         const response = res.data;
+        console.log("Members", response);
         if (response.success) {
           setMembers(response.users);
         } else {
@@ -212,6 +230,22 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
         if (!mountedRef.current) return null;
         toast.error(err.message);
         redirectToMyTeams(navigate);
+      });
+
+    getPendingUsers({
+      teamId: teamId,
+    }).then((res) => {
+        if (!mountedRef.current) return null;
+        const response = res.data;
+        console.log("Pending", response);
+        if (response.success) {
+          setPendingMembers(response.users);
+        } else {
+          throw new Error(response.message);
+        }
+      })
+      .catch((err) => {
+        if (!mountedRef.current) return null;
       });
   };
 
@@ -273,7 +307,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
       (member) => member.id !== loggedInUserId
     );
 
-    const membersData = [...currentUser, ...otherMembers].map(
+    const membersData = [...currentUser, ...otherMembers, ...pendingMembers].map(
       (member, idx) => ({
         key: idx + 1,
         img: member,
@@ -285,7 +319,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
     setDataSource(membersData);
     setIsLoggedInUserAdmin(currentUser[0]?.isAdmin);
-  }, [members, loggedInUserId]);
+  }, [members, loggedInUserId, pendingMembers]);
 
   useEffect(() => {
     if (user.details.isLoggedIn) {
