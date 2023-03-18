@@ -20,7 +20,7 @@ import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
 
-const TeamMembersTable = ({ teamId, refresh, callback }) => {
+const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
 
@@ -142,7 +142,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
         ) : (
           <MemberRoleDropdown
             showLoader
-            isHoverEffect
+            isHoverEffect={isLoggedInUserAdmin || member.id === loggedInUserId}
             placement="bottomLeft"
             isAdmin={member.isAdmin}
             memberId={member.id}
