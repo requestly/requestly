@@ -109,8 +109,8 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner
-              ruleType={currentlySelectedRuleConfig.TYPE}
               appMode={appMode}
+              ruleType={currentlySelectedRuleConfig.TYPE}
             />
             {renderWarning()}
 
