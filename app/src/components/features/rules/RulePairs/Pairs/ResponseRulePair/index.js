@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Row, Col } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleData } from "store/selectors";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
 import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
@@ -7,7 +9,13 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import GraphqlRequestPayload from "./GraphqlRequestPayload";
 import { ResponseRuleResourceType } from "types/rules";
+import getObjectValue from "../../Filters/actions/getObjectValue";
+import APP_CONSTANTS from "config/constants";
 import "./ResponseRulePair.css";
+
+const {
+  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
+} = APP_CONSTANTS;
 
 const ResponseRulePair = ({
   pair,
@@ -17,7 +25,32 @@ const ResponseRulePair = ({
   isInputDisabled,
   responseRuleResourceType = "",
 }) => {
-  const [payloadBackup, setPayloadBackup] = useState(null);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const currentPayloadKey = useMemo(
+    () =>
+      getObjectValue(
+        currentlySelectedRuleData,
+        pairIndex,
+        SOURCE_REQUEST_PAYLOAD_KEY
+      ),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const currentPayloadValue = useMemo(
+    () =>
+      getObjectValue(
+        currentlySelectedRuleData,
+        pairIndex,
+        SOURCE_REQUEST_PAYLOAD_VALUE
+      ),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const [gqlOperationFilter, setGqlOperationFilter] = useState({
+    key: currentPayloadKey,
+    value: currentPayloadValue,
+  });
+
   const canOverrideStatus = useMemo(() => {
     return (
       isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) &&
@@ -45,8 +78,8 @@ const ResponseRulePair = ({
           <Col span={12}>
             <GraphqlRequestPayload
               pairIndex={pairIndex}
-              payloadBackup={payloadBackup}
-              setPayloadBackup={setPayloadBackup}
+              gqlOperationFilter={gqlOperationFilter}
+              setGqlOperationFilter={setGqlOperationFilter}
               modifyPairAtGivenPath={helperFunctions?.modifyPairAtGivenPath}
             />
           </Col>

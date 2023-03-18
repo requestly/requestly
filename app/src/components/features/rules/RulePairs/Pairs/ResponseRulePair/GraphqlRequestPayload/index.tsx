@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { Input, Row } from "antd";
@@ -8,7 +8,6 @@ import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import getObjectValue from "../../../Filters/actions/getObjectValue";
 import { debounce, snakeCase } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
 import {
@@ -39,8 +38,8 @@ type RequestPayload = { key: string; value: string };
 
 interface GraphqlRequestPayloadProps {
   pairIndex: number;
-  payloadBackup: RequestPayload;
-  setPayloadBackup: (payload: RequestPayload) => void;
+  gqlOperationFilter: RequestPayload;
+  setGqlOperationFilter: React.Dispatch<React.SetStateAction<RequestPayload>>;
   modifyPairAtGivenPath: (
     e: React.ChangeEvent<HTMLInputElement>,
     pairIndex: number,
@@ -53,8 +52,8 @@ interface GraphqlRequestPayloadProps {
 
 const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   pairIndex,
-  payloadBackup,
-  setPayloadBackup,
+  gqlOperationFilter,
+  setGqlOperationFilter,
   modifyPairAtGivenPath = () => {},
 }) => {
   const dispatch = useDispatch();
@@ -62,66 +61,26 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   const isRequestPayloadFilterCompatible = isFeatureCompatible(
     FEATURES.REQUEST_PAYLOAD_FILTER
   );
-  const currentPayloadKey = useMemo(
-    () =>
-      getObjectValue(
-        currentlySelectedRuleData,
-        pairIndex,
-        SOURCE_REQUEST_PAYLOAD_KEY
-      ),
-    [pairIndex, currentlySelectedRuleData]
-  );
-
-  const currentPayloadValue = useMemo(
-    () =>
-      getObjectValue(
-        currentlySelectedRuleData,
-        pairIndex,
-        SOURCE_REQUEST_PAYLOAD_VALUE
-      ),
-    [pairIndex, currentlySelectedRuleData]
-  );
-
-  const [payloadKey, setPayloadKey] = useState<string>(
-    payloadBackup?.key ?? ""
-  );
-  const [payloadValue, setPayloadValue] = useState<string>(
-    payloadBackup?.value ?? ""
-  );
 
   useEffect(() => {
-    if (payloadKey && payloadValue) {
-      setPayloadBackup({ key: payloadKey, value: payloadValue });
-    }
-  }, [payloadKey, payloadValue, setPayloadBackup]);
-
-  useEffect(() => {
-    if (!payloadBackup) return;
-
-    if (payloadBackup.key && payloadBackup.value)
+    if (gqlOperationFilter.key && gqlOperationFilter.value) {
       modifyPairAtGivenPath(
         null,
         pairIndex,
         SOURCE_REQUEST_PAYLOAD_KEY,
-        payloadBackup.key,
+        gqlOperationFilter.key,
         [
           {
             path: "source.filters[0].requestPayload.value",
-            value: payloadBackup.value,
+            value: gqlOperationFilter.value,
           },
         ],
         false
       );
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [payloadBackup]);
-
-  useEffect(() => {
-    if (currentPayloadKey && currentPayloadValue) {
-      setPayloadKey(currentPayloadKey);
-      setPayloadValue(currentPayloadValue);
-    }
-  }, [currentPayloadKey, currentPayloadValue]);
+  }, [gqlOperationFilter]);
 
   const clearRequestPayload = () => {
     deleteObjectAtPath(
@@ -137,13 +96,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
-    const value = e.target.value;
+    const key = e.target.value;
 
-    if (value === "") {
+    if (key === "") {
       clearRequestPayload();
     }
 
-    setPayloadKey(value);
+    setGqlOperationFilter((prev) => ({ ...prev, key }));
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
       snakeCase(ResponseRuleResourceType.GRAPHQL_API)
@@ -160,7 +119,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
       clearRequestPayload();
     }
 
-    setPayloadValue(value);
+    setGqlOperationFilter((prev) => ({ ...prev, value }));
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
       snakeCase(ResponseRuleResourceType.GRAPHQL_API)
@@ -187,7 +146,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           autoComplete="off"
           placeholder="key"
           className="graphql-operation-type-input"
-          value={payloadKey}
+          value={gqlOperationFilter.key}
           onChange={handleRequestPayloadKeyChange}
         />
         <Input
@@ -196,7 +155,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           autoComplete="off"
           placeholder="value"
           className="graphql-operation-type-name"
-          value={payloadValue}
+          value={gqlOperationFilter.value}
           onChange={handleRequestPayloadValueChange}
         />
       </Row>
