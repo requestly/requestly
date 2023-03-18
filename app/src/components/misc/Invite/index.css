@@ -3,7 +3,8 @@
     border: 1px solid var(--border-dark);
     border-radius: var(--border-radius-sm);
     background-color: var(--component-background);
-    padding: 32px
+    padding: 32px;
+    box-shadow: var(--background) 0px 5px 20px
 }
 
 .invite-header {
