@@ -1,6 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
-import { Popconfirm, Radio, Tooltip } from "antd";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Radio, Tooltip } from "antd";
+import {
+  getCurrentlySelectedRuleData,
+  getResponseRuleResourceType,
+} from "store/selectors";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
@@ -8,7 +12,7 @@ import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
 import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
 import { omit, set } from "lodash";
-import { ResponseRule, ResponseRuleResourceType } from "types/rules";
+import { ResponseRuleResourceType } from "types/rules";
 import "./ResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
@@ -22,42 +26,14 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-interface ResponseRuleResourceTypesProps {
-  currentlySelectedRuleData: ResponseRule;
-  responseRuleResourceType: ResponseRuleResourceType;
-  setResponseRuleResourceType: (type: ResponseRuleResourceType) => void;
-}
-
-const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
-  currentlySelectedRuleData,
-  responseRuleResourceType,
-  setResponseRuleResourceType,
-}) => {
+const ResponseRuleResourceTypes: React.FC = () => {
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
-  const currentResourceType =
-    currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
-
-  const [resourceType, setResourceType] = useState<ResponseRuleResourceType>(
-    currentResourceType ?? ResponseRuleResourceType.UNKNOWN
-  );
-  const [
-    responseTypePopupVisible,
-    setResponseTypePopupVisible,
-  ] = useState<boolean>(false);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
 
   const requestPayloadFilter =
     currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
-
-  const isPopConfirmDisabled =
-    currentResourceType !== ResponseRuleResourceType.GRAPHQL_API ||
-    Object.keys(requestPayloadFilter ?? {}).length === 0;
-
-  useEffect(() => {
-    if (currentResourceType) {
-      setResponseRuleResourceType(currentResourceType);
-    }
-  }, [currentResourceType, setResponseRuleResourceType]);
 
   const updateResourceType = useCallback(
     (
@@ -100,77 +76,50 @@ const ResponseRuleResourceTypes: React.FC<ResponseRuleResourceTypesProps> = ({
     updateResourceType(ResponseRuleResourceType.UNKNOWN);
   }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
-  const handleOnConfirm = () => {
-    const clearGraphqlRequestPayload =
-      resourceType !== ResponseRuleResourceType.GRAPHQL_API;
-
-    setResponseTypePopupVisible(false);
-    setResponseRuleResourceType(resourceType);
-    updateResourceType(resourceType, clearGraphqlRequestPayload);
-  };
-
   const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
-    if (isPopConfirmDisabled) {
-      setResourceType(type);
-      setResponseRuleResourceType(type);
-      updateResourceType(type);
-      return;
-    }
+    const clearGraphqlRequestPayload =
+      type !== ResponseRuleResourceType.GRAPHQL_API;
 
-    setResponseTypePopupVisible(true);
-    setResourceType(type);
+    updateResourceType(type, clearGraphqlRequestPayload);
   };
 
   return isNewResponseRule &&
-    currentResourceType !== ResponseRuleResourceType.UNKNOWN ? (
+    responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
     <div className="resource-types-container">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
-        <Popconfirm
-          title="This will clear the existing GraphQL operation data"
-          okText="Confirm"
-          cancelText="Cancel"
-          placement="topLeft"
-          open={responseTypePopupVisible}
-          onConfirm={handleOnConfirm}
-          disabled={isPopConfirmDisabled}
-          overlayClassName="resource-types-popconfirm"
-          onCancel={() => setResponseTypePopupVisible(false)}
+        <Radio.Group
+          value={responseRuleResourceType}
+          onChange={(e) => handleResourceTypeChange(e.target.value)}
         >
-          <Radio.Group
-            value={responseRuleResourceType}
-            onChange={(e) => handleResourceTypeChange(e.target.value)}
-          >
-            <Radio value={ResponseRuleResourceType.REST_API}>Rest API</Radio>
-            <Radio value={ResponseRuleResourceType.GRAPHQL_API}>
-              GraphQL API
+          <Radio value={ResponseRuleResourceType.REST_API}>Rest API</Radio>
+          <Radio value={ResponseRuleResourceType.GRAPHQL_API}>
+            GraphQL API
+          </Radio>
+          {isDesktop ? (
+            <Radio value={ResponseRuleResourceType.STATIC}>
+              HTML / JS / CSS
             </Radio>
-            {isDesktop ? (
-              <Radio value={ResponseRuleResourceType.STATIC}>
-                HTML / JS / CSS
-              </Radio>
-            ) : (
-              <Tooltip
-                overlayClassName="response-rule-resource-type-tooltip"
-                title={
-                  <span>
-                    This option is available only in desktop app due to
-                    technical constraints of chrome extension.{" "}
-                    <DownloadDesktopAppLink />
-                  </span>
-                }
+          ) : (
+            <Tooltip
+              overlayClassName="response-rule-resource-type-tooltip"
+              title={
+                <span>
+                  This option is available only in desktop app due to technical
+                  constraints of chrome extension. <DownloadDesktopAppLink />
+                </span>
+              }
+            >
+              <Radio
+                disabled={!isDesktop}
+                value={ResponseRuleResourceType.STATIC}
               >
-                <Radio
-                  disabled={!isDesktop}
-                  value={ResponseRuleResourceType.STATIC}
-                >
-                  HTML / JS / CSS
-                  <QuestionCircleOutlined className="resource-disable-option-info-icon" />
-                </Radio>
-              </Tooltip>
-            )}
-          </Radio.Group>
-        </Popconfirm>
+                HTML / JS / CSS
+                <QuestionCircleOutlined className="resource-disable-option-info-icon" />
+              </Radio>
+            </Tooltip>
+          )}
+        </Radio.Group>
       </div>
     </div>
   ) : null;

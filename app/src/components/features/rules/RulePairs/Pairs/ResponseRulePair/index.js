@@ -1,7 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Row, Col } from "antd";
 import { useSelector } from "react-redux";
-import { getCurrentlySelectedRuleData } from "store/selectors";
+import {
+  getCurrentlySelectedRuleData,
+  getResponseRuleResourceType,
+} from "store/selectors";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
 import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
@@ -23,9 +26,9 @@ const ResponseRulePair = ({
   helperFunctions,
   ruleDetails,
   isInputDisabled,
-  responseRuleResourceType = "",
 }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const currentPayloadKey = useMemo(
     () =>
       getObjectValue(
@@ -107,7 +110,6 @@ const ResponseRulePair = ({
             helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
-            responseRuleResourceType={responseRuleResourceType}
           />
         </Col>
       </Row>

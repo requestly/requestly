@@ -61,10 +61,7 @@
 
 .response-rule-resource-type-tooltip.ant-tooltip
   .ant-tooltip-content
-  .ant-tooltip-inner,
-.resource-types-popconfirm.ant-popover
-  .ant-popover-content
-  .ant-popover-inner-content {
+  .ant-tooltip-inner {
   color: var(--text-gray);
   background-color: var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -72,12 +69,10 @@
 
 .response-rule-resource-type-tooltip.ant-tooltip
   .ant-tooltip-content
-  .ant-tooltip-arrow,
-.resource-types-popconfirm.ant-popover .ant-popover-content .ant-popover-arrow {
+  .ant-tooltip-arrow {
   display: none;
 }
 
-.response-rule-resource-type-tooltip .ant-tooltip-content .ant-tooltip-inner,
-.resource-types-popconfirm.ant-popover .ant-popover-content .ant-popover-inner {
+.response-rule-resource-type-tooltip .ant-tooltip-content .ant-tooltip-inner {
   color: inherit;
 }

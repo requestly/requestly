@@ -19,7 +19,10 @@ import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions"
 //EXTERNALS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILITIES
-import { getCurrentlySelectedRuleData } from "../../../../store/selectors";
+import {
+  getCurrentlySelectedRuleData,
+  getResponseRuleResourceType,
+} from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import { FaTrash } from "react-icons/fa";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
@@ -56,6 +59,7 @@ const RulePairs = (props) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
 
   const isInputDisabled = props.mode === "shared-list-rule-view" ? true : false;
 
@@ -64,7 +68,6 @@ const RulePairs = (props) => {
     ruleFilterActiveWithPairIndex,
     setRuleFilterActiveWithPairIndex,
   ] = useState(false);
-  const [responseRuleResourceType, setResponseRuleResourceType] = useState("");
 
   /**
    * Handles onChange event with side effects
@@ -193,7 +196,6 @@ const RulePairs = (props) => {
             helperFunctions={helperFunctions}
             ruleDetails={props.currentlySelectedRuleConfig}
             isInputDisabled={isInputDisabled}
-            responseRuleResourceType={responseRuleResourceType}
           />
         );
       case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
@@ -365,11 +367,7 @@ const RulePairs = (props) => {
   return (
     <>
       {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes
-          currentlySelectedRuleData={currentlySelectedRuleData}
-          responseRuleResourceType={responseRuleResourceType}
-          setResponseRuleResourceType={setResponseRuleResourceType}
-        />
+        <ResponseRuleResourceTypes />
       ) : null}
 
       {props.currentlySelectedRuleConfig.TYPE !== "Response" ||
