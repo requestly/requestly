@@ -8,17 +8,21 @@ import {
   RecordingOptions,
   SessionRecording,
 } from "views/features/sessions/SessionViewer/types";
+import { getOwnerId } from "backend/mocks/common";
 
 export const saveRecording = async (
   uid: string,
+  workspaceId: string | null,
   payload: SessionRecording,
   events: any,
   options: RecordingOptions
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
-
+  const ownerId = getOwnerId(uid, workspaceId);
   const fileName = uuidv4();
-  const eventsFilePath = `users/${uid}/session-events/${fileName}`;
+  const eventsFilePath = workspaceId
+    ? `teams/${workspaceId}/session-events/${fileName}`
+    : `users/${uid}/session-events/${fileName}`;
 
   // Saving is as type=application/octet-stream, because it was previously saved like this
   await createFile(
@@ -32,7 +36,7 @@ export const saveRecording = async (
     ...payload,
     eventsFilePath,
     author: uid,
-    ownerId: uid,
+    ownerId,
     visibility: "public",
     accessEmails: [],
     accessDomains: [],
@@ -44,6 +48,7 @@ export const saveRecording = async (
       return docRef.id;
     })
     .catch((err) => {
+      console.log("could not properly save recording", err);
       return null;
     });
 

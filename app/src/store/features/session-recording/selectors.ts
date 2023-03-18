@@ -45,8 +45,8 @@ export const getSessionRecordingVisibility = (state: RootState): Visibility => {
   return getSessionRecording(state)?.visibility;
 };
 
-export const getIsRequestedByAuthor = (state: RootState): boolean => {
-  return getSessionRecording(state)?.isRequestedByAuthor;
+export const getIsRequestedByOwner = (state: RootState): boolean => {
+  return getSessionRecording(state)?.isRequestedByOwner;
 };
 
 export const getSessionRecordingStartTimeOffset = (
@@ -60,7 +60,7 @@ export const getSessionRecordingDescription = (state: RootState): string => {
 };
 
 export const getIsReadOnly = (state: RootState): boolean => {
-  return getIsRequestedByAuthor(state) === false; // for draft, isRequestedByAuthor is undefined
+  return getIsRequestedByOwner(state) === false; // for draft, isRequestedByOwner is undefined
 };
 
 export const getIncludeConsoleLogs = (state: RootState): boolean => {

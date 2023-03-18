@@ -15,9 +15,11 @@ import { Visibility } from "../SessionViewer/types";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
   const sharedLink = getSessionRecordingSharedLink(recordingId);
   const [linkCopied, setLinkCopied] = useState();
@@ -35,7 +37,8 @@ const ShareButton = ({ recordingId, showShareModal }) => {
       default:
         return (
           <span>
-            <LockOutlined /> Private to me
+            <LockOutlined />{" "}
+            {isWorkspaceMode ? "Private to workspace" : "Private to me"}
           </span>
         );
 
@@ -83,7 +86,9 @@ const ShareButton = ({ recordingId, showShareModal }) => {
 
     if (currentVisibility !== Visibility.ONLY_ME) {
       options.push({
-        label: "Make private to me",
+        label: isWorkspaceMode
+          ? "Only visible to workspace"
+          : "Make private to me",
         key: Visibility.ONLY_ME,
         icon: <LockOutlined />,
       });
@@ -106,7 +111,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
     }
 
     return options;
-  }, [currentVisibility]);
+  }, [currentVisibility, isWorkspaceMode]);
 
   const onCopyLinkClicked = useCallback(() => {
     trackSessionRecordingShareLinkCopied();

@@ -16,9 +16,9 @@ import {
   orderBy,
   query as firebaseQuery,
   limit,
-  getDocs,
   where,
   startAfter,
+  onSnapshot,
 } from "firebase/firestore";
 import { filterUniqueObjects } from "utils/FormattingHelper";
 import {
@@ -33,6 +33,11 @@ import { actions } from "../../../../../store";
 import CreateSessionGuide from "./CreateFirstSessionGuide";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import Logger from "lib/logger";
+import {
+  getCurrentlyActiveWorkspace,
+  getIsWorkspaceMode,
+} from "store/features/teams/selectors";
+import { getOwnerId } from "backend/mocks/common";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -55,6 +60,8 @@ const SessionsIndexPage = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   // Custom Hook utilization
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   // Component State
@@ -73,13 +80,14 @@ const SessionsIndexPage = () => {
     const records = [];
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
+    const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
 
     let query = null;
 
     if (lastDoc) {
       query = firebaseQuery(
         collectionRef,
-        where("author", "==", user.details.profile.uid),
+        where("ownerId", "==", ownerId),
         orderBy("sessionAttributes.startTime", "desc"),
         startAfter(lastDoc),
         limit(pageSize)
@@ -87,50 +95,41 @@ const SessionsIndexPage = () => {
     } else {
       query = firebaseQuery(
         collectionRef,
-        where("author", "==", user.details.profile.uid),
+        where("ownerId", "==", ownerId),
         orderBy("sessionAttributes.startTime", "desc"),
         limit(pageSize)
       );
     }
 
-    getDocs(query)
-      .then((documentSnapshots) => {
-        if (!documentSnapshots.empty) {
-          documentSnapshots.forEach((doc) => {
-            const recordData = doc.data();
-            records.push({
-              id: doc.id,
-              name: recordData.name,
-              duration: recordData.sessionAttributes.duration,
-              startTime: recordData.sessionAttributes.startTime,
-              url: recordData.sessionAttributes.url,
-              visibility: recordData.visibility,
-              eventsFilePath: recordData.eventsFilePath,
-            });
+    onSnapshot(query, (documentSnapshots) => {
+      if (!documentSnapshots.empty) {
+        documentSnapshots.forEach((doc) => {
+          const recordData = doc.data();
+          records.push({
+            id: doc.id,
+            name: recordData.name,
+            duration: recordData.sessionAttributes.duration,
+            startTime: recordData.sessionAttributes.startTime,
+            url: recordData.sessionAttributes.url,
+            visibility: recordData.visibility,
+            eventsFilePath: recordData.eventsFilePath,
           });
+        });
 
-          if (records.length > 0) {
-            setSessionRecordings((prevRecordings) => {
-              if (prevRecordings) {
-                return prevRecordings.concat(records);
-              } else {
-                return [];
-              }
-            });
-            setQs(documentSnapshots); // Handles pagination
-          }
-        } else {
-          setReachedEnd(true);
+        setSessionRecordings(records);
+        if (records.length > 0) {
+          setQs(documentSnapshots); // Handles pagination
         }
-        setIsTableLoading(false);
-      })
-      .catch((reason) => {
-        setIsTableLoading(false);
-      });
+      } else {
+        setReachedEnd(true);
+      }
+      setIsTableLoading(false);
+    });
   };
 
   const stableFetchRecordings = useCallback(fetchRecordings, [
     user?.details?.profile?.uid,
+    workspace,
   ]);
   const openConfigModal = useCallback(() => {
     if (!user?.loggedIn) {
@@ -200,25 +199,32 @@ const SessionsIndexPage = () => {
         stableFetchRecordings();
       }
     }
-  }, [hasUserChanged, stableFetchRecordings, user?.details?.profile?.uid]);
+  }, [
+    hasUserChanged,
+    workspace,
+    stableFetchRecordings,
+    user?.details?.profile?.uid,
+  ]);
 
   const filteredRecordings = filterUniqueObjects(sessionRecordings);
 
   useEffect(() => {
-    if (filteredRecordings?.length >= 0) {
+    if (filteredRecordings?.length >= 0 && !isWorkspaceMode) {
       submitAttrUtil(
         APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS,
         filteredRecordings?.length
       );
     }
-  }, [filteredRecordings?.length]);
+  }, [filteredRecordings?.length, isWorkspaceMode]);
 
   useEffect(() => {
-    submitAttrUtil(
-      APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED,
-      config?.pageSources?.length > 0
-    );
-  }, [config?.pageSources?.length]);
+    if (!isWorkspaceMode) {
+      submitAttrUtil(
+        APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED,
+        config?.pageSources?.length > 0
+      );
+    }
+  }, [config?.pageSources?.length, isWorkspaceMode]);
 
   return (
     <>

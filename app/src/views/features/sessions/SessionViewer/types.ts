@@ -11,13 +11,14 @@ export enum Visibility {
 
 export interface SessionRecording {
   id?: string;
-  isRequestedByAuthor?: boolean;
+  isRequestedByOwner?: boolean;
   eventsFilePath?: string;
   visibility?: Visibility;
   accessEmails?: string[];
   name?: string;
   sessionAttributes: RQSessionAttributes;
   author?: string;
+  ownerId?: string;
   filePath?: string;
   startTimeOffset?: number;
   description?: string;

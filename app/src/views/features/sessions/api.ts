@@ -42,6 +42,7 @@ export const deleteRecording = async (id: string, eventsFilePath: string) => {
     toast.success("Deleted the recording");
     trackSessionRecordingDeleted();
   } catch (error) {
+    console.log("error", error);
     toast.error("Something went wrong!");
     throw error;
   }
