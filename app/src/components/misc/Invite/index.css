@@ -1,16 +1,28 @@
-.invite-modal-content {
+.invite-content {
     text-align: center;
-    /* padding: 32px !important; */
+    border: 1px solid var(--border-dark);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--component-background);
+    padding: 32px
 }
 
-.invite-modal-header {
+.invite-header {
     margin-top: 1.5em;
 }
 
-.invite-modal-subheader {
+.invite-subheader {
     margin-top: 1.5em;
 }
 
-.invite-modal-button {
+.invite-button {
     margin-top: 1.5em;
+}
+
+/* .invite-content {
+    background-color: var(--body-background);
+} */
+
+.invite-container {
+    height: 80vh;
+    align-items: center;
 }

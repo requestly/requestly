@@ -1,6 +1,6 @@
-import { Avatar } from "antd";
+import { Avatar, Col, Row } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUniqueColorForWorkspace } from "utils/teams";
@@ -26,7 +26,6 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
     const appMode = useSelector(getAppMode);
     const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
-    const [ visible, setVisible ] = useState(true);
     const [ inProgress, setInProgress ] = useState(false);
 
     const handleAcceptInvitation = () => {
@@ -70,40 +69,43 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
             })
     }
 
-    const handleModalClose = () => {
-        setVisible(false);
-        navigate("/");
-    }
-
     return (
-        <RQModal centered open={visible} onCancel={handleModalClose}>
-            <div className="rq-modal-content invite-modal-content">
-                <div className="workspace-image">
-                    <Avatar
-                        size={56}
-                        shape="square"
-                        icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-                        style={{
-                            backgroundColor: `${getUniqueColorForWorkspace(
-                                "",
-                                workspaceName,
-                            )}`,
-                        }}
-                    />
+        <Row className="invite-container" justify={"center"}>
+            <Col
+                xs={18}
+                sm={16}
+                md={14}
+                lg={12}
+                xl={8}
+            >
+                <div className="invite-content">
+                    <div className="workspace-image">
+                        <Avatar
+                            size={56}
+                            shape="square"
+                            icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
+                            style={{
+                                backgroundColor: `${getUniqueColorForWorkspace(
+                                    "",
+                                    workspaceName,
+                                )}`,
+                            }}
+                        />
+                    </div>
+                    <div className="header invite-header">
+                        {ownerName} has invited you to workspace {workspaceName}
+                    </div>
+                    <p className="text-gray invite-subheader">
+                        You are invited to the Requestly Workspace <b>{workspaceName}</b>
+                    </p>
+                    {
+                        inProgress?
+                        (<RQButton loading={true} className="invite-modal-button" type="primary" size="large">Accepting Invitation</RQButton>):
+                        (<RQButton className="invite-modal-button" type="primary" size="large" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
+                    }
                 </div>
-                <div className="header invite-modal-header">
-                    {ownerName} has invited you to workspace {workspaceName}
-                </div>
-                <p className="text-gray invite-modal-subheader">
-                    You are invited to the Requestly Workspace <b>{workspaceName}</b>
-                </p>
-                {
-                    inProgress?
-                    (<RQButton loading={true} className="invite-modal-button" type="primary" size="large">Accepting Invitation</RQButton>):
-                    (<RQButton className="invite-modal-button" type="primary" size="large" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
-                }
-            </div>
-        </RQModal>
+            </Col>
+        </Row>
     );
 };
 

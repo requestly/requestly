@@ -1,4 +1,4 @@
-import { RQModal } from "lib/design-system/components";
+import { Col, Row } from "antd";
 import "./index.css";
 
 interface Props {
@@ -10,16 +10,24 @@ interface Props {
 
 const AcceptedInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Props) => {
   return (
-    <RQModal centered open={true}>
-        <div className="rq-modal-content invite-modal-content">
-            <div className="header invite-modal-header">
+    <Row className="invite-container" justify={"center"}>
+      <Col
+        xs={18}
+        sm={16}
+        md={14}
+        lg={12}
+        xl={8}
+      >
+        <div className="invite-content">
+            <div className="header invite-header">
                 Invitation already accepted
             </div>
-            <p className="text-gray invite-modal-subheader">
+            <p className="text-gray invite-subheader">
                 If you think this is a mistake or if you have trouble logging into the workspace, please contact the workspace admins or Requestly support.
             </p>
         </div>
-    </RQModal>
+      </Col>
+    </Row>
   );
 };
 

@@ -1,13 +1,11 @@
-import { Avatar } from "antd";
+import { Avatar, Col, Row } from "antd";
 
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { actions } from "store";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
@@ -20,9 +18,7 @@ interface Props {
 }
 
 const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Props) => {
-    const [ visible, setVisible ] = useState(true);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const isWorkspaceMode = useSelector(getIsWorkspaceMode);
     const appMode = useSelector(getAppMode);
     
@@ -50,36 +46,39 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
             });
     };
 
-    const handleModalClose = () => {
-        setVisible(false);
-        navigate("/");
-    }
-
     return (
-        <RQModal centered open={visible} closable={true} onCancel={handleModalClose}>
-            <div className="rq-modal-content invite-modal-content">
-                <div className="workspace-image">
-                    <Avatar
-                        size={56}
-                        shape="square"
-                        icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-                        style={{
-                            backgroundColor: `${getUniqueColorForWorkspace(
-                                "",
-                                workspaceName,
-                            )}`,
-                        }}
-                    />
-                </div>
-                <div className="header invite-modal-header">
+        <Row className="invite-container" justify={"center"}>
+            <Col
+            xs={18}
+            sm={16}
+            md={14}
+            lg={12}
+            xl={8}
+            >
+                <div className="invite-content">
+                    <div className="workspace-image">
+                        <Avatar
+                            size={56}
+                            shape="square"
+                            icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
+                            style={{
+                                backgroundColor: `${getUniqueColorForWorkspace(
+                                    "",
+                                    workspaceName,
+                                )}`,
+                            }}
+                        />
+                    </div>
+                <div className="header invite-header">
                     {ownerName} has invited you to workspace {workspaceName}
                 </div>
-                <p className="text-gray invite-modal-subheader">
+                <p className="text-gray invite-subheader">
                     To accept the invitation, please login as <b>{invitedEmail}</b>
                 </p>
                 <RQButton className="invite-modal-button" type="primary" size="large" onClick={() => openAuthModal()}>Log in</RQButton>
             </div>
-        </RQModal>
+            </Col>
+        </Row>
     );
 };
 
