@@ -1,0 +1,19 @@
+.response-status-code-container {
+  position: relative;
+}
+
+.response-status-code-select-icon {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  padding: 0 5px;
+  color: var(--text-dark-gray);
+  background-color: var(--input-background);
+}
+
+.response-status-code-label {
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--white);
+  display: inline-block;
+}

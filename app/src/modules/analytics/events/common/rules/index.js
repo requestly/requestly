@@ -158,3 +158,8 @@ export const trackRuleSimulatorTried = (rule_type, rule_saved) => {
   const params = { rule_type, rule_saved };
   trackEvent(RULES.RULE_SIMULATOR_TRIED, params);
 };
+
+export const trackRuleResourceTypeSelected = (rule_type, resource_type) => {
+  const params = { rule_type, resource_type };
+  trackEvent(RULES.RULE_RESOURCE_TYPE_SELECTED, params);
+};

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Row, Col, Radio, Typography, Popover, Button } from "antd";
-// Constants
+import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// Utils
 import { getAppMode } from "../../../../../../../../store/selectors";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-
-import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
+import "./ResponseBodyRow.css";
 
 const { Text } = Typography;
 
@@ -32,7 +29,7 @@ const ResponseBodyRow = ({
     false
   );
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
-    GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+    pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
   const [editorStaticValue, setEditorStaticValue] = useState(
     pair.response.value
@@ -40,24 +37,32 @@ const ResponseBodyRow = ({
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const onChangeResponseType = (responseType) => {
+  const onChangeResponseType = (responseBodyType) => {
     if (
-      Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(responseType)
+      Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
+        responseBodyType
+      )
     ) {
-      let value = "";
-      if (responseType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
+      let value = "{}";
+      if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
         value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
       } else {
         setIsCodeMinified(true);
         setEditorStaticValue(value);
       }
 
-      modifyPairAtGivenPath(null, pairIndex, `response.type`, responseType, [
-        {
-          path: `response.value`,
-          value: value,
-        },
-      ]);
+      modifyPairAtGivenPath(
+        null,
+        pairIndex,
+        `response.type`,
+        responseBodyType,
+        [
+          {
+            path: `response.value`,
+            value: value,
+          },
+        ]
+      );
     }
   };
 
@@ -150,16 +155,14 @@ const ResponseBodyRow = ({
 
   return (
     <React.Fragment key={rowIndex}>
+      <div className="subtitle response-body-row-header">Response Body</div>
       <Row
         key={rowIndex}
         span={24}
         align="middle"
         className="code-editor-header-row"
       >
-        <Col span={10}>
-          <span>Response Body</span>
-        </Col>
-        <Col span={14} align="right">
+        <Col span={24}>
           <Popconfirm
             title="This will clear the existing body content"
             onConfirm={() => {
@@ -169,18 +172,19 @@ const ResponseBodyRow = ({
             onCancel={() => setResponseTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            visible={responseTypePopupVisible}
+            open={responseTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}
               value={pair.response.type}
               disabled={isInputDisabled}
+              className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>
                 Static Data
               </Radio>
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-                Programmatically (JavaScript)
+                Dynamic (JavaScript)
               </Radio>
               {getAppDetails().app_mode ===
               GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
@@ -223,6 +227,7 @@ const ResponseBodyRow = ({
           >
             <Col xl="12" span={24}>
               <CodeEditor
+                key={pair.response.type}
                 language={
                   pair.response.type ===
                   GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
