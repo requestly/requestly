@@ -39,12 +39,24 @@ const TeamViewer = ({ teamId }) => {
       {
         key: "Members",
         label: "Members",
-        children: <MembersDetails key={teamId} teamId={teamId} />,
+        children: (
+          <MembersDetails
+            key={teamId}
+            teamId={teamId}
+            isTeamAdmin={isTeamAdmin}
+          />
+        ),
       },
       {
         key: "Workspace settings",
         label: "Workspace settings",
-        children: <TeamSettings key={teamId} teamId={teamId} />,
+        children: (
+          <TeamSettings
+            key={teamId}
+            teamId={teamId}
+            isTeamAdmin={isTeamAdmin}
+          />
+        ),
       },
       {
         key: "Plans & Billings",
