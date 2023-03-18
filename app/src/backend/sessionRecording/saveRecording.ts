@@ -32,6 +32,7 @@ export const saveRecording = async (
     ...payload,
     eventsFilePath,
     author: uid,
+    ownerId: uid,
     visibility: "public",
     accessEmails: [],
     accessDomains: [],
