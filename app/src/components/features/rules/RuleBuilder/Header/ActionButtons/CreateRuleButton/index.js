@@ -18,7 +18,7 @@ import {
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../actions";
 import { fixSourceRegexFormat, validateRule } from "./actions";
-//Constants
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { ruleModifiedAnalytics } from "./actions";
@@ -26,9 +26,11 @@ import {
   trackErrorInRuleCreation,
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
+  trackRuleResourceTypeSelected,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
+import { ResponseRuleResourceType } from "types/rules";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -98,6 +100,24 @@ const CreateRuleButton = ({ isDisabled, location }) => {
         }
         ruleModifiedAnalytics(user);
         trackRQLastActivity("rule_saved");
+
+        if (
+          currentlySelectedRuleData?.ruleType ===
+          GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+        ) {
+          const resourceType =
+            currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+
+          if (
+            resourceType &&
+            resourceType !== ResponseRuleResourceType.UNKNOWN
+          ) {
+            trackRuleResourceTypeSelected(
+              GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE,
+              snakeCase(resourceType)
+            );
+          }
+        }
 
         const ruleId = currentlySelectedRuleData.id;
         redirectToRuleEditor(navigate, ruleId, "create");

@@ -19,10 +19,14 @@ import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions"
 //EXTERNALS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILITIES
-import { getCurrentlySelectedRuleData } from "../../../../store/selectors";
+import {
+  getCurrentlySelectedRuleData,
+  getResponseRuleResourceType,
+} from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import { FaTrash } from "react-icons/fa";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
+import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import {
   sourceRuleOperatorPlaceholders,
   destinationRuleOperatorPlaceholders,
@@ -55,6 +59,7 @@ const RulePairs = (props) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
 
   const isInputDisabled = props.mode === "shared-list-rule-view" ? true : false;
 
@@ -81,9 +86,11 @@ const RulePairs = (props) => {
     arrayOfOtherValuesToModify,
     triggerUnsavedChangesIndication = true
   ) => {
-    event && event.preventDefault && event.preventDefault();
-    let newValue = null;
-    newValue = customValue !== undefined ? customValue : event.target.value;
+    event?.preventDefault?.();
+
+    const newValue =
+      customValue !== undefined ? customValue : event.target.value;
+
     const copyOfCurrentlySelectedRule = JSON.parse(
       JSON.stringify(currentlySelectedRuleData)
     );
@@ -358,33 +365,44 @@ const RulePairs = (props) => {
     currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
   return (
-    <Collapse
-      className="rule-pairs-collapse"
-      defaultActiveKey={activePanelKey}
-      key={activePanelKey[activePanelKey.length - 1]}
-    >
-      {currentlySelectedRuleData?.pairs?.length > 0
-        ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
-            <Collapse.Panel
-              key={pair.id || pairIndex}
-              className="rule-pairs-panel"
-              extra={deleteButton(pairIndex)}
-              header={<span className="panel-header">{rulePairHeading}</span>}
-            >
-              {getPairMarkup(pair, pairIndex)}
-            </Collapse.Panel>
-          ))
-        : null}
-
-      {ruleFilterActiveWithPairIndex !== false ? (
-        <Filters
-          pairIndex={ruleFilterActiveWithPairIndex}
-          closeModal={closeFilterModal}
-          modifyPairAtGivenPath={modifyPairAtGivenPath}
-          isInputDisabled={isInputDisabled}
-        />
+    <>
+      {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
+        <ResponseRuleResourceTypes />
       ) : null}
-    </Collapse>
+
+      {props.currentlySelectedRuleConfig.TYPE !== "Response" ||
+      responseRuleResourceType !== "" ? (
+        <Collapse
+          className="rule-pairs-collapse"
+          defaultActiveKey={activePanelKey}
+          key={activePanelKey[activePanelKey.length - 1]}
+        >
+          {currentlySelectedRuleData?.pairs?.length > 0
+            ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
+                <Collapse.Panel
+                  key={pair.id || pairIndex}
+                  className="rule-pairs-panel"
+                  extra={deleteButton(pairIndex)}
+                  header={
+                    <span className="panel-header">{rulePairHeading}</span>
+                  }
+                >
+                  {getPairMarkup(pair, pairIndex)}
+                </Collapse.Panel>
+              ))
+            : null}
+
+          {ruleFilterActiveWithPairIndex !== false ? (
+            <Filters
+              pairIndex={ruleFilterActiveWithPairIndex}
+              closeModal={closeFilterModal}
+              modifyPairAtGivenPath={modifyPairAtGivenPath}
+              isInputDisabled={isInputDisabled}
+            />
+          ) : null}
+        </Collapse>
+      ) : null}
+    </>
   );
 };
 

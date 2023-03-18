@@ -5,7 +5,6 @@
 }
 
 .code-editor-header-row {
-  margin-top: 1rem;
   padding: 1rem 0.5rem;
   background: var(--component-header-background);
   border-top-left-radius: var(--border-radius-sm);
