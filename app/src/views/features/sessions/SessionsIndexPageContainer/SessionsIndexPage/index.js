@@ -37,7 +37,7 @@ import {
   getCurrentlyActiveWorkspace,
   getIsWorkspaceMode,
 } from "store/features/teams/selectors";
-import { getOwnerId } from "backend/mocks/common";
+import { getOwnerId } from "backend/utils";
 
 const _ = require("lodash");
 const pageSize = 15;

@@ -4,7 +4,7 @@ import { COLLECTION_NAME } from "./constants";
 import firebaseApp from "../../firebase";
 import { getFile } from "services/firebaseStorageService";
 import { SessionRecording } from "views/features/sessions/SessionViewer/types";
-import { getOwnerId } from "backend/mocks/common";
+import { getOwnerId } from "backend/utils";
 
 const isOwner = (recording: SessionRecording, uid: string) => {
   if (uid === recording.ownerId) return true;

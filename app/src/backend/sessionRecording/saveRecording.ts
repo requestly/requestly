@@ -9,7 +9,7 @@ import {
   SessionRecording,
   Visibility,
 } from "views/features/sessions/SessionViewer/types";
-import { getOwnerId } from "backend/mocks/common";
+import { getOwnerId } from "backend/utils";
 
 export const saveRecording = async (
   uid: string,
