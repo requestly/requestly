@@ -25,7 +25,7 @@ const InviteErrorModal = ({
         </div>
 
         { errors?.map((error) => {
-          return (<p className="text-gray overflow-hidden"><span className="text-bold">{error?.email}</span> ({error.message})</p>);
+          return (<p className="text-gray overflow-hidden"><span className="text-bold">{error?.email}</span> ({error.errorCode || error.message })</p>);
         }) }
       </div>
 
