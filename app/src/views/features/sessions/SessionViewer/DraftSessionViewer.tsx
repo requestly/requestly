@@ -57,6 +57,7 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 //@ts-ignore
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const defaultDebugInfo: CheckboxValueType[] = [
   "includeNetworkLogs",
@@ -69,6 +70,7 @@ const DraftSessionViewer: React.FC = () => {
 
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecording = useSelector(getSessionRecording);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
@@ -200,6 +202,7 @@ const DraftSessionViewer: React.FC = () => {
     setIsSaving(true);
     saveRecording(
       user?.details?.profile?.uid,
+      workspace?.id,
       sessionRecording,
       compressEvents(getSessionEventsToSave(recordingOptionsToSave)),
       recordingOptionsToSave
@@ -224,6 +227,7 @@ const DraftSessionViewer: React.FC = () => {
   }, [
     user?.loggedIn,
     user?.details?.profile?.uid,
+    workspace?.id,
     isSaving,
     sessionRecording,
     sessionRecordingName,

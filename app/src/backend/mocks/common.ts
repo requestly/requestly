@@ -11,13 +11,6 @@ import {
 import { createFile } from "services/firebaseStorageService";
 import { createResponseBodyFilepath } from "./utils";
 
-export const getOwnerId = (uid: string, teamId?: string) => {
-  if (teamId) {
-    return `team-${teamId}`;
-  }
-  return uid;
-};
-
 export const updateUserMockSelectorsMap = async (
   ownerId: string,
   mockId: string,

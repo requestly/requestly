@@ -10,7 +10,7 @@ import {
   MockType,
   RQMockMetadataSchema,
 } from "components/features/mocksV2/types";
-import { getOwnerId } from "./common";
+import { getOwnerId } from "backend/utils";
 
 export const getMocks = async (
   uid: string,

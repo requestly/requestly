@@ -19,6 +19,7 @@ import {
 import debounce from "lodash/debounce";
 import { AimOutlined } from "@ant-design/icons";
 import InfoIcon from "components/misc/InfoIcon";
+import { getUserAuthDetails } from "store/selectors";
 
 const SessionProperty: React.FC<{ label: string; children: ReactNode }> = ({
   label,
@@ -46,6 +47,7 @@ interface Props {
 
 const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const recordingId = useSelector(getSessionRecordingId);
   const attributes = useSelector(getSessionRecordingAttributes);
   const events = useSelector(getSessionRecordingEvents);
@@ -62,10 +64,14 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
     () =>
       debounce((value: number) => {
         if (recordingId) {
-          updateStartTimeOffset(recordingId, value);
+          updateStartTimeOffset(
+            user?.details?.profile?.uid,
+            recordingId,
+            value
+          );
         }
       }, 1000),
-    [recordingId]
+    [recordingId, user]
   );
 
   const onStartTimeOffsetChange = useCallback(
@@ -79,10 +85,10 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const saveDescription = useCallback(
     (value: string) => {
       if (recordingId) {
-        updateDescription(recordingId, value);
+        updateDescription(user?.details?.profile?.uid, recordingId, value);
       }
     },
-    [recordingId]
+    [recordingId, user]
   );
 
   const onDescriptionChange = useCallback(
