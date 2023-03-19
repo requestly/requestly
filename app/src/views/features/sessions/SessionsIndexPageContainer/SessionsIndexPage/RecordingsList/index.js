@@ -22,6 +22,9 @@ import {
 } from "../../../ShareRecordingModal";
 import { deleteRecording } from "../../../api";
 import TutorialButton from "../TutorialButton";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { UserIcon } from "components/common/UserIcon";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -57,6 +60,7 @@ const RecordingsList = ({
   TableFooter,
   _renderTableFooter,
 }) => {
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   return (
     <ProCard
       className="primary-card github-like-border rules-table-container"
@@ -118,12 +122,25 @@ const RecordingsList = ({
             },
           },
           {
+            title: "Created by",
+            width: "10%",
+            responsive: ["lg"],
+            className: "text-gray mock-table-user-icon",
+            dataIndex: "createdBy",
+            textAlign: "center",
+            render: (creatorUserID) => {
+              return <UserIcon uid={creatorUserID} />;
+            },
+          },
+          {
             title: "Visibility",
             dataIndex: "visibility",
             align: "center",
             width: "10%",
             render: (visibility) => (
-              <Tooltip title={getPrettyVisibilityName(visibility)}>
+              <Tooltip
+                title={getPrettyVisibilityName(visibility, isWorkspaceMode)}
+              >
                 {renderHeroIcon(visibility, "1em")}
               </Tooltip>
             ),
