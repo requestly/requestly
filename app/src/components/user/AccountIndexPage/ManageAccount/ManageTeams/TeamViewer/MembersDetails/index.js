@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { Col, Row, Button, Typography, Input, Switch, Divider } from "antd";
+import { Col, Row, Button, Typography, Input, Divider } from "antd";
 import { getAvailableTeams } from "store/features/teams/selectors";
 //Firebase
 import TeamMembersTable from "./TeamMembersTable";
@@ -13,6 +13,9 @@ import AddMemberModal from "./AddMemberModal";
 import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import "./MembersDetails.css";
+import { RQButton } from "lib/design-system/components";
+import CopyButton from "components/misc/CopyButton";
+import { toast } from "utils/Toast";
 
 const MembersDetails = ({ teamId }) => {
   const location = useLocation();
@@ -22,6 +25,8 @@ const MembersDetails = ({ teamId }) => {
   const [showSeatStatus, setShowSeatStatus] = useState(false);
   const [isAddMemberModalActive, setIsAddMemberModalActive] = useState(false);
   const [refreshTeamMembersTable, setRefreshTeamMembersTable] = useState(false);
+  const [publicInviteLink, setPublicInviteLink] = useState(null);
+  const [publicInviteLoading, setPublicInviteLoading] = useState(false);
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
@@ -68,46 +73,95 @@ const MembersDetails = ({ teamId }) => {
       .catch(() => setShowSeatStatus(false));
   }, [teamId, refreshTeamMembersTable]);
 
-  // DO NOT CHANGE
-  const __INVITE_LINK_FEATURE_WORK_IN_PROGRESS__ = true;
+  const handlePublicInviteCreatedClicked = () => {
+    const functions = getFunctions();
+    const createTeamInvite = httpsCallable(functions, "invites-createTeamInvite");
+    createTeamInvite({ teamId: teamId, usage: "unlimited"})
+      .then((res) => {
+        if(res?.data?.success) {
+          setPublicInviteLink(generateInviteLinkFromId(res?.data?.inviteId));
+        } else {
+          toast.error("Only admins can invite people");
+        }
+      })
+  }
+
+  const generateInviteLinkFromId = (inviteId) => {
+    return `${window.location.origin}/invite/${inviteId}`;
+  }
+
+  const fetchPublicInviteLink = () => {
+    setPublicInviteLoading(true);
+    const functions = getFunctions();
+    const getTeamPublicInvite = httpsCallable(functions, "invites-getTeamPublicInvite");
+    getTeamPublicInvite({ teamId: teamId })
+      .then((res) => {
+        console.log(res);
+        if(res?.data?.success) {
+          setPublicInviteLink(generateInviteLinkFromId(res?.data?.inviteId));
+        }
+        setPublicInviteLoading(false);
+      })
+      .catch(err => {
+        setPublicInviteLoading(false);
+      })
+  }
+
+  const stableFetchPublicInviteLink = useCallback(fetchPublicInviteLink, [teamId]);
+
+  useEffect(() => {
+    stableFetchPublicInviteLink();
+  }, [stableFetchPublicInviteLink]);
+
 
   return (
     <div className="members-details-container">
-      {/* invite */}
-      {__INVITE_LINK_FEATURE_WORK_IN_PROGRESS__ ? null : (
-        <>
-          <Row>
-            <Col span={24}>
-              <LearnMoreAboutWorkspace
-                linkText="Learn about adding members to your
-                workspace"
-              />
+      { publicInviteLoading ? null : (
+        <Row>
+          <Col span={24}>
+            <LearnMoreAboutWorkspace
+              linkText="Learn about adding members to your
+              workspace"
+            />
 
-              <Row align="middle" justify="space-between">
-                <Col className="header members-invite-title">Invite link</Col>
-                <Col className="ml-auto">
-                  <Switch onChange={() => {}} />
-                </Col>
-              </Row>
+            <Row align="middle" justify="space-between">
+              <Col className="header members-invite-title">Public Invite link</Col>
+              <Col className="ml-auto">
+              {
+                publicInviteLink?
+                (<RQButton type="danger">Revoke</RQButton>):
+                (<RQButton onClick={handlePublicInviteCreatedClicked} type="primary">Create Link</RQButton>)
+              }
+              </Col>
+            </Row>
 
-              <p className="text-dark-gray members-info-message">
-                Share this secret link to invite people to this workspace. Only
-                users who can invite members can see this. You can{" "}
-                {/* eslint-disable-next-line */}
-                <a href="#">reset the link</a> for all space members to generate
-                a new invite link.
-              </p>
-            </Col>
+            <p className="text-dark-gray members-info-message">
+              Share this secret link to invite people to this workspace. Only
+              users who can invite members can see this.
+            </p>
+          </Col>
+        </Row>
+      ) }
 
-            <Input.Group compact>
-              <Input className="invite-link-input" />
-              <Button type="primary">Copy link</Button>
-            </Input.Group>
-          </Row>
+      {publicInviteLink? (
+        <Row className={"public-invite-link-container"} justify="space-between">
+          <Col span={24}>
+            <Input
+              className="invite-link-input"
+              contentEditable={false}
+              value={publicInviteLink}
+              addonAfter={<CopyButton
+                title=""
+                copyText={publicInviteLink}
+              />}
+              disabled={true}
+              type="text"
+            />
+          </Col>
+        </Row>
+      ): null}
 
-          <Divider className="manage-workspace-divider" />
-        </>
-      )}
+      <Divider className="manage-workspace-divider" />
 
       {/* members table */}
       <Row>

@@ -107,7 +107,7 @@ const AddMemberModal = ({
             />
           </div>
           <div className="header add-member-modal-header">
-            Add people to {currentTeamId ? `${teamDetails?.name}'s` : ""}{" "}
+            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""}{" "}
             workspace
           </div>
           <p className="text-gray">
@@ -166,7 +166,7 @@ const AddMemberModal = ({
               onClick={handleAddMember}
               loading={isProcessing}
             >
-              Add members
+              Invite People
             </Button>
           </Col>
         </Row>
