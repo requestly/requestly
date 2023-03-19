@@ -258,7 +258,7 @@ const SessionsIndexPage = () => {
                       setReachedEnd(false);
                       fetchRecordings(null);
                     }}
-                    _renderTableFooter={filteredRecordings.length >= pageSize}
+                    _renderTableFooter={filteredRecordings.length > pageSize}
                     TableFooter={() => (
                       <>
                         {
