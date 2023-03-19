@@ -1391,7 +1391,7 @@ const RulesTable = ({
                     shape: "circle",
                     isTooltipShown: true,
                     hasPopconfirm: true,
-                    buttonText: "Upload",
+                    buttonText: "Import",
                     authSource: AUTH.SOURCE.UPLOAD_RULES,
                     icon: <UploadOutlined />,
                     onClickHandler: handleImportRulesOnClick,
