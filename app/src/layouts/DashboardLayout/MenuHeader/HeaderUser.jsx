@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu } from "antd";
+import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu, Row, Space } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
@@ -138,12 +138,21 @@ export default function HeaderUser() {
               open && trackHeaderClicked("user_menu");
             }}
           >
-            <Avatar
-              size={28}
-              src={userPhoto}
-              shape="square"
-              className="cursor-pointer"
-            />
+            <Row gap={2}>
+              <Space>
+                <Col>
+                  <span className="text-gray text-sm">{userEmail}</span>
+                </Col>
+                <Col>
+                  <Avatar
+                    size={28}
+                    src={userPhoto}
+                    shape="square"
+                    className="cursor-pointer"
+                  />
+                </Col>
+              </Space>
+            </Row>
           </Dropdown>
         </Col>
       </>
