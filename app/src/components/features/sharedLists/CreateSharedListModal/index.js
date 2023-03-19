@@ -46,7 +46,7 @@ const CreateSharedListModal = (props) => {
   );
   const [isSharedListCreated, setIsSharedListCreated] = useState(false);
   const [sharedListURL, setSharedListURL] = useState(null);
-  const [permittedEmailsValue, setPermittedEmailsValue] = useState([]);
+  const [permittedEmailsList, setPermittedEmailsList] = useState([]);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListVisibility, setSharedListVisibility] = useState(
     Visibility.PUBLIC
@@ -250,7 +250,7 @@ const CreateSharedListModal = (props) => {
 
   const renderCreationSummary = () => {
     const handleAddRecipient = (recipients) => {
-      setPermittedEmailsValue(recipients);
+      setPermittedEmailsList(recipients);
       const newRecipients = recipients.map((recipient) => ({
         label: recipient,
         value: recipient,
@@ -311,7 +311,7 @@ const CreateSharedListModal = (props) => {
               <ReactMultiEmail
                 className="github-like-border restricted-users-input"
                 placeholder="sam@amazon.com, tom@google.com"
-                emails={permittedEmailsValue}
+                emails={permittedEmailsList}
                 onChange={(email) => {
                   handleAddRecipient(email);
                 }}
