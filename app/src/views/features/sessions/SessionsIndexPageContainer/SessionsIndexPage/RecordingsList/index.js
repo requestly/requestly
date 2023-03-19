@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   DeleteOutlined,
   ExclamationCircleOutlined,
@@ -61,6 +61,162 @@ const RecordingsList = ({
   _renderTableFooter,
 }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
+  const getColumns = () => {
+    let columns = [
+      {
+        title: "Name",
+        dataIndex: "name",
+        width: "30%",
+        render: (name, record) => {
+          return (
+            <Link
+              to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id}
+              state={{ fromApp: true }}
+            >
+              {name}
+            </Link>
+          );
+        },
+      },
+      {
+        title: "Host",
+        dataIndex: "url",
+        width: "20%",
+        render: (url) => {
+          return (
+            <>
+              <Avatar
+                size="small"
+                style={{ display: "inline-block", marginRight: "2px" }}
+                src={`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${
+                  new URL(url).origin
+                }&size=64`}
+              />
+              <Tooltip title={url}>{` ${new URL(url).hostname}`}</Tooltip>
+            </>
+          );
+        },
+      },
+      {
+        title: "Recorded At",
+        dataIndex: "startTime",
+        width: "15%",
+        render: (ts) => {
+          return epochToDateAndTimeString(ts);
+        },
+      },
+      {
+        title: "Duration",
+        dataIndex: "duration",
+        width: "10%",
+        render: (ms) => {
+          return msToHoursMinutesAndSeconds(ms);
+        },
+      },
+      {
+        title: "Created by",
+        width: "10%",
+        responsive: ["lg"],
+        className: "text-gray mock-table-user-icon",
+        dataIndex: "createdBy",
+        textAlign: "center",
+        render: (creatorUserID) => {
+          return <UserIcon uid={creatorUserID} />;
+        },
+      },
+      {
+        title: "Visibility",
+        dataIndex: "visibility",
+        align: "center",
+        width: "10%",
+        render: (visibility) => (
+          <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>
+            {renderHeroIcon(visibility, "1em")}
+          </Tooltip>
+        ),
+      },
+
+      {
+        title: "",
+        width: "15%",
+        dataIndex: "id",
+        render: (id, record) => {
+          return (
+            <>
+              <div className="rule-action-buttons">
+                <ReactHoverObserver>
+                  {({ isHovering }) => (
+                    <Space>
+                      <Text
+                        type={isHovering ? "primary" : "secondary"}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          setSharingRecordId(id);
+                          setSelectedRowVisibility(record.visibility);
+                          setIsShareModalVisible(true);
+                        }}
+                      >
+                        <Tooltip title="Share with your Teammates">
+                          <Tag>
+                            <ShareAltOutlined />
+                          </Tag>
+                        </Tooltip>
+                      </Text>
+
+                      <Text
+                        type={isHovering ? "primary" : "secondary"}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <Tooltip title="Delete" placement="bottom">
+                          <Tag
+                            onClick={() =>
+                              confirmDeleteAction(
+                                id,
+                                record.eventsFilePath,
+                                callbackOnDeleteSuccess
+                              )
+                            }
+                          >
+                            <DeleteOutlined
+                              style={{
+                                padding: "5px 0px",
+                                fontSize: "12px",
+                                cursor: "pointer",
+                              }}
+                            />
+                          </Tag>
+                        </Tooltip>
+                      </Text>
+                    </Space>
+                  )}
+                </ReactHoverObserver>
+              </div>
+            </>
+          );
+        },
+      },
+    ];
+
+    if (!isWorkspaceMode) {
+      columns = columns.filter((colObj) => {
+        return colObj.title !== "Created by";
+      });
+    }
+
+    return columns;
+  };
+
+  const getStableColumns = useCallback(getColumns, [
+    isWorkspaceMode,
+    callbackOnDeleteSuccess,
+    setIsShareModalVisible,
+    setSelectedRowVisibility,
+    setSharingRecordId,
+  ]);
+
   return (
     <ProCard
       className="primary-card github-like-border rules-table-container"
@@ -70,144 +226,7 @@ const RecordingsList = ({
         loading={isTableLoading}
         dataSource={filteredRecordings}
         scroll={{ x: 700 }}
-        columns={[
-          {
-            title: "Name",
-            dataIndex: "name",
-            width: "30%",
-            render: (name, record) => {
-              return (
-                <Link
-                  to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id}
-                  state={{ fromApp: true }}
-                >
-                  {name}
-                </Link>
-              );
-            },
-          },
-          {
-            title: "Host",
-            dataIndex: "url",
-            width: "20%",
-            render: (url) => {
-              return (
-                <>
-                  <Avatar
-                    size="small"
-                    style={{ display: "inline-block", marginRight: "2px" }}
-                    src={`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${
-                      new URL(url).origin
-                    }&size=64`}
-                  />
-                  <Tooltip title={url}>{` ${new URL(url).hostname}`}</Tooltip>
-                </>
-              );
-            },
-          },
-          {
-            title: "Recorded At",
-            dataIndex: "startTime",
-            width: "15%",
-            render: (ts) => {
-              return epochToDateAndTimeString(ts);
-            },
-          },
-          {
-            title: "Duration",
-            dataIndex: "duration",
-            width: "10%",
-            render: (ms) => {
-              return msToHoursMinutesAndSeconds(ms);
-            },
-          },
-          {
-            title: "Created by",
-            width: "10%",
-            responsive: ["lg"],
-            className: "text-gray mock-table-user-icon",
-            dataIndex: "createdBy",
-            textAlign: "center",
-            render: (creatorUserID) => {
-              return <UserIcon uid={creatorUserID} />;
-            },
-          },
-          {
-            title: "Visibility",
-            dataIndex: "visibility",
-            align: "center",
-            width: "10%",
-            render: (visibility) => (
-              <Tooltip
-                title={getPrettyVisibilityName(visibility, isWorkspaceMode)}
-              >
-                {renderHeroIcon(visibility, "1em")}
-              </Tooltip>
-            ),
-          },
-
-          {
-            title: "",
-            width: "15%",
-            dataIndex: "id",
-            render: (id, record) => {
-              return (
-                <>
-                  <div className="rule-action-buttons">
-                    <ReactHoverObserver>
-                      {({ isHovering }) => (
-                        <Space>
-                          <Text
-                            type={isHovering ? "primary" : "secondary"}
-                            style={{
-                              cursor: "pointer",
-                            }}
-                            onClick={() => {
-                              setSharingRecordId(id);
-                              setSelectedRowVisibility(record.visibility);
-                              setIsShareModalVisible(true);
-                            }}
-                          >
-                            <Tooltip title="Share with your Teammates">
-                              <Tag>
-                                <ShareAltOutlined />
-                              </Tag>
-                            </Tooltip>
-                          </Text>
-
-                          <Text
-                            type={isHovering ? "primary" : "secondary"}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <Tooltip title="Delete" placement="bottom">
-                              <Tag
-                                onClick={() =>
-                                  confirmDeleteAction(
-                                    id,
-                                    record.eventsFilePath,
-                                    callbackOnDeleteSuccess
-                                  )
-                                }
-                              >
-                                <DeleteOutlined
-                                  style={{
-                                    padding: "5px 0px",
-                                    fontSize: "12px",
-                                    cursor: "pointer",
-                                  }}
-                                />
-                              </Tag>
-                            </Tooltip>
-                          </Text>
-                        </Space>
-                      )}
-                    </ReactHoverObserver>
-                  </div>
-                </>
-              );
-            },
-          },
-        ]}
+        columns={getStableColumns()}
         rowKey="id"
         search={false}
         pagination={false}
