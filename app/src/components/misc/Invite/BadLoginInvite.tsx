@@ -25,7 +25,6 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
     const openAuthModal = () => {
         handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
             .then(() => {
-                console.log("Signed Out");
                 dispatch(
                     actions.toggleActiveModal({
                       modalName: "authModal",

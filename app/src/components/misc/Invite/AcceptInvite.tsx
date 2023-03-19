@@ -37,7 +37,6 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
             .then((res: any) => {
                 console.log(res);
                 if(res?.data?.success) {
-                    console.log("Successfully accepted invite", res?.data?.data);
                     toast.success("Successfully accepted invite");
 
                     if(res?.data?.data?.invite.type === "teams") {
@@ -64,7 +63,6 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
                 setInProgress(false);
             }).catch((err) => {
                 toast.error("Error while accepting invitation. Please contact workspace admin");
-                console.log(err);
                 setInProgress(false);
             })
     }

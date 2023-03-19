@@ -70,7 +70,6 @@ const AddMemberModal = ({
       emails: userEmail,
       role: makeUserAdmin ? "admin": "write",
     }).then((res) => {
-      console.log(res);
       if(res?.data?.success) {
         toast.success("Sent invites successfully");
         callback?.();
@@ -82,11 +81,12 @@ const AddMemberModal = ({
           callback?.();
           setInviteErrors([...inviteErrors]);
           setInviteErrorModalActive(true);
-          trackAddTeamMemberFailure(teamId, userEmail, "user_not_found");
+          trackAddTeamMemberFailure(teamId, userEmail, null);
           setIsProcessing(false);
       }
     }).catch(err => {
-      toast.error("Error while creating invitations. Make sure you are an admin")
+      toast.error("Error while creating invitations. Make sure you are an admin");
+      trackAddTeamMemberFailure(teamId, userEmail, null);
     })
   };
 

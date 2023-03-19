@@ -73,7 +73,7 @@ const MembersDetails = ({ teamId }) => {
       .catch(() => setShowSeatStatus(false));
   }, [teamId, refreshTeamMembersTable]);
 
-  const handlePublicInviteCreatedClicked = () => {
+  const handlePublicInviteCreateClicked = () => {
     const functions = getFunctions();
     const createTeamInvite = httpsCallable(functions, "invites-createTeamInvite");
     createTeamInvite({ teamId: teamId, usage: "unlimited"})
@@ -110,7 +110,6 @@ const MembersDetails = ({ teamId }) => {
     const getTeamPublicInvite = httpsCallable(functions, "invites-getTeamPublicInvite");
     getTeamPublicInvite({ teamId: teamId })
       .then((res) => {
-        console.log(res);
         if(res?.data?.success) {
           setPublicInviteId(res?.data?.inviteId);
         }
@@ -144,7 +143,7 @@ const MembersDetails = ({ teamId }) => {
               {
                 publicInviteId?
                 (<RQButton type="danger" onClick={handlePublicInviteRevokeClicked}>Revoke</RQButton>):
-                (<RQButton onClick={handlePublicInviteCreatedClicked} type="primary">Create Link</RQButton>)
+                (<RQButton onClick={handlePublicInviteCreateClicked} type="primary">Create Link</RQButton>)
               }
               </Col>
             </Row>

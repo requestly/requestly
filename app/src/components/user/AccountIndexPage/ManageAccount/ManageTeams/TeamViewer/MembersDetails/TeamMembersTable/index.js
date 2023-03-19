@@ -226,7 +226,6 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
       .then((res) => {
         if (!mountedRef.current) return null;
         const response = res.data;
-        console.log("Members", response);
         if (response.success) {
           setMembers(response.users);
         } else {
@@ -244,7 +243,6 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
     }).then((res) => {
         if (!mountedRef.current) return null;
         const response = res.data;
-        console.log("Pending", response);
         if (response.success) {
           setPendingMembers(response.users);
         } else {
