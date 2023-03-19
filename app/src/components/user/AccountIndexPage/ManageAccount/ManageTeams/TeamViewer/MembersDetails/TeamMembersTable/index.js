@@ -20,6 +20,7 @@ import RemoveUserModal from "./RemoveUserModal";
 import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
+import PendingMemberRoleDropwdown from "../../common/PendingMemberRoleDropwdown";
 
 const TeamMembersTable = ({ teamId, refresh, callback }) => {
   const navigate = useNavigate();
@@ -145,9 +146,15 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
       render: (member) => {
         if(member.isPending) {
           return (
-            <span>
-              {member?.isAdmin ? "Admin access": "Member Access"}
-            </span>
+            <PendingMemberRoleDropwdown
+              showLoader
+              isHoverEffect
+              placement="bottomLeft"
+              isAdmin={member.isAdmin}
+              isLoggedInUserAdmin={isLoggedInUserAdmin}
+              inviteId={member?.inviteId}
+              fetchTeamMembers={fetchTeamMembers}
+            />
           );
         }
 
