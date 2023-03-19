@@ -25,7 +25,7 @@ const MembersDetails = ({ teamId }) => {
   const [showSeatStatus, setShowSeatStatus] = useState(false);
   const [isAddMemberModalActive, setIsAddMemberModalActive] = useState(false);
   const [refreshTeamMembersTable, setRefreshTeamMembersTable] = useState(false);
-  const [publicInviteLink, setPublicInviteLink] = useState(null);
+  const [publicInviteId, setPublicInviteId] = useState(null);
   const [publicInviteLoading, setPublicInviteLoading] = useState(false);
 
   // Global state
@@ -79,9 +79,23 @@ const MembersDetails = ({ teamId }) => {
     createTeamInvite({ teamId: teamId, usage: "unlimited"})
       .then((res) => {
         if(res?.data?.success) {
-          setPublicInviteLink(generateInviteLinkFromId(res?.data?.inviteId));
+          setPublicInviteId(res?.data?.inviteId);
         } else {
           toast.error("Only admins can invite people");
+        }
+      })
+  }
+
+  const handlePublicInviteRevokeClicked = () => {
+    const functions = getFunctions();
+    const revokeInvite = httpsCallable(functions, "invites-revokeInvite");
+    revokeInvite({ inviteId: publicInviteId })
+      .then((res) => {
+        if(res?.data?.success) {
+          setPublicInviteId(null);
+          toast.success("Successfully Revoked invite");
+        } else {
+          toast.error("Only admins can revoke invites");
         }
       })
   }
@@ -98,7 +112,7 @@ const MembersDetails = ({ teamId }) => {
       .then((res) => {
         console.log(res);
         if(res?.data?.success) {
-          setPublicInviteLink(generateInviteLinkFromId(res?.data?.inviteId));
+          setPublicInviteId(res?.data?.inviteId);
         }
         setPublicInviteLoading(false);
       })
@@ -128,8 +142,8 @@ const MembersDetails = ({ teamId }) => {
               <Col className="header members-invite-title">Public Invite link</Col>
               <Col className="ml-auto">
               {
-                publicInviteLink?
-                (<RQButton type="danger">Revoke</RQButton>):
+                publicInviteId?
+                (<RQButton type="danger" onClick={handlePublicInviteRevokeClicked}>Revoke</RQButton>):
                 (<RQButton onClick={handlePublicInviteCreatedClicked} type="primary">Create Link</RQButton>)
               }
               </Col>
@@ -143,16 +157,16 @@ const MembersDetails = ({ teamId }) => {
         </Row>
       ) }
 
-      {publicInviteLink? (
+      {publicInviteId? (
         <Row className={"public-invite-link-container"} justify="space-between">
           <Col span={24}>
             <Input
               className="invite-link-input"
               contentEditable={false}
-              value={publicInviteLink}
+              value={generateInviteLinkFromId(publicInviteId)}
               addonAfter={<CopyButton
                 title=""
-                copyText={publicInviteLink}
+                copyText={generateInviteLinkFromId(publicInviteId)}
               />}
               disabled={true}
               type="text"
