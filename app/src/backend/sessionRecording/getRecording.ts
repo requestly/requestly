@@ -4,21 +4,25 @@ import { COLLECTION_NAME } from "./constants";
 import firebaseApp from "../../firebase";
 import { getFile } from "services/firebaseStorageService";
 import { SessionRecording } from "views/features/sessions/SessionViewer/types";
+import { getOwnerId } from "backend/utils";
 
-const isAuthor = (recording: SessionRecording, uid: string) => {
-  if (uid === recording.author) return true;
+const isOwner = (recording: SessionRecording, uid: string) => {
+  if (uid === recording.ownerId) return true;
 
   return false;
 };
 
 const hasRecordingAccess = (
   recording: SessionRecording,
-  uid: string,
+  uid: string, // usrId or ownerId
   email: string
 ): boolean => {
+  if (recording.visibility === "public") return true;
+
   if (!uid) return false;
 
-  if (uid === recording.author) return true;
+  if (recording.visibility === "only-me" && uid === recording.ownerId)
+    return true;
 
   // TODO: We should ideally keep uids here instead of keeping emails.
   if (recording.accessEmails.includes(email)) return true;
@@ -35,13 +39,14 @@ const fetchRecordingEvents = async (filePath: string) => {
 export const getRecording = async (
   sessionId: string,
   uid: string,
+  workspaceId: string | null,
   email: string
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
-
   const sessionRecordingRef = doc(db, COLLECTION_NAME, sessionId);
-
   const snapshot = await getDoc(sessionRecordingRef);
+
+  const ownerId = getOwnerId(uid, workspaceId);
 
   if (!snapshot.exists()) {
     const err = new Error(
@@ -53,35 +58,24 @@ export const getRecording = async (
 
   const data = snapshot.data() as SessionRecording;
 
-  const visibility = data.visibility;
-
   const response: any = {
     payload: {
       ...data,
-      isRequestedByAuthor: isAuthor(data, uid),
+      isRequestedByOwner: isOwner(data, ownerId),
     },
     events: null,
   };
 
   let events: any = null;
 
-  switch (visibility) {
-    case "only-me":
-    case "custom":
-      if (hasRecordingAccess(data, uid, email)) {
-        events = await fetchRecordingEvents(data?.eventsFilePath);
-      } else {
-        const err = new Error(
-          "You do not have permission to access this recording"
-        );
-        err.name = "PermissionDenied";
-        throw err;
-      }
-      break;
-
-    case "public":
-    default:
-      events = await fetchRecordingEvents(data?.eventsFilePath);
+  if (hasRecordingAccess(data, ownerId, email)) {
+    events = await fetchRecordingEvents(data?.eventsFilePath);
+  } else {
+    const err = new Error(
+      "You do not have permission to access this recording"
+    );
+    err.name = "PermissionDenied";
+    throw err;
   }
 
   response.events = events;

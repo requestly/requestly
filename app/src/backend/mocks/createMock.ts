@@ -7,12 +7,8 @@ import {
   collection,
 } from "firebase/firestore";
 import { RQMockSchema } from "components/features/mocksV2/types";
-
-import {
-  getOwnerId,
-  updateUserMockSelectorsMap,
-  uploadResponseBodyFiles,
-} from "./common";
+import { getOwnerId } from "backend/utils";
+import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 import { updateMockFromFirebase } from "./updateMock";

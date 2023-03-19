@@ -1,7 +1,7 @@
 import firebaseApp from "../../firebase";
 import { doc, updateDoc, getFirestore, Timestamp } from "firebase/firestore";
-import { getOwnerId, removeUserMockSelector } from "./common";
-
+import { removeUserMockSelector } from "./common";
+import { getOwnerId } from "backend/utils";
 export const deleteMock = async (
   uid: string,
   mockId: string,

@@ -22,13 +22,14 @@ import { deleteRecording } from "../api";
 import { getAuthInitialization, getUserAuthDetails } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import {
-  getIsRequestedByAuthor,
+  getIsRequestedByOwner,
   getSessionRecordingEventsFilePath,
   getSessionRecordingName,
 } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -41,10 +42,11 @@ const SavedSessionViewer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const name = useSelector(getSessionRecordingName);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
-  const isRequestedByAuthor = useSelector(getIsRequestedByAuthor);
+  const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
@@ -111,7 +113,12 @@ const SavedSessionViewer: React.FC = () => {
 
     setIsFetching(true);
 
-    getRecording(id, user?.details?.profile?.uid, user?.details?.profile?.email)
+    getRecording(
+      id,
+      user?.details?.profile?.uid,
+      workspace?.id,
+      user?.details?.profile?.email
+    )
       .then((res) => {
         setShowPermissionError(false);
 
@@ -139,6 +146,7 @@ const SavedSessionViewer: React.FC = () => {
     id,
     user?.details?.profile?.uid,
     user?.details?.profile?.email,
+    workspace?.id,
   ]);
 
   if (showPermissionError) return <PermissionError />;
@@ -160,7 +168,7 @@ const SavedSessionViewer: React.FC = () => {
               {name}
             </Typography.Title>
           </div>
-          {isRequestedByAuthor ? (
+          {isRequestedByOwner ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton
