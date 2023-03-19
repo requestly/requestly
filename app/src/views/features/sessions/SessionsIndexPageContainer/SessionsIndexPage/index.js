@@ -38,13 +38,12 @@ import {
   getIsWorkspaceMode,
 } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/mocks/common";
-import ExtensionUpgradeAlert from "../../errors/ExtensionVersionError/ClosableAlert";
 
 const _ = require("lodash");
 const pageSize = 15;
 let unsubscribeListener;
 
-const SessionsIndexPage = ({ isFeatureCompatible }) => {
+const SessionsIndexPage = () => {
   // Custom Hooks
   const usePrevious = (value) => {
     const ref = useRef();
@@ -234,7 +233,6 @@ const SessionsIndexPage = ({ isFeatureCompatible }) => {
 
   return (
     <>
-      {!isFeatureCompatible ? <ExtensionUpgradeAlert /> : null}
       <ConfigurationModal
         config={config}
         isModalVisible={isConfigModalVisible}

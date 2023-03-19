@@ -12,13 +12,11 @@ const isOwner = (recording: SessionRecording, uid: string) => {
   return false;
 };
 
-export const hasRecordingAccess = (
+const hasRecordingAccess = (
   recording: SessionRecording,
   uid: string, // usrId or ownerId
   email: string
 ): boolean => {
-  console.log("prems", uid, recording);
-
   if (recording.visibility === "public") return true;
 
   if (!uid) return false;

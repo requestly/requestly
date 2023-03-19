@@ -47,7 +47,7 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
       return "Anyone with the link";
     case Visibility.CUSTOM:
       return isWorkspaceMode
-        ? "Visible to specific people outside this workspace"
+        ? "Only with specific people outside this workspace"
         : "Only with specific people";
     case Visibility.ORGANIZATION:
       return "All members of my organization";
@@ -109,7 +109,7 @@ const ShareRecordingModal = ({
         return "Anyone on the Internet with the link can view";
       case Visibility.CUSTOM:
         return isWorkspaceMode
-          ? "Apart from this workspace, only people listed below can access this recording"
+          ? "People in this Workspace & listed below can open with the link"
           : "Only people listed below can open with the link";
       case Visibility.ORGANIZATION:
         return "Only people in your organization can access this recording";
@@ -137,7 +137,7 @@ const ShareRecordingModal = ({
     {
       key: Visibility.CUSTOM,
       label: isWorkspaceMode
-        ? "Visible to specific people outside this workspace"
+        ? "Only with specific people outside this workspace"
         : "Only with specific people",
     },
   ];

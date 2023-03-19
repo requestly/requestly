@@ -93,7 +93,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
     if (currentVisibility !== Visibility.ONLY_ME) {
       options.push({
         label: isWorkspaceMode
-          ? "Only visible to workspace"
+          ? "Make private to workspace"
           : "Make private to me",
         key: Visibility.ONLY_ME,
         icon: <LockOutlined />,

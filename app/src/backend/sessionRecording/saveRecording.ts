@@ -52,7 +52,6 @@ export const saveRecording = async (
       return docRef.id;
     })
     .catch((err) => {
-      console.log("could not properly save recording", err);
       return null;
     });
 

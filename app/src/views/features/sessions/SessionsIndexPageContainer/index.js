@@ -26,11 +26,11 @@ const SessionsIndexPageContainer = () => {
   }
   if (
     isWorkspaceMode &&
-    !featureFlag.getValue(FEATURES.WORKSPACE_SESSION_RECORDING, true)
+    !featureFlag.getValue(FEATURES.WORKSPACE_SESSION_RECORDING, false)
   )
     // todo: change default to false
     return <TeamFeatureComingSoon title="Session recording" />;
-  return <SessionsIndexPage isFeatureCompatible={isFeatureCompatible} />;
+  return <SessionsIndexPage />;
 };
 
 export default SessionsIndexPageContainer;

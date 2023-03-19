@@ -16,6 +16,7 @@ import {
   trackSessionRecordingVisibilityUpdated,
 } from "modules/analytics/events/features/sessionRecording";
 import { SessionRecording, Visibility } from "./SessionViewer/types";
+import Logger from "lib/logger";
 
 const COLLECTION_NAME = "session-recordings";
 
@@ -42,7 +43,7 @@ export const deleteRecording = async (id: string, eventsFilePath: string) => {
     toast.success("Deleted the recording");
     trackSessionRecordingDeleted();
   } catch (error) {
-    console.log("error", error);
+    Logger.log("error", error);
     toast.error("Something went wrong!");
     throw error;
   }
