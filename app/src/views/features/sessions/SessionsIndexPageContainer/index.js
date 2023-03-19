@@ -1,9 +1,11 @@
 import { isExtensionVersionCompatible } from "actions/ExtensionActions";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import APP_CONSTANTS from "config/constants";
+import FEATURES from "config/constants/sub/features";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import featureFlag from "utils/feature-flag";
 import ExtensionVersionError from "../errors/ExtensionVersionError";
 import SessionsIndexPage from "./SessionsIndexPage";
 
@@ -19,10 +21,14 @@ const SessionsIndexPageContainer = () => {
     );
   }, []);
 
-  if (!isFeatureCompatible) {
+  if (!isFeatureCompatible && !isWorkspaceMode) {
     return <ExtensionVersionError />;
   }
-  if (isWorkspaceMode)
+  if (
+    isWorkspaceMode &&
+    !featureFlag.getValue(FEATURES.WORKSPACE_SESSION_RECORDING, false)
+  )
+    // todo: change default to false
     return <TeamFeatureComingSoon title="Session recording" />;
   return <SessionsIndexPage />;
 };

@@ -14,6 +14,9 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
 import "./shareRecordingModal.scss";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 
 const _ = require("lodash");
 
@@ -36,14 +39,16 @@ export const renderHeroIcon = (currentVisibility, size = 16) => {
   }
 };
 
-export const getPrettyVisibilityName = (visibility) => {
+export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
   switch (visibility) {
     case Visibility.ONLY_ME:
-      return "Private to me";
+      return isWorkspaceMode ? "Private to current workspace" : "Private to me";
     case Visibility.PUBLIC:
       return "Anyone with the link";
     case Visibility.CUSTOM:
-      return "Only with specific people";
+      return isWorkspaceMode
+        ? "Only with specific people outside this workspace"
+        : "Only with specific people";
     case Visibility.ORGANIZATION:
       return "All members of my organization";
 
@@ -59,6 +64,9 @@ const ShareRecordingModal = ({
   recordingId,
   onVisibilityChange,
 }) => {
+  const user = useSelector(getUserAuthDetails);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
   const publicURL = getSessionRecordingSharedLink(recordingId);
   // Component State
   const [copiedText, setCopiedText] = useState("");
@@ -83,18 +91,26 @@ const ShareRecordingModal = ({
   };
 
   const handleVisibilityChange = async (newVisibility) => {
-    await updateVisibility(recordingId, newVisibility);
+    await updateVisibility(
+      user?.details?.profile?.uid,
+      recordingId,
+      newVisibility
+    );
     onVisibilityChange && onVisibilityChange(newVisibility);
   };
 
   const getPrettyDescription = (visibility) => {
     switch (visibility) {
       case Visibility.ONLY_ME:
-        return "No one except me can access this recording";
+        return isWorkspaceMode
+          ? "No one outside this workspace can access this recording"
+          : "No one except me can access this recording";
       case Visibility.PUBLIC:
         return "Anyone on the Internet with the link can view";
       case Visibility.CUSTOM:
-        return "Only people listed below can open with the link";
+        return isWorkspaceMode
+          ? "People in this Workspace & listed below can open with the link"
+          : "Only people listed below can open with the link";
       case Visibility.ORGANIZATION:
         return "Only people in your organization can access this recording";
 
@@ -106,7 +122,7 @@ const ShareRecordingModal = ({
   const allOptions = [
     {
       key: Visibility.ONLY_ME,
-      label: "Private to me",
+      label: isWorkspaceMode ? "Private to workspace" : "Private to me",
     },
     {
       key: Visibility.PUBLIC,
@@ -120,7 +136,9 @@ const ShareRecordingModal = ({
     },
     {
       key: Visibility.CUSTOM,
-      label: "Only with specific people",
+      label: isWorkspaceMode
+        ? "Only with specific people outside this workspace"
+        : "Only with specific people",
     },
   ];
 
@@ -128,14 +146,24 @@ const ShareRecordingModal = ({
     setConfirmLoading(true);
 
     if (_.isEmpty(currentEmails)) {
-      await updateVisibility(recordingId, Visibility.ONLY_ME, currentEmails);
+      await updateVisibility(
+        user?.details?.profile?.uid,
+        recordingId,
+        Visibility.ONLY_ME,
+        currentEmails
+      );
       onVisibilityChange && onVisibilityChange(Visibility.ONLY_ME);
     } else {
       const recipients = currentEmails.filter(
         (email) => !sentEmails.current.includes(email)
       );
 
-      await updateVisibility(recordingId, "custom", currentEmails);
+      await updateVisibility(
+        user?.details?.profile?.uid,
+        recordingId,
+        "custom",
+        currentEmails
+      );
 
       const functions = getFunctions(firebaseApp);
       const sendSessionRecordingAsEmail = httpsCallable(
