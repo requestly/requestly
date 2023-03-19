@@ -8,6 +8,8 @@ interface UserIconProps {
 }
 
 export const UserIcon = ({ uid }: UserIconProps) => {
+  console.log("userid ", uid);
+
   const currentlyActiveWorkspaceMembers = useSelector(
     getCurrentlyActiveWorkspaceMembers
   );

@@ -49,12 +49,16 @@ export const deleteRecording = async (id: string, eventsFilePath: string) => {
 };
 
 export const updateVisibility = async (
+  userId: string,
   id: string,
   visibility: Visibility,
   accessEmails: string[] = []
 ) => {
   try {
-    await updateSessionRecordingProperties(id, { visibility, accessEmails });
+    await updateSessionRecordingProperties(userId, id, {
+      visibility,
+      accessEmails,
+    });
     toast.success("Permissions updated");
     trackSessionRecordingVisibilityUpdated(visibility);
   } catch (error) {
@@ -64,11 +68,12 @@ export const updateVisibility = async (
 };
 
 export const updateStartTimeOffset = async (
+  userId: string,
   id: string,
   startTimeOffset: number
 ) => {
   try {
-    await updateSessionRecordingProperties(id, { startTimeOffset });
+    await updateSessionRecordingProperties(userId, id, { startTimeOffset });
     toast.success("Updated default start time for the recording");
     trackSessionRecordingStartTimeOffsetUpdated();
   } catch (error) {
@@ -77,9 +82,13 @@ export const updateStartTimeOffset = async (
   }
 };
 
-export const updateDescription = async (id: string, description: string) => {
+export const updateDescription = async (
+  userId: string,
+  id: string,
+  description: string
+) => {
   try {
-    await updateSessionRecordingProperties(id, { description });
+    await updateSessionRecordingProperties(userId, id, { description });
     toast.success("Updated description for the recording");
     trackSessionRecordingDescriptionUpdated();
   } catch (error) {
@@ -89,9 +98,15 @@ export const updateDescription = async (id: string, description: string) => {
 };
 
 export const updateSessionRecordingProperties = async (
+  userId: string, // updater id
   id: string,
-  properties: Partial<SessionRecording>
+  partialUpdateObject: Partial<SessionRecording>
 ) => {
   const db = getFirestore(firebaseApp);
-  await updateDoc(doc(collection(db, COLLECTION_NAME), id), properties);
+  partialUpdateObject.updatedTs = Date.now();
+  partialUpdateObject.lastUpdatedBy = userId;
+  await updateDoc(
+    doc(collection(db, COLLECTION_NAME), id),
+    partialUpdateObject
+  );
 };

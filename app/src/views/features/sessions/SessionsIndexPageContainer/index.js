@@ -21,7 +21,7 @@ const SessionsIndexPageContainer = () => {
     );
   }, []);
 
-  if (!isFeatureCompatible) {
+  if (!isFeatureCompatible && !isWorkspaceMode) {
     return <ExtensionVersionError />;
   }
   if (
@@ -30,7 +30,7 @@ const SessionsIndexPageContainer = () => {
   )
     // todo: change default to false
     return <TeamFeatureComingSoon title="Session recording" />;
-  return <SessionsIndexPage />;
+  return <SessionsIndexPage isFeatureCompatible={isFeatureCompatible} />;
 };
 
 export default SessionsIndexPageContainer;

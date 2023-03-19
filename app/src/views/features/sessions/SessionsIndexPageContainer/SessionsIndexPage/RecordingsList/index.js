@@ -24,6 +24,7 @@ import { deleteRecording } from "../../../api";
 import TutorialButton from "../TutorialButton";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { UserIcon } from "components/common/UserIcon";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -118,6 +119,17 @@ const RecordingsList = ({
             width: "10%",
             render: (ms) => {
               return msToHoursMinutesAndSeconds(ms);
+            },
+          },
+          {
+            title: "Created by",
+            width: "10%",
+            responsive: ["lg"],
+            className: "text-gray mock-table-user-icon",
+            dataIndex: "createdBy",
+            textAlign: "center",
+            render: (creatorUserID) => {
+              return <UserIcon uid={creatorUserID} />;
             },
           },
           {

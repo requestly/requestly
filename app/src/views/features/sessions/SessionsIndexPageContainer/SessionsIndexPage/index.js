@@ -38,11 +38,13 @@ import {
   getIsWorkspaceMode,
 } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/mocks/common";
+import ExtensionUpgradeAlert from "../../errors/ExtensionVersionError/ClosableAlert";
 
 const _ = require("lodash");
 const pageSize = 15;
+let unsubscribeListener;
 
-const SessionsIndexPage = () => {
+const SessionsIndexPage = ({ isFeatureCompatible }) => {
   // Custom Hooks
   const usePrevious = (value) => {
     const ref = useRef();
@@ -76,6 +78,8 @@ const SessionsIndexPage = () => {
   const [reachedEnd, setReachedEnd] = useState(false);
 
   const fetchRecordings = (lastDoc = null) => {
+    if (unsubscribeListener) unsubscribeListener();
+
     setIsTableLoading(true);
     const records = [];
     const db = getFirestore(firebaseApp);
@@ -101,7 +105,7 @@ const SessionsIndexPage = () => {
       );
     }
 
-    onSnapshot(query, (documentSnapshots) => {
+    unsubscribeListener = onSnapshot(query, (documentSnapshots) => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
@@ -113,6 +117,7 @@ const SessionsIndexPage = () => {
             url: recordData.sessionAttributes.url,
             visibility: recordData.visibility,
             eventsFilePath: recordData.eventsFilePath,
+            createdBy: recordData.createdBy || recordData.author,
           });
         });
 
@@ -121,6 +126,7 @@ const SessionsIndexPage = () => {
           setQs(documentSnapshots); // Handles pagination
         }
       } else {
+        setSessionRecordings([]);
         setReachedEnd(true);
       }
       setIsTableLoading(false);
@@ -228,6 +234,7 @@ const SessionsIndexPage = () => {
 
   return (
     <>
+      {!isFeatureCompatible ? <ExtensionUpgradeAlert /> : null}
       <ConfigurationModal
         config={config}
         isModalVisible={isConfigModalVisible}

@@ -17,12 +17,15 @@ export interface SessionRecording {
   accessEmails?: string[];
   name?: string;
   sessionAttributes: RQSessionAttributes;
-  author?: string;
+  createdBy?: string;
   ownerId?: string;
   filePath?: string;
   startTimeOffset?: number;
   description?: string;
   options?: RecordingOptions;
+  createdTs?: number;
+  updatedTs?: number;
+  lastUpdatedBy?: string;
 }
 
 export interface RecordingOptions {

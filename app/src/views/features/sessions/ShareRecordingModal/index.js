@@ -16,6 +16,7 @@ import { Visibility } from "../SessionViewer/types";
 import "./shareRecordingModal.scss";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 
 const _ = require("lodash");
 
@@ -63,6 +64,7 @@ const ShareRecordingModal = ({
   recordingId,
   onVisibilityChange,
 }) => {
+  const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const publicURL = getSessionRecordingSharedLink(recordingId);
@@ -89,7 +91,11 @@ const ShareRecordingModal = ({
   };
 
   const handleVisibilityChange = async (newVisibility) => {
-    await updateVisibility(recordingId, newVisibility);
+    await updateVisibility(
+      user?.details?.profile?.uid,
+      recordingId,
+      newVisibility
+    );
     onVisibilityChange && onVisibilityChange(newVisibility);
   };
 
@@ -140,14 +146,24 @@ const ShareRecordingModal = ({
     setConfirmLoading(true);
 
     if (_.isEmpty(currentEmails)) {
-      await updateVisibility(recordingId, Visibility.ONLY_ME, currentEmails);
+      await updateVisibility(
+        user?.details?.profile?.uid,
+        recordingId,
+        Visibility.ONLY_ME,
+        currentEmails
+      );
       onVisibilityChange && onVisibilityChange(Visibility.ONLY_ME);
     } else {
       const recipients = currentEmails.filter(
         (email) => !sentEmails.current.includes(email)
       );
 
-      await updateVisibility(recordingId, "custom", currentEmails);
+      await updateVisibility(
+        user?.details?.profile?.uid,
+        recordingId,
+        "custom",
+        currentEmails
+      );
 
       const functions = getFunctions(firebaseApp);
       const sendSessionRecordingAsEmail = httpsCallable(

@@ -7,6 +7,7 @@ import { createFile } from "services/firebaseStorageService";
 import {
   RecordingOptions,
   SessionRecording,
+  Visibility,
 } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/mocks/common";
 
@@ -35,12 +36,15 @@ export const saveRecording = async (
   const data: any = {
     ...payload,
     eventsFilePath,
-    author: uid,
+    createdBy: uid,
     ownerId,
-    visibility: "public",
+    visibility: Visibility.PUBLIC,
     accessEmails: [],
     accessDomains: [],
     options,
+    lastUpdatedBy: uid,
+    updatedTs: Date.now(),
+    createdTs: Date.now(),
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)

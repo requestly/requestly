@@ -16,9 +16,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
   const sharedLink = getSessionRecordingSharedLink(recordingId);
@@ -64,7 +66,11 @@ const ShareButton = ({ recordingId, showShareModal }) => {
 
   const handleVisibilityChange = async (newVisibility) => {
     if (currentVisibility !== newVisibility) {
-      await updateVisibility(recordingId, newVisibility);
+      await updateVisibility(
+        user?.details?.profile?.uid,
+        recordingId,
+        newVisibility
+      );
       updateVisibilityInStore(newVisibility);
     }
 
