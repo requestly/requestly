@@ -4,7 +4,7 @@ import { Button, Col, Row, Radio, Tag, Space, Tooltip, Typography } from "antd";
 import { AiOutlineLink } from "react-icons/ai";
 import { Modal } from "antd";
 import { toast } from "utils/Toast.js";
-import CreatableSelect from "react-select/creatable";
+import { ReactMultiEmail, isEmail } from "react-multi-email";
 import EditableTable from "./editableTable";
 import { PostConfirmationModal } from "./PostConfirmationModal";
 //UTILS
@@ -27,6 +27,7 @@ import { Visibility } from "utils/sharedListUtils";
 
 import { trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
+import "./index.css";
 
 const CreateSharedListModal = (props) => {
   const { toggle: toggleModal, isOpen, rulesToShare } = props;
@@ -45,7 +46,7 @@ const CreateSharedListModal = (props) => {
   );
   const [isSharedListCreated, setIsSharedListCreated] = useState(false);
   const [sharedListURL, setSharedListURL] = useState(null);
-  const [permittedEmailValue, setPermittedEmailValue] = useState("");
+  const [permittedEmailsValue, setPermittedEmailsValue] = useState([]);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListVisibility, setSharedListVisibility] = useState(
     Visibility.PUBLIC
@@ -248,27 +249,13 @@ const CreateSharedListModal = (props) => {
   };
 
   const renderCreationSummary = () => {
-    const createOption = (label) => ({
-      label,
-      value: label,
-    });
-
-    const handleKeyDown = (event) => {
-      if (!permittedEmailValue) return;
-      switch (event.key) {
-        case "Enter":
-        case "Tab":
-          // setValue((prev) => [...prev, createOption(inputValue)]);
-          setSharedListRecipients((prev) => [
-            ...prev,
-            createOption(permittedEmailValue),
-          ]);
-          setPermittedEmailValue("");
-          event.preventDefault();
-          break;
-        default:
-          return;
-      }
+    const handleAddRecipient = (recipients) => {
+      setPermittedEmailsValue(recipients);
+      const newRecipients = recipients.map((recipient) => ({
+        label: recipient,
+        value: recipient,
+      }));
+      setSharedListRecipients(newRecipients);
     };
 
     return (
@@ -321,27 +308,26 @@ const CreateSharedListModal = (props) => {
             }}
           >
             <Col align="center" span={24}>
-              <CreatableSelect
-                components={{ DropdownIndicator: null }}
-                inputValue={permittedEmailValue}
-                isClearable
-                isMulti
-                menuIsOpen={false}
-                onChange={(newValue) => setSharedListRecipients(newValue)}
-                onInputChange={(newValue) => setPermittedEmailValue(newValue)}
-                onKeyDown={handleKeyDown}
+              <ReactMultiEmail
+                className="github-like-border restricted-users-input"
                 placeholder="sam@amazon.com, tom@google.com"
-                value={sharedListRecipients}
-                theme={(theme) => ({
-                  ...theme,
-                  borderRadius: 4,
-                  colors: {
-                    ...theme.colors,
-                    primary: "#141414",
-                    primary25: "#2b2b2b",
-                    neutral0: "#141414",
-                  },
-                })}
+                emails={permittedEmailsValue}
+                onChange={(email) => {
+                  handleAddRecipient(email);
+                }}
+                validateEmail={(email) => {
+                  return isEmail(email); // return boolean
+                }}
+                getLabel={(email, index, removeEmail) => {
+                  return (
+                    <div data-tag key={index}>
+                      {email}
+                      <span data-tag-handle onClick={() => removeEmail(index)}>
+                        ×
+                      </span>
+                    </div>
+                  );
+                }}
               />
             </Col>
           </Row>
