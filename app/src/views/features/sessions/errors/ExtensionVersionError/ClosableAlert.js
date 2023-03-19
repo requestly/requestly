@@ -10,7 +10,7 @@ const ExtensionUpgradeAlert = () => {
   return (
     <React.Fragment>
       <Alert
-        message="You need to download the latest version of the extension to record new sessions."
+        message="You need to download Requestly extension to record sessions."
         type="warning"
         showIcon
         closable
