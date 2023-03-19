@@ -138,21 +138,12 @@ export default function HeaderUser() {
               open && trackHeaderClicked("user_menu");
             }}
           >
-            <Row gap={2}>
-              <Space>
-                <Col>
-                  <span className="text-gray text-sm">{userEmail}</span>
-                </Col>
-                <Col>
-                  <Avatar
-                    size={28}
-                    src={userPhoto}
-                    shape="square"
-                    className="cursor-pointer"
-                  />
-                </Col>
-              </Space>
-            </Row>
+            <Avatar
+              size={28}
+              src={userPhoto}
+              shape="square"
+              className="cursor-pointer"
+            />
           </Dropdown>
         </Col>
       </>
