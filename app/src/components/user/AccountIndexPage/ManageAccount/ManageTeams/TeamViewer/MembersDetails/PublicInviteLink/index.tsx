@@ -29,8 +29,6 @@ const PublicInviteLink: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
-  console.log("isCurrentUserAdmin", isCurrentUserAdmin);
-
   const handlePublicInviteCreateClicked = () => {
     setIsLoading(true);
     const functions = getFunctions();
