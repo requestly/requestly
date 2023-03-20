@@ -5,7 +5,7 @@ import { RQModal } from "lib/design-system/components";
 interface DeleteWorkspaceModalProps {
   name: string;
   isOpen: boolean;
-  deletInProgress: boolean;
+  deleteInProgress: boolean;
   handleModalClose: () => void;
   handleDeleteTeam: () => Promise<any>;
 }
@@ -13,7 +13,7 @@ interface DeleteWorkspaceModalProps {
 const DeleteWorkspaceModal: React.FC<DeleteWorkspaceModalProps> = ({
   name,
   isOpen,
-  deletInProgress,
+  deleteInProgress,
   handleModalClose,
   handleDeleteTeam,
 }) => {
@@ -67,7 +67,7 @@ const DeleteWorkspaceModal: React.FC<DeleteWorkspaceModalProps> = ({
             danger
             className="delete-team-btn"
             disabled={name !== teamName}
-            loading={deletInProgress}
+            loading={deleteInProgress}
             onClick={handleDeleteTeam}
           >
             Delete workspace
