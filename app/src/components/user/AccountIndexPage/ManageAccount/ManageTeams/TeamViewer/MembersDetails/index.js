@@ -80,21 +80,16 @@ const MembersDetails = ({ teamId }) => {
       <PublicInviteLink teamId={teamId} />
 
       {/* members table */}
-      <Row>
+      <Row justify="space-between" align="bottom">
         <Col>
           <div className="title members-details-title">
             {accessCount > 1 ? `${accessCount} Members` : "Workspace Members"}
           </div>
 
           <p className="text-dark-gray members-info-message">
-            Team workspaces enable you to share rules with collaborators and
-            manage access within your team. <br />
-            By collaborating in a workspace, your edits sync with your team in
-            real time.
+            Note: you will be charged for each member added.
           </p>
         </Col>
-      </Row>
-      <Row>
         <Col>
           <Button type="primary" onClick={handleAddMemberClick}>
             <PlusOutlined />{" "}
@@ -121,25 +116,6 @@ const MembersDetails = ({ teamId }) => {
             collaborate.
           </p>
         ) : null}
-
-        {/* invite banner */}
-        <div
-          onClick={handleAddMemberClick}
-          className="members-invite-empty-container"
-        >
-          <div>
-            <img
-              alt="smiles"
-              width="48px"
-              height="44px"
-              src="/assets/img/workspaces/smiles.svg"
-            />
-          </div>
-          <span className="header text-gray">Invite people</span>
-          <span className="text-gray">
-            Get the most out of Requestly by inviting your teammates.
-          </span>
-        </div>
       </div>
 
       <Row align="middle" justify="center" className="members-quantity-info">
