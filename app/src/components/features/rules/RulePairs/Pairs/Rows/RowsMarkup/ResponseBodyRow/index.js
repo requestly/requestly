@@ -8,7 +8,7 @@ import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode } from "utils/CodeEditorUtils";
+import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 
@@ -122,7 +122,7 @@ const ResponseBodyRow = ({
           path: `response.value`,
           value:
             pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-              ? minifyCode(value)
+              ? processStaticDataBeforeSave(value)
               : value,
         },
       ],
