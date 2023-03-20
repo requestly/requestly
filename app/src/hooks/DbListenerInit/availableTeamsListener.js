@@ -9,7 +9,7 @@ import {
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { teamsActions } from "store/features/teams/slice";
-import { toast } from "utils/Toast";
+// import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 
 const db = getFirestore(firebaseApp);
@@ -35,17 +35,22 @@ const availableTeamsListener = (
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = [];
-        querySnapshot.forEach((team) => {
+        const records = querySnapshot.docs.reduce((result, team) => {
           const teamData = team.data();
-          records.push({
+
+          if (teamData.delete) {
+            return result;
+          }
+
+          return result.concat({
             id: team.id,
             name: teamData.name,
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
           });
-        });
+        }, []);
+
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
@@ -55,10 +60,10 @@ const availableTeamsListener = (
         );
         if (!found) {
           alert(
-            "You no longer have access to this workspace. Please contact your team admin."
+            "You no longer have access to this workspace. Please contact your team admin or requestly."
           );
           clearCurrentlyActiveWorkspace(dispatch, appMode);
-          toast.info("Verifying storage checksum");
+          // toast.info("Verifying storage checksum");
           setTimeout(() => {
             window.location.reload();
           }, 4000);
