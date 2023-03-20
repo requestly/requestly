@@ -34,6 +34,8 @@ export const SHARED_LIST = {
   URL_COPIED: "sharedList_url_copied",
   NOTIFY_CLICKED: "sharedList_notify_button_clicked",
   DELETE_CLICKED: "shared_list_delete_clicked",
+  VISIBILITY_TOGGLED: "shared_list_visibility_toggled",
+  RECIPIENT_ADDED: "shared_list_recipient_added",
 };
 
 export const RULES = {
