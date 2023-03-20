@@ -32,7 +32,6 @@ import {
 } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import RuleSimulatorModal from "components/features/rules/RuleSimulatorModal";
-import APP_CONSTANTS from "../../../../../config/constants";
 import { cloneDeep } from "lodash";
 import { trackSimulateRulesEvent } from "modules/analytics/events/features/ruleSimulator";
 
@@ -61,7 +60,6 @@ const RuleSimulator = ({ mode }) => {
     body: "",
     mode: "javascript",
   });
-  //url that is generated using rule processor
   const ruleData = useSelector(getCurrentlySelectedRuleData);
   // Modal toggle
   const toggle = () => {
@@ -256,11 +254,6 @@ const RuleSimulator = ({ mode }) => {
     }
   };
 
-  const tooltipMessage =
-    mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
-      ? "Save the rule to use simulator"
-      : "Test this rule";
-
   const renderRuleSimulator = () => {
     return (
       <>
@@ -278,14 +271,8 @@ const RuleSimulator = ({ mode }) => {
             </Col>
             <Col span={2}>
               <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Tooltip placement="bottomLeft" title={tooltipMessage}>
-                  <Button
-                    type="secondary"
-                    onClick={doSimulate}
-                    disabled={
-                      mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
-                    }
-                  >
+                <Tooltip placement="bottomLeft" title={"Test this rule"}>
+                  <Button type="secondary" onClick={doSimulate}>
                     Test rule
                   </Button>
                 </Tooltip>
