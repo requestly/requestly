@@ -14,11 +14,12 @@ import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import { toast } from "utils/Toast";
 import "./TeamSettings.css";
 
-const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
+const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   const user = useSelector(getUserAuthDetails);
-  const isLoggedInUserOwner = teamOwnerId === user?.details?.profile?.uid;
+  const userId = user?.details?.profile?.uid;
+  const isLoggedInUserOwner = userId === teamOwnerId;
 
   if (!teamId) redirectToMyTeams(navigate);
 
@@ -31,6 +32,8 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
   const [deleteInProgress, setDeleteInProgress] = useState(false);
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false);
 
+  const handleModalClose = () => setIsDeleteModalActive(false);
+
   const deleteTeam = async () => {
     if (!isLoggedInUserOwner) {
       toast.error("Only owner can delete the workspace!");
@@ -38,17 +41,17 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
     }
 
     const functions = getFunctions();
-    const softDeleteTeam = httpsCallable(functions, "deleteTeam");
+    const deleteTeamForm = httpsCallable(functions, "deleteTeamForm");
 
     try {
       setDeleteInProgress(true);
-      await softDeleteTeam({ teamId });
-      redirectToMyTeams(navigate);
-      toast.info("Workspace deleted successfully");
+      await deleteTeamForm({ teamId, userId });
+      toast.info("Workspace deletion scheduled");
     } catch (err) {
       toast.error("Only owner can delete the workspace!");
     } finally {
       setDeleteInProgress(false);
+      handleModalClose();
     }
   };
 
@@ -109,6 +112,14 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
       mountedRef.current = false;
     };
   }, [stableFetchTeamInfo, teamId]);
+
+  const deleteButtonProps = {
+    danger: true,
+    className: "delete-team-btn",
+    loading: deleteInProgress,
+    disabled: !isLoggedInUserOwner || !!isTeamArchived,
+    onClick: () => setIsDeleteModalActive(true),
+  };
 
   return (
     <>
@@ -186,13 +197,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
               <Col span={24}>
                 <div className="title team-delete-title">Delete workspace</div>
                 {isLoggedInUserOwner ? (
-                  <Button
-                    danger
-                    className="delete-team-btn"
-                    loading={deleteInProgress}
-                    disabled={!isLoggedInUserOwner}
-                    onClick={() => setIsDeleteModalActive(true)}
-                  >
+                  <Button {...deleteButtonProps}>
                     Delete entire workspace
                   </Button>
                 ) : (
@@ -201,13 +206,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
                     overlayInnerStyle={{ width: "270px" }}
                     title="Only owner can delete the workspace. Please contact owner of this workspace."
                   >
-                    <Button
-                      danger
-                      className="delete-team-btn"
-                      loading={deleteInProgress}
-                      disabled={!isLoggedInUserOwner}
-                      onClick={() => setIsDeleteModalActive(true)}
-                    >
+                    <Button {...deleteButtonProps}>
                       Delete entire workspace
                     </Button>
                   </Tooltip>
@@ -224,7 +223,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, teamOwnerId }) => {
           isOpen={isDeleteModalActive}
           deleteInProgress={deleteInProgress}
           handleDeleteTeam={deleteTeam}
-          handleModalClose={() => setIsDeleteModalActive(false)}
+          handleModalClose={handleModalClose}
         />
       ) : null}
     </>
