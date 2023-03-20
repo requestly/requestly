@@ -106,8 +106,7 @@ const PublicInviteLink: React.FC<Props> = ({
               <Col className="ml-auto">
               {
                 publicInviteId?
-                // @ts-ignore
-                (<RQButton loading={isLoading} type="danger" onClick={handlePublicInviteRevokeClicked}>{isLoading? "Revoking": "Revoke"}</RQButton>):
+                (<RQButton loading={isLoading} danger type="primary" onClick={handlePublicInviteRevokeClicked}>{isLoading? "Revoking": "Revoke"}</RQButton>):
                 (<RQButton loading={isLoading} onClick={handlePublicInviteCreateClicked} type="primary">{isLoading? "Creating": "Create Link"}</RQButton>)
               }
               </Col>
