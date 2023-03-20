@@ -75,12 +75,14 @@ const MocksTable: React.FC<Props> = ({
   }, [mocks]);
 
   useEffect(() => {
-    if (mockType === "FILE") {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, mocks?.length);
-    } else {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, mocks?.length);
+    if (!isWorkspaceMode) {
+      if (mockType === "FILE") {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, mocks?.length);
+      } else {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, mocks?.length);
+      }
     }
-  }, [mockType, mocks?.length]);
+  }, [mockType, mocks?.length, isWorkspaceMode]);
 
   const columns = [
     {
