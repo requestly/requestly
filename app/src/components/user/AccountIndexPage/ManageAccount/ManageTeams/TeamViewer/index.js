@@ -19,6 +19,7 @@ const TeamViewer = ({ teamId }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const name = teamDetails?.name;
+  const teamOwnerId = teamDetails?.owner;
 
   useEffect(() => {
     const functions = getFunctions();
@@ -54,6 +55,7 @@ const TeamViewer = ({ teamId }) => {
           <TeamSettings
             key={teamId}
             teamId={teamId}
+            teamOwnerId={teamOwnerId}
             isTeamAdmin={isTeamAdmin}
           />
         ),
@@ -76,7 +78,7 @@ const TeamViewer = ({ teamId }) => {
         ),
       },
     ],
-    [teamId, isTeamAdmin]
+    [teamId, teamOwnerId, isTeamAdmin]
   );
 
   return (
