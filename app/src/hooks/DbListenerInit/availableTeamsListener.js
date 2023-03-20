@@ -9,6 +9,7 @@ import {
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { teamsActions } from "store/features/teams/slice";
+import { redirectToMyTeams } from "utils/RedirectionUtils";
 // import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 
@@ -18,7 +19,8 @@ const availableTeamsListener = (
   dispatch,
   uid,
   currentlyActiveWorkspace,
-  appMode
+  appMode,
+  navigate
 ) => {
   if (!uid) {
     // Rare edge case
@@ -38,13 +40,14 @@ const availableTeamsListener = (
         const records = querySnapshot.docs.reduce((result, team) => {
           const teamData = team.data();
 
-          if (teamData.delete) {
+          if (teamData.archived) {
             return result;
           }
 
           return result.concat({
             id: team.id,
             name: teamData.name,
+            owner: teamData.owner,
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
@@ -62,6 +65,7 @@ const availableTeamsListener = (
           alert(
             "You no longer have access to this workspace. Please contact your team admin or requestly."
           );
+          redirectToMyTeams(navigate);
           clearCurrentlyActiveWorkspace(dispatch, appMode);
           // toast.info("Verifying storage checksum");
           setTimeout(() => {
