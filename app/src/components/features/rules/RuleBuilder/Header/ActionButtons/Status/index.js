@@ -11,9 +11,9 @@ import {
 } from "../../../../../../../store/selectors";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
-import { saveRule } from "../actions/index";
 import "./RuleEditorStatus.css";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
+import { StorageService } from "init";
 
 const Status = ({ isDisabled, location }) => {
   //Global State
@@ -47,24 +47,22 @@ const Status = ({ isDisabled, location }) => {
         status: newValue,
       });
 
-    const callback = () =>
-      newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-        ? toast.success("Rule saved and activated")
-        : toast.success("Rule saved and deactivated");
-
     const isCreateMode = location.pathname.indexOf("create") !== -1;
 
     !isCreateMode &&
-      saveRule(
-        appMode,
-
-        {
-          ...currentlySelectedRuleData,
-          status: newValue,
-        },
-
-        callback
-      );
+      StorageService(appMode)
+        .saveRuleOrGroup(
+          {
+            ...currentlySelectedRuleData,
+            status: newValue,
+          },
+          false
+        )
+        .then(() =>
+          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+            ? toast.success("Rule saved and activated")
+            : toast.success("Rule saved and deactivated")
+        );
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [
