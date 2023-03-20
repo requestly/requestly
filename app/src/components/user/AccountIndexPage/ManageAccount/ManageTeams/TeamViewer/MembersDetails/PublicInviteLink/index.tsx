@@ -20,6 +20,7 @@ const PublicInviteLink: React.FC<Props> = ({
   }) => {
 
   // Component state
+  const [isLoading, setIsLoading] = useState(false);
   const [publicInviteId, setPublicInviteId] = useState(null);
   const [publicInviteLoading, setPublicInviteLoading] = useState(false);
 
@@ -31,6 +32,7 @@ const PublicInviteLink: React.FC<Props> = ({
   console.log("isCurrentUserAdmin", isCurrentUserAdmin);
 
   const handlePublicInviteCreateClicked = () => {
+    setIsLoading(true);
     const functions = getFunctions();
     const createTeamInvite = httpsCallable(functions, "invites-createTeamInvite");
     createTeamInvite({ teamId: teamId, usage: "unlimited"})
@@ -40,10 +42,12 @@ const PublicInviteLink: React.FC<Props> = ({
         } else {
           toast.error("Only admins can invite people");
         }
+        setIsLoading(false);
       })
   }
 
   const handlePublicInviteRevokeClicked = () => {
+    setIsLoading(true);
     const functions = getFunctions();
     const revokeInvite = httpsCallable(functions, "invites-revokeInvite");
     revokeInvite({ inviteId: publicInviteId })
@@ -54,6 +58,7 @@ const PublicInviteLink: React.FC<Props> = ({
         } else {
           toast.error("Only admins can revoke invites");
         }
+        setIsLoading(false);
       })
   }
 
@@ -104,8 +109,8 @@ const PublicInviteLink: React.FC<Props> = ({
               {
                 publicInviteId?
                 // @ts-ignore
-                (<RQButton type="danger" onClick={handlePublicInviteRevokeClicked}>Revoke</RQButton>):
-                (<RQButton onClick={handlePublicInviteCreateClicked} type="primary">Create Link</RQButton>)
+                (<RQButton loading={isLoading} type="danger" onClick={handlePublicInviteRevokeClicked}>{isLoading? "Revoking": "Revoke"}</RQButton>):
+                (<RQButton loading={isLoading} onClick={handlePublicInviteCreateClicked} type="primary">{isLoading? "Creating": "Create Link"}</RQButton>)
               }
               </Col>
             </Row>
