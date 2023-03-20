@@ -54,7 +54,6 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 
 // WORKSPACES
 FEATURES.WORKSPACES = "workspaces";
-FEATURES.WORKSPACE_SESSION_RECORDING = "teams-session-recording";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 
 // PERSONA SURVEY
