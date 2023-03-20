@@ -14,19 +14,12 @@ import "./TeamSettings.css";
 const TeamSettings = ({ teamId, isTeamAdmin }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
-  // const inputRef = useRef(null);
 
   if (!teamId) redirectToMyTeams(navigate);
   // Component State
   const [name, setName] = useState("");
   const [originalTeamName, setOriginalTeamName] = useState("");
-  // const [creationTime, setCreationTime] = useState("");
-  // const [subscriptionStatus, setSubscriptionStatus] = useState("");
   const [membersCount, setMembersCount] = useState(0);
-  // const [subscriptionCurrentPeriodEnd, setSubscriptionCurrentPeriodEnd] =
-  //   useState("");
-  // const [subscriptionCurrentPeriodStart, setSubscriptionCurrentPeriodStart] =
-  //   useState("");
   const [isTeamInfoLoading, setIsTeamInfoLoading] = useState(false);
   const [renameInProgress, setRenameInProgress] = useState(false);
 
@@ -44,18 +37,6 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
         setName(teamInfo.name);
         setOriginalTeamName(teamInfo.name);
         setMembersCount(teamInfo.accessCount);
-        // setCreationTime(
-        //   new Date(teamInfo.creationTime._seconds * 1000).toDateString()
-        // );
-        // setSubscriptionStatus(teamInfo.subscriptionStatus);
-        // setSubscriptionCurrentPeriodStart(
-        //   new Date(
-        //     teamInfo.subscriptionCurrentPeriodStart * 1000
-        //   ).toDateString()
-        // );
-        // setSubscriptionCurrentPeriodEnd(
-        //   new Date(teamInfo.subscriptionCurrentPeriodEnd * 1000).toDateString()
-        // );
       })
       .catch(() => redirectToMyTeams(navigate))
       .finally(() => setIsTeamInfoLoading(false));
@@ -90,58 +71,6 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
       })
       .finally(() => setRenameInProgress(false));
   };
-
-  // const renderCardBody = () => {
-  //   return (
-  //     <div style={{ marginTop: "1%" }}>
-  //       <Descriptions title={null} bordered column={2}>
-  //         <Descriptions.Item
-  //           label={
-  //             <>
-  //               <span>
-  //                 {"Team Name "}
-  //                 <Button
-  //                   type="link"
-  //                   style={{ padding: 0 }}
-  //                   onClick={handleRenameOnClick}
-  //                 >
-  //                   {renderTeamNameLinkText()}
-  //                 </Button>
-  //               </span>
-  //             </>
-  //           }
-  //         >
-  //           <Input
-  //             value={name}
-  //             bordered={false}
-  //             disabled={!renameInProgress}
-  //             ref={inputRef}
-  //             onChange={(e) => setName(e.target.value)}
-  //             onPressEnter={handleRenameOnClick}
-  //           />
-  //         </Descriptions.Item>
-  //         <Descriptions.Item label="Created on">
-  //           {creationTime}
-  //         </Descriptions.Item>
-
-  //         {!subscriptionStatus || isEmpty(subscriptionStatus) ? null : (
-  //           <>
-  //             <Descriptions.Item
-  //               className=" github-like-border"
-  //               label="Current Period"
-  //             >{`${subscriptionCurrentPeriodStart} ~ ${subscriptionCurrentPeriodEnd}`}</Descriptions.Item>
-  //             <Descriptions.Item
-  //               className=" github-like-border"
-  //               label="Subscription Status"
-  //             >
-  //               {beautifySubscriptionStatus(subscriptionStatus)}
-  //             </Descriptions.Item>
-  //           </>
-  //         )}
-  //       </Descriptions>
-  //     </div>
-  //   );
-  // };
 
   useEffect(() => {
     stableFetchTeamInfo();
@@ -226,51 +155,6 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
           </>
         )}
       </div>
-
-      {/* <div className="team-settings-container"> */}
-      {/* <div>
-          <Row>
-            <Col span={12}>
-              <span>Team Details</span>
-            </Col>
-            <Col align="right" span={12}>
-            {subscriptionStatus === "active" ? (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    redirectToUpdateSubscription({
-                      mode: "team",
-                      planType: "enterprise",
-                      teamId: teamId,
-                    });
-                  }}
-                  icon={<CalendarOutlined />}
-                >
-                  Change Plan
-                </Button>
-              ) : null}
-            {subscriptionStatus === "canceled" ||
-              subscriptionStatus === "incomplete_expired" ? (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    redirectToUpdateSubscription({
-                      mode: "team",
-                      planType: "enterprise",
-                      teamId: teamId,
-                      isRenewal: true,
-                    });
-                  }}
-                  icon={<SyncOutlined />}
-                >
-                  Renew Subscription
-                </Button>
-              ) : null}
-            </Col>
-          </Row>
-        </div> */}
-      {/* {isTeamInfoLoading ? renderLoader() : renderCardBody()} */}
-      {/* </div> */}
     </>
   );
 };
