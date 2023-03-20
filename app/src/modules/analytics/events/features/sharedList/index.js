@@ -53,3 +53,11 @@ export const trackSharedListDeleteClicked = (id) => {
   const params = { id };
   trackEvent(SHARED_LIST.DELETE_CLICKED, params);
 };
+
+export const trackSharedListVisibilityToggled = (visibility) => {
+  const params = { visibility };
+  trackEvent(SHARED_LIST.VISIBILITY_TOGGLED, params);
+};
+export const trackSharedListRecipientAdded = () => {
+  trackEvent(SHARED_LIST.RECIPIENT_ADDED);
+};
