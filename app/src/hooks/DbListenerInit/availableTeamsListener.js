@@ -9,8 +9,7 @@ import {
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { teamsActions } from "store/features/teams/slice";
-import { redirectToMyTeams } from "utils/RedirectionUtils";
-// import { toast } from "utils/Toast";
+import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 
 const db = getFirestore(firebaseApp);
@@ -19,8 +18,7 @@ const availableTeamsListener = (
   dispatch,
   uid,
   currentlyActiveWorkspace,
-  appMode,
-  navigate
+  appMode
 ) => {
   if (!uid) {
     // Rare edge case
@@ -37,22 +35,19 @@ const availableTeamsListener = (
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = querySnapshot.docs.reduce((result, team) => {
+        const records = querySnapshot.docs.map((team) => {
           const teamData = team.data();
 
-          if (teamData.archived) {
-            return result;
-          }
-
-          return result.concat({
+          return {
             id: team.id,
             name: teamData.name,
             owner: teamData.owner,
+            archived: teamData.archived,
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
-          });
-        }, []);
+          };
+        });
 
         dispatch(teamsActions.setAvailableTeams(records));
 
@@ -61,13 +56,13 @@ const availableTeamsListener = (
         const found = records.find(
           (team) => team.id === currentlyActiveWorkspace.id
         );
+
         if (!found) {
           alert(
             "You no longer have access to this workspace. Please contact your team admin or requestly."
           );
-          redirectToMyTeams(navigate);
           clearCurrentlyActiveWorkspace(dispatch, appMode);
-          // toast.info("Verifying storage checksum");
+          toast.info("Verifying storage checksum");
           setTimeout(() => {
             window.location.reload();
           }, 4000);

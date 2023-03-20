@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   getCurrentlyActiveWorkspace,
   getCurrentlyActiveWorkspaceMembers,
@@ -23,7 +22,6 @@ const useDatabase = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const navigate = useNavigate();
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   let unsubscribeUserNodeRef = useRef(null);
@@ -122,8 +120,7 @@ const useDatabase = () => {
         dispatch,
         user?.details?.profile?.uid,
         currentlyActiveWorkspace,
-        appMode,
-        navigate
+        appMode
       );
     } else {
       dispatch(teamsActions.setAvailableTeams(null));
@@ -134,7 +131,6 @@ const useDatabase = () => {
     }
   }, [
     appMode,
-    navigate,
     currentlyActiveWorkspace,
     dispatch,
     user?.details?.profile?.uid,
