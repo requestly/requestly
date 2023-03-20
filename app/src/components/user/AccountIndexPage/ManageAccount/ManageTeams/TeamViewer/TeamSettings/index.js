@@ -22,6 +22,29 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
   const [membersCount, setMembersCount] = useState(0);
   const [isTeamInfoLoading, setIsTeamInfoLoading] = useState(false);
   const [renameInProgress, setRenameInProgress] = useState(false);
+  const [deletInProgress, setDeletInProgress] = useState(false);
+
+  // soft deletes the team
+  const deleteTeam = async () => {
+    setDeletInProgress(true);
+    const functions = getFunctions();
+    const softDeleteTeam = httpsCallable(functions, "deleteTeam");
+
+    // add a check for owner of workspace
+    // then make a call
+
+    try {
+      await softDeleteTeam({ teamId });
+      redirectToMyTeams(navigate);
+      toast.info("Workspace deleted successfully");
+
+      // switch to private workspace
+    } catch (err) {
+      toast.error("Only owner can delete the workspace!");
+    } finally {
+      setDeletInProgress(false);
+    }
+  };
 
   const fetchTeamInfo = () => {
     setIsTeamInfoLoading(true);
@@ -150,6 +173,24 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
                 </Button>
               </div>
             </form>
+
+            <Button
+              danger
+              type="primary"
+              loading={deletInProgress}
+              onClick={deleteTeam}
+            >
+              Delete workspace
+            </Button>
+            <div>
+              {/*
+              - on click open modal
+              - on modal confirm delete
+              - keep showing loader
+              - fetch the latest workspaces and then
+              - navigate to home manage workspace
+            */}
+            </div>
 
             <WorkspaceStatusSyncing />
           </>
