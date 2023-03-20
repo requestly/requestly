@@ -25,7 +25,11 @@ import { BsBuilding } from "react-icons/bs";
 
 import { Visibility } from "utils/sharedListUtils";
 
-import { trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
+import {
+  trackSharedListUrlCopied,
+  trackSharedListRecipientAdded,
+  trackSharedListVisibilityToggled,
+} from "modules/analytics/events/features/sharedList";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import "./index.css";
 
@@ -239,6 +243,7 @@ const CreateSharedListModal = (props) => {
 
   const handleVisibilityChange = (e) => {
     setSharedListVisibility(e.target.value);
+    trackSharedListVisibilityToggled(e.target.value);
     // modifySharedList("visibility", e.target.value, createdSharedListId)
     //   .then((res) => {
     //     toast.success("Visibility updated successfully");
@@ -256,6 +261,7 @@ const CreateSharedListModal = (props) => {
         value: recipient,
       }));
       setSharedListRecipients(newRecipients);
+      trackSharedListRecipientAdded();
     };
 
     return (
