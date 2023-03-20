@@ -125,6 +125,13 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
     );
 
     const invokeSyncingIfRequired = async (latestFirebaseRecords) => {
+      if (window.skipSyncListenerForNextOneTime) {
+        window.skipSyncListenerForNextOneTime = false;
+        window.isFirstSyncComplete = true; // Just in case!
+        dispatch(actions.updateIsRulesListLoading(false));
+        return;
+      }
+
       let updatedFirebaseRecords;
       if (latestFirebaseRecords) {
         // Means invoked for the newer time
@@ -135,12 +142,6 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
         updatedFirebaseRecords = syncNodeRefNode.val();
       }
 
-      if (window.skipSyncListenerForNextOneTime) {
-        window.skipSyncListenerForNextOneTime = false;
-        window.isFirstSyncComplete = true; // Just in case!
-        dispatch(actions.updateIsRulesListLoading(false));
-        return;
-      }
       animateSyncIcon();
 
       if (!isLocalStoragePresent(appMode)) {
