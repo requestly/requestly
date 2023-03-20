@@ -127,6 +127,8 @@ export const TEAMS = {
   INVITE_MORE_TEAMMATES_BUTTON_CLICKED: "invite_more_teammates_button_clicked",
   CREATE_NEW_WORKSPACE_CLICKED: "create_new_worskpace_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
+  WORKSPACE_DELETE_CLICKED: "workspace_delete_clicked",
+  WORKSPACE_DELETED: "workspace_deleted",
   ADD_MEMBER_CLICKED: "add_member_clicked",
   REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",

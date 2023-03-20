@@ -12,6 +12,10 @@ import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import { toast } from "utils/Toast";
+import {
+  trackWorkspaceDeleted,
+  trackWorkspaceDeleteClicked,
+} from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
@@ -32,7 +36,14 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const [deleteInProgress, setDeleteInProgress] = useState(false);
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false);
 
-  const handleModalClose = () => setIsDeleteModalActive(false);
+  const handleDeleteModalOpen = () => {
+    setIsDeleteModalActive(true);
+    trackWorkspaceDeleteClicked();
+  };
+
+  const handleDeleteModalClose = () => {
+    setIsDeleteModalActive(false);
+  };
 
   const deleteTeam = async () => {
     if (!isLoggedInUserOwner) {
@@ -47,11 +58,12 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
       setDeleteInProgress(true);
       await deleteTeamForm({ teamId, userId });
       toast.info("Workspace deletion scheduled");
+      trackWorkspaceDeleted();
     } catch (err) {
       toast.error("Only owner can delete the workspace!");
     } finally {
       setDeleteInProgress(false);
-      handleModalClose();
+      handleDeleteModalClose();
     }
   };
 
@@ -118,7 +130,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     className: "delete-team-btn",
     loading: deleteInProgress,
     disabled: !isLoggedInUserOwner || !!isTeamArchived,
-    onClick: () => setIsDeleteModalActive(true),
+    onClick: handleDeleteModalOpen,
   };
 
   return (
@@ -150,7 +162,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
                 </label>
                 <Input
                   id="name"
-                  autoFocus
                   autoComplete="off"
                   value={name}
                   disabled={renameInProgress || isTeamInfoLoading}
@@ -223,7 +234,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
           isOpen={isDeleteModalActive}
           deleteInProgress={deleteInProgress}
           handleDeleteTeam={deleteTeam}
-          handleModalClose={handleModalClose}
+          handleModalClose={handleDeleteModalClose}
         />
       ) : null}
     </>
