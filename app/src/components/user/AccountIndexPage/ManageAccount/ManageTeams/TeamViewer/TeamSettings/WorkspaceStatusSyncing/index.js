@@ -57,14 +57,16 @@ const WorkspaceStatusSyncing = () => {
     }
   };
 
-  return (
-    <SettingsItem
-      isActive={syncRuleStatus}
-      onClick={handleToggleStatusSyncing}
-      title="Enable status syncing in team workspaces"
-      caption="Stay updated by automatically syncing rule modifications with your teammates."
-    />
-  );
+  return null;
+
+  // return (
+  //   <SettingsItem
+  //     isActive={syncRuleStatus}
+  //     onClick={handleToggleStatusSyncing}
+  //     title="Enable status syncing in team workspaces"
+  //     caption="Stay updated by automatically syncing rule modifications with your teammates."
+  //   />
+  // );
 };
 
 export default WorkspaceStatusSyncing;
