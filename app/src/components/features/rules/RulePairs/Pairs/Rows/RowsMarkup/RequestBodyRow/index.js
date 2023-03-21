@@ -23,7 +23,7 @@ const RequestBodyRow = ({
     GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
-  const [isCodeMinified, setIsCodeMinified] = useState(false);
+  const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [editorStaticValue, setEditorStaticValue] = useState(
     pair.request.value
   );
@@ -84,18 +84,18 @@ const RequestBodyRow = ({
   };
 
   const handleCodePrettifyToggle = () => {
-    if (isCodeMinified) {
-      setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
+    if (!isCodeMinified) {
       setEditorStaticValue(minifyCode(editorStaticValue));
     }
+    setIsCodeMinified((isMinified) => !isMinified);
     handleCodeFormattedFlag();
   };
 
   useEffect(() => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
+    } else {
+      setIsCodeMinified(true);
     }
   }, [pair.request.type]);
 

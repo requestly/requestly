@@ -131,12 +131,10 @@ const ResponseBodyRow = ({
   };
 
   const handleCodePrettifyToggle = () => {
-    if (isCodeMinified) {
-      setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
+    if (!isCodeMinified) {
       setEditorStaticValue(minifyCode(editorStaticValue));
     }
+    setIsCodeMinified((isMinified) => !isMinified);
     handleCodeFormattedFlag();
   };
 
@@ -150,6 +148,8 @@ const ResponseBodyRow = ({
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
+    } else {
+      setIsCodeMinified(true);
     }
   }, [pair.response.type]);
 
