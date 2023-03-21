@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Radio, Button } from "antd";
 // Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -20,21 +20,27 @@ const RequestBodyRow = ({
 
   const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
-    GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
+    pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [editorStaticValue, setEditorStaticValue] = useState(
-    pair.request.value
+    pair?.request?.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC &&
+      pair.request.value
   );
+
+  const codeFormattedFlag = useRef(null);
 
   const onChangeRequestType = (requestType) => {
     if (
       Object.values(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES).includes(requestType)
     ) {
-      let value = "";
+      let value = "{}";
       if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
         value = ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"];
+      } else if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+        setIsCodeMinified(true);
+        setEditorStaticValue(value);
       }
 
       modifyPairAtGivenPath(null, pairIndex, `request.type`, requestType, [
@@ -72,14 +78,16 @@ const RequestBodyRow = ({
               : value,
         },
       ],
-      !isCodeFormatted
+      !codeFormattedFlag.current
     );
   };
 
   const handleCodeFormattedFlag = () => {
     setIsCodeFormatted(true);
+    codeFormattedFlag.current = true;
     setTimeout(() => {
       setIsCodeFormatted(false);
+      codeFormattedFlag.current = false;
     }, 2000);
   };
 
@@ -94,8 +102,6 @@ const RequestBodyRow = ({
   useEffect(() => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
     }
   }, [pair.request.type]);
 
@@ -115,7 +121,7 @@ const RequestBodyRow = ({
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            visible={requestTypePopupVisible}
+            open={requestTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}
@@ -144,6 +150,7 @@ const RequestBodyRow = ({
           >
             <Col xl="12" span={24}>
               <CodeEditor
+                key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
                     ? "javascript"

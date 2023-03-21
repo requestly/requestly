@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -32,10 +32,13 @@ const ResponseBodyRow = ({
     pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
   const [editorStaticValue, setEditorStaticValue] = useState(
-    pair.response.value
+    pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC &&
+      pair.response.value
   );
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
+
+  const codeFormattedFlag = useRef(null);
 
   const onChangeResponseType = (responseBodyType) => {
     if (
@@ -108,7 +111,7 @@ const ResponseBodyRow = ({
   };
 
   const responseBodyChangeHandler = (value) => {
-    let triggerUnsavedChangesIndication = !isCodeFormatted;
+    let triggerUnsavedChangesIndication = !codeFormattedFlag.current;
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
@@ -140,16 +143,16 @@ const ResponseBodyRow = ({
 
   const handleCodeFormattedFlag = () => {
     setIsCodeFormatted(true);
+    codeFormattedFlag.current = true;
     setTimeout(() => {
       setIsCodeFormatted(false);
+      codeFormattedFlag.current = false;
     }, 2000);
   };
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
     }
   }, [pair.response.type]);
 
