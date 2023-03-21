@@ -105,7 +105,11 @@ const Help: React.FC = () => {
     <div className="rule-editor-help-container">
       <div className="rule-editor-help-content">
         {/* header */}
-        <Row className="w-full" align="middle" justify="space-between">
+        <Row
+          align="middle"
+          justify="space-between"
+          className="w-full rule-editor-help-header"
+        >
           <Col className="title">
             {isDocsVisible && (
               <Button
@@ -124,7 +128,7 @@ const Help: React.FC = () => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <div ref={introductionRef}>
+              <div ref={introductionRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">
                   Redirect request
                 </div>
@@ -134,7 +138,10 @@ const Help: React.FC = () => {
                 </div>
               </div>
 
-              <div ref={argumentsRef} className="rule-editor-docs-arguments">
+              <div
+                ref={argumentsRef}
+                className="docs-section rule-editor-docs-arguments"
+              >
                 <div className="title">Arguments</div>
                 <div>
                   {`method (string)- The HTTP method of the request. GET | POST | PUT | DELETE etc.
@@ -148,7 +155,10 @@ const Help: React.FC = () => {
                 </div>
               </div>
 
-              <div ref={demoVideoRef} className="rule-editor-docs-demo-video">
+              <div
+                ref={demoVideoRef}
+                className="docs-section rule-editor-docs-demo-video"
+              >
                 <div className="title">Demo Video</div>
                 <YouTubePlayer
                   width="260"
@@ -158,7 +168,10 @@ const Help: React.FC = () => {
                 />
               </div>
 
-              <div ref={useCasesRef} className="rule-editor-docs-use-cases">
+              <div
+                ref={useCasesRef}
+                className="docs-section rule-editor-docs-use-cases"
+              >
                 <div className="title">Popular use cases</div>
                 <ul>
                   <li>
@@ -183,7 +196,7 @@ const Help: React.FC = () => {
 
               <div
                 ref={testingRuleRef}
-                className="rule-editor-docs-testing-rule"
+                className="docs-section rule-editor-docs-testing-rule"
               >
                 <div className="title">Testing rule</div>
                 <ul>
@@ -207,7 +220,10 @@ const Help: React.FC = () => {
                 </ul>
               </div>
 
-              <div ref={examplesRef} className="rule-editor-docs-examples">
+              <div
+                ref={examplesRef}
+                className="docs-section rule-editor-docs-examples"
+              >
                 <div className="title">Examples</div>
                 <ul>
                   <li>
@@ -217,7 +233,7 @@ const Help: React.FC = () => {
                 </ul>
               </div>
 
-              <div ref={faqsRef} className="rule-editor-docs-faqs">
+              <div ref={faqsRef} className="docs-section rule-editor-docs-faqs">
                 <div className="title">FAQs</div>
                 <ul>
                   <li>
@@ -244,7 +260,7 @@ const Help: React.FC = () => {
         ) : (
           <>
             {/* internal links */}
-            <div>
+            <div className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
                 Documentation for Modify Headers
