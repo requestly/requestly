@@ -44,12 +44,12 @@ const WorkspaceStatusSyncing = () => {
     };
 
     if (syncRuleStatus) {
-      localStorage.setItem("syncRuleStatus", false);
+      localStorage.setItem("syncRuleStatus", "false");
       setSyncRuleStatus(false);
       toast.success("Status syncing turned off");
       trackSettingsToggled("workspace_status_syncing", false);
     } else {
-      localStorage.setItem("syncRuleStatus", true);
+      localStorage.setItem("syncRuleStatus", "true");
       setSyncRuleStatus(true);
       toast.success("Status syncing turned on");
       trackSettingsToggled("workspace_status_syncing", true);

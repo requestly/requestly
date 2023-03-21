@@ -15,6 +15,9 @@ import { isEmpty } from "lodash";
 import Logger from "lib/logger";
 const _ = require("lodash");
 
+const defaultSyncValue = "Inactive";
+const defaultIsFavouriteValue = false;
+
 export const getMetadataSyncPath = () => {
   if (window.currentlyActiveWorkspaceTeamId) {
     // This is a team workspace syncing
@@ -58,7 +61,9 @@ export const getAllTeamUserRulesConfigPath = () => {
   ];
 };
 export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
-  return getTeamUserRuleAllConfigsPath.push(ruleOrGroupId);
+  const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath();
+  teamUserRuleAllConfigsPath.push(ruleOrGroupId);
+  return teamUserRuleAllConfigsPath;
 };
 export const getTeamUserRuleAllConfigsPath = () => {
   return [
@@ -70,6 +75,8 @@ export const getTeamUserRuleAllConfigsPath = () => {
   ];
 };
 
+// The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
+// It works by modifying the original param received: localRecords
 const preventWorkspaceSyncWrite = async (
   key,
   localRecords,
@@ -77,16 +84,25 @@ const preventWorkspaceSyncWrite = async (
   uid,
   remoteRecords
 ) => {
-  if (typeof localRecords[objectId][key] !== "undefined") {
-    // Save a copy of user's original value - Can be used later to restore
+  // First, if user has defined a personal rule config and it's key, write it in required db node
+  if (typeof localRecords?.[objectId]?.[key] !== "undefined") {
     await updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
     });
   }
-  // Replace the values (if exists on Firebase)
-  if (typeof remoteRecords?.[objectId]?.[key] !== "undefined")
+  // So far, we have set data in user's rule data in his own personal node
+  // Now we also need to ensure we don't change the data that is being set for a team.
+  // so, replace the team rule node with it's original data (if exists lol)
+  if (typeof remoteRecords?.[objectId]?.[key] !== "undefined") {
+    // This means some data does actually exist
+    // Override "localRecords" with that data
+    // (Why localRecords?  - since because localRecords is what actually going to be set on firebase teams node)
     localRecords[objectId][key] = remoteRecords[objectId][key];
-  else delete localRecords[objectId][key];
+  } else {
+    // This means this key never existed
+    // so remove it before it gets written to teams node in rdb
+    delete localRecords[objectId][key];
+  }
 
   return localRecords;
 };
@@ -200,7 +216,8 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
     // Todo - @sagar - Fix duplicate code - src/hooks/DbListenerInit/syncingNodeListener.js
     // Check if it's team syncing. We might not want to read some props like "isFavourite" from this not. Instead we an read from userConfig node
     if (window.currentlyActiveWorkspaceTeamId) {
-      const syncRuleStatus = localStorage.getItem("syncRuleStatus") || false;
+      const syncRuleStatus =
+        localStorage.getItem("syncRuleStatus") === "true" || false;
       // Get current values from local storage and use them xD
       const personalRuleConfigs = await getValueAsPromise(
         getTeamUserRuleAllConfigsPath()
@@ -210,22 +227,45 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
         try {
           const ownRuleConfig = personalRuleConfigs[objectId];
 
-          // Key - "isFavourite"
-          if (
-            ownRuleConfig &&
-            typeof ownRuleConfig["isFavourite"] !== "undefined"
-          ) {
-            remoteRecords[objectId].isFavourite = ownRuleConfig["isFavourite"];
-          }
-          if (!syncRuleStatus) {
-            // Key - "status"
-            if (
-              ownRuleConfig &&
-              typeof ownRuleConfig["status"] !== "undefined"
-            ) {
-              remoteRecords[objectId].status = ownRuleConfig["status"];
+          // START - Handle key -  "isFavourite"
+          // CASE: Try for user's personal level rule config
+          if (ownRuleConfig) {
+            // CASE So far, user's personal rule config exists
+            if (typeof ownRuleConfig["isFavourite"] === "undefined") {
+              // CASE:  user's personal rule config exists but its "isFavourite" key doesn't, use the default value!
+              remoteRecords[objectId].isFavourite = defaultIsFavouriteValue;
+            } else {
+              // CASE: user's personal rule config exists and it also have a value set for "isFavourite", use it!
+              remoteRecords[objectId].isFavourite =
+                ownRuleConfig["isFavourite"];
             }
+          } else {
+            // CASE: user's personal rule config doesn't even exits, use the default value!
+            remoteRecords[objectId].isFavourite = defaultIsFavouriteValue;
           }
+          // END - Handle key -  "isFavourite"
+
+          // START - Handle key - "status"
+          if (!syncRuleStatus) {
+            // CASE: Team status syncing is not enabled. Try for user's personal level rule config
+            if (ownRuleConfig) {
+              // CASE So far, user's personal rule config exists
+              if (typeof ownRuleConfig["status"] === "undefined") {
+                // CASE:  user's personal rule config exists but its "status" doesn't, use the default value!
+                remoteRecords[objectId].status = defaultSyncValue;
+              } else {
+                // CASE: user's personal rule config exists and it also have a value set for "status", use it!
+                remoteRecords[objectId].status = ownRuleConfig["status"];
+              }
+            } else {
+              // CASE: user's personal rule config doesn't even exits, use the default value!
+              remoteRecords[objectId].status = defaultSyncValue;
+            }
+          } else {
+            // CASE: Team status syncing is enabled, we don't need to look into user's personal level rule config
+            // Do nothing, keep using the original value we got from teams rule node
+          }
+          // END - Handle key - "status"
         } catch (error) {
           Logger.log("Local record doesn't exist", objectId);
           Logger.log(error);
