@@ -120,6 +120,7 @@ const RequestSourceRow = ({
       gutter={6}
       key={rowIndex}
       align="middle"
+      id="editor-source-condition"
       className="rules-pair-content-header"
       style={{ marginLeft: 0, marginRight: 0 }}
       wrap={false}

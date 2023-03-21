@@ -68,6 +68,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
               <div className="editor-title-name-wrapper">
                 <Input
                   ref={nameInputRef}
+                  id="editor-title"
                   className={`${errors?.name && !name ? "error" : null}`}
                   autoFocus={true || mode === "create"}
                   onFocus={() => setIsNameEditable(true)}

@@ -15,10 +15,19 @@ export const Tour: React.FC = () => {
       disableOverlayClose={true}
       spotlightClicks={true}
       spotlightPadding={5}
+      floaterProps={{
+        styles: {
+          arrow: {
+            display: "inline-flex",
+            length: 15,
+            position: "absolute",
+            spread: 0,
+          },
+        },
+      }}
       styles={{
         options: {
-          arrowColor: "var(--body-background)",
-          //   overlayColor: "transparent",
+          overlayColor: "rgba(0, 0, 0, 0.38)",
         },
       }}
     />

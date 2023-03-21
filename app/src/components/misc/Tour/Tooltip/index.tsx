@@ -1,24 +1,23 @@
 import { RQButton } from "lib/design-system/components";
 import React from "react";
 import { TooltipRenderProps } from "react-joyride";
-// import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
 import "./index.css";
 
 export const TourTooltip: React.FC<TooltipRenderProps> = ({
-  //   continuous,
   index,
   step,
+  isLastStep,
   size,
   //   backProps,
   //   closeProps,
-  //   skipProps,
+  skipProps,
   primaryProps,
   tooltipProps,
 }) => {
-  //   console.log("CONTINOUS", continuous);
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
-      {/* <CloseOutlined className="tour-close-icon" {...skipProps} /> */}
+      <CloseOutlined className="tour-close-icon" {...skipProps} />
       <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>
       <div className="title white">{step.title}</div>
       <div className="text-gray tour-tooltip-content">{step.content}</div>
@@ -28,7 +27,7 @@ export const TourTooltip: React.FC<TooltipRenderProps> = ({
           className="tour-tooltip-next-btn"
           {...primaryProps}
         >
-          {index + 1 === size ? "Finish" : "Next"}
+          {isLastStep ? "Finish" : "Next"}
 
           <img
             alt="back"
