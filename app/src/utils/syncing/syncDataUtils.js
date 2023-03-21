@@ -76,17 +76,22 @@ export const getTeamUserRuleAllConfigsPath = () => {
 };
 
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
-// It works by modifying the original param received: localRecords
+// It works by modifying the original param received: latestRules
 const preventWorkspaceSyncWrite = async (
   key,
-  localRecords,
+  latestRules,
   objectId,
   uid,
-  remoteRecords
+  remoteRecords,
+  myLocalRecords,
+  appMode
 ) => {
+  const localRecords = myLocalRecords || (await getAllLocalRecords(appMode));
+
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined") {
-    await updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
+    // I guess we don't need to await the next line or do we?
+    updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
     });
   }
@@ -95,20 +100,20 @@ const preventWorkspaceSyncWrite = async (
   // so, replace the team rule node with it's original data (if exists lol)
   if (typeof remoteRecords?.[objectId]?.[key] !== "undefined") {
     // This means some data does actually exist
-    // Override "localRecords" with that data
-    // (Why localRecords?  - since because localRecords is what actually going to be set on firebase teams node)
-    localRecords[objectId][key] = remoteRecords[objectId][key];
+    // Override "latestRules" with that data
+    // (Why latestRules?  - since because latestRules is what actually going to be set on firebase teams node)
+    latestRules[objectId][key] = remoteRecords[objectId][key];
   } else {
     // This means this key never existed
     // so remove it before it gets written to teams node in rdb
-    delete localRecords[objectId][key];
+    delete latestRules[objectId][key];
   }
 
-  return localRecords;
+  return latestRules;
 };
 
 export const updateUserSyncRecords = async (uid, records, appMode) => {
-  const localRecords = _.cloneDeep(records);
+  const latestRules = _.cloneDeep(records);
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
   if (window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus =
@@ -122,24 +127,29 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
         remoteRecords[key] = allRemoteRecords[key];
       }
     });
-    for (const objectId in localRecords) {
+    const localRecords = getAllLocalRecords(appMode);
+    for (const objectId in latestRules) {
       try {
         // Key - "isFavourite"
         await preventWorkspaceSyncWrite(
           "isFavourite",
-          localRecords,
+          latestRules,
           objectId,
           uid,
-          remoteRecords
+          remoteRecords,
+          localRecords,
+          appMode
         );
         // Key - "status"
         if (!syncRuleStatus) {
           await preventWorkspaceSyncWrite(
             "status",
-            localRecords,
+            latestRules,
             objectId,
             uid,
-            remoteRecords
+            remoteRecords,
+            localRecords,
+            appMode
           );
         }
       } catch (error) {
@@ -151,7 +161,7 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
 
   try {
     window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
-    await updateValueAsPromise(getRecordsSyncPath(), localRecords);
+    await updateValueAsPromise(getRecordsSyncPath(), latestRules);
   } catch (error) {
     Logger.error("err update sync records", error);
   }
