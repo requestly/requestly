@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -8,7 +8,7 @@ import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode } from "utils/CodeEditorUtils";
+import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 
@@ -32,10 +32,13 @@ const ResponseBodyRow = ({
     pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
   const [editorStaticValue, setEditorStaticValue] = useState(
-    pair.response.value
+    pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC &&
+      pair.response.value
   );
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
+
+  const codeFormattedFlag = useRef(null);
 
   const onChangeResponseType = (responseBodyType) => {
     if (
@@ -108,7 +111,7 @@ const ResponseBodyRow = ({
   };
 
   const responseBodyChangeHandler = (value) => {
-    let triggerUnsavedChangesIndication = !isCodeFormatted;
+    let triggerUnsavedChangesIndication = !codeFormattedFlag.current;
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
@@ -122,7 +125,7 @@ const ResponseBodyRow = ({
           path: `response.value`,
           value:
             pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-              ? minifyCode(value)
+              ? processStaticDataBeforeSave(value)
               : value,
         },
       ],
@@ -131,19 +134,19 @@ const ResponseBodyRow = ({
   };
 
   const handleCodePrettifyToggle = () => {
-    if (isCodeMinified) {
-      setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
+    if (!isCodeMinified) {
       setEditorStaticValue(minifyCode(editorStaticValue));
     }
+    setIsCodeMinified((isMinified) => !isMinified);
     handleCodeFormattedFlag();
   };
 
   const handleCodeFormattedFlag = () => {
     setIsCodeFormatted(true);
+    codeFormattedFlag.current = true;
     setTimeout(() => {
       setIsCodeFormatted(false);
+      codeFormattedFlag.current = false;
     }, 2000);
   };
 
