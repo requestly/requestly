@@ -38,6 +38,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import { Tour } from "components/misc/Tour";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -320,6 +321,7 @@ const RuleBuilder = (props) => {
 
   return (
     <>
+      <Tour />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
           mode={MODE}

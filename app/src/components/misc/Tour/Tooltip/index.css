@@ -1,0 +1,39 @@
+.tour-tooltip-container {
+  padding: 20px;
+  background: var(--body-background);
+  border-radius: var(--border-radius-md);
+  position: relative;
+  /* border: 1px solid var(--primary); */
+}
+.tour-tooltip-container .tour-tooltip-content {
+  margin-top: 4px;
+  max-width: 400px;
+}
+/* .tour-tooltip-container .tour-tooltip-content strong {
+  color: #fff;
+} */
+.tour-tooltip-container button.tour-tooltip-next-btn {
+  background: transparent;
+  font-weight: 500;
+  padding: 11px;
+  display: flex;
+  gap: 4px;
+}
+.tour-tooltip-container button.tour-tooltip-next-btn img {
+  transform: rotate(180deg);
+}
+.tour-tooltip-container .tour-tooltip-buttons-container {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 12px;
+}
+.tour-tooltip-container .tour-tooltip-progress {
+  margin-bottom: 8px;
+}
+.tour-close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  /* color: green; */
+  cursor: pointer;
+}
