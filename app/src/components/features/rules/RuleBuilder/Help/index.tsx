@@ -21,6 +21,14 @@ const externalLinks: { title: string; link: string }[] = [
   { title: "Ask GitHub community", link: "" },
 ];
 
+type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
+
+interface ScrollIntoViewOptions {
+  behavior?: "auto" | "smooth";
+  block?: ScrollLogicalPosition;
+  inline?: ScrollLogicalPosition;
+}
+
 const Help: React.FC = () => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const introductionRef = useRef<HTMLDivElement | null>(null);
@@ -30,15 +38,6 @@ const Help: React.FC = () => {
   const testingRuleRef = useRef<HTMLDivElement | null>(null);
   const examplesRef = useRef<HTMLDivElement | null>(null);
   const faqsRef = useRef<HTMLDivElement | null>(null);
-
-  type ScrollBehavior = "auto" | "smooth";
-  type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
-
-  interface ScrollIntoViewOptions {
-    behavior?: ScrollBehavior;
-    block?: ScrollLogicalPosition;
-    inline?: ScrollLogicalPosition;
-  }
 
   const documentationList: {
     title: string;
