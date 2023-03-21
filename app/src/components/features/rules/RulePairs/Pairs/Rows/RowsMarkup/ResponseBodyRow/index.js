@@ -286,7 +286,7 @@ const ResponseBodyRow = ({
             </Col>
             <Col span={6} align="right">
               <span className="codemirror-character-count text-gray">
-                {getByteSize(pair.response.value)} characters left
+                {getByteSize(pair.response.value)} characters
               </span>
             </Col>
           </Row>
