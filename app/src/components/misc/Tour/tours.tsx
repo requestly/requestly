@@ -2,7 +2,11 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Step } from "react-joyride";
 
-export const ProductTours: Record<string, Step[]> = {
+export interface CustomSteps extends Step {
+  disableNext?: (ruleData: any) => boolean;
+}
+
+export const ProductTours: Record<string, CustomSteps[]> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: [
     {
       target: "#editor-title",
@@ -11,6 +15,7 @@ export const ProductTours: Record<string, Step[]> = {
       disableBeacon: true,
       offset: 0,
       placement: "bottom-start",
+      disableNext: (ruleData) => (ruleData.name.length ? false : true),
     },
     {
       target: "#editor-source-condition",
@@ -26,6 +31,8 @@ export const ProductTours: Record<string, Step[]> = {
       disableBeacon: true,
       offset: 0,
       placement: "bottom-start",
+      disableNext: (ruleData) =>
+        ruleData.pairs[0].source.value.length ? false : true,
     },
     {
       target: "#destination-url",
@@ -35,6 +42,8 @@ export const ProductTours: Record<string, Step[]> = {
       disableBeacon: true,
       offset: 0,
       placement: "bottom-start",
+      disableNext: (ruleData) =>
+        ruleData.pairs[0].destination.length ? false : true,
     },
     {
       target: "#rule-editor-primary-btn",

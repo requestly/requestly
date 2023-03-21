@@ -9,7 +9,7 @@ export const Tour: React.FC = () => {
   return (
     <JoyRide
       steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
-      continuous={false}
+      continuous={true}
       tooltipComponent={TourTooltip}
       disableScrolling={true}
       disableOverlayClose={true}

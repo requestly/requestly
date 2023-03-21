@@ -1,10 +1,17 @@
-import { RQButton } from "lib/design-system/components";
 import React from "react";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleData } from "store/selectors";
+import { RQButton } from "lib/design-system/components";
 import { TooltipRenderProps } from "react-joyride";
 import { CloseOutlined } from "@ant-design/icons";
+import { CustomSteps } from "../tours";
 import "./index.css";
 
-export const TourTooltip: React.FC<TooltipRenderProps> = ({
+interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
+  step: CustomSteps;
+}
+
+export const TourTooltip: React.FC<CustomTooltipProps> = ({
   index,
   step,
   isLastStep,
@@ -13,6 +20,8 @@ export const TourTooltip: React.FC<TooltipRenderProps> = ({
   primaryProps,
   tooltipProps,
 }) => {
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  // console.log("DATA", currentlySelectedRuleData, primaryProps);
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
       <CloseOutlined className="tour-close-icon" {...skipProps} />
@@ -24,6 +33,7 @@ export const TourTooltip: React.FC<TooltipRenderProps> = ({
           type="default"
           className="tour-tooltip-next-btn"
           {...primaryProps}
+          disabled={step.disableNext?.(currentlySelectedRuleData)}
         >
           {isLastStep ? "Finish" : "Next"}
 
