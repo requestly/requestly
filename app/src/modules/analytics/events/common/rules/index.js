@@ -145,8 +145,8 @@ export const trackRuleTypeSwitched = (ruleType) => {
   trackEvent(RULES.RULE_TYPE_SWITCHED, params);
 };
 
-export const trackRuleDemoVideoClicked = (ruleType) => {
-  const params = { ruleType };
+export const trackRuleDemoVideoClicked = (ruleType, src) => {
+  const params = { ruleType, src };
   trackEvent(RULES.RULE_DEMO_VIDEO_CLICKED, params);
 };
 

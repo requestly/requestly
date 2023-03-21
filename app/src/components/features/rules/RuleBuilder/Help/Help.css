@@ -1,0 +1,91 @@
+.rule-editor-help-container {
+  margin: 1.25rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.rule-editor-help-container ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rule-editor-help-content {
+  height: 70vh;
+  padding: 1.25rem;
+  overflow: auto;
+}
+
+.rule-editor-help-back-btn {
+  margin-right: 8px;
+}
+
+.rule-editor-help-title {
+  margin: 1.25rem 0 12px 0;
+}
+
+.rule-editor-help-title .anticon {
+  margin-right: 5px;
+}
+
+.rule-editor-help-list.external-links {
+  padding-left: 17px;
+}
+
+.rule-editor-help-list.external-links li {
+  margin: 12px 0;
+}
+
+.rule-editor-help-list.external-links a {
+  font-size: 12px;
+  color: var(--white);
+  line-height: 14.06px;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.rule-editor-help-list.external-links a svg {
+  width: 10px;
+  height: 10px;
+}
+
+.rule-editor-help-list .ant-btn {
+  width: 100%;
+  padding: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  height: auto;
+  display: inline-flex;
+  justify-content: flex-start;
+}
+
+.rule-editor-help-list .ant-btn span {
+  line-height: 15.23px;
+}
+
+.rule-editor-help-list li:last-child .ant-btn {
+  margin-bottom: 0;
+}
+
+/* docs */
+.rule-editor-docs-demo-video iframe {
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.rule-editor-docs .rule-editor-docs-use-cases ul {
+  padding-left: 14px;
+}
+
+.rule-editor-docs-use-cases li {
+  list-style: disc;
+  color: var(--text-gray);
+}
+
+.rule-editor-help-footer {
+  padding: 8px 1.25rem;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--component-dark-background);
+}

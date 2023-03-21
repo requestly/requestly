@@ -15,7 +15,7 @@ const DemoVideoCard: React.FC<DemoVideoCardProps> = ({
   ruleType,
 }) => {
   const onVideoPlay = () => {
-    trackRuleDemoVideoClicked(ruleType);
+    trackRuleDemoVideoClicked(ruleType, "rule_selection_page");
   };
   return (
     <Col className="demo-video-card" span={24}>
