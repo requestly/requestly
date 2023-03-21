@@ -1,16 +1,24 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Row, Button, Input, message, Col, Tooltip } from "antd";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
+import {
+  redirectToRules,
+  redirectToMyTeams,
+} from "../../../../../../../utils/RedirectionUtils";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import {
+  clearCurrentlyActiveWorkspace,
+  showSwitchWorkspaceSuccessToast,
+} from "actions/TeamWorkspaceActions";
 import SwitchWorkspaceButton from "../SwitchWorkspaceButton";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
+import LoadingModal from "../../../../../../../layouts/DashboardLayout/Sidebar/WorkspaceSelector/LoadingModal";
 import { toast } from "utils/Toast";
 import {
   trackWorkspaceDeleted,
@@ -20,7 +28,9 @@ import "./TeamSettings.css";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const mountedRef = useRef(true);
+  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userId = user?.details?.profile?.uid;
   const isLoggedInUserOwner = userId === teamOwnerId;
@@ -35,6 +45,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const [renameInProgress, setRenameInProgress] = useState(false);
   const [deleteInProgress, setDeleteInProgress] = useState(false);
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false);
+  const [isTeamSwitchModalActive, setIsTeamSwitchModalActive] = useState(false);
 
   const handleDeleteModalOpen = () => {
     setIsDeleteModalActive(true);
@@ -43,6 +54,15 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
 
   const handleDeleteModalClose = () => {
     setIsDeleteModalActive(false);
+  };
+
+  const handleSwitchToPrivateWorkspace = async () => {
+    setIsTeamSwitchModalActive(true);
+    await clearCurrentlyActiveWorkspace(dispatch, appMode);
+    setTimeout(() => {
+      setIsTeamSwitchModalActive(false);
+      showSwitchWorkspaceSuccessToast();
+    }, 2 * 1000);
   };
 
   const deleteTeam = async () => {
@@ -57,8 +77,10 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     try {
       setDeleteInProgress(true);
       await deleteTeamForm({ teamId, userId });
-      toast.info("Workspace deletion scheduled");
       trackWorkspaceDeleted();
+      toast.info("Workspace deletion scheduled");
+      redirectToRules(navigate);
+      handleSwitchToPrivateWorkspace();
     } catch (err) {
       toast.error("Only owner can delete the workspace!");
     } finally {
@@ -125,14 +147,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     };
   }, [stableFetchTeamInfo, teamId]);
 
-  const deleteButtonProps = {
-    danger: true,
-    className: "delete-team-btn",
-    loading: deleteInProgress,
-    disabled: !isLoggedInUserOwner || !!isTeamArchived,
-    onClick: handleDeleteModalOpen,
-  };
-
   return (
     <>
       <div className="team-settings-container">
@@ -148,6 +162,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
                 teamName={name}
                 selectedTeamId={teamId}
                 teamMembersCount={membersCount}
+                isTeamArchived={isTeamArchived}
               />
             </Row>
 
@@ -207,21 +222,26 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
             <Row className="w-full">
               <Col span={24}>
                 <div className="title team-delete-title">Delete workspace</div>
-                {isLoggedInUserOwner ? (
-                  <Button {...deleteButtonProps}>
+
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "270px" }}
+                  title={
+                    isLoggedInUserOwner
+                      ? "Only owner can delete the workspace. Please contact owner of this workspace."
+                      : ""
+                  }
+                >
+                  <Button
+                    danger
+                    className="delete-team-btn"
+                    loading={deleteInProgress}
+                    onClick={handleDeleteModalOpen}
+                    disabled={!isLoggedInUserOwner || !!isTeamArchived}
+                  >
                     Delete entire workspace
                   </Button>
-                ) : (
-                  <Tooltip
-                    placement="right"
-                    overlayInnerStyle={{ width: "270px" }}
-                    title="Only owner can delete the workspace. Please contact owner of this workspace."
-                  >
-                    <Button {...deleteButtonProps}>
-                      Delete entire workspace
-                    </Button>
-                  </Tooltip>
-                )}
+                </Tooltip>
               </Col>
             </Row>
           </>
@@ -235,6 +255,13 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
           deleteInProgress={deleteInProgress}
           handleDeleteTeam={deleteTeam}
           handleModalClose={handleDeleteModalClose}
+        />
+      ) : null}
+
+      {isTeamSwitchModalActive ? (
+        <LoadingModal
+          isModalOpen={isTeamSwitchModalActive}
+          closeModal={() => setIsTeamSwitchModalActive(false)}
         />
       ) : null}
     </>
