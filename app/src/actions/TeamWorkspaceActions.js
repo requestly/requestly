@@ -54,10 +54,6 @@ export const switchWorkspace = async (
 
   trackWorkspaceSwitched();
   dispatch(actions.updateIsRulesListLoading(true));
-  // just to be safe
-  setTimeout(() => {
-    dispatch(actions.updateIsRulesListLoading(false));
-  }, 30 * 1000);
 
   setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current)
