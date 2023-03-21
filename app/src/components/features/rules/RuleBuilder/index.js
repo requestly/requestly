@@ -77,10 +77,8 @@ const RuleBuilder = (props) => {
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [
-    isChangeRuleGroupModalActive,
-    setIsChangeRuleGroupModalActive,
-  ] = useState(false);
+  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] =
+    useState(false);
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
