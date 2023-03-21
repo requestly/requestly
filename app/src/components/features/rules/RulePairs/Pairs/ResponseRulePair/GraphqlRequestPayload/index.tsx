@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
-import { Input, Row } from "antd";
+import { Input, Row, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
@@ -129,22 +129,31 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   return isRequestPayloadFilterCompatible ? (
     <>
       <label className="subtitle graphql-operation-label">
-        GraphQL Operation
-        <a
-          target="_blank"
-          rel="noreferrer"
-          className="cursor-pointer"
-          href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}
+        GraphQL Operation (Request Payload Filter)
+        <Tooltip
+          overlayInnerStyle={{ width: "302px" }}
+          title={
+            <span>
+              Target rule based on GraphQL operation name in request.{" "}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}
+              >
+                Learn more
+              </a>
+            </span>
+          }
         >
           <InfoCircleOutlined />
-        </a>
+        </Tooltip>
       </label>
       <Row wrap={false}>
         <Input
           name="key"
           type="text"
           autoComplete="off"
-          placeholder="key"
+          placeholder="Key e.g. operationName"
           className="graphql-operation-type-input"
           value={gqlOperationFilter.key}
           onChange={handleRequestPayloadKeyChange}
@@ -153,7 +162,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           name="value"
           type="text"
           autoComplete="off"
-          placeholder="value"
+          placeholder="value e.g. getUsers"
           className="graphql-operation-type-name"
           value={gqlOperationFilter.value}
           onChange={handleRequestPayloadValueChange}

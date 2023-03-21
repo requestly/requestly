@@ -4,10 +4,10 @@
   color: var(--white);
   display: inline-flex;
   align-items: center;
+  column-gap: 6px;
 }
 
-.graphql-operation-label a {
-  margin-left: 6px;
+.graphql-operation-label .anticon {
   display: inline-flex;
   align-items: center;
   color: var(--text-gray);
