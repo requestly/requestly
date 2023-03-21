@@ -259,7 +259,10 @@ export const validateRule = (rule, dispatch) => {
         };
       }
       //Response body shouldn't be empty
-      else if (isEmpty(pair.response.value)) {
+      else if (
+        isEmpty(pair.response.value) &&
+        pair.response.ruleType !== GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+      ) {
         let message = `Please specify response body`;
         let error = "missing response body";
         if (
