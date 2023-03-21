@@ -9,8 +9,6 @@ export const TourTooltip: React.FC<TooltipRenderProps> = ({
   step,
   isLastStep,
   size,
-  //   backProps,
-  //   closeProps,
   skipProps,
   primaryProps,
   tooltipProps,

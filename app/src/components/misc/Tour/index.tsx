@@ -18,16 +18,19 @@ export const Tour: React.FC = () => {
       floaterProps={{
         styles: {
           arrow: {
+            background: "orange",
             display: "inline-flex",
-            length: 15,
+            length: 5,
             position: "absolute",
-            spread: 0,
+            spread: 10,
+            border: "1px solid #ff6905",
           },
         },
       }}
       styles={{
         options: {
           overlayColor: "rgba(0, 0, 0, 0.38)",
+          arrowColor: "#ff6905",
         },
       }}
     />

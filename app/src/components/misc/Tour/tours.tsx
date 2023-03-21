@@ -1,7 +1,8 @@
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { Step } from "react-joyride";
 
-export const ProductTours = {
+export const ProductTours: Record<string, Step[]> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: [
     {
       target: "#editor-title",
@@ -9,6 +10,7 @@ export const ProductTours = {
       content: "Rule name will help you find the rule easily.",
       disableBeacon: true,
       offset: 0,
+      placement: "bottom-start",
     },
     {
       target: "#editor-source-condition",
@@ -23,6 +25,7 @@ export const ProductTours = {
       ),
       disableBeacon: true,
       offset: 0,
+      placement: "bottom-start",
     },
     {
       target: "#destination-url",
@@ -31,6 +34,7 @@ export const ProductTours = {
         "The destination to which the users will be redirected to based on the source condition",
       disableBeacon: true,
       offset: 0,
+      placement: "bottom-start",
     },
     {
       target: "#rule-editor-primary-btn",
@@ -38,6 +42,7 @@ export const ProductTours = {
       content: "Click here to Create and Save the rule.",
       disableBeacon: true,
       offset: 0,
+      placement: "bottom-start",
     },
   ],
 };

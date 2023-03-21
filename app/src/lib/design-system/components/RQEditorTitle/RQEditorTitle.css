@@ -36,6 +36,9 @@
   border-radius: 0;
   transition: 0.05s ease-in-out;
 }
+.editor-title-name .editor-title-name-wrapper .ant-input {
+  max-width: 320px;
+}
 
 .editor-title-description .ant-input,
 .editor-title-description .ant-typography {
@@ -50,7 +53,7 @@
 .editor-title-name .editor-title {
   display: flex;
   gap: 4px;
-  max-width: 600px;
+  max-width: 320px;
 }
 .editor-title-name .editor-title svg {
   align-self: center;
