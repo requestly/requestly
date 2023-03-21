@@ -82,6 +82,7 @@ const RuleBuilder = (props) => {
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
+  const [startTour, setStartTour] = useState(false);
 
   useExternalRuleCreation(MODE);
 
@@ -264,6 +265,11 @@ const RuleBuilder = (props) => {
   }, [currentlySelectedRuleConfig.TYPE, state]);
 
   useEffect(() => {
+    const shouldStartTour = state?.showProductTour;
+    if (shouldStartTour) setStartTour(true);
+  }, [state]);
+
+  useEffect(() => {
     return () => {
       //Flag to prevent future state update when component is about to unmount
       isCleaningUpRef.current = true;
@@ -321,7 +327,7 @@ const RuleBuilder = (props) => {
 
   return (
     <>
-      <Tour />
+      <Tour startTour={startTour} editorMode={MODE} />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
           mode={MODE}

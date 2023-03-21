@@ -4,11 +4,21 @@ import { ProductTours } from "./tours";
 import { TourTooltip } from "./Tooltip";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from "../../../config/constants";
 
-export const Tour: React.FC = () => {
+interface TourProps {
+  startTour: boolean;
+  editorMode: string;
+}
+
+export const Tour: React.FC<TourProps> = ({ startTour, editorMode }) => {
   return (
     <JoyRide
       steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
+      run={
+        startTour &&
+        editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
+      }
       continuous={true}
       tooltipComponent={TourTooltip}
       disableScrolling={true}

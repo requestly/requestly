@@ -17,7 +17,8 @@ export const TourTooltip: React.FC<CustomTooltipProps> = ({
   isLastStep,
   size,
   skipProps,
-  primaryProps,
+  // primaryProps,
+  closeProps,
   tooltipProps,
 }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -32,7 +33,7 @@ export const TourTooltip: React.FC<CustomTooltipProps> = ({
         <RQButton
           type="default"
           className="tour-tooltip-next-btn"
-          {...primaryProps}
+          {...closeProps}
           disabled={step.disableNext?.(currentlySelectedRuleData)}
         >
           {isLastStep ? "Finish" : "Next"}
