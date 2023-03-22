@@ -54,10 +54,8 @@ const RulesIndexPage = () => {
   const isRulesListLoading = useSelector(getIsRulesListLoading);
 
   //Component State
-  const [
-    fetchRulesAndGroupsComplete,
-    setFetchRulesAndGroupsComplete,
-  ] = useState(false);
+  const [fetchRulesAndGroupsComplete, setFetchRulesAndGroupsComplete] =
+    useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
 
   const stableDispatch = useCallback(dispatch, [dispatch]);

@@ -8,16 +8,11 @@ import React, {
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Badge, Table } from "antd";
-//CONSTANTS
 import APP_CONSTANTS from "config/constants";
-
 import { isEmpty } from "lodash";
-// Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
-// Sub Components
 import SpinnerColumn from "../../../../../../../misc/SpinnerColumn";
 import { toast } from "utils/Toast.js";
-// Utils
 import { redirectToMyTeams } from "../../../../../../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "../../../../../../../../store/selectors";
 import RemoveUserModal from "./RemoveUserModal";
@@ -25,12 +20,14 @@ import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
 
-const TeamMembersTable = ({ teamId, refresh, callback }) => {
+const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
 
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const loggedInUserId = user?.details?.profile?.uid;
+  const [isLoggedInUserAdmin, setIsLoggedInUserAdmin] = useState(false);
 
   // Component State
   const [members, setMembers] = useState([]);
@@ -38,6 +35,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
   const [deleteUserModal, setDeleteUserModal] = useState({
     isActive: false,
     userId: false,
+    isLeaveRequested: false,
   });
   const [contactUsModal, setContactUsModal] = useState(false);
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
@@ -120,7 +118,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
           />
 
           {member.displayName}
-          {(user.details.profile.uid === member.id ? " (You) " : "") +
+          {(loggedInUserId === member.id ? " (You) " : "") +
             (billingExclude.includes(member.id) ? " (Free) " : "")}
         </span>
       ),
@@ -144,14 +142,18 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
         ) : (
           <MemberRoleDropdown
             showLoader
-            isHoverEffect
+            isHoverEffect={isLoggedInUserAdmin || member.id === loggedInUserId}
             placement="bottomLeft"
             isAdmin={member.isAdmin}
-            handleRemoveMember={() =>
+            memberId={member.id}
+            loggedInUserId={loggedInUserId}
+            isLoggedInUserAdmin={isLoggedInUserAdmin}
+            handleRemoveMember={(isLeaveRequested = false) =>
               setDeleteUserModal({
                 ...deleteUserModal,
                 isActive: true,
                 userId: member.id,
+                isLeaveRequested,
               })
             }
             handleMemberRoleChange={(_, role, setIsLoading) =>
@@ -262,21 +264,28 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
 
   useEffect(() => {
     setDataSource([]);
-    members.map((member, idx) => {
-      return setDataSource((prevVal) => {
-        return [
-          ...prevVal,
-          {
-            key: idx + 1,
-            img: member,
-            member: member,
-            role: member,
-            actions: member,
-          },
-        ];
-      });
-    });
-  }, [members]);
+
+    const currentUser = members.filter(
+      (member) => member.id === loggedInUserId
+    );
+
+    const otherMembers = members.filter(
+      (member) => member.id !== loggedInUserId
+    );
+
+    const membersData = [...currentUser, ...otherMembers].map(
+      (member, idx) => ({
+        key: idx + 1,
+        img: member,
+        member: member,
+        role: member,
+        actions: member,
+      })
+    );
+
+    setDataSource(membersData);
+    setIsLoggedInUserAdmin(currentUser[0]?.isAdmin);
+  }, [members, loggedInUserId]);
 
   useEffect(() => {
     if (user.details.isLoggedIn) {
@@ -295,6 +304,7 @@ const TeamMembersTable = ({ teamId, refresh, callback }) => {
         toggleModal={toggleDeleteUserModal}
         userId={deleteUserModal.userId}
         callbackOnSuccess={modifyMembersCallback}
+        isLeaveRequested={deleteUserModal.isLeaveRequested}
       />
 
       <ContactUsModal

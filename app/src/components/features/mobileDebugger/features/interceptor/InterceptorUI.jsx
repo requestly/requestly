@@ -100,12 +100,7 @@ const InterceptorUI = ({ appId }) => {
       setShowLogger(true);
       setIsDeviceSelectorVisible(false);
     }
-  }, [
-    deviceId,
-    mobileDebuggerAppDetails,
-    mobileDebuggerInterceptorDetails,
-    sdkId,
-  ]);
+  }, [mobileDebuggerAppDetails, mobileDebuggerInterceptorDetails]);
 
   return (
     <>

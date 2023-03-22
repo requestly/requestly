@@ -1,0 +1,18 @@
+.graphql-operation-label {
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.graphql-operation-label .anticon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-gray);
+}
+
+.graphql-operation-type-input.ant-input {
+  margin-right: 5px;
+}

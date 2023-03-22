@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ExtensionRule } from "modules/extension/types";
 
 export enum ObjectType {
@@ -59,9 +58,22 @@ export enum HeaderRuleActionType {
   MODIFY = "Modify",
 }
 
+export enum ResponseRuleBodyType {
+  CODE = "code",
+  STATIC = "static",
+}
+
+export enum ResponseRuleResourceType {
+  UNKNOWN = "unknown",
+  REST_API = "restApi",
+  GRAPHQL_API = "graphqlApi",
+  STATIC = "static", //  HTML / JS / CSS
+}
+
 export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
+  requestPayload?: { key: string; value: string };
 }
 
 export interface RulePairSource {
@@ -69,6 +81,17 @@ export interface RulePairSource {
   operator: SourceOperator;
   value: string;
   filters?: SourceFilter[];
+}
+
+export interface ResponseRulePair {
+  id: string;
+  source: RulePairSource;
+  response: {
+    value: string;
+    statusCode: string;
+    type: ResponseRuleBodyType;
+    resourceType?: ResponseRuleResourceType;
+  };
 }
 
 export interface RedirectRulePair {
@@ -156,6 +179,10 @@ export interface ScriptRulePair {
 export interface ScriptRule extends Rule {
   pairs: ScriptRulePair[];
   removeCSPHeader?: boolean;
+}
+
+export interface ResponseRule extends Rule {
+  pairs: ResponseRulePair[];
 }
 
 // Group

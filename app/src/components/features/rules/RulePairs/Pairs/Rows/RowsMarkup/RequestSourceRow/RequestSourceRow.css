@@ -1,10 +1,8 @@
 .rules-pair-content-header {
   padding: 4px;
-  background-color: var(--component-header-background);
+  box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  -webkit-box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
-  -moz-box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
-  box-shadow: inset 0px 0px 18px -11px rgba(0, 0, 0, 1);
+  background-color: var(--component-header-background);
 }
 
 .rules-pair-content-header .rules-pair-input,

@@ -1,5 +1,4 @@
 import { isExtensionVersionCompatible } from "actions/ExtensionActions";
-import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import APP_CONSTANTS from "config/constants";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -19,11 +18,10 @@ const SessionsIndexPageContainer = () => {
     );
   }, []);
 
-  if (!isFeatureCompatible) {
+  if (!isFeatureCompatible && !isWorkspaceMode) {
     return <ExtensionVersionError />;
   }
-  if (isWorkspaceMode)
-    return <TeamFeatureComingSoon title="Session recording" />;
+
   return <SessionsIndexPage />;
 };
 

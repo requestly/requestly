@@ -35,8 +35,20 @@ import {
   trackRequestPayloadValueFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
+import { ResponseRuleResourceType } from "types/rules";
+import { debounce, snakeCase } from "lodash";
 
 const { Text, Link } = Typography;
+
+const debouncedTrackPayloadKeyModifiedEvent = debounce(
+  trackRequestPayloadKeyFilterModifiedEvent,
+  500
+);
+
+const debouncedTrackPayloadValueModifiedEvent = debounce(
+  trackRequestPayloadValueFilterModifiedEvent,
+  500
+);
 
 const RESOURCE_TYPE_OPTIONS = [
   { label: "All (default)", value: "all", isDisabled: true },
@@ -92,11 +104,17 @@ const Filters = (props) => {
     );
   };
 
+  const hasLegacyPayloadFilter = () => {
+    return (
+      ResponseRuleResourceType.UNKNOWN ===
+      currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType
+    );
+  };
+
   const isRequestPayloadFilterCompatible =
     isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) &&
-    currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE &&
-    isResponseRule();
+    isResponseRule() &&
+    hasLegacyPayloadFilter();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
@@ -125,19 +143,12 @@ const Filters = (props) => {
     }
   };
 
-  const clearRequestPayload = (e) => {
-    if (e === "") {
+  const clearRequestPayload = (value) => {
+    if (value === "") {
       deleteObjectAtPath(
         currentlySelectedRuleData,
         setCurrentlySelectedRule,
-        `source.filters.requestPayload`,
-        pairIndex,
-        dispatch
-      );
-      deleteObjectAtPath(
-        currentlySelectedRuleData,
-        setCurrentlySelectedRule,
-        `source.filters.requestPayload`,
+        APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD,
         pairIndex,
         dispatch
       );
@@ -174,13 +185,15 @@ const Filters = (props) => {
     trackRequestMethodFilterModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.KEY = () => {
-    trackRequestPayloadKeyFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
+    debouncedTrackPayloadKeyModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.UNKNOWN)
     );
   };
   LOG_ANALYTICS.VALUE = () => {
-    trackRequestPayloadValueFilterModifiedEvent(
-      currentlySelectedRuleData.ruleType
+    debouncedTrackPayloadValueModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.UNKNOWN)
     );
   };
 
@@ -245,7 +258,7 @@ const Filters = (props) => {
     </Menu>
   );
 
-  const renderResponsePayloadInput = () => {
+  const renderRequestPayloadInput = () => {
     return isRequestPayloadFilterCompatible ? (
       <Row
         className="one-padding-bottom"
@@ -532,7 +545,7 @@ const Filters = (props) => {
           {renderPageUrlInput()}
           {renderResourceTypeInput()}
           {renderHTTPMethodInput()}
-          {renderResponsePayloadInput()}
+          {renderRequestPayloadInput()}
         </>
       </Modal>
     </React.Fragment>

@@ -13,18 +13,29 @@ export const trackRequestMethodFilterModifiedEvent = (rule_type) => {
   trackRuleFilterModified("request_method", rule_type);
 };
 
-export const trackRequestPayloadKeyFilterModifiedEvent = (rule_type) => {
-  trackRuleFilterModified("payload_key", rule_type);
+export const trackRequestPayloadKeyFilterModifiedEvent = (
+  rule_type,
+  resource_type
+) => {
+  trackRuleFilterModified("payload_key", rule_type, resource_type);
 };
 
-export const trackRequestPayloadValueFilterModifiedEvent = (rule_type) => {
-  trackRuleFilterModified("payload_value", rule_type);
+export const trackRequestPayloadValueFilterModifiedEvent = (
+  rule_type,
+  resource_type
+) => {
+  trackRuleFilterModified("payload_value", rule_type, resource_type);
 };
 
-export const trackRuleFilterModified = (filter_type, rule_type) => {
+export const trackRuleFilterModified = (
+  filter_type,
+  rule_type,
+  resource_type
+) => {
   const params = {
     filter_type,
     rule_type,
+    resource_type,
   };
   trackEvent(RULES.RULE_FILTER_MODIFIED, params);
 };

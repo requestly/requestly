@@ -4,13 +4,13 @@ import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
-import { saveRule } from "../actions";
 import {
   trackRuleEditorHeaderClicked,
   trackRulePinToggled,
 } from "modules/analytics/events/common/rules";
 import "./PinButton.css";
 import { getModeData } from "../../../actions";
+import { StorageService } from "init";
 
 const PinButton = ({ rule }) => {
   const { MODE } = getModeData(window.location);
@@ -33,10 +33,12 @@ const PinButton = ({ rule }) => {
 
     dispatch(actions.updateCurrentlySelectedRuleData(updatedRule));
 
-    saveRule(appMode, updatedRule).then(() => {
-      trackRulePinToggled(updateValue);
-      trackRuleEditorHeaderClicked("pin_button", rule.ruleType, MODE);
-    });
+    StorageService(appMode)
+      .saveRuleOrGroup(updatedRule, false)
+      .then(() => {
+        trackRulePinToggled(updateValue);
+        trackRuleEditorHeaderClicked("pin_button", rule.ruleType, MODE);
+      });
   };
 
   return (

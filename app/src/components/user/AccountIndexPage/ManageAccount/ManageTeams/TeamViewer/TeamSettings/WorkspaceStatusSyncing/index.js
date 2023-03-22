@@ -44,12 +44,12 @@ const WorkspaceStatusSyncing = () => {
     };
 
     if (syncRuleStatus) {
-      localStorage.setItem("syncRuleStatus", false);
+      localStorage.setItem("syncRuleStatus", "false");
       setSyncRuleStatus(false);
       toast.success("Status syncing turned off");
       trackSettingsToggled("workspace_status_syncing", false);
     } else {
-      localStorage.setItem("syncRuleStatus", true);
+      localStorage.setItem("syncRuleStatus", "true");
       setSyncRuleStatus(true);
       toast.success("Status syncing turned on");
       trackSettingsToggled("workspace_status_syncing", true);
@@ -57,14 +57,16 @@ const WorkspaceStatusSyncing = () => {
     }
   };
 
-  return (
-    <SettingsItem
-      isActive={syncRuleStatus}
-      onClick={handleToggleStatusSyncing}
-      title="Enable status syncing in team workspaces"
-      caption="Stay updated by automatically syncing rule modifications with your teammates."
-    />
-  );
+  return null;
+
+  // return (
+  //   <SettingsItem
+  //     isActive={syncRuleStatus}
+  //     onClick={handleToggleStatusSyncing}
+  //     title="Enable status syncing in team workspaces"
+  //     caption="Stay updated by automatically syncing rule modifications with your teammates."
+  //   />
+  // );
 };
 
 export default WorkspaceStatusSyncing;
