@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { Col, Row, Input, Divider } from "antd";
+import { Col, Row, Input, Divider, Space } from "antd";
 import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 //Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -9,7 +9,8 @@ import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { toast } from "utils/Toast";
 import { getUserAuthDetails } from "store/selectors";
-import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
+// import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
+import "./index.css"
 
 interface Props {
     teamId: string;
@@ -96,13 +97,13 @@ const PublicInviteLink: React.FC<Props> = ({
       { publicInviteLoading ? null : (
         <Row>
           <Col span={24}>
-            <LearnMoreAboutWorkspace
+            {/* <LearnMoreAboutWorkspace
               linkText="Learn about adding members to your
               workspace"
-            />
+            /> */}
 
             <Row align="middle" justify="space-between">
-              <Col className="header members-invite-title">Public Invite link</Col>
+              <Col className="header invite-link-title">Public Invite link</Col>
               <Col className="ml-auto">
               {
                 publicInviteId?
@@ -112,7 +113,7 @@ const PublicInviteLink: React.FC<Props> = ({
               </Col>
             </Row>
 
-            <p className="text-dark-gray members-info-message">
+            <p className="text-dark-gray invite-link-info-message">
               Share this secret link to invite people to this workspace. Only
               users who can invite members can see this.
             </p>
@@ -121,19 +122,22 @@ const PublicInviteLink: React.FC<Props> = ({
       ) }
 
       {publicInviteId? (
-        <Row className={"public-invite-link-container"} justify="space-between">
+        <Row justify="space-between">
           <Col span={24}>
-            <Input
-              className="invite-link-input"
-              contentEditable={false}
-              value={generateInviteLinkFromId(publicInviteId)}
-              addonAfter={<CopyButton
-                title=""
+            <Space.Compact style={{ width: '100%' }}>
+              <Input
+                className="invite-link-input"
+                contentEditable={false}
+                value={generateInviteLinkFromId(publicInviteId)}
+                disabled={true}
+                type="text"
+              />
+              <CopyButton
+                type="primary"
+                title="Copy"
                 copyText={generateInviteLinkFromId(publicInviteId)}
-              />}
-              disabled={true}
-              type="text"
-            />
+              />
+            </Space.Compact>
           </Col>
         </Row>
       ): null}

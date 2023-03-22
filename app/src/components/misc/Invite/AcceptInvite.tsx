@@ -91,15 +91,15 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
                         />
                     </div>
                     <div className="header invite-header">
-                        {ownerName} has invited you to workspace {workspaceName}
+                        {ownerName} has invited you to join workspace {workspaceName}
                     </div>
                     <p className="text-gray invite-subheader">
-                        You are invited to the Requestly Workspace <b>{workspaceName}</b>
+                        Accept to start collaborating together
                     </p>
                     {
                         inProgress?
-                        (<RQButton loading={true} className="invite-modal-button" type="primary" size="large">Accepting Invitation</RQButton>):
-                        (<RQButton className="invite-modal-button" type="primary" size="large" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
+                        (<RQButton loading={true} className="invite-button" type="primary" size="large">Accepting Invitation</RQButton>):
+                        (<RQButton className="invite-button" type="primary" size="large" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
                     }
                 </div>
             </Col>
