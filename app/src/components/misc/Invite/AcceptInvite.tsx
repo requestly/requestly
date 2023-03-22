@@ -11,6 +11,7 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 
 interface Props {
     inviteId: string;
@@ -35,9 +36,9 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
         setInProgress(true);
         acceptInvite({ inviteId })
             .then((res: any) => {
-                console.log(res);
                 if(res?.data?.success) {
                     toast.success("Successfully accepted invite");
+                    trackWorkspaceInviteAccepted(res?.data?.data?.invite?.metadata?.teamId, inviteId, "invite_screen", res?.data?.data?.invite?.usage);
 
                     if(res?.data?.data?.invite.type === "teams") {
                         switchWorkspace(

@@ -10,6 +10,7 @@ import ExpiredInvite from "./ExpiredInvite";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import SpinnerCard from "../SpinnerCard";
+import { trackWorkspaceInviteScreenError } from "modules/analytics/events/features/teams";
 
 interface Props {
     inviteId: string;
@@ -50,8 +51,8 @@ const Invite = ({ inviteId }: Props) => {
                     setVerificationSuccess(true);
                 } else {
                     setVerificationError(res?.data?.error as VerifyInviteErrors);
+                    trackWorkspaceInviteScreenError(res?.data?.error, invite?.metadata?.teamId, inviteId);
                 }
-                console.log(res);
                 setIsLoading(false);
             }).catch((err) => {
                 setIsLoading(false);

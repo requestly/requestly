@@ -74,7 +74,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
                 <p className="text-gray invite-subheader">
                     { invitedEmail ?  (<>To accept the invitation, please login as <b>{invitedEmail}</b></>) : (<>To accept the invitation, please login first.</>)}
                 </p>
-                <RQButton className="invite-modal-button" type="primary" size="large" onClick={() => openAuthModal()}>Log in</RQButton>
+                <RQButton className="invite-button" type="primary" size="large" onClick={() => openAuthModal()}>Log in</RQButton>
             </div>
             </Col>
         </Row>

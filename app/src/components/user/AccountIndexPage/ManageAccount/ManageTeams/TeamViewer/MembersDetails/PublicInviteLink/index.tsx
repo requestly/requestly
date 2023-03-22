@@ -11,6 +11,7 @@ import { toast } from "utils/Toast";
 import { getUserAuthDetails } from "store/selectors";
 // import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
 import "./index.css"
+import { trackWorkspaceInviteLinkGenerated, trackWorkspaceInviteLinkRevoked } from "modules/analytics/events/features/teams";
 
 interface Props {
     teamId: string;
@@ -31,6 +32,7 @@ const PublicInviteLink: React.FC<Props> = ({
   const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
   const handlePublicInviteCreateClicked = () => {
+    trackWorkspaceInviteLinkGenerated(teamId);
     setIsLoading(true);
     const functions = getFunctions();
     const createTeamInvite = httpsCallable(functions, "invites-createTeamInvite");
@@ -46,6 +48,7 @@ const PublicInviteLink: React.FC<Props> = ({
   }
 
   const handlePublicInviteRevokeClicked = () => {
+    trackWorkspaceInviteLinkRevoked(teamId);
     setIsLoading(true);
     const functions = getFunctions();
     const revokeInvite = httpsCallable(functions, "invites-revokeInvite");
