@@ -68,17 +68,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       spotlightClicks={true}
       spotlightPadding={5}
       floaterProps={{
-        styles: {
-          arrow: {
-            background: "orange",
-            display: "inline-flex",
-            length: 5,
-            position: "absolute",
-            spread: 10,
-            border: "1px solid #ff6905",
-            placeItems: "center",
-          },
-        },
+        hideArrow: true,
       }}
       styles={{
         options: {

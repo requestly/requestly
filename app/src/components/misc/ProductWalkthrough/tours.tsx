@@ -4,6 +4,7 @@ import { Step } from "react-joyride";
 
 export interface CustomSteps extends Step {
   disableNext?: (ruleData: any) => boolean;
+  pointerPlacement?: "left" | "center" | "right";
 }
 
 export const ProductTours: Record<string, CustomSteps[]> = {
@@ -13,8 +14,9 @@ export const ProductTours: Record<string, CustomSteps[]> = {
       title: "Start by adding the “Rule name”",
       content: "Rule name will help you find the rule easily.",
       disableBeacon: true,
-      offset: 0,
+      offset: 12,
       placement: "bottom-start",
+      pointerPlacement: "center",
       disableNext: (ruleData) => (ruleData.name.length ? false : true),
     },
     {
@@ -29,7 +31,8 @@ export const ProductTours: Record<string, CustomSteps[]> = {
         </>
       ),
       disableBeacon: true,
-      offset: 0,
+      offset: 12,
+      pointerPlacement: "center",
       placement: "bottom-start",
       disableNext: (ruleData) =>
         ruleData.pairs[0].source.value.length ? false : true,
@@ -40,7 +43,8 @@ export const ProductTours: Record<string, CustomSteps[]> = {
       content:
         "The destination to which the users will be redirected to based on the source condition",
       disableBeacon: true,
-      offset: 0,
+      offset: 12,
+      pointerPlacement: "center",
       placement: "bottom-start",
       disableNext: (ruleData) =>
         ruleData.pairs[0].destination.length ? false : true,
@@ -50,7 +54,8 @@ export const ProductTours: Record<string, CustomSteps[]> = {
       title: "Save the rule",
       content: "Click here to Create and Save the rule.",
       disableBeacon: true,
-      offset: 0,
+      offset: 12,
+      pointerPlacement: "right",
       placement: "bottom-start",
     },
   ],

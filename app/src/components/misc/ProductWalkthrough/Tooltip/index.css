@@ -33,6 +33,19 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  /* color: green; */
   cursor: pointer;
+}
+
+.tour-tooltip-pointer {
+  position: absolute;
+  top: -27px;
+}
+.tour-tooltip-pointer-center {
+  left: 50%;
+}
+.tour-tooltip-pointer-left {
+  left: 10%;
+}
+.tour-tooltip-pointer-right {
+  left: 85%;
 }
