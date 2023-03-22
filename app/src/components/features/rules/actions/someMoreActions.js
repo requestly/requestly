@@ -1,18 +1,10 @@
-//CONFIG
 import APP_CONSTANTS from "config/constants";
-//ACTION OBJECTS
 import { actions } from "store";
-//EXTERNALS
 import { StorageService } from "init";
-//UTILS
-import { generateObjectId } from "utils/FormattingHelper";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { getExecutionLogsId } from "utils/rules/misc";
-import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
-//DOWNLOAD.JS
 const fileDownload = require("js-file-download");
-//CONSTANTS
+
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
 export const deleteRule = async (
@@ -23,7 +15,7 @@ export const deleteRule = async (
 ) => {
   Logger.log("Removing from storage in deleteRule");
   await StorageService(appMode).removeRecord(ruleId);
-  deleteRuleMetaData(appMode, ruleId);
+  deleteRuleExecutionLog(appMode, ruleId);
   dispatch(
     actions.updateRefreshPendingStatus({
       type: "rules",
@@ -35,27 +27,6 @@ export const deleteRule = async (
 const deleteRuleExecutionLog = (appMode, ruleId) => {
   Logger.log("Removing from storage in deleteRuleExecutionLog");
   return StorageService(appMode).removeRecord(getExecutionLogsId(ruleId));
-};
-
-const deleteRuleMetaData = (appMode, ruleId) => {
-  deleteRuleExecutionLog(appMode, ruleId);
-};
-
-export const copyRule = async (appMode, rule, navigate, callback) => {
-  const newRule = {
-    ...rule,
-    creationDate: generateObjectCreationDate(),
-    name: rule.name + " Copy",
-    id: rule.ruleType + "_" + generateObjectId(),
-    isSample: false,
-    isFavourite: false,
-    status: "Inactive",
-  };
-  Logger.log("Writing storage in copyRule");
-
-  await StorageService(appMode).saveRuleOrGroup(newRule);
-  redirectToRuleEditor(navigate, newRule.id);
-  callback?.();
 };
 
 export const exportRule = (rule, groupwiseRules) => {
