@@ -49,7 +49,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       WalkthroughHelpers?.go(0); // start product walkthrough from first step
       trackWalkthroughViewed();
     }
-  }, [startWalkthrough, editorMode, WalkthroughHelpers]);
+  }, [startWalkthrough, editorMode, WalkthroughHelpers, runTourWithABTest]);
 
   return (
     <JoyRide
