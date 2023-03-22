@@ -21,7 +21,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   tooltipProps,
 }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  // console.log("DATA", currentlySelectedRuleData, primaryProps);
+
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
       <CloseOutlined className="tour-close-icon" {...skipProps} />
@@ -32,6 +32,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
         <RQButton
           type="default"
           className="tour-tooltip-next-btn"
+          // used closeProps because primary props takes away the focus from input boxes when tooltip appears
           {...closeProps}
           disabled={step.disableNext?.(currentlySelectedRuleData)}
         >

@@ -38,7 +38,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
-import { Tour } from "components/misc/Tour";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -82,7 +82,7 @@ const RuleBuilder = (props) => {
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
-  const [startTour, setStartTour] = useState(false);
+  const [startWalkthrough, setStartWalkthrough] = useState(false);
 
   useExternalRuleCreation(MODE);
 
@@ -265,8 +265,8 @@ const RuleBuilder = (props) => {
   }, [currentlySelectedRuleConfig.TYPE, state]);
 
   useEffect(() => {
-    const shouldStartTour = state?.showProductTour;
-    if (shouldStartTour) setStartTour(true);
+    const shouldStartWalkthrough = state?.showProductTour;
+    if (shouldStartWalkthrough) setStartWalkthrough(true);
   }, [state]);
 
   useEffect(() => {
@@ -327,7 +327,10 @@ const RuleBuilder = (props) => {
 
   return (
     <>
-      <Tour startTour={startTour} editorMode={MODE} />
+      <ProductWalkthrough
+        startWalkthrough={startWalkthrough}
+        editorMode={MODE}
+      />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
           mode={MODE}

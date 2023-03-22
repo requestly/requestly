@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import JoyRide, { EVENTS, STATUS } from "react-joyride";
+import JoyRide, { EVENTS, STATUS, CallBackProps } from "react-joyride";
 import { ProductTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
 //@ts-ignore
@@ -12,20 +12,20 @@ import {
 } from "modules/analytics/events/misc/productWalkthrough";
 
 interface TourProps {
-  startTour: boolean;
+  startWalkthrough: boolean;
   editorMode: string;
   runTourWithABTest: boolean;
 }
 
-export const Tour: React.FC<TourProps> = ({
-  startTour,
+export const ProductWalkthrough: React.FC<TourProps> = ({
+  startWalkthrough,
   editorMode,
   runTourWithABTest = false,
 }) => {
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
 
-  const callback = (data: any) => {
+  const callback = (data: CallBackProps) => {
     const { index, type, status } = data;
     if (status === STATUS.SKIPPED) {
       WalkthroughHelpers?.skip();
@@ -42,20 +42,22 @@ export const Tour: React.FC<TourProps> = ({
 
   useEffect(() => {
     if (
-      startTour &&
-      editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
+      startWalkthrough &&
+      editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      runTourWithABTest
     ) {
       WalkthroughHelpers?.go(0); // start product walkthrough from first step
       trackWalkthroughViewed();
     }
-  }, [startTour, editorMode, WalkthroughHelpers]);
+  }, [startWalkthrough, editorMode, WalkthroughHelpers]);
 
   return (
     <JoyRide
       ref={joyrideRef}
       run={
-        startTour &&
-        editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
+        startWalkthrough &&
+        editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+        runTourWithABTest
       }
       steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
       continuous={true}
