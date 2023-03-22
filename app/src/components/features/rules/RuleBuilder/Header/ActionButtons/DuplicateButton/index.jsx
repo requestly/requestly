@@ -1,20 +1,14 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
-import { copyRule } from "components/features/rules/actions/someMoreActions";
-import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import {
-  trackRuleDuplicatedEvent,
-  trackRuleEditorHeaderClicked,
-} from "modules/analytics/events/common/rules";
-import {
-  getAppMode,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-} from "store/selectors";
+import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
+import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { actions } from "store";
 import { getModeData } from "../../../actions";
 import { toast } from "utils/Toast";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 
 const DuplicateButton = ({
   rule,
@@ -24,37 +18,60 @@ const DuplicateButton = ({
   const { MODE } = getModeData(window.location);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
     getIsCurrentlySelectedRuleHasUnsavedChanges
   );
+  const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(
+    false
+  );
 
-  const handleDuplicateRuleClick = (e) => {
-    e.stopPropagation();
+  const closeDuplicateRuleModal = useCallback(() => {
+    setIsDuplicateRuleModalActive(false);
+  }, []);
 
-    if (isCurrentlySelectedRuleHasUnsavedChanges) {
-      toast.warn("Please save changes before duplicating a rule");
-      return;
-    }
+  const onRuleDuplicated = useCallback(
+    (newRule) => {
+      closeDuplicateRuleModal();
+      redirectToRuleEditor(navigate, newRule.id);
+      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+      trackRuleEditorHeaderClicked("duplicate_button", rule.ruleType, MODE);
+    },
+    [MODE, closeDuplicateRuleModal, dispatch, navigate, rule.ruleType]
+  );
 
-    copyRule(appMode, rule, navigate, () =>
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig())
-    );
+  const handleDuplicateRuleClick = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      handleRuleOptionsDropdownClose?.();
 
-    handleRuleOptionsDropdownClose?.();
-    trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType);
-    trackRuleEditorHeaderClicked("duplicate_button", rule.ruleType, MODE);
-  };
+      if (isCurrentlySelectedRuleHasUnsavedChanges) {
+        toast.warn("Please save changes before duplicating a rule");
+        return;
+      }
+
+      setIsDuplicateRuleModalActive(true);
+    },
+    [handleRuleOptionsDropdownClose, isCurrentlySelectedRuleHasUnsavedChanges]
+  );
 
   return (
-    <Button
-      type="text"
-      disabled={isDisabled}
-      onClick={handleDuplicateRuleClick}
-    >
-      Duplicate
-    </Button>
+    <>
+      <Button
+        type="text"
+        disabled={isDisabled}
+        onClick={handleDuplicateRuleClick}
+      >
+        Duplicate
+      </Button>
+      {isDuplicateRuleModalActive ? (
+        <DuplicateRuleModal
+          isOpen={isDuplicateRuleModalActive}
+          close={closeDuplicateRuleModal}
+          rule={rule}
+          onDuplicate={onRuleDuplicated}
+        />
+      ) : null}
+    </>
   );
 };
 
