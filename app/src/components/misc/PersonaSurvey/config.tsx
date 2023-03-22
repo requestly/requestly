@@ -223,6 +223,10 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         title: "Company documentation",
         icon: "📋",
       },
+      {
+        title: "ChatGPT",
+        icon: "🤖",
+      },
     ],
   },
 };
