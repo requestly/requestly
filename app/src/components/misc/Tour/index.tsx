@@ -1,26 +1,66 @@
-import React from "react";
-import JoyRide from "react-joyride";
+import React, { useEffect, useRef } from "react";
+import JoyRide, { EVENTS, STATUS } from "react-joyride";
 import { ProductTours } from "./tours";
-import { TourTooltip } from "./Tooltip";
+import { WalkthroughTooltip } from "./Tooltip";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../config/constants";
+import {
+  trackWalkthroughCompleted,
+  trackWalkthroughStepCompleted,
+  trackWalkthroughViewed,
+} from "modules/analytics/events/misc/productWalkthrough";
 
 interface TourProps {
   startTour: boolean;
   editorMode: string;
+  runTourWithABTest: boolean;
 }
 
-export const Tour: React.FC<TourProps> = ({ startTour, editorMode }) => {
+export const Tour: React.FC<TourProps> = ({
+  startTour,
+  editorMode,
+  runTourWithABTest = false,
+}) => {
+  const joyrideRef = useRef(null);
+  const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
+
+  const callback = (data: any) => {
+    const { index, type, status } = data;
+    if (status === STATUS.SKIPPED) {
+      WalkthroughHelpers?.skip();
+    } else if (status === STATUS.FINISHED) {
+      trackWalkthroughCompleted();
+    } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
+      trackWalkthroughStepCompleted(
+        index + 1,
+        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+      );
+      WalkthroughHelpers?.next();
+    }
+  };
+
+  useEffect(() => {
+    if (
+      startTour &&
+      editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
+    ) {
+      WalkthroughHelpers?.go(0); // start product walkthrough from first step
+      trackWalkthroughViewed();
+    }
+  }, [startTour, editorMode, WalkthroughHelpers]);
+
   return (
     <JoyRide
-      steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
+      ref={joyrideRef}
       run={
         startTour &&
         editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE
       }
+      steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
       continuous={true}
-      tooltipComponent={TourTooltip}
+      callback={callback}
+      tooltipComponent={WalkthroughTooltip}
       disableScrolling={true}
       disableOverlayClose={true}
       spotlightClicks={true}
@@ -34,6 +74,7 @@ export const Tour: React.FC<TourProps> = ({ startTour, editorMode }) => {
             position: "absolute",
             spread: 10,
             border: "1px solid #ff6905",
+            placeItems: "center",
           },
         },
       }}

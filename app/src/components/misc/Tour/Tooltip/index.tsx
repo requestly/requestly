@@ -11,13 +11,12 @@ interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
   step: CustomSteps;
 }
 
-export const TourTooltip: React.FC<CustomTooltipProps> = ({
+export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   index,
   step,
   isLastStep,
   size,
   skipProps,
-  // primaryProps,
   closeProps,
   tooltipProps,
 }) => {
