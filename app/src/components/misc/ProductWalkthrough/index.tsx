@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { getAllRules } from "store/selectors";
 import JoyRide, { EVENTS, STATUS, CallBackProps } from "react-joyride";
 import { ProductTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../config/constants";
 import {
   trackWalkthroughCompleted,
@@ -12,17 +12,19 @@ import {
 } from "modules/analytics/events/misc/productWalkthrough";
 
 interface TourProps {
-  startWalkthrough: boolean;
+  tourFor: string;
   editorMode: string;
-  runTourWithABTest: boolean;
+  runTourWithABTest: boolean; //temporary flag
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
-  startWalkthrough,
+  tourFor,
   editorMode,
-  runTourWithABTest = false,
+  runTourWithABTest = true,
 }) => {
+  const [startWalkthrough, setStartWalkthrough] = useState<boolean>(false);
   const joyrideRef = useRef(null);
+  const allRules = useSelector(getAllRules);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
 
   const callback = (data: CallBackProps) => {
@@ -32,34 +34,27 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     } else if (status === STATUS.FINISHED) {
       trackWalkthroughCompleted();
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-      trackWalkthroughStepCompleted(
-        index + 1,
-        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-      );
+      trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
     }
   };
 
   useEffect(() => {
     if (
-      startWalkthrough &&
+      !allRules.length &&
       editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
       runTourWithABTest
     ) {
-      WalkthroughHelpers?.go(0); // start product walkthrough from first step
+      setStartWalkthrough(true);
       trackWalkthroughViewed();
     }
-  }, [startWalkthrough, editorMode, WalkthroughHelpers, runTourWithABTest]);
+  }, [allRules.length, editorMode, runTourWithABTest]);
 
   return (
     <JoyRide
       ref={joyrideRef}
-      run={
-        startWalkthrough &&
-        editorMode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
-        runTourWithABTest
-      }
-      steps={ProductTours[GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]}
+      run={startWalkthrough}
+      steps={ProductTours[tourFor]}
       continuous={true}
       callback={callback}
       tooltipComponent={WalkthroughTooltip}

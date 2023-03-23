@@ -25,15 +25,10 @@ export const redirectToRules = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - RULES - Create New Rule */
-export const redirectToCreateNewRule = (
-  navigate,
-  ruleType,
-  source,
-  showProductTour = false
-) => {
+export const redirectToCreateNewRule = (navigate, ruleType, source) => {
   if (ruleType) {
     navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
-      state: { source, showProductTour },
+      state: { source },
     });
   } else {
     navigate(PATHS.RULES.CREATE);

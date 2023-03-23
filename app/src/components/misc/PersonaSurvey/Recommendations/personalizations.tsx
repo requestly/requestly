@@ -4,8 +4,6 @@ import {
   redirectToMocksList,
 } from "utils/RedirectionUtils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Document, Video } from "react-iconly";
 import { Feature, PersonaType } from "../types";
 
@@ -18,12 +16,7 @@ const allRules = Object.values(RULE_TYPES_CONFIG)
       icon: ICON,
       description: DESCRIPTION,
       action: (navigate: any) =>
-        redirectToCreateNewRule(
-          navigate,
-          TYPE,
-          "persona_recommendation",
-          TYPE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT ? true : false
-        ),
+        redirectToCreateNewRule(navigate, TYPE, "persona_recommendation"),
     };
   });
 
