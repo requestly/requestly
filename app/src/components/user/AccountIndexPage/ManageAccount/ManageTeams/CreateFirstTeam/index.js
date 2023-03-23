@@ -3,6 +3,7 @@ import { Button, Row, Col, Space } from "antd";
 import ProCard from "@ant-design/pro-card";
 import CreateWorkspaceModal from "../CreateWorkspaceModal";
 import APP_CONSTANTS from "../../../../../../config/constants";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 const CreateFirstTeam = () => {
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
@@ -27,7 +28,10 @@ const CreateFirstTeam = () => {
             <Space>
               <Button
                 type="primary"
-                onClick={() => setIsCreateTeamModalOpen(true)}
+                onClick={() => {
+                  setIsCreateTeamModalOpen(true);
+                  trackCreateNewTeamClicked("my_teams");
+                }}
               >
                 Create your first team
               </Button>
