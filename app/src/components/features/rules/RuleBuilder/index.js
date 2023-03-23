@@ -82,6 +82,7 @@ const RuleBuilder = (props) => {
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
+  const [startWalkthrough, setStartWalkthrough] = useState(false);
 
   useExternalRuleCreation(MODE);
 
@@ -252,6 +253,9 @@ const RuleBuilder = (props) => {
       .then((rules) => {
         //Set Flag to prevent loop
         setFetchAllRulesComplete(true);
+        if (!rules.length && MODE === RULE_EDITOR_CONFIG.MODES.CREATE) {
+          setStartWalkthrough(true);
+        }
 
         dispatch(actions.updateRulesAndGroups({ rules, groups: [] }));
       });
@@ -321,7 +325,10 @@ const RuleBuilder = (props) => {
 
   return (
     <>
-      <ProductWalkthrough editorMode={MODE} tourFor={RULE_TYPE_TO_CREATE} />
+      <ProductWalkthrough
+        tourFor={RULE_TYPE_TO_CREATE}
+        startWalkthrough={startWalkthrough}
+      />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
           mode={MODE}
