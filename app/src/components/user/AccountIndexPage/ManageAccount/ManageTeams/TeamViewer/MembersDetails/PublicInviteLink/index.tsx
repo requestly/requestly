@@ -106,7 +106,7 @@ const PublicInviteLink: React.FC<Props> = ({
             /> */}
 
             <Row align="middle" justify="space-between">
-              <Col className="header invite-link-title">Public Invite link</Col>
+              <Col className="title">Public Invite link</Col>
               <Col className="ml-auto">
               {
                 publicInviteId?

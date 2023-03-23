@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Badge, Table, Tag } from "antd";
+import { Avatar, Badge, Col, Row, Table } from "antd";
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
 import { isEmpty } from "lodash";
@@ -21,6 +21,7 @@ import ContactUsModal from "./ContactUsModal";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import "./TeamMembersTable.css";
 import PendingMemberRoleDropwdown from "../../common/PendingMemberRoleDropwdown";
+import { ClockCircleOutlined } from "@ant-design/icons";
 
 const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const navigate = useNavigate();
@@ -116,28 +117,30 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       colSpan: 2,
       onCell: () => ({ colSpan: 2 }),
       render: (member) => (
-        <span className="text-bold">
-          <Avatar
-            size={28}
-            shape="square"
-            src={member.photoUrl}
-            alt={member.displayName}
-            className="member-avatar"
-          />
-
-          {member.displayName}
-          {(loggedInUserId === member.id ? " (You) " : "") +
-            (billingExclude.includes(member.id) ? " (Free) " : "")}
-          { member?.isPending ? <span className="pending-tag"><Tag color="#4f5053">Pending</Tag></span> : null}
-        </span>
+        <Row align="middle">
+          <Col>
+            <Avatar
+              size={42}
+              shape="square"
+              src={member.photoUrl}
+              alt={member.displayName}
+              className="member-avatar"
+              />
+          </Col>
+          <Col>  
+            <Row className="text-bold">
+              { !member?.isPending? (member.displayName + (loggedInUserId === member.id ? " (You) " : "") +
+                (billingExclude.includes(member.id) ? " (Free) " : "")): null }
+            </Row>
+            <Row align={"middle"}> 
+              <span className="member-email">{ member.email }</span>
+              { member?.isPending ? (
+                <Badge count={<div className="pending-tag-container"><span><ClockCircleOutlined /> Pending</span></div>} />
+              ) : null}
+            </Row>
+          </Col>
+        </Row>
       ),
-    },
-    {
-      title: "Email",
-      dataIndex: ["member", "email"],
-      align: "left",
-      ellipsis: true,
-      render: (email) => <span style={{ width: "100px" }}>{email}</span>,
     },
     {
       title: "Role",
