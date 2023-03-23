@@ -24,18 +24,24 @@ const RemoveUserModal = ({
     const functions = getFunctions();
     const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
 
+    if (isUserRemovingHimself) window.hasUserRemovedHimselfRecently = true;
+
     updateTeamUserRole({
       teamId: teamId,
       userId: userId,
       role: "remove",
     })
       .then((res) => {
-        if (!isUserRemovingHimself) {
-          toast.info("Member removed");
+        if (isUserRemovingHimself) {
+          window.hasUserRemovedHimselfRecently = true;
+        } else {
+          toast.info("User removed");
         }
+
         callbackOnSuccess?.();
       })
       .catch((err) => {
+        window.hasUserRemovedHimselfRecently = false;
         toast.error(err.message);
       })
       .finally(() => {
