@@ -22,6 +22,7 @@ import {
   trackCreateNewWorkspaceClicked,
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
+import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import {
   getCurrentlyActiveWorkspace,
   getAvailableTeams,
@@ -79,6 +80,9 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
         overlay={menu}
         trigger={["click"]}
         className="workspace-dropdown"
+        onOpenChange={(open) => {
+          open && trackSidebarClicked("workspace");
+        }}
       >
         <div className="cursor-pointer items-center">
           <Avatar
@@ -183,7 +187,6 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     if (user.loggedIn) {
       setIsCreateWorkspaceModalOpen(true);
       handleMobileSidebarClose?.();
-      trackCreateNewWorkspaceClicked("workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -294,6 +297,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         onClick={() => {
           handleCreateNewWorkspaceRedirect();
           trackWorkspaceDropdownClicked("create_new_workspace");
+          trackCreateNewWorkspaceClicked("workspaces_dropdown");
         }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
@@ -343,7 +347,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           className={`workspace-menu-item ${
             !currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
           }`}
-          onClick={() => confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace)}
+          onClick={() => {
+            confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
+            trackWorkspaceDropdownClicked("switch_workspace");
+          }}
         >
           <div className="workspace-name-container">
             {APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE} (Default)
@@ -403,6 +410,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         onClick={() => {
           handleCreateNewWorkspaceRedirect();
           trackWorkspaceDropdownClicked("create_new_workspace");
+          trackCreateNewWorkspaceClicked("workspaces_dropdown");
         }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
