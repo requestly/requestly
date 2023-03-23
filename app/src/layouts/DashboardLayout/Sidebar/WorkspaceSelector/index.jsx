@@ -429,7 +429,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                       }`}
                     >
                       <div className="workspace-name">{team.name}</div>
-                      <div className="text-gray wrokspace-details">
+                      <div className="text-gray workspace-details">
                         {team.subscriptionStatus
                           ? `${team.subscriptionStatus} • `
                           : null}
