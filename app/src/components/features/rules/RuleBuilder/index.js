@@ -253,6 +253,7 @@ const RuleBuilder = (props) => {
       .then((rules) => {
         //Set Flag to prevent loop
         setFetchAllRulesComplete(true);
+        //TODO: remove this check when adding feature flag
         if (!rules.length && MODE === RULE_EDITOR_CONFIG.MODES.CREATE) {
           setStartWalkthrough(true);
         }
