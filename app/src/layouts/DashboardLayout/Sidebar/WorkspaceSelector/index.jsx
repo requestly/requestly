@@ -128,6 +128,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
+  const _availableTeams = availableTeams || [];
+  const sortedAvailableTeams = [..._availableTeams.filter((team) => !team?.archived), ..._availableTeams.filter((team) => team?.archived)]
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -361,8 +363,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         </Menu.Item>
         {availableTeams === null ? renderLoader() : null}
 
-        {availableTeams &&
-          availableTeams.map((team) => {
+        {sortedAvailableTeams &&
+          sortedAvailableTeams.map((team) => {
             return (
               <Menu.Item
                 key={team.id}
