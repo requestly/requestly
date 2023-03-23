@@ -3,6 +3,19 @@ RQ.RequestResponseRuleHandler.isInitialized = false;
 RQ.RequestResponseRuleHandler.cachedResponseRuleIds = new Set();
 
 RQ.RequestResponseRuleHandler.setup = () => {
+  // TODO: store the extension status in background and watch for changes here
+  chrome.runtime.sendMessage(
+    {
+      action: RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED,
+    },
+    (isExtensionEnabled) => {
+      RQ.ClientUtils.executeJS(
+        `window.${RQ.PUBLIC_NAMESPACE}.isExtensionEnabled = ${isExtensionEnabled};`,
+        true
+      );
+    }
+  );
+
   RQ.RulesStore.getRules().then((rules) => {
     const doRequestResponseRulesExist = rules.some((rule) => {
       return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(
@@ -35,7 +48,7 @@ RQ.RequestResponseRuleHandler.init = function () {
     if (message.action === RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE) {
       RQ.RequestResponseRuleHandler.cacheResponseRule(
         message.url,
-        message.ruleId
+        message.rule
       );
     }
   });
@@ -81,16 +94,14 @@ RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
   });
 };
 
-RQ.RequestResponseRuleHandler.cacheResponseRule = (url, ruleId) => {
-  RQ.RulesStore.getRule(ruleId).then((responseRule) => {
-    RQ.ClientUtils.executeJS(
-      `window.${
-        RQ.PUBLIC_NAMESPACE
-      }.responseRulesByUrl['${url}'] = ${JSON.stringify(responseRule)};`,
-      true
-    );
-    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.add(ruleId);
-  });
+RQ.RequestResponseRuleHandler.cacheResponseRule = (url, responseRule) => {
+  RQ.ClientUtils.executeJS(
+    `window.${
+      RQ.PUBLIC_NAMESPACE
+    }.responseRulesByUrl['${url}'] = ${JSON.stringify(responseRule)};`,
+    true
+  );
+  RQ.RequestResponseRuleHandler.cachedResponseRuleIds.add(responseRule.id);
 };
 
 RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
@@ -136,6 +147,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   try {
     isDebugMode = window && window.localStorage && localStorage.isDebugMode;
   } catch (e) {}
+
+  const isExtensionEnabled = () => {
+    return window[namespace].isExtensionEnabled ?? true;
+  };
 
   const getAbsoluteUrl = (url) => {
     const dummyLink = document.createElement("a");
@@ -231,6 +246,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const getRequestRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
     const absoluteUrl = getAbsoluteUrl(url);
 
     return window[namespace].requestRules.findLast((rule) =>
@@ -258,6 +277,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const getResponseRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
     return window[namespace].responseRulesByUrl[getAbsoluteUrl(url)];
   };
 
