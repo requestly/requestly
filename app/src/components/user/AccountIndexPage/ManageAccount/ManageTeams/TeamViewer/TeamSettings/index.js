@@ -72,11 +72,11 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     }
 
     const functions = getFunctions();
-    const deleteTeamForm = httpsCallable(functions, "deleteTeamForm");
+    const archiveTeam = httpsCallable(functions, "teams-archiveTeam");
 
     try {
       setDeleteInProgress(true);
-      await deleteTeamForm({ teamId, userId });
+      await archiveTeam({ teamId });
       trackWorkspaceDeleted();
       toast.info("Workspace deletion scheduled");
       redirectToRules(navigate);
