@@ -227,9 +227,11 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
                   placement="right"
                   overlayInnerStyle={{ width: "270px" }}
                   title={
-                    isLoggedInUserOwner
-                      ? "Only owner can delete the workspace. Please contact owner of this workspace."
-                      : ""
+                    isTeamArchived? "Team is already archived" : 
+                    (isLoggedInUserOwner
+                      ? ""
+                      : "Only owner can delete the workspace. Please contact owner of this workspace."
+                    )
                   }
                 >
                   <Button
