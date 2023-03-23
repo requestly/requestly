@@ -16,7 +16,17 @@ import {
   showSwitchWorkspaceSuccessToast,
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
-import { Avatar, Divider, Dropdown, Menu, Modal, Row, Spin } from "antd";
+import {
+  Avatar,
+  Divider,
+  Dropdown,
+  Menu,
+  Modal,
+  Row,
+  Spin,
+  Tag,
+  Tooltip,
+} from "antd";
 import {
   trackInviteTeammatesClicked,
   trackCreateNewWorkspaceClicked,
@@ -122,6 +132,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
+  const _availableTeams = availableTeams || [];
+  const sortedAvailableTeams = [..._availableTeams.filter((team) => !team?.archived), ..._availableTeams.filter((team) => team?.archived)]
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -358,11 +370,12 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         </Menu.Item>
         {availableTeams === null ? renderLoader() : null}
 
-        {availableTeams &&
-          availableTeams.map((team) => {
+        {sortedAvailableTeams &&
+          sortedAvailableTeams.map((team) => {
             return (
               <Menu.Item
                 key={team.id}
+                disabled={!!team.archived}
                 icon={
                   <Avatar
                     size={28}
@@ -387,16 +400,33 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                   trackWorkspaceDropdownClicked("switch_workspace");
                 }}
               >
-                <div className="workspace-name-container">
-                  <div className="workspace-name">{team.name}</div>
-                  <div className="text-gray wrokspace-details">
-                    {team.subscriptionStatus
-                      ? `${team.subscriptionStatus} • `
-                      : null}
-                    {team.accessCount}{" "}
-                    {team.accessCount > 1 ? "members" : "member"}
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "178px" }}
+                  title={
+                    team.archived
+                      ? "This workspace has been scheduled for deletion in next 48 hours."
+                      : ""
+                  }
+                >
+                  <div className="workspace-item-wrapper">
+                    <div
+                      className={`workspace-name-container ${
+                        team.archived ? "archived-workspace-item" : ""
+                      }`}
+                    >
+                      <div className="workspace-name">{team.name}</div>
+                      <div className="text-gray wrokspace-details">
+                        {team.subscriptionStatus
+                          ? `${team.subscriptionStatus} • `
+                          : null}
+                        {team.accessCount}{" "}
+                        {team.accessCount > 1 ? "members" : "member"}
+                      </div>
+                    </div>
+                    {team.archived ? <Tag color="gold">archived</Tag> : null}
                   </div>
-                </div>
+                </Tooltip>
               </Menu.Item>
             );
           })}

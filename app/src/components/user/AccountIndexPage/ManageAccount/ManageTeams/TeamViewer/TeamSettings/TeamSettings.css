@@ -1,10 +1,14 @@
 .team-settings-container {
   margin-top: 4px;
+  margin-bottom: 1rem;
 }
 
 .team-settings-title {
-  color: var(--white);
   margin: 1.25rem 0 0.75rem 0;
+}
+
+div.team-delete-title {
+  margin-bottom: 8px;
 }
 
 /* form */
@@ -32,4 +36,42 @@
   margin-bottom: 8px;
   color: var(--white);
   display: inline-block;
+}
+
+/* delete team modal */
+.delete-team-modal-header {
+  margin-bottom: 8px;
+  margin-top: 1.43rem;
+}
+
+.delete-team-permanently-highlight {
+  border-bottom: 2px solid rgba(250, 40, 40, 0.6);
+}
+
+.delete-team-input-label {
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.delete-team-input.ant-input {
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+  background-color: var(--component-background);
+}
+
+.delete-team-cancel-btn {
+  margin-right: 8px;
+}
+
+.delete-team-btn.ant-btn {
+  font-weight: 500;
+  color: var(--white);
+  background-color: rgba(250, 40, 40, 0.2);
+  border: 1px solid rgba(250, 40, 40, 0.6);
+}
+
+.delete-team-btn.ant-btn:hover,
+.delete-team-btn.ant-btn:focus {
+  color: var(--white);
+  background-color: rgba(250, 40, 40, 0.5);
 }

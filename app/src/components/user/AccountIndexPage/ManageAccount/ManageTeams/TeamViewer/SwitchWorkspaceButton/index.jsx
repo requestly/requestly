@@ -14,6 +14,7 @@ const SwitchWorkspaceButton = ({
   teamName,
   selectedTeamId,
   teamMembersCount,
+  isTeamArchived = false,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -59,7 +60,7 @@ const SwitchWorkspaceButton = ({
   return (
     <Button
       type="primary"
-      disabled={isButtonDisabled}
+      disabled={isButtonDisabled || isTeamArchived}
       onClick={handleSwitchWorkspace}
     >
       <SyncOutlined /> Switch to this workspace
