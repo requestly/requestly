@@ -22,6 +22,10 @@ import {
   PhoneOutlined,
   QuestionCircleOutlined,
   ReadOutlined,
+  SlackCircleFilled,
+  SlackOutlined,
+  SlackSquareFilled,
+  SlackSquareOutlined,
   SnippetsOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
@@ -38,6 +42,9 @@ import {
   trackHelpdeskClicked,
 } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
+import { BsSlack } from "react-icons/bs";
+import { FaSlack } from "react-icons/fa";
+import { FiSlack } from "react-icons/fi";
 
 const { Header } = Layout;
 
@@ -112,6 +119,8 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     </Menu>
   );
 
+  const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
+
   return showMenuHeader() ? (
     <Header className="layout-header">
       <Row justify="center" className="w-full" wrap={false}>
@@ -167,22 +176,46 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
             <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <Col>
-                    <span
-                      className="github-star-button"
-                      onClick={() => trackHeaderClicked("github_star_button")}
-                    >
-                      <GitHubButton
-                        style={{ display: "flex" }}
+                  {randomNumberBetween1And2 === 1 ? (
+                    <Col>
+                      <span
                         className="github-star-button"
-                        href="https://github.com/requestly/requestly"
-                        data-color-scheme="dark_dimmed"
-                        data-text="Star"
-                        data-show-count="true"
-                        aria-label="Star Requestly on GitHub"
-                      />
-                    </span>
-                  </Col>
+                        onClick={() => trackHeaderClicked("github_star_button")}
+                      >
+                        <GitHubButton
+                          style={{ display: "flex" }}
+                          className="github-star-button"
+                          href="https://github.com/requestly/requestly"
+                          data-color-scheme="dark_dimmed"
+                          data-text="Star"
+                          data-show-count="true"
+                          aria-label="Star Requestly on GitHub"
+                        />
+                      </span>
+                    </Col>
+                  ) : (
+                    <Col>
+                      <span
+                        className="join-slack-button"
+                        onClick={() => trackHeaderClicked("join_slack_button")}
+                      >
+                        <Button
+                          type="default"
+                          size="small"
+                          icon={<SlackOutlined />}
+                          onClick={() =>
+                            window.open(
+                              "https://bit.ly/requestly-slack",
+                              "_blank"
+                            )
+                          }
+                        >
+                          Join Slack Community
+                        </Button>
+                      </span>
+                    </Col>
+                  )}
+
                   <Divider
                     type="vertical"
                     className="header-vertival-divider"
