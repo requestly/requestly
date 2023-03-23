@@ -348,6 +348,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     </Menu>
   );
 
+  const isTeamCurrentlyActive = (teamId) =>
+    currentlyActiveWorkspace.id === teamId;
+
   const menu = (
     <Menu className="workspaces-menu">
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
@@ -383,7 +386,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
             return (
               <Menu.Item
                 key={team.id}
-                disabled={!!team.archived}
+                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
                 icon={
                   <Avatar
                     size={28}
@@ -420,7 +423,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                   <div className="workspace-item-wrapper">
                     <div
                       className={`workspace-name-container ${
-                        team.archived ? "archived-workspace-item" : ""
+                        team.archived || isTeamCurrentlyActive(team.id)
+                          ? "archived-workspace-item"
+                          : ""
                       }`}
                     >
                       <div className="workspace-name">{team.name}</div>
@@ -432,7 +437,11 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                         {team.accessCount > 1 ? "members" : "member"}
                       </div>
                     </div>
-                    {team.archived ? <Tag color="gold">archived</Tag> : null}
+                    {team.archived ? (
+                      <Tag color="gold">archived</Tag>
+                    ) : isTeamCurrentlyActive(team.id) ? (
+                      <Tag color="green">current</Tag>
+                    ) : null}
                   </div>
                 </Tooltip>
               </Menu.Item>
