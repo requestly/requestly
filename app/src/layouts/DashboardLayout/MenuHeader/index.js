@@ -22,10 +22,7 @@ import {
   PhoneOutlined,
   QuestionCircleOutlined,
   ReadOutlined,
-  SlackCircleFilled,
   SlackOutlined,
-  SlackSquareFilled,
-  SlackSquareOutlined,
   SnippetsOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
@@ -42,9 +39,6 @@ import {
   trackHelpdeskClicked,
 } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
-import { BsSlack } from "react-icons/bs";
-import { FaSlack } from "react-icons/fa";
-import { FiSlack } from "react-icons/fi";
 
 const { Header } = Layout;
 
