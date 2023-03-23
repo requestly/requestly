@@ -217,6 +217,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       files: PATHS.FILE_SERVER_V2.ABSOLUTE,
       sessions: PATHS.SESSIONS.ABSOLUTE,
+      teams: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
     }),
     []
   );
@@ -228,7 +229,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           pathname.includes(path) &&
           (pathname.includes("editor") ||
             pathname.includes("viewer") ||
-            pathname.includes("saved"))
+            pathname.includes("saved") ||
+            pathname.includes("/teams/"))
       ),
     [redirects, pathname]
   );
@@ -242,7 +244,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       }
     };
 
-    if (!isCurrentlySelectedRuleHasUnsavedChanges) {
+    if (
+      !isCurrentlySelectedRuleHasUnsavedChanges ||
+      pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)
+    ) {
       handleCallback();
       return;
     }
