@@ -54,9 +54,10 @@ const availableTeamsListener = (
           (team) => team.id === currentlyActiveWorkspace.id
         );
         if (!found) {
-          alert(
-            "You no longer have access to this workspace. Please contact your team admin."
-          );
+          if (!window.hasUserRemovedHimselfRecently)
+            alert(
+              "You no longer have access to this workspace. Please contact your team admin."
+            );
           clearCurrentlyActiveWorkspace(dispatch, appMode);
           toast.info("Verifying storage checksum");
           setTimeout(() => {
