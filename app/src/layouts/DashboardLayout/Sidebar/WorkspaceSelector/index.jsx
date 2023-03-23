@@ -133,7 +133,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const _availableTeams = availableTeams || [];
-  const sortedAvailableTeams = [..._availableTeams.filter((team) => !team?.archived), ..._availableTeams.filter((team) => team?.archived)]
+  const sortedAvailableTeams = [
+    ..._availableTeams.filter((team) => !team?.archived),
+    ..._availableTeams.filter((team) => team?.archived),
+  ];
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
