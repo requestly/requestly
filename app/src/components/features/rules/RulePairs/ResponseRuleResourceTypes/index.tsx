@@ -61,7 +61,11 @@ const ResponseRuleResourceTypes: React.FC = () => {
         pairs: [{ ...updatedPair }],
       };
 
-      setCurrentlySelectedRule(dispatch, updatedRule, true);
+      setCurrentlySelectedRule(
+        dispatch,
+        updatedRule,
+        resourceType !== ResponseRuleResourceType.UNKNOWN
+      );
     },
     [dispatch, currentlySelectedRuleData]
   );
