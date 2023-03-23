@@ -15,7 +15,7 @@ interface MemberRoleDropdownProps extends DropDownProps {
     updatedRole: "admin" | "user",
     setIsLoading: (status: boolean) => void
   ) => void;
-  handleRemoveMember?: (isLeaveRequested?: boolean) => void;
+  handleRemoveMember?: () => void;
 }
 
 const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
@@ -80,10 +80,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
             {memberId === loggedInUserId ? (
               <>
                 <Divider className="member-role-dropdown" />
-                <Menu.Item
-                  key="remove"
-                  onClick={() => handleRemoveMember(true)}
-                >
+                <Menu.Item key="remove" onClick={() => handleRemoveMember()}>
                   <Typography.Text
                     type="danger"
                     className="remove-user-menu-item-text"

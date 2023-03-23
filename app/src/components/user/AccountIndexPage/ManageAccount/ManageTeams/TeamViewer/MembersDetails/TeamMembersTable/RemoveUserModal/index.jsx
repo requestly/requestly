@@ -4,6 +4,8 @@ import { toast } from "utils/Toast.js";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import "./RemoveUserModal.css";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 
 const RemoveUserModal = ({
   isOpen,
@@ -11,9 +13,11 @@ const RemoveUserModal = ({
   userId,
   teamId,
   callbackOnSuccess,
-  isLeaveRequested = false,
 }) => {
   const [showLoader, setShowLoader] = useState(false);
+  const user = useSelector(getUserAuthDetails);
+
+  const isUserRemovingHimself = user?.details?.profile?.uid === userId;
 
   const removeUserFromTeam = () => {
     setShowLoader(true);
@@ -24,10 +28,9 @@ const RemoveUserModal = ({
       teamId: teamId,
       userId: userId,
       role: "remove",
-      isLeaveRequested,
     })
       .then((res) => {
-        if (!isLeaveRequested) {
+        if (!isUserRemovingHimself) {
           toast.info("Member removed");
         }
         callbackOnSuccess?.();
@@ -45,10 +48,10 @@ const RemoveUserModal = ({
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <div className="rq-modal-content">
         <div className="header">
-          {isLeaveRequested ? "Leave workspace" : "Remove Member"}
+          {isUserRemovingHimself ? "Leave workspace" : "Remove user"}
         </div>
         <div className="text-gray text-sm remove-user-message">
-          {isLeaveRequested ? (
+          {isUserRemovingHimself ? (
             <>
               <p>Do you really want to leave this workspace?</p>
               <p>
@@ -79,7 +82,7 @@ const RemoveUserModal = ({
             onClick={removeUserFromTeam}
             className="remove-user-btn"
           >
-            {isLeaveRequested
+            {isUserRemovingHimself
               ? showLoader
                 ? "Leaving..."
                 : "Leave"
