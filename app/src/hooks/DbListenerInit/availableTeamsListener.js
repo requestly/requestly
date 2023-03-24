@@ -35,17 +35,20 @@ const availableTeamsListener = (
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = [];
-        querySnapshot.forEach((team) => {
+        const records = querySnapshot.docs.map((team) => {
           const teamData = team.data();
-          records.push({
+
+          return {
             id: team.id,
             name: teamData.name,
+            owner: teamData.owner,
+            archived: teamData.archived,
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
-          });
+          };
         });
+
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
@@ -53,10 +56,12 @@ const availableTeamsListener = (
         const found = records.find(
           (team) => team.id === currentlyActiveWorkspace.id
         );
+
         if (!found) {
-          alert(
-            "You no longer have access to this workspace. Please contact your team admin."
-          );
+          if (!window.hasUserRemovedHimselfRecently)
+            alert(
+              "You no longer have access to this workspace. Please contact your team admin."
+            );
           clearCurrentlyActiveWorkspace(dispatch, appMode);
           toast.info("Verifying storage checksum");
           setTimeout(() => {

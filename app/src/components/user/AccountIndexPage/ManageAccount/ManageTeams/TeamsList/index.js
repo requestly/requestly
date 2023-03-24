@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Badge } from "antd";
+import { Button, Badge, Space, Tag } from "antd";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
 import CreateWorkspaceModal from "../CreateWorkspaceModal";
 import { trackCreateNewWorkspaceClicked } from "modules/analytics/events/common/teams";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const TeamsList = ({ teams = [] }) => {
   const navigate = useNavigate();
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
 
@@ -56,18 +59,26 @@ const TeamsList = ({ teams = [] }) => {
       title: "Workspace",
       dataIndex: "name",
       render: (_, record) => (
-        <span
-          onClick={() => {
-            redirectToTeam(navigate, record.id, {
-              redirectBackToMyTeams: true,
-            });
-          }}
-          style={{
-            cursor: "pointer",
-          }}
-        >
-          {_}
-        </span>
+        <>
+          <span
+            onClick={() => {
+              redirectToTeam(navigate, record.id, {
+                redirectBackToMyTeams: true,
+              });
+            }}
+            style={{
+              cursor: "pointer",
+            }}
+          >
+            {_}
+          </span>
+
+          {currentlyActiveWorkspace.id === record.id ? (
+            <Tag style={{ marginLeft: "1em" }} color="green">
+              Current
+            </Tag>
+          ) : null}
+        </>
       ),
     },
     {

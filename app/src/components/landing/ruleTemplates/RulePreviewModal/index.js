@@ -47,7 +47,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       modificationDate,
     };
 
-    saveRule(appMode, dispatch, ruleToSave).then(() => {
+    saveRule(appMode, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name));
       redirectToRuleEditor(navigate, ruleToSave.id, "templates");
     });
