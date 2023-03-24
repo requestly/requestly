@@ -182,7 +182,22 @@ const RequestSourceRow = ({
       {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
         <Col span={1} align="right" className="source-filter-col">
           &nbsp;&nbsp;
-          <Tooltip title="Filters">
+          <Tooltip
+            overlayInnerStyle={{ width: "270px" }}
+            title={
+              <span>
+                Advanced filters like resource type, request method to target
+                requests when rule should be applied.{" "}
+                <a
+                  href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn More
+                </a>
+              </span>
+            }
+          >
             <span
               onClick={() => openFilterModal(pairIndex)}
               className="cursor-pointer text-gray source-filter-icon-container"

@@ -37,6 +37,9 @@ const LINKS = {
   // Docs - Mock GraphQL API response
   REQUESTLY_DOCS_MOCK_GRAPHQL:
     "https://docs.requestly.io/using-rules/mock-graphql-api-response",
+  // Docs - Source Filters
+  REQUESTLY_DOCS_SOURCE_FILTERS:
+    "https://docs.requestly.io/browser-extension/chrome/features/advance-targeting",
   // Docs - Android Debugger Overview
   REQUESTLY_DOCS_ANDROID_DEBUGGER:
     "https://docs.requestly.io/android-debugger/overview",
