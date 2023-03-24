@@ -133,7 +133,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const _availableTeams = availableTeams || [];
-  const sortedAvailableTeams = [..._availableTeams.filter((team) => !team?.archived), ..._availableTeams.filter((team) => team?.archived)]
+  const sortedAvailableTeams = [
+    ..._availableTeams.filter((team) => !team?.archived),
+    ..._availableTeams.filter((team) => team?.archived),
+  ];
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -229,6 +232,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       files: PATHS.FILE_SERVER_V2.ABSOLUTE,
       sessions: PATHS.SESSIONS.ABSOLUTE,
+      teams: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
     }),
     []
   );
@@ -240,7 +244,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           pathname.includes(path) &&
           (pathname.includes("editor") ||
             pathname.includes("viewer") ||
-            pathname.includes("saved"))
+            pathname.includes("saved") ||
+            pathname.includes("/teams/"))
       ),
     [redirects, pathname]
   );
@@ -254,7 +259,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       }
     };
 
-    if (!isCurrentlySelectedRuleHasUnsavedChanges) {
+    if (
+      !isCurrentlySelectedRuleHasUnsavedChanges ||
+      pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)
+    ) {
       handleCallback();
       return;
     }
@@ -340,6 +348,9 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     </Menu>
   );
 
+  const isTeamCurrentlyActive = (teamId) =>
+    currentlyActiveWorkspace.id === teamId;
+
   const menu = (
     <Menu className="workspaces-menu">
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
@@ -375,7 +386,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
             return (
               <Menu.Item
                 key={team.id}
-                disabled={!!team.archived}
+                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
                 icon={
                   <Avatar
                     size={28}
@@ -412,11 +423,13 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                   <div className="workspace-item-wrapper">
                     <div
                       className={`workspace-name-container ${
-                        team.archived ? "archived-workspace-item" : ""
+                        team.archived || isTeamCurrentlyActive(team.id)
+                          ? "archived-workspace-item"
+                          : ""
                       }`}
                     >
                       <div className="workspace-name">{team.name}</div>
-                      <div className="text-gray wrokspace-details">
+                      <div className="text-gray workspace-details">
                         {team.subscriptionStatus
                           ? `${team.subscriptionStatus} • `
                           : null}
@@ -424,7 +437,11 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                         {team.accessCount > 1 ? "members" : "member"}
                       </div>
                     </div>
-                    {team.archived ? <Tag color="gold">archived</Tag> : null}
+                    {team.archived ? (
+                      <Tag color="gold">archived</Tag>
+                    ) : isTeamCurrentlyActive(team.id) ? (
+                      <Tag color="green">current</Tag>
+                    ) : null}
                   </div>
                 </Tooltip>
               </Menu.Item>
