@@ -5,6 +5,7 @@ import { Step } from "react-joyride";
 export interface CustomSteps extends Step {
   disableNext?: (ruleData: any) => boolean;
   pointerPlacement?: "left" | "center" | "right";
+  isLastStep?: boolean;
 }
 
 const tourTarget = (tourId: string) => `[data-tour-id="${tourId}"]`;
@@ -57,6 +58,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 12,
       pointerPlacement: "right",
       placement: "bottom-start",
+      isLastStep: true,
     },
   ],
 };
