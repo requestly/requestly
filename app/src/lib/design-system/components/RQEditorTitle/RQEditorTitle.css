@@ -53,7 +53,7 @@
 .editor-title-name .editor-title {
   display: flex;
   gap: 4px;
-  max-width: 320px;
+  width: 320px;
 }
 .editor-title-name .editor-title svg {
   align-self: center;

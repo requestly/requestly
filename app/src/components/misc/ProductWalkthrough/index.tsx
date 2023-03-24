@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import JoyRide, { EVENTS, STATUS, CallBackProps } from "react-joyride";
-import { ProductTours } from "./tours";
+import { productTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
 import {
   trackWalkthroughCompleted,
@@ -41,26 +41,30 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   }, [runTourWithABTest, startWalkthrough]);
 
   return (
-    <JoyRide
-      ref={joyrideRef}
-      run={startWalkthrough && runTourWithABTest}
-      steps={ProductTours[tourFor]}
-      continuous={true}
-      callback={callback}
-      tooltipComponent={WalkthroughTooltip}
-      disableScrolling={true}
-      disableOverlayClose={true}
-      spotlightClicks={true}
-      spotlightPadding={5}
-      floaterProps={{
-        hideArrow: true,
-      }}
-      styles={{
-        options: {
-          overlayColor: "rgba(0, 0, 0, 0.38)",
-          arrowColor: "#ff6905",
-        },
-      }}
-    />
+    <>
+      {startWalkthrough && (
+        <JoyRide
+          ref={joyrideRef}
+          run={startWalkthrough && runTourWithABTest}
+          steps={productTours[tourFor]}
+          continuous={true}
+          callback={callback}
+          tooltipComponent={WalkthroughTooltip}
+          disableScrolling={true}
+          disableOverlayClose={true}
+          spotlightClicks={true}
+          spotlightPadding={5}
+          floaterProps={{
+            hideArrow: true,
+          }}
+          styles={{
+            options: {
+              overlayColor: "rgba(0, 0, 0, 0.38)",
+              arrowColor: "#ff6905",
+            },
+          }}
+        />
+      )}
+    </>
   );
 };

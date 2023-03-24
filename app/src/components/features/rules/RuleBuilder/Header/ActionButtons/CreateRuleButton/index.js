@@ -155,7 +155,7 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     <>
       <Tooltip title={tooltipText} placement="top">
         <Button
-          id="rule-editor-primary-btn"
+          data-tour-id="rule-editor-create-btn"
           type="primary"
           className="text-bold"
           disabled={isDisabled}

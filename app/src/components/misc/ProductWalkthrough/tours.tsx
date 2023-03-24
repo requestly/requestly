@@ -7,20 +7,22 @@ export interface CustomSteps extends Step {
   pointerPlacement?: "left" | "center" | "right";
 }
 
-export const ProductTours: Record<string, CustomSteps[]> = {
+const tourTarget = (tourId: string) => `[data-tour-id="${tourId}"]`;
+
+export const productTours: Record<string, CustomSteps[]> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: [
     {
-      target: "#editor-title",
+      target: tourTarget("rule-editor-title"),
       title: "Start by adding the “Rule name”",
       content: "Rule name will help you find the rule easily.",
       disableBeacon: true,
       offset: 12,
       placement: "bottom-start",
       pointerPlacement: "center",
-      disableNext: (ruleData) => (ruleData.name.length ? false : true),
+      disableNext: (ruleData) => !ruleData.name.length,
     },
     {
-      target: "#editor-source-condition",
+      target: tourTarget("rule-editor-source"),
       title: "Add Source condition to set criteria for the rules",
       content: (
         <>
@@ -34,11 +36,10 @@ export const ProductTours: Record<string, CustomSteps[]> = {
       offset: 12,
       pointerPlacement: "center",
       placement: "bottom-start",
-      disableNext: (ruleData) =>
-        ruleData.pairs[0].source.value.length ? false : true,
+      disableNext: (ruleData) => !ruleData.pairs[0].source.value?.length,
     },
     {
-      target: "#destination-url",
+      target: tourTarget("rule-editor-destination-url"),
       title: "Add Destination URL",
       content:
         "The destination to which the users will be redirected to based on the source condition",
@@ -46,11 +47,10 @@ export const ProductTours: Record<string, CustomSteps[]> = {
       offset: 12,
       pointerPlacement: "center",
       placement: "bottom-start",
-      disableNext: (ruleData) =>
-        ruleData.pairs[0].destination.length ? false : true,
+      disableNext: (ruleData) => !ruleData.pairs[0].destination?.length,
     },
     {
-      target: "#rule-editor-primary-btn",
+      target: tourTarget("rule-editor-create-btn"),
       title: "Save the rule",
       content: "Click here to Create and Save the rule.",
       disableBeacon: true,
