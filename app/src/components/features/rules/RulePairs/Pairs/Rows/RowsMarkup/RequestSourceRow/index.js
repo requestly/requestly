@@ -1,10 +1,16 @@
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown } from "lib/design-system/components";
+import {
+  trackMoreInfoViewed,
+  trackMoreInfoClicked,
+} from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
@@ -23,6 +29,10 @@ const RequestSourceRow = ({
     getFilterCount,
     generatePlaceholderText,
   } = helperFunctions;
+
+  const currentlySelectedRuleConfig = useSelector(
+    getCurrentlySelectedRuleConfig
+  );
 
   const sourceKeys = useMemo(
     () => [
@@ -184,6 +194,13 @@ const RequestSourceRow = ({
           &nbsp;&nbsp;
           <Tooltip
             overlayInnerStyle={{ width: "270px" }}
+            onOpenChange={(open) => {
+              if (open)
+                trackMoreInfoViewed(
+                  currentlySelectedRuleConfig.TYPE,
+                  "source_filter"
+                );
+            }}
             title={
               <span>
                 Advanced filters like resource type, request method to target
@@ -192,6 +209,12 @@ const RequestSourceRow = ({
                   href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() =>
+                    trackMoreInfoClicked(
+                      currentlySelectedRuleConfig.TYPE,
+                      "source_filter"
+                    )
+                  }
                 >
                   Learn More
                 </a>

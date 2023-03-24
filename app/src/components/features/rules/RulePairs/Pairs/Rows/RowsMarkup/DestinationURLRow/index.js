@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { Row, Col, Input, Tooltip, Dropdown } from "antd";
 import {
   FolderOpenOutlined,
@@ -20,6 +22,7 @@ import {
   trackClickMock,
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
+import { trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
 import { isDesktopMode } from "utils/AppUtils";
 import Logger from "lib/logger";
 import "./index.css";
@@ -34,6 +37,9 @@ const DestinationURLRow = ({
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
   const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
+  const currentlySelectedRuleConfig = useSelector(
+    getCurrentlySelectedRuleConfig
+  );
 
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
@@ -90,12 +96,40 @@ const DestinationURLRow = ({
   const inputOptions = () => {
     const items = [
       {
-        label: "Pick from Mock Server",
+        label: (
+          <Tooltip
+            title="Redirect to endpoint from Requestly Mock Server or File Server"
+            placement="left"
+            onOpenChange={(open) => {
+              if (open)
+                trackMoreInfoViewed(
+                  currentlySelectedRuleConfig.TYPE,
+                  "pick_from_mock_server"
+                );
+            }}
+          >
+            Pick from Mock Server
+          </Tooltip>
+        ),
         key: "mock",
         icon: <FolderOpenOutlined />,
       },
       {
-        label: "Map Local File",
+        label: (
+          <Tooltip
+            title="Serve content from a local file on your device for matching network request URL"
+            placement="left"
+            onOpenChange={(open) => {
+              if (open)
+                trackMoreInfoViewed(
+                  currentlySelectedRuleConfig.TYPE,
+                  "map_local"
+                );
+            }}
+          >
+            Map Local File
+          </Tooltip>
+        ),
         key: "local",
         disabled: !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL),
         icon: <FileSyncOutlined />,
@@ -171,6 +205,13 @@ const DestinationURLRow = ({
               title={
                 "Define the destination URL where you want to redirect the original request."
               }
+              onOpenChange={(open) => {
+                if (open)
+                  trackMoreInfoViewed(
+                    currentlySelectedRuleConfig.TYPE,
+                    "destination_url"
+                  );
+              }}
             >
               <img src={InfoOutlinedIcon} alt="info" />
             </Tooltip>
@@ -202,6 +243,13 @@ const DestinationURLRow = ({
                   onClick={() => {
                     trackClickMock();
                     setIsMockPickerVisible(true);
+                  }}
+                  onOpenChange={(open) => {
+                    if (open)
+                      trackMoreInfoViewed(
+                        currentlySelectedRuleConfig.TYPE,
+                        "pick_from_mock_server"
+                      );
                   }}
                 >
                   <FolderOpenOutlined />
