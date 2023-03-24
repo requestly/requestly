@@ -162,8 +162,8 @@ const MenuItem = (props) => {
   useEffect(() => {
     if (collapsed) {
       setTimeout(() => {
-        setCollapsedFlag(collapsed);
-      }, 500);
+        setCollapsedFlag(collapsed); // on collapse, we align the text to center so do not want to do it immediately which induces a jerking motion of sidebar
+      }, 300);
     } else {
       setCollapsedFlag(collapsed);
     }
@@ -240,11 +240,6 @@ const MenuItem = (props) => {
           icon={<div className="icon-wrapper">{item.icon}</div>}
           onClick={onClose}
           style={{ paddingLeft: "11px", paddingRight: "6px" }}
-          // style={
-          //   collapsed
-          //     ? { display: "flex", alignItems: "center" }
-          //     : { paddingLeft: "11px" }
-          // }
           className={
             locationURL === itemNavLink
               ? "ant-menu-item-selected"
@@ -285,15 +280,11 @@ const MenuItem = (props) => {
         splitLocation[splitLocation.length - 2],
       ]}
       theme={appTheme}
-      style={
-        {
-          // paddingBottom: "2.4rem",
-        }
-      }
-      // className="siderbar-menu"
-      className={`siderbar-menu${
-        collapsedFlag ? " siderbar-menu-collapsed" : ""
-      }`}
+      style={{
+        paddingBottom: "2.4rem",
+      }}
+      className={`siderbar-menu
+      ${collapsedFlag ? " siderbar-menu-collapsed" : ""}`}
     >
       {menuItem}
     </Menu>
