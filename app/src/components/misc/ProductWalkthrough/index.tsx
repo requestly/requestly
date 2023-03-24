@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import JoyRide, {
   EVENTS,
   STATUS,
@@ -29,21 +35,23 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
+  const tourSteps = useMemo(() => productTours[tourFor], [tourFor]);
 
-  const renderCustomToolTip = (props: TooltipRenderProps) => {
-    return <WalkthroughTooltip {...props} context={context} />;
-  };
+  const renderCustomToolTip = useCallback(
+    (props: TooltipRenderProps) => {
+      return <WalkthroughTooltip {...props} context={context} />;
+    },
+    [context]
+  );
 
   const callback = (data: CallBackProps) => {
-    const { step, index, type, status } = data;
+    const { index, type, status } = data;
     if (status === STATUS.SKIPPED) {
       WalkthroughHelpers?.skip();
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
-    }
-    //@ts-ignore
-    else if (step?.isLastStep) {
+    } else if (index >= tourSteps?.length - 1) {
       setHasReachedLastStep(true);
     }
   };
