@@ -50,6 +50,12 @@ class PosthogIntegration implements IAnalyticsIntegration {
       return;
     }
 
+    // Disabling events Tracking for posthog.
+    // TODO: Move to new account
+    if(true)
+    return;
+
+
     if (this.isIntegrationDone) {
       posthog.capture(eventName, eventParams);
     } else {
