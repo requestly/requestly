@@ -41,14 +41,19 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
           {...closeProps}
           disabled={step.disableNext?.(context)}
         >
-          {isLastStep ? "Finish" : "Next"}
-
-          <img
-            alt="back"
-            width="14px"
-            height="12px"
-            src="/assets/icons/leftArrow.svg"
-          />
+          {isLastStep ? (
+            "Finish"
+          ) : (
+            <>
+              Next{" "}
+              <img
+                alt="back"
+                width="14px"
+                height="12px"
+                src="/assets/icons/leftArrow.svg"
+              />
+            </>
+          )}
         </RQButton>
       </div>
     </div>
