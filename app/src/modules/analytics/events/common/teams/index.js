@@ -27,6 +27,15 @@ export const trackCreateNewWorkspaceClicked = (source) => {
 export const trackNewWorkspaceCreated = () => {
   trackEvent(TEAMS.NEW_WORKSPACE_CREATED);
 };
+
+export const trackWorkspaceDeleteClicked = () => {
+  trackEvent(TEAMS.WORKSPACE_DELETE_CLICKED);
+};
+
+export const trackWorkspaceDeleted = () => {
+  trackEvent(TEAMS.WORKSPACE_DELETED);
+};
+
 export const trackAddMemberClicked = () => {
   trackEvent(TEAMS.ADD_MEMBER_CLICKED);
 };
@@ -64,4 +73,9 @@ export const trackAddWorkspaceNameModalViewed = () => {
 
 export const trackAddMembersInWorkspaceModalViewed = () => {
   trackEvent(TEAMS.ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED);
+};
+
+export const trackCreateNewTeamClicked = (source) => {
+  const params = { source };
+  trackEvent(TEAMS.CREATE_NEW_TEAM_CLICKED, params);
 };

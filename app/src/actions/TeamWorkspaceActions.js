@@ -35,6 +35,7 @@ export const switchWorkspace = async (
   setLoader
 ) => {
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
+  let needToMergeRecords = false;
 
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
@@ -45,6 +46,7 @@ export const switchWorkspace = async (
         const message = "Turn on syncing?";
         const confirmationResponse = window.confirm(message);
         if (confirmationResponse !== true) return;
+        needToMergeRecords = true;
         setSyncState(window.uid, true, appMode);
       }
     }
@@ -52,10 +54,6 @@ export const switchWorkspace = async (
 
   trackWorkspaceSwitched();
   dispatch(actions.updateIsRulesListLoading(true));
-  // just to be safe
-  setTimeout(() => {
-    dispatch(actions.updateIsRulesListLoading(false));
-  }, 30 * 1000);
 
   setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current)
@@ -78,7 +76,7 @@ export const switchWorkspace = async (
     );
     await mergeRecordsAndSaveToFirebase(appMode, parsedFirebaseRules);
   };
-  await mergeLocalRecords();
+  needToMergeRecords && (await mergeLocalRecords());
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
@@ -99,6 +97,12 @@ export const switchWorkspace = async (
   window.skipSyncListenerForNextOneTime = false;
   window.isFirstSyncComplete = false;
 
+  if (teamId === null) {
+    // We are switching to pvt workspace
+    // Clear team members info
+    dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
+  }
+
   dispatch(
     teamsActions.setCurrentlyActiveWorkspace({
       id: teamId,
@@ -106,12 +110,6 @@ export const switchWorkspace = async (
       membersCount: teamMembersCount,
     })
   );
-
-  if (teamId === null) {
-    // We are switching to pvt workspace
-    // Clear team members info
-    dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
-  }
 
   //Refresh Rules List
   dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));

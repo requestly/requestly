@@ -24,7 +24,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
 
     // @ts-ignore
     if (!window.POSTHOG_INTEGRATION_DONE) {
-      posthog.init("phc_7D52fDZhcwbC2BRlC3Py7jSEGPWFoFStHk00xnx7zSg", {
+      posthog.init("phc_uNIYhy7rJ7GZF0H7aYtHvCOHIaCjB6wKICG9dkNUEDy", {
         api_host: "https://app.posthog.com",
         persistence: "memory",
         disable_session_recording: true,
@@ -49,6 +49,11 @@ class PosthogIntegration implements IAnalyticsIntegration {
       Logger.log(`[Analytics] Posthog ${eventName} blacklisted`);
       return;
     }
+
+    // Disabling events Tracking for posthog.
+    // TODO: Move to new account
+    // eslint-disable-next-line
+    if (true) return;
 
     if (this.isIntegrationDone) {
       posthog.capture(eventName, eventParams);

@@ -701,7 +701,7 @@ BG.Methods.overrideResponse = function (details) {
       {
         action: RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE,
         url: details.url,
-        ruleId: finalResponseRule.id,
+        rule: finalResponseRule,
       },
       { frameId: details.frameId }
     );

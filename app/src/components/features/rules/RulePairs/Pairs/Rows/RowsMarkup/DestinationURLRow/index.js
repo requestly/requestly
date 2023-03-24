@@ -219,6 +219,7 @@ const DestinationURLRow = ({
         </Col>
         <Col span={21}>
           <Input
+            data-tour-id="rule-editor-destination-url"
             className="display-inline-block has-dark-text"
             placeholder={generatePlaceholderText(
               pair.source.operator,

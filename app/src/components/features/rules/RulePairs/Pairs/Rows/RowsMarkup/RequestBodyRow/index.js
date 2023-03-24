@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Radio, Button } from "antd";
 // Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -6,6 +6,7 @@ import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 
 import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
+import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
 
 const RequestBodyRow = ({
   rowIndex,
@@ -19,17 +20,27 @@ const RequestBodyRow = ({
 
   const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
-    GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
+    pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
+  const [isCodeMinified, setIsCodeMinified] = useState(true);
+  const [editorStaticValue, setEditorStaticValue] = useState(
+    pair?.request?.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC &&
+      pair.request.value
+  );
+
+  const codeFormattedFlag = useRef(null);
 
   const onChangeRequestType = (requestType) => {
     if (
       Object.values(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES).includes(requestType)
     ) {
-      let value = "";
+      let value = "{}";
       if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
         value = ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"];
+      } else if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+        setIsCodeMinified(true);
+        setEditorStaticValue(value);
       }
 
       modifyPairAtGivenPath(null, pairIndex, `request.type`, requestType, [
@@ -49,6 +60,10 @@ const RequestBodyRow = ({
   };
 
   const requestBodyChangeHandler = (value) => {
+    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+      setEditorStaticValue(value);
+    }
+
     modifyPairAtGivenPath(
       null,
       pairIndex,
@@ -57,19 +72,38 @@ const RequestBodyRow = ({
       [
         {
           path: `request.value`,
-          value: value,
+          value:
+            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
+              ? processStaticDataBeforeSave(value)
+              : value,
         },
       ],
-      !isCodeFormatted
+      !codeFormattedFlag.current
     );
   };
 
   const handleCodeFormattedFlag = () => {
     setIsCodeFormatted(true);
+    codeFormattedFlag.current = true;
     setTimeout(() => {
       setIsCodeFormatted(false);
+      codeFormattedFlag.current = false;
     }, 2000);
   };
+
+  const handleCodePrettifyToggle = () => {
+    if (!isCodeMinified) {
+      setEditorStaticValue(minifyCode(editorStaticValue));
+    }
+    setIsCodeMinified((isMinified) => !isMinified);
+    handleCodeFormattedFlag();
+  };
+
+  useEffect(() => {
+    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
+      setIsCodeMinified(false);
+    }
+  }, [pair.request.type]);
 
   return (
     <React.Fragment key={rowIndex}>
@@ -87,7 +121,7 @@ const RequestBodyRow = ({
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            visible={requestTypePopupVisible}
+            open={requestTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}
@@ -116,12 +150,18 @@ const RequestBodyRow = ({
           >
             <Col xl="12" span={24}>
               <CodeEditor
+                key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
                     ? "javascript"
                     : "json"
                 }
-                value={pair.request.value}
+                value={
+                  pair.request.type ===
+                  GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
+                    ? editorStaticValue
+                    : pair.request.value
+                }
                 handleChange={requestBodyChangeHandler}
                 readOnly={isInputDisabled}
                 validation={
@@ -130,6 +170,8 @@ const RequestBodyRow = ({
                     ? "off"
                     : "editable"
                 }
+                unlockJsonPrettify={true}
+                isCodeMinified={isCodeMinified}
                 isCodeFormatted={isCodeFormatted}
               />
             </Col>
@@ -141,11 +183,21 @@ const RequestBodyRow = ({
           >
             <Col align="left">
               {pair.request.type ===
-              GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? (
+              GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? (
                 <Button type="link" onClick={handleCodeFormattedFlag}>
                   Pretty Print {"{ }"}
                 </Button>
-              ) : null}
+              ) : (
+                <>
+                  <Button type="link" onClick={handleCodePrettifyToggle}>
+                    {isCodeMinified ? (
+                      <span>Pretty Print {"{ }"}</span>
+                    ) : (
+                      <span>View Raw</span>
+                    )}
+                  </Button>
+                </>
+              )}
             </Col>
             <Col
               span={6}
