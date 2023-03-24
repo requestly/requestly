@@ -10,6 +10,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import "./TeamViewer.css";
+import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 
 const TeamViewer = ({ teamId }) => {
   // Component State
@@ -21,6 +22,7 @@ const TeamViewer = ({ teamId }) => {
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
+  const teamMembersCount = teamDetails?.accessCount;
 
   useEffect(() => {
     const functions = getFunctions();
@@ -104,7 +106,11 @@ const TeamViewer = ({ teamId }) => {
           />
         ) : null}
 
-        <Row align="middle" className="manage-workspace-header-container">
+        <Row
+          align="middle"
+          justify="space-between"
+          className="manage-workspace-header-container"
+        >
           <Col>
             <Row
               wrap={false}
@@ -125,6 +131,20 @@ const TeamViewer = ({ teamId }) => {
               <span className="header">
                 Manage {name ?? "private"} workspace
               </span>
+            </Row>
+          </Col>
+          <Col>
+            <Row
+              wrap={false}
+              align="middle"
+              className="manage-workspace-header"
+            >
+              <SwitchWorkspaceButton
+                teamName={name}
+                selectedTeamId={teamId}
+                teamMembersCount={teamMembersCount}
+                isTeamArchived={isTeamArchived}
+              />
             </Row>
           </Col>
         </Row>

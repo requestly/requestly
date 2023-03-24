@@ -268,10 +268,16 @@ var routes = [
     component: Goodbye,
   },
   {
-    path: PATHS.ACCOUNT.TEAM.RELATIVE + "/:teamId",
+    path: PATHS.ACCOUNT.TEAMS.RELATIVE + "/:teamId",
     name: "Manage Team",
     icon: "ni ni-lock-circle-open text-red",
     component: TeamViewerIndex,
+  },
+  {
+    path: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
+    name: "Manage Team",
+    icon: "ni ni-lock-circle-open text-red",
+    component: () => <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
   },
   {
     path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,

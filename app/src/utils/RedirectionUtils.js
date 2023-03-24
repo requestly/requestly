@@ -294,7 +294,7 @@ export const redirectToBackups = (navigate, hardRedirect) => {
 export const redirectToTeam = (navigate, teamId, options = {}) => {
   const { hardRedirect, autoRefresh, redirectBackToMyTeams, state } = options;
   const url = new URL(window.location.href);
-  url.pathname = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
+  url.pathname = PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`;
   if (autoRefresh) {
     url.searchParams.set("autoRefresh", "true");
   }
@@ -302,7 +302,7 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
     url.searchParams.set("redirectBackToMyTeams", "true");
   }
   if (hardRedirect) {
-    window.location = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
+    window.location = PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`;
   } else if (state) {
     navigate(url.pathname + url.search, { state });
   } else {
