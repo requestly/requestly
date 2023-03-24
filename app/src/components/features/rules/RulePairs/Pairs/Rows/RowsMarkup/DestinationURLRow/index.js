@@ -5,8 +5,8 @@ import {
   CaretDownOutlined,
   FileSyncOutlined,
   WarningFilled,
-  InfoCircleOutlined,
 } from "@ant-design/icons";
+import InfoOutlinedIcon from "../../../../../../../../assets/icons/info-outlined.svg";
 import isEmpty from "is-empty";
 import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 import { isValidUrl } from "utils/FormattingHelper";
@@ -22,7 +22,7 @@ import {
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { isDesktopMode } from "utils/AppUtils";
 import Logger from "lib/logger";
-import "./destinationURLRow.css";
+import "./index.css";
 
 const DestinationURLRow = ({
   rowIndex,
@@ -172,7 +172,7 @@ const DestinationURLRow = ({
                 "Define the destination URL where you want to redirect the original request."
               }
             >
-              <InfoCircleOutlined />
+              <img src={InfoOutlinedIcon} alt="info" />
             </Tooltip>
           </span>
         </Col>
