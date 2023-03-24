@@ -45,8 +45,8 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         icon: "📊",
       },
       {
-        title: PersonaType.FOUNDER,
-        icon: "👑",
+        title: PersonaType.FULLSTACK,
+        icon: "👨🏽‍💻",
       },
     ],
   },
@@ -102,8 +102,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) =>
-          answer === PersonaType.FOUNDER || answer === PersonaType.PRODUCT,
+        condition: (answer: string) => answer === PersonaType.PRODUCT,
         options: [
           {
             title: "Testing new features on client websites",
@@ -142,7 +141,8 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) => answer === PersonaType.FRONTEND,
+        condition: (answer: string) =>
+          answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
         options: [
           {
             title: "Local development before the backend is ready",

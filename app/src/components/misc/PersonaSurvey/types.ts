@@ -56,8 +56,8 @@ export interface Feature {
 export enum PersonaType {
   FRONTEND = "Front-end developer",
   BACKEND = "Back-end developer",
+  FULLSTACK = "Full-stack developer",
   MARKETER = "Digital Marketer",
-  FOUNDER = "Founder",
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
 }
