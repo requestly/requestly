@@ -94,6 +94,8 @@ const givenRoutes = [
 
 const MenuItem = (props) => {
   const { onClose, collapsed } = props;
+
+  const [collapsedFlag, setCollapsedFlag] = useState(false);
   // Location
   const location = useLocation();
   const { pathname } = location;
@@ -156,6 +158,16 @@ const MenuItem = (props) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    if (collapsed) {
+      setTimeout(() => {
+        setCollapsedFlag(collapsed);
+      }, 500);
+    } else {
+      setCollapsedFlag(collapsed);
+    }
+  }, [collapsed]);
 
   const menuItem = myRoutes.map((item) => {
     if (item.header) {
@@ -227,11 +239,12 @@ const MenuItem = (props) => {
           key={item.key}
           icon={<div className="icon-wrapper">{item.icon}</div>}
           onClick={onClose}
-          style={
-            collapsed
-              ? { display: "flex", alignItems: "center" }
-              : { paddingLeft: "11px" }
-          }
+          style={{ paddingLeft: "11px", paddingRight: "6px" }}
+          // style={
+          //   collapsed
+          //     ? { display: "flex", alignItems: "center" }
+          //     : { paddingLeft: "11px" }
+          // }
           className={
             locationURL === itemNavLink
               ? "ant-menu-item-selected"
@@ -272,10 +285,15 @@ const MenuItem = (props) => {
         splitLocation[splitLocation.length - 2],
       ]}
       theme={appTheme}
-      style={{
-        paddingBottom: "2.4rem",
-        textAlign: collapsed ? "center" : "left",
-      }}
+      style={
+        {
+          // paddingBottom: "2.4rem",
+        }
+      }
+      // className="siderbar-menu"
+      className={`siderbar-menu${
+        collapsedFlag ? " siderbar-menu-collapsed" : ""
+      }`}
     >
       {menuItem}
     </Menu>
