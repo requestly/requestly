@@ -34,7 +34,7 @@ const PinButton = ({ rule }) => {
     dispatch(actions.updateCurrentlySelectedRuleData(updatedRule));
 
     StorageService(appMode)
-      .saveRuleOrGroup(updatedRule, false)
+      .saveRuleOrGroup(updatedRule, { silentUpdate: true })
       .then(() => {
         trackRulePinToggled(updateValue);
         trackRuleEditorHeaderClicked("pin_button", rule.ruleType, MODE);

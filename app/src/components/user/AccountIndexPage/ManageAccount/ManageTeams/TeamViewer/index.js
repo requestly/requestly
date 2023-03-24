@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Row, Col, Avatar, Tabs } from "antd";
+import { Row, Col, Avatar, Tabs, Alert } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import MembersDetails from "./MembersDetails";
@@ -19,6 +19,8 @@ const TeamViewer = ({ teamId }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const name = teamDetails?.name;
+  const teamOwnerId = teamDetails?.owner;
+  const isTeamArchived = teamDetails?.archived;
 
   useEffect(() => {
     const functions = getFunctions();
@@ -54,7 +56,9 @@ const TeamViewer = ({ teamId }) => {
           <TeamSettings
             key={teamId}
             teamId={teamId}
+            teamOwnerId={teamOwnerId}
             isTeamAdmin={isTeamAdmin}
+            isTeamArchived={isTeamArchived}
           />
         ),
       },
@@ -76,7 +80,7 @@ const TeamViewer = ({ teamId }) => {
         ),
       },
     ],
-    [teamId, isTeamAdmin]
+    [teamId, teamOwnerId, isTeamArchived, isTeamAdmin]
   );
 
   return (
@@ -89,6 +93,17 @@ const TeamViewer = ({ teamId }) => {
         xl={{ offset: 4, span: 16 }}
         flex="1 1 820px"
       >
+        {isTeamArchived ? (
+          <Alert
+            showIcon
+            closable
+            type="warning"
+            className="workspace-delete-scheduled-alert"
+            message="Your workspace has been scheduled for deletion"
+            description="We have scheduled your workspace for deletion in 48 hours. You will receive an email confirmation when it has completed."
+          />
+        ) : null}
+
         <Row align="middle" className="manage-workspace-header-container">
           <Col>
             <Row
