@@ -598,14 +598,6 @@ const RulesTable = ({
     setIsDuplicateRuleModalActive(false);
   }, []);
 
-  const onRuleDuplicated = useCallback(
-    (newRule) => {
-      closeDuplicateRuleModal();
-      redirectToRuleEditor(navigate, newRule.id);
-    },
-    [closeDuplicateRuleModal, navigate]
-  );
-
   const deleteIconOnClickHandler = async (event, rule) => {
     event.stopPropagation();
     setRuleToDelete([rule]);
@@ -1551,7 +1543,7 @@ const RulesTable = ({
           isOpen={isDuplicateRuleModalActive}
           close={closeDuplicateRuleModal}
           rule={ruleToDuplicate}
-          onDuplicate={onRuleDuplicated}
+          onDuplicate={closeDuplicateRuleModal}
         />
       ) : null}
     </>

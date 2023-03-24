@@ -16,6 +16,7 @@ import {
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
 import { StorageService } from "init";
+import Logger from "lib/logger";
 
 /**
  * This functions triggers syncing process
@@ -25,10 +26,15 @@ import { StorageService } from "init";
  *
  * syncing is disabled when storage is remote
  */
-export const doSyncRecords = async (records, syncType, appMode, forceSync) => {
+export const doSyncRecords = async (
+  records,
+  syncType,
+  appMode,
+  options = {}
+) => {
   if (!window.uid) return; // If user is not logged in
   if (
-    !forceSync &&
+    !options.forceSync &&
     !window.isSyncEnabled &&
     !window.currentlyActiveWorkspaceTeamId
   )
@@ -36,9 +42,9 @@ export const doSyncRecords = async (records, syncType, appMode, forceSync) => {
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
-      await updateUserSyncRecords(window.uid, records).catch((e) =>
-        console.error(e)
-      );
+      await updateUserSyncRecords(window.uid, records, appMode, {
+        workspaceId: options.workspaceId,
+      }).catch(Logger.error);
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
