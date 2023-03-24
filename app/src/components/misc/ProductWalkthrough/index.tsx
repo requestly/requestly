@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import JoyRide, { EVENTS, STATUS, CallBackProps } from "react-joyride";
+import JoyRide, {
+  EVENTS,
+  STATUS,
+  CallBackProps,
+  TooltipRenderProps,
+} from "react-joyride";
 import { productTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
 import {
@@ -11,17 +16,23 @@ import {
 interface TourProps {
   startWalkthrough: boolean;
   tourFor: string;
+  context: any;
   runTourWithABTest: boolean; //temporary flag
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
+  context,
   runTourWithABTest = true,
 }) => {
   const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
+
+  const renderCustomToolTip = (props: TooltipRenderProps) => {
+    return <WalkthroughTooltip {...props} context={context} />;
+  };
 
   const callback = (data: CallBackProps) => {
     const { step, index, type, status } = data;
@@ -58,7 +69,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
           steps={productTours[tourFor]}
           continuous={true}
           callback={callback}
-          tooltipComponent={WalkthroughTooltip}
+          tooltipComponent={renderCustomToolTip}
           disableScrolling={true}
           disableOverlayClose={true}
           spotlightClicks={true}

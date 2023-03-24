@@ -1,6 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { getCurrentlySelectedRuleData } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { TooltipRenderProps } from "react-joyride";
 import { CloseOutlined } from "@ant-design/icons";
@@ -11,6 +9,7 @@ import "./index.css";
 
 interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
   step: CustomSteps;
+  context: any;
 }
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
@@ -21,9 +20,8 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   skipProps,
   closeProps,
   tooltipProps,
+  context,
 }) => {
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
       <img
@@ -41,7 +39,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
           className="tour-tooltip-next-btn"
           // used closeProps because primary props takes away the focus from input boxes when tooltip appears
           {...closeProps}
-          disabled={step.disableNext?.(currentlySelectedRuleData)}
+          disabled={step.disableNext?.(context)}
         >
           {isLastStep ? "Finish" : "Next"}
 

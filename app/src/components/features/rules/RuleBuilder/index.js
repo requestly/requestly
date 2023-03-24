@@ -331,6 +331,7 @@ const RuleBuilder = (props) => {
       <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
+        context={currentlySelectedRuleData}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
