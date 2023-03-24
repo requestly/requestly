@@ -30,7 +30,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
   context,
-  runTourWithABTest = true,
+  runTourWithABTest = false,
 }) => {
   const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
@@ -74,7 +74,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
         <JoyRide
           ref={joyrideRef}
           run={startWalkthrough && runTourWithABTest}
-          steps={productTours[tourFor]}
+          steps={tourSteps}
           continuous={true}
           callback={callback}
           tooltipComponent={renderCustomToolTip}
