@@ -24,7 +24,6 @@ import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
-// import featureFlag from "utils/feature-flag";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -204,8 +203,6 @@ const DashboardContent = () => {
           {...activeModals.syncConsentModal.props}
         />
       ) : null}
-      {/* TODO: This feature flag does not work as component mounts before posthog inits */}
-      {/* {featureFlag.getValue(APP_CONSTANTS.FEATURES.PERSONA_SURVEY) ? ( */}
       {!userPersona.isSurveyCompleted ? (
         <PersonaSurveyModal
           isOpen={activeModals.personaSurveyModal.isActive}
