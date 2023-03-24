@@ -14,7 +14,6 @@ import {
   clearCurrentlyActiveWorkspace,
   showSwitchWorkspaceSuccessToast,
 } from "actions/TeamWorkspaceActions";
-import SwitchWorkspaceButton from "../SwitchWorkspaceButton";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
@@ -40,7 +39,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   // Component State
   const [name, setName] = useState("");
   const [originalTeamName, setOriginalTeamName] = useState("");
-  const [membersCount, setMembersCount] = useState(0);
   const [isTeamInfoLoading, setIsTeamInfoLoading] = useState(false);
   const [renameInProgress, setRenameInProgress] = useState(false);
   const [deleteInProgress, setDeleteInProgress] = useState(false);
@@ -102,7 +100,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
         const teamInfo = response.data;
         setName(teamInfo.name);
         setOriginalTeamName(teamInfo.name);
-        setMembersCount(teamInfo.accessCount);
       })
       .catch(() => redirectToMyTeams(navigate))
       .finally(() => setIsTeamInfoLoading(false));
@@ -158,12 +155,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
           <>
             <Row align="middle" justify="space-between">
               <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
-              <SwitchWorkspaceButton
-                teamName={name}
-                selectedTeamId={teamId}
-                teamMembersCount={membersCount}
-                isTeamArchived={isTeamArchived}
-              />
             </Row>
 
             <div className="title team-settings-title">Workspace settings</div>
@@ -227,11 +218,11 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
                   placement="right"
                   overlayInnerStyle={{ width: "270px" }}
                   title={
-                    isTeamArchived? "Team is already archived" : 
-                    (isLoggedInUserOwner
+                    isTeamArchived
+                      ? "Team is already archived"
+                      : isLoggedInUserOwner
                       ? ""
                       : "Only owner can delete the workspace. Please contact owner of this workspace."
-                    )
                   }
                 >
                   <Button

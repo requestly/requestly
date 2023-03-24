@@ -76,7 +76,7 @@
 }
 
 .workspace-name-container .workspace-name,
-.workspace-name-container .wrokspace-details {
+.workspace-name-container .workspace-details {
   max-width: 137px;
   overflow: hidden;
   text-overflow: ellipsis;
