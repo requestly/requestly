@@ -4,7 +4,7 @@
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
-  max-width: 10ch;
+  max-width: 16ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -62,8 +62,8 @@ export const isWorkspacesFeatureEnabled = (email) => {
 };
 
 const prettifyWorkspaceName = (workspaceName) => {
-  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
-    return "Private";
+  // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
+  //   return "Private";
   return workspaceName;
 };
 const getWorkspaceIcon = (workspaceName) => {
