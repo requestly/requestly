@@ -5,6 +5,7 @@ import {
   CaretDownOutlined,
   FileSyncOutlined,
   WarningFilled,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import isEmpty from "is-empty";
 import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
@@ -21,6 +22,7 @@ import {
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { isDesktopMode } from "utils/AppUtils";
 import Logger from "lib/logger";
+import "./destinationURLRow.css";
 
 const DestinationURLRow = ({
   rowIndex,
@@ -163,7 +165,16 @@ const DestinationURLRow = ({
         }}
       >
         <Col span={3}>
-          <span>Redirect to</span>
+          <span className="redirect-rule-destination-label">
+            Redirect to{" "}
+            <Tooltip
+              title={
+                "Define the destination URL where you want to redirect the original request."
+              }
+            >
+              <InfoCircleOutlined />
+            </Tooltip>
+          </span>
         </Col>
         <Col span={21}>
           <Input
@@ -187,7 +198,7 @@ const DestinationURLRow = ({
                 inputOptions()
               ) : (
                 <Tooltip
-                  title="Import a existing Mock API"
+                  title="Redirect to endpoint from Requestly Mock Server or File Server"
                   onClick={() => {
                     trackClickMock();
                     setIsMockPickerVisible(true);
