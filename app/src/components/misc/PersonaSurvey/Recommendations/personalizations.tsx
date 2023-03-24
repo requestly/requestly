@@ -78,12 +78,12 @@ export const recommendation = [
     ],
   },
   {
-    id: PersonaType.FOUNDER,
+    id: PersonaType.FULLSTACK,
     recommended: [
-      "Bug Reporting",
-      "Insert Scripts",
       "Redirect Request",
-      "Replace String",
+      "Modify Headers",
+      "Modify API Response",
+      "Insert Scripts",
     ],
   },
   {
