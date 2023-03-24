@@ -81,3 +81,8 @@ export const PERSONA_SURVEY = {
   PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
   PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
 };
+
+export const MORE_INFO = {
+  MORE_INFO_VIEWED: "more_info_viewed",
+  MORE_INFO_CLICKED: "more_info_clicked",
+};
