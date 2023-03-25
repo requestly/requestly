@@ -1,13 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { actions } from "store";
 import { getModeData } from "../../../actions";
 import { toast } from "utils/Toast";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 
 const DuplicateButton = ({
@@ -17,7 +15,7 @@ const DuplicateButton = ({
 }) => {
   const { MODE } = getModeData(window.location);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
     getIsCurrentlySelectedRuleHasUnsavedChanges
   );
@@ -29,15 +27,11 @@ const DuplicateButton = ({
     setIsDuplicateRuleModalActive(false);
   }, []);
 
-  const onRuleDuplicated = useCallback(
-    (newRule) => {
-      closeDuplicateRuleModal();
-      redirectToRuleEditor(navigate, newRule.id);
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
-      trackRuleEditorHeaderClicked("duplicate_button", rule.ruleType, MODE);
-    },
-    [MODE, closeDuplicateRuleModal, dispatch, navigate, rule.ruleType]
-  );
+  const onRuleDuplicated = useCallback(() => {
+    closeDuplicateRuleModal();
+    dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+    trackRuleEditorHeaderClicked("duplicate_button", rule.ruleType, MODE);
+  }, [MODE, closeDuplicateRuleModal, dispatch, rule.ruleType]);
 
   const handleDuplicateRuleClick = useCallback(
     async (e) => {

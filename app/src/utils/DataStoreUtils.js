@@ -24,7 +24,7 @@ const DataStoreUtils = {
   },
 
   updateValueAsPromise: function (pathArray, value) {
-    return FirebaseActions.updateValueAsPromise(pathArray, value);
+    return FirebaseActions.updateValue(pathArray, value);
   },
   updateValue: function (pathArray, value) {
     return FirebaseActions.updateValue(pathArray, value);

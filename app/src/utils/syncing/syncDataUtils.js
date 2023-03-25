@@ -1,7 +1,4 @@
-import {
-  getValueAsPromise,
-  updateValueAsPromise,
-} from "../../actions/FirebaseActions";
+import { getValueAsPromise, updateValue } from "../../actions/FirebaseActions";
 import { StorageService } from "../../init";
 import {
   trackSyncCompleted,
@@ -91,7 +88,7 @@ const preventWorkspaceSyncWrite = async (
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined") {
     // I guess we don't need to await the next line or do we?
-    updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
+    updateValue(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
     });
   }
@@ -112,10 +109,17 @@ const preventWorkspaceSyncWrite = async (
   return latestRules;
 };
 
-export const updateUserSyncRecords = async (uid, records, appMode) => {
+export const updateUserSyncRecords = async (uid, records, appMode, options) => {
+  const targetWorkspaceId =
+    typeof options.workspaceId !== "undefined"
+      ? options.workspaceId
+      : window.currentlyActiveWorkspaceTeamId;
+  const isSameWorkspaceOperation =
+    targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
+
   const latestRules = _.cloneDeep(records);
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
-  if (window.currentlyActiveWorkspaceTeamId) {
+  if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus = true;
     // localStorage.getItem("syncRuleStatus") === "true" || false;
     // Get current values from db and use them xD
@@ -159,11 +163,24 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
     }
   }
 
-  try {
+  let syncPath;
+  if (isSameWorkspaceOperation) {
     window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
-    await updateValueAsPromise(getRecordsSyncPath(), latestRules);
+    syncPath = getRecordsSyncPath();
+  } else {
+    if (targetWorkspaceId === null) {
+      // private workspace
+      syncPath = getIndividualSyncPath();
+    } else {
+      syncPath = getTeamSyncPath(targetWorkspaceId);
+    }
+  }
+
+  try {
+    await updateValue(syncPath, latestRules);
   } catch (error) {
     Logger.error("err update sync records", error);
+    throw error;
   }
 };
 
@@ -191,7 +208,7 @@ export const removeUserSyncRecords = (uid, recordIds) => {
     // null is passed to update Value as no node ref is
     // required when deleting multiple value using update function
     // reference: https://firebase.google.com/docs/database/web/read-and-write#:~:text=You%20can%20use-,this,-technique%20with%20update
-    updateValueAsPromise(null, recordIdsObject)
+    updateValue(null, recordIdsObject)
       .then(() => resolve())
       .catch((e) => reject(JSON.stringify(e) + "err remove sync records"));
   });
@@ -444,7 +461,7 @@ export const syncSessionRecordingPageConfigToFirebase = async (
 
 export const updateSessionRecordingPageConfig = (uid, recordObject) => {
   return new Promise((resolve, reject) => {
-    updateValueAsPromise(
+    updateValue(
       ["sync", uid, "configs", "sessionRecordingConfig"],
       recordObject
     )

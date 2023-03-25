@@ -531,14 +531,10 @@ export function setValue(pathArray, value) {
   return set(nodeRef, value);
 }
 
-export function updateValue(pathArray, value, callback) {
+export function updateValue(pathArray, value) {
   const nodeRef = getNodeRef(pathArray);
   value = sanitizeDataForFirebase(value);
-  update(nodeRef, value).then(() => callback());
-}
-
-export function updateValueAsPromise(pathArray, value) {
-  return new Promise((resolve) => updateValue(pathArray, value, resolve));
+  return update(nodeRef, value);
 }
 
 export function removeValue(pathArray, callback) {
