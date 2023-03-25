@@ -39,6 +39,7 @@ import "./index.css";
 import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
+import featureFlag from "utils/feature-flag";
 
 interface Props {
   isNew?: boolean;
@@ -428,9 +429,11 @@ const MockEditor: React.FC<Props> = ({
             defaultActiveKey="1"
             items={editors}
             tabBarExtraContent={
-              <Button className="generate-ai-response-button" type="primary" onClick={() => setIsAiResponseModalOpen(true)}>
+              featureFlag.getValue("ai-mock-response", false) ?
+              (<Button className="generate-ai-response-button" type="primary" onClick={() => setIsAiResponseModalOpen(true)}>
                 <BsStars />&nbsp;AI Response
-              </Button>}
+              </Button>): null
+            }
           />
         </>
       );
