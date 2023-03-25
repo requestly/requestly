@@ -1,6 +1,6 @@
 import {
   removeValueAsPromise,
-  updateValueAsPromise,
+  updateValue,
 } from "../../actions/FirebaseActions";
 import {
   updateUserSyncRecords,
@@ -44,7 +44,7 @@ export const doSyncRecords = async (
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
       await updateUserSyncRecords(window.uid, records, appMode, {
         workspaceId: options.workspaceId,
-      }).catch(Logger.error);
+      });
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
@@ -62,7 +62,7 @@ export const doSyncRecords = async (
 
 export const setSyncState = async (uid, state, appMode) => {
   return new Promise((resolve, reject) => {
-    updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
+    updateValue(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
         if (!state)
           await StorageService(appMode).removeRecordsWithoutSyncing([
