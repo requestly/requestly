@@ -2,7 +2,7 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Col, Input, InputNumber, Row, Select } from "antd";
+import { AutoComplete, Button, Col, Input, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CodeEditor from "components/misc/CodeEditor";
@@ -18,6 +18,7 @@ import React, {
   useRef,
 } from "react";
 import { useSelector } from "react-redux";
+import { BsStars } from "react-icons/bs"
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType } from "../../types";
@@ -37,6 +38,8 @@ import {
 import "./index.css";
 import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import AIResponseModal from "./AIResponseModal";
+import featureFlag from "utils/feature-flag";
 
 interface Props {
   isNew?: boolean;
@@ -83,6 +86,8 @@ const MockEditor: React.FC<Props> = ({
     statusCode: null,
     endpoint: null,
   });
+
+  const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
 
   //editor fields ref
   const endpointRef = useRef(null);
@@ -418,7 +423,20 @@ const MockEditor: React.FC<Props> = ({
 
   const renderMockCodeEditor = () => {
     if (mockType === MockType.API) {
-      return <Tabs defaultActiveKey="1" items={editors} />;
+      return (
+        <>
+          <Tabs
+            defaultActiveKey="1"
+            items={editors}
+            tabBarExtraContent={
+              featureFlag.getValue("ai-mock-response", false) ?
+              (<Button className="generate-ai-response-button" type="primary" onClick={() => setIsAiResponseModalOpen(true)}>
+                <BsStars />&nbsp;AI Response
+              </Button>): null
+            }
+          />
+        </>
+      );
     } else {
       return <>{renderBodyRow()}</>;
     }
@@ -453,6 +471,11 @@ const MockEditor: React.FC<Props> = ({
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
+            <AIResponseModal
+              isOpen={isAiResponseModalOpen}
+              toggleOpen={(open) => setIsAiResponseModalOpen(open)}
+              handleAiResponseUsed={(responseText) => { setBody(responseText) }}
+            />
           </Row>
         </Col>
       </Row>
