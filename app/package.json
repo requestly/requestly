@@ -108,6 +108,7 @@
     "rrweb-player": "2.0.0-alpha.5",
     "semver": "^7.3.5",
     "ts-loader": "^9.3.0",
+    "typewriter-effect": "^2.19.0",
     "ua-parser-js": "^1.0.2",
     "unique-names-generator": "^4.7.1",
     "uuid": "^8.3.2",
