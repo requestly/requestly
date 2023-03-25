@@ -63,3 +63,7 @@
   background: var(--component-dark-background);
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
 }
+
+.generate-ai-response-button {
+  margin-top: 0.5rem;
+}
