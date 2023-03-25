@@ -8,6 +8,7 @@ import { toast } from "utils/Toast";
 import "./index.css";
 // @ts-ignore
 import Typewriter from 'typewriter-effect/dist/core';
+import Logger from "lib/logger";
 
 
 interface Props {
@@ -61,15 +62,15 @@ const AIResponseModal = ({isOpen = false, toggleOpen, handleAiResponseUsed}: Pro
         setIsLoading(true);
         fetchAiMockResponse({input: prompt}).then((res: any) => {
             if(res?.data?.success) {
-                console.log(res?.data?.responseJSON);
-                console.log(res?.data?.response);
+                Logger.log(res?.data?.responseJSON);
+                Logger.log(res?.data?.response);
                 handleResponseFetched(res?.data?.responseJSON);
             } else {
                 toast.error("Response can't be generated");
             }
             setIsLoading(false);
         }).catch((err) => {
-            console.log(err);
+            Logger.log(err);
             toast.error("Response can't be generated");
             setIsLoading(false);
         })
