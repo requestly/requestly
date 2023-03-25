@@ -1,7 +1,4 @@
-import {
-  getValueAsPromise,
-  updateValueAsPromise,
-} from "../../actions/FirebaseActions";
+import { getValueAsPromise, updateValue } from "../../actions/FirebaseActions";
 import { StorageService } from "../../init";
 import {
   trackSyncCompleted,
@@ -91,7 +88,7 @@ const preventWorkspaceSyncWrite = async (
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined") {
     // I guess we don't need to await the next line or do we?
-    updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
+    updateValue(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
     });
   }
@@ -180,9 +177,10 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
   }
 
   try {
-    await updateValueAsPromise(syncPath, latestRules);
+    await updateValue(syncPath, latestRules);
   } catch (error) {
     Logger.error("err update sync records", error);
+    throw error;
   }
 };
 
@@ -210,7 +208,7 @@ export const removeUserSyncRecords = (uid, recordIds) => {
     // null is passed to update Value as no node ref is
     // required when deleting multiple value using update function
     // reference: https://firebase.google.com/docs/database/web/read-and-write#:~:text=You%20can%20use-,this,-technique%20with%20update
-    updateValueAsPromise(null, recordIdsObject)
+    updateValue(null, recordIdsObject)
       .then(() => resolve())
       .catch((e) => reject(JSON.stringify(e) + "err remove sync records"));
   });
@@ -463,7 +461,7 @@ export const syncSessionRecordingPageConfigToFirebase = async (
 
 export const updateSessionRecordingPageConfig = (uid, recordObject) => {
   return new Promise((resolve, reject) => {
-    updateValueAsPromise(
+    updateValue(
       ["sync", uid, "configs", "sessionRecordingConfig"],
       recordObject
     )

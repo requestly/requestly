@@ -4,7 +4,7 @@ import DataStoreUtils from "utils/DataStoreUtils";
 import { getCurrentTimeStamp } from "utils/DateTimeUtils";
 import { getUserDetail } from "utils/helpers/appDetails/UserProvider";
 import { getMetadataSyncPath } from "utils/syncing/syncDataUtils";
-import { updateValueAsPromise } from "./FirebaseActions";
+import { updateValue } from "./FirebaseActions";
 
 // Notes
 // In Remote appMode, storage is
@@ -53,7 +53,7 @@ export const saveStorageObject = async (object) => {
 
   await DataStoreUtils.updateValueAsPromise(getRemoteStoragePath(uid), object);
   window.skipSyncListenerForNextOneTime = true; // Prevents syncing infinite loop
-  return updateValueAsPromise(getMetadataSyncPath(uid), syncTimestampObject);
+  return updateValue(getMetadataSyncPath(uid), syncTimestampObject);
 };
 
 export const removeStorageObject = async (recordIds, updateTS = true) => {
@@ -76,10 +76,7 @@ export const removeStorageObject = async (recordIds, updateTS = true) => {
       const syncTimestampObject = {
         [APP_CONSTANTS.LAST_SYNC_TIMESTAMP]: timestamp,
       };
-      return updateValueAsPromise(
-        getMetadataSyncPath(uid),
-        syncTimestampObject
-      );
+      return updateValue(getMetadataSyncPath(uid), syncTimestampObject);
     } else {
       return await DataStoreUtils.setValue(
         getRemoteStoragePath(uid),
@@ -107,10 +104,7 @@ export function removeStorageObjects(recordIds) {
       const syncTimestampObject = {
         [APP_CONSTANTS.LAST_SYNC_TIMESTAMP]: timestamp,
       };
-      return updateValueAsPromise(
-        getMetadataSyncPath(uid),
-        syncTimestampObject
-      );
+      return updateValue(getMetadataSyncPath(uid), syncTimestampObject);
     })
     .catch((err) => Logger.log(err));
 }
