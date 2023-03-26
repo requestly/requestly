@@ -40,6 +40,7 @@ const DestinationURLRow = ({
   const currentlySelectedRuleConfig = useSelector(
     getCurrentlySelectedRuleConfig
   );
+  const showInfoToolTipWithABTest = true; // temp flag for info icon experiment
 
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
@@ -100,6 +101,7 @@ const DestinationURLRow = ({
           <Tooltip
             title="Redirect to endpoint from Requestly Mock Server or File Server"
             placement="left"
+            trigger={showInfoToolTipWithABTest ? ["hover", "focus"] : [null]}
             onOpenChange={(open) => {
               if (open)
                 trackMoreInfoViewed(
@@ -119,6 +121,7 @@ const DestinationURLRow = ({
           <Tooltip
             title="Serve content from a local file on your device for matching network request URL"
             placement="left"
+            trigger={showInfoToolTipWithABTest ? ["hover", "focus"] : [null]}
             onOpenChange={(open) => {
               if (open)
                 trackMoreInfoViewed(
@@ -201,20 +204,22 @@ const DestinationURLRow = ({
         <Col span={3}>
           <span className="redirect-rule-destination-label">
             Redirect to{" "}
-            <Tooltip
-              title={
-                "Define the destination URL where you want to redirect the original request."
-              }
-              onOpenChange={(open) => {
-                if (open)
-                  trackMoreInfoViewed(
-                    currentlySelectedRuleConfig.TYPE,
-                    "destination_url"
-                  );
-              }}
-            >
-              <img src={InfoOutlinedIcon} alt="info" />
-            </Tooltip>
+            {showInfoToolTipWithABTest && (
+              <Tooltip
+                title={
+                  "Define the destination URL where you want to redirect the original request."
+                }
+                onOpenChange={(open) => {
+                  if (open)
+                    trackMoreInfoViewed(
+                      currentlySelectedRuleConfig.TYPE,
+                      "destination_url"
+                    );
+                }}
+              >
+                <img src={InfoOutlinedIcon} alt="info" />
+              </Tooltip>
+            )}
           </span>
         </Col>
         <Col span={21}>
@@ -241,6 +246,9 @@ const DestinationURLRow = ({
               ) : (
                 <Tooltip
                   title="Redirect to endpoint from Requestly Mock Server or File Server"
+                  trigger={
+                    showInfoToolTipWithABTest ? ["hover", "focus"] : [null]
+                  }
                   onClick={() => {
                     trackClickMock();
                     setIsMockPickerVisible(true);

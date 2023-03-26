@@ -33,6 +33,7 @@ const RequestSourceRow = ({
   const currentlySelectedRuleConfig = useSelector(
     getCurrentlySelectedRuleConfig
   );
+  const showInfoToolTipWithABTest = true; // temp flag for info icon experiment
 
   const sourceKeys = useMemo(
     () => [
@@ -195,6 +196,7 @@ const RequestSourceRow = ({
           &nbsp;&nbsp;
           <Tooltip
             overlayInnerStyle={{ width: "270px" }}
+            trigger={showInfoToolTipWithABTest ? ["hover", "focus"] : [null]}
             onOpenChange={(open) => {
               if (open)
                 trackMoreInfoViewed(
