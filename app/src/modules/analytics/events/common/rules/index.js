@@ -46,9 +46,10 @@ export const trackRuleDeactivatedStatus = (rule_type) => {
   trackEvent(RULES.RULE_DEACTIVATED, params);
 };
 
-export const trackRuleDuplicatedEvent = (rule_type) => {
+export const trackRuleDuplicatedEvent = (rule_type, workspace) => {
   const params = {
     rule_type,
+    workspace,
   };
   trackEvent(RULES.RULE_DUPLICATED, params);
 };
