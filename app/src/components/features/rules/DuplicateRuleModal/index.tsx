@@ -50,8 +50,8 @@ const DuplicateRuleModal: React.FC<Props> = ({
   const ruleNameInputRef = useRef<InputRef>(null);
 
   const isUsingWorkspaces = useMemo(() => {
-    return currentlyActiveWorkspace && availableWorkspaces?.length > 0;
-  }, [availableWorkspaces?.length, currentlyActiveWorkspace]);
+    return availableWorkspaces?.length > 0;
+  }, [availableWorkspaces?.length]);
 
   const workspaceOptions = useMemo(() => {
     if (!isUsingWorkspaces) {
