@@ -24,6 +24,7 @@ import {
 } from "store/features/teams/selectors";
 import { TeamWorkspace } from "types/teamWorkspace";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import APP_CONSTANTS from "config/constants";
 
 interface Props {
   isOpen: boolean;
@@ -58,7 +59,10 @@ const DuplicateRuleModal: React.FC<Props> = ({
     }
 
     return [
-      { value: null, label: "Private Workspace" },
+      {
+        value: null,
+        label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
+      },
       ...availableWorkspaces.map(({ id, name }) => ({
         value: id,
         label: name,
