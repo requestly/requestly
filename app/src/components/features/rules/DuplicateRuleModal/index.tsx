@@ -92,7 +92,8 @@ const DuplicateRuleModal: React.FC<Props> = ({
     };
 
     if (!isOperationInSameWorkspace) {
-      newRule.groupId = "";
+      newRule.groupId =
+        APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
     }
 
     try {
