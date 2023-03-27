@@ -70,10 +70,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
         );
         break;
       case 3:
-        trackPersonaQ3Completed(userPersona.referralChannel);
+        trackPersonaQ3Completed(userPersona.numberOfEmployees);
         submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL,
-          userPersona.referralChannel
+          APP_CONSTANTS.GA_EVENTS.ATTR.NUMBER_OF_EMPLOYEES,
+          userPersona.numberOfEmployees
         );
         if (window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE)) {
           //don't show recommendation screen for shared list users
