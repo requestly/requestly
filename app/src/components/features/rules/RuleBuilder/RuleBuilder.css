@@ -7,8 +7,8 @@
   display: inline-flex;
   align-items: center;
   font-weight: 500;
-  color: var(--white);
   font-size: 14px;
+  color: var(--white);
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
   background-color: var(--component-dark-background);
@@ -16,6 +16,8 @@
 
 .rule-editor-help-btn.ant-btn:hover {
   opacity: 0.7;
+  color: var(--white);
+  border-color: var(--border-dark);
 }
 
 .rule-editor-help-btn.ant-btn span:first-child {

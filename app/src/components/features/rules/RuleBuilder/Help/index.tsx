@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from "react";
 import { Button, Col, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
+import APP_CONSTANTS from "config/constants";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
@@ -9,12 +10,30 @@ import { trackRuleDemoVideoClicked } from "modules/analytics/events/common/rules
 import "./Help.css";
 
 const externalLinks: { title: string; link: string }[] = [
-  { title: "Tutorial videos", link: "" },
-  { title: "Troubleshooting", link: "" },
-  { title: "Shared workspace", link: "" },
-  { title: "HTTP modifications", link: "" },
-  { title: "Request a feature", link: "" },
-  { title: "Ask GitHub community", link: "" },
+  {
+    title: "Tutorial videos",
+    link: APP_CONSTANTS.LINKS.YOUTUBE_TUTORIALS,
+  },
+  {
+    title: "Troubleshooting",
+    link: APP_CONSTANTS.LINKS.TUTORIALS.REDIRECT_RULE,
+  },
+  {
+    title: "Shared workspace",
+    link: APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES,
+  },
+  {
+    title: "HTTP modifications",
+    link: APP_CONSTANTS.LINKS.REQUESTLY_DOCS_HTTP_MODIFICATIONS,
+  },
+  {
+    title: "Request a feature",
+    link: APP_CONSTANTS.LINKS.REQUESTLY_GITHUB_ISSUES,
+  },
+  {
+    title: "Ask GitHub community",
+    link: APP_CONSTANTS.LINKS.REQUESTLY_GITHUB_ISSUES, // TODO: update link
+  },
 ];
 
 type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
