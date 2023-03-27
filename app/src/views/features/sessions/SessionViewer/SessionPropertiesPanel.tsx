@@ -148,9 +148,11 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
             style={{ wordBreak: "break-word", resize: "none" }}
           />
         ) : (
-          <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-            {sessionDescription}
-          </span>
+          sessionDescription && (
+            <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+              {sessionDescription}
+            </span>
+          )
         )}
       </SessionProperty>
     </ProCard>
