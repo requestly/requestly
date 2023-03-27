@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { Col, Row, Input, Divider, Space } from "antd";
+import { Col, Row, Input, Divider } from "antd";
 import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 //Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -126,8 +126,7 @@ const PublicInviteLink: React.FC<Props> = ({
 
       {publicInviteId? (
         <Row justify="space-between">
-          <Col span={24}>
-            <Space.Compact style={{ width: '100%' }}>
+          <Col flex="1 0 auto" className="invite-link-input-container">
               <Input
                 className="invite-link-input"
                 contentEditable={false}
@@ -135,12 +134,14 @@ const PublicInviteLink: React.FC<Props> = ({
                 disabled={true}
                 type="text"
               />
+          </Col>
+          <Col flex="0 0 auto">
               <CopyButton
+                size="middle"
                 type="primary"
                 title="Copy"
                 copyText={generateInviteLinkFromId(publicInviteId)}
               />
-            </Space.Compact>
           </Col>
         </Row>
       ): null}

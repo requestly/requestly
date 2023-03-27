@@ -1,7 +1,6 @@
 .dropdown-trigger,
 .dropdown-menu.ant-dropdown-menu {
   max-width: 16.375rem;
-  margin: auto;
 }
 
 .dropdown-access-type-menu-item .ant-dropdown-menu-title-content {
