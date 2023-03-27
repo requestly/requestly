@@ -112,3 +112,16 @@
 .ant-dropdown .join-workspace-menu.ant-dropdown-menu .ant-dropdown-menu-item {
   padding: 8px;
 }
+
+.workspace-selector-tooltip.ant-tooltip
+  .ant-tooltip-content
+  .ant-tooltip-inner {
+  color: var(--text-gray);
+  background-color: var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+}
+
+.workspace-selector-tooltip.ant-tooltip-placement-bottomRight {
+  padding-top: 7px;
+}
