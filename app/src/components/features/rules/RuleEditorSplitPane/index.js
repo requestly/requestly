@@ -67,7 +67,7 @@ const RuleEditorSplitPane = ({
       >
         <TabPane tab={"Test this Rule"} key="ruleSimulator">
           <div style={{ padding: "5px", width: "90%" }}>
-            <RuleSimulator mode={mode} />
+            <RuleSimulator />
           </div>
         </TabPane>
         <TabPane
