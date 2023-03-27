@@ -1,8 +1,10 @@
 import { Avatar, Col, Row } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import lottie from "lottie-web/build/player/lottie_light";
+import inviteAccept from "assets/lottie/invite-accept.json";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { toast } from "utils/Toast";
 import "./index.css";
@@ -12,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
+import Logger from "lib/logger";
 
 interface Props {
     inviteId: string;
@@ -68,6 +71,26 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
             })
     }
 
+    useEffect(() => {
+        try {
+          lottie.destroy("inviteAcceptAnimation");
+        } catch (_e) {
+          Logger.log("loading welcome animation");
+        }
+        lottie.loadAnimation({
+          name: "inviteAcceptAnimation",
+          container: document.querySelector("#inviteAcceptAnimation"),
+          animationData: inviteAccept,
+          renderer: "svg", // "canvas", "html"
+          loop: true, // boolean
+          autoplay: true, // boolean,
+          rendererSettings: {
+            viewBoxOnly: true,
+            viewBoxSize: "50 70 400 340"
+          }
+        });
+    }, []);
+
     return (
         <Row className="invite-container" justify={"center"}>
             <Col
@@ -97,10 +120,19 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
                     <p className="text-gray invite-subheader">
                         Accept to start collaborating together
                     </p>
+
+                    <div className="invite-accept-lottie-animation-container">
+                        <div
+                            className="invite-accept-lottie-animation"
+                            id="inviteAcceptAnimation"
+                        />
+                    </div>
+                </div>
+                <div className="invite-footer">
                     {
                         inProgress?
-                        (<RQButton loading={true} className="invite-button" type="primary" size="large">Accepting Invitation</RQButton>):
-                        (<RQButton className="invite-button" type="primary" size="large" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
+                        (<RQButton loading={true} className="invite-button" type="primary" size="middle">Accepting Invitation</RQButton>):
+                        (<RQButton className="invite-button" type="primary" size="middle" onClick={handleAcceptInvitation}>Accept Invitation</RQButton>)
                     }
                 </div>
             </Col>
