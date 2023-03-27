@@ -96,7 +96,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
           value={responseRuleResourceType}
           onChange={(e) => handleResourceTypeChange(e.target.value)}
         >
-          <Radio value={ResponseRuleResourceType.REST_API}>Rest API</Radio>
+          <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
           <Radio value={ResponseRuleResourceType.GRAPHQL_API}>
             GraphQL API
           </Radio>

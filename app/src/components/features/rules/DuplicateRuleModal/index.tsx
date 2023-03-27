@@ -115,7 +115,10 @@ const DuplicateRuleModal: React.FC<Props> = ({
     }
 
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType);
+    trackRuleDuplicatedEvent(
+      rule.ruleType,
+      isOperationInSameWorkspace ? "same" : "different"
+    );
 
     onDuplicate(newRule);
     close();
