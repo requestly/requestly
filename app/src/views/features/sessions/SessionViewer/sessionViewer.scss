@@ -8,7 +8,7 @@
   .session-recording-player-row {
     display: flex;
     width: 100%;
-    column-gap: 12px;
+    gap: 12px;
     margin: 12px 0;
 
     .session-recording-player-container {
@@ -298,5 +298,26 @@ body.dark {
     height: 13px;
     width: 13px;
     cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .session-viewer-page {
+    .session-viewer-header {
+      flex-direction: column;
+    }
+
+    .session-recording-player-row {
+      flex-direction: column;
+
+      .session-recording-player-container {
+        width: 100%;
+      }
+
+      .session-recording-properties {
+        width: 100%;
+        min-height: auto;
+      }
+    }
   }
 }
