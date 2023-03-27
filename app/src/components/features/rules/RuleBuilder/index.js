@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
-import { Col, Row } from "antd";
+import { Button, Col, Row } from "antd";
 import { actions } from "../../../../../../app/src/store";
 import Header from "./Header";
 import Body from "./Body";
@@ -35,7 +35,9 @@ import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
+import "./RuleBuilder.css";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -74,14 +76,16 @@ const RuleBuilder = (props) => {
   ruleSelection[currentlySelectedRuleData.id] = true;
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
-
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] =
-    useState(false);
+  const [
+    isChangeRuleGroupModalActive,
+    setIsChangeRuleGroupModalActive,
+  ] = useState(false);
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
   const [startWalkthrough, setStartWalkthrough] = useState(false);
+  const [showDocs, setShowDocs] = useState(false);
 
   useExternalRuleCreation(MODE);
 
@@ -342,19 +346,34 @@ const RuleBuilder = (props) => {
         />
       ) : null}
 
-      <Row className="w-full">
-        <Col span={isRedirectRuleWithABTest ? 17 : 24}>
+      <Row className="w-full relative">
+        <Col span={showDocs ? 17 : 24}>
           <Body
             mode={MODE}
+            showDocs={showDocs}
             isRedirectRuleWithABTest={isRedirectRuleWithABTest}
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         </Col>
 
         {isRedirectRuleWithABTest ? (
-          <Col span={7}>
-            <Help />
-          </Col>
+          <>
+            {!showDocs ? (
+              <Button
+                className="rule-editor-help-btn"
+                onClick={() => setShowDocs(true)}
+              >
+                Help
+                <span>
+                  <DownArrow />
+                </span>
+              </Button>
+            ) : (
+              <Col span={7}>
+                <Help showDocs={showDocs} setShowDocs={setShowDocs} />
+              </Col>
+            )}
+          </>
         ) : null}
       </Row>
 

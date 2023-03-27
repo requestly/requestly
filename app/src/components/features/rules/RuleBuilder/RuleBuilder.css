@@ -1,0 +1,26 @@
+.rule-editor-help-btn.ant-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  padding: 20px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--white);
+  font-size: 14px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-dark-background);
+}
+
+.rule-editor-help-btn.ant-btn span:first-child {
+  margin-right: 12px;
+  display: inline-block;
+}
+
+.rule-editor-help-btn.ant-btn svg {
+  width: 11px;
+  height: 7px;
+  color: var(--text-gray);
+}

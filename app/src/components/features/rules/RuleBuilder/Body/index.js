@@ -18,11 +18,7 @@ import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
 import "./RuleBuilderBody.css";
 
-const Body = ({
-  mode,
-  isRedirectRuleWithABTest,
-  currentlySelectedRuleConfig,
-}) => {
+const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -90,13 +86,13 @@ const Body = ({
         <RQEditorTitle
           mode={mode}
           errors={ruleErrors}
+          showDocs={showDocs}
           name={currentlySelectedRuleData.name}
           namePlaceholder="Enter rule name"
           nameChangeCallback={handleRuleNameChange}
           descriptionPlaceholder="Add description (optional)"
           description={currentlySelectedRuleData.description}
           descriptionChangeCallback={handleDescriptionChange}
-          isRedirectRuleWithABTest={isRedirectRuleWithABTest}
         />
       )}
       <Row className="rule-builder-body">
@@ -104,12 +100,12 @@ const Body = ({
           span={22}
           offset={1}
           md={{
-            offset: isRedirectRuleWithABTest ? 1 : 2,
-            span: isRedirectRuleWithABTest ? 22 : 20,
+            offset: showDocs ? 1 : 2,
+            span: showDocs ? 22 : 20,
           }}
           lg={{
-            offset: isSharedListView ? 2 : isRedirectRuleWithABTest ? 1 : 4,
-            span: isSharedListView ? 20 : isRedirectRuleWithABTest ? 22 : 16,
+            offset: isSharedListView ? 2 : showDocs ? 1 : 4,
+            span: isSharedListView ? 20 : showDocs ? 22 : 16,
           }}
         >
           <CardBody>

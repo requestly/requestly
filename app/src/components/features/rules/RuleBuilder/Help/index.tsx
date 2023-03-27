@@ -29,7 +29,12 @@ interface ScrollIntoViewOptions {
   inline?: ScrollLogicalPosition;
 }
 
-const Help: React.FC = () => {
+interface HelpProps {
+  showDocs: boolean;
+  setShowDocs: (showDocs: boolean) => void;
+}
+
+const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const introductionRef = useRef<HTMLDivElement | null>(null);
   const argumentsRef = useRef<HTMLDivElement | null>(null);
@@ -121,7 +126,11 @@ const Help: React.FC = () => {
             Help
           </Col>
           <Col>
-            <CloseOutlined />
+            <Button
+              className=""
+              icon={<CloseOutlined />}
+              onClick={() => setShowDocs(false)}
+            />
           </Col>
         </Row>
 
