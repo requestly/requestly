@@ -8,6 +8,7 @@ import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
+import { formatRegexSource, isRegexFormat } from "utils/rules/misc";
 
 export const validateRule = (rule, dispatch) => {
   let output;
@@ -403,19 +404,21 @@ export const ruleModifiedAnalytics = (user) => {
 };
 
 export const fixSourceRegexFormat = (dispatch, rule) => {
-  const ruleCopy = cloneDeep(rule);
-  ruleCopy.pairs.forEach((pair, i, self) => {
+  const rulePairs = cloneDeep(rule.pairs);
+  rulePairs.forEach((pair, i, self) => {
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
-      const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
-      if (!regexFormat.test(pair.source.value)) {
-        const sourceValueInRegexFormat = pair.source.value.replace(
-          /^\/?([^/]+(?:\/[^/]+)*)\/?$/,
-          "/$1/"
-        );
-        self[i].source.value = sourceValueInRegexFormat;
+      if (!isRegexFormat(pair.source.value)) {
+        self[i].source.value = formatRegexSource(pair.source.value);
       }
     }
   });
 
-  setCurrentlySelectedRule(dispatch, ruleCopy);
+  const fixedRule = {
+    ...rule,
+    pairs: rulePairs,
+  };
+
+  setCurrentlySelectedRule(dispatch, fixedRule);
+
+  return fixedRule;
 };
