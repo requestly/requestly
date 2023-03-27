@@ -85,10 +85,6 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           <div className="title members-details-title">
             {accessCount > 1 ? `${accessCount} Members` : "Workspace Members"}
           </div>
-
-          <p className="text-dark-gray members-info-message">
-            Note: you will be charged for each member added.
-          </p>
         </Col>
         <Col>
           <Button

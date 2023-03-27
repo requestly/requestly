@@ -101,7 +101,8 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Prop
                 xl={8}
             >
                 <div className="invite-content">
-                    <div className="workspace-image">
+                    <RQButton className="invite-skip-button" type="text" size="middle" onClick={() => navigate("/")}>No, I'll skip</RQButton>
+                    <div className="workspace-image invite-accept-avatar-image">
                         <Avatar
                             size={56}
                             shape="square"

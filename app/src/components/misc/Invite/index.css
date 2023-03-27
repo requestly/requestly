@@ -1,19 +1,25 @@
+.invite-skip-button {
+    position: absolute !important;
+    top: 12px;
+    right: 12px;
+}
+
 .invite-content {
     text-align: center;
     border: 1px solid var(--border-dark);
     border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
     background-color: var(--component-background);
     padding: 40px 40px 0 40px;
-    box-shadow: 0px 0px 20px var(--background);
+    box-shadow: 5px 0px 20px var(--background);
 }
 
-.invite-header {
-    margin-top: 1.5em;
+.invite-accept-avatar-image {
+    margin-bottom: 1.5em;
 }
 
 .invite-subheader {
     margin-top: 1.5em;
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
 .invite-container {
@@ -27,7 +33,7 @@
     border-radius:0 0 var(--border-radius-sm) var(--border-radius-sm);
     border: 1px solid var(--border-dark);
     background-color: var(--component-dark-background);
-    box-shadow: 0px 5px 20px var(--background);
+    box-shadow: 5px 10px 20px var(--background);
 }
   
 .invite-footer button.ant-btn {

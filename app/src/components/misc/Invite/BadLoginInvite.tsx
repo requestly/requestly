@@ -55,7 +55,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
             xl={8}
             >
                 <div className="invite-content">
-                    <div className="workspace-image">
+                    <div className="workspace-image invite-accept-avatar-image">
                         <Avatar
                             size={56}
                             shape="square"
@@ -68,14 +68,16 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
                             }}
                         />
                     </div>
-                <div className="header invite-header">
-                    {ownerName} has invited you to workspace {workspaceName}
+                    <div className="header invite-header">
+                        {ownerName} has invited you to workspace {workspaceName}
+                    </div>
+                    <p className="text-gray invite-subheader">
+                        { invitedEmail ?  (<>To accept the invitation, please login as <b>{invitedEmail}</b></>) : (<>To accept the invitation, please login first.</>)}
+                    </p>
                 </div>
-                <p className="text-gray invite-subheader">
-                    { invitedEmail ?  (<>To accept the invitation, please login as <b>{invitedEmail}</b></>) : (<>To accept the invitation, please login first.</>)}
-                </p>
-                <RQButton className="invite-button" type="primary" size="large" onClick={() => openAuthModal()}>Log in</RQButton>
-            </div>
+                <div className="invite-footer">
+                    <RQButton className="invite-button" type="primary" size="middle" onClick={() => openAuthModal()}>Log in</RQButton>
+                </div>
             </Col>
         </Row>
     );

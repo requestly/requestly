@@ -29,7 +29,9 @@ const AcceptedInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
             <p className="text-gray invite-subheader">
                 If you think this is a mistake or if you have trouble logging into the workspace, please contact the workspace admins or Requestly support.
             </p>
-            <RQButton className="invite-button" type="primary" size="large" onClick={() => navigate("/")}>
+        </div>
+        <div className="invite-footer">
+            <RQButton className="invite-button" type="primary" size="middle" onClick={() => navigate("/")}>
               Go Back
             </RQButton>
         </div>
