@@ -14,6 +14,10 @@
   background-color: var(--component-dark-background);
 }
 
+.rule-editor-help-btn.ant-btn:hover {
+  opacity: 0.7;
+}
+
 .rule-editor-help-btn.ant-btn span:first-child {
   margin-right: 12px;
   display: inline-block;

@@ -12,6 +12,22 @@
   padding: 0 1.25rem 10px 0;
 }
 
+.rule-editor-help-header .title.items-center {
+  column-gap: 7px;
+}
+
+.rule-editor-help-back-btn,
+.rule-editor-docs-close-btn.ant-btn {
+  border: none;
+  width: max-content;
+  height: max-content;
+}
+
+.rule-editor-help-back-btn:hover,
+.rule-editor-docs-close-btn.ant-btn:hover {
+  opacity: 0.7;
+}
+
 .rule-editor-help-container ul,
 li {
   margin: 0;

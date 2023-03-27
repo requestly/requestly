@@ -1,13 +1,9 @@
 import React, { useMemo, useRef, useState } from "react";
 import { Button, Col, Row } from "antd";
-import {
-  ArrowLeftOutlined,
-  CloseOutlined,
-  CompassOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
-//@ts-ignore
+import { ReactComponent as Cross } from "assets/icons/cross.svg";
+import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { trackRuleDemoVideoClicked } from "modules/analytics/events/common/rules";
 import "./Help.css";
@@ -115,23 +111,23 @@ const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
           justify="space-between"
           className="w-full rule-editor-help-header"
         >
-          <Col className="title">
+          <Col className="title items-center">
             {isDocsVisible && (
               <Button
                 onClick={toggleDocs}
-                icon={<ArrowLeftOutlined />}
+                icon={<LeftArrow />}
                 className="rule-editor-help-back-btn"
               />
             )}
             Help
           </Col>
-          <Col>
-            <Button
-              className=""
-              icon={<CloseOutlined />}
-              onClick={() => setShowDocs(false)}
-            />
-          </Col>
+
+          <Button
+            title="Close"
+            icon={<Cross />}
+            className="rule-editor-docs-close-btn"
+            onClick={() => setShowDocs(false)}
+          />
         </Row>
 
         {isDocsVisible ? (
