@@ -134,7 +134,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
             {!isPricingOrGoodbyePage ? (
               <Col span={4} flex="1 1">
-                <div className="header-left-section">
+                <div className="header-left-section hidden-on-small-screen">
                   {!isMyRulesPage && (
                     <Button
                       type="text"
@@ -162,7 +162,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               md={0}
               lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 12) : 16}
             >
-              <div className="header-middle-section">
+              <div className="header-middle-section hidden-on-small-screen">
                 <HeaderText />
               </div>
             </Col>
@@ -171,7 +171,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
                   {randomNumberBetween1And2 === 1 ? (
-                    <Col>
+                    <Col className="hidden-on-small-screen">
                       <span
                         className="github-star-button"
                         onClick={() => trackHeaderClicked("github_star_button")}
@@ -188,7 +188,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                       </span>
                     </Col>
                   ) : (
-                    <Col>
+                    <Col className="hidden-on-small-screen">
                       <span
                         className="join-slack-button"
                         onClick={() => trackHeaderClicked("join_slack_button")}
@@ -212,16 +212,19 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
                   <Divider
                     type="vertical"
-                    className="header-vertival-divider"
+                    className="header-vertical-divider hidden-on-small-screen"
                   />
-                  <div onClick={() => trackHeaderClicked("syncing")}>
+                  <div
+                    className="hidden-on-small-screen"
+                    onClick={() => trackHeaderClicked("syncing")}
+                  >
                     <RulesSyncToggle />
                   </div>
                   {/* info */}
-                  <Col>
+                  <Col className="hidden-on-small-screen">
                     <Dropdown
                       trigger={["click"]}
-                      overlay={helpMenu}
+                      menu={helpMenu}
                       placement="bottomRight"
                       onOpenChange={(open) => {
                         open && trackHeaderClicked("helpdesk");
@@ -236,7 +239,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                   </Col>
 
                   {/* product updates */}
-                  <Col>
+                  <Col className="hidden-on-small-screen">
                     <Tooltip
                       title={
                         <span className="text-gray text-sm">
