@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { SurveyConfig } from "./config";
+import { SurveyConfig, OptionsConfig } from "./config";
 import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
@@ -27,18 +27,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const disableContinue = () => {
-    switch (page) {
-      case 0:
-        return false;
-      case 1:
-        return userPersona.persona ? false : true;
-      case 2:
-        return userPersona.useCases.length ? false : true;
-      case 3:
-        return userPersona.numberOfEmployees ? false : true;
-      default:
-        return true;
-    }
+    if (page === 0) return false;
+    if (userPersona[OptionsConfig[page]?.key].length) return false;
+    else return true;
   };
 
   const renderModalLeftSection = () => {
