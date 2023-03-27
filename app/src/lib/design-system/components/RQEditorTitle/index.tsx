@@ -10,7 +10,7 @@ interface ValidationErrors {
 }
 interface TitleProps {
   name: string;
-  isRedirectRuleWithABTest?: boolean;
+  showDocs?: boolean;
   description: string;
   namePlaceholder: string;
   descriptionPlaceholder: string;
@@ -25,7 +25,7 @@ const { TextArea } = Input;
 
 export const RQEditorTitle: React.FC<TitleProps> = ({
   name,
-  isRedirectRuleWithABTest = false,
+  showDocs = false,
   description,
   nameChangeCallback,
   namePlaceholder,
@@ -61,12 +61,12 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
       span={22}
       offset={1}
       md={{
-        offset: isRedirectRuleWithABTest ? 1 : 2,
-        span: isRedirectRuleWithABTest ? 22 : 20,
+        offset: showDocs ? 1 : 2,
+        span: showDocs ? 22 : 20,
       }}
       lg={{
-        offset: isRedirectRuleWithABTest ? 1 : 4,
-        span: isRedirectRuleWithABTest ? 22 : 16,
+        offset: showDocs ? 1 : 4,
+        span: showDocs ? 22 : 16,
       }}
     >
       <Row className="editor-title-container">
