@@ -3,26 +3,26 @@ import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { UserRecommendations } from "./Recommendations";
 import {
   handleUseCaseActiveOption,
-  setPersonaReferralChannel,
   setPersonaUseCase,
-  setUserPersona,
+  setSingleChoicePersonaFields,
 } from "./actions";
 
-//@ts-ignore
-import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
-//@ts-ignore
-import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
-//@ts-ignore
-import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
-//@ts-ignore
-import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+// //@ts-ignore
+// import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
+// //@ts-ignore
+// import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
+// //@ts-ignore
+// import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
+// //@ts-ignore
+// import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
 
 export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   1: {
     key: "persona",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
+    action: (dispatch, value, clear) =>
+      setSingleChoicePersonaFields(dispatch, value, clear, "persona"),
     options: [
       {
         title: PersonaType.FRONTEND,
@@ -181,54 +181,83 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     ],
   },
   3: {
-    key: "referralChannel",
+    key: "numberOfEmployees",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
     action: (dispatch, value, clear) =>
-      setPersonaReferralChannel(dispatch, value, clear),
+      setSingleChoicePersonaFields(dispatch, value, clear, "numberOfEmployees"),
     options: [
       {
-        title: "Google search",
-        icon: <img src={chromeIcon} alt="google chrome" />,
+        title: "Just me",
       },
       {
-        title: "Friend/Colleague",
-        icon: "🙂",
+        title: "1-10",
       },
       {
-        title: "Online ads",
-        icon: "📢",
+        title: "11-50",
       },
       {
-        title: "Chrome webstore",
-        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+        title: "51-100",
       },
       {
-        title: "Social media",
-        icon: "🌐",
+        title: "100-500",
       },
       {
-        title: "Read an article",
-        icon: "📄",
-      },
-      {
-        title: "Reddit",
-        icon: <img src={redditIcon} alt="reddit" />,
-      },
-      {
-        title: "HackerNews",
-        icon: <img src={hackerNewsIcon} alt="hacker news" />,
-      },
-      {
-        title: "Company documentation",
-        icon: "📋",
-      },
-      {
-        title: "ChatGPT",
-        icon: "🤖",
+        title: "500+",
       },
     ],
   },
+
+  /* Referral channel questionaire*/
+  // 3: {
+  //   key: "referralChannel",
+  //   questionType: "single",
+  //   isActive: ({ key, title }) => key === title,
+  //   action: (dispatch, value, clear) =>
+  //     setPersonaReferralChannel(dispatch, value, clear),
+  //   options: [
+  //     {
+  //       title: "Google search",
+  //       icon: <img src={chromeIcon} alt="google chrome" />,
+  //     },
+  //     {
+  //       title: "Friend/Colleague",
+  //       icon: "🙂",
+  //     },
+  //     {
+  //       title: "Online ads",
+  //       icon: "📢",
+  //     },
+  //     {
+  //       title: "Chrome webstore",
+  //       icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+  //     },
+  //     {
+  //       title: "Social media",
+  //       icon: "🌐",
+  //     },
+  //     {
+  //       title: "Read an article",
+  //       icon: "📄",
+  //     },
+  //     {
+  //       title: "Reddit",
+  //       icon: <img src={redditIcon} alt="reddit" />,
+  //     },
+  //     {
+  //       title: "HackerNews",
+  //       icon: <img src={hackerNewsIcon} alt="hacker news" />,
+  //     },
+  //     {
+  //       title: "Company documentation",
+  //       icon: "📋",
+  //     },
+  //     {
+  //       title: "ChatGPT",
+  //       icon: "🤖",
+  //     },
+  //   ],
+  // },
 };
 
 export const SurveyConfig: PageConfig[] = [
@@ -253,7 +282,7 @@ export const SurveyConfig: PageConfig[] = [
   },
   {
     pageId: 3,
-    title: "How did you hear about Requestly?",
+    title: "How many employees do you have in your organisation?",
     subTitle: "Select one",
     render: 3,
   },

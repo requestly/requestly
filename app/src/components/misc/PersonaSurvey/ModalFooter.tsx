@@ -35,7 +35,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
       case 2:
         return userPersona.useCases.length ? false : true;
       case 3:
-        return userPersona.referralChannel ? false : true;
+        return userPersona.numberOfEmployees ? false : true;
       default:
         return true;
     }
