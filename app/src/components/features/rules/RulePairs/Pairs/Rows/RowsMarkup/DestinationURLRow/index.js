@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Row, Col, Input, Tooltip, Dropdown, Radio, Popconfirm } from "antd";
 import {
   FolderOpenOutlined,
   CaretDownOutlined,
   FileSyncOutlined,
-  WarningFilled,
 } from "@ant-design/icons";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
@@ -20,7 +19,6 @@ import {
   trackClickMock,
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
-import { isDesktopMode } from "utils/AppUtils";
 import Logger from "lib/logger";
 import "./index.css";
 import { RQButton } from "lib/design-system/components";
@@ -47,7 +45,6 @@ const DestinationURLRow = ({
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(
     null
   );
-  const isDesktop = useMemo(() => isDesktopMode(), []);
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
     setIsFilePickerModalActive(!isFilePickerModalActive);
@@ -79,51 +76,6 @@ const DestinationURLRow = ({
       pairIndex,
       "destination",
       `file://${filePath}`
-    );
-  };
-
-  const handleInputOptionSelect = (e) => {
-    switch (e.key) {
-      case "mock": {
-        trackClickMock();
-        setIsMockPickerVisible(true);
-        break;
-      }
-      case "local": {
-        trackClickMapLocalFile();
-        displayFileSelector(handleFileSelectCallback);
-        break;
-      }
-      default: {
-        Logger.error("Added menu item without click handler");
-      }
-    }
-  };
-
-  const inputOptions = () => {
-    const items = [
-      {
-        label: "Pick from Mock Server",
-        key: "mock",
-        icon: <FolderOpenOutlined />,
-      },
-      {
-        label: "Map Local File",
-        key: "local",
-        disabled: !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL),
-        icon: <FileSyncOutlined />,
-      },
-    ];
-
-    return (
-      <Dropdown.Button
-        menu={{ items, onClick: handleInputOptionSelect }}
-        placement="bottom"
-        icon={<CaretDownOutlined />}
-        onClick={() => setIsMockPickerVisible(true)}
-      >
-        Pick from Mock Server
-      </Dropdown.Button>
     );
   };
 
@@ -192,19 +144,6 @@ const DestinationURLRow = ({
         value={pair.destination}
         disabled={isInputDisabled}
         status={showInputWarning() ? "warning" : null}
-        suffix={
-          showInputWarning() ? (
-            <Tooltip
-              title={
-                isDesktop
-                  ? "Update to latest version to redirect to Local File"
-                  : "Map Local File is not supported in Extension. Use Requestly Desktop App instead."
-              }
-            >
-              <WarningFilled />
-            </Tooltip>
-          ) : null
-        }
       />
     );
   };
@@ -215,7 +154,10 @@ const DestinationURLRow = ({
         <RQButton
           className="white text-bold"
           type="default"
-          onClick={() => setIsMockPickerVisible(true)}
+          onClick={() => {
+            setIsMockPickerVisible(true);
+            trackClickMock();
+          }}
         >
           {pair.destination ? "Change file" : " Select mock/file"}
         </RQButton>
@@ -233,12 +175,34 @@ const DestinationURLRow = ({
     );
   };
 
+  const renderLocalFileSelector = () => {
+    return (
+      <Col span={24} className="picker-container">
+        <RQButton
+          type="default"
+          onClick={() => {
+            displayFileSelector(handleFileSelectCallback);
+            trackClickMapLocalFile();
+          }}
+        >
+          {pair.destination ? "Change file" : " Select file"}
+        </RQButton>
+        <span className="destination-file-path">
+          {" "}
+          {pair.destination.length ? pair.destination : " No file chosen"}
+        </span>
+      </Col>
+    );
+  };
+
   const renderDestinationAction = () => {
     switch (pair.destinationType) {
       case REDIRECT_DESTINATIONS.URL:
         return renderRedirectURLInput();
       case REDIRECT_DESTINATIONS.MOCK_PICKER:
         return renderMockOrFilePicker();
+      case REDIRECT_DESTINATIONS.MAP_LOCAL:
+        return renderLocalFileSelector();
       default:
         return renderRedirectURLInput();
     }
@@ -280,7 +244,11 @@ const DestinationURLRow = ({
                 <Radio.Group value={pair.destinationType} onChange={showPopup}>
                   <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
                   <Tooltip
-                    trigger={!isDesktop ? ["hover", "focus"] : [null]}
+                    trigger={
+                      !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
+                        ? ["hover", "focus"]
+                        : [null]
+                    }
                     overlayInnerStyle={{ width: "442px" }}
                     title={
                       <>
@@ -298,7 +266,9 @@ const DestinationURLRow = ({
                   >
                     <Radio
                       value={REDIRECT_DESTINATIONS.MAP_LOCAL}
-                      disabled={!isDesktop}
+                      disabled={
+                        !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
+                      }
                     >
                       Local file
                     </Radio>
