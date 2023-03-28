@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Col, Input, Tooltip, Dropdown, Radio } from "antd";
+import { Row, Col, Input, Tooltip, Dropdown, Radio, Popconfirm } from "antd";
 import {
   FolderOpenOutlined,
   CaretDownOutlined,
@@ -40,8 +40,13 @@ const DestinationURLRow = ({
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
   const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
-  console.log("PAIR", pair);
-
+  const [
+    destinationTypePopupVisible,
+    setDestinationTypePopupVisible,
+  ] = useState(false);
+  const [destinationPopupSelection, setDestinationPopupSelection] = useState(
+    null
+  );
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
     setIsFilePickerModalActive(!isFilePickerModalActive);
@@ -160,13 +165,13 @@ const DestinationURLRow = ({
     return false;
   };
 
-  const handleDestinationTypeChange = (e) => {
+  const handleDestinationTypeChange = () => {
     modifyPairAtGivenPath(undefined, pairIndex, "destination", "", [
       {
         path: "destinationType",
-        value: e.target.value,
+        value: destinationPopupSelection,
       },
-    ]); //temp
+    ]);
   };
 
   const renderRedirectURLInput = () => {
@@ -238,6 +243,12 @@ const DestinationURLRow = ({
     }
   };
 
+  const showPopup = (e) => {
+    const destinationType = e.target.value;
+    setDestinationPopupSelection(destinationType);
+    setDestinationTypePopupVisible(true);
+  };
+
   return (
     <React.Fragment>
       <Row
@@ -254,21 +265,30 @@ const DestinationURLRow = ({
         <Col span={24}>
           <Row className="redirect-destination-container">
             <Col span={24} className="destination-options">
-              <Radio.Group
-                value={pair.destinationType}
-                onChange={handleDestinationTypeChange}
+              <Popconfirm
+                title="This will clear the existing changes"
+                okText="Confirm"
+                cancelText="Cancel"
+                onConfirm={() => {
+                  handleDestinationTypeChange();
+                  setDestinationTypePopupVisible(false);
+                }}
+                onCancel={() => setDestinationTypePopupVisible(false)}
+                open={destinationTypePopupVisible}
               >
-                <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
-                <Radio
-                  value={REDIRECT_DESTINATIONS.MAP_LOCAL}
-                  disabled={!isDesktopMode()}
-                >
-                  Local file
-                </Radio>
-                <Radio value={REDIRECT_DESTINATIONS.MOCK_PICKER}>
-                  Pick from Files/Mock server
-                </Radio>
-              </Radio.Group>
+                <Radio.Group value={pair.destinationType} onChange={showPopup}>
+                  <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
+                  <Radio
+                    value={REDIRECT_DESTINATIONS.MAP_LOCAL}
+                    disabled={!isDesktopMode()}
+                  >
+                    Local file
+                  </Radio>
+                  <Radio value={REDIRECT_DESTINATIONS.MOCK_PICKER}>
+                    Pick from Files/Mock server
+                  </Radio>
+                </Radio.Group>
+              </Popconfirm>
             </Col>
             <Col span={24} className="destination-action">
               {renderDestinationAction()}
