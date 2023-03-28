@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     persona: "",
     useCases: [],
     referralChannel: "",
+    numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 

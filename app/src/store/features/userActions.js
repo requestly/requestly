@@ -27,13 +27,8 @@ export const updateUsername = (prevState, action) => {
 };
 
 //Persona Survey actions
-
 export const updateUserPersona = (prevState, action) => {
-  prevState.userPersona.persona = action.payload;
-};
-
-export const updatePersonaReferralChannel = (prevState, action) => {
-  prevState.userPersona.referralChannel = action.payload;
+  prevState.userPersona[action.payload.key] = action.payload.value;
 };
 
 export const updateSelectedPersonaUseCase = (prevState, action) => {

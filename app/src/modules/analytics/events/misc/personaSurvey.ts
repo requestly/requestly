@@ -15,8 +15,8 @@ export const trackPersonaQ2Completed = (option: string[]) => {
   trackEvent(PERSONA_SURVEY.PERSONA_Q2_COMPLETED, params);
 };
 
-export const trackPersonaQ3Completed = (options: string) => {
-  const params = { options };
+export const trackPersonaQ3Completed = (option: string) => {
+  const params = { option };
   trackEvent(PERSONA_SURVEY.PERSONA_Q3_COMPLETED, params);
 };
 
