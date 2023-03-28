@@ -28,3 +28,8 @@
   color: var(--text-gray);
   margin-top: 2px;
 }
+.tooltip-link,
+.tooltip-link:hover {
+  color: inherit;
+  text-decoration: underline;
+}
