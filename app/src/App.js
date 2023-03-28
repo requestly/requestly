@@ -20,6 +20,11 @@ import useRuleExecutionsSyncer from "hooks/useRuleExecutionsSyncer";
 import useFeatureUsageEvent from "hooks/useFeatureUsageEvent";
 import useActiveWorkspace from "hooks/useActiveWorkspace";
 import { CommandBar } from "components/misc/CommandBar";
+import { GrowthBookProvider } from "@growthbook/growthbook-react";
+import { growthbook } from "utils/feature-flag/growthbook";
+import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
+
+
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -28,8 +33,11 @@ const App = () => {
 
   // Global State
   const hasAuthInitialized = useSelector(getAuthInitialization);
-
-  submitAppDetailAttributes();
+  
+  useEffect(() => {
+    // Load features asynchronously when the app renders
+    growthbook.loadFeatures({ autoRefresh: true });
+  }, []);
 
   useAuth();
   useThirdPartyIntegrations();
@@ -39,6 +47,8 @@ const App = () => {
   useRuleExecutionsSyncer();
   useFeatureUsageEvent();
   useActiveWorkspace();
+
+  submitAppDetailAttributes();
 
   useEffect(() => {
     if (hasAuthInitialized) {
@@ -71,22 +81,25 @@ const App = () => {
 
   return (
     <ConfigProvider locale={enUS}>
-      <div
-        id="requestly-dashboard-layout"
-        style={{
-          height: "100vh",
-        }}
-      >
-        <CommandBar />
-        {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-          <FullScreenLayout />
-        ) : (
-          <>
-            <UpdateDialog />
-            <DashboardLayout />
-          </>
-        )}
-      </div>
+      <GrowthBookProvider growthbook={growthbook}>
+        <LocalUserAttributesHelperComponent />
+        <div
+          id="requestly-dashboard-layout"
+          style={{
+            height: "100vh",
+          }}
+        >
+          <CommandBar />
+          {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
+            <FullScreenLayout />
+          ) : (
+            <>
+              <UpdateDialog />
+              <DashboardLayout />
+            </>
+          )}
+        </div>
+      </GrowthBookProvider>
     </ConfigProvider>
   );
 };
