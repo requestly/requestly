@@ -67,10 +67,12 @@ const RuleBuilder = (props) => {
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const __IS_AB_TEST__ = true;
-  const isRedirectRuleWithABTest =
-    __IS_AB_TEST__ &&
-    currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT;
+
+  // TODO: use feature flag
+  const __IS_FEATURE_FLAG_ON__ = false;
+  const isRedirectRuleWithFeatureFlagOn =
+    currentlySelectedRuleData.ruleType ===
+      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && __IS_FEATURE_FLAG_ON__;
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -80,8 +82,10 @@ const RuleBuilder = (props) => {
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] =
-    useState(false);
+  const [
+    isChangeRuleGroupModalActive,
+    setIsChangeRuleGroupModalActive,
+  ] = useState(false);
   const [selectedRules, setSelectedRules] = useState(
     getSelectedRules(ruleSelection)
   );
@@ -352,12 +356,11 @@ const RuleBuilder = (props) => {
           <Body
             mode={MODE}
             showDocs={showDocs}
-            isRedirectRuleWithABTest={isRedirectRuleWithABTest}
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         </Col>
 
-        {isRedirectRuleWithABTest ? (
+        {isRedirectRuleWithFeatureFlagOn ? (
           <>
             {!showDocs ? (
               <Button
