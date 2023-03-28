@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Row, Col, Input, Tooltip, Dropdown } from "antd";
+import { Row, Col, Input, Tooltip, Dropdown, Radio } from "antd";
 import {
   FolderOpenOutlined,
   CaretDownOutlined,
   FileSyncOutlined,
   WarningFilled,
 } from "@ant-design/icons";
+import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
 import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 import { isValidUrl } from "utils/FormattingHelper";
@@ -21,6 +22,8 @@ import {
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { isDesktopMode } from "utils/AppUtils";
 import Logger from "lib/logger";
+import "./index.css";
+import { RQButton } from "lib/design-system/components";
 
 const DestinationURLRow = ({
   rowIndex,
@@ -29,9 +32,17 @@ const DestinationURLRow = ({
   helperFunctions,
   isInputDisabled,
 }) => {
+  const REDIRECT_DESTINATIONS = {
+    URL: "URL",
+    MAP_LOCAL: "map_local",
+    MOCK_PICKER: "mock_picker",
+  };
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
   const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
+  const [destinationType, setDestinationType] = useState(
+    REDIRECT_DESTINATIONS.URL
+  );
 
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
@@ -151,69 +162,116 @@ const DestinationURLRow = ({
     return false;
   };
 
+  const handleDestinationTypeChange = (e) => {
+    setDestinationType(e.target.value);
+    // modifyPairAtGivenPath(undefined, pairIndex, "destination", ""); //temp
+  };
+
+  const renderRedirectURLInput = () => {
+    return (
+      <Input
+        data-tour-id="rule-editor-destination-url"
+        className="display-inline-block"
+        placeholder={generatePlaceholderText(
+          pair.source.operator,
+          "destination"
+        )}
+        type="text"
+        onChange={(event) =>
+          modifyPairAtGivenPath(event, pairIndex, "destination")
+        }
+        onBlur={preValidateURL}
+        value={pair.destination}
+        disabled={isInputDisabled}
+        status={showInputWarning() ? "warning" : null}
+        suffix={
+          showInputWarning() ? (
+            <Tooltip
+              title={
+                isDesktopMode()
+                  ? "Update to latest version to redirect to Local File"
+                  : "Map Local File is not supported in Extension. Use Requestly Desktop App instead."
+              }
+            >
+              <WarningFilled />
+            </Tooltip>
+          ) : null
+        }
+      />
+    );
+  };
+
+  const renderMockOrFilePicker = () => {
+    return (
+      <Col span={24} className="picker-container">
+        <RQButton
+          className="white text-bold"
+          type="default"
+          onClick={() => setIsMockPickerVisible(true)}
+        >
+          {pair.destination ? "Change file" : " Select mock/file"}
+        </RQButton>
+        <span className="destination-file-path">
+          {pair.destination.length
+            ? pair.destination
+            : " No mock or file chosen"}
+        </span>
+        {pair.destination && (
+          <a href={pair.destination} target="_blank" rel="noreferrer">
+            <HiOutlineExternalLink className="external-link-icon" />
+          </a>
+        )}
+      </Col>
+    );
+  };
+
+  const renderDestinationAction = () => {
+    switch (destinationType) {
+      case REDIRECT_DESTINATIONS.URL:
+        return renderRedirectURLInput();
+      case REDIRECT_DESTINATIONS.MOCK_PICKER:
+        return renderMockOrFilePicker();
+      default:
+        return null;
+    }
+  };
+
   return (
     <React.Fragment>
       <Row
-        className=" margin-top-one"
+        className="margin-top-one"
         key={rowIndex}
         span={24}
         style={{
           alignItems: "center",
-          justifyContent: "center",
         }}
       >
         <Col span={3}>
-          <span>Redirect to</span>
+          <span className="white text-bold">Redirect to</span>
         </Col>
-        <Col span={21}>
-          <Input
-            data-tour-id="rule-editor-destination-url"
-            className="display-inline-block has-dark-text"
-            placeholder={generatePlaceholderText(
-              pair.source.operator,
-              "destination"
-            )}
-            type="text"
-            onChange={(event) =>
-              modifyPairAtGivenPath(event, pairIndex, "destination")
-            }
-            onBlur={preValidateURL}
-            style={{ cursor: "pointer" }}
-            value={pair.destination}
-            disabled={isInputDisabled}
-            addonAfter={
-              isInputDisabled ? null : isFeatureCompatible(
-                  FEATURES.REDIRECT_MAP_LOCAL
-                ) ? (
-                inputOptions()
-              ) : (
-                <Tooltip
-                  title="Import a existing Mock API"
-                  onClick={() => {
-                    trackClickMock();
-                    setIsMockPickerVisible(true);
-                  }}
+        <Col span={24}>
+          <Row className="redirect-destination-container">
+            <Col span={24} className="destination-options">
+              <Radio.Group
+                value={destinationType}
+                onChange={handleDestinationTypeChange}
+              >
+                <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
+                <Radio
+                  value={REDIRECT_DESTINATIONS.MAP_LOCAL}
+                  disabled={!isDesktopMode()}
                 >
-                  <FolderOpenOutlined />
-                  &nbsp; Pick from Mock Server
-                </Tooltip>
-              )
-            }
-            status={showInputWarning() ? "warning" : null}
-            suffix={
-              showInputWarning() ? (
-                <Tooltip
-                  title={
-                    isDesktopMode()
-                      ? "Update to latest version to redirect to Local File"
-                      : "Map Local File is not supported in Extension. Use Requestly Desktop App instead."
-                  }
-                >
-                  <WarningFilled />
-                </Tooltip>
-              ) : null
-            }
-          />
+                  Local file
+                </Radio>
+                <Radio value={REDIRECT_DESTINATIONS.MOCK_PICKER}>
+                  Pick from Files/Mock server
+                </Radio>
+              </Radio.Group>
+            </Col>
+            <Col span={24} className="destination-action">
+              {renderDestinationAction()}
+            </Col>
+          </Row>
         </Col>
       </Row>
       {/* MODALS */}
