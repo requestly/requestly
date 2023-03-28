@@ -11,15 +11,20 @@
 }
 
 .rule-editor-help-header {
-  padding: 0 1.25rem 10px 0;
+  padding: 0 1.25rem 8px 0;
 }
 
-.rule-editor-help-header .title.items-center {
-  column-gap: 7px;
+.rule-editor-help-back-btn.ant-btn {
+  margin-left: -6px;
+}
+
+.rule-editor-docs-close-btn.ant-btn {
+  margin-right: -6px;
 }
 
 .rule-editor-help-back-btn.ant-btn,
 .rule-editor-docs-close-btn.ant-btn {
+  padding: 6px;
   border: none;
   width: max-content;
   height: max-content;
