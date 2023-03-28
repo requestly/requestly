@@ -1,18 +1,19 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Button, Col, Row } from "antd";
+import { Button, Col, Collapse, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import APP_CONSTANTS from "config/constants";
+import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
+import { RuleType } from "types/rules";
 import {
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
-import { RuleType } from "types/rules";
 import "./Help.css";
 
 const externalLinks: { title: string; link: string }[] = [
@@ -42,13 +43,13 @@ const externalLinks: { title: string; link: string }[] = [
   },
 ];
 
-type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
+// type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
 
-interface ScrollIntoViewOptions {
-  behavior?: "auto" | "smooth";
-  block?: ScrollLogicalPosition;
-  inline?: ScrollLogicalPosition;
-}
+// interface ScrollIntoViewOptions {
+//   behavior?: "auto" | "smooth";
+//   block?: ScrollLogicalPosition;
+//   inline?: ScrollLogicalPosition;
+// }
 
 interface HelpProps {
   ruleType: RuleType;
@@ -67,13 +68,18 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
 
   const handleDocumentationList = useCallback(
     (ref: React.MutableRefObject<HTMLDivElement>) => {
-      const scrollIntoViewOptions: ScrollIntoViewOptions = {
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      };
+      // const scrollIntoViewOptions: ScrollIntoViewOptions = {
+      //   block: "nearest",
+      //   inline: "center",
+      // };
 
-      ref?.current?.scrollIntoView(scrollIntoViewOptions);
+      // ref.current?.scrollIntoView(scrollIntoViewOptions);
+      if (ref.current) {
+        // const offsetTop = ref.current.offsetTop;
+        // ref.current.scrollTop = offsetTop - 56;
+        // console.log(offsetTop - 56);
+      }
+      ref.current.scrollTo(0, 0);
     },
     []
   );
@@ -151,7 +157,11 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <div ref={introductionRef} className="rule-editor-docs-intro">
+              <div
+                // id="introduction"
+                ref={introductionRef}
+                className="rule-editor-docs-intro"
+              >
                 <div className="title rule-editor-docs-rule-name">
                   Redirect request
                 </div>
@@ -162,6 +172,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
+                // id="arguments"
                 ref={argumentsRef}
                 className="docs-section rule-editor-docs-arguments"
               >
@@ -179,6 +190,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
+                // id="demo"
                 ref={demoVideoRef}
                 className="docs-section rule-editor-docs-demo-video"
               >
@@ -192,6 +204,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
+                // id="popular use cases"
                 ref={useCasesRef}
                 className="docs-section rule-editor-docs-use-cases"
               >
@@ -218,6 +231,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
+                // id="testing rule"
                 ref={testingRuleRef}
                 className="docs-section rule-editor-docs-testing-rule"
               >
@@ -244,6 +258,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
+                // id="examples"
                 ref={examplesRef}
                 className="docs-section rule-editor-docs-examples"
               >
@@ -256,27 +271,59 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 </ul>
               </div>
 
-              <div ref={faqsRef} className="docs-section rule-editor-docs-faqs">
+              <div
+                // id="faqs"
+                ref={faqsRef}
+                className="docs-section rule-editor-docs-faqs"
+              >
                 <div className="title">FAQs</div>
-                <ul>
-                  <li>
-                    You want to work on front-end while back-end is not
-                    available or ready yet.
-                  </li>
-                  <li>
-                    You want to test application behavior when provided altered
-                    data.
-                  </li>
-
-                  <li>
-                    You want to simulate errors by returning different status
-                    codes.
-                  </li>
-                  <li>
-                    You want to modify API responses but don't have access to
-                    the back-end.
-                  </li>
-                </ul>
+                <RQCollapse
+                  accordion
+                  className="rule-editor-docs-faqs-collapse"
+                >
+                  <Collapse.Panel
+                    key={0}
+                    header="How do I know if the rule is executed on the page?"
+                  >
+                    <p>
+                      Please use{" "}
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://docs.requestly.io/guides/know-if-rule-executed-on-page"
+                      >
+                        this
+                      </a>{" "}
+                      guide to check if the rule was executed or not
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    key={1}
+                    header="Can I redirect https URL to HTTP URLs"
+                  >
+                    <p>
+                      Yes, Redirect Rule supports redirecting from HTTPS to HTTP
+                      and vice-versa
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    key={2}
+                    header="Can you redirect it to a local file?"
+                  >
+                    <p>
+                      Right now this is not possible in Browser Extension. But
+                      you can use our{" "}
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://docs.requestly.io/desktop-app/mac/features/map-local"
+                      >
+                        desktop app
+                      </a>{" "}
+                      to redirect to a local file (Map Local)
+                    </p>
+                  </Collapse.Panel>
+                </RQCollapse>
               </div>
             </div>
           </>
@@ -291,6 +338,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               <ul className="rule-editor-help-list">
                 {documentationList.map(({ title, onClick }) => (
                   <li key={title}>
+                    {/* <a href={`#${title.toLowerCase()}`}> */}
                     <Button
                       onClick={() => {
                         toggleDocs();
@@ -303,6 +351,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     >
                       {title}
                     </Button>
+                    {/* </a> */}
                   </li>
                 ))}
               </ul>

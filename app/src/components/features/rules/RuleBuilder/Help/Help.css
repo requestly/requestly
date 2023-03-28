@@ -140,3 +140,36 @@ li {
   list-style: disc;
   color: var(--text-gray);
 }
+
+/* faqs collapse */
+.rule-editor-docs-faqs {
+  margin-right: 11px;
+  margin-bottom: 2rem;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item,
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-content {
+  background-color: transparent;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item:last-child {
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-header-text {
+  max-width: 94%;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-content
+  p {
+  font-size: 13px;
+  margin-bottom: 0;
+}
