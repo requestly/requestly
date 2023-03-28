@@ -93,7 +93,7 @@ const RULE_TYPES_CONFIG = {
     },
     EMPTY_PAIR_FORMAT: {
       destination: "",
-      destinationType: "URL",
+      destinationType: "url",
       source: getSourceFormat(),
     },
     ALLOW_ADD_PAIR: true,

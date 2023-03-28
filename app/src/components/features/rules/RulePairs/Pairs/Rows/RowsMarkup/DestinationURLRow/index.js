@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Tooltip, Dropdown, Radio, Popconfirm } from "antd";
+import { RedirectDestinationType } from "types/rules";
 import {
   FolderOpenOutlined,
   CaretDownOutlined,
@@ -30,14 +31,10 @@ const DestinationURLRow = ({
   helperFunctions,
   isInputDisabled,
 }) => {
-  const REDIRECT_DESTINATIONS = {
-    URL: "URL",
-    MAP_LOCAL: "map_local",
-    MOCK_PICKER: "mock_picker",
-  };
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
   const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
+  const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [
     destinationTypePopupVisible,
     setDestinationTypePopupVisible,
@@ -45,16 +42,6 @@ const DestinationURLRow = ({
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(
     null
   );
-  /** TODO: Remove this once MocksV2 Released */
-  const toggleFilePickerModal = () => {
-    setIsFilePickerModalActive(!isFilePickerModalActive);
-  };
-
-  const handleFilePickerAction = (url) => {
-    setIsFilePickerModalActive(false);
-    modifyPairAtGivenPath(undefined, pairIndex, "destination", url);
-  };
-  /** TODO: Remove till here */
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
@@ -118,13 +105,39 @@ const DestinationURLRow = ({
     return false;
   };
 
+  const getDestinationTypeForExistingRule = (destination) => {
+    if (destination.startsWith("file://")) {
+      return RedirectDestinationType.MAP_LOCAL;
+    } else if (
+      /* check for both new and old mocks */
+      destination.includes("requestly.dev/api/mockv2/") ||
+      destination.includes("requestly.me")
+    ) {
+      return RedirectDestinationType.MOCK_OR_FILE_PICKER;
+    } else {
+      return RedirectDestinationType.URL;
+    }
+  };
+
+  const showPopup = (e) => {
+    setDestinationPopupSelection(e.target.value);
+    setDestinationTypePopupVisible(true);
+  };
+
   const handleDestinationTypeChange = () => {
-    modifyPairAtGivenPath(undefined, pairIndex, "destination", "", [
-      {
-        path: "destinationType",
-        value: destinationPopupSelection,
-      },
-    ]);
+    modifyPairAtGivenPath(
+      undefined,
+      pairIndex,
+      "destinationType",
+      destinationPopupSelection,
+      [
+        {
+          path: "destination",
+          value: "",
+        },
+      ]
+    );
+    setDestinationType(destinationPopupSelection);
   };
 
   const renderRedirectURLInput = () => {
@@ -179,6 +192,7 @@ const DestinationURLRow = ({
     return (
       <Col span={24} className="picker-container">
         <RQButton
+          disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
           type="default"
           onClick={() => {
             displayFileSelector(handleFileSelectCallback);
@@ -197,22 +211,25 @@ const DestinationURLRow = ({
 
   const renderDestinationAction = () => {
     switch (pair.destinationType) {
-      case REDIRECT_DESTINATIONS.URL:
+      case RedirectDestinationType.URL:
         return renderRedirectURLInput();
-      case REDIRECT_DESTINATIONS.MOCK_PICKER:
+      case RedirectDestinationType.MOCK_OR_FILE_PICKER:
         return renderMockOrFilePicker();
-      case REDIRECT_DESTINATIONS.MAP_LOCAL:
+      case RedirectDestinationType.MAP_LOCAL:
         return renderLocalFileSelector();
       default:
         return renderRedirectURLInput();
     }
   };
 
-  const showPopup = (e) => {
-    const destinationType = e.target.value;
-    setDestinationPopupSelection(destinationType);
-    setDestinationTypePopupVisible(true);
-  };
+  useEffect(() => {
+    if (!pair.destinationType) {
+      const destinationType = getDestinationTypeForExistingRule(
+        pair.destination
+      );
+      setDestinationType(destinationType);
+    }
+  }, [pair.destination, pair.destinationType]);
 
   return (
     <React.Fragment>
@@ -241,8 +258,8 @@ const DestinationURLRow = ({
                 onCancel={() => setDestinationTypePopupVisible(false)}
                 open={destinationTypePopupVisible}
               >
-                <Radio.Group value={pair.destinationType} onChange={showPopup}>
-                  <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
+                <Radio.Group value={destinationType} onChange={showPopup}>
+                  <Radio value={RedirectDestinationType.URL}>URL</Radio>
                   <Tooltip
                     trigger={
                       !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
@@ -265,7 +282,7 @@ const DestinationURLRow = ({
                     }
                   >
                     <Radio
-                      value={REDIRECT_DESTINATIONS.MAP_LOCAL}
+                      value={RedirectDestinationType.MAP_LOCAL}
                       disabled={
                         !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
                       }
@@ -273,7 +290,7 @@ const DestinationURLRow = ({
                       Local file
                     </Radio>
                   </Tooltip>
-                  <Radio value={REDIRECT_DESTINATIONS.MOCK_PICKER}>
+                  <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>
                     Pick from Files/Mock server
                   </Radio>
                 </Radio.Group>
@@ -286,15 +303,6 @@ const DestinationURLRow = ({
         </Col>
       </Row>
       {/* MODALS */}
-      {/* Remove this once MocksV2 Released */}
-      {isFilePickerModalActive ? (
-        <FilePickerModal
-          isOpen={isFilePickerModalActive}
-          toggle={toggleFilePickerModal}
-          callback={handleFilePickerAction}
-        />
-      ) : null}
-      {/* Till here */}
       {isMockPickerVisible ? (
         <MockPickerModal
           isVisible={isMockPickerVisible}
