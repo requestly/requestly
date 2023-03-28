@@ -66,7 +66,7 @@ const MockEditor: React.FC<Props> = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const isAiResponseActive = useFeatureValue("ai-mock-response", false);
+  const isAiResponseActive = useFeatureValue("ai_mock_response", false);
 
   const [id] = useState<string>(mockData.id); // No need to edit this. Set by firebase
   const [type] = useState<MockType>(mockData?.type || mockType);
