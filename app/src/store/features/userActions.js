@@ -27,7 +27,7 @@ export const updateUsername = (prevState, action) => {
 };
 
 //Persona Survey actions
-export const updateSingleChoicePersonaFields = (prevState, action) => {
+export const updateUserPersona = (prevState, action) => {
   prevState.userPersona[action.payload.key] = action.payload.value;
 };
 

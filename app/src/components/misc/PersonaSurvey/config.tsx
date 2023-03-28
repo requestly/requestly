@@ -4,16 +4,12 @@ import { UserRecommendations } from "./Recommendations";
 import {
   handleUseCaseActiveOption,
   setPersonaUseCase,
-  setSingleChoicePersonaFields,
+  setUserPersona,
 } from "./actions";
 
-// //@ts-ignore
 // import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
-// //@ts-ignore
 // import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
-// //@ts-ignore
 // import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
-// //@ts-ignore
 // import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
 
 export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
@@ -22,7 +18,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     questionType: "single",
     isActive: ({ key, title }) => key === title,
     action: (dispatch, value, clear) =>
-      setSingleChoicePersonaFields(dispatch, value, clear, "persona"),
+      setUserPersona(dispatch, value, clear, "persona"),
     options: [
       {
         title: PersonaType.FRONTEND,
@@ -185,7 +181,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     questionType: "single",
     isActive: ({ key, title }) => key === title,
     action: (dispatch, value, clear) =>
-      setSingleChoicePersonaFields(dispatch, value, clear, "numberOfEmployees"),
+      setUserPersona(dispatch, value, clear, "numberOfEmployees"),
     options: [
       {
         title: "Just me",

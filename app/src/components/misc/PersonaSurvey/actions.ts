@@ -1,15 +1,13 @@
 import { actions } from "store";
 import { multipleChoiceOption } from "./types";
 
-export const setSingleChoicePersonaFields = (
+export const setUserPersona = (
   dispatch: any,
   value: string,
   clear: boolean,
   key: string
 ) => {
-  dispatch(
-    actions.updateSingleChoicePersonaFields({ value: clear ? "" : value, key })
-  );
+  dispatch(actions.updateUserPersona({ value: clear ? "" : value, key }));
 };
 
 export const setPersonaUseCase = (
