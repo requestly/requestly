@@ -36,7 +36,7 @@ const NetworkLogRow: React.FC<Props> = ({
     () => !status || (status >= 400 && status <= 599),
     [status]
   );
-  const requestMethod = useMemo(() => method.toUpperCase(), [method]);
+  const requestMethod = useMemo(() => method?.toUpperCase() ?? "GET", [method]);
 
   return (
     <SessionDetailsPanelRow
