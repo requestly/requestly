@@ -16,6 +16,12 @@
   padding: 1.5rem 1.25rem 8px 1.25rem;
 }
 
+.ant-collapse.custom-collapse .ant-collapse-expand-icon svg {
+  width: 11.67px;
+  height: 6.67px;
+  color: var(--text-gray);
+}
+
 .ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-content {
   padding: 0 1.25rem;
   color: var(--text-gray);
