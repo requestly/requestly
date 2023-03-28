@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Tooltip, Dropdown, Radio, Popconfirm } from "antd";
+import { Row, Col, Input, Tooltip, Radio, Popconfirm } from "antd";
 import { RedirectDestinationType } from "types/rules";
-import {
-  FolderOpenOutlined,
-  CaretDownOutlined,
-  FileSyncOutlined,
-} from "@ant-design/icons";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
-import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
@@ -20,7 +14,6 @@ import {
   trackClickMock,
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
-import Logger from "lib/logger";
 import "./index.css";
 import { RQButton } from "lib/design-system/components";
 
@@ -33,7 +26,6 @@ const DestinationURLRow = ({
 }) => {
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
-  const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [
     destinationTypePopupVisible,
