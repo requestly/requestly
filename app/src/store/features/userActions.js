@@ -79,3 +79,10 @@ export const updateIsPersonaSurveyCompleted = (prevState, action) => {
 export const updatePersonaSurveyPage = (prevState, action) => {
   prevState.userPersona.page = action.payload;
 };
+
+export const updateUserAttributes = (prevState, action) => {
+  prevState.userAttributes = {
+    ...prevState.userAttributes,
+    ...action.payload,
+  }
+}
