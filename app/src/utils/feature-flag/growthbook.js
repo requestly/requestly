@@ -8,11 +8,10 @@ export const growthbook = new GrowthBook({
   clientKey: "sdk-ONIe1oQehroUJmyv",
   enableDevMode: true,
   trackingCallback: (experiment, result) => {
-    // TODO: Use your real analytics tracking system
-    trackEvent("Experiment Viewed", { id: experiment.key, value: result.value });
+    trackEvent("experiment_viewed", { id: experiment.key, value: result.value });
   },
   onFeatureUsage: (featureKey, result) => {
-    const attrName = `x-flag-${featureKey}`;
+    const attrName = `x_flag_${featureKey}`;
     trackAttr(attrName, result?.value);
   },
 });
