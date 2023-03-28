@@ -88,7 +88,8 @@ const mockNetworkEvents: NetworkEventData[] = [
   {
     timestamp: 1653654848375,
     method: undefined,
-    url:
+    url: "",
+    responseURL:
       "https://github.com/requestly/requestly-demo/spoofed_commit_check/4ed9548459d91bc6e5acd4837938cae2918dd6b9",
     requestData: {},
     response: "\n\n",

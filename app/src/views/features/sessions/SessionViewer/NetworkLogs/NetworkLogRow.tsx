@@ -22,6 +22,7 @@ const NetworkLogRow: React.FC<Props> = ({
   timeOffset,
   method,
   url,
+  responseURL,
   status,
   responseTime = 0,
   onClick,
@@ -38,7 +39,9 @@ const NetworkLogRow: React.FC<Props> = ({
   );
   const requestMethod = useMemo(() => method?.toUpperCase() ?? "GET", [method]);
 
-  return (
+  const networkUrl = useMemo(() => url || responseURL, [url, responseURL]);
+
+  return !networkUrl ? null : (
     <SessionDetailsPanelRow
       className={`network-log-row ${isSelected ? "selected" : ""}`}
       timeOffset={timeOffset}
@@ -60,7 +63,7 @@ const NetworkLogRow: React.FC<Props> = ({
       <span
         className={classNames("network-log-url", { failed: isFailedRequest })}
       >
-        {url}
+        {networkUrl}
       </span>
     </SessionDetailsPanelRow>
   );
