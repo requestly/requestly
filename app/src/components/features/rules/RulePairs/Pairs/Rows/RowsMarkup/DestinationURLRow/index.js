@@ -40,9 +40,7 @@ const DestinationURLRow = ({
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
   //Component State
   const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
-  const [destinationType, setDestinationType] = useState(
-    REDIRECT_DESTINATIONS.URL
-  );
+  console.log("PAIR", pair);
 
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
@@ -163,8 +161,12 @@ const DestinationURLRow = ({
   };
 
   const handleDestinationTypeChange = (e) => {
-    setDestinationType(e.target.value);
-    // modifyPairAtGivenPath(undefined, pairIndex, "destination", ""); //temp
+    modifyPairAtGivenPath(undefined, pairIndex, "destination", "", [
+      {
+        path: "destinationType",
+        value: e.target.value,
+      },
+    ]); //temp
   };
 
   const renderRedirectURLInput = () => {
@@ -226,13 +228,13 @@ const DestinationURLRow = ({
   };
 
   const renderDestinationAction = () => {
-    switch (destinationType) {
+    switch (pair.destinationType) {
       case REDIRECT_DESTINATIONS.URL:
         return renderRedirectURLInput();
       case REDIRECT_DESTINATIONS.MOCK_PICKER:
         return renderMockOrFilePicker();
       default:
-        return null;
+        return renderRedirectURLInput();
     }
   };
 
@@ -253,7 +255,7 @@ const DestinationURLRow = ({
           <Row className="redirect-destination-container">
             <Col span={24} className="destination-options">
               <Radio.Group
-                value={destinationType}
+                value={pair.destinationType}
                 onChange={handleDestinationTypeChange}
               >
                 <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
