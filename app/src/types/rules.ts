@@ -94,6 +94,12 @@ export interface ResponseRulePair {
   };
 }
 
+export enum RedirectDestinationType {
+  URL = "url",
+  MAP_LOCAL = "map_local",
+  MOCK_OR_FILE_PICKER = "mock_or_file_picker",
+}
+
 export interface RedirectRulePair {
   destination: string;
   source: RulePairSource;
