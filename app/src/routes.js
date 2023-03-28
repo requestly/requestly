@@ -60,6 +60,7 @@ import FileMockListView from "views/features/mocksV2/FileMockListView";
 import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
+import InviteView from "views/misc/Invite";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -558,6 +559,11 @@ var routes = [
     path: PATHS.GETTING_STARTED,
     name: "Getting started",
     component: GettingStarted,
+  },
+  {
+    path: PATHS.INVITE.RELATIVE,
+    name: "Accept Invite",
+    component: InviteView,
   },
 ];
 export default routes;

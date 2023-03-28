@@ -9,7 +9,6 @@ import {
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import InviteMemberModal from "./InviteMemberModal";
 import { RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
@@ -20,6 +19,7 @@ import {
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
+import InviteErrorModal from "./InviteErrorModal";
 
 const AddMemberModal = ({
   isOpen,
@@ -30,13 +30,11 @@ const AddMemberModal = ({
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
-  const [isInviteEmailModalActive, setIsInviteEmailModalActive] = useState(
+  const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(
     false
   );
   const [isProcessing, setIsProcessing] = useState(false);
-  const [unsuccessfulUserAdditions, setUnsuccessfulUserAdditions] = useState(
-    []
-  );
+  const [inviteErrors, setInviteErrors] = useState([]);
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
@@ -46,7 +44,7 @@ const AddMemberModal = ({
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
 
   const toggleInviteEmailModal = () => {
-    setIsInviteEmailModalActive(!isInviteEmailModalActive);
+    setInviteErrorModalActive(!isInviteErrorModalActive);
     handleModalClose();
   };
 
@@ -64,46 +62,32 @@ const AddMemberModal = ({
     }
 
     const functions = getFunctions();
-    const addUserToTeam = httpsCallable(functions, "addUserToTeam");
-
-    // For loading icon
+    const createTeamInvites = httpsCallable(functions, "invites-createTeamInvites");
     setIsProcessing(true);
 
-    addUserToTeam({
+    createTeamInvites({
       teamId: teamId,
-      email: userEmail,
-      isAdmin: makeUserAdmin,
+      emails: userEmail,
+      role: makeUserAdmin ? "admin": "write",
+    }).then((res) => {
+      if(res?.data?.success) {
+        toast.success("Sent invites successfully");
+        callback?.();
+        trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin);
+        setIsProcessing(false);
+        handleModalClose();
+      } else {
+          const inviteErrors = res?.data?.results.filter(result => result?.success !== true);
+          callback?.();
+          setInviteErrors([...inviteErrors]);
+          setInviteErrorModalActive(true);
+          trackAddTeamMemberFailure(teamId, userEmail, null);
+          setIsProcessing(false);
+      }
+    }).catch(err => {
+      toast.error("Error while creating invitations. Make sure you are an admin");
+      trackAddTeamMemberFailure(teamId, userEmail, null);
     })
-      .then((res) => {
-        if (res.data.success) {
-          toast.success("Users added successfully");
-          callback?.();
-          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin);
-          setIsProcessing(false);
-          handleModalClose();
-        }
-      })
-      .catch((err) => {
-        if (err.message === "user-not-found") {
-          const invalidEmails = JSON.parse(JSON.stringify(err)).details;
-          callback?.();
-          setUnsuccessfulUserAdditions([...invalidEmails]);
-          setIsInviteEmailModalActive(true);
-          trackAddTeamMemberFailure(teamId, userEmail, "user_not_found");
-          setIsProcessing(false);
-        } else if (err.message === "user-already-exists") {
-          toast.warn(`User already has access to the team`);
-          handleModalClose();
-          trackAddTeamMemberFailure(teamId, userEmail, "user_already_exist");
-        } else if (err.message === "user-not-admin") {
-          toast.warn("Opps! Make sure you are an admin");
-          handleModalClose();
-        } else {
-          toast.warn(`Trouble adding users`);
-          trackAddTeamMemberFailure(teamId, userEmail, "other");
-          handleModalClose();
-        }
-      });
   };
 
   useEffect(() => {
@@ -123,7 +107,7 @@ const AddMemberModal = ({
             />
           </div>
           <div className="header add-member-modal-header">
-            Add people to {currentTeamId ? `${teamDetails?.name}'s` : ""}{" "}
+            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""}{" "}
             workspace
           </div>
           <p className="text-gray">
@@ -182,16 +166,16 @@ const AddMemberModal = ({
               onClick={handleAddMember}
               loading={isProcessing}
             >
-              Add members
+              Invite People
             </Button>
           </Col>
         </Row>
       </RQModal>
 
-      <InviteMemberModal
-        isOpen={isInviteEmailModalActive}
+      <InviteErrorModal
+        isOpen={isInviteErrorModalActive}
         handleModalClose={toggleInviteEmailModal}
-        emails={unsuccessfulUserAdditions}
+        errors={inviteErrors}
         teamId={teamId}
         isAdmin={makeUserAdmin}
       />

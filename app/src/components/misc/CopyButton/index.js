@@ -9,6 +9,7 @@ const CopyButton = ({
   disableTooltip = false,
   showIcon = true,
   type = "text",
+  size = "small",
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
@@ -18,7 +19,7 @@ const CopyButton = ({
     >
       <RQButton
         type={type}
-        size="small"
+        size={"small" | size}
         icon={
           showIcon &&
           (copyClicked ? (
