@@ -106,6 +106,10 @@ export const TEAMS = {
   NEW_TEAM_CREATE_FAILURE: "new_team_create_failure",
   ADD_TEAM_MEMBER_SUCCESS: "add_team_member_success",
   ADD_TEAM_MEMBER_FAILURE: "add_team_member_failure",
+  WORKSPACE_INVITE_LINK_GENERATED: "workspace_invite_link_generated",
+  WORKSPACE_INVITE_LINK_REVOKED: "workspace_invite_link_revoked",
+  WORKSPACE_INVITE_ACCEPTED: "workspace_invite_accepted",
+  WORKSPACE_INVITE_SCREEN_ERROR: "workspace_invite_screen_error",
 };
 
 export const TRASH = {

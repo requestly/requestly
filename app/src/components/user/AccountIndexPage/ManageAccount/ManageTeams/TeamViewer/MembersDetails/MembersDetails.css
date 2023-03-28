@@ -8,7 +8,6 @@
 
 .members-invite-title,
 .members-details-title {
-  margin-bottom: 8px;
   color: var(--white);
 }
 
@@ -16,7 +15,7 @@
   font-size: 13px;
   line-height: 22px;
   max-width: 37.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .members-table-container {

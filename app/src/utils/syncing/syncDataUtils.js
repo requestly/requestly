@@ -112,10 +112,17 @@ const preventWorkspaceSyncWrite = async (
   return latestRules;
 };
 
-export const updateUserSyncRecords = async (uid, records, appMode) => {
+export const updateUserSyncRecords = async (uid, records, appMode, options) => {
+  const targetWorkspaceId =
+    typeof options.workspaceId !== "undefined"
+      ? options.workspaceId
+      : window.currentlyActiveWorkspaceTeamId;
+  const isSameWorkspaceOperation =
+    targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
+
   const latestRules = _.cloneDeep(records);
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
-  if (window.currentlyActiveWorkspaceTeamId) {
+  if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus = true;
     // localStorage.getItem("syncRuleStatus") === "true" || false;
     // Get current values from db and use them xD
@@ -159,9 +166,21 @@ export const updateUserSyncRecords = async (uid, records, appMode) => {
     }
   }
 
-  try {
+  let syncPath;
+  if (isSameWorkspaceOperation) {
     window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
-    await updateValueAsPromise(getRecordsSyncPath(), latestRules);
+    syncPath = getRecordsSyncPath();
+  } else {
+    if (targetWorkspaceId === null) {
+      // private workspace
+      syncPath = getIndividualSyncPath();
+    } else {
+      syncPath = getTeamSyncPath(targetWorkspaceId);
+    }
+  }
+
+  try {
+    await updateValueAsPromise(syncPath, latestRules);
   } catch (error) {
     Logger.error("err update sync records", error);
   }

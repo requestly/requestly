@@ -71,10 +71,10 @@ class StorageServiceWrapper {
   }
 
   /**
-   *
    * @param ruleOrGroup rule or group
    * @param options options for save operation
    * @param {boolean} options.silentUpdate do not update last modified timestamp
+   * @param {string} options.workspaceId workspace identifier
    * @returns a promise on save of the rule or group
    */
   async saveRuleOrGroup(ruleOrGroup, options = {}) {
@@ -89,7 +89,8 @@ class StorageServiceWrapper {
     await doSyncRecords(
       formattedObject,
       SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-      this.appMode
+      this.appMode,
+      { workspaceId: options.workspaceId }
     );
     return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
   }

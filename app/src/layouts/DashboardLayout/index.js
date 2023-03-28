@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
 // Utils
-import { isPricingPage, isGoodbyePage } from "utils/PathUtils.js";
+import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 
 import { getAppMode } from "store/selectors";
 // Constants
@@ -42,7 +42,7 @@ const DashboardLayout = () => {
   return (
     <>
       <Layout className="hp-app-layout">
-        {isPricingPage() || isGoodbyePage() ? null : (
+        {isPricingPage() || isGoodbyePage() || isInvitePage() ? null : (
           <Sidebar
             visible={visible}
             setVisible={setVisible}
