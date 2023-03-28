@@ -15,7 +15,7 @@ import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
-import { isPricingPage, isGoodbyePage } from "utils/PathUtils";
+import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import {
   GithubOutlined,
   NotificationOutlined,
@@ -47,13 +47,14 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isMyRulesPage = pathname.includes("my-rules");
-  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage();
+  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const editorPaths = [
     "/rules/editor",
     "/mocks/editor",
     "/filesv2/editor",
     "/mock-server/viewer",
     "/pricing",
+    "/invite"
   ];
 
   const showMenuHeader = () => {
