@@ -104,6 +104,15 @@ export const RULES = {
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
+
+  // rule editor docs
+  DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",
+  DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED:
+    "docs_sidebar_primary_category_clicked",
+  DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED:
+    "docs_sidebar_secondary_category_clicked",
+  DOCS_SIDEBAR_CONTACT_US_CLICKED: "docs_sidebar_contact_us_clicked",
+  DOCS_SIDEBAR_DEMOVIDEO_WATCHED: "docs_sidebar_demovideo_watched",
 };
 
 export const GROUPS = {

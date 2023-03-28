@@ -33,7 +33,10 @@ import {
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import {
+  trackDocsSidebarViewed,
+  trackRuleEditorViewed,
+} from "modules/analytics/events/common/rules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
@@ -359,7 +362,10 @@ const RuleBuilder = (props) => {
             {!showDocs ? (
               <Button
                 className="rule-editor-help-btn"
-                onClick={() => setShowDocs(true)}
+                onClick={() => {
+                  setShowDocs(true);
+                  trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
+                }}
               >
                 Help
                 <span>
@@ -368,7 +374,10 @@ const RuleBuilder = (props) => {
               </Button>
             ) : (
               <Col span={7}>
-                <Help showDocs={showDocs} setShowDocs={setShowDocs} />
+                <Help
+                  setShowDocs={setShowDocs}
+                  ruleType={currentlySelectedRuleData.ruleType}
+                />
               </Col>
             )}
           </>

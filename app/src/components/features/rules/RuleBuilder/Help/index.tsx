@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Button, Col, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
@@ -6,7 +6,13 @@ import APP_CONSTANTS from "config/constants";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
-import { trackRuleDemoVideoClicked } from "modules/analytics/events/common/rules";
+import {
+  trackDocsSidebarPrimaryCategoryClicked,
+  trackDocsSidebarSecondaryCategoryClicked,
+  trackDocsSidebarDemovideoWatched,
+  trackDocsSidebarContactUsClicked,
+} from "modules/analytics/events/common/rules";
+import { RuleType } from "types/rules";
 import "./Help.css";
 
 const externalLinks: { title: string; link: string }[] = [
@@ -45,11 +51,11 @@ interface ScrollIntoViewOptions {
 }
 
 interface HelpProps {
-  showDocs: boolean;
+  ruleType: RuleType;
   setShowDocs: (showDocs: boolean) => void;
 }
 
-const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
+const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const introductionRef = useRef<HTMLDivElement | null>(null);
   const argumentsRef = useRef<HTMLDivElement | null>(null);
@@ -59,66 +65,59 @@ const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
   const examplesRef = useRef<HTMLDivElement | null>(null);
   const faqsRef = useRef<HTMLDivElement | null>(null);
 
+  const handleDocumentationList = useCallback(
+    (ref: React.MutableRefObject<HTMLDivElement>) => {
+      const scrollIntoViewOptions: ScrollIntoViewOptions = {
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      };
+
+      ref?.current?.scrollIntoView(scrollIntoViewOptions);
+    },
+    []
+  );
+
   const documentationList: {
     title: string;
     onClick: () => void;
   }[] = useMemo(() => {
-    const scrollIntoViewOptions: ScrollIntoViewOptions = {
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center",
-    };
-
     return [
       {
         title: "Introduction",
-        onClick: () => {
-          introductionRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(introductionRef),
       },
       {
         title: "Arguments",
-        onClick: () => {
-          argumentsRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(argumentsRef),
       },
       {
         title: "Demo",
-        onClick: () => {
-          demoVideoRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(demoVideoRef),
       },
       {
         title: "Popular Use cases",
-        onClick: () => {
-          useCasesRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(useCasesRef),
       },
       {
         title: "Testing Rule",
-        onClick: () => {
-          testingRuleRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(testingRuleRef),
       },
       {
         title: "Examples",
-        onClick: () => {
-          examplesRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(examplesRef),
       },
       {
         title: "FAQs",
-        onClick: () => {
-          faqsRef.current?.scrollIntoView(scrollIntoViewOptions);
-        },
+        onClick: () => handleDocumentationList(faqsRef),
       },
     ];
-  }, []);
+  }, [handleDocumentationList]);
 
   const toggleDocs = () => setIsDocsVisible((prev) => !prev);
 
   const handleDemoVideoPlay = () => {
-    trackRuleDemoVideoClicked("Redirect", "rule_editor");
+    trackDocsSidebarDemovideoWatched(ruleType);
   };
 
   return (
@@ -296,6 +295,10 @@ const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
                       onClick={() => {
                         toggleDocs();
                         setTimeout(() => onClick(), 100);
+                        trackDocsSidebarPrimaryCategoryClicked(
+                          ruleType,
+                          title.toLowerCase()
+                        );
                       }}
                     >
                       {title}
@@ -312,7 +315,17 @@ const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
               <ul className="rule-editor-help-list external-links">
                 {externalLinks.map(({ title, link }) => (
                   <li key={title}>
-                    <a href={link} target="_blank" rel="noreferrer">
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() =>
+                        trackDocsSidebarSecondaryCategoryClicked(
+                          ruleType,
+                          title.toLowerCase()
+                        )
+                      }
+                    >
                       {title} <RightArrow />
                     </a>
                   </li>
@@ -325,7 +338,15 @@ const Help: React.FC<HelpProps> = ({ showDocs, setShowDocs }) => {
 
       {/* footer */}
       <Row className="rule-editor-help-footer">
-        <Button className="ml-auto">Contact us</Button>
+        <Button
+          className="ml-auto"
+          onClick={() => {
+            trackDocsSidebarContactUsClicked(ruleType);
+            window.open(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, "_blank");
+          }}
+        >
+          Contact us
+        </Button>
       </Row>
     </div>
   );
