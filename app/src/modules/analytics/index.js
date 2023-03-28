@@ -2,6 +2,7 @@ import { getAppDetails } from "utils/AppUtils";
 import { SYNCING } from "./events/features/constants";
 import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
+import localIntegration from "./integrations/local";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
@@ -45,17 +46,14 @@ export const trackAttr = (name, value) => {
   )
     return;
 
-  setTimeout(() => {
-    trackAttr(name, value);
-  }, 5000);
-
   name = name?.toLowerCase();
   Logger.log(`[analytics.trackAttr] name=${name} params=${value}`);
 
   posthogIntegration.trackAttr(name, value);
+  localIntegration.trackAttr(name, value);
 };
 
-export const initIntegrations = (user) => {
+export const initIntegrations = (user, dispatch) => {
   if (
     localStorage.getItem("dataCollectionStatus") &&
     localStorage.getItem("dataCollectionStatus") === "disabled"
@@ -64,5 +62,6 @@ export const initIntegrations = (user) => {
 
   if (window.top === window.self) {
     posthogIntegration.init(user);
+    localIntegration.init(null, dispatch);
   }
 };

@@ -47,6 +47,7 @@ const globalReducer = getReducerWithLocalStorageSync(
     "mobileDebugger",
     "initializations",
     "userPreferences",
+    "userAttributes",
   ]
 );
 
