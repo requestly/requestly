@@ -15,6 +15,10 @@ export const isGoodbyePage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.GOODBYE.RELATIVE);
 };
 
+export const isInvitePage = (pathname = window.location.pathname) => {
+  return pathname.startsWith("/invite");
+};
+
 export const isRulesIndexPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.RULES.MY_RULES.RELATIVE);
 };
