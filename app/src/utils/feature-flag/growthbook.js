@@ -1,4 +1,5 @@
 import { GrowthBook } from "@growthbook/growthbook";
+import { trackAttr, trackEvent } from "modules/analytics";
 import { buildBasicUserProperties } from "modules/analytics/utils";
 
 
@@ -8,13 +9,11 @@ export const growthbook = new GrowthBook({
   enableDevMode: true,
   trackingCallback: (experiment, result) => {
     // TODO: Use your real analytics tracking system
-    // console.log("Viewed Experiment", {
-    //   experimentId: experiment.key,
-    //   variationId: result.key
-    // }, experiment, result);
+    trackEvent("Experiment Viewed", { id: experiment.key, value: result.value });
   },
   onFeatureUsage: (featureKey, result) => {
-    // console.log("feature", featureKey, "has value", result.value);
+    const attrName = `x-flag-${featureKey}`;
+    trackAttr(attrName, result?.value);
   },
 });
 
