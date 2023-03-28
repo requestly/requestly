@@ -77,7 +77,7 @@ li {
 }
 
 .rule-editor-help-list.external-links li {
-  margin: 12px;
+  margin: 12px 0;
 }
 
 .rule-editor-help-list.external-links a {
@@ -137,7 +137,10 @@ li {
   margin-bottom: 12px;
 }
 
+.rule-editor-docs img,
 .rule-editor-docs-demo-video iframe {
+  width: 95%;
+  aspect-ratio: 2/1;
   block-size: auto;
   max-inline-size: 100%;
   border: 1px solid var(--border-dark);
@@ -145,8 +148,17 @@ li {
 }
 
 .rule-editor-docs img {
-  block-size: auto;
-  max-inline-size: 100%;
+  border: none;
+  aspect-ratio: auto;
+  user-select: none;
+}
+
+.rule-editor-docs-image [data-rmiz-modal-overlay="hidden"] {
+  background-color: rgba(13, 13, 16, 0);
+}
+
+.rule-editor-docs-image [data-rmiz-modal-overlay="visible"] {
+  background-color: rgba(13, 13, 16, 0.85);
 }
 
 .rule-editor-docs-use-cases li,

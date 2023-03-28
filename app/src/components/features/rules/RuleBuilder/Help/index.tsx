@@ -3,6 +3,8 @@ import { Button, Col, Collapse, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import APP_CONSTANTS from "config/constants";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
@@ -198,12 +200,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 className="docs-section rule-editor-docs-create-rule"
               >
                 <div className="title">How to create a redirect rule?</div>
-                <img
-                  width="260px"
-                  height="100px"
-                  alt="redirect rule editor"
-                  src="/assets/img/rule-editor/redirect-rule-editor.png"
-                />
+                <Zoom classDialog="rule-editor-docs-image">
+                  <img
+                    width="260px"
+                    height="100px"
+                    alt="redirect rule editor"
+                    src="/assets/img/rule-editor/redirect-rule-editor.png"
+                  />
+                </Zoom>
                 <ol>
                   <li>
                     <span>Source Condition:</span> Source condition is where you
@@ -249,12 +253,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                   can help you verify if the source conditions are matching to
                   the URL you want to test or not.
                 </p>
-                <img
-                  width="280px"
-                  height="120px"
-                  alt="testing redirect rule"
-                  src="/assets/img/rule-editor/test-redirect-rule.png"
-                />
+                <Zoom classDialog="rule-editor-docs-image">
+                  <img
+                    width="280px"
+                    height="120px"
+                    alt="testing redirect rule"
+                    src="/assets/img/rule-editor/test-redirect-rule.png"
+                  />
+                </Zoom>
               </div>
 
               <div
