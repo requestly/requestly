@@ -18,7 +18,9 @@ import {
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 
-const externalLinks: { title: string; link: string }[] = [
+type ExternalLink = { title: string; link: string };
+
+const externalLinks: ExternalLink[] = [
   {
     title: "Tutorial videos",
     link: APP_CONSTANTS.LINKS.YOUTUBE_TUTORIALS,
@@ -51,13 +53,10 @@ const Link: React.FC<{ text: string; href: string }> = ({ text, href }) => (
   </a>
 );
 
-// type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
-
-// interface ScrollIntoViewOptions {
-//   behavior?: "auto" | "smooth";
-//   block?: ScrollLogicalPosition;
-//   inline?: ScrollLogicalPosition;
-// }
+type DocumentationListItem = {
+  title: string;
+  onClick: () => void;
+};
 
 interface HelpProps {
   ruleType: RuleType;
@@ -66,6 +65,7 @@ interface HelpProps {
 
 const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
+  const documentationListRef = useRef<HTMLDivElement | null>(null);
   const introductionRef = useRef<HTMLDivElement | null>(null);
   const demoVideoRef = useRef<HTMLDivElement | null>(null);
   const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
@@ -76,26 +76,16 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
 
   const handleDocumentationList = useCallback(
     (ref: React.MutableRefObject<HTMLDivElement>) => {
-      // const scrollIntoViewOptions: ScrollIntoViewOptions = {
-      //   block: "nearest",
-      //   inline: "center",
-      // };
-
-      // ref.current?.scrollIntoView(scrollIntoViewOptions);
       if (ref.current) {
-        // const offsetTop = ref.current.offsetTop;
-        // ref.current.scrollTop = offsetTop - 56;
-        // console.log(offsetTop - 56);
+        const target = ref.current;
+        const offsetTop = target.offsetTop;
+        (target.parentNode as HTMLElement).scrollTop = offsetTop - 87;
       }
-      ref.current.scrollTo(0, 0);
     },
     []
   );
 
-  const documentationList: {
-    title: string;
-    onClick: () => void;
-  }[] = useMemo(() => {
+  const documentationList: DocumentationListItem[] = useMemo(() => {
     return [
       {
         title: "Introduction",
@@ -128,10 +118,29 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     ];
   }, [handleDocumentationList]);
 
-  const toggleDocs = () => setIsDocsVisible((prev) => !prev);
+  const toggleDocs = () => {
+    if (isDocsVisible) {
+      setTimeout(() => {
+        if (documentationListRef.current) {
+          documentationListRef.current.scrollTop = 0;
+        }
+      }, 0);
+    }
+    setIsDocsVisible((prev) => !prev);
+  };
 
   const handleDemoVideoPlay = () => {
     trackDocsSidebarDemovideoWatched(ruleType);
+  };
+
+  const handleDocumentationListItemClick = (
+    title: string,
+    handler: () => void
+  ) => {
+    toggleDocs();
+    // ensures element is mounted
+    setTimeout(() => handler(), 0);
+    trackDocsSidebarPrimaryCategoryClicked(ruleType, title.toLowerCase());
   };
 
   return (
@@ -165,11 +174,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <div
-                // id="introduction"
-                ref={introductionRef}
-                className="rule-editor-docs-intro"
-              >
+              <div ref={introductionRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">
                   URL Redirect Rule
                 </div>
@@ -182,7 +187,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
-                // id="demo"
                 ref={demoVideoRef}
                 className="docs-section rule-editor-docs-demo-video"
               >
@@ -242,7 +246,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
-                // id="testing rule"
                 ref={testingRuleRef}
                 className="docs-section rule-editor-docs-testing-rule"
               >
@@ -264,7 +267,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
-                // id="popular use cases"
                 ref={useCasesRef}
                 className="docs-section rule-editor-docs-use-cases"
               >
@@ -329,7 +331,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
-                // id="examples"
                 ref={examplesRef}
                 className="docs-section rule-editor-docs-examples"
               >
@@ -356,11 +357,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 </ul>
               </div>
 
-              <div
-                // id="faqs"
-                ref={faqsRef}
-                className="docs-section rule-editor-docs-faqs"
-              >
+              <div ref={faqsRef} className="docs-section rule-editor-docs-faqs">
                 <div className="title">FAQs</div>
                 <RQCollapse
                   accordion
@@ -409,7 +406,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         ) : (
           <>
             {/* internal links */}
-            <div className="rule-editor-help-lists">
+            <div ref={documentationListRef} className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
                 Documentation for Modify Headers
@@ -417,20 +414,13 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               <ul className="rule-editor-help-list">
                 {documentationList.map(({ title, onClick }) => (
                   <li key={title}>
-                    {/* <a href={`#${title.toLowerCase()}`}> */}
                     <Button
-                      onClick={() => {
-                        toggleDocs();
-                        setTimeout(() => onClick(), 100);
-                        trackDocsSidebarPrimaryCategoryClicked(
-                          ruleType,
-                          title.toLowerCase()
-                        );
-                      }}
+                      onClick={() =>
+                        handleDocumentationListItemClick(title, onClick)
+                      }
                     >
                       {title}
                     </Button>
-                    {/* </a> */}
                   </li>
                 ))}
               </ul>
