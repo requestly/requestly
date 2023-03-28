@@ -5,6 +5,8 @@
 }
 
 .rule-editor-help-content {
+  font-size: 14px;
+  line-height: 22px;
   padding: 1.25rem 0px 0px 1.25rem;
 }
 
@@ -33,6 +35,16 @@ li {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.rule-editor-docs ul,
+.rule-editor-docs ol {
+  padding-left: 14px;
+  padding-right: 5px;
+}
+
+.rule-editor-docs li {
+  margin-bottom: 4px;
 }
 
 .rule-editor-help-lists {
@@ -132,13 +144,38 @@ li {
   border-radius: var(--border-radius-md);
 }
 
-.rule-editor-docs .rule-editor-docs-use-cases ul {
-  padding-left: 14px;
+.rule-editor-docs img {
+  block-size: auto;
+  max-inline-size: 100%;
 }
 
-.rule-editor-docs-use-cases li {
+.rule-editor-docs-use-cases li,
+.rule-editor-docs-examples li {
   list-style: disc;
   color: var(--text-gray);
+}
+
+.rule-editor-docs-create-rule li {
+  list-style: auto;
+  color: var(--text-gray);
+}
+
+.rule-editor-docs-create-rule li > span,
+.rule-editor-docs-use-cases li > span {
+  font-weight: 500;
+  color: var(--white);
+}
+
+.rule-editor-docs-create-rule li code {
+  font-size: 14px;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: var(--white);
+  background-color: #3e404486;
+}
+
+.rule-editor-docs-create-rule img {
+  margin-bottom: 1rem;
 }
 
 /* faqs collapse */

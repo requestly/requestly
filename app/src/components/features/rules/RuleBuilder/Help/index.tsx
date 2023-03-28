@@ -43,6 +43,12 @@ const externalLinks: { title: string; link: string }[] = [
   },
 ];
 
+const Link: React.FC<{ text: string; href: string }> = ({ text, href }) => (
+  <a target="_blank" rel="noreferrer" href={href}>
+    {text}
+  </a>
+);
+
 // type ScrollLogicalPosition = "center" | "end" | "nearest" | "start";
 
 // interface ScrollIntoViewOptions {
@@ -59,8 +65,8 @@ interface HelpProps {
 const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const introductionRef = useRef<HTMLDivElement | null>(null);
-  const argumentsRef = useRef<HTMLDivElement | null>(null);
   const demoVideoRef = useRef<HTMLDivElement | null>(null);
+  const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
   const useCasesRef = useRef<HTMLDivElement | null>(null);
   const testingRuleRef = useRef<HTMLDivElement | null>(null);
   const examplesRef = useRef<HTMLDivElement | null>(null);
@@ -94,12 +100,12 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         onClick: () => handleDocumentationList(introductionRef),
       },
       {
-        title: "Arguments",
-        onClick: () => handleDocumentationList(argumentsRef),
-      },
-      {
         title: "Demo",
         onClick: () => handleDocumentationList(demoVideoRef),
+      },
+      {
+        title: "How to create a redirect rule?",
+        onClick: () => handleDocumentationList(howToCreateRuleRef),
       },
       {
         title: "Popular Use cases",
@@ -163,30 +169,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 className="rule-editor-docs-intro"
               >
                 <div className="title rule-editor-docs-rule-name">
-                  Redirect request
+                  URL Redirect Rule
                 </div>
-                <div className="text-gray">
-                  Redirect rule allows to redirect scripts, APIs, Stylesheets,
-                  or any other resource from one environment to another.
-                </div>
-              </div>
-
-              <div
-                // id="arguments"
-                ref={argumentsRef}
-                className="docs-section rule-editor-docs-arguments"
-              >
-                <div className="title">Arguments</div>
-                <div>
-                  {`method (string)- The HTTP method of the request. GET | POST | PUT | DELETE etc.
-                    url (string) - The request URL.
-                    response (string)- The original response object represented as string. Eg:
-                    '{"id":1,"app":"requestly","feature":"modify-request"}'
-                    responseType (string)- The content-type of the HTTP response.
-                    requestHeaders (Object<string, string>)- The request headers sent to the server.
-                    requestData (string)- The HTTP request payload in case of POST | PUT | PATCH requests.
-                    responseJSON (JSON object)- The original response represented as JSON Object:`}
-                </div>
+                <p className="text-gray">
+                  The redirect Rule helps in changing the HTTP Requests location
+                  to a new destination as per the configured rule so that the
+                  response is transparently served from the new location as if
+                  that was the original request.
+                </p>
               </div>
 
               <div
@@ -204,30 +194,47 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
 
               <div
-                // id="popular use cases"
-                ref={useCasesRef}
-                className="docs-section rule-editor-docs-use-cases"
+                ref={howToCreateRuleRef}
+                className="docs-section rule-editor-docs-create-rule"
               >
-                <div className="title">Popular use cases</div>
-                <ul>
+                <div className="title">How to create a redirect rule?</div>
+                <img
+                  width="260px"
+                  height="100px"
+                  alt="redirect rule editor"
+                  src="/assets/img/rule-editor/redirect-rule-editor.png"
+                />
+                <ol>
                   <li>
-                    You want to work on front-end while back-end is not
-                    available or ready yet.
+                    <span>Source Condition:</span> Source condition is where you
+                    set criteria for which requests will match the. You can use{" "}
+                    <code>URL</code>, <code>Host</code> or{" "}
+                    <code>Path with Regex</code>, <code>Contains</code>,{" "}
+                    <code>Wildcard</code> or{" "}
+                    <code>Equals to match the source request</code>. Learn more
+                    about source conditions{" "}
+                    <Link
+                      text="here"
+                      href="https://docs.requestly.io/guides/source-condition"
+                    />
+                    .
                   </li>
                   <li>
-                    You want to test application behavior when provided altered
-                    data.
-                  </li>
-
-                  <li>
-                    You want to simulate errors by returning different status
-                    codes.
+                    <span>Destination URL:</span> The destination to which the
+                    users will be redirected based on the source condition.
                   </li>
                   <li>
-                    You want to modify API responses but don't have access to
-                    the back-end.
+                    <span>Source Filters:</span> You can define advanced
+                    targeting conditions and restrict rules to be applied on
+                    specific request types, request methods, or request
+                    payloads. Learn more about source filters{" "}
+                    <Link
+                      text="here"
+                      href="https://docs.requestly.io/browser-extension/chrome/features/advance-targeting"
+                    />
+                    .
                   </li>
-                </ul>
+                </ol>
               </div>
 
               <div
@@ -236,23 +243,81 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 className="docs-section rule-editor-docs-testing-rule"
               >
                 <div className="title">Testing rule</div>
+                <p className="text-gray">
+                  To test if the rule is properly configured or not, use the
+                  Test this Rule feature at the bottom of the Rule Editor. This
+                  can help you verify if the source conditions are matching to
+                  the URL you want to test or not.
+                </p>
+                <img
+                  width="280px"
+                  height="120px"
+                  alt="testing redirect rule"
+                  src="/assets/img/rule-editor/test-redirect-rule.png"
+                />
+              </div>
+
+              <div
+                // id="popular use cases"
+                ref={useCasesRef}
+                className="docs-section rule-editor-docs-use-cases"
+              >
+                <div className="title">Popular use cases</div>
                 <ul>
                   <li>
-                    You want to work on front-end while back-end is not
-                    available or ready yet.
+                    <span>Redirect Production to Local Environment:</span> Map
+                    your production scripts or APIs to your local running code
+                    and test your local code directly on production sites
+                    without deployment.{" "}
+                    <Link
+                      text="Here's"
+                      href="https://requestly.io/blog/how-to-load-local-js-files-on-live-production-sites"
+                    />{" "}
+                    an article with more explanation.
                   </li>
                   <li>
-                    You want to test application behavior when provided altered
-                    data.
+                    <span>Redirect to local System files (Map Local):</span>{" "}
+                    With the Map Local feature, you can directly replace the
+                    production scripts with the local files. Any change in the
+                    local files will be instantly reflected in production. You
+                    can find more details{" "}
+                    <Link
+                      text="here"
+                      href="https://docs.requestly.io/desktop-app/mac/features/map-local"
+                    />{" "}
+                    .
                   </li>
-
                   <li>
-                    You want to simulate errors by returning different status
-                    codes.
+                    <span>Test API version changes:</span> Suppose there is a
+                    new version of some API which you are using. To test the
+                    backward compatibility of the API, you can just set up a
+                    redirect rule to redirect all URLs from the older version to
+                    the newer version and check if your application behaves as
+                    expected. This way, you don't need to change a single line
+                    of your code and test the API upgrades.
                   </li>
                   <li>
-                    You want to modify API responses but don't have access to
-                    the back-end.
+                    <span>
+                      Fix Broken URLs, Redirect dead bookmarks, and Create URL
+                      shortcuts:
+                    </span>{" "}
+                    You can set up a redirect rule to fix some broken URLs,
+                    redirect the dead bookmarks to new working bookmarks and
+                    create URL shortcuts.
+                  </li>
+                  <li>
+                    <span>
+                      Swap Tag Manager scripts from production to staging/dev
+                      environment:
+                    </span>{" "}
+                    Test your dev implementation in tag manager scripts like
+                    Adobe DTM, Tealium Tag, and Google Tag Manager Containers
+                    before pushing them live on client websites. Learn more{" "}
+                    <Link
+                      text="here"
+                      href="https://requestly.io/blog/replace-adobe-launch-production-script-with-development-script"
+                    />
+                    .
                   </li>
                 </ul>
               </div>
@@ -265,8 +330,22 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                 <div className="title">Examples</div>
                 <ul>
                   <li>
-                    You want to work on front-end while back-end is not
-                    available or ready yet.
+                    <Link
+                      text="Redirect Google queries to Duckduckgo"
+                      href="https://app.requestly.io/rules#sharedList/1679464393107-Google-to-DuckDuckGo"
+                    />
+                  </li>
+                  <li>
+                    <Link
+                      text="Load Google Analytics in Debug Mode"
+                      href="https://app.requestly.io/shared-lists/viewer/1643984301107-Load-Google-Analytics-in-Debug-Mode?template=true"
+                    />
+                  </li>
+                  <li>
+                    <Link
+                      text="Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster"
+                      href="https://app.requestly.io/rules#sharedList/1679464587448-Change-the-Default-Dictionary-in-Adobe-Acrobat-Reader-to-Merriam-Webster"
+                    />
                   </li>
                 </ul>
               </div>
@@ -287,13 +366,10 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                   >
                     <p>
                       Please use{" "}
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
+                      <Link
+                        text="this"
                         href="https://docs.requestly.io/guides/know-if-rule-executed-on-page"
-                      >
-                        this
-                      </a>{" "}
+                      />{" "}
                       guide to check if the rule was executed or not
                     </p>
                   </Collapse.Panel>
@@ -313,13 +389,10 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     <p>
                       Right now this is not possible in Browser Extension. But
                       you can use our{" "}
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
+                      <Link
+                        text="desktop app"
                         href="https://docs.requestly.io/desktop-app/mac/features/map-local"
-                      >
-                        desktop app
-                      </a>{" "}
+                      />{" "}
                       to redirect to a local file (Map Local)
                     </p>
                   </Collapse.Panel>
