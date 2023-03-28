@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Row, Col, Input, Tooltip, Dropdown, Radio, Popconfirm } from "antd";
 import {
   FolderOpenOutlined,
@@ -47,6 +47,7 @@ const DestinationURLRow = ({
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(
     null
   );
+  const isDesktop = useMemo(() => isDesktopMode(), []);
   /** TODO: Remove this once MocksV2 Released */
   const toggleFilePickerModal = () => {
     setIsFilePickerModalActive(!isFilePickerModalActive);
@@ -195,7 +196,7 @@ const DestinationURLRow = ({
           showInputWarning() ? (
             <Tooltip
               title={
-                isDesktopMode()
+                isDesktop
                   ? "Update to latest version to redirect to Local File"
                   : "Map Local File is not supported in Extension. Use Requestly Desktop App instead."
               }
@@ -278,12 +279,30 @@ const DestinationURLRow = ({
               >
                 <Radio.Group value={pair.destinationType} onChange={showPopup}>
                   <Radio value={REDIRECT_DESTINATIONS.URL}>URL</Radio>
-                  <Radio
-                    value={REDIRECT_DESTINATIONS.MAP_LOCAL}
-                    disabled={!isDesktopMode()}
+                  <Tooltip
+                    trigger={!isDesktop ? ["hover", "focus"] : [null]}
+                    overlayInnerStyle={{ width: "442px" }}
+                    title={
+                      <>
+                        Map Local file option is available only in desktop app.{" "}
+                        <a
+                          href="https://requestly.io/downloads"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="tooltip-link"
+                        >
+                          Download now
+                        </a>
+                      </>
+                    }
                   >
-                    Local file
-                  </Radio>
+                    <Radio
+                      value={REDIRECT_DESTINATIONS.MAP_LOCAL}
+                      disabled={!isDesktop}
+                    >
+                      Local file
+                    </Radio>
+                  </Tooltip>
                   <Radio value={REDIRECT_DESTINATIONS.MOCK_PICKER}>
                     Pick from Files/Mock server
                   </Radio>
