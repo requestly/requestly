@@ -42,11 +42,11 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const currentPage = userPersona.page;
   const persona = userPersona.persona;
 
-  const shuffledPersonas = useMemo(() => {
+  const shuffledQ1 = useMemo(() => {
     return shuffleOptions(OptionsConfig[1].options);
   }, []);
 
-  const shuffledUseCases = useMemo(() => {
+  const shuffledQ2 = useMemo(() => {
     if (persona) {
       const { conditional } = OptionsConfig[2];
       const { options } = conditional.find((option: Conditional) =>
@@ -60,7 +60,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     return null;
   }, [persona]);
 
-  const shuffledReferrals = useMemo(() => {
+  const shuffledQ3 = useMemo(() => {
     return shuffleOptions(OptionsConfig[3].options);
   }, []);
 
@@ -136,11 +136,11 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const renderQuestionnaire = (optionSet: number) => {
     switch (optionSet) {
       case 1:
-        return renderOptions(shuffledPersonas, optionSet);
+        return renderOptions(shuffledQ1, optionSet);
       case 2:
-        return renderOptions(shuffledUseCases, optionSet);
+        return renderOptions(shuffledQ2, optionSet);
       case 3:
-        return renderOptions(shuffledReferrals, optionSet);
+        return renderOptions(shuffledQ3, optionSet);
       default:
         return null;
     }
