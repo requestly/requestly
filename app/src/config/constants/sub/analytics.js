@@ -143,6 +143,7 @@ export const GA_EVENTS = {
     PERSONA: "persona",
     USE_CASES: "use_cases",
     REFERRAL_CHANNEL: "referral_channel",
+    NUMBER_OF_EMPLOYEES: "number_of_employees",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
