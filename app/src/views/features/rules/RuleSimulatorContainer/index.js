@@ -1,10 +1,10 @@
 import React from "react";
 import RuleSimulator from "./RuleSimulator";
 
-const RuleSimulatorContainer = ({ mode: MODE }) => {
+const RuleSimulatorContainer = () => {
   return (
     <>
-      <RuleSimulator mode={MODE} />
+      <RuleSimulator />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Input,
   Button,
@@ -32,8 +32,8 @@ import {
 } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import RuleSimulatorModal from "components/features/rules/RuleSimulatorModal";
-import { cloneDeep } from "lodash";
 import { trackSimulateRulesEvent } from "modules/analytics/events/features/ruleSimulator";
+import { fixRuleRegexSourceFormat } from "utils/rules/misc";
 
 const STEP_TYPES = {
   REDIRECT: "redirect",
@@ -49,7 +49,9 @@ const STEP_TYPES = {
 
 const { Paragraph } = Typography;
 
-const RuleSimulator = ({ mode }) => {
+const RuleSimulator = () => {
+  const dispatch = useDispatch();
+
   const [showOutput, setShowOutput] = useState(false);
   const [outputSteps, setOutputSteps] = useState([]);
   //url entered by user to test
@@ -82,8 +84,10 @@ const RuleSimulator = ({ mode }) => {
     const ruleProcessor = RULE_PROCESSOR.getInstance(rule.ruleType);
     let simulatedUrl;
 
+    const regexValidatedRule = fixRuleRegexSourceFormat(dispatch, rule);
+
     simulatedUrl = ruleProcessor.process({
-      rule: cloneDeep(rule),
+      rule: regexValidatedRule,
       requestURL,
       originalHeaders: [],
       typeOfHeaders: "Request",
