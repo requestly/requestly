@@ -1,7 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
-import { Col, Input, Modal, Row } from "antd";
-import type { InputRef } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Col, Input, Modal, Row, Select } from "antd";
 import { StorageService } from "../../../../init";
 import { getAppMode } from "store/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
@@ -9,8 +15,16 @@ import { generateObjectId } from "utils/FormattingHelper";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
+import type { InputRef } from "antd";
 import { Rule, Status } from "types/rules";
 import "./duplicateRuleModal.scss";
+import {
+  getAvailableTeams,
+  getCurrentlyActiveWorkspace,
+} from "store/features/teams/selectors";
+import { TeamWorkspace } from "types/teamWorkspace";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import APP_CONSTANTS from "config/constants";
 
 interface Props {
   isOpen: boolean;
@@ -27,9 +41,34 @@ const DuplicateRuleModal: React.FC<Props> = ({
   rule,
   onDuplicate,
 }) => {
+  const navigate = useNavigate();
+  const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
   const [newRuleName, setNewRuleName] = useState<string>();
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(null);
   const ruleNameInputRef = useRef<InputRef>(null);
+
+  const isUsingWorkspaces = useMemo(() => {
+    return availableWorkspaces?.length > 0;
+  }, [availableWorkspaces?.length]);
+
+  const workspaceOptions = useMemo(() => {
+    if (!isUsingWorkspaces) {
+      return [];
+    }
+
+    return [
+      {
+        value: null,
+        label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
+      },
+      ...availableWorkspaces.map(({ id, name }) => ({
+        value: id,
+        label: name,
+      })),
+    ];
+  }, [availableWorkspaces, isUsingWorkspaces]);
 
   const onRuleNameChange = useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +78,9 @@ const DuplicateRuleModal: React.FC<Props> = ({
   );
 
   const duplicateRule = useCallback(async () => {
+    const isOperationInSameWorkspace =
+      selectedWorkspaceId === currentlyActiveWorkspace.id;
+
     const newRule: Rule = {
       ...rule,
       creationDate: generateObjectCreationDate(),
@@ -49,13 +91,47 @@ const DuplicateRuleModal: React.FC<Props> = ({
       status: Status.INACTIVE,
     };
 
-    await StorageService(appMode).saveRuleOrGroup(newRule);
-    toast.success("Duplicated the rule successfully.");
+    if (!isOperationInSameWorkspace) {
+      newRule.groupId =
+        APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+    }
+
+    try {
+      await StorageService(appMode).saveRuleOrGroup(newRule, {
+        workspaceId: selectedWorkspaceId,
+      });
+    } catch (err) {
+      toast.error("Something went wrong!");
+      return;
+    }
+
+    if (isOperationInSameWorkspace) {
+      toast.success("Duplicated the rule successfully.");
+      redirectToRuleEditor(navigate, newRule.id);
+    } else {
+      toast.success(
+        "Duplicated the rule in the selected workspace successfully."
+      );
+    }
+
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType);
+    trackRuleDuplicatedEvent(
+      rule.ruleType,
+      isOperationInSameWorkspace ? "same" : "different"
+    );
+
     onDuplicate(newRule);
     close();
-  }, [appMode, onDuplicate, rule, close, newRuleName]);
+  }, [
+    rule,
+    newRuleName,
+    appMode,
+    selectedWorkspaceId,
+    currentlyActiveWorkspace.id,
+    onDuplicate,
+    close,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,6 +142,12 @@ const DuplicateRuleModal: React.FC<Props> = ({
   useEffect(() => {
     setNewRuleName(generateCopiedRuleName(rule.name));
   }, [rule]);
+
+  useEffect(() => {
+    if (isUsingWorkspaces) {
+      setSelectedWorkspaceId(currentlyActiveWorkspace.id);
+    }
+  }, [availableWorkspaces, currentlyActiveWorkspace, isUsingWorkspaces]);
 
   return !rule ? null : (
     <Modal
@@ -90,6 +172,19 @@ const DuplicateRuleModal: React.FC<Props> = ({
               />
             </Col>
           </Row>
+          {isUsingWorkspaces ? (
+            <Row align="middle">
+              <Col span={8}>Target workspace</Col>
+              <Col span={16}>
+                <Select
+                  className="workspace-selector"
+                  value={selectedWorkspaceId}
+                  onChange={setSelectedWorkspaceId}
+                  options={workspaceOptions}
+                />
+              </Col>
+            </Row>
+          ) : null}
         </div>
       </div>
     </Modal>

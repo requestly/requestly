@@ -61,7 +61,7 @@ export const mergeRecordsAndSaveToFirebase = async (
     formattedObject,
     SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
     appMode,
-    true
+    { forceSync: true }
   );
   return mergedRecords;
 };

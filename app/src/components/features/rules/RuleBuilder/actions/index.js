@@ -26,8 +26,7 @@ export const setCurrentlySelectedRule = (
   newRule,
   warnForUnsavedChanges = false
 ) => {
-  const { MODE } = getModeData(new URL(window.location.href));
-  if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT && warnForUnsavedChanges) {
+  if (warnForUnsavedChanges) {
     setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
   }
 

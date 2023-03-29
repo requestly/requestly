@@ -48,7 +48,7 @@ const NetworkLogDetails: React.FC<Props> = ({
               </NetworkLogProperty>
             ) : null}
             <NetworkLogProperty label="Method">
-              {method.toUpperCase()}
+              {method?.toUpperCase() ?? "GET"}
             </NetworkLogProperty>
             <NetworkPayload label="Payload" payload={requestData} />
           </div>

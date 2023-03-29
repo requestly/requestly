@@ -4,17 +4,10 @@ import { multipleChoiceOption } from "./types";
 export const setUserPersona = (
   dispatch: any,
   value: string,
-  clear: boolean
+  clear: boolean,
+  key: string
 ) => {
-  dispatch(actions.updateUserPersona(clear ? "" : value));
-};
-
-export const setPersonaReferralChannel = (
-  dispatch: any,
-  value: string,
-  clear: boolean
-) => {
-  dispatch(actions.updatePersonaReferralChannel(clear ? "" : value));
+  dispatch(actions.updateUserPersona({ value: clear ? "" : value, key }));
 };
 
 export const setPersonaUseCase = (
