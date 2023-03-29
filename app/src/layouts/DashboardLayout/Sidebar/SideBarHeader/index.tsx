@@ -1,4 +1,4 @@
-import React, { createElement } from "react";
+import React from "react";
 import { Button, Col, Row } from "antd";
 //@ts-ignore
 import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
@@ -26,10 +26,6 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
     trackSidebarClicked("collapse_button");
   };
 
-  const trigger = createElement(collapsed ? RightChevron : LeftChevron, {
-    className: "trigger",
-  });
-
   return (
     <Row
       align="middle"
@@ -48,7 +44,13 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
         <div className="ml-auto sidebar-collapse-btn-container">
           <Button
             type="text"
-            icon={trigger}
+            icon={
+              collapsed ? (
+                <RightChevron className="trigger" />
+              ) : (
+                <LeftChevron className="trigger" />
+              )
+            }
             onClick={toggle}
             className="siderbar-collapse-btn"
           />
