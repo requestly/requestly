@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Tooltip, Radio, Popconfirm } from "antd";
 import { RQButton } from "lib/design-system/components";
+import { InfoTag } from "components/misc/InfoTag";
 import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
@@ -194,9 +195,37 @@ const DestinationURLRow = ({
         >
           {pair.destination ? "Change file" : " Select file"}
         </RQButton>
-        <span className="destination-file-path">
+        <span
+          className={`${
+            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) &&
+            "highlight-file-path"
+          } destination-file-path`}
+        >
           {" "}
           {pair.destination.length ? pair.destination : " No file chosen"}
+        </span>
+        <span>
+          {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
+            <InfoTag
+              title="DESKTOP ONLY RULE"
+              tooltipWidth="415px"
+              description={
+                <>
+                  This rule cannot be executed using Extension because the
+                  request redirects to a local file that cannot be accessed by
+                  the browser.{" "}
+                  <a
+                    className="tooltip-link"
+                    href="https://requestly.io/downloads"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Use this on Desktop App!
+                  </a>
+                </>
+              }
+            />
+          )}
         </span>
       </Col>
     );

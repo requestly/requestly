@@ -17,6 +17,11 @@
 .destination-file-path {
   font-size: 12px;
 }
+.destination-file-path.highlight-file-path {
+  color: #fafa19;
+  opacity: 0.7;
+}
+
 .redirect-destination-container.ant-row .picker-container {
   display: flex;
   align-items: center;
@@ -30,6 +35,6 @@
 }
 .tooltip-link,
 .tooltip-link:hover {
-  color: inherit;
+  color: white;
   text-decoration: underline;
 }
