@@ -277,7 +277,8 @@ const RuleBuilder = (props) => {
   useEffect(() => {
     if (
       MODE === RULE_EDITOR_CONFIG.MODES.EDIT &&
-      isDesktopOnlyRule(currentlySelectedRuleData)
+      isDesktopOnlyRule(currentlySelectedRuleData) &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
     ) {
       if (
         currentlySelectedRuleConfig.TYPE ===
@@ -285,7 +286,12 @@ const RuleBuilder = (props) => {
       )
         trackDesktopRuleViewedOnExtension("map_local");
     }
-  }, [MODE, currentlySelectedRuleConfig.TYPE, currentlySelectedRuleData]);
+  }, [
+    MODE,
+    appMode,
+    currentlySelectedRuleConfig.TYPE,
+    currentlySelectedRuleData,
+  ]);
 
   useEffect(() => {
     return () => {
