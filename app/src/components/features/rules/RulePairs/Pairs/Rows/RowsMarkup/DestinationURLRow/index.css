@@ -31,7 +31,7 @@
   font-size: 1rem;
   cursor: pointer;
   color: var(--text-gray);
-  margin-top: 2px;
+  align-self: center;
 }
 .tooltip-link,
 .tooltip-link:hover {
