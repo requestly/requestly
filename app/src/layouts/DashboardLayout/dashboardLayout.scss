@@ -3,10 +3,6 @@
 }
 
 #requestly-dashboard-layout {
-  .hp-app-layout {
-    height: 100%;
-  }
-
   .hp-content-main {
     overflow: auto;
   }
@@ -14,6 +10,10 @@
 
 @media screen and (max-width: 768px) {
   #requestly-dashboard-layout {
+    .hp-app-layout {
+      height: 100%;
+    }
+
     .hidden-on-small-screen {
       display: none;
     }
