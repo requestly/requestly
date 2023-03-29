@@ -4,6 +4,8 @@ import { StorageService } from "../../init";
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
+import { cloneDeep } from "lodash";
+import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -169,27 +171,45 @@ export const getExecutionLogsId = (ruleId) => {
   return `execution_${ruleId}`;
 };
 
-// TODO: remove it- commenting it for now as no header found to be unmodifiable from this list
-// export const canBrowserModifyHeader = (header = "") => {
-//   if (isDesktopMode()) return true;
-//   const UNMODIFIABLE_HEADERS = [
-//     "Authorization",
-//     "Cache-Control",
-//     "Connection",
-//     "Content-Length",
-//     "Host",
-//     "If-Modified-Since",
-//     "If-None-Match",
-//     "If-Range",
-//     "Partial-Data",
-//     "Pragma",
-//     "Proxy-Authorization",
-//     "Proxy-Connection",
-//     "Transfer-Encoding",
-//   ];
+/**
+ * Check if the regex string contains the forward and backward slashes or not
+ * @param {string} regexStr
+ * @returns {boolean}
+ */
+export const isRegexFormat = (regexStr) => {
+  const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
+  return regexFormat.test(regexStr);
+};
 
-//   return !UNMODIFIABLE_HEADERS.find(
-//     (unmodifiableHeader) =>
-//       unmodifiableHeader.toLowerCase() === header.toLowerCase()
-//   );
-// };
+/**
+ * Formats regex string by adding forward and trailing slashes
+ * @param {string} regexStr
+ * @returns {string}
+ */
+export const formatRegexSource = (regexStr) => {
+  try {
+    return regexStr.replace(/^\/?([^/]+(?:\/[^/]+)*)\/?$/, "/$1/");
+  } catch {
+    return regexStr;
+  }
+};
+
+export const fixRuleRegexSourceFormat = (dispatch, rule) => {
+  const rulePairs = cloneDeep(rule.pairs);
+  rulePairs.forEach((pair, i, self) => {
+    if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+      if (!isRegexFormat(pair.source.value)) {
+        self[i].source.value = formatRegexSource(pair.source.value);
+      }
+    }
+  });
+
+  const fixedRule = {
+    ...rule,
+    pairs: rulePairs,
+  };
+
+  setCurrentlySelectedRule(dispatch, fixedRule);
+
+  return fixedRule;
+};
