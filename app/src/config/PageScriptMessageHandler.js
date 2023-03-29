@@ -79,9 +79,26 @@ const PageScriptMessageHandler = {
       event.data &&
       event.data.source === this.constants.CONTENT_SCRIPT
     ) {
+      if (event.data.action === "extension_events") {
+        console.log("!!!debug", "PSMH message", event.data);
+        // setTimeout(
+        //   () => this.sendResponse(event.data, "response back from psmh"),
+        //   2100
+        // );
+        // this.sendResponse(event.data,"response back from psmh")
+        this.acknowledgeExtensionEvents(event.data).then(() => {
+          console.log("!!!debug", "send msg to clear events from storage");
+        });
+      }
       Logger.log("Received message:", event.data);
       this.invokeCallback(event.data);
     }
+  },
+
+  acknowledgeExtensionEvents: function (eventData) {
+    return new Promise((resolve, reject) => {
+      resolve(this.sendResponse(eventData, "events response back from psmh"));
+    });
   },
 
   init: function () {

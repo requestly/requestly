@@ -638,7 +638,13 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     // Requests which are fired from non-tab pages like background, chrome-extension page
     return;
   }
-
+  //Remove it, added just to test
+  BG.Methods.sendMessageToApp({
+    action: RQ.EXTENSIO1N_MESSAGES.EXTENSION_EVENTS,
+    data: ["data1", "data2"],
+  })
+    .then((res) => console.log("!!!debug", "sendMsg resp", res))
+    .catch((e) => console.log("!!!debug", "error", e));
   BG.Methods.setExtensionIconActive(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
@@ -974,6 +980,29 @@ BG.Methods.sendMessage = function (messageObject, callback) {
   );
 };
 
+BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
+  const sendMessage = (messageObject, tabId) => {
+    return new Promise((resolve, reject) => {
+      chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, messageObject, (response) => {
+          if (response) {
+            resolve(response);
+          } else {
+            reject(new Error("No response from app"));
+          }
+        });
+      });
+    });
+  };
+
+  return Promise.race([
+    sendMessage(messageObject),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), timeout)
+    ),
+  ]);
+};
+
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
   if (details.reason === "install") {
     // Set installation date in storage so that we can take decisions based on usage time in future
@@ -1115,6 +1144,9 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
         BG.Methods.toggleExtensionStatus().then(sendResponse);
         return true;
+
+      case RQ.EXTENSIO1N_MESSAGES.NOTIFY_APP_LOADED:
+        BG.Methods.onAppLoadedNotification(sender.tab.id);
     }
   });
 };
