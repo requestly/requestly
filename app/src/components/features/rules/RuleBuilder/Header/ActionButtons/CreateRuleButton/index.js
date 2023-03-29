@@ -17,7 +17,7 @@ import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../actions";
-import { fixSourceRegexFormat, validateRule } from "./actions";
+import { validateRule } from "./actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -31,6 +31,7 @@ import {
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
+import { fixRuleRegexSourceFormat } from "utils/rules/misc";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -62,12 +63,15 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
     //Pre-validation regex fix
-    fixSourceRegexFormat(dispatch, currentlySelectedRuleData);
+    const fixedRuleData = fixRuleRegexSourceFormat(
+      dispatch,
+      currentlySelectedRuleData
+    );
     //Validation
-    const ruleValidation = validateRule(currentlySelectedRuleData, dispatch);
+    const ruleValidation = validateRule(fixedRuleData, dispatch);
     if (ruleValidation.result) {
       saveRule(appMode, {
-        ...currentlySelectedRuleData,
+        ...fixedRuleData,
         createdBy,
         currentOwner,
         lastModifiedBy,

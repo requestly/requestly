@@ -47,6 +47,7 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.1.2",
     "@devtools-ds/themes": "^1.2.1",
+    "@growthbook/growthbook-react": "^0.13.0",
     "@monaco-editor/react": "^4.4.6",
     "@reduxjs/toolkit": "^1.8.3",
     "@requestly/mock-server": "^0.0.1",

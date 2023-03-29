@@ -1,0 +1,15 @@
+.invite-member-modal-header {
+  margin: 1.2rem 0 8px 0;
+}
+
+.inivite-modal-oops-icon {
+  margin-left: 5px;
+}
+
+.send-workspace-invite-btn {
+  margin-left: 8px;
+}
+
+.text-sm.no-account-message {
+  line-height: 22px;
+}

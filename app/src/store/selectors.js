@@ -209,3 +209,7 @@ export const getUserPreferences = (state) => {
 export const getUserPersonaSurveyDetails = (state) => {
   return getGlobalState(state)["userPersona"];
 };
+
+export const getUserAttributes = (state) => {
+  return getGlobalState(state)["userAttributes"];
+};

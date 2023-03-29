@@ -39,7 +39,7 @@ import "./index.css";
 import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
-import featureFlag from "utils/feature-flag";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 interface Props {
   isNew?: boolean;
@@ -65,6 +65,8 @@ const MockEditor: React.FC<Props> = ({
 
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+
+  const isAiResponseActive = useFeatureValue("ai_mock_response", false);
 
   const [id] = useState<string>(mockData.id); // No need to edit this. Set by firebase
   const [type] = useState<MockType>(mockData?.type || mockType);
@@ -429,7 +431,7 @@ const MockEditor: React.FC<Props> = ({
             defaultActiveKey="1"
             items={editors}
             tabBarExtraContent={
-              featureFlag.getValue("ai-mock-response", false) ?
+              isAiResponseActive ?
               (<Button className="generate-ai-response-button" type="primary" onClick={() => setIsAiResponseModalOpen(true)}>
                 <BsStars />&nbsp;AI Response
               </Button>): null
