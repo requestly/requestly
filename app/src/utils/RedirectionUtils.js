@@ -41,14 +41,9 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (
-  navigate,
-  ruleId,
-  source,
-  isDesktopOnlyRule
-) => {
+export const redirectToRuleEditor = (navigate, ruleId, source) => {
   navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
-    state: { source, isDesktopOnlyRule },
+    state: { source },
   });
 };
 

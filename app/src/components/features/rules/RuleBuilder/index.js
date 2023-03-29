@@ -42,6 +42,7 @@ import {
   trackDesktopRuleViewedOnExtension,
 } from "modules/analytics/events/common/rules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { isDesktopOnlyRule } from "utils/rules/misc";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -274,15 +275,17 @@ const RuleBuilder = (props) => {
   }, [currentlySelectedRuleConfig.TYPE, state]);
 
   useEffect(() => {
-    const isDesktopOnlyRule = state?.isDesktopOnlyRule;
-    if (isDesktopOnlyRule) {
+    if (
+      MODE === RULE_EDITOR_CONFIG.MODES.EDIT &&
+      isDesktopOnlyRule(currentlySelectedRuleData)
+    ) {
       if (
         currentlySelectedRuleConfig.TYPE ===
         GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
       )
         trackDesktopRuleViewedOnExtension("map_local");
     }
-  }, [state?.isDesktopOnlyRule, currentlySelectedRuleConfig.TYPE]);
+  }, [MODE, currentlySelectedRuleConfig.TYPE, currentlySelectedRuleData]);
 
   useEffect(() => {
     return () => {
