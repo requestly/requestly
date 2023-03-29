@@ -4,9 +4,8 @@ import { actions } from "../../../../../../../../store";
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // LODASH
-import { cloneDeep, inRange } from "lodash";
+import { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 
 export const validateRule = (rule, dispatch) => {
@@ -400,22 +399,4 @@ export const ruleModifiedAnalytics = (user) => {
     const data = new Date().getTime();
     usageMetrics(data);
   }
-};
-
-export const fixSourceRegexFormat = (dispatch, rule) => {
-  const ruleCopy = cloneDeep(rule);
-  ruleCopy.pairs.forEach((pair, i, self) => {
-    if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
-      const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
-      if (!regexFormat.test(pair.source.value)) {
-        const sourceValueInRegexFormat = pair.source.value.replace(
-          /^\/?([^/]+(?:\/[^/]+)*)\/?$/,
-          "/$1/"
-        );
-        self[i].source.value = sourceValueInRegexFormat;
-      }
-    }
-  });
-
-  setCurrentlySelectedRule(dispatch, ruleCopy);
 };

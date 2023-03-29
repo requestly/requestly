@@ -139,6 +139,10 @@ const INITIAL_STATE = {
   userPreferences: {
     isRedirectRuleTutorialModalShown: false,
   },
+
+  userAttributes: {
+    deviceId: null,
+  }
 };
 
 export default INITIAL_STATE;

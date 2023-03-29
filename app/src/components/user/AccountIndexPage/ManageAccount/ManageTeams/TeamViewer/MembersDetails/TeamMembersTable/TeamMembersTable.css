@@ -51,3 +51,16 @@
   .ant-table-cell {
   padding: 1.25rem 4px 1.25rem 2px;
 }
+
+.pending-tag-container {
+  border: 1px solid #4F5053;
+  border-radius: 47px;
+  color: #FF6905;
+  padding: 8px;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+.member-email {
+ color: #B0B0B5;
+}
