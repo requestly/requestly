@@ -360,7 +360,7 @@ const RuleBuilder = (props) => {
           />
         </Col>
 
-        {isRedirectRuleWithFeatureFlagOn ? (
+        {!props.isSharedListViewRule && isRedirectRuleWithFeatureFlagOn ? (
           <>
             {!showDocs ? (
               <Button
