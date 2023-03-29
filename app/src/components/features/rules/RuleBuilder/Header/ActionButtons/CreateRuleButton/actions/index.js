@@ -4,11 +4,9 @@ import { actions } from "../../../../../../../../store";
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // LODASH
-import { cloneDeep, inRange } from "lodash";
+import { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
-import { formatRegexSource, isRegexFormat } from "utils/rules/misc";
 
 export const validateRule = (rule, dispatch) => {
   let output;
@@ -401,24 +399,4 @@ export const ruleModifiedAnalytics = (user) => {
     const data = new Date().getTime();
     usageMetrics(data);
   }
-};
-
-export const fixSourceRegexFormat = (dispatch, rule) => {
-  const rulePairs = cloneDeep(rule.pairs);
-  rulePairs.forEach((pair, i, self) => {
-    if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
-      if (!isRegexFormat(pair.source.value)) {
-        self[i].source.value = formatRegexSource(pair.source.value);
-      }
-    }
-  });
-
-  const fixedRule = {
-    ...rule,
-    pairs: rulePairs,
-  };
-
-  setCurrentlySelectedRule(dispatch, fixedRule);
-
-  return fixedRule;
 };
