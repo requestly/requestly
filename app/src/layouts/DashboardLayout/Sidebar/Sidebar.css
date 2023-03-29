@@ -247,11 +247,6 @@
   text-overflow: inherit;
 }
 
-.siderbar-menu.ant-menu.ant-menu-inline-collapsed.siderbar-menu-collapsed
-  div.ant-menu-item-group-title {
-  text-align: center;
-}
-
 .siderbar-menu .ant-menu-item {
   display: flex;
   align-items: center;

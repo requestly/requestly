@@ -93,9 +93,8 @@ const givenRoutes = [
 ];
 
 const MenuItem = (props) => {
-  const { onClose, collapsed } = props;
+  const { onClose } = props;
 
-  const [collapsedFlag, setCollapsedFlag] = useState(false);
   // Location
   const location = useLocation();
   const { pathname } = location;
@@ -158,16 +157,6 @@ const MenuItem = (props) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
-
-  useEffect(() => {
-    if (collapsed) {
-      setTimeout(() => {
-        setCollapsedFlag(collapsed); // on collapse, we align the text to center so do not want to do it immediately which induces a jerking motion of sidebar
-      }, 300);
-    } else {
-      setCollapsedFlag(collapsed);
-    }
-  }, [collapsed]);
 
   const menuItem = myRoutes.map((item) => {
     if (item.header) {
@@ -283,8 +272,7 @@ const MenuItem = (props) => {
       style={{
         paddingBottom: "2.4rem",
       }}
-      className={`siderbar-menu
-      ${collapsedFlag ? " siderbar-menu-collapsed" : ""}`}
+      className={`siderbar-menu`}
     >
       {menuItem}
     </Menu>
