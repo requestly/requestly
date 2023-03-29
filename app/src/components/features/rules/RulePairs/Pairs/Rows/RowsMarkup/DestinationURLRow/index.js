@@ -208,7 +208,7 @@ const DestinationURLRow = ({
           {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
             <InfoTag
               title="DESKTOP ONLY RULE"
-              tooltipWidth="415px"
+              tooltipWidth="400px"
               description={
                 <>
                   This rule cannot be executed using Extension because the
