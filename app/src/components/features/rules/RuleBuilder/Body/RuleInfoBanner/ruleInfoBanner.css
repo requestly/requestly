@@ -1,5 +1,5 @@
 .rule-info-banner-container.ant-row {
-  margin-bottom: 5px;
+  margin-bottom: 25px;
 }
 
 .rule-info-banner.ant-alert {
@@ -17,6 +17,9 @@
 .rule-info-banner.ant-alert .rule-info-banner-icon svg {
   height: 13px;
   width: 13px;
+}
+.rule-info-banner-container.ant-row .ant-alert-message {
+  max-width: 650px;
 }
 
 .rule-info-banner .rule-info-banner-text {

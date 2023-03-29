@@ -111,6 +111,7 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
             <RuleInfoBanner
               appMode={appMode}
               ruleType={currentlySelectedRuleConfig.TYPE}
+              ruleData={currentlySelectedRuleData}
             />
             {renderWarning()}
 
