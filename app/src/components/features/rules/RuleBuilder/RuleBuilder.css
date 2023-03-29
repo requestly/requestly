@@ -3,14 +3,14 @@
   top: 20px;
   right: 20px;
   z-index: 1;
-  padding: 20px;
+  padding: 15px 16px;
   display: inline-flex;
   align-items: center;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--white);
   border: 1px solid var(--border-dark);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-sm);
   background-color: var(--component-dark-background);
 }
 
