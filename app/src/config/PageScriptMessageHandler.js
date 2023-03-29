@@ -85,9 +85,9 @@ const PageScriptMessageHandler = {
         //   () => this.sendResponse(event.data, "response back from psmh"),
         //   2100
         // );
-        // this.sendResponse(event.data,"response back from psmh")
+
         this.acknowledgeExtensionEvents(event.data).then(() => {
-          console.log("!!!debug", "send msg to clear events from storage");
+          console.log("!!!debug", "msg sent to clear events from storage");
         });
       }
       Logger.log("Received message:", event.data);
@@ -97,7 +97,12 @@ const PageScriptMessageHandler = {
 
   acknowledgeExtensionEvents: function (eventData) {
     return new Promise((resolve, reject) => {
-      resolve(this.sendResponse(eventData, "events response back from psmh"));
+      resolve(
+        this.sendResponse(eventData, {
+          msg: "events response back from psmh. Can clear storage",
+          received: true,
+        })
+      );
     });
   },
 

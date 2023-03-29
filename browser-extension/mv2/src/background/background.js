@@ -13,6 +13,7 @@ BG = window.BG = {
     planName: "",
     isLoggedIn: "",
   },
+  isAppOnline: false,
   extensionStatusContextMenuId: -1,
   modifiedRequestsPool: new Queue(1000),
 };
@@ -638,13 +639,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     // Requests which are fired from non-tab pages like background, chrome-extension page
     return;
   }
-  //Remove it, added just to test
-  BG.Methods.sendMessageToApp({
-    action: RQ.EXTENSIO1N_MESSAGES.EXTENSION_EVENTS,
-    data: ["data1", "data2"],
-  })
-    .then((res) => console.log("!!!debug", "sendMsg resp", res))
-    .catch((e) => console.log("!!!debug", "error", e));
   BG.Methods.setExtensionIconActive(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
@@ -983,24 +977,56 @@ BG.Methods.sendMessage = function (messageObject, callback) {
 BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
   const sendMessage = (messageObject, tabId) => {
     return new Promise((resolve, reject) => {
-      chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, messageObject, (response) => {
-          if (response) {
-            resolve(response);
-          } else {
-            reject(new Error("No response from app"));
-          }
-        });
+      chrome.tabs.sendMessage(tabId, messageObject, (response) => {
+        if (response) {
+          resolve(response);
+        } else {
+          reject(new Error("No response from app"));
+        }
       });
     });
   };
 
   return Promise.race([
-    sendMessage(messageObject),
+    sendMessage(messageObject, tabId),
     new Promise((_, reject) =>
       setTimeout(() => reject(new Error("timeout")), timeout)
     ),
   ]);
+};
+
+BG.Methods.sendExtensionEvents = (tabId = null, retryCounter = 0) => {
+  let appTabId = tabId;
+  if (!appTabId) {
+    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
+      if (tabs.length > 0) {
+        appTabId = tabs[0].id;
+      } else {
+        BG.isAppOnline = false;
+      }
+    });
+  }
+
+  if (!BG.isAppOnline) {
+    return;
+  }
+
+  const extensionEventsMessage = {
+    action: RQ.EXTENSION_MESSAGES.EXTENSION_EVENTS,
+    events: {}, // it should fetched from a separate function only after all the checks and shouldn't be passed as params
+  };
+  BG.Methods.sendMessageToApp(extensionEventsMessage, appTabId)
+    .then((res) => {
+      console.log("!!!debug", "resp msg to app", res);
+      if (res.received) {
+        console.log("!!!debug", "ack in bg!! clear the events!!");
+      }
+    })
+    .catch(() => {
+      if (retryCounter < 3) {
+        BG.Methods.sendExtensionEvents(++retryCounter);
+      }
+    });
 };
 
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
@@ -1145,7 +1171,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.toggleExtensionStatus().then(sendResponse);
         return true;
 
-      case RQ.EXTENSIO1N_MESSAGES.NOTIFY_APP_LOADED:
+      case RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED:
         BG.Methods.onAppLoadedNotification(sender.tab.id);
     }
   });
@@ -1173,6 +1199,11 @@ BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
+};
+
+BG.Methods.onAppLoadedNotification = (tabId) => {
+  BG.isAppOnline = true;
+  BG.Methods.sendExtensionEvents(tabId);
 };
 
 BG.Methods.onContentScriptLoadedNotification = async (tabId) => {

@@ -21,7 +21,10 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAndUpdateInstallationDate, isDesktopMode } from "utils/Misc";
 import firebaseApp from "firebase.js";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import {
+  isExtensionInstalled,
+  notifyAppLoadedToExtension,
+} from "actions/ExtensionActions";
 import {
   trackBackgroundProcessStartedEvent,
   trackDesktopAppStartedEvent,
@@ -202,6 +205,12 @@ const useAppModeInitializer = () => {
       }
     });
   }, [appMode, hasAppModeBeenSet]);
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      notifyAppLoadedToExtension();
+    }
+  }, [appMode]);
 };
 
 export default useAppModeInitializer;
