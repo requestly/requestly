@@ -16,6 +16,7 @@ import {
   trackClickMock,
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
+import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import "./index.css";
 
 const DestinationURLRow = ({
@@ -192,6 +193,7 @@ const DestinationURLRow = ({
     return (
       <Col span={24} className="picker-container">
         <RQButton
+          onPointerEnter={() => trackDesktopActionInterestCaptured("map_local")}
           disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
           type="default"
           onClick={() => {
@@ -301,6 +303,9 @@ const DestinationURLRow = ({
                         ? ["hover", "focus"]
                         : [null]
                     }
+                    onOpenChange={(open) => {
+                      if (open) trackDesktopActionInterestCaptured("map_local");
+                    }}
                     overlayInnerStyle={{ width: "442px" }}
                     title={
                       <>

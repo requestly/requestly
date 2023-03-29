@@ -37,7 +37,10 @@ import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import { useDispatch, useSelector } from "react-redux";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import {
+  trackRuleEditorViewed,
+  trackDesktopRuleViewedOnExtension,
+} from "modules/analytics/events/common/rules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 
 //CONSTANTS
@@ -269,6 +272,17 @@ const RuleBuilder = (props) => {
     if (!ruleType || !source) return;
     trackRuleEditorViewed(source, ruleType);
   }, [currentlySelectedRuleConfig.TYPE, state]);
+
+  useEffect(() => {
+    const isDesktopOnlyRule = state?.isDesktopOnlyRule;
+    if (isDesktopOnlyRule) {
+      if (
+        currentlySelectedRuleConfig.TYPE ===
+        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+      )
+        trackDesktopRuleViewedOnExtension("map_local");
+    }
+  }, [state?.isDesktopOnlyRule, currentlySelectedRuleConfig.TYPE]);
 
   useEffect(() => {
     return () => {
