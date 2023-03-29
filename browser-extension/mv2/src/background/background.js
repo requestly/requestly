@@ -1,3 +1,72 @@
+// import { startEventBatchWriter } from "./EventWriter";
+
+/* can be moved to a different file --- EventWriter.js */
+
+let eventsBatch = [];
+let batchWriterInterval = null;
+
+const LOCAL_ANALYTICS_KEY = "analytics_event";
+
+function addEventToBatch(event) {
+  // export
+  // todo: generate uuid for each event
+  eventsBatch.push(event);
+}
+
+async function writeBatchToLocalStorage() {
+  const batchedEvents = [...getBatchedEvents()];
+
+  if (batchedEvents.length) {
+    await RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY).then(
+      async (storageEvents) => {
+        if (storageEvents) batchedEvents.push(...storageEvents);
+
+        const newAnalyticsEntry = {};
+        newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = batchedEvents;
+        await RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
+          console.log("BG to LOCAL: Events Write complete")
+        );
+      }
+    );
+  }
+}
+
+function getBatchedEvents() {
+  // remove from the local batched array
+  const batchedEvents = [...eventsBatch];
+  eventsBatch = [];
+  return batchedEvents;
+}
+
+function startEventBatchWriter(intervalTime = 2000) {
+  // export
+  if (!batchWriterInterval) {
+    batchWriterInterval = setInterval(async () => {
+      await writeBatchToLocalStorage();
+    }, intervalTime);
+  }
+
+  return batchWriterInterval;
+}
+
+async function getEvents() {
+  // export
+  const events = RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY)
+    .then((storedEvents) => {
+      // these are considered the events that are ready to be sent
+      // not considering events in `eventsBatch` here
+      return storedEvents;
+    })
+    .catch((err) => {
+      console.log("BG: error getting analytics events from local storage", err);
+      return null;
+    });
+
+  return events; // promise that resolves to events
+}
+
+/* -------------- */
+
 let BG = {};
 BG = window.BG = {
   Methods: {},
@@ -1004,6 +1073,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
     sendResponse
   ) {
     switch (message.action) {
+      case RQ.CLIENT_MESSAGES.ADD_ANALYTICS_EVENT:
+        addEventToBatch(message.payload);
+        break;
+
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
         if (message.url) {
           sendResponse(
@@ -1440,6 +1513,8 @@ BG.Methods.init = function () {
   BG.Methods.listenDevtools();
 
   BG.Methods.listenCommands();
+
+  startEventBatchWriter();
 };
 
 // Background Initialization Code
