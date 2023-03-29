@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Tooltip, Radio, Popconfirm } from "antd";
+import { RQButton } from "lib/design-system/components";
 import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
@@ -15,7 +16,6 @@ import {
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import "./index.css";
-import { RQButton } from "lib/design-system/components";
 
 const DestinationURLRow = ({
   rowIndex,
@@ -25,6 +25,7 @@ const DestinationURLRow = ({
   isInputDisabled,
 }) => {
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
+
   //Component State
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [
@@ -201,7 +202,7 @@ const DestinationURLRow = ({
     );
   };
 
-  const renderDestinationAction = () => {
+  const renderDestinationRow = () => {
     switch (pair.destinationType) {
       case RedirectDestinationType.URL:
         return renderRedirectURLInput();
@@ -289,7 +290,7 @@ const DestinationURLRow = ({
               </Popconfirm>
             </Col>
             <Col span={24} className="destination-action">
-              {renderDestinationAction()}
+              {renderDestinationRow()}
             </Col>
           </Row>
         </Col>
