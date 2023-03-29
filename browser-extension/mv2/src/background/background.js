@@ -17,6 +17,7 @@ async function writeBatchToLocalStorage() {
   const batchedEvents = [...getBatchedEvents()];
 
   if (batchedEvents.length) {
+    // write batched events to local storage
     await RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY).then(
       async (storageEvents) => {
         if (storageEvents) batchedEvents.push(...storageEvents);
@@ -28,6 +29,8 @@ async function writeBatchToLocalStorage() {
         );
       }
     );
+    // now these events are considered ready to be sent to UI
+    // todo: call sendEvents() // being implemented separately by @nafees
   }
 }
 
