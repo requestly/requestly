@@ -99,6 +99,12 @@ const DestinationURLRow = ({
     return false;
   };
 
+  const handleOpenLocalFileInBrowser = () => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
+      link: pair.destination,
+    });
+  };
+
   const getDestinationTypeForExistingRule = (destination) => {
     if (destination.startsWith("file://")) {
       return RedirectDestinationType.MAP_LOCAL;
@@ -203,7 +209,14 @@ const DestinationURLRow = ({
         >
           {" "}
           {pair.destination.length ? pair.destination : " No file chosen"}
-        </span>
+        </span>{" "}
+        {pair.destination &&
+          isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
+            <HiOutlineExternalLink
+              className="external-link-icon"
+              onClick={handleOpenLocalFileInBrowser}
+            />
+          )}
         <span>
           {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
             <InfoTag
