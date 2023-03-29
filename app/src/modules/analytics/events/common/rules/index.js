@@ -164,3 +164,8 @@ export const trackRuleResourceTypeSelected = (rule_type, resource_type) => {
   const params = { rule_type, resource_type };
   trackEvent(RULES.RULE_RESOURCE_TYPE_SELECTED, params);
 };
+
+export const trackDesktopRuleViewedOnExtension = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DESKTOP_RULE_VIEWED_ON_EXTENSION, params);
+};

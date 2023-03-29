@@ -495,7 +495,12 @@ const RulesTable = ({
   const handleRuleNameOnClick = (e, rule) => {
     e.stopPropagation();
     if (isEditingEnabled) {
-      redirectToRuleEditor(navigate, rule.id, "my_rules");
+      redirectToRuleEditor(
+        navigate,
+        rule.id,
+        "my_rules",
+        isDesktopOnlyRule(rule)
+      );
     } else if (openRuleViewerInModal) {
       openRuleViewerInModal(rule);
     }
@@ -688,7 +693,7 @@ const RulesTable = ({
                   {recordName}
                   {isDesktopOnlyRule(record) && (
                     <InfoTag
-                      title="DESKTOP RULE"
+                      title="NOT SUPPORTED"
                       description={
                         <>
                           {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
