@@ -1,0 +1,8 @@
+.mode-specific-tag {
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  padding: 4px 5px;
+  background: #fafa1912;
+  font-size: 12px;
+  cursor: default;
+}
