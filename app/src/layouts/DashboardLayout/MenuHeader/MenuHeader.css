@@ -145,11 +145,6 @@
   margin-left: 16px;
 }
 
-.github-star-button {
-  display: block;
-  max-height: 45px;
-}
-
 .github-star-button > span {
   display: flex;
   align-items: center;
