@@ -3,6 +3,7 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
@@ -167,6 +168,17 @@ export const compareGroupToPopulateByModificationDate = (array1, array2) => {
 export const getExecutionLogsId = (ruleId) => {
   if (!ruleId) return null;
   return `execution_${ruleId}`;
+};
+
+export const isDesktopOnlyRule = (rule) => {
+  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+    const pairs = rule.pairs;
+    return pairs.some(
+      ({ destinationType, destination }) =>
+        destinationType === RedirectDestinationType.MAP_LOCAL ||
+        destination.startsWith("file://")
+    );
+  }
 };
 
 // TODO: remove it- commenting it for now as no header found to be unmodifiable from this list
