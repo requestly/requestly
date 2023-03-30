@@ -15,6 +15,11 @@ export type NetworkRequestQueryParam = QueryString;
 
 export enum RuleEditorUrlFragment {
   HEADERS = "Headers",
+  REDIRECT = "Redirect",
+  REPLACE = "Replace",
+  CANCEL = "Cancel",
+  DELAY = "Delay",
+  QUERY_PARAM = "QueryParam",
 }
 
 export enum ResourceTypeFilter {

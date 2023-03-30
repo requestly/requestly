@@ -3,4 +3,11 @@
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
+
+  .request-url-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 10px 0;
+  }
 }

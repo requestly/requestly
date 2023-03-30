@@ -25,6 +25,7 @@ const ReplacePartRow = ({
           placeholder="This part in URL"
           disabled={isInputDisabled}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "from")}
+          data-selectionid="replace-from-in-url"
         />
       </Col>
       <Col span={12}>
@@ -35,6 +36,7 @@ const ReplacePartRow = ({
           placeholder="This part"
           disabled={isInputDisabled}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "to")}
+          data-selectionid="replace-to-in-url"
         />
       </Col>
     </Row>

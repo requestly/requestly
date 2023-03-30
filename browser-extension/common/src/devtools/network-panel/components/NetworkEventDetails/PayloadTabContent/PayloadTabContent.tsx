@@ -4,12 +4,24 @@ import {
   EditOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { Collapse, Typography } from "antd";
-import React from "react";
-import { NetworkEvent, NetworkRequestQueryParam } from "../../../types";
+import { Button, Collapse, Space, Typography } from "antd";
+import React, { useCallback } from "react";
+import { SourceKey, SourceOperator } from "../../../../../types";
+import {
+  NetworkEvent,
+  NetworkRequestQueryParam,
+  RuleEditorUrlFragment,
+} from "../../../types";
+import { createRule, getBaseUrl } from "../../../utils";
 import IconButton from "../../IconButton/IconButton";
 import PropertyRow from "../../PropertyRow/PropertyRow";
 import "./payloadTabContent.scss";
+
+enum QueryParamModification {
+  ADD = "Add",
+  REMOVE = "Remove",
+  REMOVE_ALL = "Remove All",
+}
 
 interface Props {
   networkEvent: NetworkEvent;
@@ -47,6 +59,91 @@ const QueryParamRow: React.FC<{
 };
 
 const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
+  const addQueryParam = useCallback(() => {
+    createRule(
+      RuleEditorUrlFragment.QUERY_PARAM,
+      (rule) => {
+        rule.pairs[0].source = {
+          key: SourceKey.URL,
+          operator: SourceOperator.CONTAINS,
+          value: getBaseUrl(networkEvent.request.url),
+        };
+        // @ts-ignore
+        rule.pairs[0].modifications = [
+          {
+            actionWhenParamExists: "Overwrite",
+            type: QueryParamModification.ADD,
+            param: "",
+            value: "",
+          },
+        ];
+      },
+      'input[data-selectionid="query-param-name"]' //TODO
+    );
+  }, [networkEvent]);
+
+  const editQueryParam = useCallback(
+    (queryParam: NetworkRequestQueryParam) => {
+      createRule(
+        RuleEditorUrlFragment.QUERY_PARAM,
+        (rule) => {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.CONTAINS,
+            value: getBaseUrl(networkEvent.request.url),
+          };
+          // @ts-ignore
+          rule.pairs[0].modifications = [
+            {
+              actionWhenParamExists: "Overwrite",
+              type: QueryParamModification.ADD,
+              param: queryParam.name,
+              value: queryParam.value,
+            },
+          ];
+        },
+        'input[data-selectionid="query-param-value"]' //TODO
+      );
+    },
+    [networkEvent]
+  );
+
+  const removeQueryParam = useCallback(
+    (queryParam: NetworkRequestQueryParam) => {
+      createRule(RuleEditorUrlFragment.QUERY_PARAM, (rule) => {
+        rule.pairs[0].source = {
+          key: SourceKey.URL,
+          operator: SourceOperator.CONTAINS,
+          value: getBaseUrl(networkEvent.request.url),
+        };
+        // @ts-ignore
+        rule.pairs[0].modifications = [
+          {
+            type: QueryParamModification.REMOVE,
+            param: queryParam.name,
+          },
+        ];
+      });
+    },
+    [networkEvent]
+  );
+
+  const removeAllQueryParams = useCallback(() => {
+    createRule(RuleEditorUrlFragment.QUERY_PARAM, (rule) => {
+      rule.pairs[0].source = {
+        key: SourceKey.URL,
+        operator: SourceOperator.CONTAINS,
+        value: getBaseUrl(networkEvent.request.url),
+      };
+      // @ts-ignore
+      rule.pairs[0].modifications = [
+        {
+          type: QueryParamModification.REMOVE_ALL,
+        },
+      ];
+    });
+  }, [networkEvent]);
+
   return (
     <Collapse
       className="payload-tab-content"
@@ -59,13 +156,17 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
         header={"Query Parameters"}
         key={"queryparam"}
         extra={
-          <IconButton
-            icon={PlusCircleOutlined}
-            className="payload-action-button add-queryparam-button"
-            onClick={() => null}
-            tooltip="Add query parameter"
-            tooltipPosition="left"
-          />
+          <Space>
+            <Button icon={<PlusCircleOutlined />} onClick={addQueryParam}>
+              Add query param
+            </Button>
+            <Button
+              icon={<PlusCircleOutlined />}
+              onClick={removeAllQueryParams}
+            >
+              Remove all query params
+            </Button>
+          </Space>
         }
       >
         {networkEvent.request.queryString.length ? (
@@ -73,8 +174,8 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
             <QueryParamRow
               key={index}
               queryParam={queryParam}
-              onEdit={() => null}
-              onDelete={() => null}
+              onEdit={() => editQueryParam(queryParam)}
+              onDelete={() => removeQueryParam(queryParam)}
             />
           ))
         ) : (

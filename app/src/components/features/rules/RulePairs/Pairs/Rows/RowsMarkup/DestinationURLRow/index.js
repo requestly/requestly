@@ -152,6 +152,7 @@ const DestinationURLRow = ({
     return (
       <Input
         data-tour-id="rule-editor-destination-url"
+        data-selectionid="destination-url"
         className="display-inline-block"
         placeholder={generatePlaceholderText(
           pair.source.operator,
