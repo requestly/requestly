@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   checkUserBackupState,
@@ -25,14 +25,16 @@ import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
+let hasAuthHandlerBeenSet = false;
+
 const useAuth = (onComplete) => {
-  const [hasAuthHandlerBeenSet, setHasAuthHandlerBeenSet] = useState(false);
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
-    setHasAuthHandlerBeenSet(true);
+    hasAuthHandlerBeenSet = true;
+
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -186,7 +188,7 @@ const useAuth = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, hasAuthHandlerBeenSet, onComplete]);
+  }, [dispatch, appMode, onComplete]);
 };
 
 export default useAuth;
