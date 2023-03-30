@@ -90,7 +90,7 @@ const RuleBuilder = (props) => {
     getSelectedRules(ruleSelection)
   );
   const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const [showDocs, setShowDocs] = useState(false);
+  const [showDocs, setShowDocs] = useState(true);
 
   useExternalRuleCreation(MODE);
 
