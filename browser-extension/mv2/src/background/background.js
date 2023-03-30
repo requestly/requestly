@@ -2,70 +2,6 @@
 
 /* can be moved to a different file --- EventWriter.js */
 
-let eventsToWrite = [];
-let eventWriterInterval = null;
-
-const LOCAL_ANALYTICS_KEY = "analytics_event";
-
-// to be exported
-function queueEventToWrite(event) {
-  // todo: generate uuid for each event
-  eventsToWrite.push(event);
-}
-
-async function writeEventsToLocalStorage() {
-  const localEventsToWrite = [...getEventsToWrite()];
-
-  if (localEventsToWrite.length) {
-    // write batched events to local storage
-    return getEvents().then(async (storageEvents) => {
-      if (storageEvents) localEventsToWrite.push(...storageEvents);
-
-      const newAnalyticsEntry = {};
-      newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = localEventsToWrite;
-      return RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
-        console.log("BG to LOCAL: Events Write complete")
-      );
-    });
-    // now these events are considered ready to be sent to UI
-    // todo: call sendEvents() // being implemented separately by @nafees
-  }
-}
-
-function getEventsToWrite() {
-  // remove from the local batched array
-  const _eventsToWrite = [...eventsToWrite];
-  eventsToWrite = [];
-  return _eventsToWrite;
-}
-
-function startPeriodicEventWriter(intervalTime = 2000) {
-  // export
-  if (!eventWriterInterval) {
-    eventWriterInterval = setInterval(async () => {
-      await writeEventsToLocalStorage();
-    }, intervalTime);
-  }
-
-  return eventWriterInterval;
-}
-
-async function getEvents() {
-  // export
-  const events = RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY)
-    .then((storedEvents) => {
-      // these are considered the events that are ready to be sent
-      // not considering events in `eventsBatch` here
-      return storedEvents;
-    })
-    .catch((err) => {
-      console.log("BG: error getting analytics events from local storage", err);
-      return null;
-    });
-
-  return events; // promise that resolves to events
-}
-
 /* -------------- */
 
 let BG = {};
@@ -1112,7 +1048,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
   ) {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.ADD_ANALYTICS_EVENT:
-        queueEventToWrite(message.payload);
+        EventActions.queueEventToWrite(message.payload);
         break;
 
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
@@ -1561,7 +1497,7 @@ BG.Methods.init = function () {
 
   BG.Methods.listenCommands();
 
-  startPeriodicEventWriter();
+  EventActions.startPeriodicEventWriter();
 };
 
 // Background Initialization Code

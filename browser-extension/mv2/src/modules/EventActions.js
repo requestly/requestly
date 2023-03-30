@@ -1,5 +1,66 @@
 const EventActions = {};
 
+let eventsToWrite = [];
+let eventWriterInterval = null;
+
+const LOCAL_ANALYTICS_KEY = "analytics_event";
+
+EventActions.queueEventToWrite = (event) => {
+  // todo: generate uuid for each event
+  eventsToWrite.push(event);
+};
+
+EventActions.getEvents = async () => {
+  const events = RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY)
+    .then((storedEvents) => {
+      // these are considered the events that are ready to be sent
+      // not considering events in `eventsBatch` here
+      return storedEvents;
+    })
+    .catch((err) => {
+      console.log("BG: error getting analytics events from local storage", err);
+      return null;
+    });
+
+  return events; // promise that resolves to events
+};
+
+function getEventsToWrite() {
+  // remove from the local batched array
+  const _eventsToWrite = [...eventsToWrite];
+  eventsToWrite = [];
+  return _eventsToWrite;
+}
+
+async function writeEventsToLocalStorage() {
+  const localEventsToWrite = [...getEventsToWrite()];
+
+  if (localEventsToWrite.length) {
+    // write batched events to local storage
+    return EventActions.getEvents().then(async (storageEvents) => {
+      if (storageEvents) localEventsToWrite.push(...storageEvents);
+
+      const newAnalyticsEntry = {};
+      newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = localEventsToWrite;
+      return RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
+        console.log("BG to LOCAL: Events Write complete")
+      );
+    });
+    // now these events are considered ready to be sent to UI
+    // todo: call sendEvents() // being implemented separately by @nafees
+  }
+}
+
+EventActions.startPeriodicEventWriter = async (intervalTime = 2000) => {
+  if (!eventWriterInterval) {
+    eventWriterInterval = setInterval(async () => {
+      await writeEventsToLocalStorage();
+    }, intervalTime);
+  }
+
+  return eventWriterInterval;
+};
+
 EventActions.sendExtensionEvents = async () => {
   if (!BG.isAppOnline) {
     return;
