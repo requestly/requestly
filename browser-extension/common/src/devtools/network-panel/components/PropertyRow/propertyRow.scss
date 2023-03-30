@@ -10,7 +10,7 @@
 
   .property-name,
   .property-value {
-    font-size: 11px;
+    font-size: var(--font-size-normal);
   }
 
   .property-actions {
