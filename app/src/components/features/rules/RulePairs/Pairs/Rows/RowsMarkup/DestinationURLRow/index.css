@@ -38,9 +38,3 @@
   color: white;
   text-decoration: underline;
 }
-
-.redirect-rule-destination-label .more-info-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}

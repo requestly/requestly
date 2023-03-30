@@ -7,7 +7,6 @@ import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import { InfoCircleOutlined } from "@ant-design/icons";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
@@ -288,7 +287,7 @@ const DestinationURLRow = ({
       >
         <Col span={3} className="redirect-rule-destination-label">
           <MoreInfo
-            icon={<InfoCircleOutlined />}
+            showIcon
             text="Define the destination URL where you want to redirect the original request."
             analyticsContext="redirect_to_icon"
             source={currentlySelectedRuleConfig.TYPE}

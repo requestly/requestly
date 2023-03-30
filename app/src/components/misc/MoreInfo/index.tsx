@@ -1,11 +1,13 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback } from "react";
 import { Tooltip } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
+import "./index.css";
 
 interface InfoProps {
   children: ReactNode;
   text: string | ReactNode;
-  icon: ReactNode;
+  showIcon: boolean;
   source: string;
   analyticsContext: string;
 }
@@ -13,33 +15,45 @@ interface InfoProps {
 export const MoreInfo: React.FC<InfoProps> = ({
   children,
   text,
-  icon,
+  showIcon,
   source,
   analyticsContext,
 }) => {
   const showMoreInfoWithABTest = false; // temp flag for info icon experiment
 
-  return (
-    <Tooltip
-      title={text}
-      trigger={!icon && showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
-      onOpenChange={(open) => {
-        if (open) trackMoreInfoViewed(analyticsContext, source);
-      }}
-      showArrow={false}
-      overlayInnerStyle={{ width: "300px" }}
-      className="more-info-wrapper"
-    >
+  const handleOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (isOpen) trackMoreInfoViewed(analyticsContext, source);
+    },
+    [analyticsContext, source]
+  );
+
+  if (!showMoreInfoWithABTest) {
+    return <>{children}</>;
+  }
+
+  return showIcon ? (
+    <>
       {children}
       <Tooltip
         title={text}
-        trigger={icon && showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
-        onOpenChange={(open) => {
-          if (open) trackMoreInfoViewed(analyticsContext, source);
-        }}
+        trigger={showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
+        onOpenChange={handleOpenChange}
+        showArrow={false}
+        overlayInnerStyle={{ width: "300px" }}
       >
-        <>{icon && showMoreInfoWithABTest && icon}</>
+        <InfoCircleOutlined className="more-info-icon" />
       </Tooltip>
+    </>
+  ) : (
+    <Tooltip
+      title={text}
+      trigger={showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
+      onOpenChange={handleOpenChange}
+      showArrow={false}
+      overlayInnerStyle={{ width: "300px" }}
+    >
+      {children}
     </Tooltip>
   );
 };
