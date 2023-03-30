@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../store";
 // UTILS
@@ -30,6 +30,8 @@ import {
 } from "modules/analytics/events/desktopApp";
 // import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 
+let hasAppModeBeenSet = false;
+
 const useAppModeInitializer = () => {
   const usePrevious = (value) => {
     const ref = useRef();
@@ -49,8 +51,6 @@ const useAppModeInitializer = () => {
   const { appsList, isBackgroundProcessActive } = useSelector(
     getDesktopSpecificDetails
   );
-  // Component State
-  const [hasAppModeBeenSet, setHasAppModeBeenSet] = useState(false);
 
   const appsListRef = useRef(null);
   const hasAuthChanged = useHasChanged(user.loggedIn);
@@ -160,6 +160,7 @@ const useAppModeInitializer = () => {
   useEffect(() => {
     const asyncUseEffect = async () => {
       if (!hasAppModeBeenSet || hasAuthChanged) {
+        hasAppModeBeenSet = true;
         if (!isExtensionInstalled()) {
           if (isDesktopMode()) {
             dispatch(
@@ -178,7 +179,6 @@ const useAppModeInitializer = () => {
             );
           }
         }
-        setHasAppModeBeenSet(true);
       }
     };
 
@@ -186,7 +186,6 @@ const useAppModeInitializer = () => {
   }, [
     appMode,
     dispatch,
-    hasAppModeBeenSet,
     hasAuthChanged,
     user?.details?.profile?.uid,
     user?.loggedIn,
@@ -201,7 +200,7 @@ const useAppModeInitializer = () => {
         getAndUpdateInstallationDate(appMode, true, !!user);
       }
     });
-  }, [appMode, hasAppModeBeenSet]);
+  }, [appMode]);
 };
 
 export default useAppModeInitializer;
