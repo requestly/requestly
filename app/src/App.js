@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import APP_CONSTANTS from "./config/constants";
-import { getAuthInitialization } from "./store/selectors";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
-import removePreloader from "./actions/UI/removePreloader";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
 import useAuth from "hooks/useAuth";
@@ -23,17 +20,13 @@ import { CommandBar } from "components/misc/CommandBar";
 import { GrowthBookProvider } from "@growthbook/growthbook-react";
 import { growthbook } from "utils/feature-flag/growthbook";
 import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
-
-
+import AuthInitializerComponent from "hooks/AuthInitializerComponent";
 
 const { PATHS } = APP_CONSTANTS;
 
 const App = () => {
   const location = useLocation();
 
-  // Global State
-  const hasAuthInitialized = useSelector(getAuthInitialization);
-  
   useEffect(() => {
     // Load features asynchronously when the app renders
     growthbook.loadFeatures({ autoRefresh: true });
@@ -49,12 +42,6 @@ const App = () => {
   useActiveWorkspace();
 
   submitAppDetailAttributes();
-
-  useEffect(() => {
-    if (hasAuthInitialized) {
-      removePreloader();
-    }
-  }, [hasAuthInitialized]);
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
@@ -82,7 +69,9 @@ const App = () => {
   return (
     <ConfigProvider locale={enUS}>
       <GrowthBookProvider growthbook={growthbook}>
+        <AuthInitializerComponent />
         <LocalUserAttributesHelperComponent />
+
         <div
           id="requestly-dashboard-layout"
           style={{
