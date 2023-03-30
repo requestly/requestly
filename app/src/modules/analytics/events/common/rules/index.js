@@ -1,19 +1,29 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-export const trackRuleCreatedEvent = (rule_type, description) => {
+export const trackRuleCreatedEvent = (
+  rule_type,
+  description,
+  destination_types
+) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
+  if (destination_types) params.destination_types = destination_types;
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (rule_type, description) => {
+export const trackRuleEditedEvent = (
+  rule_type,
+  description,
+  destination_types
+) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
+  if (destination_types) params.destination_types = destination_types;
   trackEvent(RULES.RULE_EDITED, params);
 };
 
@@ -141,7 +151,6 @@ export const trackNewRuleButtonClicked = (source) => {
 
 export const trackRuleTypeSwitched = (ruleType) => {
   const params = { ruleType };
-
   trackEvent(RULES.RULE_TYPE_SWITCHED, params);
 };
 
@@ -163,4 +172,42 @@ export const trackRuleSimulatorTried = (rule_type, rule_saved) => {
 export const trackRuleResourceTypeSelected = (rule_type, resource_type) => {
   const params = { rule_type, resource_type };
   trackEvent(RULES.RULE_RESOURCE_TYPE_SELECTED, params);
+};
+
+export const trackDesktopRuleViewedOnExtension = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DESKTOP_RULE_VIEWED_ON_EXTENSION, params);
+};
+// rule editor docs
+export const trackDocsSidebarViewed = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_VIEWED, params);
+};
+
+export const trackDocsSidebarClosed = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_CLOSED, params);
+};
+
+export const trackDocsSidebarPrimaryCategoryClicked = (rule_type, category) => {
+  const params = { rule_type, category };
+  trackEvent(RULES.DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED, params);
+};
+
+export const trackDocsSidebarSecondaryCategoryClicked = (
+  rule_type,
+  category
+) => {
+  const params = { rule_type, category };
+  trackEvent(RULES.DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED, params);
+};
+
+export const trackDocsSidebarDemovideoWatched = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_DEMOVIDEO_WATCHED, params);
+};
+
+export const trackDocsSidebarContactUsClicked = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_CONTACT_US_CLICKED, params);
 };

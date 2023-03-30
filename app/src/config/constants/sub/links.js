@@ -40,6 +40,11 @@ const LINKS = {
   // Docs - Android Debugger Overview
   REQUESTLY_DOCS_ANDROID_DEBUGGER:
     "https://docs.requestly.io/android-debugger/overview",
+
+  // Docs - HTTP modifications
+  REQUESTLY_DOCS_HTTP_MODIFICATIONS:
+    "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
+
   /** LANDING PAGES **/
 
   // Home
@@ -95,6 +100,10 @@ const LINKS = {
   /** TUTORIALS */
   YOUTUBE_TUTORIALS:
     "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+
+  TUTORIALS: {
+    REDIRECT_RULE: "https://youtu.be/lOt1kGKTq-w",
+  },
 
   DEMO_VIDEOS: {
     TEAM_WORKSPACES: "https://www.youtube.com/watch?v=aooZB0eWAbU",
