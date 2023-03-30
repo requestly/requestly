@@ -1,10 +1,14 @@
 import React, { useMemo } from "react";
-import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
+import { Row, Col, Input, Badge, Menu, Typography } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown } from "lib/design-system/components";
+import { MoreInfo } from "components/misc/MoreInfo";
+import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
@@ -23,6 +27,10 @@ const RequestSourceRow = ({
     getFilterCount,
     generatePlaceholderText,
   } = helperFunctions;
+
+  const currentlySelectedRuleConfig = useSelector(
+    getCurrentlySelectedRuleConfig
+  );
 
   const sourceKeys = useMemo(
     () => [
@@ -183,7 +191,30 @@ const RequestSourceRow = ({
       {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
         <Col span={1} align="right" className="source-filter-col">
           &nbsp;&nbsp;
-          <Tooltip title="Filters">
+          <MoreInfo
+            text={
+              <>
+                Advanced filters like resource type, request method to target
+                requests when rule should be applied.{" "}
+                <a
+                  className="tooltip-link"
+                  href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() =>
+                    trackMoreInfoClicked(
+                      "redirect_source_filter",
+                      currentlySelectedRuleConfig.TYPE
+                    )
+                  }
+                >
+                  Learn More
+                </a>
+              </>
+            }
+            analyticsContext="redirect_source_filter"
+            source={currentlySelectedRuleConfig.TYPE}
+          >
             <span
               onClick={() => openFilterModal(pairIndex)}
               className="cursor-pointer text-gray source-filter-icon-container"
@@ -195,7 +226,7 @@ const RequestSourceRow = ({
                 </Badge>
               ) : null}
             </span>
-          </Tooltip>
+          </MoreInfo>
         </Col>
       ) : null}
     </Row>

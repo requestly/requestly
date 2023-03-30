@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Tooltip, Radio, Popconfirm } from "antd";
+import { Row, Col, Input, Radio, Tooltip, Popconfirm } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { InfoTag } from "components/misc/InfoTag";
+import { MoreInfo } from "components/misc/MoreInfo";
 import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
@@ -39,6 +42,10 @@ const DestinationURLRow = ({
   );
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
+
+  const currentlySelectedRuleConfig = useSelector(
+    getCurrentlySelectedRuleConfig
+  );
 
   const handleMockPickerVisibilityChange = (visible) => {
     // seems like an unnecessary abstraction
@@ -278,8 +285,15 @@ const DestinationURLRow = ({
           alignItems: "center",
         }}
       >
-        <Col span={3}>
-          <span className="white text-bold">Redirect to</span>
+        <Col span={3} className="redirect-rule-destination-label">
+          <MoreInfo
+            showIcon
+            text="Define the destination URL where you want to redirect the original request."
+            analyticsContext="redirect_to_icon"
+            source={currentlySelectedRuleConfig.TYPE}
+          >
+            <span className="white text-bold">Redirect to</span>
+          </MoreInfo>
         </Col>
         <Col span={24}>
           <Row className="redirect-destination-container">
@@ -296,7 +310,13 @@ const DestinationURLRow = ({
                 open={destinationTypePopupVisible}
               >
                 <Radio.Group value={destinationType} onChange={showPopup}>
-                  <Radio value={RedirectDestinationType.URL}>URL</Radio>
+                  <MoreInfo
+                    text="Redirect URL to another URL"
+                    analyticsContext="url_destination"
+                    source={currentlySelectedRuleConfig.TYPE}
+                  >
+                    <Radio value={RedirectDestinationType.URL}>URL</Radio>
+                  </MoreInfo>
                   <Tooltip
                     trigger={
                       !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
@@ -330,9 +350,15 @@ const DestinationURLRow = ({
                       Local file
                     </Radio>
                   </Tooltip>
-                  <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>
-                    Pick from Files/Mock server
-                  </Radio>
+                  <MoreInfo
+                    text=" Redirect to endpoint from Requestly Mock Server or File Server"
+                    analyticsContext="pick_mock_or_file_destination"
+                    source={currentlySelectedRuleConfig.TYPE}
+                  >
+                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>
+                      Pick from Files/Mock server
+                    </Radio>
+                  </MoreInfo>
                 </Radio.Group>
               </Popconfirm>
             </Col>
