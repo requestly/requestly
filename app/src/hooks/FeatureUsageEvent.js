@@ -7,7 +7,7 @@ import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rule
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 
-const useFeatureUsageEvent = () => {
+const FeatureUsageEvent = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
 
@@ -28,6 +28,8 @@ const useFeatureUsageEvent = () => {
 
     return () => clearTimeout(timerId);
   }, [appMode, user.loggedIn]);
+
+  return null;
 };
 
-export default useFeatureUsageEvent;
+export default FeatureUsageEvent;

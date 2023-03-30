@@ -18,7 +18,7 @@ import { actions } from "store";
 
 window.isFirstSyncComplete = false;
 
-const useDatabase = () => {
+const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -146,6 +146,8 @@ const useDatabase = () => {
     currentTeamMembers,
     dispatch,
   ]);
+
+  return null;
 };
 
-export default useDatabase;
+export default DBListeners;

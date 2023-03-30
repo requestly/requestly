@@ -21,7 +21,7 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
   window.location.reload();
 });
 
-const useActiveWorkspace = () => {
+const ActiveWorkspace = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const performCleanup = async () => {
@@ -69,6 +69,8 @@ const useActiveWorkspace = () => {
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true;
     window.workspaceCleanupDone = false;
   }, [currentlyActiveWorkspace.id]);
+
+  return null;
 };
 
-export default useActiveWorkspace;
+export default ActiveWorkspace;

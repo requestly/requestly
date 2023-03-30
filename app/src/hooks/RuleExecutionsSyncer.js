@@ -8,7 +8,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackRuleExecuted } from "modules/analytics/events/common/rules";
 import Logger from "lib/logger";
 
-const useRuleExecutionsSyncer = () => {
+const RuleExecutionsSyncer = () => {
   //Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -103,6 +103,8 @@ const useRuleExecutionsSyncer = () => {
         }
       });
   }, [appMode, stableWriteStuffToDB, trackRuleExecutions, user?.loggedIn]);
+
+  return null;
 };
 
-export default useRuleExecutionsSyncer;
+export default RuleExecutionsSyncer;
