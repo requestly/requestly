@@ -1,6 +1,9 @@
-import React, { createElement } from "react";
+import React from "react";
 import { Button, Col, Row } from "antd";
-import { RiMenuFoldLine, RiMenuUnfoldLine } from "react-icons/ri";
+//@ts-ignore
+import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
+//@ts-ignore
+import { ReactComponent as LeftChevron } from "assets/icons/chevron-left.svg";
 import WorkspaceSelector from "../WorkspaceSelector";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 
@@ -23,10 +26,6 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
     trackSidebarClicked("collapse_button");
   };
 
-  const trigger = createElement(collapsed ? RiMenuUnfoldLine : RiMenuFoldLine, {
-    className: "trigger",
-  });
-
   return (
     <Row
       align="middle"
@@ -42,14 +41,20 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
       </Col>
 
       {!isMobileMenu && (
-        <Col className="ml-auto">
+        <div className="ml-auto sidebar-collapse-btn-container">
           <Button
             type="text"
-            icon={trigger}
+            icon={
+              collapsed ? (
+                <RightChevron className="trigger" />
+              ) : (
+                <LeftChevron className="trigger" />
+              )
+            }
             onClick={toggle}
             className="siderbar-collapse-btn"
           />
-        </Col>
+        </div>
       )}
     </Row>
   );
