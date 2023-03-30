@@ -10,6 +10,7 @@ import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
+import { snakeCase } from "lodash";
 import {
   trackDocsSidebarClosed,
   trackDocsSidebarPrimaryCategoryClicked,
@@ -67,6 +68,7 @@ interface HelpProps {
 const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
+  const getStartedRef = useRef<HTMLDivElement | null>(null);
   const demoVideoRef = useRef<HTMLDivElement | null>(null);
   const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
   const useCasesRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +90,10 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const documentationList: DocumentationListItem[] = useMemo(() => {
     return [
       {
+        title: "Get Started",
+        onClick: () => handleDocumentationList(getStartedRef),
+      },
+      {
         title: "Demo",
         onClick: () => handleDocumentationList(demoVideoRef),
       },
@@ -108,7 +114,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         onClick: () => handleDocumentationList(examplesRef),
       },
       {
-        title: "FAQs",
+        title: "FAQ",
         onClick: () => handleDocumentationList(faqsRef),
       },
     ];
@@ -136,7 +142,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     toggleDocs();
     // ensures element is mounted
     setTimeout(() => handler(), 0);
-    trackDocsSidebarPrimaryCategoryClicked(ruleType, title.toLowerCase());
+    trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
   };
 
   return (
@@ -173,7 +179,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <div className="rule-editor-docs-intro">
+              <div ref={getStartedRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">
                   URL Redirect Rule
                 </div>
