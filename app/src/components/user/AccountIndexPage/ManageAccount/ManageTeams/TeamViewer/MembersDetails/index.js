@@ -32,9 +32,6 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   const user = useSelector(getUserAuthDetails);
-  const isCurrentUserAdmin =
-    currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
-
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const accessCount = teamDetails?.accessCount;
 
