@@ -686,25 +686,26 @@ const RulesTable = ({
               >
                 <span>
                   {recordName}
-                  {isDesktopOnlyRule(record) && (
-                    <InfoTag
-                      title="NOT SUPPORTED"
-                      description={
-                        <>
-                          {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
-                          <a
-                            className="tooltip-link"
-                            href="https://requestly.io/downloads"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Use this on Desktop App!
-                          </a>
-                        </>
-                      }
-                      tooltipWidth="400px"
-                    />
-                  )}
+                  {isDesktopOnlyRule(record) &&
+                    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+                      <InfoTag
+                        title="NOT SUPPORTED"
+                        description={
+                          <>
+                            {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
+                            <a
+                              className="tooltip-link"
+                              href="https://requestly.io/downloads"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Use this on Desktop App!
+                            </a>
+                          </>
+                        }
+                        tooltipWidth="400px"
+                      />
+                    )}
                 </span>
               </Link>
               <br />
