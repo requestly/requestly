@@ -38,3 +38,15 @@
   color: white;
   text-decoration: underline;
 }
+
+.redirect-rule-destination-label .more-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* .redirect-rule-destination-label { */
+/* width: 17px; */
+/* filter for text-gray css variable */
+/* filter: invert(68%) sepia(2%) saturate(16%) hue-rotate(107deg)
+    brightness(103%) contrast(97%); */
+/* } */ ;

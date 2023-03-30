@@ -1,11 +1,12 @@
 import React, { useMemo } from "react";
-import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
+import { Row, Col, Input, Badge, Menu, Typography } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown } from "lib/design-system/components";
 import "./RequestSourceRow.css";
+import { MoreInfo } from "components/misc/MoreInfo";
 
 const { Text } = Typography;
 
@@ -183,7 +184,10 @@ const RequestSourceRow = ({
       {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
         <Col span={1} align="right" className="source-filter-col">
           &nbsp;&nbsp;
-          <Tooltip title="Filters">
+          <MoreInfo
+            text="Advanced filters like resource type, request method to target requests when rule should be applied."
+            analyticsContext="source_filter"
+          >
             <span
               onClick={() => openFilterModal(pairIndex)}
               className="cursor-pointer text-gray source-filter-icon-container"
@@ -195,7 +199,7 @@ const RequestSourceRow = ({
                 </Badge>
               ) : null}
             </span>
-          </Tooltip>
+          </MoreInfo>
         </Col>
       ) : null}
     </Row>
