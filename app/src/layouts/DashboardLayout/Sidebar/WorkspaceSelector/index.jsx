@@ -94,41 +94,42 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
           open && trackSidebarClicked("workspace");
         }}
       >
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{
-            top: "35px",
-          }}
-          title={prettifyWorkspaceName(activeWorkspaceName)}
-          placement={"bottomRight"}
-          showArrow={false}
-        >
-          <div className="cursor-pointer items-center">
-            <Avatar
-              size={28}
-              shape="square"
-              icon={getWorkspaceIcon(activeWorkspaceName)}
-              className="workspace-avatar"
-              style={{
-                backgroundColor: user.loggedIn
-                  ? activeWorkspaceName ===
-                    APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                    ? "#1E69FF"
-                    : getUniqueColorForWorkspace(
-                        currentlyActiveWorkspace?.id,
-                        activeWorkspaceName
-                      )
-                  : "#ffffff4d",
-              }}
-            />
+        <div className="cursor-pointer items-center">
+          <Avatar
+            size={28}
+            shape="square"
+            icon={getWorkspaceIcon(activeWorkspaceName)}
+            className="workspace-avatar"
+            style={{
+              backgroundColor: user.loggedIn
+                ? activeWorkspaceName ===
+                  APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                  ? "#1E69FF"
+                  : getUniqueColorForWorkspace(
+                      currentlyActiveWorkspace?.id,
+                      activeWorkspaceName
+                    )
+                : "#ffffff4d",
+            }}
+          />
+          <Tooltip
+            overlayClassName="workspace-selector-tooltip"
+            style={{
+              top: "35px",
+            }}
+            title={prettifyWorkspaceName(activeWorkspaceName)}
+            placement={"bottomRight"}
+            showArrow={false}
+            mouseEnterDelay={1}
+          >
             <span className={isCollapsed ? "hidden" : "items-center"}>
               <span className="active-workspace-name">
                 {prettifyWorkspaceName(activeWorkspaceName)}
               </span>
               <DownOutlined className="active-workspace-name-down-icon" />
             </span>
-          </div>
-        </Tooltip>
+          </Tooltip>
+        </div>
       </Dropdown>
     </Row>
   );
