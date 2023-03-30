@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
-import { getAvailableTeams, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
+import {
+  getAvailableTeams,
+  getCurrentlyActiveWorkspaceMembers,
+} from "store/features/teams/selectors";
 //Firebase
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -29,12 +32,12 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   const user = useSelector(getUserAuthDetails);
-  const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
+  const isCurrentUserAdmin =
+    currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
-  console.log("isCurrentUserAdmin", isCurrentUserAdmin);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const accessCount = teamDetails?.accessCount;
-  
+
   // To handle refresh in TeamMembersTable
   const doRefreshTeamMembersTable = () => {
     setRefreshTeamMembersTable(!refreshTeamMembersTable);

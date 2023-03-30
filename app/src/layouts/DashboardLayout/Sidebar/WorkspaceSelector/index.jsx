@@ -52,6 +52,7 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import { getTeamInvites } from "backend/teams";
 import "./WorkSpaceSelector.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -161,6 +162,16 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     false
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const loggedInUserEmail = user?.details?.profile?.email;
+
+  useEffect(() => {
+    if (!user.loggedIn) return;
+    console.log("running...", loggedInUserEmail);
+
+    getTeamInvites(loggedInUserEmail)
+      .then((d) => console.log({ "data from firebase": d }))
+      .catch((e) => console.log("error-------->>", e));
+  }, [user.loggedIn, loggedInUserEmail]);
 
   useEffect(() => {
     if (availableTeams?.length > 0) {
