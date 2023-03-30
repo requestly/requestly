@@ -45,6 +45,10 @@ const LINKS = {
   REQUESTLY_DOCS_HTTP_MODIFICATIONS:
     "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
 
+  // Docs - Source Filters
+  REQUESTLY_DOCS_SOURCE_FILTERS:
+    "https://docs.requestly.io/browser-extension/chrome/features/advance-targeting",
+
   /** LANDING PAGES **/
 
   // Home
