@@ -80,34 +80,24 @@ const PageScriptMessageHandler = {
       event.data &&
       event.data.source === this.constants.CONTENT_SCRIPT
     ) {
-      if (
-        event.data.action ===
-        GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS
-      ) {
-        console.log("!!!debug", "PSMH message", event.data);
-        // setTimeout(
-        //   () => this.sendResponse(event.data, "response back from psmh"),
-        //   2100
-        // );
+      this.messageHandler(event.data);
 
-        this.acknowledgeExtensionEvents(event.data).then(() => {
-          console.log("!!!debug", "msg sent to clear events from storage");
-        });
-      }
       Logger.log("Received message:", event.data);
       this.invokeCallback(event.data);
     }
   },
 
-  acknowledgeExtensionEvents: function (eventData) {
-    return new Promise((resolve, reject) => {
-      resolve(
-        this.sendResponse(eventData, {
-          msg: "events response back from psmh. Can clear storage",
+  messageHandler: function (message) {
+    switch (message.action) {
+      case GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS:
+        this.sendResponse(message, {
+          msg: "acknowledgement back from psmh. Can clear storage",
           received: true,
-        })
-      );
-    });
+        });
+        break;
+      default:
+        return false;
+    }
   },
 
   init: function () {
