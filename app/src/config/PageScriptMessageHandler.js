@@ -90,6 +90,8 @@ const PageScriptMessageHandler = {
   messageHandler: function (message) {
     switch (message.action) {
       case GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS:
+        // send the received events from extension to analytics here
+
         this.sendResponse(message, {
           msg: "acknowledgement back from psmh. Can clear storage",
           received: true,

@@ -5,9 +5,7 @@ EventActions.sendExtensionEvents = async () => {
     return;
   }
 
-  let ackReceived = false;
-
-  while (BG.isAppOnline && !ackReceived) {
+  while (BG.isAppOnline) {
     const lastTriedTabIds = [];
 
     const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
@@ -35,14 +33,17 @@ EventActions.sendExtensionEvents = async () => {
       events: {}, // it should fetched from a separate function only after all the checks
     };
 
-    await BG.Methods.sendMessageToApp(extensionEventsMessage, appTabId).then(
-      (res) => {
-        console.log("!!!debug", "resp msg to app", res);
-        if (res.received) {
-          ackReceived = true;
-          console.log("!!!debug", "ack rcvd in bg!! clear the events!!");
-        }
+    try {
+      const response = await BG.Methods.sendMessageToApp(
+        extensionEventsMessage,
+        appTabId
+      );
+      console.log("!!!debug", "response received from app:", response);
+      if (response) {
+        break;
       }
-    );
+    } catch {
+      console.log("!!!debug", "sendMessageToApp timed out");
+    }
   }
 };
