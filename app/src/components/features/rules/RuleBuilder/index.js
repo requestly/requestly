@@ -334,6 +334,9 @@ const RuleBuilder = (props) => {
     return <SpinnerCard renderHeader />;
   }
 
+  const isDocsVisible =
+    showDocs && isRedirectRuleWithFeatureFlagOn && !props.isSharedListViewRule;
+
   return (
     <>
       <ProductWalkthrough
@@ -352,10 +355,10 @@ const RuleBuilder = (props) => {
       ) : null}
 
       <Row className="w-full relative">
-        <Col span={showDocs ? 17 : 24}>
+        <Col span={isDocsVisible ? 17 : 24}>
           <Body
             mode={MODE}
-            showDocs={showDocs}
+            showDocs={isDocsVisible}
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         </Col>
