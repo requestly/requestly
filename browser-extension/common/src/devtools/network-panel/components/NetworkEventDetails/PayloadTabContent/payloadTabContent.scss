@@ -5,7 +5,7 @@
     .ant-collapse-expand-icon,
     .ant-collapse-header-text,
     .payload-action-button {
-      font-size: 11px;
+      font-size: var(--font-size-normal);
       font-weight: bold;
       line-height: 20px;
       height: 20px;

@@ -6,7 +6,7 @@
   justify-content: center;
 
   > span {
-    font-size: 14px;
+    font-size: var(--font-size-large);
   }
 }
 
@@ -18,15 +18,15 @@
 
   .network-panel-toolbar {
     flex: 0 0 auto;
-    padding: 2px;
+    padding: 4px 10px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    column-gap: 8px;
     background-color: var(--background-color-toolbar);
 
     .clear-events-button {
-      margin: 0 10px;
-      font-size: 12px;
+      font-size: var(--font-size-normal);
     }
   }
 
