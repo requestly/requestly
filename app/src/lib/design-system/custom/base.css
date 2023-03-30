@@ -149,3 +149,7 @@
   color: #fa2828cb;
   font-size: 12px;
 }
+
+.relative {
+  position: relative;
+}

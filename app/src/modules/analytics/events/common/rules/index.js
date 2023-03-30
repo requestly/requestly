@@ -151,7 +151,6 @@ export const trackNewRuleButtonClicked = (source) => {
 
 export const trackRuleTypeSwitched = (ruleType) => {
   const params = { ruleType };
-
   trackEvent(RULES.RULE_TYPE_SWITCHED, params);
 };
 
@@ -178,4 +177,37 @@ export const trackRuleResourceTypeSelected = (rule_type, resource_type) => {
 export const trackDesktopRuleViewedOnExtension = (rule_type) => {
   const params = { rule_type };
   trackEvent(RULES.DESKTOP_RULE_VIEWED_ON_EXTENSION, params);
+};
+// rule editor docs
+export const trackDocsSidebarViewed = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_VIEWED, params);
+};
+
+export const trackDocsSidebarClosed = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_CLOSED, params);
+};
+
+export const trackDocsSidebarPrimaryCategoryClicked = (rule_type, category) => {
+  const params = { rule_type, category };
+  trackEvent(RULES.DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED, params);
+};
+
+export const trackDocsSidebarSecondaryCategoryClicked = (
+  rule_type,
+  category
+) => {
+  const params = { rule_type, category };
+  trackEvent(RULES.DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED, params);
+};
+
+export const trackDocsSidebarDemovideoWatched = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_DEMOVIDEO_WATCHED, params);
+};
+
+export const trackDocsSidebarContactUsClicked = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_CONTACT_US_CLICKED, params);
 };

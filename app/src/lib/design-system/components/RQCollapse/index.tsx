@@ -1,5 +1,5 @@
 import { Collapse, CollapseProps } from "antd";
-import { UpOutlined } from "@ant-design/icons";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import "./RQCollapse.css";
 
 export const RQCollapse = (props: CollapseProps) => {
@@ -7,7 +7,15 @@ export const RQCollapse = (props: CollapseProps) => {
     <Collapse
       bordered={false}
       expandIconPosition="right"
-      expandIcon={({ isActive }) => <UpOutlined rotate={isActive ? 180 : 0} />}
+      expandIcon={({ isActive }) => (
+        <DownArrow
+          style={{
+            top: "58%",
+            transition: "transform 0.3s",
+            transform: isActive ? "rotate(-180deg)" : "rotate(0deg)",
+          }}
+        />
+      )}
       {...props}
       className={`custom-collapse ${props?.className ?? ""}`}
     />

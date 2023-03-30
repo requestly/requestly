@@ -2,10 +2,8 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardBody } from "reactstrap";
 import { Row, Col, Alert } from "antd";
-//SUB COMPONENTS
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
-//CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
 import {
   getAppMode,
@@ -17,10 +15,10 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
-import "./RuleBuilderBody.css";
 import RuleInfoBanner from "./RuleInfoBanner";
+import "./RuleBuilderBody.css";
 
-const Body = ({ mode, currentlySelectedRuleConfig }) => {
+const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -87,23 +85,27 @@ const Body = ({ mode, currentlySelectedRuleConfig }) => {
       {!isSharedListView && (
         <RQEditorTitle
           mode={mode}
+          errors={ruleErrors}
+          showDocs={showDocs}
           name={currentlySelectedRuleData.name}
           namePlaceholder="Enter rule name"
           nameChangeCallback={handleRuleNameChange}
           descriptionPlaceholder="Add description (optional)"
           description={currentlySelectedRuleData.description}
           descriptionChangeCallback={handleDescriptionChange}
-          errors={ruleErrors}
         />
       )}
       <Row className="rule-builder-body">
         <Col
           span={22}
           offset={1}
-          md={{ offset: 2, span: 20 }}
+          md={{
+            offset: showDocs ? 1 : 2,
+            span: showDocs ? 22 : 20,
+          }}
           lg={{
-            offset: isSharedListView ? 2 : 4,
-            span: isSharedListView ? 20 : 16,
+            offset: isSharedListView ? 2 : showDocs ? 1 : 4,
+            span: isSharedListView ? 20 : showDocs ? 22 : 16,
           }}
         >
           <CardBody>
