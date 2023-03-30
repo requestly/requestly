@@ -8,7 +8,6 @@ import enUS from "antd/lib/locale/en_US";
 import useAuth from "hooks/useAuth";
 import useDatabase from "hooks/DbListenerInit/useDatabase";
 import useGeoLocation from "hooks/useGeoLocation";
-import useAppModeInitializer from "hooks/useAppModeInitializer";
 import DashboardLayout from "layouts/DashboardLayout";
 import FullScreenLayout from "layouts/FullScreenLayout";
 import UpdateDialog from "components/mode-specific/desktop/UpdateDialog";
@@ -21,6 +20,7 @@ import { GrowthBookProvider } from "@growthbook/growthbook-react";
 import { growthbook } from "utils/feature-flag/growthbook";
 import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperComponent";
 import AuthInitializerComponent from "hooks/AuthInitializerComponent";
+import AppModeInitializer from "hooks/AppModeInitializer";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -34,7 +34,6 @@ const App = () => {
 
   useAuth();
   useThirdPartyIntegrations();
-  useAppModeInitializer();
   useDatabase();
   useGeoLocation();
   useRuleExecutionsSyncer();
@@ -70,6 +69,7 @@ const App = () => {
     <ConfigProvider locale={enUS}>
       <GrowthBookProvider growthbook={growthbook}>
         <AuthInitializerComponent />
+        <AppModeInitializer />
         <LocalUserAttributesHelperComponent />
 
         <div

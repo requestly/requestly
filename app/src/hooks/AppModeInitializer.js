@@ -32,7 +32,7 @@ import {
 
 let hasAppModeBeenSet = false;
 
-const useAppModeInitializer = () => {
+const AppModeInitializer = () => {
   const usePrevious = (value) => {
     const ref = useRef();
     useEffect(() => {
@@ -201,6 +201,8 @@ const useAppModeInitializer = () => {
       }
     });
   }, [appMode]);
+
+  return null;
 };
 
-export default useAppModeInitializer;
+export default AppModeInitializer;
