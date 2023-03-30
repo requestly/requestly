@@ -90,3 +90,8 @@ export const PRODUCT_WALKTHROUGH = {
   WALKTHROUGH_STEP_DONE: "walkthrough_step_done",
   WALKTHROUGH_COMPLETED: "walkthrough_completed",
 };
+
+export const MORE_INFO = {
+  MORE_INFO_VIEWED: "more_info_viewed",
+  MORE_INFO_CLICKED: "more_info_clicked",
+};
