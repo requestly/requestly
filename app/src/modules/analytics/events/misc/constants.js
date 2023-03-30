@@ -42,6 +42,9 @@ export const BUSINESS = {
 
 export const INTEREST_CAPTURED = "interest_captured";
 
+export const DESKTOP_ACTION_INTEREST_CAPTURED =
+  "desktop_action_interest_captured";
+
 export const COUPON = {
   COUPON_APPLIED_SUCCESS: "coupon_applied_success",
   COUPON_APPLIED_FAILURE: "coupon_applied_failure",

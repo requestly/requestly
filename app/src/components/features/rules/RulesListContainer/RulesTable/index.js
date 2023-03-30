@@ -48,7 +48,10 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getSelectedRules, unselectAllRules } from "../../actions";
 import { actions } from "store";
-import { compareRuleByModificationDate } from "utils/rules/misc";
+import {
+  compareRuleByModificationDate,
+  isDesktopOnlyRule,
+} from "utils/rules/misc";
 import SharedListRuleViewerModal from "../../SharedListRuleViewerModal";
 import { isEmpty } from "lodash";
 import moment from "moment";
@@ -61,6 +64,7 @@ import {
   ungroupSelectedRules,
   updateRulesListRefreshPendingStatus,
 } from "./actions";
+import { InfoTag } from "components/misc/InfoTag";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -241,6 +245,13 @@ const RulesTable = ({
 
   const setRulesToPopulate = (rules) => {
     dispatch(actions.updateRulesToPopulate(rules));
+  };
+
+  const getPrettyDesktopRuleTooltipTitle = (ruleType) => {
+    if (ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+      return "This rule may not get executed using extension because the request redirects to a local file that cannot be accessed by the browser.";
+    }
+    return null;
   };
 
   const stableSetRulesToPopulate = useCallback(setRulesToPopulate, [dispatch]);
@@ -668,8 +679,34 @@ const RulesTable = ({
                 textOverflow: "ellipsis",
               }}
             >
-              <Link onClick={(e) => handleRuleNameOnClick(e, record)}>
-                {recordName}
+              <Link
+                onClick={(e) => {
+                  handleRuleNameOnClick(e, record);
+                }}
+              >
+                <span>
+                  {recordName}
+                  {isDesktopOnlyRule(record) &&
+                    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+                      <InfoTag
+                        title="NOT SUPPORTED"
+                        description={
+                          <>
+                            {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
+                            <a
+                              className="tooltip-link"
+                              href="https://requestly.io/downloads"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Use this on Desktop App!
+                            </a>
+                          </>
+                        }
+                        tooltipWidth="400px"
+                      />
+                    )}
+                </span>
               </Link>
               <br />
               <Text

@@ -3,6 +3,7 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { cloneDeep } from "lodash";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
@@ -169,6 +170,22 @@ export const compareGroupToPopulateByModificationDate = (array1, array2) => {
 export const getExecutionLogsId = (ruleId) => {
   if (!ruleId) return null;
   return `execution_${ruleId}`;
+};
+
+export const isDesktopOnlyRule = (rule) => {
+  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+    const pairs = rule.pairs;
+    return pairs.some(
+      ({ destinationType, destination }) =>
+        destinationType === RedirectDestinationType.MAP_LOCAL ||
+        destination.startsWith("file://")
+    );
+  }
+};
+
+export const getAllRedirectDestinationTypes = (rule) => {
+  const destinationTypes = rule.pairs.map((pair) => pair.destinationType);
+  return destinationTypes;
 };
 
 /**
