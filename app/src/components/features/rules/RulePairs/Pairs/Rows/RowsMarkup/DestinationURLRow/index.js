@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Radio, Tooltip, Popconfirm } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
@@ -41,6 +43,10 @@ const DestinationURLRow = ({
   );
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
+
+  const currentlySelectedRuleConfig = useSelector(
+    getCurrentlySelectedRuleConfig
+  );
 
   const handleMockPickerVisibilityChange = (visible) => {
     // seems like an unnecessary abstraction
@@ -285,6 +291,7 @@ const DestinationURLRow = ({
             icon={<InfoCircleOutlined />}
             text="Define the destination URL where you want to redirect the original request."
             analyticsContext="redirect_to_icon"
+            source={currentlySelectedRuleConfig.TYPE}
           >
             <span className="white text-bold">Redirect to</span>
           </MoreInfo>
@@ -307,6 +314,7 @@ const DestinationURLRow = ({
                   <MoreInfo
                     text="Redirect URL to another URL"
                     analyticsContext="url_destination"
+                    source={currentlySelectedRuleConfig.TYPE}
                   >
                     <Radio value={RedirectDestinationType.URL}>URL</Radio>
                   </MoreInfo>
@@ -346,6 +354,7 @@ const DestinationURLRow = ({
                   <MoreInfo
                     text=" Redirect to endpoint from Requestly Mock Server or File Server"
                     analyticsContext="pick_mock_or_file_destination"
+                    source={currentlySelectedRuleConfig.TYPE}
                   >
                     <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>
                       Pick from Files/Mock server
