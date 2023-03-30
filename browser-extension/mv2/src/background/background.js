@@ -8,7 +8,7 @@ let eventWriterInterval = null;
 const LOCAL_ANALYTICS_KEY = "analytics_event";
 
 // to be exported
-function queueEventForWrite(event) {
+function queueEventToWrite(event) {
   // todo: generate uuid for each event
   eventsToWrite.push(event);
 }
@@ -1075,7 +1075,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
   ) {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.ADD_ANALYTICS_EVENT:
-        queueEventForWrite(message.payload);
+        queueEventToWrite(message.payload);
         break;
 
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
