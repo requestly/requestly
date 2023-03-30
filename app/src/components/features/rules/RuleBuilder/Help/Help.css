@@ -1,0 +1,229 @@
+.rule-editor-help-container {
+  margin: 1.25rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.rule-editor-help-content {
+  font-size: 14px;
+  line-height: 22px;
+  padding: 1.25rem 0px 0px 1.25rem;
+}
+
+.rule-editor-help-header {
+  padding: 0 1.25rem 8px 0;
+}
+
+.rule-editor-help-back-btn.ant-btn {
+  margin-left: -6px;
+}
+
+.rule-editor-docs-close-btn.ant-btn {
+  margin-right: -6px;
+}
+
+.rule-editor-help-back-btn.ant-btn,
+.rule-editor-docs-close-btn.ant-btn {
+  padding: 6px;
+  border: none;
+  width: max-content;
+  height: max-content;
+}
+
+.rule-editor-help-back-btn.ant-btn:hover,
+.rule-editor-docs-close-btn.ant-btn:hover {
+  opacity: 0.7;
+}
+
+.rule-editor-help-container ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rule-editor-docs ul,
+.rule-editor-docs ol {
+  padding-left: 14px;
+  padding-right: 5px;
+}
+
+.rule-editor-docs li {
+  margin-bottom: 4px;
+}
+
+.rule-editor-help-lists {
+  height: 65vh;
+  overflow: hidden;
+}
+
+.rule-editor-help-lists:hover {
+  overflow: auto;
+}
+
+.rule-editor-help-lists li {
+  margin-right: 1.25rem;
+}
+
+.rule-editor-help-back-btn {
+  margin-right: 8px;
+}
+
+.rule-editor-help-title {
+  margin: 1.25rem 0 12px 0;
+}
+
+.rule-editor-help-title .anticon {
+  margin-right: 5px;
+}
+
+.rule-editor-help-list.external-links {
+  padding-left: 17px;
+}
+
+.rule-editor-help-list.external-links li {
+  margin: 12px 0;
+}
+
+.rule-editor-help-list.external-links a {
+  font-size: 12px;
+  color: var(--white);
+  line-height: 14.06px;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.rule-editor-help-list.external-links a svg {
+  width: 10px;
+  height: 10px;
+}
+
+.rule-editor-help-list .ant-btn {
+  width: 100%;
+  padding: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  height: auto;
+  display: inline-flex;
+  justify-content: flex-start;
+}
+
+.rule-editor-help-list .ant-btn span {
+  line-height: 15.23px;
+}
+
+.rule-editor-help-list li:last-child .ant-btn {
+  margin-bottom: 0;
+}
+
+.rule-editor-help-footer {
+  margin-top: 10px;
+  padding: 8px 1.25rem;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--component-dark-background);
+}
+
+/* docs */
+.rule-editor-docs {
+  height: 65vh;
+  overflow: auto;
+}
+
+.rule-editor-docs-intro {
+  margin-top: 10px;
+}
+
+.docs-section {
+  margin-top: 1.75rem;
+}
+
+.docs-section .title {
+  margin-bottom: 12px;
+}
+
+.rule-editor-docs img,
+.rule-editor-docs-demo-video iframe {
+  width: 95%;
+  aspect-ratio: 2/1;
+  block-size: auto;
+  max-inline-size: 100%;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.rule-editor-docs img {
+  border: none;
+  aspect-ratio: auto;
+  user-select: none;
+}
+
+.rule-editor-docs-image [data-rmiz-modal-overlay="hidden"] {
+  background-color: rgba(13, 13, 16, 0);
+}
+
+.rule-editor-docs-image [data-rmiz-modal-overlay="visible"] {
+  background-color: rgba(13, 13, 16, 0.85);
+}
+
+.rule-editor-docs-use-cases li,
+.rule-editor-docs-examples li {
+  list-style: disc;
+  color: var(--text-gray);
+}
+
+.rule-editor-docs-create-rule li {
+  list-style: auto;
+  color: var(--text-gray);
+}
+
+.rule-editor-docs-create-rule li > span,
+.rule-editor-docs-use-cases li > span {
+  font-weight: 500;
+  color: var(--white);
+}
+
+.rule-editor-docs-create-rule li code {
+  font-size: 14px;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: var(--white);
+  background-color: #3e404486;
+}
+
+.rule-editor-docs-create-rule img {
+  margin-bottom: 1rem;
+}
+
+/* faqs collapse */
+.rule-editor-docs-faqs {
+  margin-right: 11px;
+  margin-bottom: 2rem;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item,
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-content {
+  background-color: transparent;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item:last-child {
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-header-text {
+  max-width: 94%;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rule-editor-docs-faqs-collapse.ant-collapse
+  .ant-collapse-item
+  .ant-collapse-content
+  p {
+  font-size: 13px;
+  margin-bottom: 0;
+}

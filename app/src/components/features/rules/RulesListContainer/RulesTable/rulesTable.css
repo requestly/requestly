@@ -41,6 +41,9 @@
 .rule-name-col a span {
   color: var(--link);
   transition: color 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .ungroup-rule-row .ant-table-cell.rule-name-col span.ant-table-row-indent,
