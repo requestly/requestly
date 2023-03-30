@@ -7,8 +7,8 @@ let batchWriterInterval = null;
 
 const LOCAL_ANALYTICS_KEY = "analytics_event";
 
+// to be exported
 function addEventToBatch(event) {
-  // export
   // todo: generate uuid for each event
   eventsBatch.push(event);
 }
@@ -18,17 +18,15 @@ async function writeBatchToLocalStorage() {
 
   if (batchedEvents.length) {
     // write batched events to local storage
-    await RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY).then(
-      async (storageEvents) => {
-        if (storageEvents) batchedEvents.push(...storageEvents);
+    return getEvents().then(async (storageEvents) => {
+      if (storageEvents) batchedEvents.push(...storageEvents);
 
-        const newAnalyticsEntry = {};
-        newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = batchedEvents;
-        await RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
-          console.log("BG to LOCAL: Events Write complete")
-        );
-      }
-    );
+      const newAnalyticsEntry = {};
+      newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = batchedEvents;
+      return RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
+        console.log("BG to LOCAL: Events Write complete")
+      );
+    });
     // now these events are considered ready to be sent to UI
     // todo: call sendEvents() // being implemented separately by @nafees
   }
