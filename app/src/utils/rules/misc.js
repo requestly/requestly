@@ -184,7 +184,6 @@ export const isDesktopOnlyRule = (rule) => {
 };
 
 export const getAllRedirectDestinationTypes = (rule) => {
-  const pairs = rule.pairs;
   const destinationTypes = rule.pairs.map((pair) => pair.destinationType);
   return destinationTypes;
 };
