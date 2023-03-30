@@ -34,9 +34,11 @@ import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
 import {
-  trackDocsSidebarViewed,
   trackRuleEditorViewed,
+  trackDesktopRuleViewedOnExtension,
+  trackDocsSidebarViewed,
 } from "modules/analytics/events/common/rules";
+import { isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
@@ -277,6 +279,25 @@ const RuleBuilder = (props) => {
     if (!ruleType || !source) return;
     trackRuleEditorViewed(source, ruleType);
   }, [currentlySelectedRuleConfig.TYPE, state]);
+
+  useEffect(() => {
+    if (
+      MODE === RULE_EDITOR_CONFIG.MODES.EDIT &&
+      isDesktopOnlyRule(currentlySelectedRuleData) &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+    ) {
+      if (
+        currentlySelectedRuleConfig.TYPE ===
+        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+      )
+        trackDesktopRuleViewedOnExtension("map_local");
+    }
+  }, [
+    MODE,
+    appMode,
+    currentlySelectedRuleConfig.TYPE,
+    currentlySelectedRuleData,
+  ]);
 
   useEffect(() => {
     return () => {

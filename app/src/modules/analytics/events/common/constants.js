@@ -104,6 +104,7 @@ export const RULES = {
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
+  DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
 
   // rule editor docs
   DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",
