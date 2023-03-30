@@ -562,8 +562,7 @@ button.ant-input-search-button {
   flex-shrink: 0;
 }
 
-.icon-wrapper,
-.sidebar-collapsed-container .icon-wrapper.ant-menu-item-icon {
+.icon-wrapper {
   width: 1.75rem;
   height: 1.75rem;
   display: flex;
