@@ -1,4 +1,5 @@
 import Logger from "lib/logger";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const PageScriptMessageHandler = {
   eventCallbackMap: {},
@@ -79,7 +80,10 @@ const PageScriptMessageHandler = {
       event.data &&
       event.data.source === this.constants.CONTENT_SCRIPT
     ) {
-      if (event.data.action === "extension_events") {
+      if (
+        event.data.action ===
+        GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS
+      ) {
         console.log("!!!debug", "PSMH message", event.data);
         // setTimeout(
         //   () => this.sendResponse(event.data, "response back from psmh"),

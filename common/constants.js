@@ -145,8 +145,8 @@ CONSTANTS.EXTENSION_MESSAGES = {
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
-  EXTENSION_EVENTS: "extension_events",
-  NOTIFY_APP_LOADED: "notify_app_loaded",
+  SEND_EXTENSION_EVENTS: "sendExtensionEvents",
+  NOTIFY_APP_LOADED: "notifyAppLoaded",
 };
 
 CONSTANTS.HEADERS_TARGET = {

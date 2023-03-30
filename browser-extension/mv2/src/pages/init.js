@@ -8,12 +8,12 @@ document.documentElement.setAttribute("rq-ext-version", extVersion);
 
 chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
   switch (message.action) {
-    case RQ.EXTENSION_MESSAGES.EXTENSION_EVENTS:
+    case RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS:
       RQ.ContentScriptMessageHandler.sendMessage(message, (response) => {
         sendResponse(response);
       });
+      return true;
   }
-  return true;
 });
 
 RQ.SessionRecorder.setup();
