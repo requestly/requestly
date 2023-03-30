@@ -974,6 +974,25 @@ BG.Methods.sendMessage = function (messageObject, callback) {
   );
 };
 
+BG.Methods.getAppTabs = () => {
+  return new Promise((resolve) => {
+    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
+      if (tabs.length === 0) {
+        BG.isAppOnline = false;
+      }
+      resolve(tabs);
+    });
+  });
+};
+
+/**
+ * Sends the message to requestly app. It takes tabId as an argument because if the app is open or not is uncertain. So there is another
+ * utility, getAppTabs() which checks if app is open and returns its tabId. After being sure that the app is open, this function is called.
+ * @param {Object} messageObject
+ * @param {Number} tabId
+ * @param {Number} timeout
+ * @returns Promise resolving to the response from app or timeout error
+ */
 BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
   console.log("!!!debug", "sendmsgtoapp", tabId);
   const sendMessage = (messageObject, tabId) => {
@@ -990,49 +1009,6 @@ BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
       setTimeout(() => reject(new Error("timeout")), timeout)
     ),
   ]);
-};
-
-BG.Methods.sendExtensionEvents = async () => {
-  if (!BG.isAppOnline) {
-    return;
-  }
-
-  let ackReceived = false;
-
-  while (BG.isAppOnline && !ackReceived) {
-    const lastTriedTabs = [];
-
-    const appTabId = await new Promise((resolve) => {
-      chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
-        const filteredTabs = tabs.filter(
-          (tab) => !lastTriedTabs.includes(tab.id)
-        );
-        if (filteredTabs.length > 0) {
-          resolve(filteredTabs[0].id);
-          lastTriedTabs.push(filteredTabs[0].id);
-        } else {
-          BG.isAppOnline = false;
-          return;
-        }
-      });
-    });
-
-    const extensionEventsMessage = {
-      action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
-      events: {}, // it should fetched from a separate function only after all the checks and shouldn't be passed as params
-    };
-
-    console.log("!!!debug", "", JSON.stringify(lastTriedTabs), appTabId);
-    await BG.Methods.sendMessageToApp(extensionEventsMessage, appTabId).then(
-      (res) => {
-        console.log("!!!debug", "resp msg to app", res);
-        if (res.received) {
-          ackReceived = true;
-          console.log("!!!debug", "ack in bg!! clear the events!!");
-        }
-      }
-    );
-  }
 };
 
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
@@ -1210,7 +1186,7 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
 
 BG.Methods.onAppLoadedNotification = () => {
   BG.isAppOnline = true;
-  BG.Methods.sendExtensionEvents();
+  EventActions.sendExtensionEvents();
 };
 
 BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
