@@ -1,19 +1,29 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-export const trackRuleCreatedEvent = (rule_type, description) => {
+export const trackRuleCreatedEvent = (
+  rule_type,
+  description,
+  destination_types
+) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
+  if (destination_types) params.destination_types = destination_types;
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (rule_type, description) => {
+export const trackRuleEditedEvent = (
+  rule_type,
+  description,
+  destination_types
+) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
+  if (destination_types) params.destination_types = destination_types;
   trackEvent(RULES.RULE_EDITED, params);
 };
 

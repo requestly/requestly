@@ -172,7 +172,6 @@ export const getExecutionLogsId = (ruleId) => {
   return `execution_${ruleId}`;
 };
 
-
 export const isDesktopOnlyRule = (rule) => {
   if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
     const pairs = rule.pairs;
@@ -182,6 +181,12 @@ export const isDesktopOnlyRule = (rule) => {
         destination.startsWith("file://")
     );
   }
+};
+
+export const getAllRedirectDestinationTypes = (rule) => {
+  const pairs = rule.pairs;
+  const destinationTypes = rule.pairs.map((pair) => pair.destinationType);
+  return destinationTypes;
 };
 
 /**
