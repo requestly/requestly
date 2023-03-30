@@ -170,6 +170,11 @@ export const trackDocsSidebarViewed = (rule_type) => {
   trackEvent(RULES.DOCS_SIDEBAR_VIEWED, params);
 };
 
+export const trackDocsSidebarClosed = (rule_type) => {
+  const params = { rule_type };
+  trackEvent(RULES.DOCS_SIDEBAR_CLOSED, params);
+};
+
 export const trackDocsSidebarPrimaryCategoryClicked = (rule_type, category) => {
   const params = { rule_type, category };
   trackEvent(RULES.DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED, params);

@@ -107,6 +107,7 @@ export const RULES = {
 
   // rule editor docs
   DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",
+  DOCS_SIDEBAR_CLOSED: "docs_sidebar_closed",
   DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED:
     "docs_sidebar_primary_category_clicked",
   DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED:

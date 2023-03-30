@@ -11,6 +11,7 @@ import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
 import {
+  trackDocsSidebarClosed,
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   trackDocsSidebarDemovideoWatched,
@@ -66,7 +67,6 @@ interface HelpProps {
 const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
-  const introductionRef = useRef<HTMLDivElement | null>(null);
   const demoVideoRef = useRef<HTMLDivElement | null>(null);
   const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
   const useCasesRef = useRef<HTMLDivElement | null>(null);
@@ -78,7 +78,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     (ref: React.MutableRefObject<HTMLDivElement>) => {
       if (ref.current) {
         const target = ref.current;
-        const offsetTop = target.offsetTop;
+        const { offsetTop } = target;
         (target.parentNode as HTMLElement).scrollTop = offsetTop - 87;
       }
     },
@@ -87,10 +87,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
 
   const documentationList: DocumentationListItem[] = useMemo(() => {
     return [
-      {
-        title: "Introduction",
-        onClick: () => handleDocumentationList(introductionRef),
-      },
       {
         title: "Demo",
         onClick: () => handleDocumentationList(demoVideoRef),
@@ -167,14 +163,17 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
             title="Close"
             icon={<Cross />}
             className="rule-editor-docs-close-btn"
-            onClick={() => setShowDocs(false)}
+            onClick={() => {
+              setShowDocs(false);
+              trackDocsSidebarClosed(ruleType);
+            }}
           />
         </Row>
 
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <div ref={introductionRef} className="rule-editor-docs-intro">
+              <div className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">
                   URL Redirect Rule
                 </div>
@@ -409,7 +408,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
             <div ref={documentationListRef} className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
-                Documentation for Modify Headers
+                Documentation for Redirect request
               </div>
               <ul className="rule-editor-help-list">
                 {documentationList.map(({ title, onClick }) => (
