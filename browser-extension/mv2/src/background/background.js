@@ -2,27 +2,27 @@
 
 /* can be moved to a different file --- EventWriter.js */
 
-let eventsBatch = [];
-let batchWriterInterval = null;
+let eventsToWrite = [];
+let eventWriterInterval = null;
 
 const LOCAL_ANALYTICS_KEY = "analytics_event";
 
 // to be exported
-function addEventToBatch(event) {
+function queueEventForWrite(event) {
   // todo: generate uuid for each event
-  eventsBatch.push(event);
+  eventsToWrite.push(event);
 }
 
-async function writeBatchToLocalStorage() {
-  const batchedEvents = [...getBatchedEvents()];
+async function writeEventsToLocalStorage() {
+  const localEventsToWrite = [...getEventsToWrite()];
 
-  if (batchedEvents.length) {
+  if (localEventsToWrite.length) {
     // write batched events to local storage
     return getEvents().then(async (storageEvents) => {
-      if (storageEvents) batchedEvents.push(...storageEvents);
+      if (storageEvents) localEventsToWrite.push(...storageEvents);
 
       const newAnalyticsEntry = {};
-      newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = batchedEvents;
+      newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = localEventsToWrite;
       return RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
         console.log("BG to LOCAL: Events Write complete")
       );
@@ -32,22 +32,22 @@ async function writeBatchToLocalStorage() {
   }
 }
 
-function getBatchedEvents() {
+function getEventsToWrite() {
   // remove from the local batched array
-  const batchedEvents = [...eventsBatch];
-  eventsBatch = [];
-  return batchedEvents;
+  const _eventsToWrite = [...eventsToWrite];
+  eventsToWrite = [];
+  return _eventsToWrite;
 }
 
-function startEventBatchWriter(intervalTime = 2000) {
+function startPeriodicEventWriter(intervalTime = 2000) {
   // export
-  if (!batchWriterInterval) {
-    batchWriterInterval = setInterval(async () => {
-      await writeBatchToLocalStorage();
+  if (!eventWriterInterval) {
+    eventWriterInterval = setInterval(async () => {
+      await writeEventsToLocalStorage();
     }, intervalTime);
   }
 
-  return batchWriterInterval;
+  return eventWriterInterval;
 }
 
 async function getEvents() {
@@ -1075,7 +1075,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
   ) {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.ADD_ANALYTICS_EVENT:
-        addEventToBatch(message.payload);
+        queueEventForWrite(message.payload);
         break;
 
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
@@ -1515,7 +1515,7 @@ BG.Methods.init = function () {
 
   BG.Methods.listenCommands();
 
-  startEventBatchWriter();
+  startPeriodicEventWriter();
 };
 
 // Background Initialization Code
