@@ -83,6 +83,7 @@ BG = window.BG = {
     planName: "",
     isLoggedIn: "",
   },
+  isAppOnline: false,
   extensionStatusContextMenuId: -1,
   modifiedRequestsPool: new Queue(1000),
 };
@@ -708,7 +709,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     // Requests which are fired from non-tab pages like background, chrome-extension page
     return;
   }
-
   BG.Methods.setExtensionIconActive(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
@@ -1044,6 +1044,43 @@ BG.Methods.sendMessage = function (messageObject, callback) {
   );
 };
 
+BG.Methods.getAppTabs = () => {
+  return new Promise((resolve) => {
+    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
+      if (tabs.length === 0) {
+        BG.isAppOnline = false;
+      }
+      resolve(tabs);
+    });
+  });
+};
+
+/**
+ * Sends the message to requestly app. It takes tabId as an argument because if the app is open or not is uncertain. So there is another
+ * utility, getAppTabs() which checks if app is open and returns its tabId. After being sure that the app is open, this function is called.
+ * @param {Object} messageObject
+ * @param {Number} tabId
+ * @param {Number} timeout
+ * @returns Promise resolving to the response from app or timeout error
+ */
+BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
+  console.log("!!!debug", "sendmsgtoapp", tabId);
+  const sendMessage = (messageObject, tabId) => {
+    return new Promise((resolve) => {
+      chrome.tabs.sendMessage(tabId, messageObject, (response) => {
+        resolve(response);
+      });
+    });
+  };
+
+  return Promise.race([
+    sendMessage(messageObject, tabId),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), timeout)
+    ),
+  ]);
+};
+
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
   if (details.reason === "install") {
     // Set installation date in storage so that we can take decisions based on usage time in future
@@ -1189,6 +1226,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
         BG.Methods.toggleExtensionStatus().then(sendResponse);
         return true;
+
+      case RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED:
+        BG.Methods.onAppLoadedNotification();
+        break;
     }
   });
 };
@@ -1215,6 +1256,11 @@ BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
+};
+
+BG.Methods.onAppLoadedNotification = () => {
+  BG.isAppOnline = true;
+  EventActions.sendExtensionEvents();
 };
 
 BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
