@@ -4,7 +4,7 @@ import {
   EditOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { Collapse, Typography } from "antd";
+import { Button, Collapse, Typography } from "antd";
 import React, { useCallback } from "react";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import {
@@ -141,13 +141,12 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         header={"Request Headers"}
         key={"request"}
         extra={
-          <IconButton
-            icon={PlusCircleOutlined}
-            className="header-action-button add-header-button"
+          <Button
+            icon={<PlusCircleOutlined />}
             onClick={() => addHeader(HeaderType.REQUEST)}
-            tooltip="Add header"
-            tooltipPosition="left"
-          />
+          >
+            Add request header
+          </Button>
         }
       >
         {requestHeaders.length > 0 ? (
@@ -169,13 +168,12 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         header={"Response Headers"}
         key={"response"}
         extra={
-          <IconButton
-            icon={PlusCircleOutlined}
-            className="header-action-button add-header-button"
+          <Button
+            icon={<PlusCircleOutlined />}
             onClick={() => addHeader(HeaderType.RESPONSE)}
-            tooltip="Add header"
-            tooltipPosition="left"
-          />
+          >
+            Add response header
+          </Button>
         }
       >
         {responseHeaders.length > 0 ? (

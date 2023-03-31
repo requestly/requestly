@@ -75,6 +75,7 @@ export default [
         extract: true,
         use: ["sass"],
       }),
+      svgr(),
     ],
   },
   {

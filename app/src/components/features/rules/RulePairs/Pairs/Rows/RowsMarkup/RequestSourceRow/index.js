@@ -185,6 +185,7 @@ const RequestSourceRow = ({
           className="rules-pair-input"
           value={pair.source.value}
           disabled={isInputDisabled}
+          data-selectionid="source-value"
         />
       </Col>
 

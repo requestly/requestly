@@ -152,6 +152,7 @@ const DestinationURLRow = ({
     return (
       <Input
         data-tour-id="rule-editor-destination-url"
+        data-selectionid="destination-url"
         className="display-inline-block"
         placeholder={generatePlaceholderText(
           pair.source.operator,
@@ -179,6 +180,7 @@ const DestinationURLRow = ({
             setIsMockPickerVisible(true);
             trackClickMock();
           }}
+          disabled={isInputDisabled}
         >
           {pair.destination ? "Change file" : " Select mock/file"}
         </RQButton>
@@ -201,7 +203,9 @@ const DestinationURLRow = ({
       <Col span={24} className="picker-container">
         <RQButton
           onPointerEnter={() => trackDesktopActionInterestCaptured("map_local")}
-          disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+          disabled={
+            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) || isInputDisabled
+          }
           type="default"
           onClick={() => {
             displayFileSelector(handleFileSelectCallback);
@@ -309,7 +313,11 @@ const DestinationURLRow = ({
                 onCancel={() => setDestinationTypePopupVisible(false)}
                 open={destinationTypePopupVisible}
               >
-                <Radio.Group value={destinationType} onChange={showPopup}>
+                <Radio.Group
+                  value={destinationType}
+                  onChange={showPopup}
+                  disabled={isInputDisabled}
+                >
                   <MoreInfo
                     text="Redirect URL to another URL"
                     analyticsContext="url_destination"

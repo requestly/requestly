@@ -87,6 +87,7 @@ const QueryParamModificationRow = ({
               ? true
               : false
           }
+          data-selectionid="query-param-name"
         />
       </Col>
       <Col span={9} align="right">
@@ -106,6 +107,7 @@ const QueryParamModificationRow = ({
           disabled={
             isInputDisabled ? true : modification.type === "Add" ? false : true
           }
+          data-selectionid="query-param-value"
         />
       </Col>
       <Col span={1} align="right">
