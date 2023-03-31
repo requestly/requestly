@@ -538,6 +538,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Menu.Item key="3" className="workspace-menu-item">
         <Dropdown
           placement="right"
+          trigger={["hover"]}
           menu={{
             items: joinWorkspaceDropdownItems,
             onClick: handleJoinWorkspaceDropdownClick,
