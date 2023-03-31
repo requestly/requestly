@@ -1,12 +1,12 @@
 import Icon, { StopOutlined } from "@ant-design/icons";
-import { Button, Space } from "antd";
+import { Button, Checkbox, Divider, Space } from "antd";
 import React, { useCallback } from "react";
 import UserAgentRuleIcon from "../../../../../resources/icons/rule-icons/useragent.svg";
 import CodeIcon from "../../../../../resources/icons/code.svg";
 import CSSIcon from "../../../../../resources/icons/css.svg";
 import "./networkPanelToolbar.scss";
 import { createRule, getPageOrigin } from "../../utils";
-import { RuleEditorUrlFragment } from "../../types";
+import { NetworkPanelSettings, RuleEditorUrlFragment } from "../../types";
 import {
   ScriptCodeType,
   ScriptRulePair,
@@ -17,9 +17,25 @@ import {
 
 interface Props {
   clearEvents: () => void;
+  settings: NetworkPanelSettings;
+  onSettingsChange: (settings: NetworkPanelSettings) => void;
 }
 
-const PrimaryToolbar: React.FC<Props> = ({ clearEvents }) => {
+const PrimaryToolbar: React.FC<Props> = ({
+  clearEvents,
+  settings,
+  onSettingsChange,
+}) => {
+  const onPreserveLogSettingChanged = useCallback(
+    (newPreserveLogSetting: boolean) => {
+      onSettingsChange({
+        ...settings,
+        preserveLog: newPreserveLogSetting,
+      });
+    },
+    [settings]
+  );
+
   const addJSInPage = useCallback(async () => {
     const pageOrigin = await getPageOrigin();
 
@@ -99,6 +115,14 @@ const PrimaryToolbar: React.FC<Props> = ({ clearEvents }) => {
         >
           Clear logs
         </Button>
+        <Divider type="vertical" className="divider" />
+        <Checkbox
+          className="preserve-log-checkbox"
+          checked={settings.preserveLog}
+          onChange={(e) => onPreserveLogSettingChanged(e.target.checked)}
+        >
+          Preserve log
+        </Checkbox>
       </div>
       <Space>
         <Button

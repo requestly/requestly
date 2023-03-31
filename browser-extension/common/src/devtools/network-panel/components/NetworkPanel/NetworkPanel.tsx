@@ -1,5 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { NetworkEvent, NetworkFilters } from "../../types";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  NetworkEvent,
+  NetworkFilters,
+  NetworkPanelSettings,
+  ResourceTypeFilter,
+} from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "../NetworkPanelToolbar";
 import EmptyPanelPlaceholder from "./EmptyPanelPlaceholder";
 import NetworkTable from "../NetworkTable/NetworkTable";
@@ -7,7 +12,18 @@ import "./networkPanel.scss";
 
 const NetworkPanel: React.FC = () => {
   const [networkEvents, setNetworkEvents] = useState<NetworkEvent[]>([]);
-  const [filters, setFilters] = useState<NetworkFilters>({});
+  const [filters, setFilters] = useState<NetworkFilters>({
+    url: "",
+    resourceType: ResourceTypeFilter.ALL,
+  });
+  const [settings, setSettings] = useState<NetworkPanelSettings>({
+    preserveLog: false,
+  });
+  const preserveLogRef = useRef(false);
+
+  const clearEvents = useCallback(() => {
+    setNetworkEvents([]);
+  }, []);
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener(
@@ -15,18 +31,28 @@ const NetworkPanel: React.FC = () => {
         setNetworkEvents((networkEvents) => [...networkEvents, networkEvent]);
       }
     );
+
+    chrome.devtools.network.onNavigated.addListener(() => {
+      if (!preserveLogRef.current) {
+        clearEvents();
+      }
+    });
   }, []);
 
-  const clearEvents = useCallback(() => {
-    setNetworkEvents([]);
-  }, []);
+  useEffect(() => {
+    preserveLogRef.current = settings.preserveLog;
+  }, [settings]);
 
   return (
     <div className="network-panel">
-      <PrimaryToolbar clearEvents={clearEvents} />
+      <PrimaryToolbar
+        clearEvents={clearEvents}
+        settings={settings}
+        onSettingsChange={setSettings}
+      />
       {networkEvents.length > 0 ? (
         <>
-          <FiltersToolbar onFiltersChange={setFilters} />
+          <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
           <NetworkTable networkEvents={networkEvents} filters={filters} />
         </>
       ) : (

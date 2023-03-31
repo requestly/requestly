@@ -14,8 +14,26 @@
     color: var(--color-secondary);
   }
 
+  .divider {
+    height: 16px;
+  }
+
   &.primary {
     justify-content: space-between;
+
+    .divider {
+      margin-left: 0;
+      margin-right: 8px;
+    }
+  }
+
+  .preserve-log-checkbox {
+    font-size: var(--font-size-small);
+    color: var(--color-secondary);
+
+    .ant-checkbox {
+      font-size: 16px;
+    }
   }
 
   .url-filter {
@@ -49,7 +67,6 @@
     }
 
     .divider {
-      height: 16px;
       margin-right: 0;
       margin-left: 8px;
     }
