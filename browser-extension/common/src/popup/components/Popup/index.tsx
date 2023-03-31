@@ -5,8 +5,8 @@ import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
 import "./popup.css";
-import { sendEventToBackground } from "../../../analytics/analyticsUtils";
-import { EVENT_CONSTANTS } from "../../../analytics/analyticsContants";
+import { sendEventToBackground } from "../../../analytics/eventUtils";
+import { EVENT_CONSTANTS } from "../../../analytics/eventContants";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);

@@ -5,6 +5,7 @@ class RQDevToolsPanel {
     this.addBackgroundMessageListener();
     this.render();
     this.addEvents();
+    RQ.Events.Utils.sendEventToBackground(RQ.Events.Constants.DEVTOOLS_OPENED);
   }
 
   initState() {
