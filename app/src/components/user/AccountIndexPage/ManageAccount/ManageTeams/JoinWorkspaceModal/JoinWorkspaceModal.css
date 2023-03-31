@@ -1,0 +1,32 @@
+.teams-invite-empty-message {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 1rem;
+}
+
+.teams-invite-list {
+  padding: 0;
+  margin-top: 1rem;
+  margin-bottom: 0;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.team-invite-row {
+  padding: 12px 12px 12px 1rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+}
+
+.team-invite-row .ant-col {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.teams-invite-list li:not(:last-child) {
+  margin-bottom: 8px;
+}
