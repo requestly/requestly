@@ -1047,7 +1047,8 @@ BG.Methods.addListenerForExtensionMessages = function () {
     sendResponse
   ) {
     switch (message.action) {
-      case RQ.CLIENT_MESSAGES.ADD_ANALYTICS_EVENT:
+      case RQ.CLIENT_MESSAGES.ADD_EVENT:
+        console.log("!!!debug", "add event msg in bg", message);
         EventActions.queueEventToWrite(message.payload);
         break;
 

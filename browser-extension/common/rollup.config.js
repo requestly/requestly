@@ -95,4 +95,13 @@ export default [
     },
     plugins: commonPlugins,
   },
+  {
+    input: "src/analytics/index.ts",
+    output: {
+      file: `${OUTPUT_DIR}/analytics.js`,
+      name: "RQ.Events",
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
 ];

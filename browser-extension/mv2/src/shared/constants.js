@@ -32,8 +32,8 @@ RQ.RESOURCES = {
 };
 
 RQ.CLIENT_MESSAGES = {
+  ADD_EVENT: "addEvent",
   GET_SCRIPT_RULES: "getScriptRules",
-  ADD_ANALYTICS_EVENT: "addAnalyticsEvent",
   GET_USER_AGENT_RULE_PAIRS: "getUserAgentRulePairs",
   OVERRIDE_RESPONSE: "overrideResponse",
   NOTIFY_RULES_APPLIED: "notifyRulesApplied",
