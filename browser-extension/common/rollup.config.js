@@ -111,6 +111,6 @@ export default [
       name: "RQ.commonUtils",
       format: "iife",
     },
-    plugins: commonPlugins,
+    plugins: [...commonPlugins, nodeResolve()],
   },
 ];

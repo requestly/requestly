@@ -88,7 +88,7 @@ EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
   );
 
   if (batchesToDelete) {
-    EventActions.deleteBatchs(batchesToDelete);
+    EventActions.deleteBatches(batchesToDelete);
 
     batchesToDelete.forEach((batchId) => {
       EventActions.stopWaitingForAcknowledgement(batchId);
@@ -129,7 +129,7 @@ EventActions.sendExtensionEvents = async () => {
       appTabId
     )
       .then((payload) => {
-        console.log("!!!debug", "response received from app:", response);
+        console.log("!!!debug", "response received from app:", payload);
         if (payload) {
           return { wasMessageSent: true, payload };
         }
