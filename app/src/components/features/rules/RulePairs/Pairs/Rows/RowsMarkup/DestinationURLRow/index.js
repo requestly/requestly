@@ -180,6 +180,7 @@ const DestinationURLRow = ({
             setIsMockPickerVisible(true);
             trackClickMock();
           }}
+          disabled={isInputDisabled}
         >
           {pair.destination ? "Change file" : " Select mock/file"}
         </RQButton>
@@ -202,7 +203,9 @@ const DestinationURLRow = ({
       <Col span={24} className="picker-container">
         <RQButton
           onPointerEnter={() => trackDesktopActionInterestCaptured("map_local")}
-          disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+          disabled={
+            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) || isInputDisabled
+          }
           type="default"
           onClick={() => {
             displayFileSelector(handleFileSelectCallback);
