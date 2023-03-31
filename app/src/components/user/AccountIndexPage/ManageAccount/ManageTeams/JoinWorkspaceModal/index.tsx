@@ -69,7 +69,10 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
                     <div>{metadata.teamName}</div>
                   </Col>
 
-                  <Button onClick={() => handleJoinClick(metadata.teamId, id)}>
+                  <Button
+                    type="primary"
+                    onClick={() => handleJoinClick(metadata.teamId, id)}
+                  >
                     Join
                   </Button>
                 </Row>
