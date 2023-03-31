@@ -43,6 +43,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
 import "./RuleBuilder.css";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -71,10 +72,10 @@ const RuleBuilder = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
-  const __IS_FEATURE_FLAG_ON__ = false;
+  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
   const isRedirectRuleWithFeatureFlagOn =
     currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && __IS_FEATURE_FLAG_ON__;
+      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && redirectRuleOnboardingExp === "docs";
 
   //References
   const isCleaningUpRef = useRef(false);
