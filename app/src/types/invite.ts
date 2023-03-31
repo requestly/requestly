@@ -16,6 +16,7 @@ export enum InviteStatus {
 export type InviteMetadata = Record<string, unknown>;
 
 export interface Invite {
+  id?: string;
   email?: string | null;
   usageCount: number;
   ownerId: string; // Who invited the user
