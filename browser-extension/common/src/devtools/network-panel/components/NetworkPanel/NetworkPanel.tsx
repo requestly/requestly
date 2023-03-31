@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NetworkEvent, NetworkFilters } from "../../types";
-import NetworkPanelToolbar from "../NetworkPanelToolbar/NetworkPanelToolbar";
+import { PrimaryToolbar, FiltersToolbar } from "../NetworkPanelToolbar";
 import EmptyPanelPlaceholder from "./EmptyPanelPlaceholder";
 import NetworkTable from "../NetworkTable/NetworkTable";
 import "./networkPanel.scss";
@@ -21,16 +21,18 @@ const NetworkPanel: React.FC = () => {
     setNetworkEvents([]);
   }, []);
 
-  return networkEvents.length > 0 ? (
+  return (
     <div className="network-panel">
-      <NetworkPanelToolbar
-        onFiltersChange={setFilters}
-        clearEvents={clearEvents}
-      />
-      <NetworkTable networkEvents={networkEvents} filters={filters} />
+      <PrimaryToolbar clearEvents={clearEvents} />
+      {networkEvents.length > 0 ? (
+        <>
+          <FiltersToolbar onFiltersChange={setFilters} />
+          <NetworkTable networkEvents={networkEvents} filters={filters} />
+        </>
+      ) : (
+        <EmptyPanelPlaceholder />
+      )}
     </div>
-  ) : (
-    <EmptyPanelPlaceholder />
   );
 };
 

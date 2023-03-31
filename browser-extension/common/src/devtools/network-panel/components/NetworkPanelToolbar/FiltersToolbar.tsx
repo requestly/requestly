@@ -1,19 +1,13 @@
-import { StopOutlined } from "@ant-design/icons";
 import { Divider, Input, Radio } from "antd";
 import React, { useEffect, useState } from "react";
 import { NetworkFilters, ResourceTypeFilter } from "../../types";
-import IconButton from "../IconButton/IconButton";
 import "./networkPanelToolbar.scss";
 
 interface Props {
   onFiltersChange: (filters: NetworkFilters) => void;
-  clearEvents: () => void;
 }
 
-const NetworkPanelToolbar: React.FC<Props> = ({
-  onFiltersChange,
-  clearEvents,
-}) => {
+const FiltersToolbar: React.FC<Props> = ({ onFiltersChange }) => {
   const [urlFilter, setUrlFilter] = useState("");
   const [resourceTypeFilter, setResourceTypeFilter] = useState(
     ResourceTypeFilter.ALL
@@ -27,13 +21,7 @@ const NetworkPanelToolbar: React.FC<Props> = ({
   }, [urlFilter, resourceTypeFilter]);
 
   return (
-    <div className="network-panel-toolbar">
-      <IconButton
-        icon={StopOutlined}
-        className="clear-events-button"
-        onClick={clearEvents}
-        tooltip="Clear"
-      />
+    <div className="network-panel-toolbar filters">
       <Input
         className="url-filter"
         placeholder="Filter by URL"
@@ -67,4 +55,4 @@ const NetworkPanelToolbar: React.FC<Props> = ({
   );
 };
 
-export default NetworkPanelToolbar;
+export default FiltersToolbar;
