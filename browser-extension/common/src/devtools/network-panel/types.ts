@@ -43,3 +43,7 @@ export interface NetworkFilters {
   url?: string;
   resourceType?: ResourceTypeFilter;
 }
+
+export interface NetworkPanelSettings {
+  preserveLog?: boolean;
+}
