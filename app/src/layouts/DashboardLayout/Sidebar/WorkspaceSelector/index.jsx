@@ -10,6 +10,7 @@ import {
   SettingOutlined,
   UserOutlined,
   ExclamationCircleFilled,
+  RightOutlined,
 } from "@ant-design/icons";
 import {
   clearCurrentlyActiveWorkspace,
@@ -18,6 +19,7 @@ import {
 } from "actions/TeamWorkspaceActions";
 import {
   Avatar,
+  Badge,
   Divider,
   Dropdown,
   Menu,
@@ -47,11 +49,13 @@ import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import { toast } from "utils/Toast";
 import { getTeamInvites } from "backend/teams";
 import "./WorkSpaceSelector.css";
 
@@ -67,6 +71,7 @@ const prettifyWorkspaceName = (workspaceName) => {
   //   return "Private";
   return workspaceName;
 };
+
 const getWorkspaceIcon = (workspaceName) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
     return <LockOutlined />;
@@ -158,19 +163,22 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(
+    false
+  );
   const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(
     false
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [teamInvites, setTeamInvites] = useState([]);
   const loggedInUserEmail = user?.details?.profile?.email;
 
   useEffect(() => {
     if (!user.loggedIn) return;
-    console.log("running...", loggedInUserEmail);
 
     getTeamInvites(loggedInUserEmail)
-      .then((d) => console.log({ "data from firebase": d }))
-      .catch((e) => console.log("error-------->>", e));
+      .then(setTeamInvites)
+      .catch((e) => toast.error("Not able to fetch team invites!"));
   }, [user.loggedIn, loggedInUserEmail]);
 
   useEffect(() => {
@@ -196,6 +204,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     setIsModalOpen(false);
   };
 
+  const handleJoinWorkspaceModalClose = () => {
+    setIsJoinWorkspaceModalOpen(false);
+  };
+
   const handleCreateWorkspaceModalClose = () => {
     setIsCreateWorkspaceModalOpen(false);
   };
@@ -218,6 +230,21 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         },
       })
     );
+  };
+
+  const handleJoinWorkspaceClick = () => {
+    if (user.loggedIn) {
+      setIsJoinWorkspaceModalOpen(true);
+    } else {
+      promptUserSignupModal(() => {
+        setIsJoinWorkspaceModalOpen(true);
+      }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+    }
+  };
+
+  const handleCreateWorkspaceFromJoinModal = () => {
+    handleJoinWorkspaceModalClose();
+    handleCreateNewWorkspaceRedirect();
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
@@ -372,6 +399,42 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
   const isTeamCurrentlyActive = (teamId) =>
     currentlyActiveWorkspace.id === teamId;
+  const TeamsInviteCountBadge = (
+    <Badge
+      color="#0361FF"
+      count={teamInvites.length}
+      className="join-workspace-invite-count-badge"
+    />
+  );
+
+  const joinWorkspaceDropdownItems = [
+    {
+      key: "0",
+      label: (
+        <span className="join-existing-workspace-menu-item">
+          <span>Join an existing workspace</span>
+          {teamInvites.length > 0 && TeamsInviteCountBadge}
+        </span>
+      ),
+      onClick: () => {
+        handleJoinWorkspaceClick();
+        // send analytics
+      },
+    },
+    {
+      key: "1",
+      label: "Create a new workspace",
+      onClick: () => {
+        handleCreateNewWorkspaceRedirect();
+        trackWorkspaceDropdownClicked("create_new_workspace");
+        trackCreateNewWorkspaceClicked("workspaces_dropdown");
+      },
+    },
+  ];
+
+  const handleJoinWorkspaceDropdownClick = ({ key }) => {
+    joinWorkspaceDropdownItems[key]?.onClick?.();
+  };
 
   const menu = (
     <Menu className="workspaces-menu">
@@ -472,19 +535,26 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       </Menu.ItemGroup>
 
       <Divider className="ant-divider-margin workspace-divider" />
+      <Menu.Item key="3" className="workspace-menu-item">
+        <Dropdown
+          open={true}
+          menu={{
+            items: joinWorkspaceDropdownItems,
+            onClick: handleJoinWorkspaceDropdownClick,
+          }}
+          overlayClassName="join-workspace-menu-dropdown-container"
+        >
+          <div className="join-workspace-menu-dropdown-trigger">
+            <span>Join or create workspace</span>
 
-      <Menu.Item
-        key="3"
-        className="workspace-menu-item"
-        onClick={() => {
-          handleCreateNewWorkspaceRedirect();
-          trackWorkspaceDropdownClicked("create_new_workspace");
-          trackCreateNewWorkspaceClicked("workspaces_dropdown");
-        }}
-        icon={<PlusOutlined className="icon-wrapper" />}
-      >
-        Create New Workspace
+            <div>
+              {TeamsInviteCountBadge}
+              <RightOutlined />
+            </div>
+          </div>
+        </Dropdown>
       </Menu.Item>
+      <Divider className="ant-divider-margin workspace-divider" />
 
       {isWorkspaceMode ? (
         <>
@@ -531,12 +601,18 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} />
       ) : null}
 
+      <JoinWorkspaceModal
+        teamInvites={teamInvites}
+        isOpen={isJoinWorkspaceModalOpen}
+        handleModalClose={handleJoinWorkspaceModalClose}
+        handleCreateNewWorkspaceClick={handleCreateWorkspaceFromJoinModal}
+      />
+
       <CreateWorkspaceModal
         isOpen={isCreateWorkspaceModalOpen}
         handleModalClose={handleCreateWorkspaceModalClose}
       />
 
-      {/* TODO: change "invite" terminology to "add" */}
       {isWorkspaceMode ? (
         <AddMemberModal
           isOpen={isInviteModalOpen}
