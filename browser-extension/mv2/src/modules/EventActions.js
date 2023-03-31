@@ -153,7 +153,7 @@ EventActions.sendExtensionEvents = async () => {
 
 EventActions.writeEventsToLocalStorage = async () => {
   const createBatch = (eventsArray) => {
-    const batchId = RQ.Utils.generateUUID();
+    const batchId = RQ.commonUtils.generateUUID();
     return {
       id: batchId,
       events: eventsArray,
