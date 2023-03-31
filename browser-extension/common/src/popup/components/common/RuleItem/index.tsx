@@ -16,21 +16,6 @@ interface RuleItemProps {
   onRuleUpdated?: (rule: Rule) => void;
 }
 
-/* dummy test function :: To be removed */
-function sendEventToBackground(eventName: string, eventParams: any) {
-  const eventTs = Date.now();
-  const eventOptions = { time: eventTs };
-
-  chrome.runtime.sendMessage({
-    action: "addAnalyticsEvent",
-    payload: {
-      eventName,
-      eventParams,
-      eventOptions,
-    },
-  });
-}
-
 const RuleItem: React.FC<RuleItemProps> = ({
   rule,
   isChildren = false,
@@ -46,10 +31,6 @@ const RuleItem: React.FC<RuleItemProps> = ({
     (rule: Rule) => {
       updateRule(rule, isParentPinnedRecords);
       console.log("POPUP: sending event to BG");
-      sendEventToBackground("testingEvent", {
-        actualEvent: "RULE_TOGGLED",
-        src: "POPUP",
-      });
       onRuleUpdated?.(rule);
     },
     [updateRule, onRuleUpdated]

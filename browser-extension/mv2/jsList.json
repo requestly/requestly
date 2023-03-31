@@ -44,6 +44,7 @@
   "background": [
     "dist/generated/shared.js",
     "../../common/logger.js",
+    "../common/dist/analytics.js",
     "src/external/CircularQueue.js",
     "src/external/chromeTabService.js",
     "src/modules/StorageService.js",

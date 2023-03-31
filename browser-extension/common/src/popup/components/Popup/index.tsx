@@ -5,6 +5,8 @@ import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
 import "./popup.css";
+import { sendEventToBackground } from "../../../analytics/analyticsUtils";
+import { EVENT_CONSTANTS } from "../../../analytics/analyticsContants";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -20,6 +22,8 @@ const Popup: React.FC = () => {
       { action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED },
       setIsExtensionEnabled
     );
+
+    sendEventToBackground(EVENT_CONSTANTS.POPUP_OPENED);
   }, []);
 
   const handleToggleExtensionStatus = useCallback(() => {
