@@ -6,7 +6,7 @@ const sendEventToBackground = (
 ) => {
   const eventTs = Date.now();
   const eventOptions = { time: eventTs };
-  eventParams.source = "extension";
+  eventParams["log_source"] = "extension";
 
   chrome.runtime.sendMessage({
     action: CLIENT_MESSAGES.ADD_EVENT,
@@ -22,7 +22,7 @@ export const sendEventFromPopup = (
   eventName: string,
   eventParams: Record<string, any> = {}
 ) => {
-  eventParams["extension_component"] = "popup";
+  eventParams["source"] = "popup";
   sendEventToBackground(eventName, eventParams);
 };
 
@@ -30,6 +30,6 @@ export const sendEventFromDevtool = (
   eventName: string,
   eventParams: Record<string, any> = {}
 ) => {
-  eventParams["extension_component"] = "devtools";
+  eventParams["source"] = "devtools";
   sendEventToBackground(eventName, eventParams);
 };
