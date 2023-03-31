@@ -29,5 +29,5 @@ export const getTeamInvites = async (
 
   return !querySnapshot.empty
     ? querySnapshot.docs.map((doc) => doc.data() as TeamInvite)
-    : null;
+    : [];
 };
