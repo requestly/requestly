@@ -537,7 +537,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       <Divider className="ant-divider-margin workspace-divider" />
       <Menu.Item key="3" className="workspace-menu-item">
         <Dropdown
-          open={true}
+          placement="right"
           menu={{
             items: joinWorkspaceDropdownItems,
             onClick: handleJoinWorkspaceDropdownClick,
@@ -554,10 +554,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           </div>
         </Dropdown>
       </Menu.Item>
-      <Divider className="ant-divider-margin workspace-divider" />
 
       {isWorkspaceMode ? (
         <>
+          <Divider className="ant-divider-margin workspace-divider" />
           <Menu.Item
             key="4"
             className="workspace-menu-item"
