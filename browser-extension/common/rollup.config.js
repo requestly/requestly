@@ -95,4 +95,13 @@ export default [
     },
     plugins: commonPlugins,
   },
+  {
+    input: "src/utils.ts",
+    output: {
+      file: `${OUTPUT_DIR}/utils.js`,
+      name: "RQ.Utils",
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
 ];

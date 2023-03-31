@@ -1,24 +1,24 @@
+/* SCOPE */
 const EventActions = {};
+/* STATE */
+EventActions.eventsToWrite = [];
+EventActions.eventWriterInterval = null;
+EventActions.batchesWaitingForAck = [];
+EventActions.STORE_EVENTS_KEY = "eventBatches";
 
-let eventsToWrite = [];
-let eventWriterInterval = null;
-
-const LOCAL_ANALYTICS_KEY = "eventBatches";
-
-const generateUUID = () => parseInt(Math.random() * 10000).toString(); // todo: create and use uuid uitility from common
+/* UTILITIES */
 
 EventActions.queueEventToWrite = (event) => {
-  // todo: generate uuid for each event
-  eventsToWrite.push(event);
+  EventActions.eventsToWrite.push(event);
 };
 
 EventActions.getEventBatches = async () => {
-  const events = RQ.StorageService.getRecord(LOCAL_ANALYTICS_KEY)
-    .then((storedEvents) => {
-      // these are considered the events that are ready to be sent
-      // not considering events in `eventsToWrite` here
+  const eventBatches = RQ.StorageService.getRecord(
+    EventActions.STORE_EVENTS_KEY
+  )
+    .then((storedEventBatches) => {
       try {
-        return JSON.parse(storedEvents);
+        return JSON.parse(storedEventBatches);
       } catch (error) {
         return {};
       }
@@ -28,88 +28,82 @@ EventActions.getEventBatches = async () => {
       return {};
     });
 
-  return events; // promise that resolves to events
+  return eventBatches;
 };
 
-function getEventsToWrite() {
-  // remove from the local array buffer
-  const _eventsToWrite = [...eventsToWrite];
-  eventsToWrite = [];
-  return _eventsToWrite;
-}
-
-async function writeEventsToLocalStorage() {
-  const createBatch = (eventsArray) => {
-    const batchId = generateUUID();
-    return {
-      id: batchId,
-      events: eventsArray,
-      createdTS: Date.now(),
-    };
-  };
-
-  const _eventsToWrite = [...getEventsToWrite()];
-
-  if (_eventsToWrite.length) {
-    // // write batched events to local storage
-    // return EventActions.getEventBatches().then(async (storageEvents) => {
-    //   if (storageEvents) _eventsToWrite.push(...storageEvents);
-
-    //   const newAnalyticsEntry = {};
-    //   newAnalyticsEntry[LOCAL_ANALYTICS_KEY] = _eventsToWrite;
-    //   return RQ.StorageService.saveRecord(newAnalyticsEntry).then((_) =>
-    //     console.log("BG to LOCAL: Events Write complete")
-    //   );
-    // });
-    // now these events are considered ready to be sent to UI
-    // todo: call sendEvents() // being implemented separately by @nafees
-
-    /*
-      1. create an event batch
-      2. save an event batch
-      3. call sendEvents()
-    */
-    const eventsBatch = createBatch(_eventsToWrite);
-
-    return EventActions.getEventBatches().then(async (storageBatches) => {
-      storageBatches[eventsBatch.id] = eventsBatch;
-
-      const newStoredBatches = {};
-      newStoredBatches[LOCAL_ANALYTICS_KEY] = JSON.stringify(storageBatches);
-
-      return RQ.StorageService.saveRecord(newStoredBatches)
-        .then((_) =>
-          console.log(
-            "BG to LOCAL: Events Write complete for batch",
-            eventsBatch.id
-          )
-        )
-        .catch((err) =>
-          console.error("BG to LOCAL: Error writing batch", eventsBatch.id, err)
-        );
+EventActions.deleteBatches = async (batchIds) => {
+  const batchesInStorage = await EventActions.getEventBatches();
+  if (batchesInStorage) {
+    batchIds.forEach((id) => {
+      delete batchesInStorage[id];
     });
-    // EventActions.sendExtensionEvents()
-  }
-}
-
-EventActions.startPeriodicEventWriter = async (intervalTime = 2000) => {
-  if (!eventWriterInterval) {
-    eventWriterInterval = setInterval(async () => {
-      await writeEventsToLocalStorage();
-    }, intervalTime);
   }
 
-  return eventWriterInterval;
+  const newStoredBatches = {};
+  newStoredBatches[EventActions.STORE_EVENTS_KEY] = JSON.stringify(
+    batchesInStorage
+  );
+
+  await RQ.StorageService.saveRecord(newStoredBatches).then((_) =>
+    console.log("ack batches cleared")
+  );
 };
 
-EventActions.sendExtensionEvents = async () => {
-  if (!BG.isAppOnline) {
-    return;
+EventActions.getEventsToWrite = () => {
+  /* also removes from the local events buffer */
+  const _eventsToWrite = [...EventActions.eventsToWrite];
+  EventActions.eventsToWrite = [];
+  return _eventsToWrite;
+};
+
+/* batches recognised for sending here are added to batchesWaitingForAck */
+EventActions.getBatchesToSend = async () => {
+  let batchesToSend = [];
+
+  const allEventBatches = await EventActions.getEventBatches();
+  batchesToSend = Object.keys(allEventBatches)
+    .filter((batchId) => !EventActions.batchesWaitingForAck.includes(batchId))
+    .map((batchIdToSend) => {
+      batchesWaitingForAck.push(batchIdToSend);
+      return allEventBatches[batchIdToSend];
+    });
+
+  return batchesToSend;
+};
+
+/* ACKNOWLEDGEMENT HANDLERS */
+
+EventActions.stopWaitingForAcknowledgement = (batchId) => {
+  const batchIndex = EventActions.batchesWaitingForAck.findIndex(batchId);
+  if (batchIndex !== -1) {
+    batchesWaitingForAck.splice(batchIndex, 1);
+  } else {
+    console.warn("Weird: receiving duplicate event acknowledgements");
   }
+};
+
+EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
+  const batchesToDelete = acknowledgedBatchIds.filter((acknowledgedBatch) =>
+    EventActions.batchesWaitingForAck.includes(acknowledgedBatch)
+  );
+
+  if (batchesToDelete) {
+    EventActions.deleteBatchs(batchesToDelete);
+
+    batchesToDelete.forEach((batchId) => {
+      EventActions.stopWaitingForAcknowledgement(batchId);
+    });
+  }
+};
+
+/* CORE */
+
+// MAIN SENDING ENGINE
+EventActions.sendExtensionEvents = async () => {
+  const lastTriedTabIds = [];
 
   while (BG.isAppOnline) {
-    const lastTriedTabIds = [];
-
+    /* Getting one UI tab (that we haven't tried sending) */
     const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
       const filteredTab = tabs.find((tab) => !lastTriedTabIds.includes(tab.id));
       if (filteredTab) {
@@ -121,31 +115,87 @@ EventActions.sendExtensionEvents = async () => {
       }
     });
 
-    if (!appTabId) {
-      break;
-    }
+    if (!appTabId) break;
 
-    // read events from local storage
-    // create new batch of events to send
-    // do the above in a separate function
+    const eventBatchesPayload = await EventActions.getBatchesToSend();
+    if (!eventBatchesPayload) break;
 
-    // create message object using the batch
     const extensionEventsMessage = {
       action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
-      events: {}, // it should fetched from a separate function only after all the checks
+      eventBatches: eventBatchesPayload,
     };
+    const response = await BG.Methods.sendMessageToApp(
+      extensionEventsMessage,
+      appTabId
+    )
+      .then((payload) => {
+        console.log("!!!debug", "response received from app:", response);
+        if (payload) {
+          return { wasMessageSent: true, payload };
+        }
+      })
+      .catch((err) => {
+        // todo: can add check if timeout based on err
+        console.log("!!!debug", "sendMessageToApp timed out");
+        return { wasMessageSent: false };
+      });
 
-    try {
-      const response = await BG.Methods.sendMessageToApp(
-        extensionEventsMessage,
-        appTabId
-      );
-      console.log("!!!debug", "response received from app:", response);
-      if (response) {
-        break;
-      }
-    } catch {
-      console.log("!!!debug", "sendMessageToApp timed out");
+    if (response.wasMessageSent) {
+      await EventActions.handleAcknowledgements(response.payload.ackIds);
+      break;
+    } else {
+      eventBatchesPayload.forEach((batchId) => {
+        EventActions.stopWaitingForAcknowledgement(batchId);
+      });
     }
   }
+};
+
+EventActions.writeEventsToLocalStorage = async () => {
+  const createBatch = (eventsArray) => {
+    const batchId = RQ.Utils.generateUUID();
+    return {
+      id: batchId,
+      events: eventsArray,
+      createdTs: Date.now(),
+    };
+  };
+
+  const _eventsToWrite = [...EventActions.getEventsToWrite()];
+
+  if (_eventsToWrite.length) {
+    const newEventsBatch = createBatch(_eventsToWrite);
+
+    return EventActions.getEventBatches().then(async (batchesInStorage) => {
+      batchesInStorage[newEventsBatch.id] = newEventsBatch;
+
+      // todo: needs to be updated if local storage structure is changed
+      const newStoredBatches = {};
+      newStoredBatches[EventActions.STORE_EVENTS_KEY] = JSON.stringify(
+        batchesInStorage
+      );
+
+      return RQ.StorageService.saveRecord(newStoredBatches)
+        .then((_) => {
+          console.log(
+            "BG to LOCAL: Events Write complete for batch",
+            newEventsBatch.id
+          );
+          EventActions.sendExtensionEvents();
+        })
+        .catch((err) =>
+          console.error("BG to LOCAL: Error writing batch", newEventsBatch, err)
+        );
+    });
+  }
+};
+
+EventActions.startPeriodicEventWriter = async (intervalTime = 2000) => {
+  if (!EventActions.eventWriterInterval) {
+    EventActions.eventWriterInterval = setInterval(async () => {
+      await EventActions.writeEventsToLocalStorage();
+    }, intervalTime);
+  }
+
+  return EventActions.eventWriterInterval;
 };
