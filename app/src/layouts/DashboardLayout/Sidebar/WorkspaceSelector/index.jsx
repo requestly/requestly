@@ -548,7 +548,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
             <span>Join or create workspace</span>
 
             <div>
-              {TeamsInviteCountBadge}
+              {teamInvites.length > 0 && TeamsInviteCountBadge}
               <RightOutlined />
             </div>
           </div>
