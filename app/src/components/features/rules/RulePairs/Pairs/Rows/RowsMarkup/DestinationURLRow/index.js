@@ -310,7 +310,11 @@ const DestinationURLRow = ({
                 onCancel={() => setDestinationTypePopupVisible(false)}
                 open={destinationTypePopupVisible}
               >
-                <Radio.Group value={destinationType} onChange={showPopup}>
+                <Radio.Group
+                  value={destinationType}
+                  onChange={showPopup}
+                  disabled={isInputDisabled}
+                >
                   <MoreInfo
                     text="Redirect URL to another URL"
                     analyticsContext="url_destination"
