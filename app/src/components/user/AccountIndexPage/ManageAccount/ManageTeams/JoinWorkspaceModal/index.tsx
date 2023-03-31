@@ -6,6 +6,7 @@ import { RQModal } from "lib/design-system/components";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { TeamInvite } from "types";
+import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import "./JoinWorkspaceModal.css";
 
 interface JoinWorkspaceModalProps {
@@ -22,6 +23,11 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   handleCreateNewWorkspaceClick,
 }) => {
   const navigate = useNavigate();
+
+  const handleJoinClick = (teamId: string, inviteId: string) => {
+    trackWorkspaceJoinClicked(teamId, "workspace_joining_modal");
+    navigate(`/invite/${inviteId}`);
+  };
 
   return (
     <RQModal
@@ -63,7 +69,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
                     <div>{metadata.teamName}</div>
                   </Col>
 
-                  <Button onClick={() => navigate(`/invite/${id}`)}>
+                  <Button onClick={() => handleJoinClick(metadata.teamId, id)}>
                     Join
                   </Button>
                 </Row>

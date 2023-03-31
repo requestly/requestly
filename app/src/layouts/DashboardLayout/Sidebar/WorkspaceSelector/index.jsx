@@ -57,6 +57,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { toast } from "utils/Toast";
 import { getTeamInvites } from "backend/teams";
+import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import "./WorkSpaceSelector.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -232,12 +233,14 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     );
   };
 
-  const handleJoinWorkspaceClick = () => {
+  const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       setIsJoinWorkspaceModalOpen(true);
+      trackWorkspaceJoiningModalOpened(teamInvites.length);
     } else {
       promptUserSignupModal(() => {
         setIsJoinWorkspaceModalOpen(true);
+        trackWorkspaceJoiningModalOpened(teamInvites.length);
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
@@ -417,8 +420,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         </span>
       ),
       onClick: () => {
-        handleJoinWorkspaceClick();
-        // send analytics
+        handleJoinWorkspaceMenuItemClick();
       },
     },
     {
