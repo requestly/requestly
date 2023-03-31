@@ -66,7 +66,11 @@ EventActions.sendExtensionEvents = async () => {
     return;
   }
 
-  while (BG.isAppOnline) {
+  const useEngine = await RQ.StorageService.getRecord(
+    RQ.STORAGE_KEYS.USE_EVENTS_ENGINE
+  );
+
+  while (useEngine !== false && BG.isAppOnline) {
     const lastTriedTabIds = [];
 
     const appTabId = await BG.Methods.getAppTabs().then((tabs) => {

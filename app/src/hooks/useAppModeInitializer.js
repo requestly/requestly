@@ -31,6 +31,8 @@ import {
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
+import { StorageService } from "init";
+import { useEventsEngineFlag } from "modules/analytics/events/extension";
 // import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 
 const useAppModeInitializer = () => {
@@ -208,7 +210,9 @@ const useAppModeInitializer = () => {
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      notifyAppLoadedToExtension();
+      StorageService(appMode)
+        .saveRecord(useEventsEngineFlag)
+        .then(() => notifyAppLoadedToExtension());
     }
   }, [appMode]);
 };
