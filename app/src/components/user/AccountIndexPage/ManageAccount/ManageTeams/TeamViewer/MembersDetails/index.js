@@ -2,21 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
-import {
-  getAvailableTeams,
-  getCurrentlyActiveWorkspaceMembers,
-} from "store/features/teams/selectors";
-//Firebase
+import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
-// Icons
 import { PlusOutlined } from "@ant-design/icons";
-// Sub Components
 import AddMemberModal from "./AddMemberModal";
 import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
-import "./MembersDetails.css";
-import { getUserAuthDetails } from "store/selectors";
 import PublicInviteLink from "./PublicInviteLink";
+import "./MembersDetails.css";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const location = useLocation();
@@ -30,8 +23,6 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
-  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
-  const user = useSelector(getUserAuthDetails);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const accessCount = teamDetails?.accessCount;
 
