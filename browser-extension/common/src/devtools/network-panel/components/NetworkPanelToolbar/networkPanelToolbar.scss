@@ -1,15 +1,10 @@
-.network-event-filters-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-
+.network-panel-toolbar {
   .url-filter {
     width: 200px;
     padding: 2px 6px;
   }
 
   .resource-type-filter {
-    margin-left: 10px;
     padding: 2px;
     display: flex;
     flex-wrap: wrap;
@@ -19,7 +14,7 @@
       border: 0;
       margin-left: 6px;
       background: transparent;
-      font-size: 12px;
+      font-size: var(--font-size-normal);
       line-height: 18px;
       height: 18px;
 

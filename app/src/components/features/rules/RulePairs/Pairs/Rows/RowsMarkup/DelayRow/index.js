@@ -21,6 +21,7 @@ const DelayRow = ({
           className="display-inline-block"
           addonBefore={<span className="text-gray">DELAY (ms):</span>}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "delay")}
+          data-selectionid="delay-value"
         />
       </Col>
     </Row>

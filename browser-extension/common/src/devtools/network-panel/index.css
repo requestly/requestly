@@ -1,4 +1,6 @@
 :root {
+  --font-size-normal: 12px;
+  --font-size-large: 14px;
   --color-primary: black;
   --color-secondary: #202124;
   --color-error: #ed4e4c;

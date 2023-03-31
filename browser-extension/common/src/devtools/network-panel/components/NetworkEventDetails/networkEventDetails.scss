@@ -41,7 +41,7 @@
   .network-event-details-tab {
     padding: 2px 12px;
     color: var(--color-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-normal);
 
     &[data-selected] {
       background-color: var(--background-color-tab-selected);
@@ -50,6 +50,6 @@
   }
 
   .object-inspector span {
-    font-size: 11px;
+    font-size: var(--font-size-normal);
   }
 }

@@ -1,27 +1,39 @@
+import { StopOutlined } from "@ant-design/icons";
 import { Divider, Input, Radio } from "antd";
 import React, { useEffect, useState } from "react";
 import { NetworkFilters, ResourceTypeFilter } from "../../types";
-import "./networkEventFilters.scss";
+import IconButton from "../IconButton/IconButton";
+import "./networkPanelToolbar.scss";
 
 interface Props {
-  onChange: (filters: NetworkFilters) => void;
+  onFiltersChange: (filters: NetworkFilters) => void;
+  clearEvents: () => void;
 }
 
-const NetworkEventFilters: React.FC<Props> = ({ onChange }) => {
+const NetworkPanelToolbar: React.FC<Props> = ({
+  onFiltersChange,
+  clearEvents,
+}) => {
   const [urlFilter, setUrlFilter] = useState("");
   const [resourceTypeFilter, setResourceTypeFilter] = useState(
     ResourceTypeFilter.ALL
   );
 
   useEffect(() => {
-    onChange({
+    onFiltersChange({
       url: urlFilter,
       resourceType: resourceTypeFilter,
     });
   }, [urlFilter, resourceTypeFilter]);
 
   return (
-    <div className="network-event-filters-container">
+    <div className="network-panel-toolbar">
+      <IconButton
+        icon={StopOutlined}
+        className="clear-events-button"
+        onClick={clearEvents}
+        tooltip="Clear"
+      />
       <Input
         className="url-filter"
         placeholder="Filter by URL"
@@ -55,4 +67,4 @@ const NetworkEventFilters: React.FC<Props> = ({ onChange }) => {
   );
 };
 
-export default NetworkEventFilters;
+export default NetworkPanelToolbar;
