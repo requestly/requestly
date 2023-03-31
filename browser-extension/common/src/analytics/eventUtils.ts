@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES } from "../constants";
 
-export const sendEventToBackground = (
+const sendEventToBackground = (
   eventName: string,
   eventParams: Record<string, any> = {}
 ) => {
@@ -16,4 +16,20 @@ export const sendEventToBackground = (
       eventOptions,
     },
   });
+};
+
+export const sendEventFromPopup = (
+  eventName: string,
+  eventParams: Record<string, any> = {}
+) => {
+  eventParams["extension_component"] = "popup";
+  sendEventToBackground(eventName, eventParams);
+};
+
+export const sendEventFromDevtool = (
+  eventName: string,
+  eventParams: Record<string, any> = {}
+) => {
+  eventParams["extension_component"] = "devtools";
+  sendEventToBackground(eventName, eventParams);
 };

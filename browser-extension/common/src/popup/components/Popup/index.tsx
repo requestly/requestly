@@ -5,7 +5,7 @@ import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
 import "./popup.css";
-import { sendEventToBackground } from "../../../analytics/eventUtils";
+import { sendEventFromPopup } from "../../../analytics/eventUtils";
 import { EVENT_CONSTANTS } from "../../../analytics/eventContants";
 
 const Popup: React.FC = () => {
@@ -23,7 +23,7 @@ const Popup: React.FC = () => {
       setIsExtensionEnabled
     );
 
-    sendEventToBackground(EVENT_CONSTANTS.POPUP_OPENED);
+    sendEventFromPopup(EVENT_CONSTANTS.POPUP_OPENED);
   }, []);
 
   const handleToggleExtensionStatus = useCallback(() => {
