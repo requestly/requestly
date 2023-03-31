@@ -20,6 +20,8 @@ export enum RuleEditorUrlFragment {
   CANCEL = "Cancel",
   DELAY = "Delay",
   QUERY_PARAM = "QueryParam",
+  SCRIPT = "Script",
+  USER_AGENT = "UserAgent",
 }
 
 export enum ResourceTypeFilter {

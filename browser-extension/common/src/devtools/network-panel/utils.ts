@@ -58,6 +58,12 @@ export const getBaseUrl = (url: string): string => {
   return parsedUrl.origin + parsedUrl.pathname;
 };
 
+export const getPageOrigin = (): Promise<string> => {
+  return new Promise((resolve) => {
+    chrome.devtools.inspectedWindow.eval("window.location.origin", resolve);
+  });
+};
+
 export const getCurrentColorScheme = (): ColorScheme => {
   return window.matchMedia("(prefers-color-scheme: dark)")?.matches
     ? ColorScheme.DARK
