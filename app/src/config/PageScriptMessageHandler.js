@@ -1,5 +1,6 @@
 import Logger from "lib/logger";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { handleEventBatches } from "modules/analytics/events/extension";
 
 const PageScriptMessageHandler = {
   eventCallbackMap: {},
@@ -89,14 +90,15 @@ const PageScriptMessageHandler = {
 
   messageHandler: function (message) {
     switch (message.action) {
-      case GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS:
-        // send the received events from extension to analytics here
-
+      case GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS: {
+        const ackBatchIds = message.eventBatches.map((batch) => batch.id);
         this.sendResponse(message, {
-          msg: "acknowledgement back from psmh. Can clear storage",
+          ackIds: ackBatchIds,
           received: true,
         });
+        handleEventBatches(message.eventBatches);
         break;
+      }
       default:
         return false;
     }

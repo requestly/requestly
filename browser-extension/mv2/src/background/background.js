@@ -1001,7 +1001,7 @@ BG.Methods.getAppTabs = () => {
  */
 BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
   console.log("!!!debug", "sendmsgtoapp", tabId);
-  const sendMessage = (messageObject, tabId) => {
+  const sendMessageToTab = (messageObject, tabId) => {
     return new Promise((resolve) => {
       chrome.tabs.sendMessage(tabId, messageObject, (response) => {
         resolve(response);
@@ -1010,7 +1010,7 @@ BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
   };
 
   return Promise.race([
-    sendMessage(messageObject, tabId),
+    sendMessageToTab(messageObject, tabId),
     new Promise((_, reject) =>
       setTimeout(() => reject(new Error("timeout")), timeout)
     ),
