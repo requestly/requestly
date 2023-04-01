@@ -31,12 +31,31 @@ export const trackWorkspaceInviteLinkRevoked = (team_id) => {
   trackEvent(TEAMS.WORKSPACE_INVITE_LINK_REVOKED, params);
 };
 
-export const trackWorkspaceInviteAccepted = (team_id, invite_id, source, usage_type) => {
+export const trackWorkspaceInviteAccepted = (
+  team_id,
+  invite_id,
+  source,
+  usage_type
+) => {
   const params = { team_id, source, invite_id, usage_type };
   trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED, params);
 };
 
-export const trackWorkspaceInviteScreenError = (error_type, team_id, invite_id) => {
+export const trackWorkspaceInviteScreenError = (
+  error_type,
+  team_id,
+  invite_id
+) => {
   const params = { team_id, invite_id, error_type };
   trackEvent(TEAMS.WORKSPACE_INVITE_SCREEN_ERROR, params);
+};
+
+export const trackWorkspaceJoiningModalOpened = (pending_invites) => {
+  const params = { pending_invites };
+  trackEvent(TEAMS.WORKSPACE_JOINING_MODAL_OPENED, params);
+};
+
+export const trackWorkspaceJoinClicked = (team_id, source) => {
+  const params = { team_id, source };
+  trackEvent(TEAMS.WORKSPACE_JOIN_CLICKED, params);
 };
