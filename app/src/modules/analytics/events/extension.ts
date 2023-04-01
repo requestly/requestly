@@ -2,7 +2,7 @@ import { trackEvent } from "..";
 
 interface Event {
   eventName: string;
-  eventParam: object;
+  eventParams: object;
   eventTs: number;
 }
 
@@ -14,7 +14,14 @@ interface EventBatch {
 function sendEventsBatch(eventBatch: EventBatch) {
   eventBatch.events.forEach((event) => {
     const eventConfig = { time: event.eventTs };
-    trackEvent(event.eventName, event.eventParam, eventConfig);
+    console.log(
+      "!!!debug",
+      "trackEvent",
+      event.eventName,
+      event.eventParams,
+      eventConfig
+    );
+    trackEvent(event.eventName, event.eventParams, eventConfig);
   });
 }
 

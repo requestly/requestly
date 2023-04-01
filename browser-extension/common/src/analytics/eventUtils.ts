@@ -29,6 +29,6 @@ export const sendEventFromDevtool = (
   eventName: string,
   eventParams: Record<string, any> = {}
 ) => {
-  eventParams["source"] = "devtools";
+  eventParams["source"] = "devtool";
   sendEventToBackground(eventName, eventParams);
 };
