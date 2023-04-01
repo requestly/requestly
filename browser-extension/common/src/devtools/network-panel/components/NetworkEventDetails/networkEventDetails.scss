@@ -52,4 +52,10 @@
   .object-inspector span {
     font-size: var(--font-size-normal);
   }
+
+  .ant-btn {
+    box-shadow: none;
+    padding: 0 8px;
+    height: 24px;
+  }
 }
