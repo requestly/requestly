@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Badge, Space, Tag } from "antd";
+import { Button, Badge, Tag } from "antd";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
