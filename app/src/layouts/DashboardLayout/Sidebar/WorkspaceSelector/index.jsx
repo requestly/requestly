@@ -55,10 +55,10 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
-import { toast } from "utils/Toast";
 import { getTeamInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import "./WorkSpaceSelector.css";
+import Logger from "lib/logger";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -179,7 +179,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
     getTeamInvites(loggedInUserEmail)
       .then(setTeamInvites)
-      .catch((e) => toast.error("Not able to fetch team invites!"));
+      .catch((e) => Logger.log("Not able to fetch team invites!"));
   }, [user.loggedIn, loggedInUserEmail]);
 
   useEffect(() => {

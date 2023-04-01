@@ -1,7 +1,6 @@
 import {
   where,
   query,
-  orderBy,
   getDocs,
   Timestamp,
   collection,
@@ -20,9 +19,7 @@ export const getTeamInvites = async (
     where("email", "==", email),
     where("type", "==", InviteType.teams),
     where("status", "==", InviteStatus.pending),
-    where("expireTs", ">", Timestamp.now().toMillis()),
-    orderBy("expireTs", "desc"), // https://firebase.google.com/docs/firestore/query-data/order-limit-data#limitations
-    orderBy("createdTs", "desc")
+    where("expireTs", ">", Timestamp.now().toMillis())
   );
 
   const querySnapshot = await getDocs(inviteQuery);
