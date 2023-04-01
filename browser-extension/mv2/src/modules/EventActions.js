@@ -13,9 +13,7 @@ EventActions.queueEventToWrite = (event) => {
 };
 
 EventActions.getEventBatches = async () => {
-  const eventBatches = RQ.StorageService.getRecord(
-    EventActions.STORE_EVENTS_KEY
-  )
+  return RQ.StorageService.getRecord(EventActions.STORE_EVENTS_KEY)
     .then((storedEventBatches) => {
       try {
         return JSON.parse(storedEventBatches);
@@ -27,8 +25,6 @@ EventActions.getEventBatches = async () => {
       console.log("BG: error getting analytics events from local storage", err);
       return {};
     });
-
-  return eventBatches;
 };
 
 EventActions.deleteBatches = async (batchIds) => {
@@ -64,7 +60,7 @@ EventActions.getBatchesToSend = async () => {
   batchesToSend = Object.keys(allEventBatches)
     .filter((batchId) => !EventActions.batchesWaitingForAck.includes(batchId))
     .map((batchIdToSend) => {
-      batchesWaitingForAck.push(batchIdToSend);
+      EventActions.batchesWaitingForAck.push(batchIdToSend);
       return allEventBatches[batchIdToSend];
     });
 
@@ -74,9 +70,11 @@ EventActions.getBatchesToSend = async () => {
 /* ACKNOWLEDGEMENT HANDLERS */
 
 EventActions.stopWaitingForAcknowledgement = (batchId) => {
-  const batchIndex = EventActions.batchesWaitingForAck.findIndex(batchId);
+  const batchIndex = EventActions.batchesWaitingForAck.findIndex(
+    (batch) => batch === batchId
+  );
   if (batchIndex !== -1) {
-    batchesWaitingForAck.splice(batchIndex, 1);
+    EventActions.batchesWaitingForAck.splice(batchIndex, 1);
   } else {
     console.warn("Weird: receiving duplicate event acknowledgements");
   }
