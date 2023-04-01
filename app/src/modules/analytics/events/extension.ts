@@ -12,8 +12,8 @@ interface EventBatch {
   createdTs: number;
 }
 function sendEventsBatch(eventBatch: EventBatch) {
-  const eventConfig = { time: eventBatch.createdTs };
   eventBatch.events.forEach((event) => {
+    const eventConfig = { time: event.eventTs };
     trackEvent(event.eventName, event.eventParam, eventConfig);
   });
 }
