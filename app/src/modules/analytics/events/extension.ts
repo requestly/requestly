@@ -1,4 +1,6 @@
 import { trackEvent } from "..";
+// @ts-ignore
+import { CONSTANTS } from "@requestly/requestly-core";
 
 interface Event {
   eventName: string;
@@ -28,3 +30,8 @@ function sendEventsBatch(eventBatch: EventBatch) {
 export function handleEventBatches(batches: EventBatch[]) {
   batches.forEach(sendEventsBatch);
 }
+
+/* EXTENSION EVENTS ENGINE FLAG */
+export const useEventsEngineFlag = {
+  [CONSTANTS.STORAGE_KEYS.USE_EVENTS_ENGINE]: true,
+};

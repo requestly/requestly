@@ -199,6 +199,7 @@ CONSTANTS.STORAGE_KEYS = {
   USER_INFO: "user_info",
   LATEST_NOTIFICATION_READ_BY_USER: "latestNotificationReadId",
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
+  USE_EVENTS_ENGINE: "useEventsEngine",
 };
 
 CONSTANTS.REQUEST_STATE = {

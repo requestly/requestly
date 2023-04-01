@@ -94,7 +94,11 @@ EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
 EventActions.sendExtensionEvents = async () => {
   const lastTriedTabIds = [];
 
-  while (BG.isAppOnline) {
+  const useEngine = await RQ.StorageService.getRecord(
+    RQ.STORAGE_KEYS.USE_EVENTS_ENGINE
+  );
+
+  while (useEngine !== false && BG.isAppOnline) {
     /* Getting one UI tab (that we haven't tried sending) */
     const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
       const filteredTab = tabs.find((tab) => !lastTriedTabIds.includes(tab.id));
