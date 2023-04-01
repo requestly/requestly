@@ -104,4 +104,13 @@ export default [
     },
     plugins: commonPlugins,
   },
+  {
+    input: "src/utils.ts",
+    output: {
+      file: `${OUTPUT_DIR}/utils.js`,
+      name: "RQ.commonUtils",
+      format: "iife",
+    },
+    plugins: [...commonPlugins, nodeResolve()],
+  },
 ];

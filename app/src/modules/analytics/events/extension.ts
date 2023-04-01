@@ -4,7 +4,7 @@ import { CONSTANTS } from "@requestly/requestly-core";
 
 interface Event {
   eventName: string;
-  eventParam: object;
+  eventParams: object;
   eventTs: number;
 }
 
@@ -14,9 +14,16 @@ interface EventBatch {
   createdTs: number;
 }
 function sendEventsBatch(eventBatch: EventBatch) {
-  const eventConfig = { time: eventBatch.createdTs };
   eventBatch.events.forEach((event) => {
-    trackEvent(event.eventName, event.eventParam, eventConfig);
+    const eventConfig = { time: event.eventTs };
+    console.log(
+      "!!!debug",
+      "trackEvent",
+      event.eventName,
+      event.eventParams,
+      eventConfig
+    );
+    trackEvent(event.eventName, event.eventParams, eventConfig);
   });
 }
 
