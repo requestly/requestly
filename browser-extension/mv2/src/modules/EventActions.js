@@ -180,7 +180,7 @@ EventActions.writeEventsToLocalStorage = async () => {
   }
 };
 
-EventActions.startPeriodicEventWriter = async (intervalTime = 2000) => {
+EventActions.startPeriodicEventWriter = async (intervalTime = 10000) => {
   if (!EventActions.eventWriterInterval) {
     EventActions.eventWriterInterval = setInterval(async () => {
       await EventActions.writeEventsToLocalStorage();
