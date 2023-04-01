@@ -15,11 +15,7 @@ EventActions.queueEventToWrite = (event) => {
 EventActions.getEventBatches = async () => {
   return RQ.StorageService.getRecord(EventActions.STORE_EVENTS_KEY)
     .then((storedEventBatches) => {
-      try {
-        return JSON.parse(storedEventBatches);
-      } catch (error) {
-        return {};
-      }
+      return storedEventBatches || {};
     })
     .catch((err) => {
       console.log("BG: error getting analytics events from local storage", err);
@@ -36,9 +32,7 @@ EventActions.deleteBatches = async (batchIds) => {
   }
 
   const newStoredBatches = {};
-  newStoredBatches[EventActions.STORE_EVENTS_KEY] = JSON.stringify(
-    batchesInStorage
-  );
+  newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
 
   await RQ.StorageService.saveRecord(newStoredBatches).then((_) =>
     console.log("ack batches cleared")
@@ -169,9 +163,7 @@ EventActions.writeEventsToLocalStorage = async () => {
 
       // todo: needs to be updated if local storage structure is changed
       const newStoredBatches = {};
-      newStoredBatches[EventActions.STORE_EVENTS_KEY] = JSON.stringify(
-        batchesInStorage
-      );
+      newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
 
       return RQ.StorageService.saveRecord(newStoredBatches)
         .then((_) => {
