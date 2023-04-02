@@ -1,0 +1,32 @@
+.rule-editor-help-btn.ant-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  padding: 15px 16px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--white);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-dark-background);
+}
+
+.rule-editor-help-btn.ant-btn:hover {
+  opacity: 0.7;
+  color: var(--white);
+  border-color: var(--border-dark);
+}
+
+.rule-editor-help-btn.ant-btn span:first-child {
+  margin-right: 12px;
+  display: inline-block;
+}
+
+.rule-editor-help-btn.ant-btn svg {
+  width: 11px;
+  height: 7px;
+  color: var(--text-gray);
+}

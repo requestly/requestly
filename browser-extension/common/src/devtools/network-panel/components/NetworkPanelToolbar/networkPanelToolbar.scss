@@ -1,7 +1,40 @@
-.network-event-filters-container {
+.network-panel-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  background-color: var(--background-color-toolbar);
+  border-bottom: 1px solid var(--border-color);
+
+  .ant-btn {
+    height: 24px;
+    padding: 0px 8px;
+    font-size: var(--font-size-small);
+    color: var(--color-secondary);
+  }
+
+  .divider {
+    height: 16px;
+  }
+
+  &.primary {
+    justify-content: space-between;
+
+    .divider {
+      margin-left: 0;
+      margin-right: 8px;
+    }
+  }
+
+  .preserve-log-checkbox {
+    font-size: var(--font-size-small);
+    color: var(--color-secondary);
+
+    .ant-checkbox {
+      font-size: 16px;
+    }
+  }
 
   .url-filter {
     width: 200px;
@@ -9,7 +42,6 @@
   }
 
   .resource-type-filter {
-    margin-left: 10px;
     padding: 2px;
     display: flex;
     flex-wrap: wrap;
@@ -19,7 +51,7 @@
       border: 0;
       margin-left: 6px;
       background: transparent;
-      font-size: 12px;
+      font-size: var(--font-size-normal);
       line-height: 18px;
       height: 18px;
 
@@ -35,7 +67,6 @@
     }
 
     .divider {
-      height: 16px;
       margin-right: 0;
       margin-left: 8px;
     }

@@ -1,11 +1,12 @@
 .headers-section {
   &.ant-collapse > .ant-collapse-item > .ant-collapse-header {
     padding: 6px;
+    align-items: center;
 
     .ant-collapse-expand-icon,
     .ant-collapse-header-text,
     .header-action-button {
-      font-size: 11px;
+      font-size: var(--font-size-normal);
       font-weight: bold;
       line-height: 20px;
       height: 20px;
@@ -13,10 +14,6 @@
 
     .ant-collapse-expand-icon {
       padding-inline-end: 6px;
-    }
-
-    .add-header-button {
-      margin-right: 4px;
     }
   }
 

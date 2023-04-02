@@ -15,6 +15,13 @@ export type NetworkRequestQueryParam = QueryString;
 
 export enum RuleEditorUrlFragment {
   HEADERS = "Headers",
+  REDIRECT = "Redirect",
+  REPLACE = "Replace",
+  CANCEL = "Cancel",
+  DELAY = "Delay",
+  QUERY_PARAM = "QueryParam",
+  SCRIPT = "Script",
+  USER_AGENT = "UserAgent",
 }
 
 export enum ResourceTypeFilter {
@@ -35,4 +42,8 @@ export enum ResourceTypeFilter {
 export interface NetworkFilters {
   url?: string;
   resourceType?: ResourceTypeFilter;
+}
+
+export interface NetworkPanelSettings {
+  preserveLog?: boolean;
 }

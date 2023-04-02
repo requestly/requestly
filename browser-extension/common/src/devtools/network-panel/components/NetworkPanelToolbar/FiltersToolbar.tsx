@@ -1,39 +1,48 @@
 import { Divider, Input, Radio } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { NetworkFilters, ResourceTypeFilter } from "../../types";
-import "./networkEventFilters.scss";
+import "./networkPanelToolbar.scss";
 
 interface Props {
-  onChange: (filters: NetworkFilters) => void;
+  filters: NetworkFilters;
+  onFiltersChange: (filters: NetworkFilters) => void;
 }
 
-const NetworkEventFilters: React.FC<Props> = ({ onChange }) => {
-  const [urlFilter, setUrlFilter] = useState("");
-  const [resourceTypeFilter, setResourceTypeFilter] = useState(
-    ResourceTypeFilter.ALL
+const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
+  const onUrlFilterChange = useCallback(
+    (newUrlFilter: string) => {
+      onFiltersChange({
+        ...filters,
+        url: newUrlFilter,
+      });
+    },
+    [filters]
   );
 
-  useEffect(() => {
-    onChange({
-      url: urlFilter,
-      resourceType: resourceTypeFilter,
-    });
-  }, [urlFilter, resourceTypeFilter]);
+  const onResourceTypeFilterChange = useCallback(
+    (newResourceTypeFilter: ResourceTypeFilter) => {
+      onFiltersChange({
+        ...filters,
+        resourceType: newResourceTypeFilter,
+      });
+    },
+    [filters]
+  );
 
   return (
-    <div className="network-event-filters-container">
+    <div className="network-panel-toolbar filters">
       <Input
         className="url-filter"
         placeholder="Filter by URL"
-        value={urlFilter}
-        onChange={(e) => setUrlFilter(e.target.value)}
+        value={filters.url}
+        onChange={(e) => onUrlFilterChange(e.target.value)}
         allowClear
       />
       <Radio.Group
         size="small"
         className="resource-type-filter"
-        value={resourceTypeFilter}
-        onChange={(e) => setResourceTypeFilter(e.target.value)}
+        value={filters.resourceType}
+        onChange={(e) => onResourceTypeFilterChange(e.target.value)}
       >
         <Radio.Button value={ResourceTypeFilter.ALL}>All</Radio.Button>
         <Divider type="vertical" className="divider" />
@@ -55,4 +64,4 @@ const NetworkEventFilters: React.FC<Props> = ({ onChange }) => {
   );
 };
 
-export default NetworkEventFilters;
+export default FiltersToolbar;

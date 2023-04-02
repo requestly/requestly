@@ -155,6 +155,7 @@ const UserAgentSelectionRow = ({
             }
             filterOption={true}
             value={getCurrentUserAgentValue().label || undefined}
+            data-selectionid="device-selector"
           >
             {availableUserAgents?.length > 0 &&
               availableUserAgents.map(({ label, options }) => (

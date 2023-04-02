@@ -45,6 +45,25 @@ export const createRule = <T extends Rule>(
   editorWindow = window.open(editorUrl, "_blank");
 };
 
+export const getHostFromUrl = (
+  url: string,
+  includeScheme?: boolean
+): string => {
+  const parsedUrl = new URL(url);
+  return includeScheme ? parsedUrl.origin : parsedUrl.host;
+};
+
+export const getBaseUrl = (url: string): string => {
+  const parsedUrl = new URL(url);
+  return parsedUrl.origin + parsedUrl.pathname;
+};
+
+export const getPageOrigin = (): Promise<string> => {
+  return new Promise((resolve) => {
+    chrome.devtools.inspectedWindow.eval("window.location.origin", resolve);
+  });
+};
+
 export const getCurrentColorScheme = (): ColorScheme => {
   return window.matchMedia("(prefers-color-scheme: dark)")?.matches
     ? ColorScheme.DARK

@@ -93,7 +93,8 @@ const givenRoutes = [
 ];
 
 const MenuItem = (props) => {
-  const { onClose, collapsed } = props;
+  const { onClose } = props;
+
   // Location
   const location = useLocation();
   const { pathname } = location;
@@ -227,11 +228,7 @@ const MenuItem = (props) => {
           key={item.key}
           icon={<div className="icon-wrapper">{item.icon}</div>}
           onClick={onClose}
-          style={
-            collapsed
-              ? { display: "flex", alignItems: "center" }
-              : { paddingLeft: "11px" }
-          }
+          style={{ paddingLeft: "11px", paddingRight: "6px" }}
           className={
             locationURL === itemNavLink
               ? "ant-menu-item-selected"
@@ -274,8 +271,8 @@ const MenuItem = (props) => {
       theme={appTheme}
       style={{
         paddingBottom: "2.4rem",
-        textAlign: collapsed ? "center" : "left",
       }}
+      className={`siderbar-menu`}
     >
       {menuItem}
     </Menu>

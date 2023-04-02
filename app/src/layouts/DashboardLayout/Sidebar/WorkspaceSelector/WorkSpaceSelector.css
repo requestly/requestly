@@ -4,7 +4,7 @@
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
-  max-width: 10ch;
+  max-width: 16ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,13 +88,28 @@
   background-color: var(--hover-color);
 }
 
-.join-workspace-dropdown {
-  padding: 8px;
+.join-workspace-menu-dropdown-trigger {
+  padding: 6px;
   font-size: 13px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 4px 8px;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.join-workspace-menu-dropdown-trigger div {
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.join-workspace-menu-dropdown-container.ant-dropdown {
+  left: 274px !important;
+}
+
+.join-workspace-invite-count-badge.ant-badge .ant-badge-count {
+  box-shadow: none;
+  border-radius: 4px;
 }
 
 .join-workspace-dropdown:hover {
@@ -111,4 +126,25 @@
 
 .ant-dropdown .join-workspace-menu.ant-dropdown-menu .ant-dropdown-menu-item {
   padding: 8px;
+}
+
+.workspace-selector-tooltip.ant-tooltip
+  .ant-tooltip-content
+  .ant-tooltip-inner {
+  color: var(--text-gray);
+  background-color: var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+}
+
+.workspace-selector-tooltip.ant-tooltip-placement-bottomRight {
+  padding-top: 7px;
+}
+
+.ant-dropdown-menu-item
+  .ant-dropdown-menu-title-content
+  span.join-existing-workspace-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

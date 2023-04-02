@@ -17,10 +17,11 @@ import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
 } from "../../../actions";
-import { fixSourceRegexFormat, validateRule } from "./actions";
+import { validateRule } from "./actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import { getAllRedirectDestinationTypes } from "utils/rules/misc";
 import { ruleModifiedAnalytics } from "./actions";
 import {
   trackErrorInRuleCreation,
@@ -31,6 +32,7 @@ import {
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
+import { fixRuleRegexSourceFormat } from "utils/rules/misc";
 
 const CreateRuleButton = ({ isDisabled, location }) => {
   //Constants
@@ -62,12 +64,15 @@ const CreateRuleButton = ({ isDisabled, location }) => {
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
     //Pre-validation regex fix
-    fixSourceRegexFormat(dispatch, currentlySelectedRuleData);
+    const fixedRuleData = fixRuleRegexSourceFormat(
+      dispatch,
+      currentlySelectedRuleData
+    );
     //Validation
-    const ruleValidation = validateRule(currentlySelectedRuleData, dispatch);
+    const ruleValidation = validateRule(fixedRuleData, dispatch);
     if (ruleValidation.result) {
       saveRule(appMode, {
-        ...currentlySelectedRuleData,
+        ...fixedRuleData,
         createdBy,
         currentOwner,
         lastModifiedBy,
@@ -90,12 +95,20 @@ const CreateRuleButton = ({ isDisabled, location }) => {
 
           trackRuleCreatedEvent(
             rule_type,
-            currentlySelectedRuleData.description
+            currentlySelectedRuleData.description,
+            currentlySelectedRuleData.ruleType ===
+              GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+              ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+              : null
           );
         } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
           trackRuleEditedEvent(
             rule_type,
-            currentlySelectedRuleData.description
+            currentlySelectedRuleData.description,
+            currentlySelectedRuleData.ruleType ===
+              GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+              ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+              : null
           );
         }
         ruleModifiedAnalytics(user);
