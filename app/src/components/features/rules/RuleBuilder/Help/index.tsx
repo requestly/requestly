@@ -29,7 +29,7 @@ const externalLinks: ExternalLink[] = [
   },
   {
     title: "Troubleshooting",
-    link: APP_CONSTANTS.LINKS.TUTORIALS.REDIRECT_RULE,
+    link: APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING,
   },
   {
     title: "Shared workspace",
