@@ -193,3 +193,10 @@ EventActions.startPeriodicEventWriter = async (intervalTime = 10000) => {
 
   return EventActions.eventWriterInterval;
 };
+
+EventActions.stopPeriodicEventWriter = () => {
+  if (EventActions.eventWriterInterval) {
+    clearInterval(EventActions.eventWriterInterval);
+    EventActions.eventWriterInterval = null;
+  }
+};
