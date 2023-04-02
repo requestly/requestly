@@ -29,6 +29,7 @@ import {
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getIsRedirectRuleTourCompleted,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
@@ -43,6 +44,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
 import "./RuleBuilder.css";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -71,10 +73,13 @@ const RuleBuilder = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
-  const __IS_FEATURE_FLAG_ON__ = false;
-  const isRedirectRuleWithFeatureFlagOn =
+  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
+  const isRedirectRuleDocsEnabled =
     currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && __IS_FEATURE_FLAG_ON__;
+      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && redirectRuleOnboardingExp === "docs";
+
+  const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
+  const isRedirectRuleTourEnabled = (redirectRuleOnboardingExp === "tour") && !isRedirectRuleTourCompleted;
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -356,7 +361,7 @@ const RuleBuilder = (props) => {
   }
 
   const isDocsVisible =
-    showDocs && isRedirectRuleWithFeatureFlagOn && !props.isSharedListViewRule;
+    showDocs && isRedirectRuleDocsEnabled && !props.isSharedListViewRule;
 
   return (
     <>
@@ -364,6 +369,7 @@ const RuleBuilder = (props) => {
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
+        runTourWithABTest={isRedirectRuleTourEnabled}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
@@ -384,7 +390,7 @@ const RuleBuilder = (props) => {
           />
         </Col>
 
-        {!props.isSharedListViewRule && isRedirectRuleWithFeatureFlagOn ? (
+        {!props.isSharedListViewRule && isRedirectRuleDocsEnabled ? (
           <>
             {!showDocs ? (
               <Button

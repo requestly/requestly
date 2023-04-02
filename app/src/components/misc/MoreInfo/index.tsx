@@ -3,6 +3,7 @@ import { Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 interface InfoProps {
   children: ReactNode;
@@ -19,7 +20,8 @@ export const MoreInfo: React.FC<InfoProps> = ({
   source,
   analyticsContext,
 }) => {
-  const showMoreInfoWithABTest = false; // temp flag for info icon experiment
+  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
+  const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip";
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
@@ -28,7 +30,7 @@ export const MoreInfo: React.FC<InfoProps> = ({
     [analyticsContext, source]
   );
 
-  if (!showMoreInfoWithABTest) {
+  if (!isMoreInfoActive) {
     return <>{children}</>;
   }
 
@@ -37,7 +39,7 @@ export const MoreInfo: React.FC<InfoProps> = ({
       {children}
       <Tooltip
         title={text}
-        trigger={showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
+        trigger={isMoreInfoActive ? ["hover", "focus"] : [null]}
         onOpenChange={handleOpenChange}
         showArrow={false}
         overlayInnerStyle={{ width: "300px" }}
@@ -48,7 +50,7 @@ export const MoreInfo: React.FC<InfoProps> = ({
   ) : (
     <Tooltip
       title={text}
-      trigger={showMoreInfoWithABTest ? ["hover", "focus"] : [null]}
+      trigger={isMoreInfoActive ? ["hover", "focus"] : [null]}
       onOpenChange={handleOpenChange}
       showArrow={false}
       overlayInnerStyle={{ width: "300px" }}
