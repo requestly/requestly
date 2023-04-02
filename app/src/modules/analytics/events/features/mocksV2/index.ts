@@ -74,3 +74,28 @@ export const trackMockUploadFailed = (type: string, cause: string) => {
   const params = { type, cause };
   trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
 };
+
+export const trackAiResponseButtonClicked = () => {
+  const params = {};
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_BUTTON_CLICKED, params);
+};
+
+export const trackAiResponseGenerateClicked = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATE_CLICKED, params);
+};
+
+export const trackAiResponseUseClicked = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_USE_CLICKED, params);
+};
+
+export const trackAiResponseGenerated = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATED, params);
+};
+
+export const trackAiResponseGenerateFailed = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATE_FAILED, params);
+};

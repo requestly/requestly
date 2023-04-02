@@ -9,6 +9,7 @@ import "./index.css";
 // @ts-ignore
 import Typewriter from 'typewriter-effect/dist/core';
 import Logger from "lib/logger";
+import { trackAiResponseGenerateFailed, trackAiResponseGenerateClicked, trackAiResponseGenerated, trackAiResponseUseClicked } from "modules/analytics/events/features/mocksV2";
 
 
 interface Props {
@@ -44,6 +45,7 @@ const AIResponseModal = ({isOpen = false, toggleOpen, handleAiResponseUsed}: Pro
     }
 
     const handleUseResponseClicked = () => {
+        trackAiResponseUseClicked(prompt);
         const responseText = JSON.stringify(responseJson, null, 2);;
         typewriter.stop();
         setIsTyping(false);
@@ -53,6 +55,12 @@ const AIResponseModal = ({isOpen = false, toggleOpen, handleAiResponseUsed}: Pro
     }
 
     const fetchResponse = () => {
+        if(!prompt) {
+            toast.error("Please enter a prompt");
+        }
+
+        trackAiResponseGenerateClicked(prompt);
+
         const functions = getFunctions();
         const fetchAiMockResponse = httpsCallable(
             functions,
@@ -62,14 +70,17 @@ const AIResponseModal = ({isOpen = false, toggleOpen, handleAiResponseUsed}: Pro
         setIsLoading(true);
         fetchAiMockResponse({input: prompt}).then((res: any) => {
             if(res?.data?.success) {
+                trackAiResponseGenerated(prompt);
                 Logger.log(res?.data?.responseJSON);
                 Logger.log(res?.data?.response);
                 handleResponseFetched(res?.data?.responseJSON);
             } else {
+                trackAiResponseGenerateFailed(prompt);
                 toast.error("Response can't be generated");
             }
             setIsLoading(false);
         }).catch((err) => {
+            trackAiResponseGenerateFailed(prompt);
             Logger.log(err);
             toast.error("Response can't be generated");
             setIsLoading(false);
@@ -77,15 +88,16 @@ const AIResponseModal = ({isOpen = false, toggleOpen, handleAiResponseUsed}: Pro
     }
 
     return (
-        <RQModal centered open={isOpen} onCancel={() => toggleOpen(false)}>
+        <RQModal centered open={isOpen} onCancel={() => toggleOpen(false)} width="50%">
             <Col className="rq-modal-content ai-response-modal-content">
                 <Row justify="space-between">
                     <Col flex="1 0 auto" className="ai-prompt-input-container">
                         <Input
+                            disabled={isLoading}
                             className="ai-prompt-input"
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="Enter Prompt"
+                            placeholder="Enter Prompt. Eg: List of users with name, address, avatar, age, job, email"
                         />
                     </Col>
                     <Col flex="0 0 auto">
