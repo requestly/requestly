@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { useDispatch } from "react-redux";
 import JoyRide, {
   EVENTS,
   STATUS,
@@ -18,6 +19,7 @@ import {
   trackWalkthroughStepCompleted,
   trackWalkthroughViewed,
 } from "modules/analytics/events/misc/productWalkthrough";
+import { actions } from "store";
 
 interface TourProps {
   startWalkthrough: boolean;
@@ -32,6 +34,8 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   context,
   runTourWithABTest = false,
 }) => {
+  const dispatch = useDispatch();
+
   const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
@@ -48,11 +52,16 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     const { index, type, status } = data;
     if (status === STATUS.SKIPPED) {
       WalkthroughHelpers?.skip();
+      dispatch(actions.updateRedirectRuleTourCompleted({}));
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
     } else if (index >= tourSteps?.length - 1) {
       setHasReachedLastStep(true);
+    }
+
+    if(type === EVENTS.TOUR_END) {
+      dispatch(actions.updateRedirectRuleTourCompleted({}));
     }
   };
 

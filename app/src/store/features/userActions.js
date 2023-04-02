@@ -81,3 +81,7 @@ export const updateUserAttributes = (prevState, action) => {
     ...action.payload,
   }
 }
+
+export const updateRedirectRuleTourCompleted = (prevState, action) => {
+  prevState.misc.isRedirectRuleTourCompleted = true;
+}
