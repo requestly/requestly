@@ -142,6 +142,10 @@ const INITIAL_STATE = {
 
   userAttributes: {
     deviceId: null,
+  },
+
+  misc: {
+    isRedirectRuleTourCompleted: false,
   }
 };
 
