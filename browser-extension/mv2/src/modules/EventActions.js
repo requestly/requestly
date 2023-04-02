@@ -79,7 +79,7 @@ EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
     EventActions.batchesWaitingForAck.includes(acknowledgedBatch)
   );
 
-  if (batchesToDelete) {
+  if (batchesToDelete.length > 0) {
     EventActions.deleteBatches(batchesToDelete);
 
     batchesToDelete.forEach((batchId) => {
@@ -114,7 +114,7 @@ EventActions.sendExtensionEvents = async () => {
     if (!appTabId) break;
 
     const eventBatchesPayload = await EventActions.getBatchesToSend();
-    if (!eventBatchesPayload) break;
+    if (eventBatchesPayload?.length === 0) break;
 
     const extensionEventsMessage = {
       action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
