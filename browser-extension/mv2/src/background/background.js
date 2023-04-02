@@ -1,9 +1,3 @@
-// import { startEventBatchWriter } from "./EventWriter";
-
-/* can be moved to a different file --- EventWriter.js */
-
-/* -------------- */
-
 let BG = {};
 BG = window.BG = {
   Methods: {},
