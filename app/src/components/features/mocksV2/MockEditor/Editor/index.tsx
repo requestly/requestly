@@ -36,7 +36,7 @@ import {
   validateStatusCode,
 } from "../utils";
 import "./index.css";
-import { trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
+import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -432,7 +432,10 @@ const MockEditor: React.FC<Props> = ({
             items={editors}
             tabBarExtraContent={
               isAiResponseActive ?
-              (<Button className="generate-ai-response-button" type="primary" onClick={() => setIsAiResponseModalOpen(true)}>
+              (<Button className="generate-ai-response-button" type="primary" onClick={() => {
+                  trackAiResponseButtonClicked();
+                  setIsAiResponseModalOpen(true)
+                }}>
                 <BsStars />&nbsp;AI Response
               </Button>): null
             }
