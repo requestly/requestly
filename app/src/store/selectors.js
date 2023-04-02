@@ -213,3 +213,7 @@ export const getUserPersonaSurveyDetails = (state) => {
 export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
 };
+
+export const getIsRedirectRuleTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isRedirectRuleTourCompleted"];;
+};
