@@ -1197,6 +1197,15 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
 
 BG.Methods.onAppLoadedNotification = () => {
   BG.isAppOnline = true;
+  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE).then(
+    (useEngine) => {
+      if (useEngine === false) {
+        EventActions.stopPeriodicEventWriter();
+      } else {
+        EventActions.startPeriodicEventWriter();
+      }
+    }
+  );
   EventActions.sendExtensionEvents();
 };
 
@@ -1489,11 +1498,6 @@ BG.Methods.init = function () {
 
     // Fetch records
     RQ.StorageService.fetchRecords().then(BG.Methods.readExtensionStatus);
-    RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE).then(
-      (useEngine) => {
-        useEngine !== false && EventActions.startPeriodicEventWriter();
-      }
-    );
   });
 
   // Add Listener to reply to requests from extension content scripts or popup
@@ -1502,6 +1506,8 @@ BG.Methods.init = function () {
   BG.Methods.listenDevtools();
 
   BG.Methods.listenCommands();
+
+  EventActions.startPeriodicEventWriter();
 };
 
 // Background Initialization Code
