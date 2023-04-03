@@ -994,7 +994,6 @@ BG.Methods.getAppTabs = () => {
  * @returns Promise resolving to the response from app or timeout error
  */
 BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
-  console.log("!!!debug", "sendmsgtoapp", tabId);
   const sendMessageToTab = (messageObject, tabId) => {
     return new Promise((resolve) => {
       chrome.tabs.sendMessage(tabId, messageObject, (response) => {
@@ -1042,7 +1041,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
   ) {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.ADD_EVENT:
-        console.log("!!!debug", "add event msg in bg", message);
         EventActions.queueEventToWrite(message.payload);
         break;
 

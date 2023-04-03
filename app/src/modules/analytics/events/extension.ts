@@ -16,13 +16,6 @@ interface EventBatch {
 function sendEventsBatch(eventBatch: EventBatch) {
   eventBatch.events.forEach((event) => {
     const eventConfig = { time: event.eventTs };
-    console.log(
-      "!!!debug",
-      "trackEvent",
-      event.eventName,
-      event.eventParams,
-      eventConfig
-    );
     trackEvent(event.eventName, event.eventParams, eventConfig);
   });
 }

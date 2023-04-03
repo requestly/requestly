@@ -30,7 +30,6 @@ const RuleItem: React.FC<RuleItemProps> = ({
   const handleUpdateRule = useCallback(
     (rule: Rule) => {
       updateRule(rule, isParentPinnedRecords);
-      console.log("POPUP: sending event to BG");
       onRuleUpdated?.(rule);
     },
     [updateRule, onRuleUpdated]

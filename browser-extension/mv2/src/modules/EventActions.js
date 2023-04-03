@@ -17,8 +17,7 @@ EventActions.getEventBatches = async () => {
     .then((storedEventBatches) => {
       return storedEventBatches || {};
     })
-    .catch((err) => {
-      console.log("BG: error getting analytics events from local storage", err);
+    .catch(() => {
       return {};
     });
 };
@@ -34,9 +33,7 @@ EventActions.deleteBatches = async (batchIds) => {
   const newStoredBatches = {};
   newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
 
-  await RQ.StorageService.saveRecord(newStoredBatches).then((_) =>
-    console.log("ack batches cleared")
-  );
+  await RQ.StorageService.saveRecord(newStoredBatches);
 };
 
 EventActions.getEventsToWrite = () => {
@@ -69,8 +66,6 @@ EventActions.stopWaitingForAcknowledgement = (batchId) => {
   );
   if (batchIndex !== -1) {
     EventActions.batchesWaitingForAck.splice(batchIndex, 1);
-  } else {
-    console.warn("Weird: receiving duplicate event acknowledgements");
   }
 };
 
@@ -125,14 +120,12 @@ EventActions.sendExtensionEvents = async () => {
       appTabId
     )
       .then((payload) => {
-        console.log("!!!debug", "response received from app:", payload);
         if (payload) {
           return { wasMessageSent: true, payload };
         }
       })
       .catch((err) => {
         // todo: can add check if timeout based on err
-        console.log("!!!debug", "sendMessageToApp timed out");
         return { wasMessageSent: false };
       });
 
@@ -169,17 +162,9 @@ EventActions.writeEventsToLocalStorage = async () => {
       const newStoredBatches = {};
       newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
 
-      return RQ.StorageService.saveRecord(newStoredBatches)
-        .then((_) => {
-          console.log(
-            "BG to LOCAL: Events Write complete for batch",
-            newEventsBatch.id
-          );
-          EventActions.sendExtensionEvents();
-        })
-        .catch((err) =>
-          console.error("BG to LOCAL: Error writing batch", newEventsBatch, err)
-        );
+      return RQ.StorageService.saveRecord(newStoredBatches).then((_) => {
+        EventActions.sendExtensionEvents();
+      });
     });
   }
 };
