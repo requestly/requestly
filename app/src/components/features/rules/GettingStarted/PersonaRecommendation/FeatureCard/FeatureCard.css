@@ -34,5 +34,5 @@
 .feature-card .feature-subtitle {
   font-size: 13px;
   line-height: 1.25rem;
-  color: var(--text-gray);
+  color: var(--text-dark-gray);
 }
