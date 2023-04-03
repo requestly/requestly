@@ -123,6 +123,7 @@ EventActions.sendExtensionEvents = async () => {
         if (payload) {
           return { wasMessageSent: true, payload };
         }
+        return { wasMessageSent: false };
       })
       .catch((err) => {
         // todo: can add check if timeout based on err
@@ -133,8 +134,8 @@ EventActions.sendExtensionEvents = async () => {
       await EventActions.handleAcknowledgements(response.payload.ackIds);
       break;
     } else {
-      eventBatchesPayload.forEach((batchId) => {
-        EventActions.stopWaitingForAcknowledgement(batchId);
+      eventBatchesPayload.forEach((batch) => {
+        EventActions.stopWaitingForAcknowledgement(batch.id);
       });
     }
   }
