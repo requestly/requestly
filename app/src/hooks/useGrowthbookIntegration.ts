@@ -27,12 +27,6 @@ const useGrowthBookIntegration = () => {
         if(growthbookStatus.initDone) {
             // IMP: Updating this only on after comparing if anything is changed or not. As this was causing rerenders when useFeatureValue is used which then called trackAttr() and causing infinite loops
             // We can only updateGrowthbookAttributes only if deviceId, sessionId, id, email changes in case this happens again.
-            console.log(prevUserAttributes, userAttributes);
-            console.log(_.reduce(prevUserAttributes, function(result, value, key) {
-                return _.isEqual(value, userAttributes[key]) ?
-                    result : result.concat(key);
-            }, []));
-
             if(prevUserAttributes && !_.isEqual(prevUserAttributes, userAttributes)) {
                 // console.log("userAttributesChanged");
                 updateGrowthbookAttributes({ ...userAttributes });
