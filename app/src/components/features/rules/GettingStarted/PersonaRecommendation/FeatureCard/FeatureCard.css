@@ -1,0 +1,38 @@
+/* feature card */
+.feature-card {
+  padding: 1.125rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.feature-card:hover,
+.feature-card:focus {
+  cursor: pointer;
+  background-color: #292a2e;
+  transition: background-color 0.2s;
+}
+
+.feature-title-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  column-gap: 13.67px;
+}
+
+.feature-title-wrapper .feature-icon svg {
+  width: 16.67px;
+  height: 16.67px;
+  color: var(--text-gray);
+}
+
+.feature-title-wrapper .feature-title {
+  font-size: 14px;
+  line-height: 16.41px;
+  color: var(--white);
+}
+
+.feature-card .feature-subtitle {
+  font-size: 13px;
+  line-height: 1.25rem;
+  color: var(--text-gray);
+}
