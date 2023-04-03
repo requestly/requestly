@@ -27,6 +27,10 @@ export const updateUsername = (prevState, action) => {
 };
 
 //Persona Survey actions
+export const syncUserPersonaData = (prevState, action) => {
+  prevState.userPersona = action.payload;
+};
+
 export const updateUserPersona = (prevState, action) => {
   prevState.userPersona[action.payload.key] = action.payload.value;
 };
@@ -79,5 +83,5 @@ export const updateUserAttributes = (prevState, action) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
     ...action.payload,
-  }
-}
+  };
+};
