@@ -72,6 +72,12 @@ export const MOCKSV2 = {
   MOCK_UPLOAD_WORKFLOW_STARTED: "mock_upload_workflow_started",
   MOCK_UPLOADED: "mock_uploaded",
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
+
+  AI_MOCK_RESPONSE_BUTTON_CLICKED: "ai_mock_response_button_clicked",
+  AI_MOCK_RESPONSE_GENERATE_CLICKED: "ai_mock_response_generate_clicked",
+  AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
+  AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
+  AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
@@ -110,6 +116,8 @@ export const TEAMS = {
   WORKSPACE_INVITE_LINK_REVOKED: "workspace_invite_link_revoked",
   WORKSPACE_INVITE_ACCEPTED: "workspace_invite_accepted",
   WORKSPACE_INVITE_SCREEN_ERROR: "workspace_invite_screen_error",
+  WORKSPACE_JOINING_MODAL_OPENED: "workspace_joining_modal_opened",
+  WORKSPACE_JOIN_CLICKED: "workspace_join_clicked",
 };
 
 export const TRASH = {
