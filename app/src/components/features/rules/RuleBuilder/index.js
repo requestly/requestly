@@ -73,13 +73,20 @@ const RuleBuilder = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
-  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
+  const redirectRuleOnboardingExp = useFeatureValue(
+    "redirect_rule_onboarding",
+    null
+  );
   const isRedirectRuleDocsEnabled =
     currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && redirectRuleOnboardingExp === "docs";
+      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
+    redirectRuleOnboardingExp === "docs";
 
-  const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
-  const isRedirectRuleTourEnabled = (redirectRuleOnboardingExp === "tour") && !isRedirectRuleTourCompleted;
+  const isRedirectRuleTourCompleted = useSelector(
+    getIsRedirectRuleTourCompleted
+  );
+  const isRedirectRuleTourEnabled =
+    redirectRuleOnboardingExp === "tour" && !isRedirectRuleTourCompleted;
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -273,10 +280,13 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE) {
+    if (
+      MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
+      RULE_TYPE_TO_CREATE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+    ) {
       setStartWalkthrough(true);
     }
-  }, [MODE]);
+  }, [MODE, RULE_TYPE_TO_CREATE]);
 
   useEffect(() => {
     const source = state?.source ?? null;
