@@ -32,6 +32,6 @@ export function handleEventBatches(batches: EventBatch[]) {
 }
 
 /* EXTENSION EVENTS ENGINE FLAG */
-export const useEventsEngineFlag = {
+export const getEventsEngineFlag = {
   [CONSTANTS.STORAGE_KEYS.USE_EVENTS_ENGINE]: true,
 };
