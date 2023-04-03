@@ -13,6 +13,7 @@ import {
   resetPassword,
   googleSignInDesktopApp,
 } from "../../../../actions/FirebaseActions";
+import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
@@ -151,7 +152,9 @@ export const handleEmailSignInButtonOnClick = (
   src,
   callbackOnSuccess,
   callbackOnFail,
-  eventSource
+  eventSource,
+  userPersona,
+  dispatch
 ) => {
   event && event.preventDefault();
   if (isEmpty(email) || !isEmail(email)) {
@@ -168,6 +171,7 @@ export const handleEmailSignInButtonOnClick = (
       if (result.user.uid) {
         showInfo(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
         callbackOnSuccess && callbackOnSuccess(result.user.uid);
+        syncUserPersona(result.user.uid, dispatch, userPersona);
       } else {
         showError("Sorry we couldn't log you in. Can you please retry?");
         setLoader && setLoader(false);
@@ -188,7 +192,9 @@ export const handleGoogleSignInButtonOnClick = (
   appMode,
   MODE,
   navigate,
-  eventSource
+  eventSource,
+  userPersona,
+  dispatch
 ) => {
   setLoader && setLoader(true);
   const functionToCall =
@@ -201,6 +207,7 @@ export const handleGoogleSignInButtonOnClick = (
       if (result && result.uid) {
         showInfo(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
         callbackOnSuccess && callbackOnSuccess();
+        syncUserPersona(result.uid, dispatch, userPersona);
       }
       setLoader && setLoader(false);
     })
@@ -220,7 +227,9 @@ export const handleSignUpButtonOnClick = (
   emailOptin,
   isSignUp,
   callbackOnSuccess,
-  eventSource
+  eventSource,
+  userPersona,
+  dispatch
 ) => {
   event.preventDefault();
   setLoader(true);
@@ -239,7 +248,9 @@ export const handleSignUpButtonOnClick = (
           null,
           callbackOnSuccess,
           () => {},
-          eventSource
+          eventSource,
+          userPersona,
+          dispatch
         );
       } else {
         showError(getPrettyErrorMessage(authTypes.SIGN_UP, errorCode));

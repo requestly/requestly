@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { Typography, Row, Col } from "antd";
@@ -27,7 +27,10 @@ import {
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode } from "../../../store/selectors";
+import {
+  getAppMode,
+  getUserPersonaSurveyDetails,
+} from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
@@ -49,9 +52,11 @@ const AuthForm = ({
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
+  const dispatch = useDispatch();
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const path = window.location.pathname;
   const [actionPending, setActionPending] = useState(false);
   const [name, setName] = useState("");
@@ -110,7 +115,9 @@ const AuthForm = ({
                   appMode,
                   MODE,
                   navigate,
-                  eventSource
+                  eventSource,
+                  userPersona,
+                  dispatch
                 )
               }
             >
@@ -177,7 +184,9 @@ const AuthForm = ({
                 src,
                 onSignInSuccess,
                 () => setPassword(""),
-                eventSource
+                eventSource,
+                userPersona,
+                dispatch
               )
             }
           >
@@ -202,7 +211,9 @@ const AuthForm = ({
                 emailOptin,
                 isSignUp,
                 onSignInSuccess,
-                eventSource
+                eventSource,
+                userPersona,
+                dispatch
               )
             }
           >

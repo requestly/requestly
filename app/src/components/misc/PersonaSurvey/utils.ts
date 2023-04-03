@@ -1,5 +1,7 @@
+import { child, get, getDatabase, ref, update } from "firebase/database";
+import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { multipleChoiceOption, Option } from "./types";
+import { multipleChoiceOption, Option, UserPersona } from "./types";
 
 export const shouldShowPersonaSurvey = async (appMode: string) => {
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
@@ -21,4 +23,20 @@ export const shuffleOptions = (options: Option[]) => {
     [options[i], options[j]] = [options[j], options[i]];
   }
   return options;
+};
+
+export const syncUserPersona = async (
+  uid: string,
+  dispatch: any,
+  userPersona: UserPersona
+) => {
+  const database = getDatabase();
+  const userProfileRef = ref(database, `users/${uid}/profile`);
+  const profile: any = (await get(child(userProfileRef, "/"))).toJSON();
+  if (!profile) {
+    return;
+  }
+  if (profile.userPersona)
+    dispatch(actions.syncUserPersonaData(profile.userPersona));
+  else update(userProfileRef, { userPersona });
 };
