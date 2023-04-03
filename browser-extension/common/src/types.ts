@@ -46,6 +46,7 @@ export interface UrlSource {
   key: SourceKey;
   operator: SourceOperator;
   value: string;
+  filters?: unknown[];
 }
 
 export interface SessionRecordingConfig {

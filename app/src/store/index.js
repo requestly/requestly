@@ -48,6 +48,7 @@ const globalReducer = getReducerWithLocalStorageSync(
     "initializations",
     "userPreferences",
     "userAttributes",
+    "misc",
   ]
 );
 
