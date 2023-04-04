@@ -58,7 +58,9 @@
 .editor-title-name .editor-title svg {
   align-self: center;
   cursor: pointer;
-  min-width: 20px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
 }
 .editor-title-name .ant-input,
 .editor-title-name .editor-title {
