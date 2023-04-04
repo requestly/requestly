@@ -27,7 +27,7 @@ const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
 const GettingStarted = () => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
@@ -37,10 +37,9 @@ const GettingStarted = () => {
   );
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const isGettingStartedRoute = pathname.includes(PATHS.GETTING_STARTED);
   const isFeatureflagOn = useFeatureIsOn("persona_recommendation");
   const isPersonaRecommendationFlagOn =
-    isFeatureflagOn && isGettingStartedRoute;
+    isFeatureflagOn && state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);

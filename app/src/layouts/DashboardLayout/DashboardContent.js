@@ -74,7 +74,7 @@ const DashboardContent = () => {
     if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
-        state: { src: "persona_survey_modal" },
+        state: { src: "persona_survey_modal", ...(location?.state ?? {}) },
       });
     }
   }, [navigate, userPersona.page, userPersona.isSurveyCompleted]);

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Row } from "antd";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import { actions } from "store";
@@ -8,7 +8,6 @@ import { personaRecommendationData } from "./personaRecommendationData";
 import { RQButton } from "lib/design-system/components";
 import { FeatureCard } from "./FeatureCard";
 import { AUTH } from "modules/analytics/events/common/constants";
-import PATHS from "config/constants/sub/paths";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { trackPersonaRecommendationSkipped } from "modules/analytics/events/misc/personaSurvey";
@@ -24,6 +23,7 @@ const PersonaRecommendation: React.FC<Props> = ({
   handleUploadRulesClick,
 }) => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const dispatch = useDispatch();
   const [isViewAllOptions, setIsViewAllOptions] = useState<boolean>(false);
 
@@ -37,8 +37,9 @@ const PersonaRecommendation: React.FC<Props> = ({
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped("screen");
+    //@ts-ignore
+    navigate(state?.redirectTo ?? "/", { replace: true });
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
-    navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { replace: true });
   };
 
   return (

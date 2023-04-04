@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
@@ -26,6 +26,7 @@ interface FooterProps {
 export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isPersonaRecommendationFlagOn = useFeatureIsOn(
@@ -95,9 +96,12 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
             actions.toggleActiveModal({ modalName: "personaSurveyModal" })
           );
           navigate(PATHS.GETTING_STARTED, {
-            state: { src: "persona_survey_modal" },
+            replace: true,
+            state: {
+              src: "persona_survey_modal",
+              redirectTo: location.pathname,
+            },
           });
-          return;
         }
         break;
     }
