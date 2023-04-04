@@ -32,11 +32,15 @@ const PersonaRecommendation: React.FC<Props> = ({
       <h2 className="header">✨ Quick and easy ways to get started</h2>
       <div>
         {data.map(({ section, features }) => (
-          <div>
+          <div key={section}>
             <div className="section-header">{section}</div>
             <div className="section-row">
               {features.map((feature) => (
-                <FeatureCard {...feature} isUserLoggedIn={isUserLoggedIn} />
+                <FeatureCard
+                  {...feature}
+                  key={feature.title}
+                  isUserLoggedIn={isUserLoggedIn}
+                />
               ))}
             </div>
           </div>
