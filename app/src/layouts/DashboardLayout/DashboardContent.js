@@ -6,6 +6,7 @@ import {
   Navigate,
   useLocation,
   useSearchParams,
+  useNavigate,
 } from "react-router-dom";
 //FOR ROUTER
 import routes from "../../routes";
@@ -28,6 +29,7 @@ const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   //Global state
@@ -67,6 +69,15 @@ const DashboardContent = () => {
   };
 
   const prevProps = usePrevious({ location });
+
+  useEffect(() => {
+    if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
+      navigate(PATHS.GETTING_STARTED, {
+        replace: true,
+        state: { src: "persona_survey_modal" },
+      });
+    }
+  }, [navigate, userPersona.page, userPersona.isSurveyCompleted]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
