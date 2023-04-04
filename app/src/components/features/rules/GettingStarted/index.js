@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -37,7 +38,9 @@ const GettingStarted = () => {
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const isGettingStartedRoute = pathname.includes(PATHS.GETTING_STARTED);
-  const __IS_PERSONA_RECOMMENDATION_FLAG_ON__ = false && isGettingStartedRoute;
+  const isFeatureflagOn = useFeatureIsOn("persona_recommendation");
+  const isPersonaRecommendationFlagOn =
+    isFeatureflagOn && isGettingStartedRoute;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -98,46 +101,31 @@ const GettingStarted = () => {
     }
   }, []);
 
-  const breakpoints = __IS_PERSONA_RECOMMENDATION_FLAG_ON__
-    ? {
-        md: {
-          span: 20,
-          offset: 2,
-        },
-        lg: {
-          span: 18,
-          offset: 3,
-        },
-        xl: {
-          span: 18,
-          offset: 3,
-        },
-      }
-    : {
-        md: {
-          span: 20,
-          offset: 2,
-        },
-        lg: {
-          span: 18,
-          offset: 3,
-        },
-        xl: {
-          span: 14,
-          offset: 5,
-        },
-      };
-
   return (
     <>
-      <Row className="getting-started-container">
-        <Col offset={1} span={22} {...breakpoints}>
-          {__IS_PERSONA_RECOMMENDATION_FLAG_ON__ ? (
-            <PersonaRecommendation
-              isUserLoggedIn={isUserLoggedIn}
-              handleUploadRulesClick={handleUploadRulesClick}
-            />
-          ) : (
+      {isPersonaRecommendationFlagOn ? (
+        <PersonaRecommendation
+          isUserLoggedIn={isUserLoggedIn}
+          handleUploadRulesClick={handleUploadRulesClick}
+        />
+      ) : (
+        <Row className="getting-started-container">
+          <Col
+            offset={1}
+            span={22}
+            md={{
+              span: 20,
+              offset: 2,
+            }}
+            lg={{
+              span: 18,
+              offset: 3,
+            }}
+            xl={{
+              span: 14,
+              offset: 5,
+            }}
+          >
             <>
               <div className="getting-started-header-container">
                 <p className="text-gray getting-started-header">
@@ -204,9 +192,9 @@ const GettingStarted = () => {
                 </p>
               ) : null}
             </>
-          )}
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      )}
 
       {isImportRulesModalActive ? (
         <ImportRulesModal
