@@ -10,9 +10,6 @@ import { getModeData } from "../../actions";
 import APP_CONSTANTS from "config/constants";
 import "./RuleEditorActionButtons.css";
 
-// quick bug fix
-const hideShareButton = true;
-
 const ActionButtons = (props) => {
   const { MODE } = getModeData(props.location);
   const rule = useSelector(getCurrentlySelectedRuleData);
@@ -23,8 +20,7 @@ const ActionButtons = (props) => {
 
   return (
     <div className="rule-editor-header-action-btns">
-      {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT &&
-      !hideShareButton ? (
+      {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? (
         <ShareRuleButton handleShareRuleClick={props.shareBtnClickHandler} />
       ) : null}
 
