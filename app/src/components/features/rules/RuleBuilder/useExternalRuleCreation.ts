@@ -69,10 +69,16 @@ const useExternalRuleCreation = (mode: string): void => {
 
   useEffect(() => {
     if (loaded && inputSelectorRefToFocus.current) {
-      const input = document.querySelector(
-        inputSelectorRefToFocus.current
-      ) as HTMLInputElement;
-      input?.focus();
+      setTimeout(() => {
+        const input = document.querySelector(
+          inputSelectorRefToFocus.current
+        ) as HTMLInputElement;
+
+        if (input) {
+          input.focus();
+          input.selectionStart = input.value?.length;
+        }
+      }, 500); // sometimes app takes time to render the selected input
     }
   }, [loaded]);
 };

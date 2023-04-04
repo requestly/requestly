@@ -12,7 +12,7 @@ import {
   NetworkRequestQueryParam,
   RuleEditorUrlFragment,
 } from "../../../types";
-import { createRule, getBaseUrl } from "../../../utils";
+import { createRule, generateRuleName, getBaseUrl } from "../../../utils";
 import IconButton from "../../IconButton/IconButton";
 import PropertyRow from "../../PropertyRow/PropertyRow";
 import "./payloadTabContent.scss";
@@ -63,10 +63,11 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.QUERY_PARAM,
       (rule) => {
+        const baseUrl = getBaseUrl(networkEvent.request.url);
         rule.pairs[0].source = {
           key: SourceKey.URL,
           operator: SourceOperator.CONTAINS,
-          value: getBaseUrl(networkEvent.request.url),
+          value: baseUrl,
         };
         // @ts-ignore
         rule.pairs[0].modifications = [
@@ -77,6 +78,8 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
             value: "",
           },
         ];
+        rule.name = generateRuleName("Add query param");
+        rule.description = `Add query param to ${baseUrl}`;
       },
       'input[data-selectionid="query-param-name"]' //TODO
     );
@@ -87,10 +90,11 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
       createRule(
         RuleEditorUrlFragment.QUERY_PARAM,
         (rule) => {
+          const baseUrl = getBaseUrl(networkEvent.request.url);
           rule.pairs[0].source = {
             key: SourceKey.URL,
             operator: SourceOperator.CONTAINS,
-            value: getBaseUrl(networkEvent.request.url),
+            value: baseUrl,
           };
           // @ts-ignore
           rule.pairs[0].modifications = [
@@ -101,6 +105,8 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
               value: queryParam.value,
             },
           ];
+          rule.name = generateRuleName("Override query param");
+          rule.description = `Override query param ${queryParam.name} in ${baseUrl}`;
         },
         'input[data-selectionid="query-param-value"]' //TODO
       );
@@ -111,10 +117,11 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
   const removeQueryParam = useCallback(
     (queryParam: NetworkRequestQueryParam) => {
       createRule(RuleEditorUrlFragment.QUERY_PARAM, (rule) => {
+        const baseUrl = getBaseUrl(networkEvent.request.url);
         rule.pairs[0].source = {
           key: SourceKey.URL,
           operator: SourceOperator.CONTAINS,
-          value: getBaseUrl(networkEvent.request.url),
+          value: baseUrl,
         };
         // @ts-ignore
         rule.pairs[0].modifications = [
@@ -123,6 +130,8 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
             param: queryParam.name,
           },
         ];
+        rule.name = generateRuleName("Remove query param");
+        rule.description = `Remove query param ${queryParam.name} from ${baseUrl}`;
       });
     },
     [networkEvent]
@@ -130,10 +139,11 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
 
   const removeAllQueryParams = useCallback(() => {
     createRule(RuleEditorUrlFragment.QUERY_PARAM, (rule) => {
+      const baseUrl = getBaseUrl(networkEvent.request.url);
       rule.pairs[0].source = {
         key: SourceKey.URL,
         operator: SourceOperator.CONTAINS,
-        value: getBaseUrl(networkEvent.request.url),
+        value: baseUrl,
       };
       // @ts-ignore
       rule.pairs[0].modifications = [
@@ -141,6 +151,8 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
           type: QueryParamModification.REMOVE_ALL,
         },
       ];
+      rule.name = generateRuleName("Remove all query params");
+      rule.description = `Remove all query params from ${baseUrl}`;
     });
   }, [networkEvent]);
 
