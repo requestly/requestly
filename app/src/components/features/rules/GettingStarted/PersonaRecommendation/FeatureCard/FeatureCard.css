@@ -44,14 +44,26 @@
 .feature-title-wrapper {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   column-gap: 12px;
+}
+
+.feature-icon,
+.feature-icon .remix-icon {
+  display: flex;
+  align-items: center;
+}
+
+.feature-title-wrapper .feature-icon .remix-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .feature-title-wrapper .feature-icon svg {
   width: 16.67px;
   height: 16.67px;
   flex-shrink: 0;
+  margin-top: -2px;
   color: var(--text-gray);
 }
 
