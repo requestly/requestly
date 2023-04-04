@@ -6,6 +6,7 @@ import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { snakeCase } from "lodash";
 import { Feature } from "../types";
+import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./FeatureCard.css";
 
@@ -61,9 +62,14 @@ export const FeatureCard: React.FC<Props> = ({
 
   return (
     <div className="feature-card" onClick={handleNavigation}>
-      <div className="feature-title-wrapper">
-        <span className="feature-icon">{<Icon />}</span>
-        <span className="feature-title">{title}</span>
+      <div className="feature-title-container">
+        <div className="feature-title-wrapper">
+          <span className="feature-icon">{<Icon />}</span>
+          <span className="feature-title">{title}</span>
+        </div>
+        <span className="right-chevron">
+          <RightChevron />
+        </span>
       </div>
       <div className="feature-subtitle">{subTitle}</div>
     </div>
