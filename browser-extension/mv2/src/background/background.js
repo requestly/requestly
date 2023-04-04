@@ -1202,17 +1202,21 @@ BG.Methods.onAppLoadedNotification = () => {
 };
 
 BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
-  chrome.tabs.sendMessage(
-    tabId,
-    {
-      action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
-      appliedRuleDetails: BG.Methods.getCachedAppliedRuleDetails(tabId),
-      isConsoleLoggerEnabled: await RQ.StorageService.getRecord(
-        RQ.CONSOLE_LOGGER_ENABLED
-      ),
-    },
-    () => window.tabService.removeData(tabId, "appliedRuleDetails")
-  );
+  const cachedAppliesRules = BG.Methods.getCachedAppliedRuleDetails(tabId);
+
+  if (cachedAppliesRules?.length > 0) {
+    chrome.tabs.sendMessage(
+      tabId,
+      {
+        action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
+        appliedRuleDetails: cachedAppliesRules,
+        isConsoleLoggerEnabled: await RQ.StorageService.getRecord(
+          RQ.CONSOLE_LOGGER_ENABLED
+        ),
+      },
+      () => window.tabService.removeData(tabId, "appliedRuleDetails")
+    );
+  }
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {
@@ -1222,7 +1226,7 @@ BG.Methods.getExecutedRules = async (tabId, callback) => {
       action: RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS,
     },
     async (appliedRuleIds) => {
-      if (appliedRuleIds.length > 0) {
+      if (appliedRuleIds?.length > 0) {
         callback(await RQ.StorageService.getRecords(appliedRuleIds));
       } else {
         callback([]);
