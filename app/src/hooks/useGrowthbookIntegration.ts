@@ -12,11 +12,12 @@ const useGrowthBookIntegration = () => {
     const [growthbookStatus, setGrowthbookStatus] = useState({ initDone: false});
     const userAttributes = useSelector(getUserAttributes);
 
-    // Custom Hooks
     const usePrevious = (value: any) => {
         const ref = useRef();
         useEffect(() => {
-            ref.current = value;
+            if(growthbookStatus?.initDone) {
+                ref.current = value;
+            }
         });
         return ref.current;
     };
@@ -27,7 +28,7 @@ const useGrowthBookIntegration = () => {
         if(growthbookStatus.initDone) {
             // IMP: Updating this only on after comparing if anything is changed or not. As this was causing rerenders when useFeatureValue is used which then called trackAttr() and causing infinite loops
             // We can only updateGrowthbookAttributes only if deviceId, sessionId, id, email changes in case this happens again.
-            if(prevUserAttributes && !_.isEqual(prevUserAttributes, userAttributes)) {
+            if(!_.isEqual(prevUserAttributes, userAttributes)) {
                 // console.log("userAttributesChanged");
                 updateGrowthbookAttributes({ ...userAttributes });
             } else {
