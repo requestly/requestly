@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
+import { snakeCase } from "lodash";
 import { Feature } from "../types";
+import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./FeatureCard.css";
 
 interface Props extends Feature {
@@ -41,13 +43,21 @@ export const FeatureCard: React.FC<Props> = ({
     [dispatch]
   );
 
-  const handleNavigation = (e: React.MouseEvent<HTMLElement>) => {
-    if (isUserLoggedIn) {
-      navigate(link);
-    } else {
-      showAuthModal(() => navigate(link));
-    }
-  };
+  const handleNavigation = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const callback = () => {
+        trackPersonaRecommendationSelected(snakeCase(title), "screen");
+        navigate(link);
+      };
+
+      if (isUserLoggedIn) {
+        callback();
+      } else {
+        showAuthModal(callback);
+      }
+    },
+    [title, link, isUserLoggedIn, navigate, showAuthModal]
+  );
 
   return (
     <div className="feature-card" onClick={handleNavigation}>
