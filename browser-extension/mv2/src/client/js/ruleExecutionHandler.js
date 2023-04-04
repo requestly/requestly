@@ -18,7 +18,7 @@ RQ.RuleExecutionHandler.setup = () => {
           message.appliedRuleDetails,
           message.isConsoleLoggerEnabled
         );
-        sendResponse(true);
+        sendResponse();
         return true;
     }
     return false;
