@@ -12,7 +12,7 @@ import {
   NetworkHeader,
   RuleEditorUrlFragment,
 } from "../../../types";
-import { createRule } from "../../../utils";
+import { createRule, generateRuleName } from "../../../utils";
 import IconButton from "../../IconButton/IconButton";
 import PropertyRow from "../../PropertyRow/PropertyRow";
 import "./headersTabContent.scss";
@@ -24,6 +24,12 @@ interface Props {
 enum HeaderType {
   REQUEST = "Request",
   RESPONSE = "Response",
+}
+
+enum HeaderModificationType {
+  ADD = "Add",
+  MODIFY = "Modify",
+  REMOVE = "Remove",
 }
 
 const HeaderRow: React.FC<{
@@ -61,72 +67,91 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
   const requestHeaders = networkEvent.request.headers;
   const responseHeaders = networkEvent.response.headers;
 
-  const createHeadersRule = useCallback(
-    (
-      headerType: HeaderType,
-      modification: Object,
-      inputSelectorToFocus?: string
-    ) => {
-      createRule(
-        RuleEditorUrlFragment.HEADERS,
-        (rule) => {
-          // @ts-ignore
-          rule.pairs[0].modifications[headerType] = [modification];
-          rule.pairs[0].source = {
-            key: SourceKey.URL,
-            operator: SourceOperator.EQUALS,
-            value: networkEvent.request.url,
-          };
-        },
-        inputSelectorToFocus
-      );
-    },
+  const getRuleSource = useCallback(
+    () => ({
+      key: SourceKey.URL,
+      operator: SourceOperator.EQUALS,
+      value: networkEvent.request.url,
+    }),
     [networkEvent]
   );
 
   const editHeader = useCallback(
-    (header: NetworkHeader, type: HeaderType) => {
-      createHeadersRule(
-        type,
-        {
-          type: "Modify",
-          header: header.name,
-          value: header.value,
+    (header: NetworkHeader, headerType: HeaderType) => {
+      const ruleSource = getRuleSource();
+      createRule(
+        RuleEditorUrlFragment.HEADERS,
+        (rule) => {
+          // @ts-ignore
+          rule.pairs[0].modifications[headerType] = [
+            {
+              type: HeaderModificationType.MODIFY,
+              header: header.name,
+              value: header.value,
+            },
+          ];
+          rule.pairs[0].source = ruleSource;
+          rule.name = generateRuleName(`Override ${headerType} header`);
+          rule.description = `Override ${headerType.toLowerCase()} header "${
+            header.name
+          }" for ${ruleSource.value}`;
         },
         'input[data-selectionid="header-value"]'
       );
     },
-    [createHeadersRule]
+    [getRuleSource]
   );
 
   const deleteHeader = useCallback(
-    (header: NetworkHeader, type: HeaderType) => {
-      createHeadersRule(
-        type,
-        {
-          type: "Remove",
-          header: header.name,
-          value: "",
+    (header: NetworkHeader, headerType: HeaderType) => {
+      const ruleSource = getRuleSource();
+      createRule(
+        RuleEditorUrlFragment.HEADERS,
+        (rule) => {
+          // @ts-ignore
+          rule.pairs[0].modifications[headerType] = [
+            {
+              type: HeaderModificationType.REMOVE,
+              header: header.name,
+              value: "",
+            },
+          ];
+          rule.pairs[0].source = ruleSource;
+          rule.name = generateRuleName(`Delete ${headerType} header`);
+          rule.description = `Delete ${headerType.toLowerCase()} header "${
+            header.name
+          }" for ${ruleSource.value}`;
         },
         'input[data-selectionid="header-name"]'
       );
     },
-    [createHeadersRule]
+    [getRuleSource]
   );
 
   const addHeader = useCallback(
-    (type: HeaderType) => {
-      createHeadersRule(
-        type,
-        {
-          type: "Add",
-          header: "",
-          value: "",
+    (headerType: HeaderType) => {
+      const ruleSource = getRuleSource();
+      createRule(
+        RuleEditorUrlFragment.HEADERS,
+        (rule) => {
+          // @ts-ignore
+          rule.pairs[0].modifications[headerType] = [
+            {
+              type: HeaderModificationType.ADD,
+              header: "",
+              value: "",
+            },
+          ];
+          rule.pairs[0].source = ruleSource;
+          rule.name = generateRuleName(`Add ${headerType} header`);
+          rule.description = `Add new ${headerType.toLowerCase()} header for ${
+            ruleSource.value
+          }`;
         },
         'input[data-selectionid="header-name"]'
       );
     },
-    [createHeadersRule]
+    [getRuleSource]
   );
 
   return (
