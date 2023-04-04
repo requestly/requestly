@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -26,6 +26,7 @@ const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
 const GettingStarted = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
@@ -35,7 +36,8 @@ const GettingStarted = () => {
   );
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const __IS_PERSONA_RECOMMENDATION_FLAG_ON__ = 1;
+  const isGettingStartedRoute = pathname.includes(PATHS.GETTING_STARTED);
+  const __IS_PERSONA_RECOMMENDATION_FLAG_ON__ = false && isGettingStartedRoute;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
