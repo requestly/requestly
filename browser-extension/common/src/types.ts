@@ -67,6 +67,7 @@ export interface Rule extends Record<string, unknown> {
   extensionRules?: ExtensionRule[];
   pairs?: RulePair[];
   name: string;
+  description?: string;
   isFavourite?: boolean;
   modificationDate?: number;
 }
