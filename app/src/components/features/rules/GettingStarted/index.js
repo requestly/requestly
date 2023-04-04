@@ -107,8 +107,8 @@ const GettingStarted = () => {
           offset: 3,
         },
         xl: {
-          span: 16,
-          offset: 4,
+          span: 18,
+          offset: 3,
         },
       }
     : {
