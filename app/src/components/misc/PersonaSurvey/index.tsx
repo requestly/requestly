@@ -103,7 +103,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               onClick={() => {
                 toggle();
                 dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                trackPersonaRecommendationSkipped();
+                trackPersonaRecommendationSkipped("modal");
               }}
               className="white skip-recommendation-btn"
             >

@@ -1,6 +1,8 @@
 import { PERSONA_SURVEY } from "./constants";
 import { trackEvent } from "modules/analytics";
 
+type PersonaSurveySource = "modal" | "screen";
+
 export const trackPersonaSurveyViewed = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_VIEWED);
 };
@@ -22,14 +24,17 @@ export const trackPersonaQ3Completed = (option: string) => {
 
 export const trackPersonaRecommendationSelected = (
   feature: string,
-  source: "modal" | "screen"
+  source: PersonaSurveySource
 ) => {
   const params = { feature, source };
   trackEvent(PERSONA_SURVEY.PERSONA_RECOMMENDATION_SELECTED, params);
 };
 
-export const trackPersonaRecommendationSkipped = () => {
-  trackEvent(PERSONA_SURVEY.PERSONA_RECOMMENDATION_SKIPPED);
+export const trackPersonaRecommendationSkipped = (
+  source: PersonaSurveySource
+) => {
+  const params = { source };
+  trackEvent(PERSONA_SURVEY.PERSONA_RECOMMENDATION_SKIPPED, params);
 };
 
 export const trackPersonaQuestionnaireStarted = () => {
