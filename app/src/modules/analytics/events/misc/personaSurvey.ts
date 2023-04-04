@@ -20,8 +20,11 @@ export const trackPersonaQ3Completed = (option: string) => {
   trackEvent(PERSONA_SURVEY.PERSONA_Q3_COMPLETED, params);
 };
 
-export const trackPersonaRecommendationSelected = (feature: string) => {
-  const params = { feature };
+export const trackPersonaRecommendationSelected = (
+  feature: string,
+  source: "modal" | "screen"
+) => {
+  const params = { feature, source };
   trackEvent(PERSONA_SURVEY.PERSONA_RECOMMENDATION_SELECTED, params);
 };
 
