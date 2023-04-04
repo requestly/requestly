@@ -1,5 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
@@ -23,8 +25,15 @@ interface FooterProps {
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isPersonaRecommendationFlagOn = useFeatureIsOn(
+    "persona_recommendation"
+  );
+  const isSharedListUser = window.location.href.includes(
+    PATHS.SHARED_LISTS.VIEWER.RELATIVE
+  );
 
   const disableContinue = () => {
     if (page === 0) return false;
@@ -75,9 +84,20 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
           APP_CONSTANTS.GA_EVENTS.ATTR.NUMBER_OF_EMPLOYEES,
           userPersona.numberOfEmployees
         );
-        if (window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE)) {
+        if (isSharedListUser) {
           //don't show recommendation screen for shared list users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
+          dispatch(actions.updatePersonaSurveyPage(page + 1));
+          return;
+        }
+        if (isPersonaRecommendationFlagOn) {
+          dispatch(
+            actions.toggleActiveModal({ modalName: "personaSurveyModal" })
+          );
+          navigate(PATHS.GETTING_STARTED, {
+            state: { src: "persona_survey_modal" },
+          });
+          return;
         }
         break;
     }
