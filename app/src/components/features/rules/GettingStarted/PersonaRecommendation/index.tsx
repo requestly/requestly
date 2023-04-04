@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Row } from "antd";
 import { CloudUploadOutlined } from "@ant-design/icons";
+import { actions } from "store";
 import { personaRecommendationData } from "./personaRecommendationData";
 import { RQButton } from "lib/design-system/components";
 import { FeatureCard } from "./FeatureCard";
@@ -22,7 +24,9 @@ const PersonaRecommendation: React.FC<Props> = ({
   handleUploadRulesClick,
 }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isViewAllOptions, setIsViewAllOptions] = useState<boolean>(false);
+
   const data = useMemo(
     () =>
       isViewAllOptions
@@ -33,6 +37,7 @@ const PersonaRecommendation: React.FC<Props> = ({
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped("screen");
+    dispatch(actions.updateIsPersonaSurveyCompleted(true));
     navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { replace: true });
   };
 
@@ -55,11 +60,7 @@ const PersonaRecommendation: React.FC<Props> = ({
               <div className="section-header">{section}</div>
               <div className="section-row">
                 {features.map((feature) => (
-                  <FeatureCard
-                    {...feature}
-                    key={feature.title}
-                    isUserLoggedIn={isUserLoggedIn}
-                  />
+                  <FeatureCard {...feature} key={feature.title} />
                 ))}
               </div>
             </div>
