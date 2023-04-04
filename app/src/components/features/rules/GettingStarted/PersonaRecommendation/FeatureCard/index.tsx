@@ -48,7 +48,7 @@ export const FeatureCard: React.FC<Props> = ({
     (e: React.MouseEvent<HTMLElement>) => {
       const callback = () => {
         trackPersonaRecommendationSelected(snakeCase(title), "screen");
-        navigate(link);
+        navigate(link, { replace: true });
       };
 
       if (isUserLoggedIn) {
