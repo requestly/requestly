@@ -12,7 +12,7 @@ const BLACKLISTED_EVENTS = [
   SYNCING.BACKUP.CREATED,
 ];
 
-export const trackEvent = (name, params) => {
+export const trackEvent = (name, params, eventConfig) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;
   if (
     localStorage.getItem("dataCollectionStatus") &&
@@ -34,7 +34,10 @@ export const trackEvent = (name, params) => {
     ? window.currentlyActiveWorkspaceTeamId
     : null;
 
-  Logger.log(`[analytics.trackEvent] name=${name} params=`, params);
+  Logger.log(
+    `[analytics.trackEvent] name=${name} params=${params} config=`,
+    eventConfig
+  );
   posthogIntegration.trackEvent(name, newParams);
 };
 
