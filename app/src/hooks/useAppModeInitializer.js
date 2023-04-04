@@ -21,13 +21,18 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getAndUpdateInstallationDate, isDesktopMode } from "utils/Misc";
 import firebaseApp from "firebase.js";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import {
+  isExtensionInstalled,
+  notifyAppLoadedToExtension,
+} from "actions/ExtensionActions";
 import {
   trackBackgroundProcessStartedEvent,
   trackDesktopAppStartedEvent,
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
+import { StorageService } from "init";
+import { getEventsEngineFlag } from "modules/analytics/events/extension";
 // import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 
 const useAppModeInitializer = () => {
@@ -202,6 +207,14 @@ const useAppModeInitializer = () => {
       }
     });
   }, [appMode, hasAppModeBeenSet]);
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      StorageService(appMode)
+        .saveRecord(getEventsEngineFlag)
+        .then(() => notifyAppLoadedToExtension());
+    }
+  }, [appMode]);
 };
 
 export default useAppModeInitializer;
