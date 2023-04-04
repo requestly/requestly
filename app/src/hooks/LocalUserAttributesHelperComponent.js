@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { getUserAttributes } from "store/selectors";
 import { actions } from "store";
-import useGrowthBookIntegration from "./useGrowthbookIntegration";
+import useGrowthBookIntegration, { GrowthbookExperimentHelperComponent } from "./useGrowthbookIntegration";
 
 const LocalUserAttributesHelperComponent = () => {
   const dispatch = useDispatch();
@@ -28,7 +28,11 @@ const LocalUserAttributesHelperComponent = () => {
 
   useGrowthBookIntegration();
 
-  return null;
+  return (
+    <>
+      <GrowthbookExperimentHelperComponent />
+    </>
+  );
 }
 
 export default LocalUserAttributesHelperComponent;
