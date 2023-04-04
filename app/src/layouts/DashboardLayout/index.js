@@ -15,6 +15,7 @@ import { Col, Layout, Row } from "antd";
 import Sidebar from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { Content } from "antd/lib/layout/layout";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./dashboardLayout.scss";
 
 const DashboardLayout = () => {
@@ -39,10 +40,17 @@ const DashboardLayout = () => {
     ) : null;
   };
 
+  const isPersonaRecommendationFeatureflagOn =
+    useFeatureIsOn("persona_recommendation") &&
+    location?.state?.src === "persona_survey_modal";
+
   return (
     <>
       <Layout className="hp-app-layout">
-        {isPricingPage() || isGoodbyePage() || isInvitePage() ? null : (
+        {isPricingPage() ||
+        isGoodbyePage() ||
+        isInvitePage() ||
+        isPersonaRecommendationFeatureflagOn ? null : (
           <Sidebar
             visible={visible}
             setVisible={setVisible}
@@ -52,7 +60,9 @@ const DashboardLayout = () => {
         )}
 
         <Layout className="hp-bg-color-dark-90">
-          <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />
+          {!isPersonaRecommendationFeatureflagOn && (
+            <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />
+          )}
 
           <Content className="hp-content-main">
             <Row justify="center" style={{ height: "100%" }}>
