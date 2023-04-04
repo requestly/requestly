@@ -2,62 +2,29 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
 import { snakeCase } from "lodash";
 import { Feature } from "../types";
 import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./FeatureCard.css";
 
-interface Props extends Feature {
-  isUserLoggedIn: boolean;
-}
-
-export const FeatureCard: React.FC<Props> = ({
+export const FeatureCard: React.FC<Feature> = ({
   icon,
   title,
   subTitle,
   link,
-  isUserLoggedIn,
 }) => {
   const Icon = icon;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const showAuthModal = useCallback(
-    (callback: () => void) => {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            callback,
-            userActionMessage: "Please sign up.",
-            src: APP_CONSTANTS.FEATURES.RULES,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-            eventSource: AUTH.SOURCE.PERSONA_RECOMMENDATION_SCREEN,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
-
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      const callback = () => {
-        trackPersonaRecommendationSelected(snakeCase(title), "screen");
-        navigate(link, { replace: true });
-      };
-
-      if (isUserLoggedIn) {
-        callback();
-      } else {
-        showAuthModal(callback);
-      }
+      trackPersonaRecommendationSelected(snakeCase(title), "screen");
+      dispatch(actions.updateIsPersonaSurveyCompleted(true));
+      navigate(link, { replace: true });
     },
-    [title, link, isUserLoggedIn, navigate, showAuthModal]
+    [title, link, navigate, dispatch]
   );
 
   return (
