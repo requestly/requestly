@@ -119,10 +119,9 @@ const RuleBuilder = (props) => {
   );
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs, setShowDocs] = useState(true);
-  const isDocsVisible = useMemo(() => enableDocs && showDocs, [
-    enableDocs,
-    showDocs,
-  ]);
+  const isDocsVisible = useMemo(() => {
+    return enableDocs && showDocs;
+  }, [enableDocs, showDocs]);
 
   useExternalRuleCreation(MODE);
 
