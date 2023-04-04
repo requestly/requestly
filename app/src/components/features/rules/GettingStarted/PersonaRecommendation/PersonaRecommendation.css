@@ -1,0 +1,58 @@
+.persona-recommendation-container {
+  margin: auto;
+  max-width: 50rem;
+}
+
+.persona-recommendation-container .header {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 28px;
+  text-align: center;
+  margin-bottom: 1.56rem;
+}
+
+.persona-recommendation-container .section-header {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 15px;
+  margin-bottom: 12px;
+  color: var(--white);
+}
+
+.persona-recommendation-container .section-row {
+  margin-bottom: 5px;
+  display: grid;
+  column-gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(246px, 1fr));
+}
+
+.persona-recommendation-container .view-all-options-btn.ant-btn {
+  color: var(--text-gray);
+  text-decoration: underline;
+}
+
+.persona-recommendation-container .view-all-options-btn.ant-btn:hover,
+.persona-recommendation-container .view-all-options-btn.ant-btn:focus {
+  opacity: 0.7;
+  color: var(--text-gray);
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+/* footer */
+.persona-recommendation-footer {
+  margin-top: 4rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.persona-recommendation-footer .upload-rule-message {
+  font-size: 13px;
+  line-height: 20px;
+  margin-top: 1.25rem;
+  margin-bottom: 12px;
+  color: var(--text-dark-gray);
+}
+
+.persona-recommendation .upload-btn span.anticon {
+  margin-top: 5px;
+}
