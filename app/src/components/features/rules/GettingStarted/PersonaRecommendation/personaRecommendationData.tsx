@@ -2,6 +2,7 @@ import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
+import { Document, PaperUpload, Video } from "react-iconly";
 import { FeatureSection } from "./types";
 
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
@@ -53,7 +54,11 @@ export const personaRecommendationData: FeatureSection[] = [
     features: [
       {
         title: "New API end point",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].ICON, // TODO: update icon
+        icon: () => (
+          <span className="remix-icon">
+            <Document set="curved" />
+          </span>
+        ),
         subTitle: "Create mocks for your APIs",
         link: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       },
@@ -82,14 +87,22 @@ export const personaRecommendationData: FeatureSection[] = [
       },
       {
         title: "Replay session",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].ICON, // TODO: update icon
+        icon: () => (
+          <span className="remix-icon">
+            <Video set="curved" />
+          </span>
+        ),
         subTitle:
           "Record your browsing sessions along with network and console logs",
         link: PATHS.SESSIONS.ABSOLUTE,
       },
       {
         title: "Host JS/CSS",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].ICON, // TODO: update icon
+        icon: () => (
+          <span className="remix-icon">
+            <PaperUpload set="curved" />
+          </span>
+        ),
         subTitle:
           "Host your JS/CSS/HTML files and use them anywhere for debugging",
         link: PATHS.FILE_SERVER_V2.ABSOLUTE,
