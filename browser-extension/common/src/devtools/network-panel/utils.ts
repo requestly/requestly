@@ -70,6 +70,11 @@ export const getCurrentColorScheme = (): ColorScheme => {
     : ColorScheme.LIGHT;
 };
 
+export const generateRuleName = (modification: string) => {
+  const words = modification.split(" ").map((word) => word.toLowerCase());
+  return [...words, Date.now()].join("-");
+};
+
 export const onColorSchemeChange = (
   callback: (theme: ColorScheme) => void
 ): void => {
