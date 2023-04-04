@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import _ from "lodash";
 
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
@@ -11,11 +12,29 @@ const useGrowthBookIntegration = () => {
     const [growthbookStatus, setGrowthbookStatus] = useState({ initDone: false});
     const userAttributes = useSelector(getUserAttributes);
 
+    // Custom Hooks
+    const usePrevious = (value: any) => {
+        const ref = useRef();
+        useEffect(() => {
+            ref.current = value;
+        });
+        return ref.current;
+    };
+
+    const prevUserAttributes = usePrevious(userAttributes);
+
     useEffect(() => {
         if(growthbookStatus.initDone) {
-            updateGrowthbookAttributes({ ...userAttributes });
+            // IMP: Updating this only on after comparing if anything is changed or not. As this was causing rerenders when useFeatureValue is used which then called trackAttr() and causing infinite loops
+            // We can only updateGrowthbookAttributes only if deviceId, sessionId, id, email changes in case this happens again.
+            if(prevUserAttributes && !_.isEqual(prevUserAttributes, userAttributes)) {
+                // console.log("userAttributesChanged");
+                updateGrowthbookAttributes({ ...userAttributes });
+            } else {
+                // console.log("userAttributes not changed");
+            }
         }
-    }, [userAttributes, growthbookStatus]);
+    }, [userAttributes, growthbookStatus, prevUserAttributes]);
 
     useEffect(() => {
         const auth = getAuth(firebaseApp);
