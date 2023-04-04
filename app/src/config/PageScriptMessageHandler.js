@@ -1,6 +1,6 @@
 import Logger from "lib/logger";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { handleEventBatches } from "modules/analytics/events/extension";
+// import { handleEventBatches } from "modules/analytics/events/extension";
 
 const PageScriptMessageHandler = {
   eventCallbackMap: {},
@@ -96,7 +96,7 @@ const PageScriptMessageHandler = {
           ackIds: ackBatchIds,
           received: true,
         });
-        handleEventBatches(message.eventBatches);
+        // handleEventBatches(message.eventBatches);
         break;
       }
       default:
