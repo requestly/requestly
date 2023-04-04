@@ -6,11 +6,14 @@ window.localStorage.setItem("extID", extID);
 
 document.documentElement.setAttribute("rq-ext-version", extVersion);
 
-RQ.Utils.submitAttr("ext_id", extID);
-RQ.Utils.submitAttr("ext_version", extVersion);
-RQ.Utils.submitAttr(
-  "last_activity",
-  RQ.Utils.formatDate(Date.now(), "yyyy-mm-dd")
-);
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+  switch (message.action) {
+    case RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS:
+      RQ.ContentScriptMessageHandler.sendMessage(message, (response) => {
+        sendResponse(response);
+      });
+      return true;
+  }
+});
 
 RQ.SessionRecorder.setup();

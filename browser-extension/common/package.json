@@ -32,6 +32,7 @@
     "@types/chrome": "^0.0.200",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
+    "@types/uuid": "^9.0.1",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
     "rollup": "^2.79.1",
@@ -50,6 +51,7 @@
     "antd": "^5.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-split": "^2.0.14"
+    "react-split": "^2.0.14",
+    "uuid": "^9.0.0"
   }
 }

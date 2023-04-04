@@ -145,6 +145,8 @@ CONSTANTS.EXTENSION_MESSAGES = {
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
+  SEND_EXTENSION_EVENTS: "sendExtensionEvents",
+  NOTIFY_APP_LOADED: "notifyAppLoaded",
 };
 
 CONSTANTS.HEADERS_TARGET = {
@@ -197,6 +199,7 @@ CONSTANTS.STORAGE_KEYS = {
   USER_INFO: "user_info",
   LATEST_NOTIFICATION_READ_BY_USER: "latestNotificationReadId",
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
+  USE_EVENTS_ENGINE: "useEventsEngine",
 };
 
 CONSTANTS.REQUEST_STATE = {
