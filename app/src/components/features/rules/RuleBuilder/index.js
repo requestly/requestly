@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
@@ -77,10 +83,18 @@ const RuleBuilder = (props) => {
     "redirect_rule_onboarding",
     null
   );
-  const isRedirectRuleDocsEnabled =
-    currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
-    redirectRuleOnboardingExp === "docs";
+  const enableDocs = useMemo(() => {
+    return (
+      !props.isSharedListViewRule &&
+      currentlySelectedRuleData.ruleType ===
+        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
+      redirectRuleOnboardingExp === "docs"
+    );
+  }, [
+    currentlySelectedRuleData.ruleType,
+    props.isSharedListViewRule,
+    redirectRuleOnboardingExp,
+  ]);
 
   const isRedirectRuleTourCompleted = useSelector(
     getIsRedirectRuleTourCompleted
@@ -105,6 +119,10 @@ const RuleBuilder = (props) => {
   );
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs, setShowDocs] = useState(true);
+  const isDocsVisible = useMemo(() => enableDocs && showDocs, [
+    enableDocs,
+    showDocs,
+  ]);
 
   useExternalRuleCreation(MODE);
 
@@ -120,6 +138,12 @@ const RuleBuilder = (props) => {
     });
     return ref.current;
   };
+
+  useEffect(() => {
+    if (isDocsVisible) {
+      trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
+    }
+  }, [isDocsVisible, currentlySelectedRuleData.ruleType]);
 
   const hasRuleToEditIdChanged = useHasChanged(RULE_TO_EDIT_ID);
 
@@ -370,9 +394,6 @@ const RuleBuilder = (props) => {
     return <SpinnerCard renderHeader />;
   }
 
-  const isDocsVisible =
-    showDocs && isRedirectRuleDocsEnabled && !props.isSharedListViewRule;
-
   return (
     <>
       <ProductWalkthrough
@@ -400,14 +421,13 @@ const RuleBuilder = (props) => {
           />
         </Col>
 
-        {!props.isSharedListViewRule && isRedirectRuleDocsEnabled ? (
+        {enableDocs ? (
           <>
             {!showDocs ? (
               <Button
                 className="rule-editor-help-btn"
                 onClick={() => {
                   setShowDocs(true);
-                  trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
                 }}
               >
                 Help
