@@ -6,6 +6,7 @@ import _ from "lodash";
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
 import firebaseApp from "firebase.js";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const useGrowthBookIntegration = () => {
     // Keeping it object as boolean wasn't working when updating attributes
@@ -22,17 +23,20 @@ const useGrowthBookIntegration = () => {
         return ref.current;
     };
 
+    // console.log("gb: LocalUserAttributesHelperComponent");
+
     const prevUserAttributes = usePrevious(userAttributes);
 
     useEffect(() => {
+        // console.log("gb: userAttributes reference/value changed in redux");
         if(growthbookStatus.initDone) {
             // IMP: Updating this only on after comparing if anything is changed or not. As this was causing rerenders when useFeatureValue is used which then called trackAttr() and causing infinite loops
             // We can only updateGrowthbookAttributes only if deviceId, sessionId, id, email changes in case this happens again.
             if(!_.isEqual(prevUserAttributes, userAttributes)) {
-                // console.log("userAttributesChanged");
+                // console.log("gb: userAttributes value changed");
                 updateGrowthbookAttributes({ ...userAttributes });
             } else {
-                // console.log("userAttributes not changed");
+                // console.log("gb: userAttributes value not changed");
             }
         }
     }, [userAttributes, growthbookStatus, prevUserAttributes]);
@@ -45,6 +49,16 @@ const useGrowthBookIntegration = () => {
             setGrowthbookStatus({initDone: true});
         });
     }, []);
+}
+
+// This is used to prevent rerenders in `useGrowthBookIntegration` when `updateGrowthbookAttributes` is called since it triggers useFeatureValue change.
+export const GrowthbookExperimentHelperComponent = (): any => {
+    // Fire experiment_assigned as soon as ui loads
+    useFeatureValue("redirect_rule_onboarding", null);
+
+    // console.log("gb: GrowthbookExperimentHelperComponent");
+
+    return null;
 }
 
 export default useGrowthBookIntegration;

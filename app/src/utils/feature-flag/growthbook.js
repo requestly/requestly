@@ -8,7 +8,7 @@ export const growthbook = new GrowthBook({
   clientKey: "sdk-ONIe1oQehroUJmyv",
   enableDevMode: true,
   trackingCallback: (experiment, result) => {
-    trackEvent("experiment_viewed", { id: experiment.key, value: result.value });
+    trackEvent("experiment_assigned", { id: experiment.key, value: result.value });
   },
   onFeatureUsage: (featureKey, result) => {
     const attrName = `x_flag_${featureKey}`;
