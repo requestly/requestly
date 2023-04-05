@@ -77,7 +77,7 @@ const DashboardContent = () => {
   useEffect(() => {
     if (
       isPersonaRecommendationFlagOn &&
-      userPersona.page === 4 &&
+      userPersona.page === 1 &&
       userPersona.isSurveyCompleted === false
     ) {
       navigate(PATHS.GETTING_STARTED, {
