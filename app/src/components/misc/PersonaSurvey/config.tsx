@@ -272,12 +272,14 @@ export const SurveyConfig: PageConfig[] = [
   },
   {
     pageId: 2,
+    skip: true,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
     render: 2,
   },
   {
     pageId: 3,
+    skip: true,
     title: "How many employees do you have in your organisation?",
     subTitle: "Select one",
     render: 3,
