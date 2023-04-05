@@ -72,7 +72,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
         ],
       },
     ],
-    [RULE_TYPES]
+    [RULE_TYPES, log.url, log.requestShellCurl]
   );
   return (
     <Dropdown menu={{ items }} trigger={["contextMenu"]}>
