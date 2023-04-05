@@ -13,16 +13,23 @@ interface EventBatch {
   events: Event[];
   createdTs: number;
 }
-function sendEventsBatch(eventBatch: EventBatch) {
+
+const sendEventsBatch = (eventBatch: EventBatch): void => {
   eventBatch.events.forEach((event) => {
     const eventConfig = { time: event.eventTs };
     trackEvent(event.eventName, event.eventParams, eventConfig);
   });
-}
+};
 
-export function handleEventBatches(batches: EventBatch[]) {
+/**
+ *
+ * @param batches event batches
+ * @returns processed batch IDs to acknowledge
+ */
+export const handleEventBatches = (batches: EventBatch[]): string[] => {
   batches.forEach(sendEventsBatch);
-}
+  return batches.map((batch) => batch.id);
+};
 
 /* EXTENSION EVENTS ENGINE FLAG */
 export const getEventsEngineFlag = {
