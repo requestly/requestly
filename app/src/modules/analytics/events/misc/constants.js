@@ -93,6 +93,7 @@ export const PRODUCT_WALKTHROUGH = {
 };
 
 export const MORE_INFO = {
+  MORE_INFO_SHOWN: "more_info_shown",
   MORE_INFO_VIEWED: "more_info_viewed",
   MORE_INFO_CLICKED: "more_info_clicked",
 };
