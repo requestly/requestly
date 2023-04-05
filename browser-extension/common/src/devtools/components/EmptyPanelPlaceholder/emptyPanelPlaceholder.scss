@@ -1,0 +1,11 @@
+.empty-panel-placeholder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  > span {
+    font-size: var(--font-size-large);
+  }
+}

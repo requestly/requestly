@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { ConfigProvider, theme } from "antd";
 import { ThemeProvider } from "@devtools-ds/themes";
 import "./index.css";
-import NetworkPanel from "./components/NetworkPanel/NetworkPanel";
+import Network from "./containers/network/Network";
 import { ColorScheme } from "./types";
 import { getCurrentColorScheme, onColorSchemeChange } from "./utils";
 
@@ -34,7 +34,7 @@ const App: React.FC = () => {
   return (
     <ConfigProvider theme={antDesignTheme}>
       <ThemeProvider theme={"chrome"} colorScheme={colorScheme}>
-        <NetworkPanel />
+        <Network />
       </ThemeProvider>
     </ConfigProvider>
   );

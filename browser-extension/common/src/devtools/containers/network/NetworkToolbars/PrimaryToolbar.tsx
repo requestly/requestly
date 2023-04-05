@@ -4,14 +4,13 @@ import React, { useCallback } from "react";
 import UserAgentRuleIcon from "../../../../../resources/icons/rule-icons/useragent.svg";
 import CodeIcon from "../../../../../resources/icons/code.svg";
 import CSSIcon from "../../../../../resources/icons/css.svg";
-import "./networkPanelToolbar.scss";
 import {
   createRule,
   generateRuleName,
   getHostFromUrl,
   getPageOrigin,
-} from "../../utils";
-import { NetworkPanelSettings, RuleEditorUrlFragment } from "../../types";
+} from "../../../utils";
+import { NetworkSettings, RuleEditorUrlFragment } from "../../../types";
 import {
   ScriptCodeType,
   ScriptRulePair,
@@ -22,8 +21,8 @@ import {
 
 interface Props {
   clearEvents: () => void;
-  settings: NetworkPanelSettings;
-  onSettingsChange: (settings: NetworkPanelSettings) => void;
+  settings: NetworkSettings;
+  onSettingsChange: (settings: NetworkSettings) => void;
 }
 
 const PrimaryToolbar: React.FC<Props> = ({
@@ -120,7 +119,7 @@ const PrimaryToolbar: React.FC<Props> = ({
   }, []);
 
   return (
-    <div className="network-panel-toolbar primary">
+    <div className="network-toolbar primary">
       <div>
         <Button
           icon={<StopOutlined />}

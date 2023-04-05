@@ -1,7 +1,6 @@
 import { Divider, Input, Radio } from "antd";
 import React, { useCallback } from "react";
-import { NetworkFilters, ResourceTypeFilter } from "../../types";
-import "./networkPanelToolbar.scss";
+import { NetworkFilters, ResourceTypeFilter } from "../../../types";
 
 interface Props {
   filters: NetworkFilters;
@@ -30,7 +29,7 @@ const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
   );
 
   return (
-    <div className="network-panel-toolbar filters">
+    <div className="network-toolbar filters">
       <Input
         className="url-filter"
         placeholder="Filter by URL"

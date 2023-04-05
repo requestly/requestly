@@ -2,21 +2,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   NetworkEvent,
   NetworkFilters,
-  NetworkPanelSettings,
+  NetworkSettings,
   ResourceTypeFilter,
 } from "../../types";
-import { PrimaryToolbar, FiltersToolbar } from "../NetworkPanelToolbar";
-import EmptyPanelPlaceholder from "./EmptyPanelPlaceholder";
-import NetworkTable from "../NetworkTable/NetworkTable";
-import "./networkPanel.scss";
+import { PrimaryToolbar, FiltersToolbar } from "./NetworkToolbars";
+import EmptyPanelPlaceholder from "../../components/EmptyPanelPlaceholder/EmptyPanelPlaceholder";
+import NetworkTable from "./NetworkTable/NetworkTable";
+import "./network.scss";
 
-const NetworkPanel: React.FC = () => {
+const Network: React.FC = () => {
   const [networkEvents, setNetworkEvents] = useState<NetworkEvent[]>([]);
   const [filters, setFilters] = useState<NetworkFilters>({
     url: "",
     resourceType: ResourceTypeFilter.ALL,
   });
-  const [settings, setSettings] = useState<NetworkPanelSettings>({
+  const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
   });
   const preserveLogRef = useRef(false);
@@ -44,7 +44,7 @@ const NetworkPanel: React.FC = () => {
   }, [settings]);
 
   return (
-    <div className="network-panel">
+    <div className="network-container">
       <PrimaryToolbar
         clearEvents={clearEvents}
         settings={settings}
@@ -62,4 +62,4 @@ const NetworkPanel: React.FC = () => {
   );
 };
 
-export default NetworkPanel;
+export default Network;

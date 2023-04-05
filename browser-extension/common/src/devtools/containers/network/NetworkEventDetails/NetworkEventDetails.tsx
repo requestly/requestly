@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from "react";
-import { NetworkEvent } from "../../types";
+import { NetworkEvent } from "../../../types";
 // @ts-ignore
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Navigation } from "@devtools-ds/navigation";
@@ -59,7 +59,7 @@ const NetworkEventDetails: React.FC<Props> = ({ networkEvent, close }) => {
           <Navigation.Left>
             <Navigation.Button
               icon={<span>&times;</span>}
-              aria-label="Close panel"
+              aria-label="Close"
               title="Close"
               onClick={close}
             />

@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
 import { Table } from "@devtools-ds/table";
-import { NetworkEvent } from "../../types";
+import { NetworkEvent } from "../../../types";
 
 interface Props {
   id: string;

@@ -1,12 +1,16 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Table } from "@devtools-ds/table";
-import { NetworkEvent, NetworkFilters, ResourceTypeFilter } from "../../types";
+import {
+  NetworkEvent,
+  NetworkFilters,
+  ResourceTypeFilter,
+} from "../../../types";
 import NetworkTableRow from "./NetworkTableRow";
-import useAutoScrollableContainer from "../../hooks/useAutoScrollableContainer";
+import useAutoScrollableContainer from "../../../hooks/useAutoScrollableContainer";
 import "./networkTable.scss";
 import NetworkEventDetails from "../NetworkEventDetails/NetworkEventDetails";
-import EmptyTablePlaceholder from "../NetworkPanel/EmptyPanelPlaceholder";
-import SplitPane from "../SplitPane/SplitPane";
+import EmptyTablePlaceholder from "../../../components/EmptyPanelPlaceholder/EmptyPanelPlaceholder";
+import SplitPane from "../../../components/SplitPane/SplitPane";
 
 const getRowId = (index: number) => (index >= 0 ? `request-${index}` : "");
 const getRowIndex = (id: string) =>

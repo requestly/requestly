@@ -5,7 +5,7 @@ import RedirectRuleIcon from "../../../../../../resources/icons/rule-icons/redir
 import ReplaceRuleIcon from "../../../../../../resources/icons/rule-icons/replace.svg";
 import CancelRuleIcon from "../../../../../../resources/icons/rule-icons/cancel.svg";
 import DelayRuleIcon from "../../../../../../resources/icons/rule-icons/delay.svg";
-import { NetworkEvent, RuleEditorUrlFragment } from "../../../types";
+import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import PropertyRow from "../../PropertyRow/PropertyRow";
 import "./generalTabContent.scss";
@@ -14,7 +14,7 @@ import {
   generateRuleName,
   getBaseUrl,
   getHostFromUrl,
-} from "../../../utils";
+} from "../../../../utils";
 
 interface Props {
   networkEvent: NetworkEvent;

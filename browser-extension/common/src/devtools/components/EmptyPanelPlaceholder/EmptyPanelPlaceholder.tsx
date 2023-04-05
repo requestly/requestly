@@ -1,5 +1,6 @@
-import { Typography } from "antd";
 import React from "react";
+import { Typography } from "antd";
+import "./emptyPanelPlaceholder.scss";
 
 const EmptyPanelPlaceholder: React.FC = () => {
   return (

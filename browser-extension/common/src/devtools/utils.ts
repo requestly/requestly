@@ -1,5 +1,5 @@
-import config from "../../config";
-import { Rule } from "../../types";
+import config from "../config";
+import { Rule } from "../types";
 import { RuleEditorUrlFragment, ColorScheme } from "./types";
 
 interface PostMessageData {

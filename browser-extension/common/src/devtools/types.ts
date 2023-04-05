@@ -44,6 +44,6 @@ export interface NetworkFilters {
   resourceType?: ResourceTypeFilter;
 }
 
-export interface NetworkPanelSettings {
+export interface NetworkSettings {
   preserveLog?: boolean;
 }
