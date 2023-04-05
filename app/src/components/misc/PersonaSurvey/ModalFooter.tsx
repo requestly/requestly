@@ -1,18 +1,20 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { SurveyConfig, OptionsConfig } from "./config";
-import { getFormattedUserUseCases } from "./utils";
+// import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
   trackPersonaQ1Completed,
-  trackPersonaQ2Completed,
-  trackPersonaQ3Completed,
+  // trackPersonaQ2Completed,
+  // trackPersonaQ3Completed,
   trackPersonaQuestionnaireStarted,
 } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
@@ -23,8 +25,16 @@ interface FooterProps {
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isPersonaRecommendationFlagOn = useFeatureIsOn(
+    "persona_recommendation"
+  );
+  const isSharedListUser = window.location.href.includes(
+    PATHS.SHARED_LISTS.VIEWER.RELATIVE
+  );
 
   const disableContinue = () => {
     if (page === 0) return false;
@@ -33,21 +43,22 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   };
 
   const renderModalLeftSection = () => {
-    if (page === 0)
+    if (page === 0) {
       return (
         <>
           <span className="survey-modal-emoji">😁</span> We are excited to see
           you here
         </>
       );
-
-    if (page > 0 && page <= surveyLength - 2) {
-      return (
-        <>
-          {page}/{surveyLength - 2}
-        </>
-      );
     } else return null;
+
+    // if (page > 0 && page <= surveyLength - 2) {
+    //   return (
+    //     <>
+    //       {page}/{surveyLength - 2}
+    //     </>
+    //   );
+    // } else return null;
   };
 
   const handleMoveToNextPage = () => {
@@ -61,27 +72,61 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
           APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA,
           userPersona.persona
         );
-        break;
-      case 2:
-        trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
-        submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASES,
-          getFormattedUserUseCases(userPersona.useCases)
-        );
-        break;
-      case 3:
-        trackPersonaQ3Completed(userPersona.numberOfEmployees);
-        submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.NUMBER_OF_EMPLOYEES,
-          userPersona.numberOfEmployees
-        );
-        if (window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE)) {
+
+        if (isSharedListUser) {
           //don't show recommendation screen for shared list users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
+          return;
         }
-        break;
+
+        if (isPersonaRecommendationFlagOn) {
+          dispatch(
+            actions.toggleActiveModal({ modalName: "personaSurveyModal" })
+          );
+          navigate(PATHS.GETTING_STARTED, {
+            replace: true,
+            state: {
+              src: "persona_survey_modal",
+              redirectTo: location.pathname,
+            },
+          });
+        }
+      // break;
+      //   case 2:
+      //     trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
+      //     submitAttrUtil(
+      //       APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASES,
+      //       getFormattedUserUseCases(userPersona.useCases)
+      //     );
+      //     break;
+      //   case 3:
+      //     trackPersonaQ3Completed(userPersona.numberOfEmployees);
+      //     submitAttrUtil(
+      //       APP_CONSTANTS.GA_EVENTS.ATTR.NUMBER_OF_EMPLOYEES,
+      //       userPersona.numberOfEmployees
+      //     );
+      //     if (isSharedListUser) {
+      //       //don't show recommendation screen for shared list users
+      //       dispatch(actions.updateIsPersonaSurveyCompleted(true));
+      //       dispatch(actions.updatePersonaSurveyPage(page + 1));
+      //       return;
+      //     }
+      //     if (isPersonaRecommendationFlagOn) {
+      //       dispatch(
+      //         actions.toggleActiveModal({ modalName: "personaSurveyModal" })
+      //       );
+      //       navigate(PATHS.GETTING_STARTED, {
+      //         replace: true,
+      //         state: {
+      //           src: "persona_survey_modal",
+      //           redirectTo: location.pathname,
+      //         },
+      //       });
+      //     }
+      //     break;
     }
-    dispatch(actions.updatePersonaSurveyPage(page + 1));
+
+    dispatch(actions.updatePersonaSurveyPage(page === 1 ? 4 : page + 1));
   };
 
   return (
@@ -98,7 +143,8 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
                 }`}
                 onClick={handleMoveToNextPage}
               >
-                {page === surveyLength - 2 ? "Get started" : "Continue"}
+                {/* {page === surveyLength - 2 ? "Get started" : "Continue"} */}
+                {page === 1 ? "Get started" : "Continue"}
               </RQButton>
             </Col>
           </Row>

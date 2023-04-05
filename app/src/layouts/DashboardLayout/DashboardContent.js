@@ -6,6 +6,7 @@ import {
   Navigate,
   useLocation,
   useSearchParams,
+  useNavigate,
 } from "react-router-dom";
 //FOR ROUTER
 import routes from "../../routes";
@@ -24,11 +25,16 @@ import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isPersonaRecommendationFlagOn = useFeatureIsOn(
+    "persona_recommendation"
+  );
 
   //Global state
   const dispatch = useDispatch();
@@ -67,6 +73,29 @@ const DashboardContent = () => {
   };
 
   const prevProps = usePrevious({ location });
+
+  useEffect(() => {
+    if (
+      isPersonaRecommendationFlagOn &&
+      userPersona.page === 4 &&
+      userPersona.isSurveyCompleted === false
+    ) {
+      navigate(PATHS.GETTING_STARTED, {
+        replace: true,
+        state: {
+          src: "persona_survey_modal",
+          redirectTo:
+            location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
+        },
+      });
+    }
+  }, [
+    navigate,
+    location.state?.redirectTo,
+    userPersona.page,
+    userPersona.isSurveyCompleted,
+    isPersonaRecommendationFlagOn,
+  ]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
