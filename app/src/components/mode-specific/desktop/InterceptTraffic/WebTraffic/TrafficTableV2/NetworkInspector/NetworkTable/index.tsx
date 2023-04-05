@@ -5,6 +5,7 @@ import _ from "lodash";
 import { getColumnKey } from "../utils";
 import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
+import { ContextMenu } from "../ContextMenu";
 
 export const ITEM_SIZE = 30;
 
@@ -84,16 +85,18 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     }
 
     const rowProps = onRow(log);
+    console.log("RENDER ROW", log);
 
     return (
       <Table.Row id={log.id} {...rowProps}>
         {columns.map((column: any) => {
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
-
           return (
-            <Table.Cell key={column.id}>
-              {column?.render ? column.render(columnData) : columnData}
-            </Table.Cell>
+            <ContextMenu>
+              <Table.Cell key={column.id}>
+                {column?.render ? column.render(columnData) : columnData}
+              </Table.Cell>
+            </ContextMenu>
           );
         })}
       </Table.Row>
