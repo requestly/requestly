@@ -21,8 +21,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { actions } from "store";
-import "./index.css";
 import { SurveyOption } from "./Option";
+import "./index.css";
 
 interface PersonaModalProps {
   isOpen: boolean;
@@ -103,7 +103,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
               onClick={() => {
                 toggle();
                 dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                trackPersonaRecommendationSkipped();
+                trackPersonaRecommendationSkipped("modal");
               }}
               className="white skip-recommendation-btn"
             >
@@ -208,11 +208,13 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
           "survey-modal-border-radius"
         }`}
       >
-        {SurveyConfig.map((page: PageConfig, index) => (
-          <React.Fragment key={index}>
-            {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
-          </React.Fragment>
-        ))}
+        {SurveyConfig.filter((config) => !config.skip).map(
+          (page: PageConfig, index) => (
+            <React.Fragment key={index}>
+              {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
+            </React.Fragment>
+          )
+        )}
       </div>
       <SurveyModalFooter page={currentPage} />
     </RQModal>
