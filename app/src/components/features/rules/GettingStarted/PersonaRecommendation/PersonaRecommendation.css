@@ -5,7 +5,7 @@
 
 .persona-recommendation-container {
   margin: auto;
-  max-width: 54rem;
+  max-width: 58rem;
   padding: 0 1.25rem;
 }
 
@@ -29,7 +29,7 @@
   margin-bottom: 5px;
   display: grid;
   column-gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
 .persona-recommendation-container .view-all-options-btn.ant-btn {
