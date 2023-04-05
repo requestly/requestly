@@ -32,7 +32,11 @@ import {
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
 import { StorageService } from "init";
-import { getEventsEngineFlag } from "modules/analytics/events/extension";
+import {
+  getEventsEngineFlag,
+  handleEventBatches,
+} from "modules/analytics/events/extension";
+import PSMH from "../config/PageScriptMessageHandler";
 // import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 
 const useAppModeInitializer = () => {
@@ -213,6 +217,19 @@ const useAppModeInitializer = () => {
       StorageService(appMode)
         .saveRecord(getEventsEngineFlag)
         .then(() => notifyAppLoadedToExtension());
+
+      PSMH.addMessageListener(
+        GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
+        (message) => {
+          const batchIdsToAcknowledge = handleEventBatches(
+            message.eventBatches
+          );
+          return {
+            ackIds: batchIdsToAcknowledge,
+            received: true,
+          };
+        }
+      );
     }
   }, [appMode]);
 };
