@@ -7,6 +7,7 @@ import { actions } from "store";
 import { personaRecommendationData } from "./personaRecommendationData";
 import { RQButton } from "lib/design-system/components";
 import { FeatureCard } from "./FeatureCard";
+import PATHS from "config/constants/sub/paths";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
@@ -37,8 +38,15 @@ const PersonaRecommendation: React.FC<Props> = ({
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped("screen");
-    //@ts-ignore
-    navigate(state?.redirectTo ?? "/", { replace: true });
+
+    navigate(
+      //@ts-ignore
+      state?.redirectTo?.includes(PATHS.GETTING_STARTED)
+        ? PATHS.RULES.MY_RULES.ABSOLUTE
+        : //@ts-ignore
+          state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
+      { replace: true }
+    );
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
   };
 

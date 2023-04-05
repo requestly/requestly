@@ -82,12 +82,16 @@ const DashboardContent = () => {
     ) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
-        state: { src: "persona_survey_modal", ...(location?.state ?? {}) },
+        state: {
+          src: "persona_survey_modal",
+          redirectTo:
+            location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
+        },
       });
     }
   }, [
     navigate,
-    location?.state,
+    location.state?.redirectTo,
     userPersona.page,
     userPersona.isSurveyCompleted,
     isPersonaRecommendationFlagOn,
