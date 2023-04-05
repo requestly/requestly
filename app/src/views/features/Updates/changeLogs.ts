@@ -2,6 +2,14 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.4.5",
+    logs: [
+      {
+        title: "Bug fixes in Modify Response rule execution.",
+      },
+    ],
+  },
+  {
     version: "23.3.3",
     logs: [
       {
