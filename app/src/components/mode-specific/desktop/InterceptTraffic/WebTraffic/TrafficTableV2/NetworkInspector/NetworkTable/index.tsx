@@ -98,6 +98,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     return (
       <ContextMenu
         triggerMenu={isContextMenuFlagEnabled ? ["contextMenu"] : [null]}
+        log={log}
       >
         <Table.Row id={log.id} {...rowProps}>
           {columns.map((column: any) => {

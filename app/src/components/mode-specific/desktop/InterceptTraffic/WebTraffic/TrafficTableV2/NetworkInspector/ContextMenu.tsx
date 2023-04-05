@@ -1,18 +1,20 @@
 import React, { ReactNode, useMemo } from "react";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
-
+import { copyToClipBoard } from "../../../../../../../utils/Misc";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 interface ContextMenuProps {
   children: ReactNode;
   triggerMenu: ("contextMenu" | null)[];
+  log: any;
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   children,
   triggerMenu,
+  log,
 }) => {
   const { RULE_TYPES } = GLOBAL_CONSTANTS;
   const items: MenuProps["items"] = useMemo(
@@ -20,10 +22,13 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
       {
         label: "Copy cURL",
         key: "copy_curl",
+        onClick: () =>
+          copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard"),
       },
       {
         label: "Copy URL",
         key: "copy_url",
+        onClick: () => copyToClipBoard(log.url, "URL copied to clipboard"),
       },
       {
         label: "Redirect URL(Map local/Remote)",
