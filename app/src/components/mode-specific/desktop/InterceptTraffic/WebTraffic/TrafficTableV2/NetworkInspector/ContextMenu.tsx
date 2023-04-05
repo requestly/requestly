@@ -1,14 +1,19 @@
 import React, { ReactNode, useMemo } from "react";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
+
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 interface ContextMenuProps {
   children: ReactNode;
+  triggerMenu: ("contextMenu" | null)[];
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({
+  children,
+  triggerMenu,
+}) => {
   const { RULE_TYPES } = GLOBAL_CONSTANTS;
   const items: MenuProps["items"] = useMemo(
     () => [
@@ -70,7 +75,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children }) => {
     [RULE_TYPES]
   );
   return (
-    <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+    <Dropdown menu={{ items }} trigger={triggerMenu}>
       {children}
     </Dropdown>
   );

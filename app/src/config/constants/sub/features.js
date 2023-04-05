@@ -40,7 +40,7 @@ FEATURES.ENABLE_TRACKING = "enable_tracking";
 FEATURES.REDIRECT_RULE_DEMO_VIDEO_IN_EDITOR =
   "redirect-rule-tutorial-video-in-editor-experiment";
 FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
-
+FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 // MARKETING
 FEATURES.INTERCEPTOR = {};
 FEATURES.INTERCEPTOR.INTERCEPTOR_LAUNCH = "interceptor-launch";
