@@ -1,16 +1,15 @@
-import { Table } from "@devtools-ds/table";
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { actions } from "store";
-import { getIsTrafficTableTourCompleted } from "store/selectors";
-import _ from "lodash";
-
-import { getColumnKey } from "../utils";
-import { VirtualTable } from "./VirtualTable";
-import AppliedRules from "../../Tables/columns/AppliedRules";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import FEATURES from "config/constants/sub/features";
-import { ContextMenu } from "../ContextMenu";
+import { Table } from '@devtools-ds/table';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { actions } from 'store';
+import { getIsTrafficTableTourCompleted } from 'store/selectors';
+import _ from 'lodash';
+import { getColumnKey } from '../utils';
+import { VirtualTable } from './VirtualTable';
+import AppliedRules from '../../Tables/columns/AppliedRules';
+import { ProductWalkthrough } from 'components/misc/ProductWalkthrough';
+import FEATURES from 'config/constants/sub/features';
+import { ContextMenu } from '../ContextMenu';
 
 export const ITEM_SIZE = 30;
 
@@ -21,16 +20,14 @@ interface Props {
 
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   const dispatch = useDispatch();
-  const isTrafficTableTourCompleted = useSelector(
-    getIsTrafficTableTourCompleted
-  );
+  const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
   const columns = [
     {
-      id: "time",
-      title: "Time",
-      dataIndex: "timestamp",
-      width: "5%",
+      id: 'time',
+      title: 'Time',
+      dataIndex: 'timestamp',
+      width: '5%',
       render: (timestamp: any) => {
         return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
           hour12: false,
@@ -38,40 +35,40 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       },
     },
     {
-      id: "url",
-      title: "URL",
-      dataIndex: "url",
-      width: "50%",
+      id: 'url',
+      title: 'URL',
+      dataIndex: 'url',
+      width: '50%',
     },
     {
-      id: "method",
-      title: "Method",
-      dataIndex: ["request", "method"], // corresponds to request.method
-      width: "5%",
+      id: 'method',
+      title: 'Method',
+      dataIndex: ['request', 'method'], // corresponds to request.method
+      width: '5%',
     },
     {
-      id: "contentType",
-      title: "Content-Type",
-      dataIndex: ["response", "contentType"],
-      width: "10%",
+      id: 'contentType',
+      title: 'Content-Type',
+      dataIndex: ['response', 'contentType'],
+      width: '10%',
     },
     {
-      title: "Rules Applied",
-      dataIndex: ["actions"],
-      width: "10%",
-      responsive: ["xs", "sm"],
+      title: 'Rules Applied',
+      dataIndex: ['actions'],
+      width: '10%',
+      responsive: ['xs', 'sm'],
       render: (actions: any) => {
-        if (!actions || actions === "-" || actions.length === 0) {
-          return "-";
+        if (!actions || actions === '-' || actions.length === 0) {
+          return '-';
         }
         return <AppliedRules actions={actions} />;
       },
     },
     {
-      id: "status",
-      title: "Status",
-      dataIndex: ["response", "statusCode"],
-      width: "5%",
+      id: 'status',
+      title: 'Status',
+      dataIndex: ['response', 'statusCode'],
+      width: '5%',
     },
   ];
 
@@ -95,22 +92,15 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     }
 
     const rowProps = onRow(log);
+    console.log('RENDER ROW', log);
 
     return (
       <ContextMenu log={log}>
-        <Table.Row
-          id={log.id}
-          {...rowProps}
-          data-tour-id={index === 0 ? "traffic-table-row" : null}
-        >
+        <Table.Row id={log.id} {...rowProps} data-tour-id={index === 0 ? 'traffic-table-row' : null}>
           {columns.map((column: any) => {
             const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
-            return (
-              <Table.Cell key={column.id}>
-                {column?.render ? column.render(columnData) : columnData}
-              </Table.Cell>
-            );
+            return <Table.Cell key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
           })}
         </Table.Row>
       </ContextMenu>
@@ -126,9 +116,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
         startWalkthrough={!isTrafficTableTourCompleted}
-        onTourComplete={() =>
-          dispatch(actions.updateTrafficTableTourCompleted({}))
-        }
+        onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
       />
       <VirtualTable
         height="100%"
