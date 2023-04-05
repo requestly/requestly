@@ -76,7 +76,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
         if (isSharedListUser) {
           //don't show recommendation screen for shared list users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
-          dispatch(actions.updatePersonaSurveyPage(page + 1));
           return;
         }
 
