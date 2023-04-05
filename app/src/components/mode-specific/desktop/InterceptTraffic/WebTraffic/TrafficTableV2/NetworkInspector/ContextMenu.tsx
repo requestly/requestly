@@ -16,6 +16,7 @@ import './index.css';
 interface ContextMenuProps {
   log: any;
   children: ReactNode;
+  triggerMenu: ('contextMenu' | null)[];
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
