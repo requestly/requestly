@@ -11,7 +11,10 @@ import PATHS from "config/constants/sub/paths";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
-import { trackPersonaRecommendationSkipped } from "modules/analytics/events/misc/personaSurvey";
+import {
+  trackPersonaRecommendationSkipped,
+  trackPersonaSurveyViewAllOptionsClicked,
+} from "modules/analytics/events/misc/personaSurvey";
 import "./PersonaRecommendation.css";
 
 interface Props {
@@ -50,6 +53,11 @@ const PersonaRecommendation: React.FC<Props> = ({
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
   };
 
+  const handleViewAllOptionsClick = (e: React.MouseEvent<HTMLElement>) => {
+    setIsViewAllOptions(true);
+    trackPersonaSurveyViewAllOptionsClicked();
+  };
+
   return (
     <>
       <Row align="middle" justify="end">
@@ -81,7 +89,7 @@ const PersonaRecommendation: React.FC<Props> = ({
             <Button
               type="text"
               className="view-all-options-btn"
-              onClick={() => setIsViewAllOptions(true)}
+              onClick={handleViewAllOptionsClick}
             >
               View all options
             </Button>

@@ -44,3 +44,7 @@ export const trackPersonaQuestionnaireStarted = () => {
 export const trackPersonaSurveySignInClicked = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_SIGN_IN_CLICKED);
 };
+
+export const trackPersonaSurveyViewAllOptionsClicked = () => {
+  trackEvent(PERSONA_SURVEY.VIEW_ALL_PERSONA_RECOMMENDATION);
+};

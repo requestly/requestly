@@ -83,6 +83,7 @@ export const PERSONA_SURVEY = {
   PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
   PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
   PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
+  VIEW_ALL_PERSONA_RECOMMENDATION: "view_all_persona_recommendation",
 };
 
 export const PRODUCT_WALKTHROUGH = {
