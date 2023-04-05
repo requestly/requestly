@@ -7,9 +7,6 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ContextMenu } from "../ContextMenu";
 
-import FEATURES from "config/constants/sub/features";
-import featureFlag from "utils/feature-flag";
-
 export const ITEM_SIZE = 30;
 
 interface Props {
@@ -18,11 +15,6 @@ interface Props {
 }
 
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
-  const isContextMenuFlagEnabled = featureFlag.getValue(
-    FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE,
-    false
-  );
-
   const columns = [
     {
       id: "time",
@@ -95,10 +87,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     const rowProps = onRow(log);
 
     return (
-      <ContextMenu
-        triggerMenu={isContextMenuFlagEnabled ? ["contextMenu"] : [null]}
-        log={log}
-      >
+      <ContextMenu log={log}>
         <Table.Row id={log.id} {...rowProps}>
           {columns.map((column: any) => {
             const columnData = _.get(log, getColumnKey(column?.dataIndex));

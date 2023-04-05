@@ -7,15 +7,10 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 interface ContextMenuProps {
   children: ReactNode;
-  triggerMenu: ("contextMenu" | null)[];
   log: any;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({
-  children,
-  triggerMenu,
-  log,
-}) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
   const { RULE_TYPES } = GLOBAL_CONSTANTS;
   const items: MenuProps["items"] = useMemo(
     () => [
@@ -80,7 +75,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     [RULE_TYPES]
   );
   return (
-    <Dropdown menu={{ items }} trigger={triggerMenu}>
+    <Dropdown menu={{ items }} trigger={["contextMenu"]}>
       {children}
     </Dropdown>
   );
