@@ -86,7 +86,13 @@ const PageScriptMessageHandler = {
     ) {
       Logger.log("Received message:", event.data);
 
-      if (event.data.requestId) {
+      if (
+        event.data.requestId &&
+        Object.hasOwn(
+          this.eventCallbackMap,
+          `${event.data.action}_${event.data.requestId}`
+        )
+      ) {
         this.invokeCallback(event.data);
       } else {
         this.messageHandler(event.data);
