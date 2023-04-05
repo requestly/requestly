@@ -11,6 +11,9 @@ import { ProductWalkthrough } from 'components/misc/ProductWalkthrough';
 import FEATURES from 'config/constants/sub/features';
 import { ContextMenu } from '../ContextMenu';
 
+import FEATURES from 'config/constants/sub/features';
+import featureFlag from 'utils/feature-flag';
+
 export const ITEM_SIZE = 30;
 
 interface Props {
