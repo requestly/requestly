@@ -37,7 +37,7 @@ const PageScriptMessageHandler = {
 
     if (typeof callbackRef === "function") {
       // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
-      delete this.eventCallbackMap[data.action];
+      delete this.eventCallbackMap[data.action + "_" + data.requestId];
       callbackRef.call(this, data.response);
     }
   },
