@@ -95,7 +95,6 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     }
 
     const rowProps = onRow(log);
-    console.log('RENDER ROW', log);
 
     return (
       <ContextMenu log={log}>

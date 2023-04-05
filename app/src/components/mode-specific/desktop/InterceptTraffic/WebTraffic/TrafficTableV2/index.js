@@ -87,7 +87,6 @@ const CurrentTrafficTable = ({
   };
 
   const handleRowClick = (row) => {
-    console.log("ROW CLICK", row);
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
     trackTrafficTableRequestClicked();
