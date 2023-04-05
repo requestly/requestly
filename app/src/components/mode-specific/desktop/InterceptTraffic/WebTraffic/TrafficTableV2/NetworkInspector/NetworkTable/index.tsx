@@ -88,18 +88,18 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     console.log("RENDER ROW", log);
 
     return (
-      <Table.Row id={log.id} {...rowProps}>
-        {columns.map((column: any) => {
-          const columnData = _.get(log, getColumnKey(column?.dataIndex));
-          return (
-            <ContextMenu>
+      <ContextMenu>
+        <Table.Row id={log.id} {...rowProps}>
+          {columns.map((column: any) => {
+            const columnData = _.get(log, getColumnKey(column?.dataIndex));
+            return (
               <Table.Cell key={column.id}>
                 {column?.render ? column.render(columnData) : columnData}
               </Table.Cell>
-            </ContextMenu>
-          );
-        })}
-      </Table.Row>
+            );
+          })}
+        </Table.Row>
+      </ContextMenu>
     );
   };
 
