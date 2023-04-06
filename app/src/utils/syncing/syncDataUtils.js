@@ -1,47 +1,41 @@
-import {
-  getValueAsPromise,
-  updateValueAsPromise,
-} from "../../actions/FirebaseActions";
-import { StorageService } from "../../init";
-import {
-  trackSyncCompleted,
-  trackSyncTriggered,
-} from "modules/analytics/events/features/syncing";
-import { getAllRulesAndGroups, getAllRulesAndGroupsIds } from "../rules/misc";
-import { SYNC_CONSTANTS } from "./syncConstants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { isEqual, uniqWith } from "lodash";
-import { isEmpty } from "lodash";
-import Logger from "lib/logger";
-const _ = require("lodash");
+import { getValueAsPromise, updateValueAsPromise } from '../../actions/FirebaseActions';
+import { StorageService } from '../../init';
+import { trackSyncCompleted, trackSyncTriggered } from 'modules/analytics/events/features/syncing';
+import { getAllRulesAndGroups, getAllRulesAndGroupsIds } from '../rules/misc';
+import { SYNC_CONSTANTS } from './syncConstants';
+import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
+import { isEqual, uniqWith } from 'lodash';
+import { isEmpty } from 'lodash';
+import Logger from 'lib/logger';
+const _ = require('lodash');
 
-const defaultSyncValue = "Inactive";
+const defaultSyncValue = 'Inactive';
 const defaultIsFavouriteValue = false;
 
 export const getMetadataSyncPath = () => {
   if (window.currentlyActiveWorkspaceTeamId) {
     // This is a team workspace syncing
-    return ["teamSync", window.currentlyActiveWorkspaceTeamId, "metadata"];
+    return ['teamSync', window.currentlyActiveWorkspaceTeamId, 'metadata'];
   } else {
     // This is personal syncing
-    return ["sync", window.uid, "metadata"];
+    return ['sync', window.uid, 'metadata'];
   }
 };
 
 const getTeamSyncPath = (team_id) => {
   const teamId = team_id || window.currentlyActiveWorkspaceTeamId;
-  return ["teamSync", teamId, "records"];
+  return ['teamSync', teamId, 'records'];
 };
 const getIndividualSyncPath = (uid) => {
   const userId = uid || window.uid;
-  return ["sync", userId, "records"];
+  return ['sync', userId, 'records'];
 };
 
 export const getRecordsSyncPath = (syncTarget, uid, team_id) => {
   switch (syncTarget) {
-    case "teamSync":
+    case 'teamSync':
       return getTeamSyncPath(team_id);
-    case "sync":
+    case 'sync':
       return getIndividualSyncPath(uid);
 
     default:
@@ -52,13 +46,7 @@ export const getRecordsSyncPath = (syncTarget, uid, team_id) => {
 };
 
 export const getAllTeamUserRulesConfigPath = () => {
-  return [
-    "teamSync",
-    window.currentlyActiveWorkspaceTeamId,
-    "userConfig",
-    window.uid,
-    "rulesConfig",
-  ];
+  return ['teamSync', window.currentlyActiveWorkspaceTeamId, 'userConfig', window.uid, 'rulesConfig'];
 };
 export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
   const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath();
@@ -66,30 +54,16 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
   return teamUserRuleAllConfigsPath;
 };
 export const getTeamUserRuleAllConfigsPath = () => {
-  return [
-    "teamSync",
-    window.currentlyActiveWorkspaceTeamId,
-    "userConfig",
-    window.uid,
-    "rulesConfig",
-  ];
+  return ['teamSync', window.currentlyActiveWorkspaceTeamId, 'userConfig', window.uid, 'rulesConfig'];
 };
 
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
 // It works by modifying the original param received: latestRules
-const preventWorkspaceSyncWrite = async (
-  key,
-  latestRules,
-  objectId,
-  uid,
-  remoteRecords,
-  myLocalRecords,
-  appMode
-) => {
+const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
   const localRecords = myLocalRecords || (await getAllLocalRecords(appMode));
 
   // First, if user has defined a personal rule config and it's key, write it in required db node
-  if (typeof localRecords?.[objectId]?.[key] !== "undefined") {
+  if (typeof localRecords?.[objectId]?.[key] !== 'undefined') {
     // I guess we don't need to await the next line or do we?
     updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
       [key]: localRecords[objectId][key],
@@ -98,7 +72,7 @@ const preventWorkspaceSyncWrite = async (
   // So far, we have set data in user's rule data in his own personal node
   // Now we also need to ensure we don't change the data that is being set for a team.
   // so, replace the team rule node with it's original data (if exists lol)
-  if (typeof remoteRecords?.[objectId]?.[key] !== "undefined") {
+  if (typeof remoteRecords?.[objectId]?.[key] !== 'undefined') {
     // This means some data does actually exist
     // Override "latestRules" with that data
     // (Why latestRules?  - since because latestRules is what actually going to be set on firebase teams node)
@@ -114,11 +88,8 @@ const preventWorkspaceSyncWrite = async (
 
 export const updateUserSyncRecords = async (uid, records, appMode, options) => {
   const targetWorkspaceId =
-    typeof options.workspaceId !== "undefined"
-      ? options.workspaceId
-      : window.currentlyActiveWorkspaceTeamId;
-  const isSameWorkspaceOperation =
-    targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
+    typeof options.workspaceId !== 'undefined' ? options.workspaceId : window.currentlyActiveWorkspaceTeamId;
+  const isSameWorkspaceOperation = targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
 
   const latestRules = _.cloneDeep(records);
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
@@ -126,8 +97,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
     const syncRuleStatus = true;
     // localStorage.getItem("syncRuleStatus") === "true" || false;
     // Get current values from db and use them xD
-    const allRemoteRecords =
-      (await getValueAsPromise(getRecordsSyncPath())) || {};
+    const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
     const remoteRecords = {};
     Object.keys(allRemoteRecords).forEach((key) => {
       if (!isEmpty(allRemoteRecords[key]?.id)) {
@@ -139,7 +109,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
       try {
         // Key - "isFavourite"
         await preventWorkspaceSyncWrite(
-          "isFavourite",
+          'isFavourite',
           latestRules,
           objectId,
           uid,
@@ -149,15 +119,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
         );
         // Key - "status"
         if (!syncRuleStatus) {
-          await preventWorkspaceSyncWrite(
-            "status",
-            latestRules,
-            objectId,
-            uid,
-            remoteRecords,
-            localRecords,
-            appMode
-          );
+          await preventWorkspaceSyncWrite('status', latestRules, objectId, uid, remoteRecords, localRecords, appMode);
         }
       } catch (error) {
         Logger.log("Remote record doesn't exist", objectId);
@@ -182,7 +144,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
   try {
     await updateValueAsPromise(syncPath, latestRules);
   } catch (error) {
-    Logger.error("err update sync records", error);
+    Logger.error('err update sync records', error);
   }
 };
 
@@ -212,7 +174,7 @@ export const removeUserSyncRecords = (uid, recordIds) => {
     // reference: https://firebase.google.com/docs/database/web/read-and-write#:~:text=You%20can%20use-,this,-technique%20with%20update
     updateValueAsPromise(null, recordIdsObject)
       .then(() => resolve())
-      .catch((e) => reject(JSON.stringify(e) + "err remove sync records"));
+      .catch((e) => reject(JSON.stringify(e) + 'err remove sync records'));
   });
 };
 
@@ -248,9 +210,7 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
       const syncRuleStatus = true;
       // localStorage.getItem("syncRuleStatus") === "true" || false;
       // Get current values from local storage and use them xD
-      const personalRuleConfigs = await getValueAsPromise(
-        getTeamUserRuleAllConfigsPath()
-      );
+      const personalRuleConfigs = await getValueAsPromise(getTeamUserRuleAllConfigsPath());
       for (const objectId in remoteRecords) {
         // Get a copy of user's own value
         try {
@@ -260,13 +220,12 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
           // CASE: Try for user's personal level rule config
           if (ownRuleConfig) {
             // CASE So far, user's personal rule config exists
-            if (typeof ownRuleConfig["isFavourite"] === "undefined") {
+            if (typeof ownRuleConfig['isFavourite'] === 'undefined') {
               // CASE:  user's personal rule config exists but its "isFavourite" key doesn't, use the default value!
               remoteRecords[objectId].isFavourite = defaultIsFavouriteValue;
             } else {
               // CASE: user's personal rule config exists and it also have a value set for "isFavourite", use it!
-              remoteRecords[objectId].isFavourite =
-                ownRuleConfig["isFavourite"];
+              remoteRecords[objectId].isFavourite = ownRuleConfig['isFavourite'];
             }
           } else {
             // CASE: user's personal rule config doesn't even exits, use the default value!
@@ -279,12 +238,12 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
             // CASE: Team status syncing is not enabled. Try for user's personal level rule config
             if (ownRuleConfig) {
               // CASE So far, user's personal rule config exists
-              if (typeof ownRuleConfig["status"] === "undefined") {
+              if (typeof ownRuleConfig['status'] === 'undefined') {
                 // CASE:  user's personal rule config exists but its "status" doesn't, use the default value!
                 remoteRecords[objectId].status = defaultSyncValue;
               } else {
                 // CASE: user's personal rule config exists and it also have a value set for "status", use it!
-                remoteRecords[objectId].status = ownRuleConfig["status"];
+                remoteRecords[objectId].status = ownRuleConfig['status'];
               }
             } else {
               // CASE: user's personal rule config doesn't even exits, use the default value!
@@ -315,33 +274,21 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
 };
 
 export const saveRecords = (records, appMode) => {
-  Logger.log("Writing storage in saveRecords");
+  Logger.log('Writing storage in saveRecords');
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };
 
-export const syncToLocalFromFirebase = async (
-  allSyncedRecords,
-  appMode,
-  uid
-) => {
+export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) => {
   // dump the entire firebase node in the storage
-  trackSyncTriggered(
-    uid,
-    allSyncedRecords.length,
-    SYNC_CONSTANTS.SYNC_ALL_RECORDS_TO_LOCAL
-  );
+  trackSyncTriggered(uid, allSyncedRecords.length, SYNC_CONSTANTS.SYNC_ALL_RECORDS_TO_LOCAL);
 
   // START - Handles the case where a rule/group is delete from the cloud but still might exist locally
   const recordIdsOnFirebase = allSyncedRecords.map((object) => object.id);
   const recordIdsInStorage = await getAllRulesAndGroupsIds(appMode);
-  const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter(
-    (x) => !recordIdsOnFirebase.includes(x)
-  );
+  const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter((x) => !recordIdsOnFirebase.includes(x));
   if (!isEmpty(recordsThatShouldBeDeletedFromLocal)) {
-    Logger.log("Removing storage in syncToLocalFromFirebase");
-    await StorageService(appMode).removeRecordsWithoutSyncing(
-      recordsThatShouldBeDeletedFromLocal
-    );
+    Logger.log('Removing storage in syncToLocalFromFirebase');
+    await StorageService(appMode).removeRecordsWithoutSyncing(recordsThatShouldBeDeletedFromLocal);
   }
 
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
@@ -352,9 +299,7 @@ export const syncToLocalFromFirebase = async (
     allSyncedRecords = processRecordsArrayIntoObject(allSyncedRecords);
     const syncRuleStatus = true;
     // localStorage.getItem("syncRuleStatus") === "true" || false;
-    const personalRuleConfigs = await getValueAsPromise(
-      getAllTeamUserRulesConfigPath()
-    );
+    const personalRuleConfigs = await getValueAsPromise(getAllTeamUserRulesConfigPath());
     // Get current values from local storage and use them xD
     for (const objectId in allSyncedRecords) {
       // Get a copy of user's own value
@@ -362,16 +307,13 @@ export const syncToLocalFromFirebase = async (
         const ownRuleConfig = personalRuleConfigs[objectId];
 
         // Key - "isFavourite"
-        if (
-          ownRuleConfig &&
-          typeof ownRuleConfig["isFavourite"] !== "undefined"
-        ) {
-          allSyncedRecords[objectId].isFavourite = ownRuleConfig["isFavourite"];
+        if (ownRuleConfig && typeof ownRuleConfig['isFavourite'] !== 'undefined') {
+          allSyncedRecords[objectId].isFavourite = ownRuleConfig['isFavourite'];
         }
         if (!syncRuleStatus) {
           // Key - "status"
-          if (ownRuleConfig && typeof ownRuleConfig["status"] !== "undefined") {
-            allSyncedRecords[objectId].status = ownRuleConfig["status"];
+          if (ownRuleConfig && typeof ownRuleConfig['status'] !== 'undefined') {
+            allSyncedRecords[objectId].status = ownRuleConfig['status'];
           }
         }
       } catch (error) {
@@ -383,30 +325,21 @@ export const syncToLocalFromFirebase = async (
   }
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
-  Logger.log("Writing storage in syncToLocalFromFirebase");
-  return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(
-    allSyncedRecords
-  );
+  Logger.log('Writing storage in syncToLocalFromFirebase');
+  return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
 };
 
 export const mergeRecords = (firebaseRecords, localRecords) => {
   const mergedRecords = [...localRecords];
 
   firebaseRecords.forEach((firebaseRecord) => {
-    const duplicateLocalIndex = mergedRecords.findIndex(
-      (data) => data.id === firebaseRecord.id
-    );
+    const duplicateLocalIndex = mergedRecords.findIndex((data) => data.id === firebaseRecord.id);
     if (duplicateLocalIndex !== -1) {
       const duplicateLocalRecord = mergedRecords[duplicateLocalIndex];
-      if (
-        !duplicateLocalRecord.modificationDate ||
-        !firebaseRecord.modificationDate
-      ) {
+      if (!duplicateLocalRecord.modificationDate || !firebaseRecord.modificationDate) {
         return;
       }
-      if (
-        duplicateLocalRecord.modificationDate < firebaseRecord.modificationDate
-      ) {
+      if (duplicateLocalRecord.modificationDate < firebaseRecord.modificationDate) {
         mergedRecords.splice(duplicateLocalIndex, 1, firebaseRecord);
       }
     } else {
@@ -418,19 +351,14 @@ export const mergeRecords = (firebaseRecords, localRecords) => {
 
 // ** SESSION RECORDING SYNC UTILS ** //
 
-const saveSessionRecordingPageConfigLocallyWithoutSync = async (
-  object,
-  appMode
-) => {
-  Logger.log(
-    "Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync"
-  );
+const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
+  Logger.log('Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync');
   await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
 
 export const getSyncedSessionRecordingPageConfig = (uid) => {
   return new Promise((resolve) => {
-    getValueAsPromise(["sync", uid, "configs", "sessionRecordingConfig"])
+    getValueAsPromise(['sync', uid, 'configs', 'sessionRecordingConfig'])
       .then((config) => {
         resolve(config);
       })
@@ -439,7 +367,7 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 };
 
 export const getLocalSessionRecordingPageConfig = (appMode) => {
-  Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
+  Logger.log('Reading storage in getLocalSessionRecordingPageConfig');
   return new Promise((resolve) => {
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
@@ -447,11 +375,7 @@ export const getLocalSessionRecordingPageConfig = (appMode) => {
   });
 };
 
-export const syncSessionRecordingPageConfigToFirebase = async (
-  uid,
-  appMode,
-  timestamp
-) => {
+export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode, timestamp) => {
   const pageConfig = await getLocalSessionRecordingPageConfig(appMode);
 
   trackSyncTriggered(uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
@@ -463,12 +387,9 @@ export const syncSessionRecordingPageConfigToFirebase = async (
 
 export const updateSessionRecordingPageConfig = (uid, recordObject) => {
   return new Promise((resolve, reject) => {
-    updateValueAsPromise(
-      ["sync", uid, "configs", "sessionRecordingConfig"],
-      recordObject
-    )
+    updateValueAsPromise(['sync', uid, 'configs', 'sessionRecordingConfig'], recordObject)
       .then(() => resolve())
-      .catch(() => reject("err update sessionRecordingPageConfg"));
+      .catch(() => reject('err update sessionRecordingPageConfg'));
   });
 };
 
@@ -477,32 +398,21 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
     {
       key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
       operator: GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES,
-      value: "*",
+      value: '*',
     },
   ];
   let mergedPageSources;
 
-  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(
-    uid
-  );
-  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(
-    appMode
-  );
+  const firebaseSessionRecordingPageConfig = await getSyncedSessionRecordingPageConfig(uid);
+  const localSessionRecordingPageConfig = await getLocalSessionRecordingPageConfig(appMode);
 
-  const firebasePageSources =
-    firebaseSessionRecordingPageConfig?.pageSources || [];
+  const firebasePageSources = firebaseSessionRecordingPageConfig?.pageSources || [];
   const localPageSources = localSessionRecordingPageConfig?.pageSources || [];
 
-  if (
-    isEqual(allPagesSourceData, firebasePageSources) ||
-    isEqual(allPagesSourceData, localPageSources)
-  ) {
+  if (isEqual(allPagesSourceData, firebasePageSources) || isEqual(allPagesSourceData, localPageSources)) {
     mergedPageSources = allPagesSourceData;
   } else {
-    mergedPageSources = uniqWith(
-      [...firebasePageSources, ...localPageSources],
-      isEqual
-    );
+    mergedPageSources = uniqWith([...firebasePageSources, ...localPageSources], isEqual);
   }
 
   const mergedPageSourcesConfig = {
@@ -510,9 +420,6 @@ export const mergeAndSyncRecordingPageSources = async (uid, appMode) => {
     pageSources: mergedPageSources,
   };
 
-  saveSessionRecordingPageConfigLocallyWithoutSync(
-    mergedPageSourcesConfig,
-    appMode
-  );
+  saveSessionRecordingPageConfigLocallyWithoutSync(mergedPageSourcesConfig, appMode);
   updateSessionRecordingPageConfig(uid, mergedPageSourcesConfig);
 };
