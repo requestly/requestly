@@ -49,7 +49,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
       {
         label: "More modification options",
         key: "more_options",
-        overlayClassName: "context-menu",
         children: [
           {
             label: "Cancel Request",
@@ -80,7 +79,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     <Dropdown
       menu={{ items }}
       trigger={["contextMenu"]}
-      overlayClassName="context-menu"
+      overlayClassName="traffic-context-menu"
       destroyPopupOnHide={true}
     >
       {children}
