@@ -211,13 +211,19 @@ export const formatRegexSource = (regexStr) => {
 };
 
 export const fixRuleRegexSourceFormat = (dispatch, rule) => {
-  const rulePairs = rule.pairs.map((pair, i, self) => {
+  const rulePairs = rule.pairs.map((pair) => {
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
       if (!isRegexFormat(pair.source.value)) {
-        self[i].source.value = formatRegexSource(pair.source.value);
+        return {
+          ...pair,
+          source: {
+            ...pair.source,
+            value: formatRegexSource(pair.source.value),
+          },
+        };
       }
     }
-    return self[i];
+    return pair;
   });
 
   const fixedRule = {
