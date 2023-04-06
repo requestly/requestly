@@ -18,7 +18,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { isValidUrl } from "utils/FormattingHelper";
-import { isEmpty } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import {
   FaBan,
   FaClock,
@@ -87,7 +87,7 @@ const RuleSimulator = () => {
     const regexValidatedRule = fixRuleRegexSourceFormat(dispatch, rule);
 
     simulatedUrl = ruleProcessor.process({
-      rule: regexValidatedRule,
+      rule: cloneDeep(regexValidatedRule),
       requestURL,
       originalHeaders: [],
       typeOfHeaders: "Request",
