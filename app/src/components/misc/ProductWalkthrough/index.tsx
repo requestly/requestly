@@ -24,15 +24,15 @@ import { actions } from "store";
 interface TourProps {
   startWalkthrough: boolean;
   tourFor: string;
-  context: any;
-  runTourWithABTest: boolean; //temporary flag
+  context?: any;
+  runTourWithABTest?: boolean; //temporary flag
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
   context,
-  runTourWithABTest = false,
+  runTourWithABTest = true,
 }) => {
   const dispatch = useDispatch();
 
@@ -60,7 +60,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       setHasReachedLastStep(true);
     }
 
-    if(type === EVENTS.TOUR_END) {
+    if (type === EVENTS.TOUR_END) {
       dispatch(actions.updateRedirectRuleTourCompleted({}));
     }
   };

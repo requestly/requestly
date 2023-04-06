@@ -1,5 +1,6 @@
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import FEATURES from "config/constants/sub/features";
 import { Step } from "react-joyride";
 
 export interface CustomSteps extends Step {
@@ -57,6 +58,18 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 12,
       pointerPlacement: "right",
       placement: "bottom-start",
+    },
+  ],
+  [FEATURES.DESKTOP_APP_TRAFFIC_TABLE]: [
+    {
+      target: tourTarget("traffic-table-row"),
+      title:
+        "Right-click on a request to modify request, copy cURL and more. Try it now!",
+      content: null,
+      disableBeacon: true,
+      offset: 12,
+      pointerPlacement: "center",
+      placement: "bottom",
     },
   ],
 };
