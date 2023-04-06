@@ -76,6 +76,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
           tooltipComponent={renderCustomToolTip}
           disableScrolling={true}
           disableOverlayClose={true}
+          disableCloseOnEsc={true}
           spotlightClicks={true}
           spotlightPadding={5}
           floaterProps={{
