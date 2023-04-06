@@ -1,79 +1,108 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../utils/Misc";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { actions } from "store";
+import { RuleType } from "types";
 
 interface ContextMenuProps {
-  children: ReactNode;
   log: any;
+  children: ReactNode;
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
-  const { RULE_TYPES } = GLOBAL_CONSTANTS;
+  const dispatch = useDispatch();
+
+  const handleOnClick = useCallback(
+    (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
+      dispatch(
+        actions.toggleActiveModal({
+          newValue: true,
+          modalName: "ruleEditorModal",
+          newProps: {
+            ruleData: log,
+            ruleType: menuInfo.key,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
+
   const items: MenuProps["items"] = useMemo(
     () => [
       {
-        label: "Copy cURL",
         key: "copy_curl",
+        label: "Copy cURL",
         onClick: () =>
           copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard"),
       },
       {
-        label: "Copy URL",
         key: "copy_url",
+        label: "Copy URL",
         onClick: () => copyToClipBoard(log.url, "URL copied to clipboard"),
       },
       {
+        key: RuleType.REDIRECT,
         label: "Redirect URL(Map local/Remote)",
-        key: RULE_TYPES.REDIRECT,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.RESPONSE,
         label: "Modify Response Body",
-        key: RULE_TYPES.RESPONSE,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.REQUEST,
         label: "Modify Request Body",
-        key: RULE_TYPES.REQUEST,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.HEADERS,
         label: "Modify Headers",
-        key: RULE_TYPES.HEADERS,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.REPLACE,
         label: "Replace part of URL",
-        key: RULE_TYPES.REPLACE,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         label: "More modification options",
         key: "more_options",
         children: [
           {
+            key: RuleType.CANCEL,
             label: "Cancel Request",
-            key: RULE_TYPES.CANCEL,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.SCRIPT,
             label: "Insert Custom Script",
-            key: RULE_TYPES.SCRIPT,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.DELAY,
             label: "Delay Request",
-            key: RULE_TYPES.DELAY,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.QUERYPARAM,
             label: "Modify Query Params",
-            key: RULE_TYPES.QUERYPARAM,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.USERAGENT,
             label: "Modify User Agent",
-            key: RULE_TYPES.USERAGENT,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
         ],
       },
     ],
-    [RULE_TYPES, log.url, log.requestShellCurl]
+    [log, handleOnClick]
   );
+
   return (
     <Dropdown menu={{ items }} trigger={["contextMenu"]}>
       {children}
