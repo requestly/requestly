@@ -63,7 +63,7 @@ export const getTeamUserRuleAllConfigsPath = () => {
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
-  if (typeof localRecords?.[objectId]?.[key] !== 'undefined') {
+  if (typeof localRecords?.[objectId]?.[key] !== 'undefined' || key === 'isFavourite') {
     // I guess we don't need to await the next line or do we?
     updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
       [key]: latestRules[objectId][key],
