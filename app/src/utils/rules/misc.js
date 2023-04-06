@@ -5,7 +5,6 @@ import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
-import { cloneDeep } from "lodash";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
@@ -212,13 +211,13 @@ export const formatRegexSource = (regexStr) => {
 };
 
 export const fixRuleRegexSourceFormat = (dispatch, rule) => {
-  const rulePairs = cloneDeep(rule.pairs);
-  rulePairs.forEach((pair, i, self) => {
+  const rulePairs = rule.pairs.map((pair, i, self) => {
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
       if (!isRegexFormat(pair.source.value)) {
         self[i].source.value = formatRegexSource(pair.source.value);
       }
     }
+    return self[i];
   });
 
   const fixedRule = {
