@@ -7,6 +7,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
 import { isEqual, uniqWith } from 'lodash';
 import { isEmpty } from 'lodash';
 import Logger from 'lib/logger';
+import { rulesFlatObjectToObjectIdArray } from 'utils/FormattingHelper';
 const _ = require('lodash');
 
 const defaultSyncValue = 'Inactive';
@@ -60,18 +61,17 @@ export const getTeamUserRuleAllConfigsPath = () => {
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
 // It works by modifying the original param received: latestRules
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
-  const localRecords = myLocalRecords || (await getAllLocalRecords(appMode));
-
+  const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== 'undefined') {
     // I guess we don't need to await the next line or do we?
     updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
-      [key]: localRecords[objectId][key],
+      [key]: latestRules[objectId][key],
     });
   }
   // So far, we have set data in user's rule data in his own personal node
   // Now we also need to ensure we don't change the data that is being set for a team.
-  // so, replace the team rule node with it's original data (if exists lol)
+  // so, replace the team rule node with it's original data (if exists)
   if (typeof remoteRecords?.[objectId]?.[key] !== 'undefined') {
     // This means some data does actually exist
     // Override "latestRules" with that data
@@ -91,7 +91,8 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
     typeof options.workspaceId !== 'undefined' ? options.workspaceId : window.currentlyActiveWorkspaceTeamId;
   const isSameWorkspaceOperation = targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
 
-  const latestRules = _.cloneDeep(records);
+  const latestRules = _.cloneDeep(records); // Does not contain all rules, only contains rules that has been updated.
+
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
   if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus = localStorage.getItem('syncRuleStatus') === 'true' || false;
@@ -103,7 +104,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
         remoteRecords[key] = allRemoteRecords[key];
       }
     });
-    const localRecords = getAllLocalRecords(appMode);
+    const localRecords = rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
     for (const objectId in latestRules) {
       try {
         // Key - "isFavourite"
