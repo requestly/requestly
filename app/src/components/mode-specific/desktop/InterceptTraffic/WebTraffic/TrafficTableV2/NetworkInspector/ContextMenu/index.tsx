@@ -1,9 +1,10 @@
 import React, { ReactNode, useMemo } from "react";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
-import { copyToClipBoard } from "../../../../../../../utils/Misc";
+import { copyToClipBoard } from "../../../../../../../../utils/Misc";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./index.css";
 
 interface ContextMenuProps {
   children: ReactNode;
@@ -48,6 +49,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
       {
         label: "More modification options",
         key: "more_options",
+        overlayClassName: "context-menu",
         children: [
           {
             label: "Cancel Request",
@@ -75,7 +77,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     [RULE_TYPES, log.url, log.requestShellCurl]
   );
   return (
-    <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+    <Dropdown
+      menu={{ items }}
+      trigger={["contextMenu"]}
+      overlayClassName="context-menu"
+      destroyPopupOnHide={true}
+    >
       {children}
     </Dropdown>
   );
