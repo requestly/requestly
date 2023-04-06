@@ -27,8 +27,8 @@
   flex-direction: row-reverse;
   margin-top: 12px;
 }
-.tour-tooltip-container .tour-tooltip-progress {
-  margin-bottom: 8px;
+.tour-tooltip-container .title {
+  margin-top: 8px;
 }
 .tour-close-icon {
   position: absolute;
