@@ -1,5 +1,8 @@
 import { Table } from "@devtools-ds/table";
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
+import { getIsTrafficTableTourCompleted } from "store/selectors";
 import _ from "lodash";
 
 import { getColumnKey } from "../utils";
@@ -16,6 +19,11 @@ interface Props {
 }
 
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
+  const dispatch = useDispatch();
+  const isTrafficTableTourCompleted = useSelector(
+    getIsTrafficTableTourCompleted
+  );
+
   const columns = [
     {
       id: "time",
@@ -115,7 +123,10 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     <>
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
-        startWalkthrough={true}
+        startWalkthrough={!isTrafficTableTourCompleted}
+        onTourComplete={() =>
+          dispatch(actions.updateTrafficTableTourCompleted({}))
+        }
       />
       <VirtualTable
         height="100%"

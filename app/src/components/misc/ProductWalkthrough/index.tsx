@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import JoyRide, {
   EVENTS,
@@ -26,6 +20,7 @@ interface TourProps {
   tourFor: string;
   context?: any;
   runTourWithABTest?: boolean; //temporary flag
+  onTourComplete: () => void;
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
@@ -33,10 +28,10 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   tourFor,
   context,
   runTourWithABTest = true,
+  onTourComplete,
 }) => {
   const dispatch = useDispatch();
 
-  const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
   const tourSteps = useMemo(() => productTours[tourFor], [tourFor]);
@@ -56,12 +51,10 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
-    } else if (index >= tourSteps?.length - 1) {
-      setHasReachedLastStep(true);
     }
-
     if (type === EVENTS.TOUR_END) {
-      dispatch(actions.updateRedirectRuleTourCompleted({}));
+      onTourComplete();
+      trackWalkthroughCompleted();
     }
   };
 
@@ -70,12 +63,6 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       trackWalkthroughViewed();
     }
   }, [runTourWithABTest, startWalkthrough]);
-
-  useEffect(() => {
-    return () => {
-      if (hasReachedLastStep) trackWalkthroughCompleted();
-    };
-  }, [hasReachedLastStep]);
 
   return (
     <>

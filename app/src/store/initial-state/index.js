@@ -146,7 +146,8 @@ const INITIAL_STATE = {
 
   misc: {
     isRedirectRuleTourCompleted: false,
-  }
+    isTrafficTableTourCompleted: false,
+  },
 };
 
 export default INITIAL_STATE;
