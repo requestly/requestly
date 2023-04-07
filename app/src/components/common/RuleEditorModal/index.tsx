@@ -16,6 +16,7 @@ import {
   initiateBlankCurrentlySelectedRule,
 } from 'components/features/rules/RuleBuilder/actions';
 import { Rule, Status } from 'types';
+import { trackRuleEditorViewed } from 'modules/analytics/events/common/rules';
 import './RuleEditorModal.css';
 
 const getEventObject = (name: string, value: string) => ({
@@ -25,9 +26,10 @@ const getEventObject = (name: string, value: string) => ({
 interface props {
   isOpen: boolean;
   handleModalClose: () => void;
+  source: string;
 }
 
-const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose }) => {
+const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -74,6 +76,10 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose }) => {
     [dispatch, currentlySelectedRuleData]
   );
 
+  useEffect(() => {
+    trackRuleEditorViewed(source, ruleType);
+  }, [source, ruleType]);
+
   return (
     <RQModal
       centered
@@ -95,7 +101,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose }) => {
             descriptionPlaceholder="Add description (optional)"
           />
 
-          <CreateRuleButton location={location} isRuleEditorModal={true} />
+          <CreateRuleButton location={location} isRuleEditorModal={true} source={source} />
         </Row>
 
         <div className="rule-editor-modal-container">

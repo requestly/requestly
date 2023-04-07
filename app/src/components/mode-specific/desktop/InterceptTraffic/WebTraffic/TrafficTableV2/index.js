@@ -324,7 +324,11 @@ const CurrentTrafficTable = ({
       <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />
 
       {ruleEditorModal.isActive && (
-        <RuleEditorModal isOpen={ruleEditorModal.isActive} handleModalClose={handleRuleEditorModalClose} />
+        <RuleEditorModal
+          isOpen={ruleEditorModal.isActive}
+          handleModalClose={handleRuleEditorModalClose}
+          source="traffic_table_right_click"
+        />
       )}
     </React.Fragment>
   );
