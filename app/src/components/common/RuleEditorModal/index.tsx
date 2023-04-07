@@ -31,33 +31,32 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const {
-    ruleEditorModal: { props: ruleDetails },
-  } = useSelector(getActiveModals);
+  const { ruleEditorModal } = useSelector(getActiveModals);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
-  const ruleConfig = RULE_TYPES_CONFIG[ruleDetails.ruleType];
+  const { ruleType = '' } = ruleEditorModal.props;
+  const ruleConfig = RULE_TYPES_CONFIG[ruleType];
 
   useEffect(() => {
     const defaultRuleDetails: Partial<Rule> = {
-      name: `${ruleDetails.ruleType}_untitled`,
-      description: `${ruleDetails.ruleType}_untitled`,
+      name: `${ruleType}_untitled`,
+      description: `${ruleType}_untitled`,
       status: Status.ACTIVE,
     };
 
     initiateBlankCurrentlySelectedRule(
       dispatch,
       currentlySelectedRuleConfig,
-      ruleDetails.ruleType,
+      ruleType,
       setCurrentlySelectedRule,
       defaultRuleDetails
     );
-    setCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[ruleDetails.ruleType], navigate);
+    setCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[ruleType], navigate);
 
     return () => {
       dispatch(actions.clearCurrentlySelectedRuleAndConfig());
     };
-  }, [dispatch, currentlySelectedRuleConfig, ruleDetails.ruleType, navigate]);
+  }, [dispatch, currentlySelectedRuleConfig, ruleType, navigate]);
 
   const handleRuleNameChange = useCallback(
     (name: Rule['name']) => {
@@ -76,7 +75,14 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose }) => {
   );
 
   return (
-    <RQModal centered open={isOpen} width={'920px'} onCancel={handleModalClose} className="rule-editor-modal">
+    <RQModal
+      centered
+      key={ruleType}
+      open={isOpen}
+      width={'920px'}
+      onCancel={handleModalClose}
+      className="rule-editor-modal"
+    >
       <div className="rq-modal-content">
         <Row align="middle" justify="space-between" className="rule-editor-modal-header">
           <RQEditorTitle
