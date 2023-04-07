@@ -64,7 +64,7 @@ export const productTours: Record<string, CustomSteps[]> = {
     {
       target: tourTarget("traffic-table-row"),
       title:
-        "Right-click on a request to modify request, copy cURL and more. Try it now!",
+"Right-click to modify request, copy cURL and more. Try it now!",
       content: null,
       disableBeacon: true,
       offset: 12,
