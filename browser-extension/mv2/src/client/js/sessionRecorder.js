@@ -12,14 +12,14 @@ RQ.SessionRecorder.setup = () => {
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case RQ.CLIENT_MESSAGES.START_RECORDING:
+      case RQ.Constants.CLIENT_MESSAGES.START_RECORDING:
         RQ.SessionRecorder.explicitRecordingFlag.set();
         RQ.SessionRecorder.startRecording();
         break;
-      case RQ.CLIENT_MESSAGES.STOP_RECORDING:
+      case RQ.Constants.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording");
         break;
-      case RQ.CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
+      case RQ.Constants.CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
         sendResponse(RQ.SessionRecorder.explicitRecordingFlag.get());
         break;
     }
@@ -30,7 +30,7 @@ RQ.SessionRecorder.getRecordingConfig = () => {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage(
       {
-        action: RQ.CLIENT_MESSAGES.GET_SESSION_RECORDING_CONFIG,
+        action: RQ.Constants.CLIENT_MESSAGES.GET_SESSION_RECORDING_CONFIG,
       },
       resolve
     );
@@ -44,22 +44,15 @@ RQ.SessionRecorder.startRecording = (sessionRecordingConfig) => {
     RQ.SessionRecorder.addListeners();
   }
 
-  RQ.ClientUtils.addRemoteJS(
-    chrome.runtime.getURL("libs/requestly-web-sdk.js"),
-    () => {
-      RQ.ClientUtils.executeJS(
-        `(${RQ.SessionRecorder.bootstrapClient.toString()})('${
-          RQ.PUBLIC_NAMESPACE
-        }')`
-      );
-      RQ.SessionRecorder.sendMessageToClient("startRecording", {
-        relayEventsToTop: isIFrame,
-        console: true,
-        network: true,
-        maxDuration: (sessionRecordingConfig?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-      });
-    }
-  );
+  RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/requestly-web-sdk.js"), () => {
+    RQ.ClientUtils.executeJS(`(${RQ.SessionRecorder.bootstrapClient.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
+    RQ.SessionRecorder.sendMessageToClient("startRecording", {
+      relayEventsToTop: isIFrame,
+      console: true,
+      network: true,
+      maxDuration: (sessionRecordingConfig?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+    });
+  });
 };
 
 RQ.SessionRecorder.isIframe = () => {
@@ -69,16 +62,12 @@ RQ.SessionRecorder.isIframe = () => {
 RQ.SessionRecorder.addListeners = () => {
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case RQ.CLIENT_MESSAGES.IS_RECORDING_SESSION:
+      case RQ.Constants.CLIENT_MESSAGES.IS_RECORDING_SESSION:
         sendResponse(RQ.SessionRecorder.isRecording);
         break;
 
-      case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
-        RQ.SessionRecorder.sendMessageToClient(
-          "getSessionData",
-          null,
-          sendResponse
-        );
+      case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
+        RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
         return true; // notify sender to wait for response and not resolve request immediately
     }
   });
@@ -89,20 +78,17 @@ RQ.SessionRecorder.addListeners = () => {
     }
 
     if (event.data.response) {
-      RQ.SessionRecorder.sendResponseToRuntime(
-        event.data.action,
-        event.data.payload
-      );
+      RQ.SessionRecorder.sendResponseToRuntime(event.data.action, event.data.payload);
     } else if (event.data.action === "sessionRecordingStarted") {
       RQ.SessionRecorder.isRecording = true;
       chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        action: RQ.Constants.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.explicitRecordingFlag.clear();
       chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
+        action: RQ.Constants.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
   });
@@ -113,15 +99,8 @@ RQ.SessionRecorder.sendResponseToRuntime = (action, payload) => {
   delete RQ.SessionRecorder.sendResponseCallbacks[action];
 };
 
-RQ.SessionRecorder.sendMessageToClient = (
-  action,
-  payload,
-  sendResponseCallback
-) => {
-  window.postMessage(
-    { source: "requestly:extension", action, payload },
-    window.location.href
-  );
+RQ.SessionRecorder.sendMessageToClient = (action, payload, sendResponseCallback) => {
+  window.postMessage({ source: "requestly:extension", action, payload }, window.location.href);
   if (sendResponseCallback) {
     RQ.SessionRecorder.sendResponseCallbacks[action] = sendResponseCallback;
   }
@@ -135,32 +114,21 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
   window[namespace] = window[namespace] || {};
 
   const sendMessageToExtension = (action, payload) => {
-    window.postMessage(
-      { source: "requestly:client", action, payload },
-      window.location.href
-    );
+    window.postMessage({ source: "requestly:client", action, payload }, window.location.href);
   };
 
   const sendResponseToExtension = (action, payload) => {
-    window.postMessage(
-      { source: "requestly:client", response: true, action, payload },
-      window.location.href
-    );
+    window.postMessage({ source: "requestly:client", response: true, action, payload }, window.location.href);
   };
 
   window.addEventListener("message", function (event) {
     // We only accept messages from ourselves
-    if (
-      event.source !== window ||
-      event.data.source !== "requestly:extension"
-    ) {
+    if (event.source !== window || event.data.source !== "requestly:extension") {
       return;
     }
 
     if (event.data.action === "startRecording") {
-      window[namespace].sessionRecorder = new Requestly.SessionRecorder(
-        event.data.payload
-      );
+      window[namespace].sessionRecorder = new Requestly.SessionRecorder(event.data.payload);
       window[namespace].sessionRecorder.start();
       sendMessageToExtension("sessionRecordingStarted");
     } else if (event.data.action === "stopRecording") {
@@ -168,10 +136,7 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
       sendMessageToExtension("sessionRecordingStopped");
     } else if (event.data.action === "getSessionData") {
       try {
-        sendResponseToExtension(
-          event.data.action,
-          window[namespace].sessionRecorder.getSession()
-        );
+        sendResponseToExtension(event.data.action, window[namespace].sessionRecorder.getSession());
       } catch (err) {
         const error = err instanceof Error ? err.message : String(err);
         sendResponseToExtension(event.data.action, error);
@@ -184,19 +149,12 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
 RQ.SessionRecorder.explicitRecordingFlag = {
   IS_EXPLICIT_RECORDING: "__RQ__isExplicitRecording",
   set: () => {
-    window.sessionStorage.setItem(
-      RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING,
-      true
-    );
+    window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
   },
   get: () => {
-    return window.sessionStorage.getItem(
-      RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING
-    );
+    return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
   },
   clear: () => {
-    window.sessionStorage.removeItem(
-      RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING
-    );
+    window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
   },
 };

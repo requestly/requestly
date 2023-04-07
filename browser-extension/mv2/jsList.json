@@ -5,11 +5,11 @@
     "src/shared/constants.js",
     "src/shared/utils.js",
     "src/shared/ContentScriptMessageHandler.js",
-    "src/shared/DataStoreUtils.js",
     "src/shared/userAgentLibrary.js",
     "src/shared/DOMUtils.js"
   ],
   "pages": [
+    "../common/dist/constants.js",
     "dist/generated/shared.js",
     "src/client/js/utils.js",
     "src/modules/StorageService.js",
@@ -19,6 +19,7 @@
   "client": [
     "../config/dist/config.js",
     "../../common/constants.js",
+    "../common/dist/constants.js",
     "../common/dist/rulesStore.js",
     "src/shared/constants.js",
     "src/client/js/utils.js",
@@ -34,6 +35,7 @@
   "background": [
     "dist/generated/shared.js",
     "../../common/logger.js",
+    "../common/dist/constants.js",
     "../common/dist/utils.js",
     "src/external/CircularQueue.js",
     "src/external/chromeTabService.js",

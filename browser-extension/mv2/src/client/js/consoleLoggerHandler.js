@@ -4,22 +4,17 @@ RQ.ConsoleLogger = {
 
 RQ.ConsoleLogger.setup = () => {
   window.addEventListener("message", function (event) {
-    if (
-      event.source !== window ||
-      event.data.source !== "requestly:consoleLogger"
-    ) {
+    if (event.source !== window || event.data.source !== "requestly:consoleLogger") {
       return;
     }
 
     if (event.data.action === "showInitialMessage") {
-      RQ.ConsoleLogger.showInitialMessage(
-        event.data.payload?.isConsoleLoggerEnabled
-      );
+      RQ.ConsoleLogger.showInitialMessage(event.data.payload?.isConsoleLoggerEnabled);
     }
   });
 
   chrome.runtime.onMessage.addListener(function (message) {
-    if (message.action === RQ.CLIENT_MESSAGES.PRINT_CONSOLE_LOGS) {
+    if (message.action === RQ.Constants.CLIENT_MESSAGES.PRINT_CONSOLE_LOGS) {
       RQ.ConsoleLogger.handleMessage(message);
     }
   });

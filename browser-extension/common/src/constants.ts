@@ -23,17 +23,27 @@ export const EXTENSION_MESSAGES = {
 };
 
 export const CLIENT_MESSAGES = {
-  INIT_SESSION_RECORDING: "initSessionRecording",
-  NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
-  IS_RECORDING_SESSION: "isRecordingSession",
-  GET_TAB_SESSION: "getTabSession",
+  ADD_EVENT: "addEvent",
   GET_APPLIED_RESPONSE_RULES: "getAppliedResponseRules",
+  GET_APPLIED_RULE_IDS: "getAppliedRuleIds",
   GET_APPLIED_SCRIPT_RULES: "getAppliedScriptRules",
-  UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
+  GET_SCRIPT_RULES: "getScriptRules",
+  GET_SESSION_RECORDING_CONFIG: "getSessionRecordingConfig",
+  GET_USER_AGENT_RULE_PAIRS: "getUserAgentRulePairs",
+  IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
+  IS_RECORDING_SESSION: "isRecordingSession",
+  INIT_SESSION_RECORDING: "initSessionRecording",
+  NOTIFY_CONTENT_SCRIPT_LOADED: "notifyContentScriptLoaded",
+  NOTIFY_RULES_APPLIED: "notifyRulesApplied",
+  NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
+  NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
+  OVERRIDE_RESPONSE: "overrideResponse",
+  PRINT_CONSOLE_LOGS: "printConsoleLogs",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
-  IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
-  ADD_EVENT: "addEvent",
+  SYNC_APPLIED_RULES: "syncAppliedRules",
+  UPDATE_APPLIED_RULE_ID: "updateAppliedRuleId",
+  UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
 };
 
 export const STORAGE_TYPE = "local";
