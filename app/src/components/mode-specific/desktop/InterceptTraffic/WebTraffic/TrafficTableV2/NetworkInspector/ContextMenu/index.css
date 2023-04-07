@@ -1,33 +1,33 @@
-.traffic-context-menu .ant-dropdown-menu,
+.traffic-table-context-menu .ant-dropdown-menu,
 .ant-dropdown-menu-submenu ul[id*="more_options"] {
   background: #222325;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
   width: 250px;
 }
-.traffic-context-menu ul.ant-dropdown-menu-sub,
+.traffic-table-context-menu ul.ant-dropdown-menu-sub,
 .ant-dropdown-menu-submenu ul[id*="more_options"] {
   padding: 8px;
 }
-.traffic-context-menu .ant-dropdown-menu-item-active,
+.traffic-table-context-menu .ant-dropdown-menu-item-active,
 .ant-dropdown-menu-submenu
   ul[id*="more_options"]
   .ant-dropdown-menu-item-active,
-.traffic-context-menu .ant-dropdown-menu-submenu-title:hover {
+.traffic-table-context-menu .ant-dropdown-menu-submenu-title:hover {
   background: var(--hover-color);
 }
-.traffic-context-menu .ant-dropdown-menu-submenu {
+.traffic-table-context-menu .ant-dropdown-menu-submenu {
   padding: 0 8px;
 }
-.traffic-context-menu .ant-dropdown-menu-submenu span,
+.traffic-table-context-menu .ant-dropdown-menu-submenu span,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {
   font-size: 13px;
 }
-.traffic-context-menu .ant-dropdown-menu-submenu-title,
+.traffic-table-context-menu .ant-dropdown-menu-submenu-title,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {
   padding: 4px 8px;
   border-radius: var(--border-radius-sm);
 }
-.traffic-context-menu .ant-dropdown-menu-submenu-title svg {
+.traffic-table-context-menu .ant-dropdown-menu-submenu-title svg {
   margin-right: 5px;
 }

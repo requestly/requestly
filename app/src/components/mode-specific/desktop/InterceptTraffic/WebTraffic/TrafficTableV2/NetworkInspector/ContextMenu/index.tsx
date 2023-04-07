@@ -79,7 +79,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     <Dropdown
       menu={{ items }}
       trigger={["contextMenu"]}
-      overlayClassName="traffic-context-menu"
+      overlayClassName="traffic-table-context-menu"
       destroyPopupOnHide={true}
     >
       {children}
