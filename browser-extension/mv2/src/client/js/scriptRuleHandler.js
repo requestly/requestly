@@ -2,7 +2,7 @@ RQ.ScriptRuleHandler = {};
 
 RQ.ScriptRuleHandler.setup = function () {
   const message = {
-    action: RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES,
+    action: RQ.Constants.CLIENT_MESSAGES.GET_SCRIPT_RULES,
     url: window.location.href,
   };
   chrome.runtime.sendMessage(message, function (rules) {
@@ -10,7 +10,7 @@ RQ.ScriptRuleHandler.setup = function () {
       RQ.ScriptRuleHandler.handleRules(rules);
 
       chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_RULES_APPLIED,
+        action: RQ.Constants.CLIENT_MESSAGES.NOTIFY_RULES_APPLIED,
         url: window.location.href,
         rules: rules,
         modification: "executed script",
@@ -85,17 +85,11 @@ RQ.ScriptRuleHandler.handleJSScripts = function (jsScripts) {
       }
     });
 
-    RQ.ScriptRuleHandler.includeJSScriptsInOrder(
-      prePageLoadScripts,
-      function () {
-        RQ.ClientUtils.onPageLoad().then(function () {
-          RQ.ScriptRuleHandler.includeJSScriptsInOrder(
-            postPageLoadScripts,
-            resolve
-          );
-        });
-      }
-    );
+    RQ.ScriptRuleHandler.includeJSScriptsInOrder(prePageLoadScripts, function () {
+      RQ.ClientUtils.onPageLoad().then(function () {
+        RQ.ScriptRuleHandler.includeJSScriptsInOrder(postPageLoadScripts, resolve);
+      });
+    });
   });
 };
 
@@ -120,11 +114,7 @@ RQ.ScriptRuleHandler.addLibraries = function (libraries, callback, index) {
   }
 };
 
-RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (
-  scripts,
-  callback,
-  index
-) {
+RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (scripts, callback, index) {
   index = index || 0;
 
   if (index >= scripts.length) {

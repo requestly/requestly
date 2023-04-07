@@ -11,6 +11,6 @@
   RQ.RequestResponseRuleHandler.setup();
 
   chrome.runtime.sendMessage({
-    action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
+    action: RQ.Constants.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
   });
 })();

@@ -2,7 +2,7 @@ RQ.UserAgentRuleHandler = {};
 
 RQ.UserAgentRuleHandler.setup = function () {
   const message = {
-    action: RQ.CLIENT_MESSAGES.GET_USER_AGENT_RULE_PAIRS,
+    action: RQ.Constants.CLIENT_MESSAGES.GET_USER_AGENT_RULE_PAIRS,
     url: window.location.href,
   };
   chrome.runtime.sendMessage(message, function (rulePairs) {
