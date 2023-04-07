@@ -38,6 +38,7 @@ const CreateRuleButton = ({
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
   analyticEventRuleCreatedSource = 'rule_editor_screen_header',
+  ruleCreatedFromEditorModalCallback = () => {},
 }) => {
   //Constants
   const navigate = useNavigate();
@@ -95,6 +96,7 @@ const CreateRuleButton = ({
               </span>
             ),
           });
+          ruleCreatedFromEditorModalCallback();
         } else {
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
@@ -141,7 +143,17 @@ const CreateRuleButton = ({
 
         const ruleId = currentlySelectedRuleData.id;
 
-        if (!isRuleEditorModal) {
+        if (isRuleEditorModal) {
+          // TODO: styling
+          toast.success(
+            <span>
+              Rule created successfully
+              <Button type="text" onClick={() => redirectToRuleEditor(navigate, ruleId, 'create')}>
+                view rule
+              </Button>
+            </span>
+          );
+        } else {
           redirectToRuleEditor(navigate, ruleId, 'create');
         }
       });
