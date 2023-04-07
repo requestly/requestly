@@ -10,6 +10,7 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
+import { ContextMenu } from "../ContextMenu";
 
 export const ITEM_SIZE = 30;
 
@@ -96,26 +97,27 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     const rowProps = onRow(log);
 
     return (
-      <Table.Row
-        id={log.id}
-        {...rowProps}
-        data-tour-id={index === 0 ? "traffic-table-row" : null}
-      >
-        {columns.map((column: any) => {
-          const columnData = _.get(log, getColumnKey(column?.dataIndex));
+      <ContextMenu log={log}>
+        <Table.Row
+          id={log.id}
+          {...rowProps}
+          data-tour-id={index === 0 ? "traffic-table-row" : null}
+        >
+          {columns.map((column: any) => {
+            const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
-          return (
-            <Table.Cell key={column.id}>
-              {column?.render ? column.render(columnData) : columnData}
-            </Table.Cell>
-          );
-        })}
-      </Table.Row>
+            return (
+              <Table.Cell key={column.id}>
+                {column?.render ? column.render(columnData) : columnData}
+              </Table.Cell>
+            );
+          })}
+        </Table.Row>
+      </ContextMenu>
     );
   };
 
   const Row = ({ index, style }: any) => {
-    console.log("INDEX", index);
     return renderLogRow(logs[index], index, style);
   };
 
