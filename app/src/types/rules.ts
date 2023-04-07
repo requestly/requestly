@@ -23,20 +23,6 @@ export enum RuleType {
   DELAY = 'Delay',
 }
 
-/**
- * selectors representing fields in rule editor to focus on,
- * in which user needs to fill just after the pre-filled data
- */
-export enum RuleEditorFieldSelector {
-  HEADERS = 'header-name',
-  REDIRECT = 'destination-url',
-  REPLACE = 'replace-from-in-url',
-  CANCE = 'source-value',
-  QUERYPARAM = 'query-param-name',
-  USERAGENT = 'device-selector',
-  DELAY = 'delay-value',
-}
-
 export interface Rule extends Record<string, unknown> {
   id: string;
   name: string;
