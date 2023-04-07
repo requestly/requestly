@@ -96,7 +96,7 @@ const CreateRuleButton = ({
         if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
           rule_type = currentlySelectedRuleData.ruleType;
         }
-        if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+        if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
           ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
 
           trackRuleCreatedEvent(
