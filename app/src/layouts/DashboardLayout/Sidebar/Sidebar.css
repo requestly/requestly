@@ -14,7 +14,7 @@
   height: 56px;
 }
 
-.sidebar-horizontal-divider.ant-divider {
+li.sidebar-horizontal-divider.ant-menu-item-divider {
   margin: 12px 0 4px 0;
 }
 
@@ -245,7 +245,7 @@
 
 .siderbar-menu.ant-menu.ant-menu-inline-collapsed
   div.ant-menu-item-group-title {
-  padding: 18px 14px 12px 14px;
+  padding: 18px 14px 12px 12px;
   text-overflow: inherit;
 }
 
