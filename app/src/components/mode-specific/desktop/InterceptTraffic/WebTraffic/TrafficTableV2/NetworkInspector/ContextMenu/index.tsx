@@ -1,4 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getIsTrafficTableTourCompleted } from "store/selectors";
+import { actions } from "store";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../../utils/Misc";
@@ -12,6 +15,10 @@ interface ContextMenuProps {
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
+  const dispatch = useDispatch();
+  const isTrafficTableTourCompleted = useSelector(
+    getIsTrafficTableTourCompleted
+  );
   const { RULE_TYPES } = GLOBAL_CONSTANTS;
   const items: MenuProps["items"] = useMemo(
     () => [
@@ -75,12 +82,20 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     ],
     [RULE_TYPES, log.url, log.requestShellCurl]
   );
+
+  const handleDropdownOpenChange = (open: boolean) => {
+    if (open && !isTrafficTableTourCompleted) {
+      dispatch(actions.updateTrafficTableTourCompleted({}));
+    }
+  };
+
   return (
     <Dropdown
       menu={{ items }}
       trigger={["contextMenu"]}
       overlayClassName="traffic-table-context-menu"
       destroyPopupOnHide={true}
+      onOpenChange={handleDropdownOpenChange}
     >
       {children}
     </Dropdown>

@@ -1,10 +1,15 @@
 import { Table } from "@devtools-ds/table";
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
+import { getIsTrafficTableTourCompleted } from "store/selectors";
 import _ from "lodash";
 
 import { getColumnKey } from "../utils";
 import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import FEATURES from "config/constants/sub/features";
 import { ContextMenu } from "../ContextMenu";
 
 export const ITEM_SIZE = 30;
@@ -15,6 +20,11 @@ interface Props {
 }
 
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
+  const dispatch = useDispatch();
+  const isTrafficTableTourCompleted = useSelector(
+    getIsTrafficTableTourCompleted
+  );
+
   const columns = [
     {
       id: "time",
@@ -79,7 +89,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     );
   };
 
-  const renderLogRow = (log: any, style: any) => {
+  const renderLogRow = (log: any, index: number, style: any) => {
     if (!log) {
       return null;
     }
@@ -88,9 +98,14 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
 
     return (
       <ContextMenu log={log}>
-        <Table.Row id={log.id} {...rowProps}>
+        <Table.Row
+          id={log.id}
+          {...rowProps}
+          data-tour-id={index === 0 ? "traffic-table-row" : null}
+        >
           {columns.map((column: any) => {
             const columnData = _.get(log, getColumnKey(column?.dataIndex));
+
             return (
               <Table.Cell key={column.id}>
                 {column?.render ? column.render(columnData) : columnData}
@@ -103,11 +118,18 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   };
 
   const Row = ({ index, style }: any) => {
-    return renderLogRow(logs[index], style);
+    return renderLogRow(logs[index], index, style);
   };
 
   return (
     <>
+      <ProductWalkthrough
+        tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
+        startWalkthrough={!isTrafficTableTourCompleted}
+        onTourComplete={() =>
+          dispatch(actions.updateTrafficTableTourCompleted({}))
+        }
+      />
       <VirtualTable
         height="100%"
         width="100%"

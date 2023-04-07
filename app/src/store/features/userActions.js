@@ -79,9 +79,13 @@ export const updateUserAttributes = (prevState, action) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
     ...action.payload,
-  }
-}
+  };
+};
 
 export const updateRedirectRuleTourCompleted = (prevState, action) => {
   prevState.misc.isRedirectRuleTourCompleted = true;
-}
+};
+
+export const updateTrafficTableTourCompleted = (prevState, action) => {
+  prevState.misc.isTrafficTableTourCompleted = true;
+};

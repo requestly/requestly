@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import JoyRide, {
   EVENTS,
@@ -24,19 +18,20 @@ import { actions } from "store";
 interface TourProps {
   startWalkthrough: boolean;
   tourFor: string;
-  context: any;
-  runTourWithABTest: boolean; //temporary flag
+  context?: any;
+  runTourWithABTest?: boolean; //temporary flag
+  onTourComplete: () => void;
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
   context,
-  runTourWithABTest = false,
+  runTourWithABTest = true,
+  onTourComplete,
 }) => {
   const dispatch = useDispatch();
 
-  const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const joyrideRef = useRef(null);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
   const tourSteps = useMemo(() => productTours[tourFor], [tourFor]);
@@ -56,12 +51,10 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
-    } else if (index >= tourSteps?.length - 1) {
-      setHasReachedLastStep(true);
     }
-
-    if(type === EVENTS.TOUR_END) {
-      dispatch(actions.updateRedirectRuleTourCompleted({}));
+    if (type === EVENTS.TOUR_END) {
+      onTourComplete();
+      trackWalkthroughCompleted();
     }
   };
 
@@ -70,12 +63,6 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       trackWalkthroughViewed();
     }
   }, [runTourWithABTest, startWalkthrough]);
-
-  useEffect(() => {
-    return () => {
-      if (hasReachedLastStep) trackWalkthroughCompleted();
-    };
-  }, [hasReachedLastStep]);
 
   return (
     <>
@@ -89,6 +76,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
           tooltipComponent={renderCustomToolTip}
           disableScrolling={true}
           disableOverlayClose={true}
+          disableCloseOnEsc={true}
           spotlightClicks={true}
           spotlightPadding={5}
           floaterProps={{
