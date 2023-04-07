@@ -16,6 +16,7 @@ import GroupByNone from './Tables/GroupByNone';
 import SSLProxyingModal from 'components/mode-specific/desktop/SSLProxyingModal';
 import { convertProxyLogToUILog } from './utils/logUtils';
 import { makeOriginalLog } from 'capture-console-logs';
+import { trackTrafficTableRequestClicked } from 'modules/analytics/events/desktopApp';
 import './css/draggable.css';
 
 const CurrentTrafficTable = ({
@@ -88,6 +89,7 @@ const CurrentTrafficTable = ({
   const handleRowClick = (row) => {
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
+    trackTrafficTableRequestClicked();
   };
 
   const handleOnGroupParameterChange = (e) => {
