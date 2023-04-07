@@ -1,10 +1,12 @@
-import React, { ReactNode, useCallback, useMemo } from "react";
-import { useDispatch } from "react-redux";
-import type { MenuProps } from "antd";
-import { Dropdown } from "antd";
-import { copyToClipBoard } from "../../../../../../../utils/Misc";
-import { actions } from "store";
-import { RuleType } from "types";
+import React, { ReactNode, useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { MenuProps } from 'antd';
+import { Dropdown } from 'antd';
+import { copyToClipBoard } from '../../../../../../../utils/Misc';
+import { actions } from 'store';
+import { RuleType } from 'types';
+import { getIsTrafficTableTourCompleted } from 'store/selectors';
+import './index.css';
 
 interface ContextMenuProps {
   log: any;
@@ -13,13 +15,14 @@ interface ContextMenuProps {
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
   const dispatch = useDispatch();
+  const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
   const handleOnClick = useCallback(
-    (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
+    (menuInfo: Parameters<MenuProps['onClick']>[0], log: any) => {
       dispatch(
         actions.toggleActiveModal({
           newValue: true,
-          modalName: "ruleEditorModal",
+          modalName: 'ruleEditorModal',
           newProps: {
             ruleData: log,
             ruleType: menuInfo.key,
@@ -30,71 +33,70 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     [dispatch]
   );
 
-  const items: MenuProps["items"] = useMemo(
+  const items: MenuProps['items'] = useMemo(
     () => [
       {
-        key: "copy_curl",
-        label: "Copy cURL",
-        onClick: () =>
-          copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard"),
+        key: 'copy_curl',
+        label: 'Copy cURL',
+        onClick: () => copyToClipBoard(log.requestShellCurl, 'cURL copied to clipboard'),
       },
       {
-        key: "copy_url",
-        label: "Copy URL",
-        onClick: () => copyToClipBoard(log.url, "URL copied to clipboard"),
+        key: 'copy_url',
+        label: 'Copy URL',
+        onClick: () => copyToClipBoard(log.url, 'URL copied to clipboard'),
       },
       {
         key: RuleType.REDIRECT,
-        label: "Redirect URL(Map local/Remote)",
+        label: 'Redirect URL(Map local/Remote)',
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.RESPONSE,
-        label: "Modify Response Body",
+        label: 'Modify Response Body',
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REQUEST,
-        label: "Modify Request Body",
+        label: 'Modify Request Body',
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.HEADERS,
-        label: "Modify Headers",
+        label: 'Modify Headers',
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REPLACE,
-        label: "Replace part of URL",
+        label: 'Replace part of URL',
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
-        label: "More modification options",
-        key: "more_options",
+        label: 'More modification options',
+        key: 'more_options',
         children: [
           {
             key: RuleType.CANCEL,
-            label: "Cancel Request",
+            label: 'Cancel Request',
             onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.SCRIPT,
-            label: "Insert Custom Script",
+            label: 'Insert Custom Script',
             onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.DELAY,
-            label: "Delay Request",
+            label: 'Delay Request',
             onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.QUERYPARAM,
-            label: "Modify Query Params",
+            label: 'Modify Query Params',
             onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.USERAGENT,
-            label: "Modify User Agent",
+            label: 'Modify User Agent',
             onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
         ],
@@ -103,8 +105,20 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
     [log, handleOnClick]
   );
 
+  const handleDropdownOpenChange = (open: boolean) => {
+    if (open && !isTrafficTableTourCompleted) {
+      dispatch(actions.updateTrafficTableTourCompleted({}));
+    }
+  };
+
   return (
-    <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+    <Dropdown
+      menu={{ items }}
+      trigger={['contextMenu']}
+      overlayClassName="traffic-table-context-menu"
+      destroyPopupOnHide={true}
+      onOpenChange={handleDropdownOpenChange}
+    >
       {children}
     </Dropdown>
   );
