@@ -42,8 +42,7 @@ export const initiateBlankCurrentlySelectedRule = (
   dispatch,
   currentlySelectedRuleConfig,
   RULE_TYPE_TO_CREATE,
-  setCurrentlySelectedRule,
-  defaultRuleDetails = {}
+  setCurrentlySelectedRule
 ) => {
   if (currentlySelectedRuleConfig) {
     const extraRuleConfig = getRuleLevelInitialConfigs(RULE_TYPE_TO_CREATE);
@@ -59,7 +58,6 @@ export const initiateBlankCurrentlySelectedRule = (
       ruleType: RULE_TYPE_TO_CREATE,
       status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
       ...extraRuleConfig,
-      ...defaultRuleDetails,
     };
 
     if (currentlySelectedRuleConfig.VERSION) {
@@ -72,6 +70,8 @@ export const initiateBlankCurrentlySelectedRule = (
 
     blankRuleFormat.pairs.push(getEmptyPairUsingRuleType(RULE_TYPE_TO_CREATE));
     setCurrentlySelectedRule(dispatch, blankRuleFormat);
+
+    return blankRuleFormat;
   }
 };
 
