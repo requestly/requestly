@@ -94,7 +94,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     const rowProps = onRow(log);
 
     return (
-      <ContextMenu log={log}>
+      <ContextMenu log={log} key={log.id}>
         <Table.Row id={log.id} {...rowProps} data-tour-id={index === 0 ? 'traffic-table-row' : null}>
           {columns.map((column: any) => {
             const columnData = _.get(log, getColumnKey(column?.dataIndex));
