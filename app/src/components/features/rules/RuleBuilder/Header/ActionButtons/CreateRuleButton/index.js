@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tooltip, message } from "antd";
+import { Button, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
@@ -51,7 +51,6 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const [messageApi, contextHolder] = message.useMessage();
 
   const tooltipText = isDisabled
     ? "Only available in desktop app."
@@ -126,24 +125,21 @@ const CreateRuleButton = ({
         const ruleId = currentlySelectedRuleData.id;
 
         if (isRuleEditorModal) {
-          messageApi.open({
-            type: "success",
-            content: (
-              <span>
-                Rule created successfully
-                <RQButton
-                  type="default"
-                  className="rule-created-tooltip-btn"
-                  onClick={() => {
-                    redirectToRuleEditor(navigate, ruleId, "create");
-                    messageApi.destroy();
-                  }}
-                >
-                  view rule
-                </RQButton>
-              </span>
-            ),
-          });
+          toast.success(
+            <span>
+              Rule created successfully
+              <RQButton
+                type="default"
+                className="rule-created-tooltip-btn"
+                onClick={() => {
+                  redirectToRuleEditor(navigate, ruleId, "create");
+                }}
+              >
+                view rule
+              </RQButton>
+            </span>,
+            2
+          );
         } else {
           redirectToRuleEditor(navigate, ruleId, "create");
         }
@@ -173,7 +169,6 @@ const CreateRuleButton = ({
 
   return (
     <>
-      {contextHolder} {/* required for rule created toast for rule editor modal */}
       <Tooltip title={tooltipText} placement="top">
         <Button
           data-tour-id="rule-editor-create-btn"
