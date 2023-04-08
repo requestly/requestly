@@ -64,7 +64,7 @@ export const trackTrafficTableRequestRightClicked = () => {
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_RIGHT_CLICKED);
 };
 
-export const TrackTrafficTableDropdownClicked = (action) => {
+export const trackTrafficTableDropdownClicked = (action) => {
   const params = { action };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED, params);
 };

@@ -7,7 +7,7 @@ import { actions } from 'store';
 import { RuleType } from 'types';
 import { getIsTrafficTableTourCompleted } from 'store/selectors';
 import {
-  TrackTrafficTableDropdownClicked,
+  trackTrafficTableDropdownClicked,
   trackTrafficTableRequestRightClicked,
 } from 'modules/analytics/events/desktopApp';
 import './index.css';
@@ -33,7 +33,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
           },
         })
       );
-      TrackTrafficTableDropdownClicked(menuInfo.key);
+      trackTrafficTableDropdownClicked(menuInfo.key);
     },
     [dispatch]
   );
@@ -45,7 +45,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
         label: 'Copy cURL',
         onClick: () => {
           copyToClipBoard(log.requestShellCurl, 'cURL copied to clipboard');
-          TrackTrafficTableDropdownClicked('copy_curl');
+          trackTrafficTableDropdownClicked('copy_curl');
         },
       },
       {
@@ -53,7 +53,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
         label: 'Copy URL',
         onClick: () => {
           copyToClipBoard(log.url, 'URL copied to clipboard');
-          TrackTrafficTableDropdownClicked('copy_url');
+          trackTrafficTableDropdownClicked('copy_url');
         },
       },
       {
