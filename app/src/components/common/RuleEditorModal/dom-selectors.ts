@@ -1,9 +1,10 @@
 import { RuleType } from 'types';
 
 /**
- * @description  Use it as 'input[data-selectionid="value"]' to focus rule editor fields
+ * @description Used to focus rule editor fields.
+ *
+ * @example document.querySelector(`input[data-selectionid="header-name"]`)
  */
-
 export const RULE_EDITOR_FIELD_SELECTOR = {
   [RuleType.HEADERS]: 'header-name',
   [RuleType.REDIRECT]: 'destination-url',
