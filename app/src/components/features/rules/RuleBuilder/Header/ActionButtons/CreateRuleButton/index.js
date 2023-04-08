@@ -1,43 +1,44 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Tooltip, message } from 'antd';
-import { RQButton } from 'lib/design-system/components';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'utils/Toast.js';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, Tooltip } from "antd";
+import { RQButton } from "lib/design-system/components";
+import { useNavigate } from "react-router-dom";
+import { toast } from "utils/Toast.js";
 //UTILS
 import {
   getAppMode,
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAuthDetails,
-} from '../../../../../../../store/selectors';
-import { trackRQLastActivity } from '../../../../../../../utils/AnalyticsUtils';
+} from "../../../../../../../store/selectors";
+import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
 //Actions
-import { saveRule } from '../actions';
-import { getModeData, setIsCurrentlySelectedRuleHasUnsavedChanges } from '../../../actions';
-import { validateRule } from './actions';
-import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
-import APP_CONSTANTS from '../../../../../../../config/constants';
-import { redirectToRuleEditor } from 'utils/RedirectionUtils';
-import { getAllRedirectDestinationTypes } from 'utils/rules/misc';
-import { ruleModifiedAnalytics } from './actions';
+import { saveRule } from "../actions";
+import { getModeData, setIsCurrentlySelectedRuleHasUnsavedChanges } from "../../../actions";
+import { validateRule } from "./actions";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from "../../../../../../../config/constants";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import { getAllRedirectDestinationTypes } from "utils/rules/misc";
+import { ruleModifiedAnalytics } from "./actions";
 import {
   trackErrorInRuleCreation,
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
   trackRuleResourceTypeSelected,
-} from 'modules/analytics/events/common/rules';
-import { snakeCase } from 'lodash';
-import ruleInfoDialog from './RuleInfoDialog';
-import { ResponseRuleResourceType } from 'types/rules';
-import { fixRuleRegexSourceFormat } from 'utils/rules/misc';
-import '../RuleEditorActionButtons.css';
+} from "modules/analytics/events/common/rules";
+import { snakeCase } from "lodash";
+import ruleInfoDialog from "./RuleInfoDialog";
+import { ResponseRuleResourceType } from "types/rules";
+import { fixRuleRegexSourceFormat } from "utils/rules/misc";
+import "../RuleEditorActionButtons.css";
 
 const CreateRuleButton = ({
   location,
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
-  analyticEventRuleCreatedSource = 'rule_editor_screen_header',
+  analyticEventRuleCreatedSource = "rule_editor_screen_header",
+  ruleCreatedFromEditorModalCallback = () => {},
 }) => {
   //Constants
   const navigate = useNavigate();
@@ -50,15 +51,14 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const [messageApi, contextHolder] = message.useMessage();
 
   const tooltipText = isDisabled
-    ? 'Only available in desktop app.'
-    : navigator.platform.match('Mac')
-    ? '⌘+S'
-    : 'Ctrl+S';
+    ? "Only available in desktop app."
+    : navigator.platform.match("Mac")
+    ? "⌘+S"
+    : "Ctrl+S";
 
-  const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? 'Save' : 'Create';
+  const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
   const handleBtnOnClick = async () => {
     const createdBy = user?.details?.profile?.uid || null;
@@ -77,24 +77,7 @@ const CreateRuleButton = ({
         lastModifiedBy,
       }).then(async () => {
         if (isRuleEditorModal) {
-          messageApi.open({
-            type: 'success',
-            content: (
-              <span>
-                Rule created successfully
-                <RQButton
-                  type="default"
-                  className="rule-created-tooltip-btn"
-                  onClick={() => {
-                    redirectToRuleEditor(navigate, ruleId, 'create');
-                    messageApi.destroy();
-                  }}
-                >
-                  view rule
-                </RQButton>
-              </span>
-            ),
-          });
+          ruleCreatedFromEditorModalCallback();
         } else {
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
@@ -129,7 +112,7 @@ const CreateRuleButton = ({
           );
         }
         ruleModifiedAnalytics(user);
-        trackRQLastActivity('rule_saved');
+        trackRQLastActivity("rule_saved");
 
         if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
           const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
@@ -141,8 +124,24 @@ const CreateRuleButton = ({
 
         const ruleId = currentlySelectedRuleData.id;
 
-        if (!isRuleEditorModal) {
-          redirectToRuleEditor(navigate, ruleId, 'create');
+        if (isRuleEditorModal) {
+          toast.success(
+            <span>
+              Rule created successfully
+              <RQButton
+                type="default"
+                className="rule-created-tooltip-btn"
+                onClick={() => {
+                  redirectToRuleEditor(navigate, ruleId, "create");
+                }}
+              >
+                view rule
+              </RQButton>
+            </span>,
+            2
+          );
+        } else {
+          redirectToRuleEditor(navigate, ruleId, "create");
         }
       });
     } else {
@@ -155,22 +154,21 @@ const CreateRuleButton = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const saveFn = (event) => {
-    if ((navigator.platform.match('Mac') ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === 's') {
+    if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
       event.preventDefault();
       handleBtnOnClick();
     }
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', saveFn);
+    document.addEventListener("keydown", saveFn);
     return () => {
-      document.removeEventListener('keydown', saveFn);
+      document.removeEventListener("keydown", saveFn);
     };
   }, [saveFn]);
 
   return (
     <>
-      {contextHolder} {/* required for rule created toast for rule editor modal */}
       <Tooltip title={tooltipText} placement="top">
         <Button
           data-tour-id="rule-editor-create-btn"
@@ -179,8 +177,8 @@ const CreateRuleButton = ({
           disabled={isDisabled}
           onClick={handleBtnOnClick}
         >
-          {isCurrentlySelectedRuleHasUnsavedChanges ? '*' : null}
-          {currentActionText === 'Create' ? `${currentActionText} rule` : currentActionText}
+          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
         </Button>
       </Tooltip>
     </>

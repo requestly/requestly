@@ -1,23 +1,25 @@
-import React, { useCallback, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { Col, Row } from 'antd';
-import { getActiveModals, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from 'store/selectors';
-import { RQEditorTitle, RQModal } from 'lib/design-system/components';
-import RulePairs from 'components/features/rules/RulePairs';
-import AddPairButton from 'components/features/rules/RuleBuilder/Body/Columns/AddPairButton';
-import CreateRuleButton from 'components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton';
-import RULE_TYPES_CONFIG from 'config/constants/sub/rule-types';
-import { onChangeHandler } from 'components/features/rules/RuleBuilder/Body/actions';
-import { actions } from 'store';
+import React, { useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Col, Row } from "antd";
+import { getActiveModals, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
+import { RQEditorTitle, RQModal } from "lib/design-system/components";
+import RulePairs from "components/features/rules/RulePairs";
+import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
+import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
+import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
+import { actions } from "store";
 import {
   setCurrentlySelectedRule,
   setCurrentlySelectedRuleConfig,
   initiateBlankCurrentlySelectedRule,
-} from 'components/features/rules/RuleBuilder/actions';
-import { Rule, Status } from 'types';
-import { trackRuleEditorViewed } from 'modules/analytics/events/common/rules';
-import './RuleEditorModal.css';
+} from "components/features/rules/RuleBuilder/actions";
+import { RULE_EDITOR_FIELD_SELECTOR } from "./dom-selectors";
+import { prefillRuleData } from "./prefill";
+import { Rule, Status } from "types";
+import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import "./RuleEditorModal.css";
 
 const getEventObject = (name: string, value: string) => ({
   target: { name, value },
@@ -36,41 +38,50 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const { ruleEditorModal } = useSelector(getActiveModals);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
-  const { ruleType = '' } = ruleEditorModal.props;
+  const { ruleData, ruleType = "" } = ruleEditorModal.props;
   const ruleConfig = RULE_TYPES_CONFIG[ruleType];
 
   useEffect(() => {
-    const defaultRuleDetails: Partial<Rule> = {
-      name: `${ruleType}_untitled`,
-      description: `${ruleType}_untitled`,
-      status: Status.ACTIVE,
-    };
-
-    initiateBlankCurrentlySelectedRule(
+    setCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[ruleType], navigate);
+    const newRule = initiateBlankCurrentlySelectedRule(
       dispatch,
       currentlySelectedRuleConfig,
       ruleType,
-      setCurrentlySelectedRule,
-      defaultRuleDetails
+      setCurrentlySelectedRule
     );
-    setCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[ruleType], navigate);
+
+    if (newRule) {
+      const prefilledRule: Rule = {
+        ...prefillRuleData(ruleData, newRule),
+        name: `${ruleType}_untitled`,
+        description: `${ruleType.toLowerCase()}_untitled`,
+        status: Status.ACTIVE,
+      };
+
+      setCurrentlySelectedRule(dispatch, prefilledRule);
+    }
 
     return () => {
       dispatch(actions.clearCurrentlySelectedRuleAndConfig());
     };
-  }, [dispatch, currentlySelectedRuleConfig, ruleType, navigate]);
+  }, [dispatch, ruleData, currentlySelectedRuleConfig, ruleType, navigate]);
 
-  const handleRuleNameChange = useCallback(
-    (name: Rule['name']) => {
-      const event = getEventObject('name', name);
-      onChangeHandler(currentlySelectedRuleData, dispatch, event);
-    },
-    [dispatch, currentlySelectedRuleData]
-  );
+  useEffect(() => {
+    setTimeout(() => {
+      const element = document.querySelector(
+        //@ts-ignore
+        `input[data-selectionid=${RULE_EDITOR_FIELD_SELECTOR[ruleType]}]`
+      ) as HTMLInputElement;
 
-  const handleDescriptionChange = useCallback(
-    (description: Rule['description']) => {
-      const event = getEventObject('description', description);
+      if (element) {
+        element.focus();
+      }
+    }, 0); // finish all the state updates then run this
+  }, [ruleType]);
+
+  const handleRuleTitleChange = useCallback(
+    (key: "name" | "description", value: string) => {
+      const event = getEventObject(key, value);
       onChangeHandler(currentlySelectedRuleData, dispatch, event);
     },
     [dispatch, currentlySelectedRuleData]
@@ -85,19 +96,20 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       centered
       key={ruleType}
       open={isOpen}
-      width={'920px'}
+      width="920px"
+      maskClosable={false}
       onCancel={handleModalClose}
       className="rule-editor-modal"
     >
       <div className="rq-modal-content">
         <Row align="middle" justify="space-between" className="rule-editor-modal-header">
           <RQEditorTitle
-            mode={'create'}
-            name={currentlySelectedRuleData?.name ?? ''}
-            nameChangeCallback={handleRuleNameChange}
+            mode="create"
+            name={currentlySelectedRuleData?.name ?? ""}
+            nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
             namePlaceholder="Enter rule name"
-            description={currentlySelectedRuleData?.description ?? ''}
-            descriptionChangeCallback={handleDescriptionChange}
+            description={currentlySelectedRuleData?.description ?? ""}
+            descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
             descriptionPlaceholder="Add description (optional)"
           />
 
@@ -105,6 +117,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
             location={location}
             isRuleEditorModal={true}
             analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+            ruleCreatedFromEditorModalCallback={handleModalClose}
           />
         </Row>
 
@@ -124,4 +137,4 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   );
 };
 
-export default RuleEditorModal;
+export default React.memo(RuleEditorModal);

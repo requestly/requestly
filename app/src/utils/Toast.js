@@ -7,8 +7,8 @@ message.config({
   maxCount: 2,
 });
 
-toast.success = (messageText) => {
-  message.success(messageText);
+toast.success = (messageText, duration = 3) => {
+  message.success(messageText, duration);
 };
 toast.info = (messageText, duration) => {
   message.info(messageText, duration);
