@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Tooltip } from 'antd';
+import { Button, Tooltip, message } from 'antd';
+import { RQButton } from 'lib/design-system/components';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'utils/Toast.js';
 //UTILS
@@ -30,6 +31,7 @@ import { snakeCase } from 'lodash';
 import ruleInfoDialog from './RuleInfoDialog';
 import { ResponseRuleResourceType } from 'types/rules';
 import { fixRuleRegexSourceFormat } from 'utils/rules/misc';
+import '../RuleEditorActionButtons.css';
 
 const CreateRuleButton = ({
   location,
@@ -48,6 +50,7 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const tooltipText = isDisabled
     ? 'Only available in desktop app.'
@@ -74,15 +77,24 @@ const CreateRuleButton = ({
         lastModifiedBy,
       }).then(async () => {
         if (isRuleEditorModal) {
-          // TODO: styling
-          toast.success(
-            <span>
-              Rule created successfully
-              <Button type="text" onClick={() => redirectToRuleEditor(navigate, ruleId, 'create')}>
-                view rule
-              </Button>
-            </span>
-          );
+          messageApi.open({
+            type: 'success',
+            content: (
+              <span>
+                Rule created successfully
+                <RQButton
+                  type="default"
+                  className="rule-created-tooltip-btn"
+                  onClick={() => {
+                    redirectToRuleEditor(navigate, ruleId, 'create');
+                    messageApi.destroy();
+                  }}
+                >
+                  view rule
+                </RQButton>
+              </span>
+            ),
+          });
         } else {
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
@@ -158,6 +170,7 @@ const CreateRuleButton = ({
 
   return (
     <>
+      {contextHolder} {/* required for rule created toast for rule editor modal */}
       <Tooltip title={tooltipText} placement="top">
         <Button
           data-tour-id="rule-editor-create-btn"
