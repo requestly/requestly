@@ -6,6 +6,11 @@ import { copyToClipBoard } from '../../../../../../../utils/Misc';
 import { actions } from 'store';
 import { RuleType } from 'types';
 import { getIsTrafficTableTourCompleted } from 'store/selectors';
+import { trackRuleCreationWorkflowStartedEvent } from 'modules/analytics/events/common/rules';
+import {
+  trackTrafficTableDropdownClicked,
+  trackTrafficTableRequestRightClicked,
+} from 'modules/analytics/events/desktopApp';
 import './index.css';
 
 interface ContextMenuProps {
@@ -29,6 +34,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
           },
         })
       );
+      trackTrafficTableDropdownClicked(menuInfo.key);
+      trackRuleCreationWorkflowStartedEvent(menuInfo.key, 'modal');
     },
     [dispatch]
   );
@@ -38,12 +45,18 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
       {
         key: 'copy_curl',
         label: 'Copy cURL',
-        onClick: () => copyToClipBoard(log.requestShellCurl, 'cURL copied to clipboard'),
+        onClick: () => {
+          copyToClipBoard(log.requestShellCurl, 'cURL copied to clipboard');
+          trackTrafficTableDropdownClicked('copy_curl');
+        },
       },
       {
         key: 'copy_url',
         label: 'Copy URL',
-        onClick: () => copyToClipBoard(log.url, 'URL copied to clipboard'),
+        onClick: () => {
+          copyToClipBoard(log.url, 'URL copied to clipboard');
+          trackTrafficTableDropdownClicked('copy_url');
+        },
       },
       {
         key: RuleType.REDIRECT,
@@ -106,8 +119,11 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
   );
 
   const handleDropdownOpenChange = (open: boolean) => {
-    if (open && !isTrafficTableTourCompleted) {
-      dispatch(actions.updateTrafficTableTourCompleted({}));
+    if (open) {
+      trackTrafficTableRequestRightClicked();
+      if (!isTrafficTableTourCompleted) {
+        dispatch(actions.updateTrafficTableTourCompleted({}));
+      }
     }
   };
 
