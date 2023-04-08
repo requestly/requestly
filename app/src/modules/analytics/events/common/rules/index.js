@@ -102,8 +102,8 @@ export const trackRuleExecuted = (type, count, month, year) => {
   trackEvent(RULES.RULE_EXECUTED, params);
 };
 
-export const trackRuleCreationWorkflowStartedEvent = (ruleType) => {
-  const params = { ruleType };
+export const trackRuleCreationWorkflowStartedEvent = (ruleType, source) => {
+  const params = { ruleType, source };
   trackEvent(RULES.RULE_CREATION_WORKFLOW_STARTED, params);
 };
 

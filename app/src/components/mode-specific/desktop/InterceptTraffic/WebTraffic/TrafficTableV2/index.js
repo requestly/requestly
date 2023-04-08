@@ -327,7 +327,7 @@ const CurrentTrafficTable = ({
         <RuleEditorModal
           isOpen={ruleEditorModal.isActive}
           handleModalClose={handleRuleEditorModalClose}
-          source="traffic_table_right_click"
+          analyticEventEditorViewedSource="traffic_table_right_click"
         />
       )}
     </React.Fragment>

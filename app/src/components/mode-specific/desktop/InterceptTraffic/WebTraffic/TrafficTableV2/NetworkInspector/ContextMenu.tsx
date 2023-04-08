@@ -6,6 +6,7 @@ import { copyToClipBoard } from '../../../../../../../utils/Misc';
 import { actions } from 'store';
 import { RuleType } from 'types';
 import { getIsTrafficTableTourCompleted } from 'store/selectors';
+import { trackRuleCreationWorkflowStartedEvent } from 'modules/analytics/events/common/rules';
 import {
   trackTrafficTableDropdownClicked,
   trackTrafficTableRequestRightClicked,
@@ -34,6 +35,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
         })
       );
       trackTrafficTableDropdownClicked(menuInfo.key);
+      trackRuleCreationWorkflowStartedEvent(menuInfo.key, 'modal');
     },
     [dispatch]
   );

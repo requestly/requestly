@@ -26,10 +26,10 @@ const getEventObject = (name: string, value: string) => ({
 interface props {
   isOpen: boolean;
   handleModalClose: () => void;
-  source: string;
+  analyticEventEditorViewedSource: string;
 }
 
-const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, source }) => {
+const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEventEditorViewedSource }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -77,8 +77,8 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, source }) 
   );
 
   useEffect(() => {
-    trackRuleEditorViewed(source, ruleType);
-  }, [source, ruleType]);
+    trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
+  }, [analyticEventEditorViewedSource, ruleType]);
 
   return (
     <RQModal
@@ -101,7 +101,11 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, source }) 
             descriptionPlaceholder="Add description (optional)"
           />
 
-          <CreateRuleButton location={location} isRuleEditorModal={true} source={source} />
+          <CreateRuleButton
+            location={location}
+            isRuleEditorModal={true}
+            analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+          />
         </Row>
 
         <div className="rule-editor-modal-container">
