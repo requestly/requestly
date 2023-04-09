@@ -29,9 +29,15 @@ interface props {
   isOpen: boolean;
   handleModalClose: () => void;
   analyticEventEditorViewedSource: string;
+  ruleCreatedCallback: (ruleId: string) => void;
 }
 
-const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEventEditorViewedSource }) => {
+const RuleEditorModal: React.FC<props> = ({
+  isOpen,
+  handleModalClose,
+  analyticEventEditorViewedSource,
+  ruleCreatedCallback,
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -117,7 +123,10 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
             location={location}
             isRuleEditorModal={true}
             analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
-            ruleCreatedFromEditorModalCallback={handleModalClose}
+            ruleCreatedFromEditorModalCallback={(ruleId: any) => {
+              ruleCreatedCallback(ruleId);
+              handleModalClose();
+            }}
           />
         </Row>
 
