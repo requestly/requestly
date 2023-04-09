@@ -329,7 +329,6 @@ const CurrentTrafficTable = ({
           isOpen={ruleEditorModal.isActive}
           handleModalClose={handleRuleEditorModalClose}
           analyticEventEditorViewedSource="traffic_table_right_click"
-          // ruleCreatedCallback={showRuleCreatedFromTableToast}
         />
       )}
     </React.Fragment>
