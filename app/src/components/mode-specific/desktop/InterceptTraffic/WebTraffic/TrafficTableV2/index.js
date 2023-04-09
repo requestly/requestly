@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Row, message } from "antd";
-import { RQButton } from "lib/design-system/components";
+import { Row } from "antd";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
@@ -18,7 +16,6 @@ import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
 import { convertProxyLogToUILog } from "./utils/logUtils";
 import { makeOriginalLog } from "capture-console-logs";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import "./css/draggable.css";
 
@@ -34,7 +31,6 @@ const CurrentTrafficTable = ({
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { ruleEditorModal } = useSelector(getActiveModals);
 
   // Component State
@@ -272,27 +268,6 @@ const CurrentTrafficTable = ({
     );
   };
 
-  const showRuleCreatedFromTableToast = (ruleId) => {
-    message.success({
-      key: "rule_created",
-      content: (
-        <span>
-          Rule created successfully
-          <RQButton
-            type="default"
-            className="rule-created-tooltip-btn"
-            onClick={() => {
-              message.destroy("rule_created");
-              redirectToRuleEditor(navigate, ruleId, "create");
-            }}
-          >
-            view rule
-          </RQButton>
-        </span>
-      ),
-    });
-  };
-
   return (
     <React.Fragment>
       <ActionHeader
@@ -354,7 +329,7 @@ const CurrentTrafficTable = ({
           isOpen={ruleEditorModal.isActive}
           handleModalClose={handleRuleEditorModalClose}
           analyticEventEditorViewedSource="traffic_table_right_click"
-          ruleCreatedCallback={showRuleCreatedFromTableToast}
+          // ruleCreatedCallback={showRuleCreatedFromTableToast}
         />
       )}
     </React.Fragment>

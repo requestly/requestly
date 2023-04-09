@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row } from "antd";
+import { Col, Row, message } from "antd";
 import { getActiveModals, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
-import { RQEditorTitle, RQModal } from "lib/design-system/components";
+import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
@@ -20,6 +20,7 @@ import { prefillRuleData } from "./prefill";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
 
 const getEventObject = (name: string, value: string) => ({
   target: { name, value },
@@ -29,15 +30,9 @@ interface props {
   isOpen: boolean;
   handleModalClose: () => void;
   analyticEventEditorViewedSource: string;
-  ruleCreatedCallback: (ruleId: string) => void;
 }
 
-const RuleEditorModal: React.FC<props> = ({
-  isOpen,
-  handleModalClose,
-  analyticEventEditorViewedSource,
-  ruleCreatedCallback,
-}) => {
+const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEventEditorViewedSource }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -93,6 +88,27 @@ const RuleEditorModal: React.FC<props> = ({
     [dispatch, currentlySelectedRuleData]
   );
 
+  const showRuleCreatedFromModalToast = (ruleId: string) => {
+    message.success({
+      key: "rule_created",
+      content: (
+        <span>
+          Rule created successfully
+          <RQButton
+            type="default"
+            className="rule-created-tooltip-btn"
+            onClick={() => {
+              message.destroy("rule_created");
+              redirectToRuleEditor(navigate, ruleId, "create");
+            }}
+          >
+            view rule
+          </RQButton>
+        </span>
+      ),
+    });
+  };
+
   useEffect(() => {
     trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
   }, [analyticEventEditorViewedSource, ruleType]);
@@ -124,7 +140,7 @@ const RuleEditorModal: React.FC<props> = ({
             isRuleEditorModal={true}
             analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
             ruleCreatedFromEditorModalCallback={(ruleId: any) => {
-              ruleCreatedCallback(ruleId);
+              showRuleCreatedFromModalToast(ruleId);
               handleModalClose();
             }}
           />
