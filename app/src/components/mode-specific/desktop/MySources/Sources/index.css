@@ -3,8 +3,43 @@
 }
 .connected-apps-modal .contected-apps-modal-content {
   padding: 20px;
+  background: var(--body-background);
+  min-height: 450px;
 }
 
 .connected-apps-modal .source-tabs-container {
   width: 100%;
+}
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--white);
+  font-weight: 500;
+}
+.source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
+  border-bottom: 1px solid var(--border-dark);
+}
+.connected-apps-modal .source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  width: 100%;
+}
+
+.connected-apps-modal .source-grid .source-item {
+  padding: 11px 16px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+}
+.connected-apps-modal .source-grid .source-item .source-item-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+.connected-apps-modal .source-grid .source-item .danger-btn {
+  background: #fc5f5f33;
+  border-color: #fc5f5f99;
 }
