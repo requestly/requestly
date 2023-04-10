@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, message } from "antd";
+import { Button, Col, Row, message } from "antd";
 import { getActiveModals, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
-import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
+import { RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
@@ -95,16 +95,16 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         content: (
           <span>
             Rule created successfully
-            <RQButton
-              type="default"
-              className="rule-created-tooltip-btn"
+            <Button
+              type="text"
+              className="view-rule-toast-btn"
               onClick={() => {
                 message.destroy("rule_editor_modal");
                 redirectToRuleEditor(navigate, ruleId, "create");
               }}
             >
-              view rule
-            </RQButton>
+              View rule
+            </Button>
           </span>
         ),
       });
