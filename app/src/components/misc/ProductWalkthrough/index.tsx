@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import JoyRide, {
-  EVENTS,
-  STATUS,
-  CallBackProps,
-  TooltipRenderProps,
-} from "react-joyride";
+import JoyRide, { EVENTS, STATUS, CallBackProps, TooltipRenderProps } from "react-joyride";
 import { productTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
 import {
@@ -54,15 +49,15 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     }
     if (type === EVENTS.TOUR_END) {
       onTourComplete();
-      trackWalkthroughCompleted();
+      trackWalkthroughCompleted(tourFor);
     }
   };
 
   useEffect(() => {
     if (startWalkthrough && runTourWithABTest) {
-      trackWalkthroughViewed();
+      trackWalkthroughViewed(tourFor);
     }
-  }, [runTourWithABTest, startWalkthrough]);
+  }, [runTourWithABTest, startWalkthrough, tourFor]);
 
   return (
     <>
