@@ -17,14 +17,11 @@ import {
 } from "components/features/rules/RuleBuilder/actions";
 import { RULE_EDITOR_FIELD_SELECTOR } from "./dom-selectors";
 import { prefillRuleData } from "./prefill";
+import { generateRuleDescription, getEventObject } from "./utils";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
-
-const getEventObject = (name: string, value: string) => ({
-  target: { name, value },
-});
 
 interface props {
   isOpen: boolean;
@@ -55,7 +52,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       const prefilledRule: Rule = {
         ...prefillRuleData(ruleData, newRule),
         name: `${ruleType}_untitled`,
-        description: `${ruleType.toLowerCase()}_untitled`,
+        description: generateRuleDescription(ruleType, ruleData),
         status: Status.ACTIVE,
       };
 
