@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
@@ -12,6 +13,10 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
+//UTILS
+import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
+import { getGreeting } from "utils/FormattingHelper";
+
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
 import PATHS from "config/constants/sub/paths";
@@ -21,7 +26,7 @@ import {
   handleEmailSignInButtonOnClick,
   handleSignUpButtonOnClick,
   handleForgotPasswordButtonOnClick,
-  handleGoogleSignInButtonOnClick,
+  handleGoogleSignIn,
   handleResetPasswordOnClick,
 } from "./actions";
 
@@ -89,6 +94,32 @@ const AuthForm = ({
     }
   }, [eventSource, referralCode, trackEvent]);
 
+  const handleGoogleSignInButtonClick = () => {
+    setActionPending(true);
+    handleGoogleSignIn(
+      setActionPending,
+      src,
+      onSignInSuccess,
+      appMode,
+      MODE,
+      navigate,
+      eventSource,
+      userPersona,
+      dispatch
+    )
+      .then((result) => {
+        if (result && result.uid) {
+          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          syncUserPersona(result.uid, dispatch, userPersona);
+          onSignInSuccess();
+        }
+        setActionPending(false);
+      })
+      .catch((e) => {
+        setActionPending(false);
+      });
+  };
+
   const SocialAuthButtons = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.LOG_IN:
@@ -107,19 +138,7 @@ const AuthForm = ({
                   </Button> */}
             <RQButton
               className="btn-default text-bold w-full"
-              onClick={() =>
-                handleGoogleSignInButtonOnClick(
-                  setActionPending,
-                  src,
-                  onSignInSuccess,
-                  appMode,
-                  MODE,
-                  navigate,
-                  eventSource,
-                  userPersona,
-                  dispatch
-                )
-              }
+              onClick={handleGoogleSignInButtonClick}
             >
               <img src={GoogleIcon} alt="google" className="auth-icons" />
               {MODE === AUTH_ACTION_LABELS.SIGN_UP

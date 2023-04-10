@@ -185,35 +185,13 @@ export const handleEmailSignInButtonOnClick = (
       callbackOnFail && callbackOnFail();
     });
 };
-export const handleGoogleSignInButtonOnClick = (
-  setLoader,
-  src,
-  callbackOnSuccess,
-  appMode,
-  MODE,
-  navigate,
-  eventSource,
-  userPersona,
-  dispatch
-) => {
-  setLoader && setLoader(true);
+export const handleGoogleSignIn = (appMode, MODE, eventSource) => {
   const functionToCall =
     appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
       ? googleSignInDesktopApp
       : googleSignIn;
 
-  functionToCall(null, MODE, eventSource)
-    .then((result) => {
-      if (result && result.uid) {
-        showInfo(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
-        callbackOnSuccess && callbackOnSuccess();
-        syncUserPersona(result.uid, dispatch, userPersona);
-      }
-      setLoader && setLoader(false);
-    })
-    .catch(() => {
-      setLoader && setLoader(false);
-    });
+  return functionToCall(null, MODE, eventSource);
 };
 
 export const handleSignUpButtonOnClick = (
