@@ -88,26 +88,37 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     [dispatch, currentlySelectedRuleData]
   );
 
-  const showRuleCreatedFromModalToast = (ruleId: string) => {
-    message.success({
-      key: "rule_created",
-      content: (
-        <span>
-          Rule created successfully
-          <RQButton
-            type="default"
-            className="rule-created-tooltip-btn"
-            onClick={() => {
-              message.destroy("rule_created");
-              redirectToRuleEditor(navigate, ruleId, "create");
-            }}
-          >
-            view rule
-          </RQButton>
-        </span>
-      ),
-    });
-  };
+  const showRuleCreatedFromModalToast = useCallback(
+    (ruleId: string) => {
+      message.success({
+        key: "rule_editor_modal",
+        content: (
+          <span>
+            Rule created successfully
+            <RQButton
+              type="default"
+              className="rule-created-tooltip-btn"
+              onClick={() => {
+                message.destroy("rule_editor_modal");
+                redirectToRuleEditor(navigate, ruleId, "create");
+              }}
+            >
+              view rule
+            </RQButton>
+          </span>
+        ),
+      });
+    },
+    [navigate]
+  );
+
+  const ruleCreatedCallback = useCallback(
+    (ruleId: any) => {
+      handleModalClose();
+      showRuleCreatedFromModalToast(ruleId);
+    },
+    [handleModalClose, showRuleCreatedFromModalToast]
+  );
 
   useEffect(() => {
     trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
@@ -139,10 +150,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
             location={location}
             isRuleEditorModal={true}
             analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
-            ruleCreatedFromEditorModalCallback={(ruleId: any) => {
-              showRuleCreatedFromModalToast(ruleId);
-              handleModalClose();
-            }}
+            ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
           />
         </Row>
 

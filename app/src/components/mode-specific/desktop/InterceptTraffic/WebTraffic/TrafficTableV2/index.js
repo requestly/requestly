@@ -45,7 +45,6 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
-  // const [messageApi, contextHolder] = message.useMessage();
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
