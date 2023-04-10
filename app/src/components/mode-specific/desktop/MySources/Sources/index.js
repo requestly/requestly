@@ -1,20 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Col,
-  Row,
-  Space,
-  Card,
-  Avatar,
-  Button,
-  Typography,
-  Collapse,
-} from "antd";
+import { Col, Row, Space, Card, Avatar, Button, Typography, Collapse } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
 import CloseConfirmModal from "./ErrorHandling/CloseConfirmModal";
+import { RQModal } from "lib/design-system/components";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
 import { actions } from "../../../../../store";
@@ -31,6 +23,7 @@ import {
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
+import "./index.css";
 
 const { Meta } = Card;
 const { Panel } = Collapse;
@@ -44,9 +37,7 @@ const Sources = () => {
 
   // Component State
   const [processingApps, setProcessingApps] = useState({});
-  const [isCloseConfirmModalActive, setIsCloseConfirmModalActive] = useState(
-    false
-  );
+  const [isCloseConfirmModalActive, setIsCloseConfirmModalActive] = useState(false);
   const [appIdToCloseConfirm, setAppIdToCloseConfirm] = useState(false);
   const [appsListArray, setAppsListArray] = useState([]);
 
@@ -114,9 +105,7 @@ const Sources = () => {
           setAppIdToCloseConfirm(appId);
           setIsCloseConfirmModalActive(true);
         } else {
-          toast.error(
-            `Unable to activate ${getAppName(appId)}. Issue reported.`
-          );
+          toast.error(`Unable to activate ${getAppName(appId)}. Issue reported.`);
           trackAppConnectFailureEvent(getAppName(appId));
         }
       })
@@ -147,26 +136,15 @@ const Sources = () => {
           );
           trackAppDisconnectedEvent(getAppName(appId));
         } else {
-          toast.error(
-            `Unable to deactivate ${getAppName(appId)}. Issue reported.`
-          );
+          toast.error(`Unable to deactivate ${getAppName(appId)}. Issue reported.`);
         }
       })
       .catch((err) => Logger.log(err));
   };
 
-  const renderChangeAppStatusBtn = (
-    appId,
-    isScanned,
-    isActive,
-    isAvailable
-  ) => {
+  const renderChangeAppStatusBtn = (appId, isScanned, isActive, isAvailable) => {
     if (!isAvailable) {
-      return (
-        <span className="text-primary cursor-disabled">
-          Couldn't find it on your system
-        </span>
-      );
+      return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
     } else if (!isActive) {
       return (
         <Button
@@ -194,20 +172,12 @@ const Sources = () => {
   };
 
   const renderComingSoonBtn = (appName) => {
-    return (
-      <span className="text-primary cursor-disabled">
-        Support for {appName} is coming soon
-      </span>
-    );
+    return <span className="text-primary cursor-disabled">Support for {appName} is coming soon</span>;
   };
 
   const renderInstructionsActionButton = (app) => {
     return (
-      <Button
-        type="secondary"
-        icon={<ArrowRightOutlined />}
-        onClick={() => renderInstructionsModal(app.id)}
-      >
+      <Button type="secondary" icon={<ArrowRightOutlined />} onClick={() => renderInstructionsModal(app.id)}>
         Open
       </Button>
     );
@@ -217,43 +187,25 @@ const Sources = () => {
     if (
       app.id === "android" ||
       app.id === "ios" ||
-      (app.id === "existing-terminal" &&
-        isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY))
+      (app.id === "existing-terminal" && isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY))
     ) {
       return renderInstructionsActionButton(app);
     }
 
     const button = app.comingSoon
       ? renderComingSoonBtn(app.name)
-      : renderChangeAppStatusBtn(
-          app.id,
-          app.isScanned,
-          app.isActive,
-          app.isAvailable
-        );
+      : renderChangeAppStatusBtn(app.id, app.isScanned, app.isActive, app.isAvailable);
 
     return button;
   };
 
   const renderSourceCard = (app) => {
     return (
-      <Card
-        key={app.id}
-        style={{ width: 270 }}
-        actions={[<p>{renderSourceCardActionButton(app)}</p>]}
-      >
+      <Card key={app.id} style={{ width: 270 }} actions={[<p>{renderSourceCardActionButton(app)}</p>]}>
         <Row>
           <Col flex="auto">
             <Meta
-              avatar={
-                <Avatar
-                  src={
-                    window.location.origin +
-                    "/assets/img/thirdPartyAppIcons/" +
-                    app.icon
-                  }
-                />
-              }
+              avatar={<Avatar src={window.location.origin + "/assets/img/thirdPartyAppIcons/" + app.icon} />}
               title={app.name}
               description={app.description}
             />
@@ -301,8 +253,7 @@ const Sources = () => {
           !app.isScanned ||
           app.id === "android" ||
           app.id === "ios" ||
-          (app.id === "existing-terminal" &&
-            isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY)))
+          (app.id === "existing-terminal" && isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY)))
     );
     return availableSources.map((app) => {
       return renderSourceCard(app);
@@ -325,9 +276,7 @@ const Sources = () => {
   };
 
   const renderComingSoonSources = () => {
-    const comingSoonSources = appsListArray.filter(
-      (app) => app.comingSoon && app.id !== "ios"
-    );
+    const comingSoonSources = appsListArray.filter((app) => app.comingSoon && app.id !== "ios");
 
     return comingSoonSources.map((app) => {
       return renderSourceCard(app);
@@ -337,7 +286,7 @@ const Sources = () => {
   return (
     <React.Fragment>
       {<InstructionsModal appId={currentApp} setCurrentApp={setCurrentApp} />}
-      <Row>
+      {/* <Row>
         <Col span={24} align="center">
           <p className="text-center lead">
             Connect your system apps to Requestly. After connecting the required
@@ -363,7 +312,16 @@ const Sources = () => {
             </Link>{" "}
           </Typography.Title>
         </Col>
-      </Row>
+      </Row> */}
+      <RQModal visible={true} wrapClassName="connected-apps-modal" centered>
+        <Col className="contected-apps-modal-content">
+          <Row className="white header text-bold">Connected apps</Row>
+          <Row className="text-gray mt-8">
+            Connect your system apps to Requestly. After connecting the required app, click here to setup rules.
+          </Row>
+        </Col>
+        <Col className="rq-modal-footer">footer</Col>
+      </RQModal>
       {/* Modals */}
       {isCloseConfirmModalActive ? (
         <CloseConfirmModal
