@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Row, Space, Card, Avatar, Button, Typography, Collapse, Tabs } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, QuestionCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
@@ -241,6 +241,35 @@ const Sources = () => {
     [renderSources]
   );
 
+  const renderInterceptSystemWideSourceToggle = () => {
+    const source = desktopSpecificDetails.appsList["system-wide"];
+
+    return (
+      <>
+        {source.isActive ? (
+          <>
+            <CheckCircleOutlined style={{ color: "#069D4F" }} />
+            Requestly everywhere enabled to inspect all traffic from this device.
+            <RQButton type="default" className="danger-btn" onClick={() => handleDisconnectAppOnClick(source.id)}>
+              Disconnect
+            </RQButton>
+          </>
+        ) : (
+          <>
+            <QuestionCircleOutlined /> Want to capture requests from all your apps across this device?
+            <RQButton
+              type="default"
+              icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}
+              onClick={() => handleActivateAppOnClick(source.id)}
+            >
+              Enable Requestly system-wide
+            </RQButton>
+          </>
+        )}
+      </>
+    );
+  };
+
   return (
     <React.Fragment>
       {<InstructionsModal appId={currentApp} setCurrentApp={setCurrentApp} />}
@@ -254,7 +283,7 @@ const Sources = () => {
             <Tabs className="source-tabs-container" defaultActiveKey="browser" items={sourceTabs} />
           </Row>
         </Col>
-        <Col className="rq-modal-footer">footer</Col>
+        <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
       </RQModal>
       {/* Modals */}
       {isCloseConfirmModalActive ? (

@@ -10,10 +10,16 @@
 .connected-apps-modal .source-tabs-container {
   width: 100%;
 }
-.source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: var(--white);
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn {
   font-weight: 500;
 }
+
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn:hover,
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab:hover {
+  color: var(--white);
+}
+
 .source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
   border-bottom: 1px solid var(--border-dark);
 }
@@ -39,7 +45,22 @@
   align-items: center;
   gap: 12px;
 }
-.connected-apps-modal .source-grid .source-item .danger-btn {
+.connected-apps-modal .source-grid .source-item .danger-btn,
+.connected-apps-modal .rq-modal-footer .danger-btn {
   background: #fc5f5f33;
   border-color: #fc5f5f99;
+}
+.system-wide-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.connected-apps-modal .source-modal-footer-link {
+  color: var(--text-gray);
+  text-decoration: underline;
+  margin-left: auto;
+}
+.connected-apps-modal .source-modal-footer-link:hover {
+  color: var(--white);
+  text-decoration: underline;
 }
