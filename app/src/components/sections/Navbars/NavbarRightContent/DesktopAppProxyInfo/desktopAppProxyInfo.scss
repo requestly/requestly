@@ -1,0 +1,19 @@
+.desktop-app-proxy-info.ant-badge {
+  height: 20px;
+  .ant-badge-status-dot {
+    margin-left: 8px;
+  }
+
+  .ant-badge-status-text {
+    span:first-child {
+      margin-right: 6px;
+    }
+    button.rq-btn {
+      margin-left: 2px;
+      margin-right: 4px;
+      span:first-child {
+        margin-right: 6px;
+      }
+    }
+  }
+}

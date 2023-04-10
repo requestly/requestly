@@ -1,18 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Layout,
-  Button,
-  Row,
-  Col,
-  Tooltip,
-  Dropdown,
-  Menu,
-  Divider,
-} from "antd";
+import { Layout, Button, Row, Col, Tooltip, Dropdown, Menu, Divider } from "antd";
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
@@ -26,19 +18,16 @@ import {
   SnippetsOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
-import {
-  redirectToSettings,
-  redirectToProductUpdates,
-} from "utils/RedirectionUtils";
+import { redirectToSettings, redirectToProductUpdates } from "utils/RedirectionUtils";
 import { RQBreadcrumb } from "lib/design-system/components";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
-import {
-  trackHeaderClicked,
-  trackHelpdeskClicked,
-} from "modules/analytics/events/common/onboarding/header";
+import { trackHeaderClicked, trackHelpdeskClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
+import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 
 const { Header } = Layout;
 
@@ -54,8 +43,9 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     "/filesv2/editor",
     "/mock-server/viewer",
     "/pricing",
-    "/invite"
+    "/invite",
   ];
+  const appMode = useSelector(getAppMode);
 
   const showMenuHeader = () => {
     //don't show general app header component for editor screens
@@ -72,16 +62,9 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   };
 
   const helpMenu = (
-    <Menu
-      className="header-help-menu-container"
-      onClick={({ key }) => trackHelpdeskClicked(key)}
-    >
+    <Menu className="header-help-menu-container" onClick={({ key }) => trackHelpdeskClicked(key)}>
       <Menu.Item key="github">
-        <a
-          href={LINKS.REQUESTLY_GITHUB_ISSUES}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={LINKS.REQUESTLY_GITHUB_ISSUES} target="_blank" rel="noreferrer">
           <GithubOutlined /> <span>Github</span>
         </a>
       </Menu.Item>
@@ -140,14 +123,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                     <Button
                       type="text"
                       className="header-icon-btn"
-                      icon={
-                        <img
-                          alt="back"
-                          width="14px"
-                          height="12px"
-                          src="/assets/icons/leftArrow.svg"
-                        />
-                      }
+                      icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
                       onClick={() => navigate(-1)}
                     />
                   )}
@@ -157,26 +133,23 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               </Col>
             ) : null}
 
-            <Col
-              xs={0}
-              sm={0}
-              md={0}
-              lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 12) : 16}
-            >
-              <div className="header-middle-section hidden-on-small-screen">
-                <HeaderText />
-              </div>
-            </Col>
+            {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+              <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 12) : 16}>
+                <div className="header-middle-section hidden-on-small-screen">
+                  <HeaderText />
+                </div>
+              </Col>
+            ) : null}
 
-            <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
+            <Col className="ml-auto">
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
+                  <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
+                    <DesktopAppProxyInfo />
+                  </Col>
                   {randomNumberBetween1And2 === 1 ? (
                     <Col className="hidden-on-small-screen">
-                      <span
-                        className="github-star-button"
-                        onClick={() => trackHeaderClicked("github_star_button")}
-                      >
+                      <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                         <GitHubButton
                           style={{ display: "flex" }}
                           className="github-star-button"
@@ -190,20 +163,13 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                     </Col>
                   ) : (
                     <Col className="hidden-on-small-screen">
-                      <span
-                        className="join-slack-button"
-                        onClick={() => trackHeaderClicked("join_slack_button")}
-                      >
+                      <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
                         <Button
+                          style={{ display: "flex" }}
                           type="default"
                           size="small"
                           icon={<SlackOutlined />}
-                          onClick={() =>
-                            window.open(
-                              "https://bit.ly/requestly-slack",
-                              "_blank"
-                            )
-                          }
+                          onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
                         >
                           Join Slack Community
                         </Button>
@@ -211,14 +177,8 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                     </Col>
                   )}
 
-                  <Divider
-                    type="vertical"
-                    className="header-vertical-divider hidden-on-small-screen"
-                  />
-                  <div
-                    className="hidden-on-small-screen"
-                    onClick={() => trackHeaderClicked("syncing")}
-                  >
+                  <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
+                  <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
                     <RulesSyncToggle />
                   </div>
                   {/* info */}
@@ -231,23 +191,13 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                         open && trackHeaderClicked("helpdesk");
                       }}
                     >
-                      <Button
-                        type="text"
-                        className="header-icon-btn"
-                        icon={<QuestionCircleOutlined />}
-                      />
+                      <Button type="text" className="header-icon-btn" icon={<QuestionCircleOutlined />} />
                     </Dropdown>
                   </Col>
 
                   {/* product updates */}
                   <Col className="hidden-on-small-screen">
-                    <Tooltip
-                      title={
-                        <span className="text-gray text-sm">
-                          Product updates
-                        </span>
-                      }
-                    >
+                    <Tooltip title={<span className="text-gray text-sm">Product updates</span>}>
                       <Button
                         type="text"
                         className="header-icon-btn"
@@ -262,11 +212,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
                   {/* settings */}
                   <Col>
-                    <Tooltip
-                      title={
-                        <span className="text-gray text-sm">Settings</span>
-                      }
-                    >
+                    <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
                       <Button
                         type="text"
                         className="header-icon-btn"

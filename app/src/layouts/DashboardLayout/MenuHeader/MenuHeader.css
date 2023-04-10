@@ -123,18 +123,12 @@
   color: var(--text-gray);
 }
 
-.header-help-menu-container.ant-dropdown-menu
-  .ant-dropdown-menu-item
-  .ant-dropdown-menu-title-content
-  a {
+.header-help-menu-container.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content a {
   display: flex;
   align-items: center;
 }
 
-.header-help-menu-container.ant-dropdown-menu
-  .ant-dropdown-menu-item
-  .ant-dropdown-menu-title-content
-  .anticon {
+.header-help-menu-container.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content .anticon {
   font-size: 1.1rem;
   margin-right: 9px;
 }
@@ -152,4 +146,11 @@
 
 .header-profile-dropdown-trigger.ant-avatar {
   margin-top: -2px;
+}
+
+.desktop-app-proxy-info-container.ant-col {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+  margin-right: 8px;
 }
