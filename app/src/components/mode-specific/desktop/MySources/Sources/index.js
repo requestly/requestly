@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Space, Card, Avatar, Button, Typography, Collapse } from "antd";
+import { Col, Row, Space, Card, Avatar, Button, Typography, Collapse, Tabs } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
@@ -48,6 +48,35 @@ const Sources = () => {
   const appsListRef = useRef(null);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
+  console.log(desktopSpecificDetails);
+
+  const sourceTabs = [
+    {
+      key: "1",
+      label: `Installed browsers`,
+      children: `Content of Tab Pane 1`,
+    },
+    {
+      key: "2",
+      label: `Mobile apps & browsers`,
+      children: `Content of Tab Pane 2`,
+    },
+    {
+      key: "3",
+      label: `Terminal processes`,
+      children: `Content of Tab Pane 3`,
+    },
+    {
+      key: "4",
+      label: `Desktop apps`,
+      children: `Content of Tab Pane 4`,
+    },
+    {
+      key: "5",
+      label: `Others`,
+      children: `Content of Tab Pane 5`,
+    },
+  ];
 
   useEffect(() => {
     appsListRef.current = appsList;
@@ -318,6 +347,9 @@ const Sources = () => {
           <Row className="white header text-bold">Connected apps</Row>
           <Row className="text-gray mt-8">
             Connect your system apps to Requestly. After connecting the required app, click here to setup rules.
+          </Row>
+          <Row className="w-full mt-20">
+            <Tabs className="source-tabs-container" defaultActiveKey="1" items={sourceTabs} />
           </Row>
         </Col>
         <Col className="rq-modal-footer">footer</Col>

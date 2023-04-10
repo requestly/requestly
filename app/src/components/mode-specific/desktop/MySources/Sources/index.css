@@ -4,3 +4,7 @@
 .connected-apps-modal .contected-apps-modal-content {
   padding: 20px;
 }
+
+.connected-apps-modal .source-tabs-container {
+  width: 100%;
+}
