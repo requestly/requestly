@@ -46,23 +46,6 @@ export const handleEmailSignIn = (email, password, isSignUp, eventSource) => {
     return null;
   }
   return emailSignIn(email, password, isSignUp, eventSource);
-  // .then(({ result }) => {
-  //   if (result.user.uid) {
-  //     showInfo(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-  //     callbackOnSuccess && callbackOnSuccess(result.user.uid);
-  //     syncUserPersona(result.user.uid, dispatch, userPersona);
-  //   } else {
-  //     showError("Sorry we couldn't log you in. Can you please retry?");
-  //     setLoader && setLoader(false);
-  //     //Clear password field
-  //     callbackOnFail && callbackOnFail();
-  //   }
-  // })
-  // .catch(({ errorCode }) => {
-  //   showError(getPrettyAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
-  //   setLoader && setLoader(false);
-  //   callbackOnFail && callbackOnFail();
-  // });
 };
 export const handleGoogleSignIn = (appMode, MODE, eventSource) => {
   const functionToCall =
