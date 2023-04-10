@@ -25,3 +25,14 @@
 .rule-editor-modal.ant-modal .rq-modal-content .add-pair-btn {
   margin-bottom: 0;
 }
+
+/* toast */
+.view-rule-toast-btn.ant-btn {
+  margin-left: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.view-rule-toast-btn.ant-btn:hover,
+.view-rule-toast-btn.ant-btn:focus {
+  background: rgba(255, 255, 255, 0.03);
+}
