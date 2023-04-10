@@ -29,11 +29,31 @@
     "isScanned": false,
     "isAvailable": false
   },
+  "existing-chrome-beta": {
+    "id": "existing-chrome-beta",
+    "name": "Chrome Beta",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
   "fresh-chrome-dev": {
     "id": "fresh-chrome-dev",
     "name": "Chrome Dev",
     "description": "New Profile",
     "icon": "chrome-dev.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-chrome-dev": {
+    "id": "existing-chrome-dev",
+    "name": "Chrome Dev",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
@@ -73,6 +93,16 @@
     "id": "fresh-edge",
     "name": "Microsoft Edge ",
     "description": "New Profile",
+    "icon": "edge.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-edge": {
+    "id": "existing-edge",
+    "name": "Microsoft Edge",
+    "description": "Existing Profile",
     "icon": "edge.png",
     "isActive": false,
     "comingSoon": false,
