@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { Typography, Row, Col } from "antd";
+import { Typography, Row, Col, Modal } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
 
@@ -16,6 +16,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 //UTILS
 import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
+import { getPrettyAuthErrorMessage, AuthTypes } from "../utils";
 
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
@@ -23,8 +24,8 @@ import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  handleEmailSignInButtonOnClick,
-  handleSignUpButtonOnClick,
+  handleEmailSignIn,
+  handleEmailSignUp,
   handleForgotPasswordButtonOnClick,
   handleGoogleSignIn,
   handleResetPasswordOnClick,
@@ -75,8 +76,22 @@ const AuthForm = ({
     () => Math.floor(Math.random() * 3),
     []
   );
-  const emailOptin = false;
-  let isSignUp = true;
+  // const emailOptin = false;
+  // let isSignUp = true;
+
+  const showVerifyEmailMessage = () => {
+    Modal.info({
+      title: "Verify email",
+      content: (
+        <div>
+          <p>
+            Please click on the link that has just been sent to your email
+            account to verify your email.
+          </p>
+        </div>
+      ),
+    });
+  };
 
   useEffect(() => {
     // Updating reference code from query parameters
@@ -96,27 +111,62 @@ const AuthForm = ({
 
   const handleGoogleSignInButtonClick = () => {
     setActionPending(true);
-    handleGoogleSignIn(
-      setActionPending,
-      src,
-      onSignInSuccess,
-      appMode,
-      MODE,
-      navigate,
-      eventSource,
-      userPersona,
-      dispatch
-    )
+    handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
           toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
           syncUserPersona(result.uid, dispatch, userPersona);
-          onSignInSuccess();
+          onSignInSuccess && onSignInSuccess();
         }
         setActionPending(false);
       })
       .catch((e) => {
         setActionPending(false);
+      });
+  };
+
+  const handleEmailSignUpButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignUp(name, email, password, referralCode, eventSource)
+      .then(({ status, errorCode }) => {
+        if (status) {
+          showVerifyEmailMessage();
+          handleEmailSignIn(email, password, true, eventSource);
+        } else {
+          toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+          setActionPending(false);
+        }
+      })
+      .catch(({ errorCode }) => {
+        toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+        setActionPending(false);
+      });
+  };
+
+  const handleEmailSignInButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignIn(email, password, false, eventSource)
+      .then(({ result }) => {
+        if (result.user.uid) {
+          toast.info(
+            `${getGreeting()}, ${result.user.displayName.split(" ")[0]}`
+          );
+          setEmail("");
+          setPassword("");
+          onSignInSuccess && onSignInSuccess(result.user.uid);
+          syncUserPersona(result.user.uid, dispatch, userPersona);
+        } else {
+          toast.error("Sorry we couldn't log you in. Can you please retry?");
+          setActionPending(true);
+        }
+      })
+      .catch(({ errorCode }) => {
+        toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+        setActionPending(false);
+        setEmail("");
+        setPassword("");
       });
   };
 
@@ -193,20 +243,21 @@ const AuthForm = ({
             type="primary"
             className="form-elements-margin w-full"
             onClick={(event) =>
-              handleEmailSignInButtonOnClick(
-                event,
-                email,
-                password,
-                false,
-                appMode,
-                setActionPending,
-                src,
-                onSignInSuccess,
-                () => setPassword(""),
-                eventSource,
-                userPersona,
-                dispatch
-              )
+              // handleEmailSignIn(
+              //   event,
+              //   email,
+              //   password,
+              //   false,
+              //   appMode,
+              //   setActionPending,
+              //   src,
+              //   onSignInSuccess,
+              //   () => setPassword(""),
+              //   eventSource,
+              //   userPersona,
+              //   dispatch
+              // )
+              handleEmailSignInButtonClick(event)
             }
           >
             Sign In with Email
@@ -219,21 +270,22 @@ const AuthForm = ({
             type="primary"
             className="form-elements-margin w-full"
             onClick={(event) =>
-              handleSignUpButtonOnClick(
-                event,
-                name,
-                email,
-                password,
-                referralCode,
-                setActionPending,
-                navigate,
-                emailOptin,
-                isSignUp,
-                onSignInSuccess,
-                eventSource,
-                userPersona,
-                dispatch
-              )
+              // handleEmailSignUp(
+              //   event,
+              //   name,
+              //   email,
+              //   password,
+              //   referralCode,
+              //   setActionPending,
+              //   navigate,
+              //   emailOptin,
+              //   isSignUp,
+              //   onSignInSuccess,
+              //   eventSource,
+              //   userPersona,
+              //   dispatch
+              // )
+              handleEmailSignUpButtonClick(event)
             }
           >
             Create Account
