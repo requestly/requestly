@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Row } from 'antd';
-import ProCard from '@ant-design/pro-card';
-import Split from 'react-split';
-import { isEqual, sortBy } from 'lodash';
-import { getActiveModals } from 'store/selectors';
-import { actions } from 'store';
-import FixedRequestLogPane from './FixedRequestLogPane';
-import ActionHeader from './ActionHeader';
-import RuleEditorModal from 'components/common/RuleEditorModal';
-import { groupByApp, groupByDomain } from '../../../../../../utils/TrafficTableUtils';
-import GroupByDomain from './Tables/GroupByDomain';
-import GroupByApp from './Tables/GroupByApp';
-import GroupByNone from './Tables/GroupByNone';
-import SSLProxyingModal from 'components/mode-specific/desktop/SSLProxyingModal';
-import { convertProxyLogToUILog } from './utils/logUtils';
-import { makeOriginalLog } from 'capture-console-logs';
-import { trackTrafficTableRequestClicked } from 'modules/analytics/events/desktopApp';
-import './css/draggable.css';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Row } from "antd";
+import ProCard from "@ant-design/pro-card";
+import Split from "react-split";
+import { isEqual, sortBy } from "lodash";
+import { getActiveModals } from "store/selectors";
+import { actions } from "store";
+import FixedRequestLogPane from "./FixedRequestLogPane";
+import ActionHeader from "./ActionHeader";
+import RuleEditorModal from "components/common/RuleEditorModal";
+import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
+import GroupByDomain from "./Tables/GroupByDomain";
+import GroupByApp from "./Tables/GroupByApp";
+import GroupByNone from "./Tables/GroupByNone";
+import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
+import { convertProxyLogToUILog } from "./utils/logUtils";
+import { makeOriginalLog } from "capture-console-logs";
+import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import "./css/draggable.css";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -40,8 +40,8 @@ const CurrentTrafficTable = ({
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [groupByParameter, setGroupByParameter] = useState('none');
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [groupByParameter, setGroupByParameter] = useState("none");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
@@ -50,7 +50,7 @@ const CurrentTrafficTable = ({
     dispatch(
       actions.toggleActiveModal({
         newValue: false,
-        modalName: 'ruleEditorModal',
+        modalName: "ruleEditorModal",
       })
     );
   }, [dispatch]);
@@ -111,32 +111,32 @@ const CurrentTrafficTable = ({
   if (selectedRequestData.timestamp) {
     previewData = [
       {
-        property: 'Time',
+        property: "Time",
         value: selectedRequestData.timestamp,
       },
       {
-        property: 'Method',
+        property: "Method",
         value: selectedRequestData.request.method,
       },
       {
-        property: 'Status Code',
+        property: "Status Code",
         value: selectedRequestData.response.statusCode,
       },
       {
-        property: 'Path',
+        property: "Path",
         value: selectedRequestData.request.path,
       },
       {
-        property: 'Host',
+        property: "Host",
         value: selectedRequestData.request.host,
       },
       {
-        property: 'Port',
+        property: "Port",
         value: selectedRequestData.request.port,
       },
       {
-        property: 'REQUEST HEADERS',
-        value: '',
+        property: "REQUEST HEADERS",
+        value: "",
       },
     ];
     for (const [key, value] of Object.entries(selectedRequestData.request.headers)) {
@@ -147,8 +147,8 @@ const CurrentTrafficTable = ({
       previewData.push(header);
     }
     previewData.push({
-      property: 'RESPONSE HEADERS',
-      value: '',
+      property: "RESPONSE HEADERS",
+      value: "",
     });
     for (const [key, value] of Object.entries(selectedRequestData.response.headers)) {
       const header = {
@@ -185,11 +185,11 @@ const CurrentTrafficTable = ({
 
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent('log-network-request', (payload) => {
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
       // TODO: @sahil865gupta Fix this multiple time registering
       upsertNetworkLogMap(payload);
     });
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent('log-network-request-v2', (payload) => {
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
       const rqLog = convertProxyLogToUILog(payload);
       printLogsToConsole(rqLog);
       upsertNetworkLogMap(rqLog);
@@ -198,21 +198,21 @@ const CurrentTrafficTable = ({
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
         // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent('log-network-request');
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent('log-network-request-v2');
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
   }, [upsertNetworkLogMap, printLogsToConsole]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG('enable-request-logger').then(() => {});
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
     }
 
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
         // Disable sending logs from bg window
-        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG('disable-request-logger').then(() => {});
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
   }, []);
@@ -221,7 +221,7 @@ const CurrentTrafficTable = ({
     const logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
 
     if (searchKeyword) {
-      const reg = new RegExp(searchKeyword, 'i');
+      const reg = new RegExp(searchKeyword, "i");
       const filteredLogs = logs.filter((log) => {
         return log.url.match(reg);
       });
@@ -252,9 +252,9 @@ const CurrentTrafficTable = ({
   };
 
   const getGroupLogs = () => {
-    return groupByParameter === 'domain' ? (
+    return groupByParameter === "domain" ? (
       <GroupByDomain handleRowClick={handleRowClick} {...getDomainLogs()} />
-    ) : groupByParameter === 'app' ? (
+    ) : groupByParameter === "app" ? (
       <GroupByApp handleRowClick={handleRowClick} {...getAppLogs()} />
     ) : (
       <GroupByNone
@@ -286,30 +286,30 @@ const CurrentTrafficTable = ({
         direction="vertical"
         cursor="row-resize"
         style={{
-          height: '75vh',
+          height: "75vh",
         }}
       >
-        <Row className="gap-case-1" style={{ overflow: 'hidden' }}>
+        <Row className="gap-case-1" style={{ overflow: "hidden" }}>
           <ProCard
             className="primary-card github-like-border network-table-wrapper-override"
             style={{
-              boxShadow: 'none',
-              borderBottom: '2px solid #f5f5f5',
-              borderRadius: '0',
+              boxShadow: "none",
+              borderBottom: "2px solid #f5f5f5",
+              borderRadius: "0",
             }}
           >
             {getGroupLogs()}
           </ProCard>
         </Row>
-        <Row style={{ overflow: 'auto', height: '100%' }}>
+        <Row style={{ overflow: "auto", height: "100%" }}>
           <ProCard
             className="primary-card github-like-border"
             style={{
-              boxShadow: 'none',
-              borderRadius: '0',
-              borderTop: '2px solid #f5f5f5',
+              boxShadow: "none",
+              borderRadius: "0",
+              borderTop: "2px solid #f5f5f5",
             }}
-            bodyStyle={{ padding: '0px 20px' }}
+            bodyStyle={{ padding: "0px 20px" }}
           >
             <FixedRequestLogPane
               selectedRequestData={selectedRequestData}

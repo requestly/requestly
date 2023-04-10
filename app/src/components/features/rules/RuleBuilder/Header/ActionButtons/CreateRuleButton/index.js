@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
-import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 //UTILS
@@ -38,7 +37,7 @@ const CreateRuleButton = ({
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
   analyticEventRuleCreatedSource = "rule_editor_screen_header",
-  ruleCreatedFromEditorModalCallback = () => {},
+  ruleCreatedFromEditorModalCallback = (ruleId) => {},
 }) => {
   //Constants
   const navigate = useNavigate();
@@ -77,7 +76,7 @@ const CreateRuleButton = ({
         lastModifiedBy,
       }).then(async () => {
         if (isRuleEditorModal) {
-          ruleCreatedFromEditorModalCallback();
+          ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
         } else {
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
@@ -124,23 +123,7 @@ const CreateRuleButton = ({
 
         const ruleId = currentlySelectedRuleData.id;
 
-        if (isRuleEditorModal) {
-          toast.success(
-            <span>
-              Rule created successfully
-              <RQButton
-                type="default"
-                className="rule-created-tooltip-btn"
-                onClick={() => {
-                  redirectToRuleEditor(navigate, ruleId, "create");
-                }}
-              >
-                view rule
-              </RQButton>
-            </span>,
-            2
-          );
-        } else {
+        if (!isRuleEditorModal) {
           redirectToRuleEditor(navigate, ruleId, "create");
         }
       });
