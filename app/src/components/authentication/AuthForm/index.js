@@ -242,23 +242,7 @@ const AuthForm = ({
           <RQButton
             type="primary"
             className="form-elements-margin w-full"
-            onClick={(event) =>
-              // handleEmailSignIn(
-              //   event,
-              //   email,
-              //   password,
-              //   false,
-              //   appMode,
-              //   setActionPending,
-              //   src,
-              //   onSignInSuccess,
-              //   () => setPassword(""),
-              //   eventSource,
-              //   userPersona,
-              //   dispatch
-              // )
-              handleEmailSignInButtonClick(event)
-            }
+            onClick={(event) => handleEmailSignInButtonClick(event)}
           >
             Sign In with Email
           </RQButton>
@@ -269,24 +253,7 @@ const AuthForm = ({
           <RQButton
             type="primary"
             className="form-elements-margin w-full"
-            onClick={(event) =>
-              // handleEmailSignUp(
-              //   event,
-              //   name,
-              //   email,
-              //   password,
-              //   referralCode,
-              //   setActionPending,
-              //   navigate,
-              //   emailOptin,
-              //   isSignUp,
-              //   onSignInSuccess,
-              //   eventSource,
-              //   userPersona,
-              //   dispatch
-              // )
-              handleEmailSignUpButtonClick(event)
-            }
+            onClick={(event) => handleEmailSignUpButtonClick(event)}
           >
             Create Account
           </RQButton>
