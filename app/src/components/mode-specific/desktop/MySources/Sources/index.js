@@ -11,7 +11,7 @@ import { RQButton, RQModal } from "lib/design-system/components";
 import { actions } from "../../../../../store";
 // UTILS
 import { getDesktopSpecificDetails } from "../../../../../store/selectors";
-import InstructionsModal from "./InstructionsModal";
+import SetupInstructions from "./InstructionsModal";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import {
@@ -111,7 +111,7 @@ const Sources = ({ isOpen, toggle }) => {
         })
         .catch(Logger.log);
     },
-    [dispatch, navigate, processingApps, renderInstructionsModal]
+    [dispatch, navigate, processingApps]
   );
 
   const handleDisconnectAppOnClick = useCallback(
@@ -282,7 +282,7 @@ const Sources = ({ isOpen, toggle }) => {
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
             <>
-              <InstructionsModal
+              <SetupInstructions
                 appId={currentApp}
                 setCurrentApp={setCurrentApp}
                 setShowInstructions={setShowInstructions}

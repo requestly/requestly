@@ -29,7 +29,7 @@ const CompleteStep = ({ appId }) => {
   };
 
   return (
-    <div>
+    <div style={{ paddingTop: "4px" }}>
       <Button shape="round" onClick={navigateToRules}>
         Create Rule
       </Button>

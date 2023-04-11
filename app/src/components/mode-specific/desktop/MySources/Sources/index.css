@@ -88,3 +88,38 @@
 .setup-instructions-header h4.ant-typography {
   margin-bottom: 0;
 }
+
+.setup-instructions-body.ant-row {
+  padding: 6px 60px 6px 60px;
+}
+
+.setup-instructions-body.ant-row .ant-steps .ant-steps-item-container div.ant-steps-item-tail {
+  display: none;
+}
+
+.setup-instructions-body.ant-row .ant-steps .ant-steps-item-container div.ant-steps-item-icon {
+  background: transparent;
+  border: none;
+}
+
+.setup-instructions-body.ant-row .ant-steps .ant-steps-item-container span.ant-steps-icon {
+  color: var(--primary);
+  font-size: 36px;
+}
+
+.setup-instructions-body.ant-row .ant-list-split .ant-list-item {
+  border-bottom: none;
+}
+
+.setup-instructions-body.ant-row .ant-steps-item.ant-steps-item-process {
+  border-bottom: 1px solid var(--border-dark);
+  margin-bottom: 16px;
+}
+
+.setup-instructions-body.ant-row .ant-steps-item.ant-steps-item-process:last-child {
+  border-bottom: none;
+}
+
+.setup-instructions-body.ant-row .ant-steps .ant-steps-item-title {
+  font-size: 24px;
+}
