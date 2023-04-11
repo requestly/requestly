@@ -1,6 +1,3 @@
-.connected-apps-modal .rq-modal.ant-modal {
-  width: 900px !important;
-}
 .connected-apps-modal .contected-apps-modal-content {
   padding: 20px;
   background: var(--body-background);
@@ -33,22 +30,25 @@
 .connected-apps-modal .source-grid .source-item {
   padding: 11px 16px;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.5fr;
   align-items: center;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
 }
 .connected-apps-modal .source-grid .source-item .source-item-meta {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
 }
+.connected-apps-modal .source-grid .source-item .source-description {
+  padding-left: 10px;
+}
 .connected-apps-modal .source-grid .source-item .danger-btn,
 .connected-apps-modal .rq-modal-footer .danger-btn {
-  background: #fc5f5f33;
-  border-color: #fc5f5f99;
+  background: var(--danger);
+  border-color: var(--danger-border);
 }
 .system-wide-source {
   display: flex;

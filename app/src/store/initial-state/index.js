@@ -99,7 +99,7 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-    sourcesModal: {
+    connectedAppsModal: {
       isActive: true,
       props: {},
     },

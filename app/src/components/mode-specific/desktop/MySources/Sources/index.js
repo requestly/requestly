@@ -182,7 +182,7 @@ const Sources = ({ isOpen, toggle }) => {
             <Avatar src={window.location.origin + "/assets/img/thirdPartyAppIcons/" + app.icon} />
             <Row className="text-bold">{app.name}</Row>
           </Col>
-          <Col>{app.description}</Col>
+          <Col className="source-description">{app.description}</Col>
           <>
             {app.id === "android" || app.id === "ios" || app.id === "existing-terminal" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
@@ -274,7 +274,14 @@ const Sources = ({ isOpen, toggle }) => {
   return (
     <React.Fragment>
       {<InstructionsModal appId={currentApp} setCurrentApp={setCurrentApp} />}
-      <RQModal open={isOpen} wrapClassName="connected-apps-modal" centered maskClosable={true} onCancel={toggle}>
+      <RQModal
+        width={900}
+        open={isOpen}
+        wrapClassName="connected-apps-modal"
+        centered
+        maskClosable={true}
+        onCancel={toggle}
+      >
         <Col className="contected-apps-modal-content">
           <Row className="white header text-bold">Connected apps</Row>
           <Row className="text-gray mt-8">

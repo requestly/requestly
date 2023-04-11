@@ -18,7 +18,7 @@ import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
-import SourcesModal from "components/mode-specific/desktop/MySources/Sources/index";
+import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 const { PATHS } = APP_CONSTANTS;
 
@@ -46,8 +46,8 @@ const DashboardContent = () => {
   const toggleSyncConsentModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "syncConsentModal" }));
   };
-  const toggleSourcesModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "sourcesModal" }));
+  const toggleConnectedAppsModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
   const togglePersonaSurveyModal = useCallback(() => {
     dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
@@ -185,11 +185,11 @@ const DashboardContent = () => {
           {...activeModals.syncConsentModal.props}
         />
       ) : null}
-      {activeModals.sourcesModal.isActive ? (
-        <SourcesModal
-          isOpen={activeModals.sourcesModal.isActive}
-          toggle={toggleSourcesModal}
-          {...activeModals.sourcesModal.props}
+      {activeModals.connectedAppsModal.isActive ? (
+        <ConnectedAppsModal
+          isOpen={activeModals.connectedAppsModal.isActive}
+          toggle={toggleConnectedAppsModal}
+          {...activeModals.connectedAppsModal.props}
         />
       ) : null}
       {!userPersona.isSurveyCompleted ? (
