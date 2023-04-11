@@ -1,97 +1,139 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getIsTrafficTableTourCompleted } from "store/selectors";
-import { actions } from "store";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { copyToClipBoard } from "../../../../../../../../utils/Misc";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { actions } from "store";
+import { RuleType } from "types";
+import { getIsTrafficTableTourCompleted } from "store/selectors";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
+import {
+  trackTrafficTableDropdownClicked,
+  trackTrafficTableRequestRightClicked,
+} from "modules/analytics/events/desktopApp";
 import "./index.css";
 
 interface ContextMenuProps {
-  children: ReactNode;
   log: any;
+  children: ReactNode;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) => {
   const dispatch = useDispatch();
-  const isTrafficTableTourCompleted = useSelector(
-    getIsTrafficTableTourCompleted
+  const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
+
+  const handleOnClick = useCallback(
+    (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
+      dispatch(
+        actions.toggleActiveModal({
+          newValue: true,
+          modalName: "ruleEditorModal",
+          newProps: {
+            ruleData: log,
+            ruleType: menuInfo.key,
+          },
+        })
+      );
+      trackTrafficTableDropdownClicked(menuInfo.key);
+      trackRuleCreationWorkflowStartedEvent(menuInfo.key, "modal");
+    },
+    [dispatch]
   );
-  const { RULE_TYPES } = GLOBAL_CONSTANTS;
+
   const items: MenuProps["items"] = useMemo(
     () => [
       {
-        label: "Copy cURL",
         key: "copy_curl",
-        onClick: () =>
-          copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard"),
+        label: "Copy cURL",
+        onClick: () => {
+          copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard");
+          trackTrafficTableDropdownClicked("copy_curl");
+        },
       },
       {
-        label: "Copy URL",
         key: "copy_url",
-        onClick: () => copyToClipBoard(log.url, "URL copied to clipboard"),
+        label: "Copy URL",
+        onClick: () => {
+          copyToClipBoard(log.url, "URL copied to clipboard");
+          trackTrafficTableDropdownClicked("copy_url");
+        },
       },
       {
+        type: "divider",
+      },
+      {
+        key: RuleType.REDIRECT,
         label: "Redirect URL(Map local/Remote)",
-        key: RULE_TYPES.REDIRECT,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.RESPONSE,
         label: "Modify Response Body",
-        key: RULE_TYPES.RESPONSE,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.REQUEST,
         label: "Modify Request Body",
-        key: RULE_TYPES.REQUEST,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.HEADERS,
         label: "Modify Headers",
-        key: RULE_TYPES.HEADERS,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
+        key: RuleType.REPLACE,
         label: "Replace part of URL",
-        key: RULE_TYPES.REPLACE,
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         label: "More modification options",
         key: "more_options",
         children: [
           {
+            key: RuleType.CANCEL,
             label: "Cancel Request",
-            key: RULE_TYPES.CANCEL,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.SCRIPT,
             label: "Insert Custom Script",
-            key: RULE_TYPES.SCRIPT,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.DELAY,
             label: "Delay Request",
-            key: RULE_TYPES.DELAY,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.QUERYPARAM,
             label: "Modify Query Params",
-            key: RULE_TYPES.QUERYPARAM,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
+            key: RuleType.USERAGENT,
             label: "Modify User Agent",
-            key: RULE_TYPES.USERAGENT,
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
         ],
       },
     ],
-    [RULE_TYPES, log.url, log.requestShellCurl]
+    [log, handleOnClick]
   );
 
   const handleDropdownOpenChange = (open: boolean) => {
-    if (open && !isTrafficTableTourCompleted) {
-      dispatch(actions.updateTrafficTableTourCompleted({}));
+    if (open) {
+      trackTrafficTableRequestRightClicked();
+      if (!isTrafficTableTourCompleted) {
+        dispatch(actions.updateTrafficTableTourCompleted({}));
+      }
     }
   };
 
   return (
     <Dropdown
       menu={{ items }}
+      autoFocus={true}
       trigger={["contextMenu"]}
       overlayClassName="traffic-table-context-menu"
       destroyPopupOnHide={true}

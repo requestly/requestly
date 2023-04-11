@@ -10,9 +10,7 @@
   padding: 8px;
 }
 .traffic-table-context-menu .ant-dropdown-menu-item-active,
-.ant-dropdown-menu-submenu
-  ul[id*="more_options"]
-  .ant-dropdown-menu-item-active,
+.ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item-active,
 .traffic-table-context-menu .ant-dropdown-menu-submenu-title:hover {
   background: var(--hover-color);
 }
