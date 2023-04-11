@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
-import { copyToClipBoard } from "../../../../../../../utils/Misc";
+import { copyToClipBoard } from "../../../../../../../../utils/Misc";
 import { actions } from "store";
 import { RuleType } from "types";
 import { getIsTrafficTableTourCompleted } from "store/selectors";
