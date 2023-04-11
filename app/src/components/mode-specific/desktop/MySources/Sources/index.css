@@ -1,0 +1,66 @@
+.connected-apps-modal .contected-apps-modal-content {
+  padding: 20px;
+  background: var(--body-background);
+  min-height: 450px;
+}
+
+.connected-apps-modal .source-tabs-container {
+  width: 100%;
+}
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn {
+  font-weight: 500;
+}
+
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn:hover,
+.source-tabs-container .ant-tabs-nav .ant-tabs-tab:hover {
+  color: var(--white);
+}
+
+.source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
+  border-bottom: 1px solid var(--border-dark);
+}
+.connected-apps-modal .source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  width: 100%;
+}
+
+.connected-apps-modal .source-grid .source-item {
+  padding: 11px 16px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.5fr;
+  align-items: center;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+}
+.connected-apps-modal .source-grid .source-item .source-item-meta {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+.connected-apps-modal .source-grid .source-item .source-description {
+  padding-left: 10px;
+}
+.connected-apps-modal .source-grid .source-item .danger-btn,
+.connected-apps-modal .rq-modal-footer .danger-btn {
+  background: var(--danger);
+  border-color: var(--danger-border);
+}
+.system-wide-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.connected-apps-modal .source-modal-footer-link {
+  color: var(--text-gray);
+  text-decoration: underline;
+  margin-left: auto;
+}
+.connected-apps-modal .source-modal-footer-link:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
