@@ -144,9 +144,11 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
             <Col className="ml-auto">
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
-                    <DesktopAppProxyInfo />
-                  </Col>
+                  {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+                    <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
+                      <DesktopAppProxyInfo />{" "}
+                    </Col>
+                  ) : null}
                   {randomNumberBetween1And2 === 1 ? (
                     <Col className="hidden-on-small-screen">
                       <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
