@@ -1,11 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, Tabs, theme } from "antd";
 import { ThemeProvider } from "@devtools-ds/themes";
-import "./index.css";
-import Network from "./containers/network/Network";
+import NetworkContainer from "./containers/network/NetworkContainer";
+import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
 import { ColorScheme } from "./types";
-import { getCurrentColorScheme, onColorSchemeChange } from "./utils";
+import {
+  getCurrentColorScheme,
+  isExtensionManifestV3,
+  onColorSchemeChange,
+} from "./utils";
+import "./index.scss";
 
 const token = {
   borderRadius: 4,
@@ -31,13 +36,41 @@ const App: React.FC = () => {
     return { token, algorithm };
   }, [colorScheme]);
 
+  const isManifestV3 = useMemo(isExtensionManifestV3, []);
+
   return (
     <ConfigProvider theme={antDesignTheme}>
       <ThemeProvider theme={"chrome"} colorScheme={colorScheme}>
-        <Network />
+        {isManifestV3 ? (
+          <NetworkContainer />
+        ) : (
+          <Tabs
+            className="devtools-tabs"
+            defaultActiveKey="1"
+            tabPosition="left"
+            tabBarStyle={{ minWidth: 140 }}
+            tabBarGutter={0}
+            items={[
+              {
+                label: "Network Traffic",
+                key: "network",
+                children: <NetworkContainer />,
+                forceRender: true,
+              },
+              {
+                label: "Rule Executions",
+                key: "executions",
+                children: <ExecutionsContainer />,
+                forceRender: true,
+              },
+            ]}
+          />
+        )}
       </ThemeProvider>
     </ConfigProvider>
   );
 };
 
 ReactDOM.render(<App />, document.getElementById("root"));
+
+// TODO: send analytics event: sendEventFromDevtool()

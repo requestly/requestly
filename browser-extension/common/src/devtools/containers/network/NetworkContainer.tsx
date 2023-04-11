@@ -1,20 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  NetworkEvent,
-  NetworkFilters,
-  NetworkSettings,
-  ResourceTypeFilter,
-} from "../../types";
-import { PrimaryToolbar, FiltersToolbar } from "./NetworkToolbars";
-import EmptyPanelPlaceholder from "../../components/EmptyPanelPlaceholder/EmptyPanelPlaceholder";
+import { NetworkEvent, ResourceFilters, NetworkSettings } from "../../types";
+import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
+import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
+import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 import NetworkTable from "./NetworkTable/NetworkTable";
-import "./network.scss";
+import "./networkContainer.scss";
 
-const Network: React.FC = () => {
+const NetworkContainer: React.FC = () => {
   const [networkEvents, setNetworkEvents] = useState<NetworkEvent[]>([]);
-  const [filters, setFilters] = useState<NetworkFilters>({
+  const [filters, setFilters] = useState<ResourceFilters>({
     url: "",
-    resourceType: ResourceTypeFilter.ALL,
+    resourceType: ResourceTypeFilterValue.ALL,
   });
   const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
@@ -37,7 +33,7 @@ const Network: React.FC = () => {
         clearEvents();
       }
     });
-  }, []);
+  }, [clearEvents]);
 
   useEffect(() => {
     preserveLogRef.current = settings.preserveLog;
@@ -56,10 +52,15 @@ const Network: React.FC = () => {
           <NetworkTable networkEvents={networkEvents} filters={filters} />
         </>
       ) : (
-        <EmptyPanelPlaceholder />
+        <EmptyContainerPlaceholder
+          lines={[
+            "Recording network activity...",
+            "Perform a request or Reload the page to see network requests.",
+          ]}
+        />
       )}
     </div>
   );
 };
 
-export default Network;
+export default NetworkContainer;

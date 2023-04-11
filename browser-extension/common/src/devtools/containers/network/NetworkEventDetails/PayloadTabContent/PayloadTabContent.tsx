@@ -14,7 +14,7 @@ import {
 } from "../../../../types";
 import { createRule, generateRuleName, getBaseUrl } from "../../../../utils";
 import IconButton from "../../../../components/IconButton/IconButton";
-import PropertyRow from "../../PropertyRow/PropertyRow";
+import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
 import "./payloadTabContent.scss";
 
 enum QueryParamModification {

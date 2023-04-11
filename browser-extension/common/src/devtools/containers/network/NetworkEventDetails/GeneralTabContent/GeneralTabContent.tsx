@@ -7,7 +7,7 @@ import CancelRuleIcon from "../../../../../../resources/icons/rule-icons/cancel.
 import DelayRuleIcon from "../../../../../../resources/icons/rule-icons/delay.svg";
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
 import { SourceKey, SourceOperator } from "../../../../../types";
-import PropertyRow from "../../PropertyRow/PropertyRow";
+import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
 import "./generalTabContent.scss";
 import {
   createRule,

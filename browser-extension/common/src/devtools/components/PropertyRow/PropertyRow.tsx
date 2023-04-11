@@ -4,7 +4,7 @@ import "./propertyRow.scss";
 
 interface Props {
   name: string;
-  value: string;
+  value: ReactNode;
   actions?: ReactNode;
   className?: string;
 }
@@ -16,7 +16,7 @@ const PropertyRow: React.FC<Props> = ({ name, value, actions, className }) => {
         {name}:
       </Typography.Text>
       <Typography.Text className="property-value">
-        {value || "(empty)"}
+        {value ?? "(empty)"}
       </Typography.Text>
       {actions ? <div className="property-actions">{actions}</div> : null}
     </div>

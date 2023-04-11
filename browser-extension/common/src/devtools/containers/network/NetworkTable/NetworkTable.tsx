@@ -1,24 +1,22 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Table } from "@devtools-ds/table";
-import {
-  NetworkEvent,
-  NetworkFilters,
-  ResourceTypeFilter,
-} from "../../../types";
+import { NetworkEvent, ResourceFilters } from "../../../types";
 import NetworkTableRow from "./NetworkTableRow";
 import useAutoScrollableContainer from "../../../hooks/useAutoScrollableContainer";
-import "./networkTable.scss";
 import NetworkEventDetails from "../NetworkEventDetails/NetworkEventDetails";
-import EmptyTablePlaceholder from "../../../components/EmptyPanelPlaceholder/EmptyPanelPlaceholder";
 import SplitPane from "../../../components/SplitPane/SplitPane";
+import { matchResourceTypeFilter } from "../../../utils";
+import "./networkTable.scss";
 
-const getRowId = (index: number) => (index >= 0 ? `request-${index}` : "");
+const ROW_ID_PREFIX = "request-";
+const getRowId = (index: number) =>
+  index >= 0 ? `${ROW_ID_PREFIX}${index}` : "";
 const getRowIndex = (id: string) =>
-  id ? parseInt(id.substring("request-".length)) : undefined;
+  id ? parseInt(id.substring(ROW_ID_PREFIX.length)) : undefined;
 
 const NetworkTable: React.FC<{
   networkEvents: NetworkEvent[];
-  filters: NetworkFilters;
+  filters: ResourceFilters;
 }> = ({ networkEvents, filters }) => {
   const [selectedRowId, setSelectedRowId] = useState("");
   const [
@@ -47,41 +45,21 @@ const NetworkTable: React.FC<{
       }
 
       if (
-        !filters.resourceType ||
-        filters.resourceType === ResourceTypeFilter.ALL
+        filters.resourceType &&
+        !matchResourceTypeFilter(
+          networkEvent._resourceType,
+          filters.resourceType
+        )
       ) {
-        return true;
+        return false;
       }
 
-      switch (filters.resourceType) {
-        case ResourceTypeFilter.AJAX:
-          return ["fetch", "xhr"].includes(networkEvent._resourceType);
-        case ResourceTypeFilter.JS:
-          return networkEvent._resourceType === "script";
-        case ResourceTypeFilter.CSS:
-          return networkEvent._resourceType === "stylesheet";
-        case ResourceTypeFilter.IMG:
-          return networkEvent._resourceType === "image";
-        case ResourceTypeFilter.MEDIA:
-          return networkEvent._resourceType === "media";
-        case ResourceTypeFilter.FONT:
-          return networkEvent._resourceType === "font";
-        case ResourceTypeFilter.DOC:
-          return networkEvent._resourceType === "document";
-        case ResourceTypeFilter.WS:
-          return networkEvent._resourceType === "websocket";
-        case ResourceTypeFilter.WASM:
-          return networkEvent._resourceType === "wasm"; // TODO
-        case ResourceTypeFilter.MANIFEST:
-          return networkEvent._resourceType === "manifest"; // TODO
-        case ResourceTypeFilter.OTHER:
-          return true;
-      }
+      return true;
     },
     [filters]
   );
 
-  return networkEvents.length > 0 ? (
+  return (
     <SplitPane className="network-table-container">
       <div>
         <Table
@@ -90,9 +68,7 @@ const NetworkTable: React.FC<{
           ref={scrollableContainerRef}
           onScroll={onScroll}
           selected={selectedRowId}
-          onSelected={(id) => {
-            setSelectedRowId(id);
-          }}
+          onSelected={setSelectedRowId}
         >
           <Table.Head>
             {selectedRowId ? (
@@ -131,8 +107,6 @@ const NetworkTable: React.FC<{
         />
       )}
     </SplitPane>
-  ) : (
-    <EmptyTablePlaceholder />
   );
 };
 

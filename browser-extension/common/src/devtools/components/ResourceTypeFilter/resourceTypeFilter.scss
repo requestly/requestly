@@ -1,0 +1,31 @@
+.resource-type-filter {
+  padding: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .ant-radio-button-wrapper {
+    border: 0;
+    margin-left: 6px;
+    background: transparent;
+    font-size: var(--font-size-normal);
+    line-height: 18px;
+    height: 18px;
+
+    &::before {
+      display: none;
+    }
+
+    &.ant-radio-button-wrapper-checked {
+      background-color: var(--background-color-radiobutton-selected);
+      color: var(--color-secondary);
+      border-radius: 4px;
+    }
+  }
+
+  .divider {
+    margin-right: 0;
+    margin-left: 8px;
+    height: 16px;
+  }
+}

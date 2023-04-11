@@ -1,6 +1,11 @@
 import config from "../config";
 import { Rule } from "../types";
-import { RuleEditorUrlFragment, ColorScheme } from "./types";
+import { ResourceTypeFilterValue } from "./components/ResourceTypeFilter";
+import {
+  RuleEditorUrlFragment,
+  ColorScheme,
+  NetworkResourceType,
+} from "./types";
 
 interface PostMessageData {
   author: string;
@@ -83,4 +88,42 @@ export const onColorSchemeChange = (
     .addEventListener("change", function (e) {
       callback(e.matches ? ColorScheme.DARK : ColorScheme.LIGHT);
     });
+};
+
+export const isExtensionManifestV3 = (): boolean => {
+  return chrome.runtime.getManifest()["manifest_version"] === 3;
+};
+
+export const matchResourceTypeFilter = (
+  networkResourceType: NetworkResourceType,
+  filter: ResourceTypeFilterValue
+): boolean => {
+  switch (filter) {
+    case ResourceTypeFilterValue.ALL:
+      return true;
+    case ResourceTypeFilterValue.AJAX:
+      return [NetworkResourceType.FETCH, NetworkResourceType.XHR].includes(
+        networkResourceType
+      );
+    case ResourceTypeFilterValue.JS:
+      return networkResourceType === NetworkResourceType.JS;
+    case ResourceTypeFilterValue.CSS:
+      return networkResourceType === NetworkResourceType.CSS;
+    case ResourceTypeFilterValue.IMG:
+      return networkResourceType === NetworkResourceType.IMG;
+    case ResourceTypeFilterValue.MEDIA:
+      return networkResourceType === NetworkResourceType.MEDIA;
+    case ResourceTypeFilterValue.FONT:
+      return networkResourceType === NetworkResourceType.FONT;
+    case ResourceTypeFilterValue.DOC:
+      return networkResourceType === NetworkResourceType.DOC;
+    case ResourceTypeFilterValue.WS:
+      return networkResourceType === NetworkResourceType.WEBSOCKET;
+    case ResourceTypeFilterValue.WASM:
+      return networkResourceType === NetworkResourceType.WASM; // TODO
+    case ResourceTypeFilterValue.MANIFEST:
+      return networkResourceType === NetworkResourceType.MANIFEST; // TODO
+    case ResourceTypeFilterValue.OTHER:
+      return true;
+  }
 };

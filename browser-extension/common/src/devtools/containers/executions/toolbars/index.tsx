@@ -1,5 +1,5 @@
 import PrimaryToolbar from "./PrimaryToolbar";
 import FiltersToolbar from "./FiltersToolbar";
-import "./networkToolbars.scss";
+import "./toolbars.scss";
 
 export { PrimaryToolbar, FiltersToolbar };

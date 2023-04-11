@@ -41,3 +41,24 @@ body,
   height: 100%;
   width: 100%;
 }
+
+.devtools-tabs.ant-tabs {
+  height: 100%;
+
+  .ant-tabs-tab {
+    font-size: var(--font-size-normal);
+  }
+
+  > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+    padding-left: 0;
+  }
+
+  .ant-tabs-content {
+    height: 100%;
+    line-height: initial;
+
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+  }
+}
