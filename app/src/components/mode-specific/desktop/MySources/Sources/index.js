@@ -35,6 +35,8 @@ const Sources = ({ isOpen, toggle }) => {
   const [isCloseConfirmModalActive, setIsCloseConfirmModalActive] = useState(false);
   const [appIdToCloseConfirm, setAppIdToCloseConfirm] = useState(false);
   const [appsListArray, setAppsListArray] = useState([]);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [activeSourceTab, setActiveSourceTab] = useState("browser");
 
   const { appsList } = desktopSpecificDetails;
 
@@ -65,13 +67,14 @@ const Sources = ({ isOpen, toggle }) => {
     handleActivateAppOnClick(appIdToCloseConfirm, { closeConfirmed: true });
   };
 
-  const renderInstructionsModal = (appId) => {
+  const renderInstructionsModal = useCallback((appId) => {
     setCurrentApp(appId);
-  };
+    setShowInstructions(true);
+  }, []);
 
   const handleActivateAppOnClick = useCallback(
     (appId, options = {}) => {
-      renderInstructionsModal(appId); // currently no event for this
+      // renderInstructionsModal(appId); // currently no event for this
       setProcessingApps({ ...processingApps, appId: true });
       // If URL is opened in browser instead of desktop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
@@ -108,7 +111,7 @@ const Sources = ({ isOpen, toggle }) => {
         })
         .catch(Logger.log);
     },
-    [dispatch, navigate, processingApps]
+    [dispatch, navigate, processingApps, renderInstructionsModal]
   );
 
   const handleDisconnectAppOnClick = useCallback(
@@ -190,7 +193,7 @@ const Sources = ({ isOpen, toggle }) => {
         </Row>
       );
     },
-    [renderChangeAppStatusBtn]
+    [renderChangeAppStatusBtn, renderInstructionsModal]
   );
 
   const renderSources = useCallback(
@@ -268,7 +271,6 @@ const Sources = ({ isOpen, toggle }) => {
 
   return (
     <React.Fragment>
-      {<InstructionsModal appId={currentApp} setCurrentApp={setCurrentApp} />}
       <RQModal
         width={900}
         open={isOpen}
@@ -277,14 +279,31 @@ const Sources = ({ isOpen, toggle }) => {
         maskClosable={true}
         onCancel={toggle}
       >
-        <Col className="contected-apps-modal-content">
-          <Row className="white header text-bold">Connected apps</Row>
-          <Row className="text-gray mt-8">
-            Connect your system apps to Requestly. After connecting the required app, click here to setup rules.
-          </Row>
-          <Row className="w-full mt-20">
-            <Tabs className="source-tabs-container" defaultActiveKey="browser" items={sourceTabs} />
-          </Row>
+        <Col className="connected-apps-modal-content">
+          {showInstructions ? (
+            <>
+              <InstructionsModal
+                appId={currentApp}
+                setCurrentApp={setCurrentApp}
+                setShowInstructions={setShowInstructions}
+              />
+            </>
+          ) : (
+            <>
+              <Row className="white header text-bold">Connected apps</Row>
+              <Row className="text-gray mt-8">
+                Connect your system apps to Requestly. After connecting the required app, click here to setup rules.
+              </Row>
+              <Row className="w-full mt-20">
+                <Tabs
+                  className="source-tabs-container"
+                  activeKey={activeSourceTab}
+                  onChange={setActiveSourceTab}
+                  items={sourceTabs}
+                />
+              </Row>
+            </>
+          )}
         </Col>
         <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
       </RQModal>

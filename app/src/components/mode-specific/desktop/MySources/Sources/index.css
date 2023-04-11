@@ -1,7 +1,9 @@
-.connected-apps-modal .contected-apps-modal-content {
+.connected-apps-modal .connected-apps-modal-content {
   padding: 20px;
   background: var(--body-background);
   min-height: 450px;
+  max-height: 700px;
+  overflow: auto;
 }
 
 .connected-apps-modal .source-tabs-container {
@@ -63,4 +65,26 @@
 .connected-apps-modal .source-modal-footer-link:hover {
   color: var(--white);
   text-decoration: underline;
+}
+
+.instructions-back-btn.ant-row {
+  align-items: center;
+  width: fit-content;
+}
+
+.instructions-back-btn div {
+  left: -6px;
+}
+
+.instructions-back-btn:hover {
+  cursor: pointer;
+}
+
+.instructions-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.instructions-header h4.ant-typography {
+  margin-bottom: 0;
 }

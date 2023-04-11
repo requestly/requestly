@@ -5,7 +5,7 @@ import SystemWideInstructionModal from "./SystemWide";
 import ExistingTerminalInstructionModal from "./ExistingTerminal";
 import IOSInstructionModal from "./IOS";
 
-const InstructionsModal = ({ appId, setCurrentApp }) => {
+const InstructionsModal = ({ appId, setCurrentApp, setShowInstructions }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleCancel = () => {
@@ -21,40 +21,15 @@ const InstructionsModal = ({ appId, setCurrentApp }) => {
 
   switch (appId) {
     case "android":
-      return (
-        <AndroidInstructionModal
-          isVisible={isVisible}
-          handleCancel={handleCancel}
-        />
-      );
+      return <AndroidInstructionModal setShowInstructions={setShowInstructions} />;
     case "ios":
-      return (
-        <IOSInstructionModal
-          isVisible={isVisible}
-          handleCancel={handleCancel}
-        />
-      );
+      return <IOSInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     case "system-wide":
-      return (
-        <SystemWideInstructionModal
-          isVisible={isVisible}
-          handleCancel={handleCancel}
-        />
-      );
+      return <SystemWideInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     case "fresh-safari":
-      return (
-        <SafariInstructionModal
-          isVisible={isVisible}
-          handleCancel={handleCancel}
-        />
-      );
+      return <SafariInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     case "existing-terminal":
-      return (
-        <ExistingTerminalInstructionModal
-          isVisible={isVisible}
-          handleCancel={handleCancel}
-        />
-      );
+      return <ExistingTerminalInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     default:
       return null;
   }
