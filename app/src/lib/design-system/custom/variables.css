@@ -6,7 +6,7 @@
   --border: #4f5053;
   --border-dark: #3e4044;
   --danger: #fc5f5f;
-  --danger-border: 255, 105, 5;
+  --danger-rgb: 255, 105, 5;
   --primary: #1e69ff;
   --background: #141414;
   --background-dark: #1c1d21;
@@ -27,6 +27,5 @@
   --border-radius-md: 8px;
 
   /* shadows */
-  --input-box-shadow: inset 0px -1px 2px #4f5154,
-    inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+  --input-box-shadow: inset 0px -1px 2px #4f5154, inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 }
