@@ -43,7 +43,7 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
         setShowInstructions={setShowInstructions}
         RightComponent={renderDeviceSelector()}
       />
-      <Row className="mt-8">
+      <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1} className="mt-8">
           <Steps.Step
             title="Configure Wifi Proxy"

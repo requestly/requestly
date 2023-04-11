@@ -23,7 +23,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
 
   return (
     <>
-      <Row className="text-gray instructions-back-btn" onClick={navigateBackToSources}>
+      <Row className="text-gray setup-instructions-back-btn" onClick={navigateBackToSources}>
         <Col>
           <RQButton
             iconOnly
@@ -35,11 +35,11 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
         </Col>
         <Col>Back</Col>
       </Row>
-      <Row className="mt-8 instructions-header">
-        <Col span={2}>
+      <Row className="mt-8 setup-instructions-header">
+        <Col span={1} className="mr-2">
           <Avatar src={icon} />
         </Col>
-        <Col span={16}>
+        <Col span={18} className="mr-16">
           <Row>
             <Typography.Title level={4} className="mb-0">
               {heading}
@@ -49,7 +49,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
             <Typography.Text className="text-gray">{description}</Typography.Text>
           </Row>
         </Col>
-        <Col span={4}>{RightComponent ? RightComponent : null}</Col>
+        {RightComponent ? <Col span={4}>{RightComponent}</Col> : null}
       </Row>
     </>
   );

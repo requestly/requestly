@@ -5,6 +5,7 @@ import { CopyOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "utils/RedirectionUtils";
+import InstructionsHeader from "./InstructionsHeader";
 
 const { Title } = Typography;
 
@@ -47,7 +48,7 @@ const TerminalCommand = ({ helperServerPort }) => {
   );
 };
 
-const ExistingTerminalInstructionModal = ({ isVisible, handleCancel }) => {
+const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
@@ -56,8 +57,13 @@ const ExistingTerminalInstructionModal = ({ isVisible, handleCancel }) => {
   const { helperServerPort } = desktopSpecificDetails;
   return (
     <>
-      <Row className="white header text-bold">Steps to setup terminal proxy</Row>
-      <Row className="mt-8">
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/terminal.png"}
+        heading="Terminal proxy setup"
+        description="Note: Follow the below mentioned steps to complete the setup."
+        setShowInstructions={setShowInstructions}
+      />
+      <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1}>
           <Steps.Step
             title="Run the command below in your terminal"

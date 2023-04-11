@@ -23,13 +23,13 @@ const InstructionsModal = ({ appId, setCurrentApp, setShowInstructions }) => {
     case "android":
       return <AndroidInstructionModal setShowInstructions={setShowInstructions} />;
     case "ios":
-      return <IOSInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
+      return <IOSInstructionModal setShowInstructions={setShowInstructions} />;
     case "system-wide":
       return <SystemWideInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     case "fresh-safari":
       return <SafariInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
     case "existing-terminal":
-      return <ExistingTerminalInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
+      return <ExistingTerminalInstructionModal setShowInstructions={setShowInstructions} />;
     default:
       return null;
   }

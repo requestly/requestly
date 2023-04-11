@@ -67,24 +67,24 @@
   text-decoration: underline;
 }
 
-.instructions-back-btn.ant-row {
+.setup-instructions-back-btn.ant-row {
   align-items: center;
   width: fit-content;
 }
 
-.instructions-back-btn div {
+.setup-instructions-back-btn div {
   left: -6px;
 }
 
-.instructions-back-btn:hover {
+.setup-instructions-back-btn:hover {
   cursor: pointer;
 }
 
-.instructions-header {
+.setup-instructions-header {
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-dark);
 }
 
-.instructions-header h4.ant-typography {
+.setup-instructions-header h4.ant-typography {
   margin-bottom: 0;
 }

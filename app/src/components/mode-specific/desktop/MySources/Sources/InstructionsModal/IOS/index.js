@@ -9,10 +9,11 @@ import CertificateDownloadInstructions from "./CertificateDownload";
 import CertificateTrustInstructions from "./CertificateTrust";
 import { IOS_DEVICES } from "./constants";
 import WifiInstructions from "./Wifi";
+import InstructionsHeader from "../InstructionsHeader";
 
 const { Option } = Select;
 
-const IOSInstructionModal = ({ isVisible, handleCancel }) => {
+const IOSInstructionModal = ({ setShowInstructions }) => {
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
@@ -36,15 +37,14 @@ const IOSInstructionModal = ({ isVisible, handleCancel }) => {
 
   return (
     <>
-      <Row className="white header text-bold">IOS Setup Steps&nbsp;&nbsp;&nbsp;{renderDeviceSelector()}</Row>
-      <Row className="mt-8">
-        <Alert
-          message="Steps may vary depending upon your device. Select your device first."
-          type="info"
-          showIcon
-          closable
-        />
-        <br />
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/ios.png"}
+        heading="iOS setup"
+        description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
+        setShowInstructions={setShowInstructions}
+        RightComponent={renderDeviceSelector()}
+      />
+      <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1} className="mt-8">
           <Steps.Step
             key={1}
