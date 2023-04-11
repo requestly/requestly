@@ -141,6 +141,18 @@
   margin-top: auto;
 }
 
+.mt-8 {
+  margin-top: 0.5rem;
+}
+
+.mt-16 {
+  margin-top: 1rem;
+}
+
+.mt-20 {
+  margin-top: 1.25rem;
+}
+
 .visibility-hidden {
   visibility: hidden;
 }
