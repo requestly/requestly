@@ -28,7 +28,7 @@ import "./index.css";
 const { Meta } = Card;
 const { Panel } = Collapse;
 
-const Sources = () => {
+const Sources = ({ isOpen, toggle }) => {
   const navigate = useNavigate();
 
   // Global State
@@ -206,7 +206,7 @@ const Sources = () => {
         mobile: (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
-        other: (source) => renderSourceCard(source),
+        other: (source) => (source.isAvailable ? renderSourceCard(source) : null),
       };
 
       return <div className="source-grid">{sources.map((source) => renderSourceByType[type](source))}</div>;
@@ -232,11 +232,12 @@ const Sources = () => {
         disabled: !isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY),
         children: renderSources("terminal"),
       },
-      {
-        key: "other",
-        label: `Others`,
-        children: renderSources("other"),
-      },
+      // Hide others tab for now (only showing sources that are available)
+      // {
+      //   key: "other",
+      //   label: `Others`,
+      //   children: renderSources("other"),
+      // },
     ],
     [renderSources]
   );
@@ -273,7 +274,7 @@ const Sources = () => {
   return (
     <React.Fragment>
       {<InstructionsModal appId={currentApp} setCurrentApp={setCurrentApp} />}
-      <RQModal visible={true} wrapClassName="connected-apps-modal" centered>
+      <RQModal open={isOpen} wrapClassName="connected-apps-modal" centered maskClosable={true} onCancel={toggle}>
         <Col className="contected-apps-modal-content">
           <Row className="white header text-bold">Connected apps</Row>
           <Row className="text-gray mt-8">
