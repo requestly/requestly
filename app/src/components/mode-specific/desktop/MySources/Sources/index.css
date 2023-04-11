@@ -47,8 +47,8 @@
 }
 .connected-apps-modal .source-grid .source-item .danger-btn,
 .connected-apps-modal .rq-modal-footer .danger-btn {
-  background: var(--danger);
-  border-color: var(--danger-border);
+  background: rgba(var(--danger-rgb), 0.2);
+  border-color: rgba(var(--danger-rgb), 0.6);
 }
 .system-wide-source {
   display: flex;

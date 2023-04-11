@@ -100,7 +100,7 @@ const INITIAL_STATE = {
       props: {},
     },
     connectedAppsModal: {
-      isActive: true,
+      isActive: false,
       props: {},
     },
   },

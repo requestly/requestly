@@ -1,18 +1,16 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Space, Card, Avatar, Button, Typography, Collapse, Tabs } from "antd";
-import { InfoCircleOutlined, QuestionCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Col, Row, Avatar, Tabs } from "antd";
+import { QuestionCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
 import CloseConfirmModal from "./ErrorHandling/CloseConfirmModal";
 import { RQButton, RQModal } from "lib/design-system/components";
 // CONSTANTS
-import APP_CONSTANTS from "../../../../../config/constants";
 import { actions } from "../../../../../store";
 // UTILS
 import { getDesktopSpecificDetails } from "../../../../../store/selectors";
-import { ArrowRightOutlined, PoweroffOutlined } from "@ant-design/icons";
 import InstructionsModal from "./InstructionsModal";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -24,9 +22,6 @@ import {
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.css";
-
-const { Meta } = Card;
-const { Panel } = Collapse;
 
 const Sources = ({ isOpen, toggle }) => {
   const navigate = useNavigate();
