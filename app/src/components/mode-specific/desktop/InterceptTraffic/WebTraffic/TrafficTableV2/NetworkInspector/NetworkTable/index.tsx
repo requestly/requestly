@@ -9,7 +9,6 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
-import { ContextMenu } from "../ContextMenu";
 
 export const ITEM_SIZE = 30;
 
@@ -121,18 +120,16 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         startWalkthrough={!isTrafficTableTourCompleted}
         onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
       />
-      <ContextMenu>
-        <VirtualTable
-          height="100%"
-          width="100%"
-          itemCount={logs.length}
-          itemSize={ITEM_SIZE}
-          header={renderHeader()}
-          row={Row}
-          footer={null}
-          selectedRowData={selectedRowData}
-        />
-      </ContextMenu>
+      <VirtualTable
+        height="100%"
+        width="100%"
+        itemCount={logs.length}
+        itemSize={ITEM_SIZE}
+        header={renderHeader()}
+        row={Row}
+        footer={null}
+        selectedRowData={selectedRowData}
+      />
     </>
   );
 };

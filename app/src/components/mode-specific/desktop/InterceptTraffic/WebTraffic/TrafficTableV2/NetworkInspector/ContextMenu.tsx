@@ -14,18 +14,13 @@ import {
 import "./index.css";
 
 interface ContextMenuProps {
-  log?: any;
+  log: any;
   children: ReactNode;
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) => {
-  // const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
-
-  // const toggleContextMenu = () => {
-  //   setIsMenuOpen((prev) => !prev);
-  // };
 
   const handleOnClick = useCallback(
     (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
@@ -52,7 +47,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
         label: "Copy cURL",
         onClick: () => {
           copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard");
-          // toggleContextMenu();
           trackTrafficTableDropdownClicked("copy_curl");
         },
       },
@@ -61,7 +55,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
         label: "Copy URL",
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
-          // toggleContextMenu();
           trackTrafficTableDropdownClicked("copy_url");
         },
       },
@@ -71,42 +64,27 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
       {
         key: RuleType.REDIRECT,
         label: "Redirect URL(Map local/Remote)",
-        onClick: (menuInfo) => {
-          handleOnClick(menuInfo, log);
-          // toggleContextMenu();
-        },
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.RESPONSE,
         label: "Modify Response Body",
-        onClick: (menuInfo) => {
-          handleOnClick(menuInfo, log);
-          // toggleContextMenu();
-        },
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REQUEST,
         label: "Modify Request Body",
-        onClick: (menuInfo) => {
-          handleOnClick(menuInfo, log);
-          // toggleContextMenu();
-        },
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.HEADERS,
         label: "Modify Headers",
-        onClick: (menuInfo) => {
-          handleOnClick(menuInfo, log);
-          // toggleContextMenu();
-        },
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REPLACE,
         label: "Replace part of URL",
-        onClick: (menuInfo) => {
-          handleOnClick(menuInfo, log);
-          // toggleContextMenu();
-        },
+        onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         label: "More modification options",
@@ -115,42 +93,27 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
           {
             key: RuleType.CANCEL,
             label: "Cancel Request",
-            onClick: (menuInfo) => {
-              handleOnClick(menuInfo, log);
-              // toggleContextMenu();
-            },
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.SCRIPT,
             label: "Insert Custom Script",
-            onClick: (menuInfo) => {
-              handleOnClick(menuInfo, log);
-              // toggleContextMenu();
-            },
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.DELAY,
             label: "Delay Request",
-            onClick: (menuInfo) => {
-              handleOnClick(menuInfo, log);
-              // toggleContextMenu();
-            },
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.QUERYPARAM,
             label: "Modify Query Params",
-            onClick: (menuInfo) => {
-              handleOnClick(menuInfo, log);
-              // toggleContextMenu();
-            },
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
           {
             key: RuleType.USERAGENT,
             label: "Modify User Agent",
-            onClick: (menuInfo) => {
-              handleOnClick(menuInfo, log);
-              // toggleContextMenu();
-            },
+            onClick: (menuInfo) => handleOnClick(menuInfo, log),
           },
         ],
       },
@@ -159,8 +122,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
   );
 
   const handleDropdownOpenChange = (open: boolean) => {
-    // toggleContextMenu();
-    console.log({ open });
     if (open) {
       trackTrafficTableRequestRightClicked();
       if (!isTrafficTableTourCompleted) {

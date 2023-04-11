@@ -6,7 +6,7 @@ import React from "react";
 import { useState, useRef, useContext } from "react";
 import { FixedSizeList, FixedSizeListProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-// import { ContextMenu } from "../ContextMenu";
+import { ContextMenu } from "../ContextMenu";
 
 /** Context for cross component communication */
 const VirtualTableContext = React.createContext<{
@@ -98,7 +98,7 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
   // To higlight the row
   const [selected, setSelected] = useState(null);
 
-  const { header, footer, top } = useContext(VirtualTableContext);
+  const { header, footer, top, selectedRowData } = useContext(VirtualTableContext);
   return (
     <div {...rest} ref={ref}>
       <Table
@@ -114,9 +114,9 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
         }}
       >
         {header}
-        {/* <ContextMenu log={selectedRowData}> */}
-        <Table.Body>{children}</Table.Body>
-        {/* </ContextMenu> */}
+        <ContextMenu log={selectedRowData}>
+          <Table.Body>{children}</Table.Body>
+        </ContextMenu>
         {footer}
       </Table>
     </div>
