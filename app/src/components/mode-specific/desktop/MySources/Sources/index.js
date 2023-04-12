@@ -146,14 +146,13 @@ const Sources = ({ isOpen, toggle }) => {
               })
             );
             trackAppDisconnectedEvent(getAppName(appId));
-            toggle();
           } else {
             toast.error(`Unable to deactivate ${getAppName(appId)}. Issue reported.`);
           }
         })
         .catch((err) => Logger.log(err));
     },
-    [dispatch, processingApps, toggle]
+    [dispatch, processingApps]
   );
 
   const renderChangeAppStatusBtn = useCallback(
