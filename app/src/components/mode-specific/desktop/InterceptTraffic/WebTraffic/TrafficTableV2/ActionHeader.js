@@ -8,8 +8,6 @@ const { Text } = Typography;
 
 const ActionHeader = ({
   handleOnSearchChange,
-  groupByParameter,
-  handleOnGroupParameterChange,
   clearLogs,
   setIsSSLProxyingModalVisible,
   showDeviceSelector,

@@ -40,7 +40,6 @@ const CurrentTrafficTable = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [groupByParameter, setGroupByParameter] = useState("domain");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
@@ -90,10 +89,6 @@ const CurrentTrafficTable = ({
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
     trackTrafficTableRequestClicked();
-  };
-
-  const handleOnGroupParameterChange = (e) => {
-    setGroupByParameter(e.target.value);
   };
 
   const handleClosePane = () => {
@@ -299,8 +294,6 @@ const CurrentTrafficTable = ({
         <Col flex="auto">
           <ActionHeader
             handleOnSearchChange={handleOnSearchChange}
-            handleOnGroupParameterChange={handleOnGroupParameterChange}
-            groupByParameter={groupByParameter}
             clearLogs={clearLogs}
             setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
             showDeviceSelector={showDeviceSelector}
