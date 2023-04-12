@@ -134,3 +134,6 @@
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-title {
   font-size: 24px;
 }
+.setup-instructions-header .ant-avatar-image img {
+  object-fit: contain;
+}
