@@ -194,7 +194,7 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": true
+    "isAvailable": false
   },
   "android": {
     "id": "android",

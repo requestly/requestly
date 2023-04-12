@@ -1,30 +1,119 @@
 import React from "react";
-import { Button, Col, Row } from "antd";
-import { useNavigate } from "react-router-dom";
-
-import { redirectToApps } from "utils/RedirectionUtils";
+import { Button, Col, Row, Space, Typography } from "antd";
 import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/NetworkInspector";
+import { RQButton } from "lib/design-system/components";
+import { useDispatch, useSelector } from "react-redux";
+import { getDesktopSpecificDetails } from "store/selectors";
+import { CheckCircleOutlined } from "@ant-design/icons";
+import { actions } from "store";
+import { toast } from "utils/Toast";
+import Logger from "lib/logger";
+import {
+  trackAppConnectFailureEvent,
+  trackAppConnectedEvent,
+  trackAppDisconnectedEvent,
+} from "modules/analytics/events/desktopApp/apps";
+import "./index.css";
 
-const GroupByNone = ({
-  requestsLog,
-  handleRowClick,
-  emptyCtaText,
-  emptyCtaAction,
-  emptyDesc,
-}) => {
-  const navigate = useNavigate();
+const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc }) => {
+  const dispatch = useDispatch();
+  const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
+  const source = desktopSpecificDetails.appsList["system-wide"];
+  const { id: appId, name: appName } = source;
+
+  const connectSystemWide = () => {
+    if (!window.RQ || !window.RQ.DESKTOP) return;
+
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("activate-app", {
+      id: appId,
+    })
+      .then((res) => {
+        if (res.success) {
+          toast.success(`Connected ${appName}`);
+          dispatch(
+            actions.updateDesktopSpecificAppProperty({
+              appId: appId,
+              property: "isActive",
+              value: true,
+            })
+          );
+          trackAppConnectedEvent(appName);
+        } else {
+          toast.error(`Unable to activate ${appName}. Issue reported.`);
+          trackAppConnectFailureEvent(appName);
+        }
+      })
+      .catch(Logger.log);
+  };
+
+  const disconnectSystemWide = () => {
+    if (!window.RQ || !window.RQ.DESKTOP) return;
+
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
+      id: appId,
+    })
+      .then((res) => {
+        // Notify user and update state
+        if (res.success) {
+          toast.info(`Disconnected ${appName}`);
+
+          dispatch(
+            actions.updateDesktopSpecificAppProperty({
+              appId: appId,
+              property: "isActive",
+              value: false,
+            })
+          );
+          trackAppDisconnectedEvent(appName);
+        } else {
+          toast.error(`Unable to deactivate ${appName}. Issue reported.`);
+        }
+      })
+      .catch((err) => Logger.log(err));
+  };
+
+  const renderInterceptSystemWideSourceToggle = () => {
+    if (!source.isAvailable) {
+      return null;
+    }
+
+    return (
+      <>
+        <Typography.Text>Or</Typography.Text>
+        {source.isActive ? (
+          <>
+            <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
+            <RQButton type="default" className="danger-btn" onClick={disconnectSystemWide}>
+              Disconnect
+            </RQButton>
+          </>
+        ) : (
+          <>
+            <Typography.Text>Capture all the requests from this device</Typography.Text>
+            <RQButton onClick={connectSystemWide} icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}>
+              Enable Requestly system-wide
+            </RQButton>
+          </>
+        )}
+      </>
+    );
+  };
+
+  const openConnectedAppsModal = () => {
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "connectedAppsModal",
+        newValue: true,
+        newProps: {},
+      })
+    );
+  };
 
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
       return (
         <>
-          <Button
-            type="primary"
-            href={emptyCtaAction}
-            target="_blank"
-            style={{ margin: 8 }}
-            size="small"
-          >
+          <Button type="primary" href={emptyCtaAction} target="_blank" style={{ margin: 8 }} size="small">
             {emptyCtaText}
           </Button>
           <p>{emptyDesc}</p>
@@ -33,17 +122,15 @@ const GroupByNone = ({
     }
 
     return (
-      <Row justify={"center"}>
-        <Col style={{ textAlign: "center" }}>
-          <Button
-            type="primary"
-            shape="round"
-            onClick={() => redirectToApps(navigate)}
-            style={{ margin: 8 }}
-          >
-            Connect App
-          </Button>
-          <p>Connect an App to start intercepting traffic</p>
+      <Row className="empty-traffic-table-container" justify={"center"}>
+        <Col>
+          <Space direction="vertical" align="center">
+            <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
+            <RQButton type="primary" onClick={openConnectedAppsModal}>
+              Connect Apps
+            </RQButton>
+            {renderInterceptSystemWideSourceToggle()}
+          </Space>
         </Col>
       </Row>
     );
