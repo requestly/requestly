@@ -1,5 +1,7 @@
+import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { multipleChoiceOption, Option } from "./types";
+import { multipleChoiceOption, Option, UserPersona } from "./types";
+import { getValueAsPromise, updateValue } from "actions/FirebaseActions";
 
 export const shouldShowPersonaSurvey = async (appMode: string) => {
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
@@ -21,4 +23,18 @@ export const shuffleOptions = (options: Option[]) => {
     [options[i], options[j]] = [options[j], options[i]];
   }
   return options;
+};
+
+export const syncUserPersona = async (
+  uid: string,
+  dispatch: any,
+  userPersona: UserPersona
+) => {
+  const profile: any = await getValueAsPromise(["users", uid, "profile"]);
+  if (!profile) {
+    return;
+  }
+  if (profile.userPersona)
+    dispatch(actions.setUserPersonaData(profile.userPersona));
+  else updateValue(["users", uid, "profile"], { userPersona });
 };
