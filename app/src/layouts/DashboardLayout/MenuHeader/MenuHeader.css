@@ -147,10 +147,3 @@
 .header-profile-dropdown-trigger.ant-avatar {
   margin-top: -2px;
 }
-
-.desktop-app-proxy-info-container.ant-col {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 8px;
-  margin-right: 8px;
-}
