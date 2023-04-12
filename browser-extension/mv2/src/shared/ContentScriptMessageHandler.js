@@ -36,7 +36,9 @@ RQ.ContentScriptMessageHandler = {
 
     if (typeof callbackRef === "function") {
       // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
-      delete this.eventCallbackMap[event.data.action];
+      delete this.eventCallbackMap[
+        event.data.action + "_" + event.data.requestId
+      ];
       callbackRef.call(this, event.data.response);
     }
   },
@@ -163,6 +165,7 @@ RQ.ContentScriptMessageHandler = {
           RQ.EXTENSION_MESSAGES.CLEAR_LOGS_FOR_DOMAIN,
           RQ.EXTENSION_MESSAGES.GET_FLAGS,
           RQ.EXTENSION_MESSAGES.GET_TAB_SESSION,
+          RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED,
         ].includes(event.data.action)
       ) {
         this.delegateMessageToBackground(event.data);

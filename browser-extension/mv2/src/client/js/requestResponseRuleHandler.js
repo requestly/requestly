@@ -10,7 +10,10 @@ RQ.RequestResponseRuleHandler.setup = () => {
     },
     (isExtensionEnabled) => {
       RQ.ClientUtils.executeJS(
-        `window.${RQ.PUBLIC_NAMESPACE}.isExtensionEnabled = ${isExtensionEnabled};`,
+        `
+        window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+        window.${RQ.PUBLIC_NAMESPACE}.isExtensionEnabled = ${isExtensionEnabled};
+      `,
         true
       );
     }
@@ -86,9 +89,12 @@ RQ.RequestResponseRuleHandler.init = function () {
 RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
   RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
     RQ.ClientUtils.executeJS(
-      `window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
+      `
+      window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+      window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
         requestRules
-      )};`,
+      )};
+    `,
       true
     );
   });

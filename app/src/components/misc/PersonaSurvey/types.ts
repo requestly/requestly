@@ -27,6 +27,10 @@ export interface PageConfig {
   pageId: number;
   title: string;
   subTitle: string;
+  /**
+   * If skip true then don't show the question in survey
+   */
+  skip?: boolean;
   render?: number | ((props: renderProps) => ReactNode);
 }
 

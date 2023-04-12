@@ -2,6 +2,7 @@ import Logger from "lib/logger";
 
 const PageScriptMessageHandler = {
   eventCallbackMap: {},
+  messageListeners: {},
   requestId: 1,
 
   constants: {
@@ -11,8 +12,12 @@ const PageScriptMessageHandler = {
     SOURCE_FIELD: "source",
   },
 
-  addMessageListener: function () {
-    window.addEventListener("message", this.handleMessageReceived.bind(this));
+  addMessageListener: function (messageAction, listener) {
+    this.messageListeners[messageAction] = listener;
+  },
+
+  removeMessageListener: function (messageName) {
+    delete this.messageListeners[messageName];
   },
 
   getSource: function () {
@@ -35,7 +40,7 @@ const PageScriptMessageHandler = {
 
     if (typeof callbackRef === "function") {
       // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
-      delete this.eventCallbackMap[data.action];
+      delete this.eventCallbackMap[data.action + "_" + data.requestId];
       callbackRef.call(this, data.response);
     }
   },
@@ -80,7 +85,30 @@ const PageScriptMessageHandler = {
       event.data.source === this.constants.CONTENT_SCRIPT
     ) {
       Logger.log("Received message:", event.data);
-      this.invokeCallback(event.data);
+
+      if (
+        event.data.requestId &&
+        Object.hasOwn(
+          this.eventCallbackMap,
+          `${event.data.action}_${event.data.requestId}`
+        )
+      ) {
+        this.invokeCallback(event.data);
+      } else {
+        this.messageHandler(event.data);
+      }
+    }
+  },
+
+  messageHandler: function (message) {
+    const messageListener = this.messageListeners[message.action];
+
+    if (messageListener) {
+      const response = messageListener(message);
+
+      if (response) {
+        this.sendResponse(message, response);
+      }
     }
   },
 
@@ -98,7 +126,7 @@ const PageScriptMessageHandler = {
       this.constants.DOMAIN = this.constants.DOMAIN.replace(".io", ".in");
     }
 
-    this.addMessageListener();
+    window.addEventListener("message", this.handleMessageReceived.bind(this));
   },
 };
 

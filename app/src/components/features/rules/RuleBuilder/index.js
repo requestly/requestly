@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
@@ -73,13 +79,28 @@ const RuleBuilder = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
-  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
-  const isRedirectRuleDocsEnabled =
-    currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT && redirectRuleOnboardingExp === "docs";
+  const redirectRuleOnboardingExp = useFeatureValue(
+    "redirect_rule_onboarding",
+    null
+  );
+  const enableDocs = useMemo(() => {
+    return (
+      !props.isSharedListViewRule &&
+      currentlySelectedRuleData.ruleType ===
+        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
+      redirectRuleOnboardingExp === "docs"
+    );
+  }, [
+    currentlySelectedRuleData.ruleType,
+    props.isSharedListViewRule,
+    redirectRuleOnboardingExp,
+  ]);
 
-  const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
-  const isRedirectRuleTourEnabled = (redirectRuleOnboardingExp === "tour") && !isRedirectRuleTourCompleted;
+  const isRedirectRuleTourCompleted = useSelector(
+    getIsRedirectRuleTourCompleted
+  );
+  const isRedirectRuleTourEnabled =
+    redirectRuleOnboardingExp === "tour" && !isRedirectRuleTourCompleted;
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -98,6 +119,9 @@ const RuleBuilder = (props) => {
   );
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs, setShowDocs] = useState(true);
+  const isDocsVisible = useMemo(() => {
+    return enableDocs && showDocs;
+  }, [enableDocs, showDocs]);
 
   useExternalRuleCreation(MODE);
 
@@ -113,6 +137,12 @@ const RuleBuilder = (props) => {
     });
     return ref.current;
   };
+
+  useEffect(() => {
+    if (isDocsVisible) {
+      trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
+    }
+  }, [isDocsVisible, currentlySelectedRuleData.ruleType]);
 
   const hasRuleToEditIdChanged = useHasChanged(RULE_TO_EDIT_ID);
 
@@ -273,10 +303,13 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE) {
+    if (
+      MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
+      RULE_TYPE_TO_CREATE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+    ) {
       setStartWalkthrough(true);
     }
-  }, [MODE]);
+  }, [MODE, RULE_TYPE_TO_CREATE]);
 
   useEffect(() => {
     const source = state?.source ?? null;
@@ -360,9 +393,6 @@ const RuleBuilder = (props) => {
     return <SpinnerCard renderHeader />;
   }
 
-  const isDocsVisible =
-    showDocs && isRedirectRuleDocsEnabled && !props.isSharedListViewRule;
-
   return (
     <>
       <ProductWalkthrough
@@ -370,6 +400,9 @@ const RuleBuilder = (props) => {
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         runTourWithABTest={isRedirectRuleTourEnabled}
+        onTourComplete={() =>
+          dispatch(actions.updateRedirectRuleTourCompleted({}))
+        }
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
@@ -390,14 +423,13 @@ const RuleBuilder = (props) => {
           />
         </Col>
 
-        {!props.isSharedListViewRule && isRedirectRuleDocsEnabled ? (
+        {enableDocs ? (
           <>
             {!showDocs ? (
               <Button
                 className="rule-editor-help-btn"
                 onClick={() => {
                   setShowDocs(true);
-                  trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
                 }}
               >
                 Help
