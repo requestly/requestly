@@ -1230,3 +1230,13 @@ input[id^="react-select-"] {
   background: var(--component-background);
   padding: 5px;
 }
+
+.rq-count-badge {
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--success);
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--success);
+}

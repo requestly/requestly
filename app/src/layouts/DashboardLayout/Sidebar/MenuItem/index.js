@@ -2,19 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  AddUser,
-  Bag2,
-  Category,
-  Delete,
-  Document,
-  Filter,
-  PaperUpload,
-  Swap,
-  Video,
-  Play,
-  People,
-} from "react-iconly";
+import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
@@ -126,13 +114,7 @@ const MenuItem = (props) => {
     if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       const allRoutes = [...myRoutes];
       // Check if doesn't exist already!
-      if (allRoutes.some((route) => route.key === "my-apps")) return;
-      allRoutes.unshift({
-        path: PATHS.DESKTOP.MY_APPS.ABSOLUTE,
-        key: "my-apps",
-        name: "Connected Apps",
-        icon: <Category set="curved" className="remix-icon" />,
-      });
+      if (allRoutes.some((route) => route.key === "network-traffic")) return;
       allRoutes.unshift({
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
         key: "network-traffic",
@@ -147,9 +129,7 @@ const MenuItem = (props) => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
       if (result) {
         const allRoutes = [...myRoutes];
-        const index = allRoutes.findIndex(
-          (route) => route.key === "header-collaboration"
-        );
+        const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
         allRoutes.splice(index, 0, {
           path: PATHS.MOBILE_DEBUGGER.RELATIVE,
           name: "Android Debugger",
@@ -158,9 +138,7 @@ const MenuItem = (props) => {
         });
         setMyRoutes(allRoutes);
       } else {
-        setMyRoutes((prev) =>
-          prev.filter((route) => route.key !== "android-debugger")
-        );
+        setMyRoutes((prev) => prev.filter((route) => route.key !== "android-debugger"));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,25 +164,14 @@ const MenuItem = (props) => {
       icon: <div className="icon-wrapper">{item.icon}</div>,
       onClick: onClose,
       style: { paddingLeft: "11px", paddingRight: "6px" },
-      className:
-        locationURL === item.path
-          ? "ant-menu-item-selected"
-          : "ant-menu-item-selected-in-active",
+      className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
       label:
         item.path === LINKS.YOUTUBE_TUTORIALS ? (
-          <a
-            href={LINKS.YOUTUBE_TUTORIALS}
-            target="_blank"
-            rel="noreferrer"
-            onClick={trackTutorialsClicked}
-          >
+          <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
             {item.name}
           </a>
         ) : (
-          <Link
-            onClick={() => trackSidebarClicked(snakeCase(item.name))}
-            to={item.path}
-          >
+          <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
             {item.name}
           </Link>
         ),
@@ -216,9 +183,7 @@ const MenuItem = (props) => {
       mode="inline"
       selectedKeys={[]}
       defaultOpenKeys={[
-        splitLocation.length === 5
-          ? splitLocation[splitLocation.length - 3]
-          : null,
+        splitLocation.length === 5 ? splitLocation[splitLocation.length - 3] : null,
         splitLocation[splitLocation.length - 2],
       ]}
       theme={appTheme}

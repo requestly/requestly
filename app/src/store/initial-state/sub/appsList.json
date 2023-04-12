@@ -180,10 +180,10 @@
     "name": "Terminal",
     "description": "Terminal",
     "icon": "terminal.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false,
+    "isAvailable": true,
     "isDocAvailable": "https://docs.requestly.io/desktop-app/how-to.../terminal-setup"
   },
   "system-wide": {
@@ -194,7 +194,7 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "android": {
     "id": "android",
@@ -202,10 +202,10 @@
     "name": "Android",
     "description": "External Device",
     "icon": "android.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "ios": {
     "id": "ios",
@@ -213,10 +213,10 @@
     "name": "iOS",
     "description": "External Device",
     "icon": "ios.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "raspberry-pi": {
     "id": "raspberry-pi",

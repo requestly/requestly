@@ -1,0 +1,25 @@
+.desktop-app-proxy-info-container.ant-col {
+  line-height: initial;
+}
+
+.desktop-app-proxy-info {
+  padding: 8px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+
+  & .proxy-status-text {
+    margin-left: 4px;
+    margin-right: 8px;
+  }
+
+  & .connected-apps-btn {
+    display: flex;
+    gap: 4px;
+    border: none;
+
+    &:hover,
+    &:active {
+      border: none;
+    }
+  }
+}
