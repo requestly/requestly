@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "antd";
+import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import { useNavigate } from "react-router-dom";
@@ -15,10 +16,18 @@ const CompleteStep = ({ appId }) => {
 
   const getTroubleshootLink = (appId) => {
     switch (appId) {
+      case "ios":
+        return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/ios";
+      case "android":
+        return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/android";
       case "system-wide":
         return "https://docs.requestly.io/desktop-app/troubleshooting/osx-troubleshooting";
       case "fresh-firefox":
         return "https://docs.requestly.io/desktop-app/troubleshooting/osx-troubleshooting";
+      case "existing-terminal":
+        return "https://docs.requestly.io/desktop-app/mac/getting-started/setup/terminal";
+      case "manual-setup":
+        return "https://docs.requestly.io/desktop-app/mac/category/troubleshooting";
       default:
         return "https://docs.requestly.io/";
     }
@@ -32,9 +41,10 @@ const CompleteStep = ({ appId }) => {
   };
 
   return (
-    <div style={{ paddingTop: "4px" }}>
-      <Button
-        shape="round"
+    <div className="mt-8">
+      <RQButton
+        type="default"
+        className="mr-8"
         onClick={() => {
           dispatch(
             actions.toggleActiveModal({
@@ -46,11 +56,10 @@ const CompleteStep = ({ appId }) => {
         }}
       >
         Create Rule
-      </Button>
-      &nbsp;
-      <Button shape="round" onClick={handleTroubleshoot}>
+      </RQButton>
+      <RQButton type="default" onClick={handleTroubleshoot}>
         Troubleshoot
-      </Button>
+      </RQButton>
     </div>
   );
 };
