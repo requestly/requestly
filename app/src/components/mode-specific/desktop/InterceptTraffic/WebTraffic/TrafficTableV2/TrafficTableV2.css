@@ -1,0 +1,11 @@
+.traffic-table-sidebar {
+  overflow: auto;
+  height: calc(100vh - 57px);
+  margin-top: -24px;
+  margin-left: -24px;
+  border-right: 1px solid var(--border-dark);
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark.ant-menu-dark:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: var(--component-background);
+}
