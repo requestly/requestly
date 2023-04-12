@@ -17,18 +17,12 @@ const WorkspaceStatusSyncing = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
-  const [syncRuleStatus, setSyncRuleStatus] = useState(
-    localStorage.getItem("syncRuleStatus") === "true" || false
-  );
+  const [syncRuleStatus, setSyncRuleStatus] = useState(localStorage.getItem("syncRuleStatus") === "true" || false);
 
   const handleToggleStatusSyncing = async () => {
     const triggerSync = async () => {
       const syncNodeRef = getNodeRef(
-        getRecordsSyncPath(
-          "teamSync",
-          user.details.profile.uid,
-          currentlyActiveWorkspace.id
-        )
+        getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
       );
 
       const syncNodeRefNode = await get(syncNodeRef);
@@ -57,16 +51,14 @@ const WorkspaceStatusSyncing = () => {
     }
   };
 
-  return null;
-
-  // return (
-  //   <SettingsItem
-  //     isActive={syncRuleStatus}
-  //     onClick={handleToggleStatusSyncing}
-  //     title="Enable status syncing in team workspaces"
-  //     caption="Stay updated by automatically syncing rule modifications with your teammates."
-  //   />
-  // );
+  return (
+    <SettingsItem
+      isActive={syncRuleStatus}
+      onClick={handleToggleStatusSyncing}
+      title="Enable status syncing in team workspaces"
+      caption="Stay updated by automatically syncing rule modifications with your teammates."
+    />
+  );
 };
 
 export default WorkspaceStatusSyncing;

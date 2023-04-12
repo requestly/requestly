@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   checkUserBackupState,
@@ -14,25 +14,22 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getEmailType } from "utils/FormattingHelper";
 import { getAppMode } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
-import {
-  resetUserDetails,
-  setAndUpdateUserDetails,
-} from "utils/helpers/appDetails/UserProvider";
+import { resetUserDetails, setAndUpdateUserDetails } from "utils/helpers/appDetails/UserProvider";
 import { getUsername } from "backend/auth/username";
 import moment from "moment";
 import { getAndUpdateInstallationDate, getSignupDate } from "utils/Misc";
 import Logger from "lib/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
+let hasAuthHandlerBeenSet = false;
 
-const useAuth = (onComplete) => {
-  const [hasAuthHandlerBeenSet, setHasAuthHandlerBeenSet] = useState(false);
+const AuthHandler = (onComplete) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
-    setHasAuthHandlerBeenSet(true);
+    hasAuthHandlerBeenSet = true;
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -40,42 +37,24 @@ const useAuth = (onComplete) => {
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
-        submitAttrUtil(
-          TRACKING.ATTR.EMAIL_DOMAIN,
-          user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value"
-        );
-        submitAttrUtil(
-          TRACKING.ATTR.EMAIL_TYPE,
-          getEmailType(user.email) || "Missing_Value"
-        );
+        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) || "Missing_Value");
 
         getSignupDate(user.uid).then((signup_date) => {
           if (signup_date) {
             const signupDate = moment(signup_date);
-            submitAttrUtil(
-              TRACKING.ATTR.DAYS_SINCE_SIGNUP,
-              moment().diff(signupDate, "days")
-            );
+            submitAttrUtil(TRACKING.ATTR.DAYS_SINCE_SIGNUP, moment().diff(signupDate, "days"));
           }
         });
-        getAndUpdateInstallationDate(appMode, false, true).then(
-          (install_date) => {
-            if (install_date) {
-              const installDate = moment(install_date);
-              submitAttrUtil(
-                TRACKING.ATTR.DAYS_SINCE_INSTALL,
-                moment().diff(installDate, "days")
-              );
-            }
+        getAndUpdateInstallationDate(appMode, false, true).then((install_date) => {
+          if (install_date) {
+            const installDate = moment(install_date);
+            submitAttrUtil(TRACKING.ATTR.DAYS_SINCE_INSTALL, moment().diff(installDate, "days"));
           }
-        );
+        });
         try {
           // Fetch plan details
-          const [
-            planDetails,
-            isSyncEnabled,
-            isBackupEnabled,
-          ] = await Promise.all([
+          const [planDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
             getValueAsPromise(["userSubscriptions", user.uid, "planDetails"]),
             getOrUpdateUserSyncState(user.uid, appMode),
             checkUserBackupState(user.uid),
@@ -96,9 +75,7 @@ const useAuth = (onComplete) => {
                 isLoggedIn: true,
                 planDetails: {
                   ...planDetails,
-                  planName: isUserPremium
-                    ? getPlanName(planDetails)
-                    : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
+                  planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
                 },
                 isBackupEnabled,
                 isSyncEnabled,
@@ -122,24 +99,12 @@ const useAuth = (onComplete) => {
 
           // Analytics
           if (planDetails) {
-            submitAttrUtil(
-              TRACKING.ATTR.PAYMENT_MODE,
-              planDetails.type || "Missing Value"
-            );
-            submitAttrUtil(
-              TRACKING.ATTR.PLAN_ID,
-              planDetails.planId || "Missing Value"
-            );
+            submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
 
             if (planDetails.subscription) {
-              submitAttrUtil(
-                TRACKING.ATTR.PLAN_START_DATE,
-                planDetails.subscription.startDate || "Missing Value"
-              );
-              submitAttrUtil(
-                TRACKING.ATTR.PLAN_END_DATE,
-                planDetails.subscription.endDate || "Missing Value"
-              );
+              submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");
+              submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate || "Missing Value");
             }
           }
         } catch (e) {
@@ -186,7 +151,9 @@ const useAuth = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, hasAuthHandlerBeenSet, onComplete]);
+  }, [dispatch, appMode, onComplete]);
+
+  return null;
 };
 
-export default useAuth;
+export default AuthHandler;

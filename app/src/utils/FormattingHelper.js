@@ -24,8 +24,7 @@ export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
   if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE) return "Free";
   if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.GOLD) return "Professional";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE)
-    return "Professional";
+  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
 
   return planName
     .toLowerCase()
@@ -68,8 +67,7 @@ export const isCompanyEmail = (email) => {
     return false;
   }
   return !(
-    APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) ||
-    APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
+    APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) || APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
   );
 };
 
@@ -109,9 +107,7 @@ export const filterUniqueObjects = (myArr) => {
 };
 
 export const getCountryNameFromISOCode = (ISOCode) => {
-  const countryCodeObject = APP_CONSTANTS.PRICING.COUNTRY_CODES.find(
-    (object) => object.value === ISOCode
-  );
+  const countryCodeObject = APP_CONSTANTS.PRICING.COUNTRY_CODES.find((object) => object.value === ISOCode);
 
   if (countryCodeObject) {
     return countryCodeObject.label;
@@ -153,9 +149,14 @@ export const removeTrailingSlash = (url) => {
 };
 
 export const isEmailValid = (email) => {
-  return (
-    email &&
-    typeof email === "string" &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  );
+  return email && typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// [[...],[...]] -> {id:[],id:[]}
+export const rulesFlatObjectToObjectIdArray = (inputArray) => {
+  const myRecords = {};
+  inputArray.forEach((rule) => {
+    myRecords[rule.id] = rule;
+  });
+  return myRecords;
 };

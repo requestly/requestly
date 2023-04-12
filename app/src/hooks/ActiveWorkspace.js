@@ -1,7 +1,4 @@
-import {
-  getValueAsPromise,
-  removeValueAsPromise,
-} from "actions/FirebaseActions";
+import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions";
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -13,15 +10,13 @@ import {
 } from "utils/syncing/syncDataUtils";
 
 // Broadcast channel setup
-window.activeWorkspaceBroadcastChannel = new BroadcastChannel(
-  "active-workspace"
-);
+window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
 window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
   // Refresh the webpage so that it could find updated state later on
   window.location.reload();
 });
 
-const useActiveWorkspace = () => {
+const ActiveWorkspace = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const performCleanup = async () => {
@@ -31,15 +26,12 @@ const useActiveWorkspace = () => {
 
     if (currentlyActiveWorkspace.id) {
       // Fetch fresh rule configs from Firebase
-      const allRulesConfig = await getValueAsPromise(
-        getAllTeamUserRulesConfigPath()
-      );
+      const allRulesConfig = await getValueAsPromise(getAllTeamUserRulesConfigPath());
       if (!allRulesConfig) return; // It's already empty - No cleanup required bitch
       const allRulesConfigIds = Object.keys(allRulesConfig);
 
       // Fetch fresh rule definitions from Firebase
-      const allRemoteRecords =
-        (await getValueAsPromise(getRecordsSyncPath())) || {};
+      const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
       const remoteRecords = {};
       Object.keys(allRemoteRecords).forEach((key) => {
         if (!isEmpty(allRemoteRecords[key]?.id)) {
@@ -48,9 +40,7 @@ const useActiveWorkspace = () => {
       });
       const allRuleIds = Object.keys(remoteRecords || {});
 
-      const extraConfigIds = allRulesConfigIds.filter(
-        (x) => !allRuleIds.includes(x)
-      );
+      const extraConfigIds = allRulesConfigIds.filter((x) => !allRuleIds.includes(x));
 
       for (const recordId of extraConfigIds) {
         await removeValueAsPromise(getTeamUserRuleConfigPath(recordId));
@@ -71,4 +61,4 @@ const useActiveWorkspace = () => {
   }, [currentlyActiveWorkspace.id]);
 };
 
-export default useActiveWorkspace;
+export default ActiveWorkspace;

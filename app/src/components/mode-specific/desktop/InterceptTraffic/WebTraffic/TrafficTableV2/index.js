@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Row } from "antd";
+import ProCard from "@ant-design/pro-card";
+import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
-// Styles
-import "./css/draggable.css";
+import { getActiveModals } from "store/selectors";
+import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
-import {
-  groupByApp,
-  groupByDomain,
-} from "../../../../../../utils/TrafficTableUtils";
+import RuleEditorModal from "components/common/RuleEditorModal";
+import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByDomain from "./Tables/GroupByDomain";
 import GroupByApp from "./Tables/GroupByApp";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
-import { Row } from "antd";
-import ProCard from "@ant-design/pro-card";
-import Split from "react-split";
 import { convertProxyLogToUILog } from "./utils/logUtils";
 import { makeOriginalLog } from "capture-console-logs";
+import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import "./css/draggable.css";
+
 const CurrentTrafficTable = ({
   logs = [],
   emptyCtaText,
@@ -28,6 +30,9 @@ const CurrentTrafficTable = ({
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
+  const dispatch = useDispatch();
+  const { ruleEditorModal } = useSelector(getActiveModals);
+
   // Component State
   const previousLogsRef = useRef(logs);
 
@@ -38,11 +43,18 @@ const CurrentTrafficTable = ({
   const [searchKeyword, setSearchKeyword] = useState("");
   const [groupByParameter, setGroupByParameter] = useState("none");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
-  const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(
-    false
-  );
-
+  const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
+
+  const handleRuleEditorModalClose = useCallback(() => {
+    dispatch(
+      actions.toggleActiveModal({
+        newValue: false,
+        modalName: "ruleEditorModal",
+      })
+    );
+  }, [dispatch]);
+
   const upsertLogs = (logs) => {
     let _networkLogsMap = { ...networkLogsMap };
     logs?.forEach((log) => {
@@ -77,6 +89,7 @@ const CurrentTrafficTable = ({
   const handleRowClick = (row) => {
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
+    trackTrafficTableRequestClicked();
   };
 
   const handleOnGroupParameterChange = (e) => {
@@ -126,9 +139,7 @@ const CurrentTrafficTable = ({
         value: "",
       },
     ];
-    for (const [key, value] of Object.entries(
-      selectedRequestData.request.headers
-    )) {
+    for (const [key, value] of Object.entries(selectedRequestData.request.headers)) {
       const header = {
         property: key,
         value,
@@ -139,9 +150,7 @@ const CurrentTrafficTable = ({
       property: "RESPONSE HEADERS",
       value: "",
     });
-    for (const [key, value] of Object.entries(
-      selectedRequestData.response.headers
-    )) {
+    for (const [key, value] of Object.entries(selectedRequestData.response.headers)) {
       const header = {
         property: key,
         value,
@@ -176,54 +185,40 @@ const CurrentTrafficTable = ({
 
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(
-      "log-network-request",
-      (payload) => {
-        // TODO: @sahil865gupta Fix this multiple time registering
-        upsertNetworkLogMap(payload);
-      }
-    );
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(
-      "log-network-request-v2",
-      (payload) => {
-        const rqLog = convertProxyLogToUILog(payload);
-        printLogsToConsole(rqLog);
-        upsertNetworkLogMap(rqLog);
-      }
-    );
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
+      // TODO: @sahil865gupta Fix this multiple time registering
+      upsertNetworkLogMap(payload);
+    });
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+      const rqLog = convertProxyLogToUILog(payload);
+      printLogsToConsole(rqLog);
+      upsertNetworkLogMap(rqLog);
+    });
 
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
         // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent(
-          "log-network-request-v2"
-        );
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
   }, [upsertNetworkLogMap, printLogsToConsole]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-        "enable-request-logger"
-      ).then(() => {});
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
     }
 
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
         // Disable sending logs from bg window
-        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-          "disable-request-logger"
-        ).then(() => {});
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
   }, []);
 
   const getRequestLogs = (desc = true) => {
-    const logs = Object.values(networkLogsMap).sort(
-      (log1, log2) => log2.timestamp - log1.timestamp
-    );
+    const logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
 
     if (searchKeyword) {
       const reg = new RegExp(searchKeyword, "i");
@@ -326,10 +321,15 @@ const CurrentTrafficTable = ({
         </Row>
       </Split>
       {/* ssl proxying is currently hidden */}
-      <SSLProxyingModal
-        isVisible={isSSLProxyingModalVisible}
-        setIsVisible={setIsSSLProxyingModalVisible}
-      />
+      <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />
+
+      {ruleEditorModal.isActive && (
+        <RuleEditorModal
+          isOpen={ruleEditorModal.isActive}
+          handleModalClose={handleRuleEditorModalClose}
+          analyticEventEditorViewedSource="traffic_table_right_click"
+        />
+      )}
     </React.Fragment>
   );
 };

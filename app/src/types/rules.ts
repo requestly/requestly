@@ -26,11 +26,13 @@ export enum RuleType {
 export interface Rule extends Record<string, unknown> {
   id: string;
   name: string;
+  description?: string;
   objectType?: ObjectType.RULE;
   ruleType: RuleType;
   status: Status;
   groupId?: string;
   extensionRules?: ExtensionRule[];
+  pairs: Record<string, any>[];
 }
 
 export enum SourceKey {
@@ -68,6 +70,11 @@ export enum ResponseRuleResourceType {
   REST_API = "restApi",
   GRAPHQL_API = "graphqlApi",
   STATIC = "static", //  HTML / JS / CSS
+}
+
+export enum RequestRuleBodyType {
+  CODE = "code",
+  STATIC = "static",
 }
 
 export interface SourceFilter {
@@ -189,6 +196,16 @@ export interface ScriptRule extends Rule {
 
 export interface ResponseRule extends Rule {
   pairs: ResponseRulePair[];
+}
+
+export interface RequestRulePair {
+  id: string;
+  source: RulePairSource;
+  request: { value: string; statusCode: string; type: RequestRuleBodyType };
+}
+
+export interface RequestRule extends Rule {
+  pairs: RequestRulePair[];
 }
 
 // Group

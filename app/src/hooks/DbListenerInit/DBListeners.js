@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getCurrentlyActiveWorkspace,
-  getCurrentlyActiveWorkspaceMembers,
-} from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
@@ -18,7 +15,7 @@ import { actions } from "store";
 
 window.isFirstSyncComplete = false;
 
-const useDatabase = () => {
+const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -47,11 +44,7 @@ const useDatabase = () => {
   useEffect(() => {
     if (unsubscribeUserNodeRef.current) unsubscribeUserNodeRef.current(); // Unsubscribe existing user node listener before creating a new one
     if (user?.loggedIn) {
-      unsubscribeUserNodeRef.current = userNodeListener(
-        dispatch,
-        user?.details?.profile.uid,
-        appMode
-      );
+      unsubscribeUserNodeRef.current = userNodeListener(dispatch, user?.details?.profile.uid, appMode);
 
       userSubscriptionNodeListener(dispatch);
     }
@@ -63,8 +56,7 @@ const useDatabase = () => {
       dispatch(actions.updateIsRulesListLoading(true));
     }
 
-    if (window.unsubscribeSyncingNodeRef.current)
-      window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
+    if (window.unsubscribeSyncingNodeRef.current) window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
     if (user?.loggedIn && user?.details?.profile?.uid) {
       if (currentlyActiveWorkspace.id) {
         // This is a team sync
@@ -124,13 +116,7 @@ const useDatabase = () => {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
-  }, [
-    appMode,
-    currentlyActiveWorkspace,
-    dispatch,
-    user?.details?.profile?.uid,
-    user?.loggedIn,
-  ]);
+  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
@@ -139,13 +125,9 @@ const useDatabase = () => {
       ?.then((status) => {
         Logger.log("force updated auth token");
       });
-  }, [
-    user?.details?.profile?.uid,
-    user?.loggedIn,
-    currentlyActiveWorkspace,
-    currentTeamMembers,
-    dispatch,
-  ]);
+  }, [user?.details?.profile?.uid, user?.loggedIn, currentlyActiveWorkspace, currentTeamMembers, dispatch]);
+
+  return null;
 };
 
-export default useDatabase;
+export default DBListeners;

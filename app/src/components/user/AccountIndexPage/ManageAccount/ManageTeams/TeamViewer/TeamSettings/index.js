@@ -5,24 +5,15 @@ import { Row, Button, Input, message, Col, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import {
-  redirectToRules,
-  redirectToMyTeams,
-} from "../../../../../../../utils/RedirectionUtils";
+import { redirectToRules, redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
-import {
-  clearCurrentlyActiveWorkspace,
-  showSwitchWorkspaceSuccessToast,
-} from "actions/TeamWorkspaceActions";
+import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import LoadingModal from "../../../../../../../layouts/DashboardLayout/Sidebar/WorkspaceSelector/LoadingModal";
 import { toast } from "utils/Toast";
-import {
-  trackWorkspaceDeleted,
-  trackWorkspaceDeleteClicked,
-} from "modules/analytics/events/common/teams";
+import { trackWorkspaceDeleted, trackWorkspaceDeleteClicked } from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";
 
 const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
@@ -150,7 +141,10 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
         {isTeamInfoLoading ? (
           <SpinnerColumn message="Fetching workspace settings" />
         ) : !isTeamAdmin ? (
-          <div>Only admins can view the workspace settings.</div>
+          <>
+            <WorkspaceStatusSyncing />
+            <div>Only admins can view rest of the workspace settings.</div>
+          </>
         ) : (
           <>
             <Row align="middle" justify="space-between">
@@ -160,10 +154,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
             <div className="title team-settings-title">Workspace settings</div>
             <form onSubmit={handleTeamRename} className="team-settings-form">
               <div className="team-settings-form-item">
-                <label
-                  htmlFor="name"
-                  className="team-settings-name-input-label"
-                >
+                <label htmlFor="name" className="team-settings-name-input-label">
                   Workspace name
                 </label>
                 <Input
@@ -177,14 +168,8 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
                 />
               </div>
 
-              <div
-                style={{ display: "none" }}
-                className="team-settings-form-item"
-              >
-                <label
-                  htmlFor="description"
-                  className="team-settings-description-label"
-                >
+              <div style={{ display: "none" }} className="team-settings-form-item">
+                <label htmlFor="description" className="team-settings-description-label">
                   Description
                 </label>
                 <Input.TextArea
@@ -252,10 +237,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
       ) : null}
 
       {isTeamSwitchModalActive ? (
-        <LoadingModal
-          isModalOpen={isTeamSwitchModalActive}
-          closeModal={() => setIsTeamSwitchModalActive(false)}
-        />
+        <LoadingModal isModalOpen={isTeamSwitchModalActive} closeModal={() => setIsTeamSwitchModalActive(false)} />
       ) : null}
     </>
   );

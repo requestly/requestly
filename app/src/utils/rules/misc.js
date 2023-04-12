@@ -5,18 +5,12 @@ import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
-import { cloneDeep } from "lodash";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
 
-const processRules = (
-  rule,
-  groupIdsArr,
-  isGroupIdAlreadyAdded,
-  _sanitizeRules = true
-) => {
+const processRules = (rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules = true) => {
   if (rule.groupId !== RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID) {
     if (!isGroupIdAlreadyAdded[rule.groupId]) {
       groupIdsArr.push(rule.groupId);
@@ -33,11 +27,7 @@ const sanitizeRule = (rule) => {
   return sanitizedRule;
 };
 
-export const getRulesAndGroupsFromRuleIds = (
-  appMode,
-  selectedRuleIds,
-  groupwiseRules
-) => {
+export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds, groupwiseRules) => {
   return new Promise((resolve) => {
     const groupIdsArr = [];
     const isGroupIdAlreadyAdded = {};
@@ -48,20 +38,13 @@ export const getRulesAndGroupsFromRuleIds = (
       .then((allRecords) => {
         //Fetch Required Rules
         const rules = selectedRuleIds.map((ruleId) =>
-          processRules(
-            allRecords[ruleId],
-            groupIdsArr,
-            isGroupIdAlreadyAdded,
-            true
-          )
+          processRules(allRecords[ruleId], groupIdsArr, isGroupIdAlreadyAdded, true)
         );
 
         const groups = [];
         //Fetch Required Groups
         groupIdsArr.forEach((groupId) => {
-          groups.push(
-            groupwiseRules[groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS]
-          );
+          groups.push(groupwiseRules[groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS]);
         });
 
         resolve({
@@ -100,12 +83,7 @@ export const getAllRulesAndGroups = (appMode, _sanitizeRules = true) => {
         }
 
         const rules = allRules.map((rule) => {
-          return processRules(
-            rule,
-            groupIdsArr,
-            isGroupIdAlreadyAdded,
-            _sanitizeRules
-          );
+          return processRules(rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules);
         });
 
         const groups = [];
@@ -134,12 +112,8 @@ export const getAllRulesAndGroupsIds = (appMode) => {
 };
 
 export const compareRuleByModificationDate = (object1, object2) => {
-  const comparisonKeyForObject1 = object1.modificationDate
-    ? object1.modificationDate
-    : object1.creationDate;
-  const comparisonKeyForObject2 = object2.modificationDate
-    ? object2.modificationDate
-    : object2.creationDate;
+  const comparisonKeyForObject1 = object1.modificationDate ? object1.modificationDate : object1.creationDate;
+  const comparisonKeyForObject2 = object2.modificationDate ? object2.modificationDate : object2.creationDate;
 
   if (comparisonKeyForObject1 < comparisonKeyForObject2) {
     return 1;
@@ -177,8 +151,7 @@ export const isDesktopOnlyRule = (rule) => {
     const pairs = rule.pairs;
     return pairs.some(
       ({ destinationType, destination }) =>
-        destinationType === RedirectDestinationType.MAP_LOCAL ||
-        destination.startsWith("file://")
+        destinationType === RedirectDestinationType.MAP_LOCAL || destination.startsWith("file://")
     );
   }
 };
@@ -212,13 +185,19 @@ export const formatRegexSource = (regexStr) => {
 };
 
 export const fixRuleRegexSourceFormat = (dispatch, rule) => {
-  const rulePairs = cloneDeep(rule.pairs);
-  rulePairs.forEach((pair, i, self) => {
+  const rulePairs = rule.pairs.map((pair) => {
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
       if (!isRegexFormat(pair.source.value)) {
-        self[i].source.value = formatRegexSource(pair.source.value);
+        return {
+          ...pair,
+          source: {
+            ...pair.source,
+            value: formatRegexSource(pair.source.value),
+          },
+        };
       }
     }
+    return pair;
   });
 
   const fixedRule = {

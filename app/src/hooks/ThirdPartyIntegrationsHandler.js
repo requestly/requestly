@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initIntegrations } from "modules/analytics";
 import { useDispatch } from "react-redux";
 
-const useThirdPartyIntegrations = () => {
+const ThirdPartyIntegrationsHandler = () => {
   const dispatch = useDispatch();
   const stableDispatch = useCallback(dispatch, [dispatch]);
 
@@ -16,4 +16,4 @@ const useThirdPartyIntegrations = () => {
   }, [stableDispatch]);
 };
 
-export default useThirdPartyIntegrations;
+export default ThirdPartyIntegrationsHandler;
