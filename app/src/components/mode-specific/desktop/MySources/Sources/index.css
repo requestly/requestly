@@ -123,3 +123,7 @@
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-title {
   font-size: 24px;
 }
+
+.setup-instructions-description {
+  width: 600px;
+}
