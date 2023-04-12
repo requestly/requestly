@@ -1,14 +1,5 @@
 import { ReactNode } from "react";
 
-export interface UserPersona {
-  page: number;
-  isSurveyCompleted: boolean;
-  persona: string;
-  referralChannel?: string;
-  useCases: multipleChoiceOption[];
-  numberOfEmployees?: string;
-}
-
 export interface Option {
   type?: string;
   title: string;
