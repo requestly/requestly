@@ -45,6 +45,9 @@
   align-items: center;
   gap: 12px;
 }
+.connected-apps-modal .source-grid .source-item .source-item-meta .ant-avatar-image img {
+  object-fit: contain;
+}
 .connected-apps-modal .source-grid .source-item .source-description {
   padding-left: 10px;
 }
@@ -53,12 +56,18 @@
   background: rgba(var(--danger-rgb), 0.2);
   border-color: rgba(var(--danger-rgb), 0.6);
 }
-.system-wide-source {
+.connected-apps-modal .system-wide-source {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: -10px;
 }
+
+.connected-apps-modal .instruction-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .connected-apps-modal .source-modal-footer-link {
   color: var(--text-gray);
   text-decoration: underline;
@@ -124,4 +133,7 @@
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-title {
   font-size: 24px;
+}
+.setup-instructions-header .ant-avatar-image img {
+  object-fit: contain;
 }

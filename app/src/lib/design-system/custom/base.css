@@ -120,6 +120,15 @@
   display: flex;
   align-items: center;
 }
+.self-start {
+  align-self: start;
+}
+.self-center {
+  align-self: center;
+}
+.self-end {
+  align-self: end;
+}
 
 .w-full {
   width: 100%;
@@ -172,4 +181,10 @@
 
 .relative {
   position: relative;
+}
+
+.external-link,
+.external-link:hover {
+  color: var(--white);
+  text-decoration: underline;
 }

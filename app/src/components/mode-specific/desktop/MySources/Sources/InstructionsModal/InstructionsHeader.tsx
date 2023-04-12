@@ -23,7 +23,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
 
   return (
     <>
-      <Row className="text-gray setup-instructions-back-btn" onClick={navigateBackToSources}>
+      <Row className="text-gray setup-instructions-back-btn" onClick={navigateBackToSources} gutter={8}>
         <Col>
           <RQButton
             iconOnly

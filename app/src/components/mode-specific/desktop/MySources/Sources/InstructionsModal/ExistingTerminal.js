@@ -6,6 +6,7 @@ import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import InstructionsHeader from "./InstructionsHeader";
+import CompleteStep from "./common/Complete";
 
 const { Title } = Typography;
 
@@ -70,6 +71,7 @@ const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
             status="process"
             description={<TerminalCommand helperServerPort={helperServerPort} />}
           />
+          <Steps.Step title="All Set to go" status="process" description={<CompleteStep appId="existing-terminal" />} />
         </Steps>
       </Row>
     </>
