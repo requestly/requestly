@@ -46,7 +46,7 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/ios.png"}
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/ios.svg"}
         heading="iOS setup"
         description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
         setShowInstructions={setShowInstructions}
