@@ -72,8 +72,8 @@ const convertHarJsonToRQLog = (har) => {
 const getLogAvatar = (text = "", avatarUrl) => {
   return (
     <>
-      <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={text.length >= 15 ? text : ""}>
-        <Avatar size={20} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
+      <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={text.length > 24 ? text : ""}>
+        <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
         <span>{`  ${text}`}</span>
       </Tooltip>
     </>
