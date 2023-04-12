@@ -46,8 +46,12 @@ export interface ResourceFilters {
   resourceType?: ResourceTypeFilterValue;
 }
 
+export interface ExecutionFilters extends ResourceFilters {
+  ruleName?: string;
+}
+
 export interface NetworkSettings {
-  preserveLog?: boolean;
+  preserveLog: boolean;
 }
 
 export interface ExecutionEvent {

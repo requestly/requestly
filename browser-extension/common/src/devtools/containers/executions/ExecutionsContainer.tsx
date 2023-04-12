@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ExecutionEvent, ResourceFilters, NetworkSettings } from "../../types";
+import { ExecutionEvent, NetworkSettings, ExecutionFilters } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
 import "./executionsContainer.scss";
@@ -12,9 +12,10 @@ import { matchResourceTypeFilter } from "../../utils";
 
 const ExecutionsContainer: React.FC = () => {
   const [executionEvents, setExecutionEvents] = useState<ExecutionEvent[]>([]);
-  const [filters, setFilters] = useState<ResourceFilters>({
+  const [filters, setFilters] = useState<ExecutionFilters>({
     url: "",
     resourceType: ResourceTypeFilterValue.ALL,
+    ruleName: "",
   });
   const [settings, setSettings] = useState<NetworkSettings>({
     preserveLog: false,
@@ -56,17 +57,15 @@ const ExecutionsContainer: React.FC = () => {
 
   const filterExecutions = useCallback(
     (execution: ExecutionEvent): boolean => {
-      if (
-        filters.url &&
-        !execution.requestURL.toLowerCase().includes(filters.url.toLowerCase())
-      ) {
+      if (filters.url && !execution.requestURL.toLowerCase().includes(filters.url.toLowerCase())) {
         return false;
       }
 
-      if (
-        filters.resourceType &&
-        !matchResourceTypeFilter(execution._resourceType, filters.resourceType)
-      ) {
+      if (filters.resourceType && !matchResourceTypeFilter(execution._resourceType, filters.resourceType)) {
+        return false;
+      }
+
+      if (filters.ruleName && !execution.rule.name.toLowerCase().includes(filters.ruleName.toLowerCase())) {
         return false;
       }
 
@@ -77,11 +76,7 @@ const ExecutionsContainer: React.FC = () => {
 
   return (
     <div className="executions-container">
-      <PrimaryToolbar
-        clearEvents={clearEvents}
-        settings={settings}
-        onSettingsChange={setSettings}
-      />
+      <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
       {executionEvents.length > 0 ? (
         <>
           <FiltersToolbar filters={filters} onFiltersChange={setFilters} />

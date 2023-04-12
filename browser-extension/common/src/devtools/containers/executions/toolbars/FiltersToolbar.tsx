@@ -1,14 +1,11 @@
 import { Input } from "antd";
 import React, { useCallback } from "react";
-import { ResourceFilters } from "../../../types";
-import {
-  ResourceTypeFilter,
-  ResourceTypeFilterValue,
-} from "../../../components/ResourceTypeFilter";
+import { ExecutionFilters } from "../../../types";
+import { ResourceTypeFilter, ResourceTypeFilterValue } from "../../../components/ResourceTypeFilter";
 
 interface Props {
-  filters: ResourceFilters;
-  onFiltersChange: (filters: ResourceFilters) => void;
+  filters: ExecutionFilters;
+  onFiltersChange: (filters: ExecutionFilters) => void;
 }
 
 const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
@@ -17,6 +14,16 @@ const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
       onFiltersChange({
         ...filters,
         url: newUrlFilter,
+      });
+    },
+    [filters]
+  );
+
+  const onRuleNameFilterChange = useCallback(
+    (newRuleNameFilter: string) => {
+      onFiltersChange({
+        ...filters,
+        ruleName: newRuleNameFilter,
       });
     },
     [filters]
@@ -36,15 +43,21 @@ const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
     <div className="executions-toolbar filters">
       <Input
         className="url-filter"
+        addonBefore="URL"
         placeholder="Filter by URL"
         value={filters.url}
         onChange={(e) => onUrlFilterChange(e.target.value)}
         allowClear
       />
-      <ResourceTypeFilter
-        value={filters.resourceType}
-        onChange={onResourceTypeFilterChange}
+      <Input
+        className="rule-filter"
+        addonBefore="Rule name"
+        placeholder="Filter by Rule name"
+        value={filters.ruleName}
+        onChange={(e) => onRuleNameFilterChange(e.target.value)}
+        allowClear
       />
+      <ResourceTypeFilter value={filters.resourceType} onChange={onResourceTypeFilterChange} />
     </div>
   );
 };

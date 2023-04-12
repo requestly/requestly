@@ -33,8 +33,13 @@
     }
   }
 
-  .url-filter {
-    width: 200px;
-    padding: 2px 6px;
+  .url-filter,
+  .rule-filter {
+    width: auto;
+
+    .ant-input-affix-wrapper {
+      width: 160px;
+      padding: 2px 6px;
+    }
   }
 }
