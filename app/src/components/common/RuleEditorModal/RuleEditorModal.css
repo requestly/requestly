@@ -1,0 +1,38 @@
+.rule-editor-modal.ant-modal .ant-modal-content .ant-modal-body {
+  padding: 15px 0;
+  background-color: var(--body-background);
+}
+
+.rule-editor-modal.ant-modal .rq-modal-content {
+  max-height: 43rem;
+  overflow-x: auto;
+  padding: 15px 1.875rem;
+  border-radius: inherit;
+}
+
+.rule-editor-modal.ant-modal .rule-editor-modal-header .ant-col {
+  margin-left: 0;
+}
+
+.rule-editor-modal.ant-modal .rule-editor-modal-header {
+  margin-bottom: 1rem;
+}
+
+.rule-editor-modal.ant-modal .rule-editor-modal-header .editor-title-container.ant-row {
+  padding: 0;
+}
+
+.rule-editor-modal.ant-modal .rq-modal-content .add-pair-btn {
+  margin-bottom: 0;
+}
+
+/* toast */
+.view-rule-toast-btn.ant-btn {
+  margin-left: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.view-rule-toast-btn.ant-btn:hover,
+.view-rule-toast-btn.ant-btn:focus {
+  background: rgba(255, 255, 255, 0.03);
+}

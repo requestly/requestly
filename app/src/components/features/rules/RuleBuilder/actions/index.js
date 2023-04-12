@@ -1,31 +1,22 @@
-import { generateObjectId } from "../../../../../utils/FormattingHelper";
+import { generateObjectId } from '../../../../../utils/FormattingHelper';
 //UTILS
-import { redirectToRoot } from "../../../../../utils/RedirectionUtils";
+import { redirectToRoot } from '../../../../../utils/RedirectionUtils';
 //REDUCER ACTIONS
-import { actions } from "../../../../../store";
+import { actions } from '../../../../../store';
 //CONSTANTS
-import APP_CONSTANTS from "../../../../../config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { getRuleLevelInitialConfigs } from "./utils";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import APP_CONSTANTS from '../../../../../config/constants';
+import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
+import { generateObjectCreationDate } from 'utils/DateTimeUtils';
+import { getRuleLevelInitialConfigs } from './utils';
+import { isExtensionManifestVersion3 } from 'actions/ExtensionActions';
 
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
-export const setIsCurrentlySelectedRuleHasUnsavedChanges = (
-  dispatch,
-  hasUnsavedChanges
-) => {
-  dispatch(
-    actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges)
-  );
+export const setIsCurrentlySelectedRuleHasUnsavedChanges = (dispatch, hasUnsavedChanges) => {
+  dispatch(actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
 };
 
-export const setCurrentlySelectedRule = (
-  dispatch,
-  newRule,
-  warnForUnsavedChanges = false
-) => {
+export const setCurrentlySelectedRule = (dispatch, newRule, warnForUnsavedChanges = false) => {
   if (warnForUnsavedChanges) {
     setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
   }
@@ -57,11 +48,11 @@ export const initiateBlankCurrentlySelectedRule = (
     const extraRuleConfig = getRuleLevelInitialConfigs(RULE_TYPE_TO_CREATE);
     let blankRuleFormat = {
       creationDate: generateObjectCreationDate(),
-      description: "",
-      groupId: "",
+      description: '',
+      groupId: '',
       id: `${RULE_TYPE_TO_CREATE}_${generateObjectId()}`,
       isSample: false,
-      name: "",
+      name: '',
       objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.RULE,
       pairs: [],
       ruleType: RULE_TYPE_TO_CREATE,
@@ -73,16 +64,14 @@ export const initiateBlankCurrentlySelectedRule = (
       blankRuleFormat.version = currentlySelectedRuleConfig.VERSION;
     }
 
-    if (
-      isExtensionManifestVersion3() &&
-      "REMOVE_CSP_HEADER" in currentlySelectedRuleConfig
-    ) {
-      blankRuleFormat.removeCSPHeader =
-        currentlySelectedRuleConfig.REMOVE_CSP_HEADER;
+    if (isExtensionManifestVersion3() && 'REMOVE_CSP_HEADER' in currentlySelectedRuleConfig) {
+      blankRuleFormat.removeCSPHeader = currentlySelectedRuleConfig.REMOVE_CSP_HEADER;
     }
 
     blankRuleFormat.pairs.push(getEmptyPairUsingRuleType(RULE_TYPE_TO_CREATE));
     setCurrentlySelectedRule(dispatch, blankRuleFormat);
+
+    return blankRuleFormat;
   }
 };
 
@@ -107,7 +96,7 @@ export const getModeData = (location, isSharedListViewRule) => {
   if (!location) {
     return {};
   }
-  const URL_PARTS = location.pathname.split("/");
+  const URL_PARTS = location.pathname.split('/');
   return {
     MODE: URL_PARTS[URL_PARTS.length - 2],
     RULE_TYPE_TO_CREATE: URL_PARTS[URL_PARTS.length - 1], //Eg: RULE_TYPE_TO_CREATE="Cancel" (while creating new rule), RULE_TYPE_TO_CREATE="Cancel_SOME-ID" (while editing a rule, we dont need it)
