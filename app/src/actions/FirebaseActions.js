@@ -71,7 +71,7 @@ const dummyUserImg =
  * SignIn with Google in popup window and create profile node
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
  */
-export function signUp(name, email, password, refCode, source) {
+export async function signUp(name, email, password, refCode, source) {
   const email_type = getEmailType(email);
   const domain = email.split("@")[1];
   trackSignUpAttemptedEvent({
@@ -196,7 +196,7 @@ export function signUp(name, email, password, refCode, source) {
     });
 }
 
-export function emailSignIn(email, password, isSignUp, source) {
+export async function emailSignIn(email, password, isSignUp, source) {
   trackLoginAttemptedEvent({
     auth_provider: AUTH_PROVIDERS.EMAIL,
     email,
@@ -302,7 +302,7 @@ export function resetPassword(oobCode, password) {
     });
 }
 
-export function googleSignIn(callback, MODE, source) {
+export async function googleSignIn(callback, MODE, source) {
   const provider = new GoogleAuthProvider();
   provider.addScope("profile");
   provider.addScope("email");
