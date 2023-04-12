@@ -27,10 +27,6 @@ export const updateUsername = (prevState, action) => {
 };
 
 //Persona Survey actions
-export const setUserPersonaData = (prevState, action) => {
-  prevState.userPersona = action.payload;
-};
-
 export const updateUserPersona = (prevState, action) => {
   prevState.userPersona[action.payload.key] = action.payload.value;
 };
@@ -93,4 +89,3 @@ export const updateRedirectRuleTourCompleted = (prevState, action) => {
 export const updateTrafficTableTourCompleted = (prevState, action) => {
   prevState.misc.isTrafficTableTourCompleted = true;
 };
-
