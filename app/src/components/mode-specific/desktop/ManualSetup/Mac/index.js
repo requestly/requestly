@@ -40,8 +40,8 @@ const MacProxySettings = ({ setShowInstructions }) => {
       <InstructionsHeader
         icon={window.location.origin + "/assets/img/thirdPartyAppIcons/package.png"}
         heading="Setting up system proxy"
-        description="Requestly requires your applications to send their network traffic through the its local proxy server before
-            going to their destination."
+        description="Requestly requires your applications to send their network traffic through its local proxy server before
+            going to the destination."
         setShowInstructions={setShowInstructions}
       />
       <Row className="mt-16">
@@ -61,13 +61,6 @@ const MacProxySettings = ({ setShowInstructions }) => {
       </Row>
       <Row>
         <Col>
-          {/* <Paragraph className="text-center">
-            Click{" "}
-            <Text type="link" onClick={() => saveRootCert()}>
-              here
-            </Text>{" "}
-            to save certificate to your disk.
-          </Paragraph> */}
           <Button type="primary" onClick={() => saveRootCert()}>
             Save Certificate
           </Button>
