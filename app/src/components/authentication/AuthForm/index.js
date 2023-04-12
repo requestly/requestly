@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { toast } from "utils/Toast";
-import { Typography, Row, Col, Modal } from "antd";
+import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
 
@@ -13,30 +12,22 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
-//UTILS
-import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
-import { getGreeting } from "utils/FormattingHelper";
-import { getAuthErrorMessage, AuthTypes } from "../utils";
-
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
 import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  handleEmailSignIn,
-  handleEmailSignUp,
+  handleEmailSignInButtonOnClick,
+  handleSignUpButtonOnClick,
   handleForgotPasswordButtonOnClick,
-  handleGoogleSignIn,
+  handleGoogleSignInButtonOnClick,
   handleResetPasswordOnClick,
 } from "./actions";
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import {
-  getAppMode,
-  getUserPersonaSurveyDetails,
-} from "../../../store/selectors";
+import { getAppMode } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
@@ -58,11 +49,9 @@ const AuthForm = ({
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
-  const dispatch = useDispatch();
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const path = window.location.pathname;
   const [actionPending, setActionPending] = useState(false);
   const [name, setName] = useState("");
@@ -76,18 +65,8 @@ const AuthForm = ({
     () => Math.floor(Math.random() * 3),
     []
   );
-
-  const showVerifyEmailMessage = () => {
-    Modal.info({
-      title: "Verify email",
-      content: (
-        <Typography.Text>
-          Please click on the link that has just been sent to your email account
-          to verify your email.
-        </Typography.Text>
-      ),
-    });
-  };
+  const emailOptin = false;
+  let isSignUp = true;
 
   useEffect(() => {
     // Updating reference code from query parameters
@@ -104,84 +83,6 @@ const AuthForm = ({
       setTrackEvent(false);
     }
   }, [eventSource, referralCode, trackEvent]);
-
-  const handleGoogleSignInButtonClick = () => {
-    setActionPending(true);
-    handleGoogleSignIn(appMode, MODE, eventSource)
-      .then((result) => {
-        if (result && result.uid) {
-          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
-          syncUserPersona(result.uid, dispatch, userPersona);
-          onSignInSuccess && onSignInSuccess();
-        }
-        setActionPending(false);
-      })
-      .catch((e) => {
-        setActionPending(false);
-      });
-  };
-
-  const handleEmailSignUpButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignUp(name, email, password, referralCode, eventSource)
-      .then(({ status, errorCode }) => {
-        if (status) {
-          showVerifyEmailMessage();
-          handleEmailSignIn(email, password, true, eventSource)
-            .then(({ result }) => {
-              if (result.user.uid) {
-                toast.info(
-                  `${getGreeting()}, ${result.user.displayName.split(" ")[0]}`
-                );
-                setEmail("");
-                setPassword("");
-                syncUserPersona(result.user.uid, dispatch, userPersona);
-                onSignInSuccess && onSignInSuccess(result.user.uid);
-              }
-            })
-            .catch(({ errorCode }) => {
-              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-              setActionPending(false);
-              setEmail("");
-              setPassword("");
-            });
-        } else {
-          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-          setActionPending(false);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-        setActionPending(false);
-      });
-  };
-
-  const handleEmailSignInButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignIn(email, password, false, eventSource)
-      .then(({ result }) => {
-        if (result.user.uid) {
-          toast.info(
-            `${getGreeting()}, ${result.user.displayName.split(" ")[0]}`
-          );
-          setEmail("");
-          setPassword("");
-          syncUserPersona(result.user.uid, dispatch, userPersona);
-          onSignInSuccess && onSignInSuccess(result.user.uid);
-        } else {
-          toast.error("Sorry we couldn't log you in. Can you please retry?");
-          setActionPending(true);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
-        setActionPending(false);
-        setEmail("");
-        setPassword("");
-      });
-  };
 
   const SocialAuthButtons = () => {
     switch (MODE) {
@@ -201,7 +102,17 @@ const AuthForm = ({
                   </Button> */}
             <RQButton
               className="btn-default text-bold w-full"
-              onClick={handleGoogleSignInButtonClick}
+              onClick={() =>
+                handleGoogleSignInButtonOnClick(
+                  setActionPending,
+                  src,
+                  onSignInSuccess,
+                  appMode,
+                  MODE,
+                  navigate,
+                  eventSource
+                )
+              }
             >
               <img src={GoogleIcon} alt="google" className="auth-icons" />
               {MODE === AUTH_ACTION_LABELS.SIGN_UP
@@ -255,7 +166,20 @@ const AuthForm = ({
           <RQButton
             type="primary"
             className="form-elements-margin w-full"
-            onClick={handleEmailSignInButtonClick}
+            onClick={(event) =>
+              handleEmailSignInButtonOnClick(
+                event,
+                email,
+                password,
+                false,
+                appMode,
+                setActionPending,
+                src,
+                onSignInSuccess,
+                () => setPassword(""),
+                eventSource
+              )
+            }
           >
             Sign In with Email
           </RQButton>
@@ -266,7 +190,21 @@ const AuthForm = ({
           <RQButton
             type="primary"
             className="form-elements-margin w-full"
-            onClick={handleEmailSignUpButtonClick}
+            onClick={(event) =>
+              handleSignUpButtonOnClick(
+                event,
+                name,
+                email,
+                password,
+                referralCode,
+                setActionPending,
+                navigate,
+                emailOptin,
+                isSignUp,
+                onSignInSuccess,
+                eventSource
+              )
+            }
           >
             Create Account
           </RQButton>
