@@ -190,6 +190,7 @@
     "id": "system-wide",
     "name": "Everywhere",
     "description": "System Wide",
+    "type": "system-wide",
     "icon": "pc.png",
     "isActive": false,
     "comingSoon": false,
