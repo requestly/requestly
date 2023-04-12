@@ -99,6 +99,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    connectedAppsModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -146,7 +150,7 @@ const INITIAL_STATE = {
 
   misc: {
     isRedirectRuleTourCompleted: false,
-  }
+  },
 };
 
 export default INITIAL_STATE;

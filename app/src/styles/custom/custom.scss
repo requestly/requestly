@@ -9,44 +9,24 @@
 // @import "./icons.scss";
 
 $theme-primary-color: #0a48b3;
-$theme-primary-color-gradient: linear-gradient(
-  87deg,
-  #0b52cb 0,
-  $theme-primary-color 100%
-);
+$theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
 
 .typeform-btn {
-  background-color: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background-color: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 
 //React-Notifications
 .Toastify__toast--default {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--info {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--success {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--warning {
@@ -92,11 +72,7 @@ $theme-primary-color-gradient: linear-gradient(
 // }
 // background gradient
 .bg-gradient-blue {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
 }
 
 .checkbox-empty-label {
@@ -214,9 +190,7 @@ $theme-primary-color-gradient: linear-gradient(
 .mt-1 {
   margin-top: 1em;
 }
-.mt-8 {
-  margin-top: 8em;
-}
+
 .mt-4 {
   margin-top: 4em;
 }
@@ -1255,4 +1229,14 @@ input[id^="react-select-"] {
   border-radius: var(--border-radius-sm);
   background: var(--component-background);
   padding: 5px;
+}
+
+.rq-count-badge {
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--success);
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--success);
 }

@@ -1,18 +1,17 @@
-import { Alert, Modal, Select, Steps } from "antd";
+import { Dropdown, Row, Steps } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "utils/RedirectionUtils";
-
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import CompleteStep from "../common/Complete";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
 import CertificateTrustInstructions from "./CertificateTrust";
 import { ANDROID_DEVICES } from "./constants";
 import WifiInstructions from "./Wifi";
+import InstructionsHeader from "../InstructionsHeader";
 
-const { Option } = Select;
-
-const AndroidInstructionModal = ({ isVisible, handleCancel }) => {
+const AndroidInstructionModal = ({ setShowInstructions }) => {
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
@@ -24,71 +23,51 @@ const AndroidInstructionModal = ({ isVisible, handleCancel }) => {
   };
 
   const renderDeviceSelector = () => {
+    const menuItems = Object.keys(ANDROID_DEVICES).map((device_id) => {
+      return {
+        key: device_id,
+        label: device_id.toUpperCase(),
+      };
+    });
+
+    const menuProp = {
+      items: menuItems,
+      onClick: (item) => handleOnDeviceChange(item.key),
+    };
+
     return (
-      <Select
-        defaultValue={selectedDevice}
-        style={{ width: 120 }}
-        onChange={handleOnDeviceChange}
-      >
-        {Object.keys(ANDROID_DEVICES).map((device_id) => {
-          return <Option value={device_id}>{device_id.toUpperCase()}</Option>;
-        })}
-      </Select>
+      <Dropdown.Button icon={<DownArrow />} menu={menuProp}>
+        {selectedDevice}
+      </Dropdown.Button>
     );
   };
 
   return (
     <>
-      <Modal
-        title={
-          <div>
-            Android Setup Steps&nbsp;&nbsp;&nbsp;{renderDeviceSelector()}
-          </div>
-        }
-        visible={isVisible}
-        onOk={navigateToTraffic}
-        okText="Inspect Traffic"
-        onCancel={handleCancel}
-        cancelText="Close"
-        width="50%"
-      >
-        <Alert
-          message="Steps may vary depending upon your device. Select your device first."
-          type="info"
-          showIcon
-          closable
-        />
-        <br />
-        <Steps direction="vertical" current={1}>
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/android.png"}
+        heading="Android setup"
+        description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
+        setShowInstructions={setShowInstructions}
+        RightComponent={renderDeviceSelector()}
+      />
+      <Row className="mt-8 setup-instructions-body">
+        <Steps direction="vertical" current={1} className="mt-8">
           <Steps.Step
             title="Configure Wifi Proxy"
             status="process"
             description={<WifiInstructions device_id={selectedDevice} />}
           />
-          <Steps.Step
-            title="Test HTTP Proxy"
-            status="process"
-            description={<TestProxyInstructions />}
-          />
-          <Steps.Step
-            title="Download certificate"
-            status="process"
-            description={<CertificateDownloadInstructions />}
-          />
+          <Steps.Step title="Test HTTP Proxy" status="process" description={<TestProxyInstructions />} />
+          <Steps.Step title="Download certificate" status="process" description={<CertificateDownloadInstructions />} />
           <Steps.Step
             title="Trust Certificate"
             status="process"
-            description={
-              <CertificateTrustInstructions device_id={selectedDevice} />
-            }
+            description={<CertificateTrustInstructions device_id={selectedDevice} />}
           />
-          <Steps.Step
-            title="All Set to go"
-            status="process"
-            description={<CompleteStep appId="android" />}
-          />
+          <Steps.Step title="All Set to go" status="process" description={<CompleteStep appId="android" />} />
         </Steps>
-      </Modal>
+      </Row>
     </>
   );
 };

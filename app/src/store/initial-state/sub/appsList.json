@@ -1,6 +1,7 @@
 {
   "fresh-chrome": {
     "id": "fresh-chrome",
+    "type": "browser",
     "name": "Google Chrome",
     "description": "New Profile",
     "icon": "chrome.png",
@@ -11,6 +12,7 @@
   },
   "existing-chrome": {
     "id": "existing-chrome",
+    "type": "browser",
     "name": "Google Chrome",
     "description": "Existing Profile",
     "icon": "chrome.png",
@@ -21,6 +23,7 @@
   },
   "fresh-chrome-beta": {
     "id": "fresh-chrome-beta",
+    "type": "browser",
     "name": "Chrome Beta",
     "description": "New Profile",
     "icon": "chrome-beta.png",
@@ -31,6 +34,7 @@
   },
   "fresh-chrome-dev": {
     "id": "fresh-chrome-dev",
+    "type": "browser",
     "name": "Chrome Dev",
     "description": "New Profile",
     "icon": "chrome-dev.png",
@@ -41,6 +45,7 @@
   },
   "fresh-chrome-canary": {
     "id": "fresh-chrome-canary",
+    "type": "browser",
     "name": "Chrome Canary",
     "description": "New Profile",
     "icon": "chrome-canary.png",
@@ -51,6 +56,7 @@
   },
   "fresh-chromium": {
     "id": "fresh-chromium",
+    "type": "browser",
     "name": "Chromium",
     "description": "New Profile",
     "icon": "chromium.png",
@@ -61,6 +67,7 @@
   },
   "fresh-chromium-dev": {
     "id": "fresh-chromium-dev",
+    "type": "browser",
     "name": "Chromium Dev",
     "description": "New Profile",
     "icon": "chromium.png",
@@ -71,6 +78,7 @@
   },
   "fresh-edge": {
     "id": "fresh-edge",
+    "type": "browser",
     "name": "Microsoft Edge ",
     "description": "New Profile",
     "icon": "edge.png",
@@ -81,6 +89,7 @@
   },
   "fresh-edge-beta": {
     "id": "fresh-edge-beta",
+    "type": "browser",
     "name": "Edge Beta",
     "description": "New Profile",
     "icon": "edge-beta.png",
@@ -91,6 +100,7 @@
   },
   "fresh-edge-dev": {
     "id": "fresh-edge-dev",
+    "type": "browser",
     "name": "Edge Developer",
     "description": "New Profile",
     "icon": "edge-dev.png",
@@ -101,6 +111,7 @@
   },
   "fresh-edge-canary": {
     "id": "fresh-edge-canary",
+    "type": "browser",
     "name": "Edge Canary",
     "description": "New Profile",
     "icon": "edge-can.png",
@@ -111,6 +122,7 @@
   },
   "fresh-brave": {
     "id": "fresh-brave",
+    "type": "browser",
     "name": "Brave",
     "description": "New Profile",
     "icon": "brave.png",
@@ -121,6 +133,7 @@
   },
   "fresh-opera": {
     "id": "fresh-opera",
+    "type": "browser",
     "name": "Opera",
     "description": "New Profile",
     "icon": "opera.png",
@@ -131,6 +144,7 @@
   },
   "fresh-firefox": {
     "id": "fresh-firefox",
+    "type": "browser",
     "name": "Mozilla Firefox",
     "description": "New Profile",
     "icon": "firefox.png",
@@ -141,6 +155,7 @@
   },
   "fresh-safari": {
     "id": "fresh-safari",
+    "type": "browser",
     "name": "Safari",
     "description": "New Profile",
     "icon": "safari.png",
@@ -151,6 +166,7 @@
   },
   "electron": {
     "id": "electron",
+    "type": "desktop-app",
     "name": "Any Electron App",
     "description": "Spotify, VS Code, more",
     "icon": "electron.png",
@@ -160,13 +176,14 @@
   },
   "existing-terminal": {
     "id": "existing-terminal",
+    "type": "terminal",
     "name": "Terminal",
     "description": "Terminal",
     "icon": "terminal.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false,
+    "isAvailable": true,
     "isDocAvailable": "https://docs.requestly.io/desktop-app/how-to.../terminal-setup"
   },
   "system-wide": {
@@ -177,30 +194,33 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "android": {
     "id": "android",
+    "type": "mobile",
     "name": "Android",
     "description": "External Device",
     "icon": "android.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "ios": {
     "id": "ios",
+    "type": "mobile",
     "name": "iOS",
     "description": "External Device",
     "icon": "ios.png",
-    "isActive": true,
+    "isActive": false,
     "isScanned": false,
     "comingSoon": false,
-    "isAvailable": false
+    "isAvailable": true
   },
   "raspberry-pi": {
     "id": "raspberry-pi",
+    "type": "other",
     "name": "Raspberry Pi",
     "description": "External Device",
     "icon": "raspberry-pi.png",
