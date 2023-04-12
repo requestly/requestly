@@ -2,13 +2,15 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { getUserPersonaSurveyDetails } from "store/selectors";
+import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { SurveyConfig, OptionsConfig } from "./config";
 // import { getFormattedUserUseCases } from "./utils";
 import APP_CONSTANTS from "config/constants";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
@@ -29,12 +31,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const location = useLocation();
   const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isPersonaRecommendationFlagOn = useFeatureIsOn(
-    "persona_recommendation"
-  );
-  const isSharedListUser = window.location.href.includes(
-    PATHS.SHARED_LISTS.VIEWER.RELATIVE
-  );
+  const appMode = useSelector(getAppMode);
+  const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
+  const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = () => {
     if (page === 0) return false;
@@ -46,8 +45,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
     if (page === 0) {
       return (
         <>
-          <span className="survey-modal-emoji">😁</span> We are excited to see
-          you here
+          <span className="survey-modal-emoji">😁</span> We are excited to see you here
         </>
       );
     } else return null;
@@ -68,21 +66,16 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
         break;
       case 1:
         trackPersonaQ1Completed(userPersona.persona);
-        submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA,
-          userPersona.persona
-        );
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
 
-        if (isSharedListUser) {
-          //don't show recommendation screen for shared list users
+        if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+          //don't show recommendation screen for shared list users or desktop users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
           return;
         }
 
         if (isPersonaRecommendationFlagOn) {
-          dispatch(
-            actions.toggleActiveModal({ modalName: "personaSurveyModal" })
-          );
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
           navigate(PATHS.GETTING_STARTED, {
             replace: true,
             state: {
@@ -125,7 +118,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
       //     }
       //     break;
     }
-
     dispatch(actions.updatePersonaSurveyPage(page === 1 ? 4 : page + 1));
   };
 
@@ -138,9 +130,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
             <Col>
               <RQButton
                 type="primary"
-                className={`text-bold ${
-                  disableContinue() && "survey-disable-continue"
-                }`}
+                className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
                 onClick={handleMoveToNextPage}
               >
                 {/* {page === surveyLength - 2 ? "Get started" : "Continue"} */}
