@@ -11,15 +11,14 @@ const WebTraffic = () => {
           <TrafficTableV2 />
         </Col>
       </Row>
-      <Row
-        style={{ paddingLeft: "24px", paddingRight: "24px", marginTop: "1rem" }}
-      >
+      <Row>
         <Col span={24}>
           <Alert
-            message="Network logger works only when you are on this page."
-            type="info"
-            showIcon
             closable
+            showIcon
+            type="info"
+            message="Network logger works only when you are on this page."
+            style={{ paddingLeft: "24px", paddingRight: "24px", margin: "1rem 0" }}
           />
         </Col>
       </Row>
