@@ -72,8 +72,8 @@
   width: fit-content;
 }
 
-.setup-instructions-back-btn div {
-  left: -6px;
+.setup-instructions-back-btn {
+  margin-left: -6px;
 }
 
 .setup-instructions-back-btn:hover {
