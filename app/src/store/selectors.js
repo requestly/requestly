@@ -215,5 +215,8 @@ export const getUserAttributes = (state) => {
 };
 
 export const getIsRedirectRuleTourCompleted = (state) => {
-  return getGlobalState(state)?.["misc"]?.["isRedirectRuleTourCompleted"];;
+  return getGlobalState(state)?.["misc"]?.["isRedirectRuleTourCompleted"];
+};
+export const getIsTrafficTableTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isTrafficTableTourCompleted"];
 };

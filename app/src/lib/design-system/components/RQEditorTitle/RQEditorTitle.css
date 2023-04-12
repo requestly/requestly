@@ -29,6 +29,15 @@
   margin-bottom: 0;
   color: #86868b;
 }
+
+.editor-title-container .editor-description .ant-typography span {
+  margin-right: 4px;
+}
+
+.editor-title-container .editor-description .ant-typography .ant-typography-edit {
+  margin-left: 0;
+}
+
 .editor-title-name .editor-title-name-wrapper .ant-input,
 .editor-title-description .ant-input {
   max-width: 600px;

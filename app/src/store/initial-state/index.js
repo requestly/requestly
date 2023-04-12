@@ -1,7 +1,7 @@
-import APP_CONSTANTS from "config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from 'config/constants';
+import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
 // SUB
-const appListJson = require("./sub/appsList.json");
+const appListJson = require('./sub/appsList.json');
 
 const INITIAL_STATE = {
   /* User */
@@ -12,10 +12,10 @@ const INITIAL_STATE = {
 
   userPersona: {
     page: 0,
-    persona: "",
+    persona: '',
     useCases: [],
-    referralChannel: "",
-    numberOfEmployees: "",
+    referralChannel: '',
+    numberOfEmployees: '',
     isSurveyCompleted: false,
   },
 
@@ -40,16 +40,16 @@ const INITIAL_STATE = {
     rulesToPopulate: [],
     groupwiseRulesToPopulate: {},
     selectedRules: {},
-    lastBackupTimeStamp: "",
+    lastBackupTimeStamp: '',
     isRulesListLoading: false,
   },
 
   /* Search */
   search: {
-    rules: "",
-    files: "",
-    sharedLists: "",
-    marketplace: "",
+    rules: '',
+    files: '',
+    sharedLists: '',
+    marketplace: '',
   },
 
   /* To force re-render a component */
@@ -99,6 +99,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    ruleEditorModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -112,11 +116,11 @@ const INITIAL_STATE = {
     proxyPort: 8080,
     appsList: appListJson,
     availableAppsScanned: false, // @nsr remove completely, as it is now async
-    proxyIp: "127.0.0.1",
+    proxyIp: '127.0.0.1',
   },
 
   // country of current user
-  country: "",
+  country: '',
 
   // if trial part
   trialModeEnabled: false,
@@ -146,7 +150,8 @@ const INITIAL_STATE = {
 
   misc: {
     isRedirectRuleTourCompleted: false,
-  }
+    isTrafficTableTourCompleted: false,
+  },
 };
 
 export default INITIAL_STATE;
