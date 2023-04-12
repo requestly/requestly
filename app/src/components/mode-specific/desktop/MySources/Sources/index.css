@@ -4,6 +4,7 @@
   min-height: 450px;
   max-height: 700px;
   overflow: auto;
+  border-radius: var(--border-radius-md);
 }
 
 .connected-apps-modal .source-tabs-container {
@@ -56,6 +57,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: -10px;
 }
 .connected-apps-modal .source-modal-footer-link {
   color: var(--text-gray);
