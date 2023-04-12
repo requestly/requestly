@@ -36,9 +36,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   errors,
 }) => {
   const [isNameEditable, setIsNameEditable] = useState<boolean>(false);
-  const [isDescriptionEditable, setIsDescriptionEditable] = useState<boolean>(
-    false
-  );
+  const [isDescriptionEditable, setIsDescriptionEditable] = useState<boolean>(false);
 
   const textAreaRef = useRef<TextAreaRef | null>(null);
   const nameInputRef = useRef<InputRef | null>(null);
@@ -88,9 +86,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                   placeholder={namePlaceholder}
                   onPressEnter={() => setIsNameEditable(false)}
                 />
-                <div className="field-error-prompt">
-                  {errors?.name && !name ? errors?.name : null}
-                </div>
+                <div className="field-error-prompt">{errors?.name && !name ? errors?.name : null}</div>
               </div>
             ) : (
               <div className="editor-title" data-tour-id="rule-editor-title">
@@ -143,17 +139,13 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                   }}
                   onClick={() => setIsDescriptionEditable(true)}
                 >
-                  {description ? description : descriptionPlaceholder}
+                  <span>{description ? description : descriptionPlaceholder}</span>
                 </Typography.Paragraph>
               </div>
             )}
           </Row>
         </Col>
-        <>
-          {tagText?.length && (
-            <Col className="mock-tag editor-title-tag">{tagText}</Col>
-          )}
-        </>
+        <>{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</>
       </Row>
     </Col>
   );

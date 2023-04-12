@@ -1,7 +1,7 @@
 import React, { ReactNode, useCallback } from "react";
 import { Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
+import { trackMoreInfoShown, trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 
@@ -32,6 +32,8 @@ export const MoreInfo: React.FC<InfoProps> = ({
 
   if (!isMoreInfoActive) {
     return <>{children}</>;
+  } else {
+    trackMoreInfoShown(analyticsContext, source);
   }
 
   return showIcon ? (

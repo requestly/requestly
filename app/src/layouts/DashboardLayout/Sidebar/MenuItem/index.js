@@ -13,9 +13,10 @@ import {
   Swap,
   Video,
   Play,
+  People,
 } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Divider, Menu } from "antd";
+import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
@@ -23,14 +24,12 @@ import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/u
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { snakeCase } from "lodash";
 
-const { SubMenu } = Menu;
-
 const { PATHS, LINKS } = APP_CONSTANTS;
 
 const givenRoutes = [
   {
-    header: "Rules",
-    key: "header-rules",
+    header: "Product",
+    key: "header-product",
   },
   {
     path: PATHS.RULES.MY_RULES.ABSOLUTE,
@@ -39,10 +38,27 @@ const givenRoutes = [
     key: "my-http-rules",
   },
   {
-    path: PATHS.RULES.TEMPLATES.ABSOLUTE,
-    name: "Templates",
-    icon: <Bag2 set="curved" className="remix-icon" />,
-    key: "template-rules",
+    path: PATHS.SESSIONS.RELATIVE,
+    name: "Sessions",
+    icon: <Video set="curved" className="remix-icon" />,
+    key: "sessions",
+  },
+  {
+    path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
+    name: "Mock Server",
+    icon: <Document set="curved" className="remix-icon" />,
+    key: "my-mocks",
+  },
+  {
+    path: PATHS.FILE_SERVER_V2.ABSOLUTE,
+    name: "File Server",
+    icon: <PaperUpload set="curved" className="remix-icon" />,
+    key: "my-mock-files",
+  },
+  {
+    header: "Collaboration",
+    collapsedHeader: "Collab",
+    key: "header-collaboration",
   },
   {
     path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
@@ -51,38 +67,30 @@ const givenRoutes = [
     key: "shared-lists",
   },
   {
-    path: PATHS.TRASH.ABSOLUTE,
-    name: "Trash",
-    icon: <Delete set="curved" className="remix-icon" />,
-    key: "rules-trash",
+    path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
+    name: "Workspaces",
+    icon: <People set="curved" className="remix-icon" />,
+    key: "workspaces",
   },
   {
-    header: "Mocks",
-    key: "mocks",
-  },
-  {
-    // path: PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE,
-    path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-    name: "Mock Server",
-    icon: <Document set="curved" className="remix-icon" />,
-    key: "my-mocks",
-  },
-  {
-    // path: PATHS.FILES.MY_FILES.ABSOLUTE,
-    path: PATHS.FILE_SERVER_V2.ABSOLUTE,
-    name: "File Server",
-    icon: <PaperUpload set="curved" className="remix-icon" />,
-    key: "my-mock-files",
+    header: "divider",
+    key: "divider",
   },
   {
     header: "Others",
     key: "others",
   },
   {
-    path: PATHS.SESSIONS.RELATIVE,
-    name: "Session Recording",
-    icon: <Video set="curved" className="remix-icon" />,
-    key: "session-recordings",
+    path: PATHS.RULES.TEMPLATES.ABSOLUTE,
+    name: "Templates",
+    icon: <Bag2 set="curved" className="remix-icon" />,
+    key: "template-rules",
+  },
+  {
+    path: PATHS.TRASH.ABSOLUTE,
+    name: "Trash",
+    icon: <Delete set="curved" className="remix-icon" />,
+    key: "rules-trash",
   },
   {
     path: LINKS.YOUTUBE_TUTORIALS,
@@ -93,7 +101,7 @@ const givenRoutes = [
 ];
 
 const MenuItem = (props) => {
-  const { onClose } = props;
+  const { onClose, collapsed } = props;
 
   // Location
   const location = useLocation();
@@ -140,122 +148,67 @@ const MenuItem = (props) => {
       if (result) {
         const allRoutes = [...myRoutes];
         const index = allRoutes.findIndex(
-          (route) => route.key === "session-recordings"
+          (route) => route.key === "header-collaboration"
         );
         allRoutes.splice(index, 0, {
           path: PATHS.MOBILE_DEBUGGER.RELATIVE,
-          name: "Mobile Debugger",
+          name: "Android Debugger",
           icon: <MobileOutlined />,
-          key: "mobile-debugger",
+          key: "android-debugger",
         });
         setMyRoutes(allRoutes);
       } else {
         setMyRoutes((prev) =>
-          prev.filter((route) => route.key !== "mobile-debugger")
+          prev.filter((route) => route.key !== "android-debugger")
         );
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
 
-  const menuItem = myRoutes.map((item) => {
+  const menuItems = myRoutes.map((item) => {
     if (item.header) {
-      return (
-        <>
-          {item.key === "others" ? (
-            <Divider className="sidebar-horizontal-divider" />
-          ) : null}
-          <Menu.ItemGroup key={item.key} title={item.header}></Menu.ItemGroup>
-        </>
-      );
+      if (item.key === "divider") {
+        return {
+          type: "divider",
+          key: item.key,
+          className: "sidebar-horizontal-divider",
+        };
+      }
+      return {
+        type: "group",
+        label: (collapsed && item.collapsedHeader) || item.header,
+        key: item.key,
+      };
     }
-
-    if (item.children) {
-      return (
-        <SubMenu key={item.key} icon={item.icon} title={item.name}>
-          {item.children.map((child) => {
-            if (!child.children) {
-              const childrenNavLink = child.path;
-
-              return (
-                // Level 2
-                <Menu.Item
-                  key={child.key}
-                  icon={<div className="icon-wrapper">{child.icon}</div>}
-                  className={
-                    locationURL === childrenNavLink
-                      ? "ant-menu-item-selected"
-                      : "ant-menu-item-selected-in-active"
-                  }
-                  onClick={onClose}
-                >
-                  <Link to={child.path}>{child.name}</Link>
-                </Menu.Item>
-              );
-            } else {
-              return (
-                // Level 3
-                <SubMenu key={child.key} title={child.name}>
-                  {child.children.map((childItem) => {
-                    const childrenItemLink = childItem.path;
-
-                    return (
-                      <Menu.Item
-                        key={childItem.key}
-                        className={
-                          locationURL === childrenItemLink
-                            ? "ant-menu-item-selected"
-                            : "ant-menu-item-selected-in-active"
-                        }
-                        onClick={onClose}
-                      >
-                        <Link to={childItem.path}>{childItem.name}</Link>
-                      </Menu.Item>
-                    );
-                  })}
-                </SubMenu>
-              );
-            }
-          })}
-        </SubMenu>
-      );
-    } else {
-      const itemNavLink = item.path;
-
-      return (
-        // Level 1 (in use)
-        <Menu.Item
-          key={item.key}
-          icon={<div className="icon-wrapper">{item.icon}</div>}
-          onClick={onClose}
-          style={{ paddingLeft: "11px", paddingRight: "6px" }}
-          className={
-            locationURL === itemNavLink
-              ? "ant-menu-item-selected"
-              : "ant-menu-item-selected-in-active"
-          }
-        >
-          {}
-          {item.path === LINKS.YOUTUBE_TUTORIALS ? (
-            <a
-              href={LINKS.YOUTUBE_TUTORIALS}
-              target="_blank"
-              rel="noreferrer"
-              onClick={trackTutorialsClicked}
-            >
-              {item.name}
-            </a>
-          ) : (
-            <Link
-              onClick={() => trackSidebarClicked(snakeCase(item.name))}
-              to={item.path}
-            >
-              {item.name}
-            </Link>
-          )}
-        </Menu.Item>
-      );
-    }
+    return {
+      key: item.key,
+      icon: <div className="icon-wrapper">{item.icon}</div>,
+      onClick: onClose,
+      style: { paddingLeft: "11px", paddingRight: "6px" },
+      className:
+        locationURL === item.path
+          ? "ant-menu-item-selected"
+          : "ant-menu-item-selected-in-active",
+      label:
+        item.path === LINKS.YOUTUBE_TUTORIALS ? (
+          <a
+            href={LINKS.YOUTUBE_TUTORIALS}
+            target="_blank"
+            rel="noreferrer"
+            onClick={trackTutorialsClicked}
+          >
+            {item.name}
+          </a>
+        ) : (
+          <Link
+            onClick={() => trackSidebarClicked(snakeCase(item.name))}
+            to={item.path}
+          >
+            {item.name}
+          </Link>
+        ),
+    };
   });
 
   return (
@@ -273,9 +226,8 @@ const MenuItem = (props) => {
         paddingBottom: "2.4rem",
       }}
       className={`siderbar-menu`}
-    >
-      {menuItem}
-    </Menu>
+      items={menuItems}
+    />
   );
 };
 

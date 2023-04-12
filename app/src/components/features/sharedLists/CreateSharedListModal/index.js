@@ -32,6 +32,7 @@ import {
 } from "modules/analytics/events/features/sharedList";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import "./index.css";
+import CopyButton from "components/misc/CopyButton";
 
 const CreateSharedListModal = (props) => {
   const { toggle: toggleModal, isOpen, rulesToShare } = props;
@@ -214,30 +215,13 @@ const CreateSharedListModal = (props) => {
     );
   };
 
-  const renderPostConFirmationFooter = () => {
+  const renderPostConfirmationFooter = () => {
     return isSharedListCreated ? (
-      <Row justify="space-between">
-        <div></div>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          {copiedText && (
-            <Typography.Text style={{ alignSelf: "center" }} type="secondary">
-              Copied!
-            </Typography.Text>
-          )}
-          <Button type="primary" onClick={onCopyHandler}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <AiOutlineLink />
-              Copy Link
-            </div>
-          </Button>
-        </div>
-      </Row>
+      <CopyButton
+        copyText={sharedListURL}
+        type="primary"
+        title={"Copy Text"}
+      />
     ) : null;
   };
 
@@ -403,7 +387,7 @@ const CreateSharedListModal = (props) => {
         }}
         footer={
           rulesToShare.length === 0 ? null : createSharedListConfirmed ? (
-            <>{isSharedListCreated ? renderPostConFirmationFooter() : null}</>
+            <>{isSharedListCreated ? renderPostConfirmationFooter() : null}</>
           ) : (
             <Row justify="space-between">
               <div style={{ display: "flex", gap: "0.5rem" }}></div>

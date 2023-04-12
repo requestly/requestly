@@ -50,35 +50,6 @@ RQ.Utils.reloadPage = function (wait) {
   }, wait);
 };
 
-RQ.Utils.submitEvent = function (
-  eventCategory,
-  eventAction,
-  eventLabel,
-  eventValue
-) {
-  if (!eventLabel) {
-    eventLabel = eventCategory + " " + eventAction;
-  }
-
-  RQ.ContentScriptMessageHandler.sendMessage({
-    action: RQ.CONSTANTS.MESSAGE_HANDLER_ACTIONS.SUBMIT_EVENT,
-    eventCategory: eventCategory,
-    eventAction: eventAction,
-    eventLabel: eventLabel,
-    eventValue: eventValue,
-  });
-};
-
-RQ.Utils.submitAttr = function (attr, value) {
-  const messageToSend = {
-    action: RQ.CONSTANTS.MESSAGE_HANDLER_ACTIONS.SUBMIT_ATTR,
-    attr: attr,
-    value: value,
-  };
-
-  RQ.ContentScriptMessageHandler.sendMessage(messageToSend);
-};
-
 RQ.Utils.removeLastPart = function (str, separater) {
   str = str || "";
 

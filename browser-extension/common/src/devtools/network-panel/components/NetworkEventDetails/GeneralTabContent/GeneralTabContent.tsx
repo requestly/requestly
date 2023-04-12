@@ -9,7 +9,7 @@ import { NetworkEvent, RuleEditorUrlFragment } from "../../../types";
 import { SourceKey, SourceOperator } from "../../../../../types";
 import PropertyRow from "../../PropertyRow/PropertyRow";
 import "./generalTabContent.scss";
-import { createRule, getBaseUrl, getHostFromUrl } from "../../../utils";
+import { createRule, generateRuleName, getBaseUrl, getHostFromUrl } from "../../../utils";
 
 interface Props {
   networkEvent: NetworkEvent;
@@ -25,6 +25,8 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
           operator: SourceOperator.EQUALS,
           value: networkEvent.request.url,
         };
+        rule.name = generateRuleName("Redirect request");
+        rule.description = `Redirect ${getBaseUrl(networkEvent.request.url)}`;
       },
       'input[data-selectionid="destination-url"]'
     );
@@ -41,6 +43,8 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
         };
         // @ts-ignore
         rule.pairs[0].from = getHostFromUrl(networkEvent.request.url);
+        rule.name = generateRuleName("Replace host");
+        rule.description = `Replace host in ${getBaseUrl(networkEvent.request.url)}`;
       },
       'input[data-selectionid="replace-to-in-url"]'
     );
@@ -55,6 +59,8 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
           operator: SourceOperator.CONTAINS,
           value: getBaseUrl(networkEvent.request.url),
         };
+        rule.name = generateRuleName("Modify URL");
+        rule.description = `Modify ${getBaseUrl(networkEvent.request.url)}`;
       },
       'input[data-selectionid="replace-from-in-url"]'
     );
@@ -69,6 +75,8 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
           operator: SourceOperator.EQUALS,
           value: networkEvent.request.url,
         };
+        rule.name = generateRuleName("Cancel request");
+        rule.description = `Cancel ${getBaseUrl(networkEvent.request.url)}`;
       },
       'input[data-selectionid="source-value"]'
     );
@@ -83,6 +91,8 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
           operator: SourceOperator.EQUALS,
           value: networkEvent.request.url,
         };
+        rule.name = generateRuleName("Delay request");
+        rule.description = `Delay ${getBaseUrl(networkEvent.request.url)}`;
       },
       'input[data-selectionid="delay-value"]'
     );
@@ -92,31 +102,19 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     <div className="general-tab-content">
       <PropertyRow name="Request URL" value={networkEvent.request.url} />
       <div className="request-url-actions">
-        <Button
-          icon={<Icon component={RedirectRuleIcon} />}
-          onClick={redirectRequest}
-        >
+        <Button icon={<Icon component={RedirectRuleIcon} />} onClick={redirectRequest}>
           Redirect to a different URL
         </Button>
-        <Button
-          icon={<Icon component={ReplaceRuleIcon} />}
-          onClick={replaceHostInUrl}
-        >
+        <Button icon={<Icon component={ReplaceRuleIcon} />} onClick={replaceHostInUrl}>
           Replace host
         </Button>
         <Button icon={<EditOutlined />} onClick={replacePartOfUrl}>
           Replace part of URL
         </Button>
-        <Button
-          icon={<Icon component={DelayRuleIcon} />}
-          onClick={delayRequest}
-        >
+        <Button icon={<Icon component={DelayRuleIcon} />} onClick={delayRequest}>
           Delay request
         </Button>
-        <Button
-          icon={<Icon component={CancelRuleIcon} />}
-          onClick={cancelRequest}
-        >
+        <Button icon={<Icon component={CancelRuleIcon} />} onClick={cancelRequest}>
           Cancel request
         </Button>
       </div>

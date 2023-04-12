@@ -98,3 +98,9 @@ export function getTabSession(tabId) {
     tabId,
   });
 }
+
+export function notifyAppLoadedToExtension() {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_APP_LOADED,
+  });
+}

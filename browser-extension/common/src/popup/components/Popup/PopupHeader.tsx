@@ -2,6 +2,8 @@ import React, { useCallback } from "react";
 import { Button, Dropdown, Menu, Row, Typography } from "antd";
 import config from "../../../config";
 import ArrowDown from "../../../../resources/icons/arrowDown.svg";
+import { sendEventFromPopup } from "../../../analytics/eventUtils";
+import { EVENT_CONSTANTS } from "../../../analytics/eventContants";
 
 interface PopupHeaderProps {
   isExtensionEnabled: boolean;
@@ -14,6 +16,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({
 }) => {
   const onOpenAppButtonClick = useCallback(() => {
     window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
+    sendEventFromPopup(EVENT_CONSTANTS.OPEN_APP_CLICKED);
   }, []);
 
   const items = (

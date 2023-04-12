@@ -47,7 +47,7 @@ export const UserRecommendations: React.FC<RecommendationsProps> = ({
         className="recommended-feature-container"
         onClick={() => {
           featureDetails.action(navigate);
-          trackPersonaRecommendationSelected(featureDetails?.title);
+          trackPersonaRecommendationSelected(featureDetails?.title, "modal");
           togglePersonaSurveyModal();
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
         }}
@@ -75,7 +75,10 @@ export const UserRecommendations: React.FC<RecommendationsProps> = ({
                     className="recommended-feature-title"
                     onClick={() => {
                       feature.action(navigate);
-                      trackPersonaRecommendationSelected(feature.title);
+                      trackPersonaRecommendationSelected(
+                        feature.title,
+                        "modal"
+                      );
                       togglePersonaSurveyModal();
                       dispatch(actions.updateIsPersonaSurveyCompleted(true));
                     }}

@@ -5,7 +5,12 @@ import UserAgentRuleIcon from "../../../../../resources/icons/rule-icons/userage
 import CodeIcon from "../../../../../resources/icons/code.svg";
 import CSSIcon from "../../../../../resources/icons/css.svg";
 import "./networkPanelToolbar.scss";
-import { createRule, getPageOrigin } from "../../utils";
+import {
+  createRule,
+  generateRuleName,
+  getHostFromUrl,
+  getPageOrigin,
+} from "../../utils";
 import { NetworkPanelSettings, RuleEditorUrlFragment } from "../../types";
 import {
   ScriptCodeType,
@@ -56,30 +61,38 @@ const PrimaryToolbar: React.FC<Props> = ({
             value: 'console.log("Hello World");',
           },
         ];
+        rule.name = generateRuleName("Add JS");
+        rule.description = `Add JS on ${getHostFromUrl(pageOrigin)}`;
       },
-      "textarea"
+      ".code-editor textarea"
     );
   }, []);
 
   const addCSSInPage = useCallback(async () => {
     const pageOrigin = await getPageOrigin();
 
-    createRule(RuleEditorUrlFragment.SCRIPT, (rule) => {
-      const rulePair = rule.pairs[0] as ScriptRulePair;
-      rulePair.source = {
-        key: SourceKey.URL,
-        operator: SourceOperator.CONTAINS,
-        value: pageOrigin,
-      };
-      rulePair.scripts = [
-        {
-          type: ScriptType.CODE,
-          codeType: ScriptCodeType.CSS,
-          loadTime: "afterPageLoad",
-          value: "body {\n\tbackground-color: #fff;\n}",
-        },
-      ];
-    });
+    createRule(
+      RuleEditorUrlFragment.SCRIPT,
+      (rule) => {
+        const rulePair = rule.pairs[0] as ScriptRulePair;
+        rulePair.source = {
+          key: SourceKey.URL,
+          operator: SourceOperator.CONTAINS,
+          value: pageOrigin,
+        };
+        rulePair.scripts = [
+          {
+            type: ScriptType.CODE,
+            codeType: ScriptCodeType.CSS,
+            loadTime: "afterPageLoad",
+            value: "body {\n\tbackground-color: #fff;\n}",
+          },
+        ];
+        rule.name = generateRuleName("Add CSS");
+        rule.description = `Add CSS on ${getHostFromUrl(pageOrigin)}`;
+      },
+      ".code-editor textarea"
+    );
   }, []);
 
   const emulateDevice = useCallback(async () => {
@@ -99,6 +112,8 @@ const PrimaryToolbar: React.FC<Props> = ({
         ];
         // @ts-ignore
         rulePair.envType = "device";
+        rule.name = generateRuleName("Emulate device");
+        rule.description = `Emulate device on ${getHostFromUrl(pageOrigin)}`;
       },
       '[data-selectionid="device-selector"] input'
     );

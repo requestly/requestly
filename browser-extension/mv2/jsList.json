@@ -34,6 +34,7 @@
   "devtools-panel": [
     "../config/dist/config.js",
     "../../common/constants.js",
+    "../common/dist/analytics.js",
     "src/shared/constants.js",
     "src/devtools/libs/jquery-3.5.1.js",
     "src/devtools/libs/handlebars.runtime-v4.7.7.js",
@@ -44,12 +45,14 @@
   "background": [
     "dist/generated/shared.js",
     "../../common/logger.js",
+    "../common/dist/utils.js",
     "src/external/CircularQueue.js",
     "src/external/chromeTabService.js",
     "src/modules/StorageService.js",
     "src/modules/PreDefinedFunction.js",
     "src/modules/PreDefinedFunctions.js",
     "src/modules/RuleMatcher.js",
+    "src/modules/EventActions.js",
     "src/background/SampleRules.js",
     "src/background/flags.js",
     "src/background/background.js"
