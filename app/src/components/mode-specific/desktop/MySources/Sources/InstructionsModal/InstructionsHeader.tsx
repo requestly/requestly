@@ -35,7 +35,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
         </Col>
         <Col>Back</Col>
       </Row>
-      <Row className="mt-8 setup-instructions-header">
+      <Row className="mt-16 setup-instructions-header">
         <Col span={1} className="mr-2">
           <Avatar src={icon} />
         </Col>
@@ -45,7 +45,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
               {heading}
             </Typography.Title>
           </Row>
-          <Row>
+          <Row className="mt-8 setup-instructions-description">
             <Typography.Text className="text-gray">{description}</Typography.Text>
           </Row>
         </Col>

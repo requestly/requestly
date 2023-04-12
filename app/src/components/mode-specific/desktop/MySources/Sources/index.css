@@ -74,11 +74,8 @@
   width: fit-content;
 }
 
-.setup-instructions-back-btn div {
-  left: -6px;
-}
-
-.setup-instructions-back-btn:hover {
+.setup-instructions-back-btn {
+  margin-left: -6px;
   cursor: pointer;
 }
 
@@ -124,4 +121,8 @@
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-title {
   font-size: 24px;
+}
+
+.setup-instructions-description {
+  width: 600px;
 }

@@ -1,8 +1,8 @@
-import { Row, Select, Steps } from "antd";
+import { Dropdown, Row, Steps } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "utils/RedirectionUtils";
-
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import CompleteStep from "../common/Complete";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
@@ -10,8 +10,6 @@ import CertificateTrustInstructions from "./CertificateTrust";
 import { IOS_DEVICES } from "./constants";
 import WifiInstructions from "./Wifi";
 import InstructionsHeader from "../InstructionsHeader";
-
-const { Option } = Select;
 
 const IOSInstructionModal = ({ setShowInstructions }) => {
   const navigate = useNavigate();
@@ -26,12 +24,22 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
   };
 
   const renderDeviceSelector = () => {
+    const menuItems = Object.keys(IOS_DEVICES).map((device_id) => {
+      return {
+        key: device_id,
+        label: device_id.toUpperCase(),
+      };
+    });
+
+    const menuProp = {
+      items: menuItems,
+      onClick: (item) => handleOnDeviceChange(item.key),
+    };
+
     return (
-      <Select defaultValue={selectedDevice} style={{ width: 120 }} onChange={handleOnDeviceChange}>
-        {Object.keys(IOS_DEVICES).map((device_id) => {
-          return <Option value={device_id}>{device_id.toUpperCase()}</Option>;
-        })}
-      </Select>
+      <Dropdown.Button icon={<DownArrow />} menu={menuProp}>
+        {selectedDevice}
+      </Dropdown.Button>
     );
   };
 
