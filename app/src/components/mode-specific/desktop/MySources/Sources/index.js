@@ -305,7 +305,9 @@ const Sources = ({ isOpen, toggle }) => {
             </>
           )}
         </Col>
-        <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
+        {!showInstructions && (
+          <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
+        )}
       </RQModal>
       {/* Modals */}
       {isCloseConfirmModalActive ? (
