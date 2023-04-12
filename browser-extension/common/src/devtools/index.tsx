@@ -5,11 +5,7 @@ import { ThemeProvider } from "@devtools-ds/themes";
 import NetworkContainer from "./containers/network/NetworkContainer";
 import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
 import { ColorScheme } from "./types";
-import {
-  getCurrentColorScheme,
-  isExtensionManifestV3,
-  onColorSchemeChange,
-} from "./utils";
+import { getCurrentColorScheme, isExtensionManifestV3, onColorSchemeChange } from "./utils";
 import "./index.scss";
 
 const token = {
@@ -18,9 +14,7 @@ const token = {
 };
 
 const App: React.FC = () => {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(
-    getCurrentColorScheme()
-  );
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(getCurrentColorScheme());
 
   useEffect(() => {
     onColorSchemeChange(setColorScheme);
@@ -48,7 +42,7 @@ const App: React.FC = () => {
             className="devtools-tabs"
             defaultActiveKey="1"
             tabPosition="left"
-            tabBarStyle={{ minWidth: 140 }}
+            tabBarStyle={{ minWidth: 150 }}
             tabBarGutter={0}
             items={[
               {

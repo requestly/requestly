@@ -46,7 +46,7 @@
     font-size: var(--font-size-normal);
 
     &[data-selected] {
-      background-color: var(--background-color-tab-selected);
+      background-color: var(--bg-color-secondary-tab-selected);
       color: var(--color-primary);
     }
   }

@@ -6,13 +6,14 @@
   --color-secondary: #202124;
   --color-error: #ed4e4c;
   --border-color: #cdcdcd;
-  --background-color-primary: #fff;
-  --background-color-secondary: #f5f5f5;
-  --background-color-row-hover: #ebebeb;
-  --background-color-error-row-selected: #fbd1cf;
-  --background-color-tab-selected: transparent;
-  --background-color-radiobutton-selected: #dadce0;
-  --background-color-toolbar: #f1f3f4;
+  --bg-color-primary: #fff;
+  --bg-color-secondary: #f5f5f5;
+  --bg-color-row-hover: #ebebeb;
+  --bg-color-error-row-selected: #fbd1cf;
+  --bg-color-primary-tab-selected: #dadada;
+  --bg-color-secondary-tab-selected: transparent;
+  --bg-color-radiobutton-selected: #dadce0;
+  --bg-color-toolbar: #f1f3f4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,19 +21,20 @@
     --color-primary: #ffffff;
     --color-secondary: #bdc6cf;
     --border-color: #3c3d3c;
-    --background-color-primary: #1f1f1f;
-    --background-color-secondary: #242529;
-    --background-color-row-hover: #30303091;
-    --background-color-error-row-selected: #48181a;
-    --background-color-tab-selected: black;
-    --background-color-radiobutton-selected: #454545;
-    --background-color-toolbar: #252629;
+    --bg-color-primary: #1f1f1f;
+    --bg-color-secondary: #242529;
+    --bg-color-row-hover: #30303091;
+    --bg-color-error-row-selected: #48181a;
+    --bg-color-primary-tab-selected: #474747;
+    --bg-color-secondary-tab-selected: black;
+    --bg-color-radiobutton-selected: #454545;
+    --bg-color-toolbar: #252629;
   }
 }
 
 body {
   margin: 0;
-  background-color: var(--background-color-primary);
+  background-color: var(--bg-color-primary);
 }
 
 html,
@@ -47,6 +49,16 @@ body,
 
   .ant-tabs-tab {
     font-size: var(--font-size-normal);
+    color: var(--color-secondary);
+    height: 36px;
+
+    &.ant-tabs-tab-active {
+      background: var(--bg-color-primary-tab-selected);
+
+      .ant-tabs-tab-btn {
+        color: var(--color-primary);
+      }
+    }
   }
 
   > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
