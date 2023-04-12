@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col, Card, Typography, Button } from "antd";
 import { CardBody } from "reactstrap";
+import InstructionsHeader from "../../MySources/Sources/InstructionsModal/InstructionsHeader";
 // UTILS
 import { getDesktopSpecificDetails } from "../../../../../store/selectors";
 // ACTIONS
@@ -10,15 +11,11 @@ import { useSelector } from "react-redux";
 
 const { Title } = Typography;
 
-const MacProxySettings = () => {
+const MacProxySettings = ({ setShowInstructions }) => {
   //Global State
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
 
-  const {
-    isBackgroundProcessActive,
-    isProxyServerRunning,
-    proxyPort,
-  } = desktopSpecificDetails;
+  const { isBackgroundProcessActive, isProxyServerRunning, proxyPort } = desktopSpecificDetails;
 
   if (!isBackgroundProcessActive || !isProxyServerRunning) {
     return (
@@ -27,14 +24,8 @@ const MacProxySettings = () => {
           <Col>
             <Card className="shadow">
               <CardBody>
-                <Jumbotron
-                  style={{ background: "transparent" }}
-                  className="text-center"
-                >
-                  <p>
-                    Proxy server is not running. Please restart the app or
-                    report to us if issue persists.
-                  </p>
+                <Jumbotron style={{ background: "transparent" }} className="text-center">
+                  <p>Proxy server is not running. Please restart the app or report to us if issue persists.</p>
                 </Jumbotron>
               </CardBody>
             </Card>
@@ -46,48 +37,30 @@ const MacProxySettings = () => {
 
   return (
     <React.Fragment>
-      <Row>
-        <Col lg="12" style={{ textAlign: "center", width: "100%" }}>
-          <Title level={2}>Setting up system proxy</Title>
-        </Col>
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/package.png"}
+        heading="Setting up system proxy"
+        description="Requestly requires your applications to send their network traffic through its local proxy server before
+            going to the destination."
+        setShowInstructions={setShowInstructions}
+      />
+      <Row className="mt-16">
+        <p>
+          The proxy server you set globally will be used by Safari, Google Chrome, and other applications that respect
+          your system proxy settings. Some applications, including Mozilla Firefox, can have their own custom proxy
+          settings independent from your system settings.
+        </p>
       </Row>
       <Row>
         <Col>
           <Title level={5}>
-            Requestly requires your applications to send their network traffic
-            through the its local proxy server before going to their
-            destination.
+            Set your proxy settings to host 127.0.0.1 and port {proxyPort} (http://127.0.0.1:{proxyPort})
           </Title>
-          <p>
-            The proxy server you set globally will be used by Safari, Google
-            Chrome, and other applications that respect your system proxy
-            settings. Some applications, including Mozilla Firefox, can have
-            their own custom proxy settings independent from your system
-            settings.
-          </p>
+          <p>Make sure to set HTTPS proxy, if you want to intercept secure traffic.</p>
         </Col>
       </Row>
       <Row>
         <Col>
-          <Title level={5}>
-            Set your proxy settings to host 127.0.0.1 and port {proxyPort}{" "}
-            (http://127.0.0.1:{proxyPort})
-          </Title>
-          <p>
-            Make sure to set HTTPS proxy, if you want to intercept secure
-            traffic.
-          </p>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {/* <Paragraph className="text-center">
-            Click{" "}
-            <Text type="link" onClick={() => saveRootCert()}>
-              here
-            </Text>{" "}
-            to save certificate to your disk.
-          </Paragraph> */}
           <Button type="primary" onClick={() => saveRootCert()}>
             Save Certificate
           </Button>

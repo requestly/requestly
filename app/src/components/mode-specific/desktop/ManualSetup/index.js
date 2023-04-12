@@ -1,14 +1,11 @@
-import ProCard from "@ant-design/pro-card";
 import React from "react";
 // OS Specific Components
 import MacProxySettings from "./Mac";
 
-const ManualSetup = () => {
+const ManualSetup = ({ setShowInstructions }) => {
   return (
     <React.Fragment>
-      <ProCard className="primary-card github-like-border">
-        <MacProxySettings />
-      </ProCard>
+      <MacProxySettings setShowInstructions={setShowInstructions} />
     </React.Fragment>
   );
 };
