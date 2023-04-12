@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Modal, Steps, Button, Tooltip, Typography } from "antd";
+import { Modal, Steps, Button, Tooltip, Typography, Row } from "antd";
 import { CopyOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "utils/RedirectionUtils";
+import InstructionsHeader from "./InstructionsHeader";
 
 const { Title } = Typography;
 
@@ -24,17 +25,12 @@ const TerminalCommand = ({ helperServerPort }) => {
           {command}
         </code>
       </Title>
-      <Tooltip
-        title={copyClicked ? "copied!" : "copy command"}
-        color={copyClicked ? "green" : ""}
-      >
+      <Tooltip title={copyClicked ? "copied!" : "copy command"} color={copyClicked ? "green" : ""}>
         <Button
           type="secondary"
           icon={
             copyClicked ? (
-              <CheckCircleFilled
-                style={{ color: "green", fontSize: "0.9rem" }}
-              />
+              <CheckCircleFilled style={{ color: "green", fontSize: "0.9rem" }} />
             ) : (
               <CopyOutlined style={{ fontSize: "0.9rem" }} />
             )
@@ -52,7 +48,7 @@ const TerminalCommand = ({ helperServerPort }) => {
   );
 };
 
-const ExistingTerminalInstructionModal = ({ isVisible, handleCancel }) => {
+const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
@@ -61,25 +57,21 @@ const ExistingTerminalInstructionModal = ({ isVisible, handleCancel }) => {
   const { helperServerPort } = desktopSpecificDetails;
   return (
     <>
-      <Modal
-        title="Steps to setup Terminal Proxy"
-        visible={isVisible}
-        onOk={navigateToTraffic}
-        okText="Inspect Traffic"
-        onCancel={handleCancel}
-        cancelText="Close"
-        width="50%"
-      >
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/terminal.png"}
+        heading="Terminal proxy setup"
+        description="Note: Follow the below mentioned steps to complete the setup."
+        setShowInstructions={setShowInstructions}
+      />
+      <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1}>
           <Steps.Step
             title="Run the command below in your terminal"
             status="process"
-            description={
-              <TerminalCommand helperServerPort={helperServerPort} />
-            }
+            description={<TerminalCommand helperServerPort={helperServerPort} />}
           />
         </Steps>
-      </Modal>
+      </Row>
     </>
   );
 };
