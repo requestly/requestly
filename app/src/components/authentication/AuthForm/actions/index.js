@@ -17,7 +17,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { redirectToForgotPassword } from "../../../../utils/RedirectionUtils";
 import {
-  getPrettyAuthErrorMessage,
+  getAuthErrorMessage,
   AuthTypes,
 } from "components/authentication/utils";
 import posthog from "posthog-js";
@@ -91,9 +91,7 @@ export const handleForgotPasswordButtonOnClick = (
       }
     })
     .catch(({ errorCode }) => {
-      showError(
-        getPrettyAuthErrorMessage(AuthTypes.FORGOT_PASSWORD, errorCode)
-      );
+      showError(getAuthErrorMessage(AuthTypes.FORGOT_PASSWORD, errorCode));
       setLoader(false);
     });
 };
