@@ -27,7 +27,7 @@ export const updateUsername = (prevState, action) => {
 };
 
 //Persona Survey actions
-export const syncUserPersonaData = (prevState, action) => {
+export const setUserPersonaData = (prevState, action) => {
   prevState.userPersona = action.payload;
 };
 
@@ -83,10 +83,9 @@ export const updateUserAttributes = (prevState, action) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
     ...action.payload,
-  }
-}
+  };
+};
 
 export const updateRedirectRuleTourCompleted = (prevState, action) => {
   prevState.misc.isRedirectRuleTourCompleted = true;
-}
-
+};

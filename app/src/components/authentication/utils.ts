@@ -18,7 +18,7 @@ const getForgotPasswordErrorMessage = (errorCode: string) => {
 
     default:
       return (
-        "Unable to request new password this time. Please write us at " +
+        "Unable to request new password this time. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
   }
@@ -36,13 +36,13 @@ const getSignInErrorMessage = (errorCode: string) => {
 
     case "auth/user-disabled":
       return (
-        "Sorry but your account is disabled. Please write us at " +
+        "Sorry but your account is disabled. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
 
     default:
       return (
-        "Sorry, we couldn’t log you in. Please write us at " +
+        "Sorry, we couldn't log you in. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
   }
@@ -63,21 +63,18 @@ const getSignUpErrorMessage = (errorCode: string) => {
       return "Please choose a stronger password";
     case "auth/operation-not-allowed":
       return (
-        "Sorry but your account is disabled. Please write us at " +
+        "Sorry but your account is disabled. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
     default:
       return (
-        "Sorry, we couldn’t sign you up. Please write us at " +
+        "Sorry, we couldn't sign you up. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
   }
 };
 
-export const getPrettyAuthErrorMessage = (
-  authType: string,
-  errorCode: string
-) => {
+export const getAuthErrorMessage = (authType: string, errorCode: string) => {
   switch (authType) {
     case AuthTypes.SIGN_IN:
       return getSignInErrorMessage(errorCode);
@@ -90,7 +87,7 @@ export const getPrettyAuthErrorMessage = (
 
     default:
       return (
-        "An unexpected has occurred. Please write us at " +
+        "An unexpected has occurred. Please write us to " +
         GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL
       );
   }

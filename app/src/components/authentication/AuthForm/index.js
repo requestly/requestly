@@ -16,7 +16,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 //UTILS
 import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
-import { getPrettyAuthErrorMessage, AuthTypes } from "../utils";
+import { getAuthErrorMessage, AuthTypes } from "../utils";
 
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
@@ -76,19 +76,15 @@ const AuthForm = ({
     () => Math.floor(Math.random() * 3),
     []
   );
-  // const emailOptin = false;
-  // let isSignUp = true;
 
   const showVerifyEmailMessage = () => {
     Modal.info({
       title: "Verify email",
       content: (
-        <div>
-          <p>
-            Please click on the link that has just been sent to your email
-            account to verify your email.
-          </p>
-        </div>
+        <Typography.Text>
+          Please click on the link that has just been sent to your email account
+          to verify your email.
+        </Typography.Text>
       ),
     });
   };
@@ -132,14 +128,31 @@ const AuthForm = ({
       .then(({ status, errorCode }) => {
         if (status) {
           showVerifyEmailMessage();
-          handleEmailSignIn(email, password, true, eventSource);
+          handleEmailSignIn(email, password, true, eventSource)
+            .then(({ result }) => {
+              if (result.user.uid) {
+                toast.info(
+                  `${getGreeting()}, ${result.user.displayName.split(" ")[0]}`
+                );
+                setEmail("");
+                setPassword("");
+                syncUserPersona(result.user.uid, dispatch, userPersona);
+                onSignInSuccess && onSignInSuccess(result.user.uid);
+              }
+            })
+            .catch(({ errorCode }) => {
+              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+              setActionPending(false);
+              setEmail("");
+              setPassword("");
+            });
         } else {
-          toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
           setActionPending(false);
         }
       })
       .catch(({ errorCode }) => {
-        toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
         setActionPending(false);
       });
   };
@@ -155,15 +168,15 @@ const AuthForm = ({
           );
           setEmail("");
           setPassword("");
-          onSignInSuccess && onSignInSuccess(result.user.uid);
           syncUserPersona(result.user.uid, dispatch, userPersona);
+          onSignInSuccess && onSignInSuccess(result.user.uid);
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
           setActionPending(true);
         }
       })
       .catch(({ errorCode }) => {
-        toast.error(getPrettyAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
         setActionPending(false);
         setEmail("");
         setPassword("");
