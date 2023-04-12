@@ -64,7 +64,7 @@ const MacProxySettings = ({ setShowInstructions }) => {
         <Button className="text-bold mr-8 self-end" type="primary" onClick={() => saveRootCert()}>
           Save Certificate
         </Button>
-        <CompleteStep appId={"manual-setup"} />
+        <CompleteStep appId="manual-setup" />
       </Row>
     </React.Fragment>
   );
