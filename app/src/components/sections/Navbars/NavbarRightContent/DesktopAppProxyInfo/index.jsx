@@ -7,6 +7,7 @@ import { Badge } from "antd";
 import { RQButton } from "lib/design-system/components";
 import "./desktopAppProxyInfo.scss";
 import { actions } from "store";
+import { trackConnectAppsClicked } from "modules/analytics/events/desktopApp/apps";
 
 const DesktopAppProxyInfo = () => {
   // Global State
@@ -49,6 +50,7 @@ const DesktopAppProxyInfo = () => {
                 newProps: {},
               })
             );
+            trackConnectAppsClicked("app_header");
           }}
         >
           {numberOfConnectedApps === 0 ? "Connect Apps" : "Connected Apps"}

@@ -12,6 +12,8 @@ import {
   trackAppConnectFailureEvent,
   trackAppConnectedEvent,
   trackAppDisconnectedEvent,
+  trackConnectAppsClicked,
+  trackSystemWideConnected,
 } from "modules/analytics/events/desktopApp/apps";
 import "./index.css";
 
@@ -38,6 +40,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
             })
           );
           trackAppConnectedEvent(appName);
+          trackSystemWideConnected("traffic_table");
         } else {
           toast.error(`Unable to activate ${appName}. Issue reported.`);
           trackAppConnectFailureEvent(appName);
@@ -107,6 +110,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         newProps: {},
       })
     );
+    trackConnectAppsClicked("traffic_table");
   };
 
   const renderNoTrafficCTA = () => {

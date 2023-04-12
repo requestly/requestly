@@ -18,6 +18,8 @@ import {
   trackAppConnectedEvent,
   trackAppDisconnectedEvent,
   trackAppConnectFailureEvent,
+  trackSystemWideConnected,
+  trackAppSetupInstructionsViewed,
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
@@ -45,6 +47,8 @@ const Sources = ({ isOpen, toggle }) => {
   const appsListRef = useRef(null);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
+  const getAppCount = useCallback(() => appsListArray.filter((app) => app.isActive).length, [appsListArray]);
+  const getAppType = (appId) => appsListRef.current[appId]?.type;
 
   useEffect(() => {
     appsListRef.current = appsList;
@@ -66,10 +70,14 @@ const Sources = ({ isOpen, toggle }) => {
     handleActivateAppOnClick(appIdToCloseConfirm, { closeConfirmed: true });
   };
 
-  const renderInstructionsModal = useCallback((appId) => {
-    setCurrentApp(appId);
-    setShowInstructions(true);
-  }, []);
+  const renderInstructionsModal = useCallback(
+    (appId) => {
+      setCurrentApp(appId);
+      setShowInstructions(true);
+      trackAppSetupInstructionsViewed(getAppName(appId), getAppCount() + 1);
+    },
+    [getAppCount]
+  );
 
   const handleActivateAppOnClick = useCallback(
     (appId, options = {}) => {
@@ -95,7 +103,7 @@ const Sources = ({ isOpen, toggle }) => {
                 value: true,
               })
             );
-            trackAppConnectedEvent(getAppName(appId));
+            trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId));
             toggle();
             // apps with instruction modals should not be force navigated
             if (!["system-wide", "existing-terminal"].includes(appId)) {
@@ -111,7 +119,7 @@ const Sources = ({ isOpen, toggle }) => {
         })
         .catch(Logger.log);
     },
-    [dispatch, navigate, processingApps]
+    [dispatch, getAppCount, navigate, processingApps, toggle]
   );
 
   const handleDisconnectAppOnClick = useCallback(
@@ -138,7 +146,6 @@ const Sources = ({ isOpen, toggle }) => {
               })
             );
             trackAppDisconnectedEvent(getAppName(appId));
-            toggle();
           } else {
             toast.error(`Unable to deactivate ${getAppName(appId)}. Issue reported.`);
           }
@@ -259,7 +266,10 @@ const Sources = ({ isOpen, toggle }) => {
             <RQButton
               type="default"
               icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}
-              onClick={() => handleActivateAppOnClick(source.id)}
+              onClick={() => {
+                handleActivateAppOnClick(source.id);
+                trackSystemWideConnected("app_source_modal");
+              }}
             >
               Enable Requestly system-wide
             </RQButton>
