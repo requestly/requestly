@@ -212,7 +212,7 @@
     "type": "mobile",
     "name": "iOS",
     "description": "External Device",
-    "icon": "ios.png",
+    "icon": "ios.svg",
     "isActive": false,
     "isScanned": false,
     "comingSoon": false,

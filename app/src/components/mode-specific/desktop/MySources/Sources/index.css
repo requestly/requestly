@@ -45,6 +45,9 @@
   align-items: center;
   gap: 12px;
 }
+.connected-apps-modal .source-grid .source-item .source-item-meta .ant-avatar-image img {
+  object-fit: contain;
+}
 .connected-apps-modal .source-grid .source-item .source-description {
   padding-left: 10px;
 }
