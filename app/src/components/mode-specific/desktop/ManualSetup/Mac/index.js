@@ -61,7 +61,7 @@ const MacProxySettings = ({ setShowInstructions }) => {
       </Row>
       <Row>
         <Col>
-          <Button type="primary" onClick={() => saveRootCert()}>
+          <Button className="text-bold" type="primary" onClick={() => saveRootCert()}>
             Save Certificate
           </Button>
         </Col>

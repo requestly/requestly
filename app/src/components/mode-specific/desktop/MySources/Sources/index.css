@@ -53,12 +53,18 @@
   background: rgba(var(--danger-rgb), 0.2);
   border-color: rgba(var(--danger-rgb), 0.6);
 }
-.system-wide-source {
+.connected-apps-modal .system-wide-source {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: -10px;
 }
+
+.connected-apps-modal .instruction-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .connected-apps-modal .source-modal-footer-link {
   color: var(--text-gray);
   text-decoration: underline;

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Row, Avatar, Tabs } from "antd";
 import { QuestionCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
 import CloseConfirmModal from "./ErrorHandling/CloseConfirmModal";
@@ -291,7 +291,11 @@ const Sources = ({ isOpen, toggle }) => {
             <>
               <Row className="white header text-bold">Connected apps</Row>
               <Row className="text-gray mt-8">
-                Connect your system apps to Requestly. After connecting the required app, click here to setup rules.
+                Connect your system apps to Requestly. After connecting the required app, click&nbsp;
+                <Link to="/" className="external-link" onClick={toggle}>
+                  here
+                </Link>
+                &nbsp;to setup rules.
               </Row>
               <Row className="w-full mt-20">
                 <Tabs
@@ -304,7 +308,20 @@ const Sources = ({ isOpen, toggle }) => {
             </>
           )}
         </Col>
-        {!showInstructions && (
+        {showInstructions ? (
+          <Col className="rq-modal-footer instruction-footer">
+            <RQButton
+              type="primary"
+              className="text-bold"
+              onClick={() => {
+                toggle();
+                redirectToTraffic(navigate);
+              }}
+            >
+              Intercept traffic
+            </RQButton>
+          </Col>
+        ) : (
           <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
         )}
       </RQModal>
