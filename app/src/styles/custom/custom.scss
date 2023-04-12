@@ -1232,16 +1232,11 @@ input[id^="react-select-"] {
 }
 
 .rq-count-badge {
-  margin-right: 2px;
-  .ant-badge-count.ant-scroll-number {
-    height: 18px;
-    width: 16px;
-    padding: 3px 5px 3px 5px;
-    font-size: 10px;
-    line-height: 11px;
-    color: var(--success);
-    background-color: transparent;
-    border-radius: 4px;
-    border: 1px solid var(--success);
-  }
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--success);
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--success);
 }

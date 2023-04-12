@@ -15,30 +15,32 @@ const DesktopAppProxyInfo = () => {
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const { isBackgroundProcessActive, isProxyServerRunning, proxyPort, proxyIp, appsList } = desktopSpecificDetails;
 
-  const [numberConnectedApps, setNumberConnectedApps] = useState(0);
+  const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
-    setNumberConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
+    setNumberOfConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
   }, [appsList]);
 
   const renderProxyBadgeStatus = () => {
     if (!isBackgroundProcessActive || !isProxyServerRunning) {
-      return "warning";
+      return <Badge status="warning" />;
     }
-    return "success";
+    return <Badge status="success" />;
   };
 
   const renderProxyStatusText = () => {
-    if (!isBackgroundProcessActive) return "Waiting for proxy server to start...";
+    if (!isBackgroundProcessActive)
+      return <span className="proxy-status-text">Waiting for proxy server to start...</span>;
 
-    if (!isProxyServerRunning) return "Proxy server is not running";
+    if (!isProxyServerRunning) return <span className="proxy-status-text">Proxy server is not running</span>;
 
     return (
       <>
-        <span>Proxy server is listening at{` ${proxyIp}:${proxyPort}`}</span>
+        <span className="proxy-status-text">Proxy server is listening at{` ${proxyIp}:${proxyPort}`}</span>
         <RQButton
           type="default"
           size="small"
+          className="connected-apps-btn"
           onClick={() => {
             dispatch(
               actions.toggleActiveModal({
@@ -49,10 +51,8 @@ const DesktopAppProxyInfo = () => {
             );
           }}
         >
-          {numberConnectedApps === 0 ? "Connect Apps" : "Connected Apps"}
-          {numberConnectedApps > 0 ? (
-            <Badge count={numberConnectedApps} size="small" className="rq-count-badge" />
-          ) : null}
+          {numberOfConnectedApps === 0 ? "Connect Apps" : "Connected Apps"}
+          {numberOfConnectedApps > 0 ? <div className="rq-count-badge">{numberOfConnectedApps}</div> : null}
         </RQButton>
       </>
     );
@@ -60,7 +60,12 @@ const DesktopAppProxyInfo = () => {
 
   if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) return null;
 
-  return <Badge text={renderProxyStatusText()} status={renderProxyBadgeStatus()} className="desktop-app-proxy-info" />;
+  return (
+    <div className="desktop-app-proxy-info">
+      <>{renderProxyBadgeStatus()}</>
+      <>{renderProxyStatusText()}</>
+    </div>
+  );
 };
 
 export default DesktopAppProxyInfo;
