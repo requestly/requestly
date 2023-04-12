@@ -1,4 +1,4 @@
-import { Column } from "../../components/ResourceTable/types";
+import { Column } from "../../components/ResourceTable";
 import { ExecutionEvent } from "../../types";
 
 export enum EXECUTION_TABLE_COLUMN_IDS {

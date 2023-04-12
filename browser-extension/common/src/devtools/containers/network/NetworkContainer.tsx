@@ -3,7 +3,10 @@ import { NetworkEvent, ResourceFilters, NetworkSettings } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
-import NetworkTable from "./NetworkTable/NetworkTable";
+import { ResourceTable } from "../../components/ResourceTable";
+import networkEventTableColumns, { NETWORK_TABLE_COLUMN_IDS } from "./columns";
+import networkEventDetailsTabs from "./details-tabs";
+import { matchResourceTypeFilter } from "../../utils";
 import "./networkContainer.scss";
 
 const NetworkContainer: React.FC = () => {
@@ -22,11 +25,9 @@ const NetworkContainer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    chrome.devtools.network.onRequestFinished.addListener(
-      (networkEvent: NetworkEvent) => {
-        setNetworkEvents((networkEvents) => [...networkEvents, networkEvent]);
-      }
-    );
+    chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
+      setNetworkEvents((networkEvents) => [...networkEvents, networkEvent]);
+    });
 
     chrome.devtools.network.onNavigated.addListener(() => {
       if (!preserveLogRef.current) {
@@ -39,24 +40,44 @@ const NetworkContainer: React.FC = () => {
     preserveLogRef.current = settings.preserveLog;
   }, [settings]);
 
+  const filterNetworkEvents = useCallback(
+    (networkEvent: NetworkEvent): boolean => {
+      if (filters.url && !networkEvent.request.url.toLowerCase().includes(filters.url.toLowerCase())) {
+        return false;
+      }
+
+      if (filters.resourceType && !matchResourceTypeFilter(networkEvent._resourceType, filters.resourceType)) {
+        return false;
+      }
+
+      return true;
+    },
+    [filters]
+  );
+
+  const checkEventFailed = useCallback((networkEvent: NetworkEvent) => {
+    const status = networkEvent.response.status;
+    return !status || (status >= 400 && status <= 599);
+  }, []);
+
   return (
     <div className="network-container">
-      <PrimaryToolbar
-        clearEvents={clearEvents}
-        settings={settings}
-        onSettingsChange={setSettings}
-      />
+      <PrimaryToolbar clearEvents={clearEvents} settings={settings} onSettingsChange={setSettings} />
       {networkEvents.length > 0 ? (
         <>
           <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
-          <NetworkTable networkEvents={networkEvents} filters={filters} />
+          <ResourceTable
+            resources={networkEvents}
+            columns={networkEventTableColumns}
+            primaryColumnKeys={[NETWORK_TABLE_COLUMN_IDS.URL]}
+            detailsTabs={networkEventDetailsTabs}
+            filter={filterNetworkEvents}
+            isFailed={checkEventFailed}
+          />
         </>
       ) : (
         <EmptyContainerPlaceholder
-          lines={[
-            "Recording network activity...",
-            "Perform a request or Reload the page to see network requests.",
-          ]}
+          lines={["Recording network activity...", "Perform a request or Reload the page to see network requests."]}
         />
       )}
     </div>

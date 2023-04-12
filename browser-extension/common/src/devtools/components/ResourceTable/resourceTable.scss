@@ -12,5 +12,13 @@
     cursor: default;
     color: var(--color-secondary);
     font-size: var(--font-size-normal);
+
+    .rq-resource-table-row.failed {
+      color: var(--color-error);
+
+      &:not(:hover) {
+        background-color: var(--background-color-error-row-selected);
+      }
+    }
   }
 }

@@ -6,7 +6,7 @@ import "./executionsContainer.scss";
 import { ResourceTable } from "../../components/ResourceTable";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 import executionTableColumns, { EXECUTION_TABLE_COLUMN_IDS } from "./columns";
-import executionDetailsTabs from "./details";
+import executionDetailsTabs from "./details-tabs";
 import { getResourceType } from "./utils";
 import { matchResourceTypeFilter } from "../../utils";
 

@@ -1,7 +1,7 @@
 import React from "react";
-import { DetailsTab } from "../../components/ResourceTable/types";
-import { ExecutionEvent } from "../../types";
-import ExecutionDetails from "./ExecutionDetails/ExecutionDetails";
+import { DetailsTab } from "../../../components/ResourceTable";
+import { ExecutionEvent } from "../../../types";
+import ExecutionDetails from "./ExecutionDetails";
 
 const executionDetailsTabs: DetailsTab<ExecutionEvent>[] = [
   {

@@ -13,13 +13,12 @@ interface Props<ResourceType> {
   primaryColumnKeys?: string[]; // columns to show when details panel is opened
   detailsTabs?: DetailsTab<ResourceType>[]; // if multiple tabs to show in details panel for a resource
   filter?: (resource: ResourceType) => boolean;
+  isFailed?: (resource: ResourceType) => boolean; // if returns true, the row will be marked failed
 }
 
 const ROW_ID_PREFIX = "resource-"; // TODO: move to local state
-const getRowId = (index: number) =>
-  index >= 0 ? `${ROW_ID_PREFIX}${index}` : "";
-const getRowIndex = (id: string) =>
-  id ? parseInt(id.substring(ROW_ID_PREFIX.length)) : undefined;
+const getRowId = (index: number) => (index >= 0 ? `${ROW_ID_PREFIX}${index}` : "");
+const getRowIndex = (id: string) => (id ? parseInt(id.substring(ROW_ID_PREFIX.length)) : undefined);
 
 const ResourceTable = <ResourceType,>({
   columns,
@@ -27,12 +26,10 @@ const ResourceTable = <ResourceType,>({
   primaryColumnKeys,
   detailsTabs,
   filter,
+  isFailed,
 }: Props<ResourceType>): ReactElement => {
   const [selectedRowId, setSelectedRowId] = useState("");
-  const [
-    scrollableContainerRef,
-    onScroll,
-  ] = useAutoScrollableContainer<HTMLDivElement>(resources);
+  const [scrollableContainerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(resources);
 
   const selectedResource = useMemo<ResourceType>(() => {
     if (!selectedRowId) {
@@ -46,9 +43,7 @@ const ResourceTable = <ResourceType,>({
   const columnsToRender = useMemo<Column<ResourceType>[]>(() => {
     if (selectedResource && detailsTabs) {
       if (primaryColumnKeys) {
-        return columns.filter((column) =>
-          primaryColumnKeys.includes(column.key)
-        );
+        return columns.filter((column) => primaryColumnKeys.includes(column.key));
       }
     }
     return columns;
@@ -68,10 +63,7 @@ const ResourceTable = <ResourceType,>({
           <Table.Head>
             <Table.Row>
               {columnsToRender.map((column) => (
-                <Table.HeadCell
-                  key={column.key}
-                  style={{ width: column.width ? `${column.width}%` : "auto" }}
-                >
+                <Table.HeadCell key={column.key} style={{ width: column.width ? `${column.width}%` : "auto" }}>
                   {column.header}
                 </Table.HeadCell>
               ))}
@@ -85,6 +77,7 @@ const ResourceTable = <ResourceType,>({
                   id={getRowId(index)}
                   resource={resource}
                   columns={columnsToRender}
+                  isFailed={isFailed}
                 />
               ) : null
             )}
@@ -92,11 +85,7 @@ const ResourceTable = <ResourceType,>({
         </Table>
       </div>
       {selectedResource && detailsTabs ? (
-        <ResourceDetailsTabs
-          resource={selectedResource}
-          tabs={detailsTabs}
-          close={() => setSelectedRowId("")}
-        />
+        <ResourceDetailsTabs resource={selectedResource} tabs={detailsTabs} close={() => setSelectedRowId("")} />
       ) : null}
     </SplitPane>
   );

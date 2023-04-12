@@ -15,10 +15,7 @@ const ExecutionDetails: React.FC<Props> = ({ execution }) => {
       <PropertyRow
         name="Rule applied"
         value={
-          <a
-            target="_blank"
-            href={`${config.WEB_URL}/rules/editor/edit/${execution.rule.id}`}
-          >
+          <a target="_blank" href={`${config.WEB_URL}/rules/editor/edit/${execution.rule.id}`}>
             {execution.rule.name}
           </a>
         }

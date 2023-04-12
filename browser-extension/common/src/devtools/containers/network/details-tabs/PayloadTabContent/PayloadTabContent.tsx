@@ -1,17 +1,8 @@
-import {
-  CaretRightOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  PlusCircleOutlined,
-} from "@ant-design/icons";
+import { CaretRightOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Collapse, Space, Typography } from "antd";
 import React, { useCallback } from "react";
 import { SourceKey, SourceOperator } from "../../../../../types";
-import {
-  NetworkEvent,
-  NetworkRequestQueryParam,
-  RuleEditorUrlFragment,
-} from "../../../../types";
+import { NetworkEvent, NetworkRequestQueryParam, RuleEditorUrlFragment } from "../../../../types";
 import { createRule, generateRuleName, getBaseUrl } from "../../../../utils";
 import IconButton from "../../../../components/IconButton/IconButton";
 import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
@@ -40,12 +31,7 @@ const QueryParamRow: React.FC<{
       value={value}
       actions={
         <>
-          <IconButton
-            icon={EditOutlined}
-            className="payload-action-button"
-            onClick={onEdit}
-            tooltip="Edit param"
-          />
+          <IconButton icon={EditOutlined} className="payload-action-button" onClick={onEdit} tooltip="Edit param" />
           <IconButton
             icon={DeleteOutlined}
             className="payload-action-button"
@@ -160,9 +146,7 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
     <Collapse
       className="payload-tab-content"
       bordered={false}
-      expandIcon={({ isActive }) => (
-        <CaretRightOutlined rotate={isActive ? 90 : 0} />
-      )}
+      expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
     >
       <Collapse.Panel
         header={"Query Parameters"}
@@ -172,10 +156,7 @@ const PayloadTabContent: React.FC<Props> = ({ networkEvent }) => {
             <Button icon={<PlusCircleOutlined />} onClick={addQueryParam}>
               Add query param
             </Button>
-            <Button
-              icon={<PlusCircleOutlined />}
-              onClick={removeAllQueryParams}
-            >
+            <Button icon={<PlusCircleOutlined />} onClick={removeAllQueryParams}>
               Remove all query params
             </Button>
           </Space>

@@ -1,17 +1,8 @@
-import {
-  CaretRightOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  PlusCircleOutlined,
-} from "@ant-design/icons";
+import { CaretRightOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Collapse, Typography } from "antd";
 import React, { useCallback } from "react";
 import { SourceKey, SourceOperator } from "../../../../../types";
-import {
-  NetworkEvent,
-  NetworkHeader,
-  RuleEditorUrlFragment,
-} from "../../../../types";
+import { NetworkEvent, NetworkHeader, RuleEditorUrlFragment } from "../../../../types";
 import { createRule, generateRuleName } from "../../../../utils";
 import IconButton from "../../../../components/IconButton/IconButton";
 import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
@@ -92,9 +83,7 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
           ];
           rule.pairs[0].source = ruleSource;
           rule.name = generateRuleName(`Override ${headerType} header`);
-          rule.description = `Override ${headerType.toLowerCase()} header "${
-            header.name
-          }" for ${ruleSource.value}`;
+          rule.description = `Override ${headerType.toLowerCase()} header "${header.name}" for ${ruleSource.value}`;
         },
         'input[data-selectionid="header-value"]'
       );
@@ -118,9 +107,7 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
           ];
           rule.pairs[0].source = ruleSource;
           rule.name = generateRuleName(`Delete ${headerType} header`);
-          rule.description = `Delete ${headerType.toLowerCase()} header "${
-            header.name
-          }" for ${ruleSource.value}`;
+          rule.description = `Delete ${headerType.toLowerCase()} header "${header.name}" for ${ruleSource.value}`;
         },
         'input[data-selectionid="header-name"]'
       );
@@ -144,9 +131,7 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
           ];
           rule.pairs[0].source = ruleSource;
           rule.name = generateRuleName(`Add ${headerType} header`);
-          rule.description = `Add new ${headerType.toLowerCase()} header for ${
-            ruleSource.value
-          }`;
+          rule.description = `Add new ${headerType.toLowerCase()} header for ${ruleSource.value}`;
         },
         'input[data-selectionid="header-name"]'
       );
@@ -158,18 +143,13 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
     <Collapse
       className="headers-section"
       bordered={false}
-      expandIcon={({ isActive }) => (
-        <CaretRightOutlined rotate={isActive ? 90 : 0} />
-      )}
+      expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
     >
       <Collapse.Panel
         header={"Request Headers"}
         key={"request"}
         extra={
-          <Button
-            icon={<PlusCircleOutlined />}
-            onClick={() => addHeader(HeaderType.REQUEST)}
-          >
+          <Button icon={<PlusCircleOutlined />} onClick={() => addHeader(HeaderType.REQUEST)}>
             Add request header
           </Button>
         }
@@ -193,10 +173,7 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         header={"Response Headers"}
         key={"response"}
         extra={
-          <Button
-            icon={<PlusCircleOutlined />}
-            onClick={() => addHeader(HeaderType.RESPONSE)}
-          >
+          <Button icon={<PlusCircleOutlined />} onClick={() => addHeader(HeaderType.RESPONSE)}>
             Add response header
           </Button>
         }
