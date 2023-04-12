@@ -218,14 +218,25 @@
     "comingSoon": false,
     "isAvailable": true
   },
+
   "raspberry-pi": {
     "id": "raspberry-pi",
-    "type": "other",
     "name": "Raspberry Pi",
     "description": "External Device",
     "icon": "raspberry-pi.png",
     "isActive": false,
     "comingSoon": true,
     "isAvailable": false
+  },
+  "manual-setup": {
+    "id": "manual-setup",
+    "type": "other",
+    "name": "Manual setup",
+    "description": "Proxy server",
+    "icon": "package.png",
+    "isActive": false,
+    "isScanned": false,
+    "comingSoon": false,
+    "isAvailable": true
   }
 }

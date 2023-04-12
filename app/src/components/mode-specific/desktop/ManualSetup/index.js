@@ -3,11 +3,11 @@ import React from "react";
 // OS Specific Components
 import MacProxySettings from "./Mac";
 
-const ManualSetup = () => {
+const ManualSetup = ({ setShowInstructions }) => {
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border">
-        <MacProxySettings />
+        <MacProxySettings setShowInstructions={setShowInstructions} />
       </ProCard>
     </React.Fragment>
   );

@@ -182,7 +182,7 @@ const Sources = ({ isOpen, toggle }) => {
           </Col>
           <Col className="source-description">{app.description}</Col>
           <>
-            {app.id === "android" || app.id === "ios" || app.id === "existing-terminal" ? (
+            {app.type !== "browser" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
                 Setup Instructions
               </RQButton>
@@ -204,7 +204,7 @@ const Sources = ({ isOpen, toggle }) => {
         mobile: (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
-        other: (source) => (source.isAvailable ? renderSourceCard(source) : null),
+        other: (source) => renderSourceCard(source),
       };
 
       return <div className="source-grid">{sources.map((source) => renderSourceByType[type](source))}</div>;
@@ -230,12 +230,11 @@ const Sources = ({ isOpen, toggle }) => {
         disabled: !isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY),
         children: renderSources("terminal"),
       },
-      // Hide others tab for now (only showing sources that are available)
-      // {
-      //   key: "other",
-      //   label: `Others`,
-      //   children: renderSources("other"),
-      // },
+      {
+        key: "other",
+        label: `Others`,
+        children: renderSources("other"),
+      },
     ],
     [renderSources]
   );
