@@ -45,7 +45,6 @@ const Sources = ({ isOpen, toggle }) => {
   const appsListRef = useRef(null);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
-  console.log(desktopSpecificDetails);
 
   useEffect(() => {
     appsListRef.current = appsList;
@@ -97,6 +96,7 @@ const Sources = ({ isOpen, toggle }) => {
               })
             );
             trackAppConnectedEvent(getAppName(appId));
+            toggle();
             // apps with instruction modals should not be force navigated
             if (!["system-wide", "existing-terminal"].includes(appId)) {
               redirectToTraffic(navigate);
@@ -138,6 +138,7 @@ const Sources = ({ isOpen, toggle }) => {
               })
             );
             trackAppDisconnectedEvent(getAppName(appId));
+            toggle();
           } else {
             toast.error(`Unable to deactivate ${getAppName(appId)}. Issue reported.`);
           }

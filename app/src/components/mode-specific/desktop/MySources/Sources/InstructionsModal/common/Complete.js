@@ -1,10 +1,13 @@
-import { Button } from "antd";
 import React from "react";
+import { Button } from "antd";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 import { useNavigate } from "react-router-dom";
 import { redirectToRules } from "utils/RedirectionUtils";
 
 const CompleteStep = ({ appId }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const navigateToRules = () => {
     redirectToRules(navigate);
@@ -30,7 +33,18 @@ const CompleteStep = ({ appId }) => {
 
   return (
     <div style={{ paddingTop: "4px" }}>
-      <Button shape="round" onClick={navigateToRules}>
+      <Button
+        shape="round"
+        onClick={() => {
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "connectedAppsModal",
+              newValue: false,
+            })
+          );
+          navigateToRules();
+        }}
+      >
         Create Rule
       </Button>
       &nbsp;
