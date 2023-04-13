@@ -1,18 +1,7 @@
-import React from "react";
 import { RQButton } from "lib/design-system/components";
-import { useDispatch } from "react-redux";
-import { actions } from "store";
-import { useNavigate } from "react-router-dom";
-import { redirectToRules } from "utils/RedirectionUtils";
+import React from "react";
 
-const CompleteStep = ({ appId }) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const navigateToRules = () => {
-    redirectToRules(navigate);
-  };
-
+const TroubleshootLink = ({ appId }) => {
   const getTroubleshootLink = (appId) => {
     switch (appId) {
       case "ios":
@@ -40,27 +29,10 @@ const CompleteStep = ({ appId }) => {
   };
 
   return (
-    <div className="mt-8">
-      <RQButton
-        type="default"
-        className="mr-8"
-        onClick={() => {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "connectedAppsModal",
-              newValue: false,
-            })
-          );
-          navigateToRules();
-        }}
-      >
-        Create Rule
-      </RQButton>
-      <RQButton type="default" onClick={handleTroubleshoot}>
-        Troubleshoot
-      </RQButton>
-    </div>
+    <RQButton type="link" className="troubleshoot-btn" onClick={handleTroubleshoot}>
+      Troubleshoot
+    </RQButton>
   );
 };
 
-export default CompleteStep;
+export default TroubleshootLink;

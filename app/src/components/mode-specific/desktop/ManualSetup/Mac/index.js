@@ -8,7 +8,6 @@ import { getDesktopSpecificDetails } from "../../../../../store/selectors";
 import { saveRootCert } from "../../../../../actions/DesktopActions";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useSelector } from "react-redux";
-import CompleteStep from "../../MySources/Sources/InstructionsModal/common/Complete";
 
 const { Title } = Typography;
 
@@ -64,7 +63,6 @@ const MacProxySettings = ({ setShowInstructions }) => {
         <Button className="text-bold mr-8 self-end" type="primary" onClick={() => saveRootCert()}>
           Save Certificate
         </Button>
-        <CompleteStep appId="manual-setup" />
       </Row>
     </React.Fragment>
   );

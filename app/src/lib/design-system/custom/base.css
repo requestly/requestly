@@ -182,9 +182,3 @@
 .relative {
   position: relative;
 }
-
-.external-link,
-.external-link:hover {
-  color: var(--white);
-  text-decoration: underline;
-}

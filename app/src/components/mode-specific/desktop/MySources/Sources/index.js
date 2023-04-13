@@ -25,6 +25,7 @@ import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.css";
 import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
+import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
 
 const Sources = ({ isOpen, toggle }) => {
   const navigate = useNavigate();
@@ -300,7 +301,7 @@ const Sources = ({ isOpen, toggle }) => {
               <Row className="white header text-bold">Connected apps</Row>
               <Row className="text-gray mt-8">
                 Connect your system apps to Requestly. After connecting the required app, click&nbsp;
-                <Link to="/" className="external-link" onClick={toggle}>
+                <Link to="/" className="connected-apps-secondary-link" onClick={toggle}>
                   here
                 </Link>
                 &nbsp;to setup rules.
@@ -318,6 +319,7 @@ const Sources = ({ isOpen, toggle }) => {
         </Col>
         {showInstructions ? (
           <Col className="rq-modal-footer instruction-footer">
+            <TroubleshootLink appId={currentApp} />
             <RQButton
               type="primary"
               className="text-bold"

@@ -65,7 +65,7 @@
 
 .connected-apps-modal .instruction-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .connected-apps-modal .source-modal-footer-link {
@@ -139,4 +139,20 @@
 }
 .setup-instructions-header .ant-avatar-image img {
   object-fit: contain;
+}
+
+.connected-apps-secondary-link,
+.connected-apps-secondary-link:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+.rq-btn.troubleshoot-btn.ant-btn {
+  padding: 0;
+}
+
+.rq-btn.troubleshoot-btn.ant-btn,
+.rq-btn.troubleshoot-btn.ant-btn:hover {
+  color: var(--text-gray);
+  text-decoration: underline;
 }

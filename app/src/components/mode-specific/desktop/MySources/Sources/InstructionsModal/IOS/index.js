@@ -1,7 +1,6 @@
 import { Dropdown, Row, Steps } from "antd";
 import { useState } from "react";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import CompleteStep from "../common/Complete";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
 import CertificateTrustInstructions from "./CertificateTrust";
@@ -66,7 +65,6 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
             status="process"
             description={<CertificateTrustInstructions device_id={selectedDevice} />}
           />
-          <Steps.Step key={5} title="All Set to go" status="process" description={<CompleteStep appId="ios" />} />
         </Steps>
       </Row>
     </>

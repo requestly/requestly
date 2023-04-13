@@ -4,7 +4,6 @@ import { Steps, Button, Tooltip, Typography, Row } from "antd";
 import { CopyOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
 import InstructionsHeader from "./InstructionsHeader";
-import CompleteStep from "./common/Complete";
 
 const { Title } = Typography;
 
@@ -65,7 +64,6 @@ const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
             status="process"
             description={<TerminalCommand helperServerPort={helperServerPort} />}
           />
-          <Steps.Step title="All Set to go" status="process" description={<CompleteStep appId="existing-terminal" />} />
         </Steps>
       </Row>
     </>
