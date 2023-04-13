@@ -2,7 +2,7 @@ import React from "react";
 import AndroidInstructions from "./Android";
 import ExistingTerminalInstructions from "./ExistingTerminal";
 import IOSInstructions from "./IOS";
-import ManualSetupInstructions from "components/mode-specific/desktop/ManualSetup";
+import ManualProxySetup from "components/mode-specific/desktop/ManualProxySetup";
 
 const SetupInstructions = ({ appId, setShowInstructions }) => {
   switch (appId) {
@@ -17,7 +17,7 @@ const SetupInstructions = ({ appId, setShowInstructions }) => {
     case "existing-terminal":
       return <ExistingTerminalInstructions setShowInstructions={setShowInstructions} />;
     case "manual-setup":
-      return <ManualSetupInstructions setShowInstructions={setShowInstructions} />;
+      return <ManualProxySetup setShowInstructions={setShowInstructions} />;
     default:
       return null;
   }
