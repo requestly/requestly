@@ -1,7 +1,5 @@
 import { Dropdown, Row, Steps } from "antd";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { redirectToTraffic } from "utils/RedirectionUtils";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import CompleteStep from "../common/Complete";
 import TestProxyInstructions from "../common/TestProxy";
@@ -12,10 +10,6 @@ import WifiInstructions from "./Wifi";
 import InstructionsHeader from "../InstructionsHeader";
 
 const AndroidInstructionModal = ({ setShowInstructions }) => {
-  const navigate = useNavigate();
-  const navigateToTraffic = () => {
-    redirectToTraffic(navigate);
-  };
   const [selectedDevice, setSelectedDevice] = useState(ANDROID_DEVICES.ONEPLUS);
 
   const handleOnDeviceChange = (value) => {

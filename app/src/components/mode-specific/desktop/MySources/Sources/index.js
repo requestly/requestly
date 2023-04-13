@@ -39,10 +39,9 @@ const Sources = ({ isOpen, toggle }) => {
   const [appsListArray, setAppsListArray] = useState([]);
   const [showInstructions, setShowInstructions] = useState(false);
   const [activeSourceTab, setActiveSourceTab] = useState("browser");
+  const [currentApp, setCurrentApp] = useState(null);
 
   const { appsList } = desktopSpecificDetails;
-
-  const [currentApp, setCurrentApp] = useState(null);
 
   const appsListRef = useRef(null);
 
@@ -293,11 +292,7 @@ const Sources = ({ isOpen, toggle }) => {
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
             <>
-              <SetupInstructions
-                appId={currentApp}
-                setCurrentApp={setCurrentApp}
-                setShowInstructions={setShowInstructions}
-              />
+              <SetupInstructions appId={currentApp} setShowInstructions={setShowInstructions} />
             </>
           ) : (
             <>

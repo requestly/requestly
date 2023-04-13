@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Modal, Steps, Button, Tooltip, Typography, Row } from "antd";
+import { Steps, Button, Tooltip, Typography, Row } from "antd";
 import { CopyOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
-import { useNavigate } from "react-router-dom";
-import { redirectToTraffic } from "utils/RedirectionUtils";
 import InstructionsHeader from "./InstructionsHeader";
 import CompleteStep from "./common/Complete";
 
@@ -50,10 +48,6 @@ const TerminalCommand = ({ helperServerPort }) => {
 };
 
 const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
-  const navigate = useNavigate();
-  const navigateToTraffic = () => {
-    redirectToTraffic(navigate);
-  };
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const { helperServerPort } = desktopSpecificDetails;
   return (

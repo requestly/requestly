@@ -1,16 +1,10 @@
-import { Modal, Row, Steps } from "antd";
+import { Row, Steps } from "antd";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { redirectToTraffic } from "utils/RedirectionUtils";
 import CertsInstructions from "./common/Certs";
 import CompleteStep from "./common/Complete";
 import ProxyInstructions from "./common/Proxy";
 
-const SystemWideInstructionModal = ({ isVisible, handleCancel }) => {
-  const navigate = useNavigate();
-  const navigateToTraffic = () => {
-    redirectToTraffic(navigate);
-  };
+const SystemWideInstructionModal = () => {
   return (
     <>
       <Row className="white header text-bold">Steps to setup System Wide Proxy</Row>

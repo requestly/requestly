@@ -1,16 +1,10 @@
-import { Alert, Modal, Row, Steps } from "antd";
+import { Alert, Row, Steps } from "antd";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { redirectToTraffic } from "utils/RedirectionUtils";
 import CertsInstructions from "./common/Certs";
 import CompleteStep from "./common/Complete";
 import ProxyInstructions from "./common/Proxy";
 
-const SafariInstructionModal = ({ isVisible, handleCancel }) => {
-  const navigate = useNavigate();
-  const navigateToTraffic = () => {
-    redirectToTraffic(navigate);
-  };
+const SafariInstructions = () => {
   return (
     <>
       <Row className="white header text-bold">Steps to setup proxy for Safari</Row>
@@ -32,4 +26,4 @@ const SafariInstructionModal = ({ isVisible, handleCancel }) => {
   );
 };
 
-export default SafariInstructionModal;
+export default SafariInstructions;

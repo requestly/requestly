@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
 import { actions } from "store";

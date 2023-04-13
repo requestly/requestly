@@ -1,41 +1,26 @@
-import { useEffect, useState } from "react";
-import AndroidInstructionModal from "./Android";
-import SafariInstructionModal from "./Safari";
-import SystemWideInstructionModal from "./SystemWide";
-import ExistingTerminalInstructionModal from "./ExistingTerminal";
-import IOSInstructionModal from "./IOS";
-import ManualSetup from "components/mode-specific/desktop/ManualSetup";
+import React from "react";
+import AndroidInstructions from "./Android";
+import ExistingTerminalInstructions from "./ExistingTerminal";
+import IOSInstructions from "./IOS";
+import ManualSetupInstructions from "components/mode-specific/desktop/ManualSetup";
 
-const InstructionsModal = ({ appId, setCurrentApp, setShowInstructions }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  const handleCancel = () => {
-    setIsVisible(false);
-    setCurrentApp(null);
-  };
-
-  useEffect(() => {
-    if (appId) {
-      setIsVisible(true);
-    }
-  }, [appId]);
-
+const SetupInstructions = ({ appId, setShowInstructions }) => {
   switch (appId) {
     case "android":
-      return <AndroidInstructionModal setShowInstructions={setShowInstructions} />;
+      return <AndroidInstructions setShowInstructions={setShowInstructions} />;
     case "ios":
-      return <IOSInstructionModal setShowInstructions={setShowInstructions} />;
-    case "system-wide":
-      return <SystemWideInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
-    case "fresh-safari":
-      return <SafariInstructionModal isVisible={isVisible} handleCancel={handleCancel} />;
+      return <IOSInstructions setShowInstructions={setShowInstructions} />;
+    // case "system-wide":
+    //   return <SystemWideInstructions isVisible={isVisible} handleCancel={handleCancel} />;
+    // case "fresh-safari":
+    //   return <SafariInstructions isVisible={isVisible} handleCancel={handleCancel} />;
     case "existing-terminal":
-      return <ExistingTerminalInstructionModal setShowInstructions={setShowInstructions} />;
+      return <ExistingTerminalInstructions setShowInstructions={setShowInstructions} />;
     case "manual-setup":
-      return <ManualSetup setShowInstructions={setShowInstructions} />;
+      return <ManualSetupInstructions setShowInstructions={setShowInstructions} />;
     default:
       return null;
   }
 };
 
-export default InstructionsModal;
+export default SetupInstructions;
