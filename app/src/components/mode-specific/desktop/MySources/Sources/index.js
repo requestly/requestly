@@ -166,7 +166,7 @@ const Sources = ({ isOpen, toggle }) => {
             onClick={() => handleActivateAppOnClick(appId)}
             loading={!isScanned || processingApps[appId]}
           >
-            Launch
+            {appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
         );
       } else {
@@ -254,7 +254,7 @@ const Sources = ({ isOpen, toggle }) => {
       <>
         {source.isActive ? (
           <>
-            <CheckCircleOutlined style={{ color: "#069D4F" }} />
+            <CheckCircleOutlined className="system-wide-check-icon" />
             Requestly everywhere enabled to inspect all traffic from this device.
             <RQButton type="default" className="danger-btn" onClick={() => handleDisconnectAppOnClick(source.id)}>
               Disconnect
@@ -265,7 +265,7 @@ const Sources = ({ isOpen, toggle }) => {
             <QuestionCircleOutlined /> Want to capture requests from all your apps across this device?
             <RQButton
               type="default"
-              icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}
+              icon={<CheckCircleOutlined className="system-wide-check-icon" />}
               onClick={() => {
                 handleActivateAppOnClick(source.id);
                 trackSystemWideConnected("app_source_modal");
@@ -286,7 +286,8 @@ const Sources = ({ isOpen, toggle }) => {
         open={isOpen}
         wrapClassName="connected-apps-modal"
         centered
-        maskClosable={true}
+        maskClosable={!showInstructions}
+        closable={!showInstructions}
         onCancel={toggle}
       >
         <Col className="connected-apps-modal-content">
