@@ -147,11 +147,11 @@ export const getExecutionLogsId = (ruleId) => {
 };
 
 export const isDesktopOnlyRule = (rule) => {
-  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
-    const pairs = rule.pairs;
+  if (rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+    const pairs = rule?.pairs;
     return pairs.some(
       ({ destinationType, destination }) =>
-        destinationType === RedirectDestinationType.MAP_LOCAL || destination.startsWith("file://")
+        destinationType === RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
     );
   }
 };
