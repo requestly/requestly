@@ -82,7 +82,6 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
 
     return (
       <>
-        <Typography.Text>Or</Typography.Text>
         {source.isActive ? (
           <>
             <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
@@ -92,6 +91,11 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
           </>
         ) : (
           <>
+            <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
+            <RQButton type="primary" onClick={openConnectedAppsModal}>
+              Connect Apps
+            </RQButton>
+            <Typography.Text>Or</Typography.Text>
             <Typography.Text>Capture all the requests from this device</Typography.Text>
             <RQButton onClick={connectSystemWide} icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}>
               Enable Requestly system-wide
@@ -129,10 +133,6 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       <Row className="empty-traffic-table-container" justify={"center"}>
         <Col>
           <Space direction="vertical" align="center">
-            <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
-            <RQButton type="primary" onClick={openConnectedAppsModal}>
-              Connect Apps
-            </RQButton>
             {renderInterceptSystemWideSourceToggle()}
           </Space>
         </Col>
