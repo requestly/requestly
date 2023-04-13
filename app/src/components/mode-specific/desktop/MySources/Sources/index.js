@@ -287,6 +287,7 @@ const Sources = ({ isOpen, toggle }) => {
         wrapClassName="connected-apps-modal"
         centered
         maskClosable={true}
+        closable={!showInstructions}
         onCancel={toggle}
       >
         <Col className="connected-apps-modal-content">
