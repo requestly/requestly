@@ -307,7 +307,7 @@ const CurrentTrafficTable = ({
             style={{
               boxShadow: "none",
               borderRadius: "0",
-              borderTop: "2px solid #f5f5f5",
+              borderTop: "2px solid var(--border)",
             }}
             bodyStyle={{ padding: "0px 20px" }}
           >
