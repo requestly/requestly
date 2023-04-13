@@ -59,11 +59,7 @@ export default [
       copy({
         targets: [
           {
-            src: [
-              "src/devtools/devtools.html",
-              "src/devtools/devtools.js",
-              "src/devtools/index.html",
-            ],
+            src: ["src/devtools/devtools.html", "src/devtools/devtools.js", "src/devtools/index.html"],
             dest: `${OUTPUT_DIR}/devtools`,
           },
         ],
@@ -96,15 +92,6 @@ export default [
     output: {
       file: `${OUTPUT_DIR}/rulesStore.js`,
       name: "RQ.RulesStore",
-      format: "iife",
-    },
-    plugins: commonPlugins,
-  },
-  {
-    input: "src/analytics/index.ts",
-    output: {
-      file: `${OUTPUT_DIR}/analytics.js`,
-      name: "RQ.Events",
       format: "iife",
     },
     plugins: commonPlugins,
