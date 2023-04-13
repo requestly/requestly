@@ -39,12 +39,12 @@ import {
   trackDesktopRuleViewedOnExtension,
   trackDocsSidebarViewed,
 } from "modules/analytics/events/common/rules";
-import { isDesktopOnlyRule } from "utils/rules/misc";
+import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
-import "./RuleBuilder.css";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import "./RuleBuilder.css";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -170,16 +170,6 @@ const RuleBuilder = (props) => {
   const stableInitiateBlankCurrentlySelectedRule = useCallback(initiateBlankCurrentlySelectedRule, [
     currentlySelectedRuleConfig,
   ]);
-
-  const getRuleConfigInEditMode = (rule) => {
-    if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
-      if (!rule.version) {
-        return RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS_V1];
-      }
-    }
-
-    return RULE_TYPES_CONFIG[rule.ruleType];
-  };
 
   useEffect(() => {
     if (
