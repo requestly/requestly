@@ -12,12 +12,9 @@ const BLACKLISTED_EVENTS = [
   SYNCING.BACKUP.CREATED,
 ];
 
-export const trackEvent = (name, params, eventConfig) => {
+export const trackEvent = (name, params, config) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
   const { app_mode, app_version } = getAppDetails();
@@ -27,26 +24,16 @@ export const trackEvent = (name, params, eventConfig) => {
   newParams.rq_app_mode = app_mode;
   newParams.rq_app_version = app_version;
   newParams.automation_enabled = window.navigator.webdriver === true;
-  newParams.workspace = window.currentlyActiveWorkspaceTeamId
-    ? "team"
-    : "personal";
-  newParams.workspaceId = window.currentlyActiveWorkspaceTeamId
-    ? window.currentlyActiveWorkspaceTeamId
-    : null;
+  newParams.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
+  newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
 
-  Logger.log(
-    `[analytics.trackEvent] name=${name} params=${params} config=`,
-    eventConfig
-  );
+  Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });
   posthogIntegration.trackEvent(name, newParams);
 };
 
 export const trackAttr = (name, value) => {
   if (!name || !value) return;
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
   name = name?.toLowerCase();
@@ -57,10 +44,7 @@ export const trackAttr = (name, value) => {
 };
 
 export const initIntegrations = (user, dispatch) => {
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
   if (window.top === window.self) {
