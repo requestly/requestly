@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Card, Typography, Steps, List } from "antd";
+import { Row, Col, Card, Typography, Steps, List, Image } from "antd";
 import { CardBody } from "reactstrap";
 import UAParser from "ua-parser-js";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
@@ -8,6 +8,8 @@ import { RQButton } from "lib/design-system/components";
 import { getDesktopSpecificDetails } from "store/selectors";
 import InstructionsHeader from "../MySources/Sources/InstructionsModal/InstructionsHeader";
 import { saveRootCert } from "actions/DesktopActions";
+import trustCertGif from "assets/img/screenshots/trust_cert.gif";
+import installWinCert from "assets/img/screenshots/install_win_cert.gif";
 
 const { Text } = Typography;
 
@@ -58,6 +60,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
           }
           description={`select “Always Trust” for “When Using the certificate” in the trust section`}
         />
+        <Image src={trustCertGif} />
       </>
     );
   };
@@ -96,6 +99,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
         <List.Item.Meta
           title={<Text>6. Import the certificate you downloaded in the previous step (RQProxyCA.pem)</Text>}
         />
+        <Image src={installWinCert} />
       </>
     );
   };
@@ -147,7 +151,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
                     </>
                   }
                 />
-                {os.name !== "Mac OS" ? renderOsxInstructions() : renderWindowsInstructions()}
+                {os.name === "Mac OS" ? renderOsxInstructions() : renderWindowsInstructions()}
               </List>
             }
           />
