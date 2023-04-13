@@ -9,17 +9,18 @@ import FEATURES from "config/constants/sub/features";
 import { getModeData } from "../../actions";
 import APP_CONSTANTS from "config/constants";
 import "./RuleEditorActionButtons.css";
+import MiscRuleConfigAction from "./MiscRuleActionUI";
 
 const ActionButtons = (props) => {
   const { MODE } = getModeData(props.location);
   const rule = useSelector(getCurrentlySelectedRuleData);
 
   const isDisabled =
-    rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
-    !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
+    rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST && !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
 
   return (
     <div className="rule-editor-header-action-btns">
+      <MiscRuleConfigAction location={props.location} />
       {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? (
         <ShareRuleButton handleShareRuleClick={props.shareBtnClickHandler} />
       ) : null}
