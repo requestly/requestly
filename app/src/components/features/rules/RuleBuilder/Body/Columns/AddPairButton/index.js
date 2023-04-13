@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'antd';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button } from "antd";
 //ACTIONS
-import { addEmptyPair } from './actions';
+import { addEmptyPair } from "./actions";
 //UTILITIES
-import { getCurrentlySelectedRuleData } from '../../../../../../../store/selectors';
-import { trackRQLastActivity } from '../../../../../../../utils/AnalyticsUtils';
+import { getCurrentlySelectedRuleData } from "../../../../../../../store/selectors";
+import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
 //CONSTANTS
-import { PlusOutlined } from '@ant-design/icons';
-import { trackRulePairCreated } from 'modules/analytics/events/common/rules';
-import './AddPairButton.css';
+import { PlusOutlined } from "@ant-design/icons";
+import { trackRulePairCreated } from "modules/analytics/events/common/rules";
+import "./AddPairButton.css";
 
 const AddPairButton = (props) => {
   const { currentlySelectedRuleConfig } = props;
@@ -28,7 +28,7 @@ const AddPairButton = (props) => {
 
   const handleRulePairsOnClick = () => {
     addEmptyPair(currentlySelectedRuleData, currentlySelectedRuleConfig, dispatch);
-    trackRQLastActivity('rule_pair_created');
+    trackRQLastActivity("rule_pair_created");
     trackRulePairCreated({ current_pairs_count: currentlySelectedRuleCount });
   };
 

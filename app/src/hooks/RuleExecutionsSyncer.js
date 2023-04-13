@@ -1,12 +1,12 @@
-import { useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { StorageService } from 'init';
-import { getAppMode, getUserAuthDetails } from 'store/selectors';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import firebaseApp from '../firebase';
-import { submitAttrUtil } from 'utils/AnalyticsUtils';
-import { trackRuleExecuted } from 'modules/analytics/events/common/rules';
-import Logger from 'lib/logger';
+import { useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { StorageService } from "init";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import firebaseApp from "../firebase";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { trackRuleExecuted } from "modules/analytics/events/common/rules";
+import Logger from "lib/logger";
 
 const RuleExecutionsSyncer = () => {
   //Global State
@@ -18,7 +18,7 @@ const RuleExecutionsSyncer = () => {
       const uid = user.details.profile.uid;
       const db = getFirestore(firebaseApp);
 
-      const docRef = doc(db, 'rule_execution_metrics', uid, YYYY.toString(), MM.toString());
+      const docRef = doc(db, "rule_execution_metrics", uid, YYYY.toString(), MM.toString());
 
       if (count) setDoc(docRef, count);
     }
@@ -28,7 +28,7 @@ const RuleExecutionsSyncer = () => {
 
   const sendAsAttribute = (data, YYYY, MM) => {
     for (const ruleType in data) {
-      const attrName = ruleType.toLowerCase() + '_executions_' + YYYY.toString() + '_' + MM.toString();
+      const attrName = ruleType.toLowerCase() + "_executions_" + YYYY.toString() + "_" + MM.toString();
       const attrValue = data[ruleType];
 
       submitAttrUtil(attrName, attrValue);
@@ -42,9 +42,9 @@ const RuleExecutionsSyncer = () => {
   }, []);
 
   useEffect(() => {
-    Logger.log('Reading storage in useRuleExecutionsSyncer');
+    Logger.log("Reading storage in useRuleExecutionsSyncer");
     StorageService(appMode)
-      .getRecord('ec')
+      .getRecord("ec")
       .then((storageEC) => {
         if (storageEC) {
           const current = new Date();

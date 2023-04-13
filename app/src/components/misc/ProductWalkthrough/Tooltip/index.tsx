@@ -31,9 +31,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
       />
       <CloseOutlined className="tour-close-icon" {...skipProps} />
       {/* show steps counter only when no of steps > 1 */}
-      {size > 1 && (
-        <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>
-      )}
+      {size > 1 && <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>}
       <div className="title white">{step.title}</div>
       <div className="text-gray tour-tooltip-content">{step.content}</div>
       <div className="tour-tooltip-buttons-container">
@@ -49,13 +47,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
               "Finish"
             ) : (
               <>
-                Next{" "}
-                <img
-                  alt="back"
-                  width="14px"
-                  height="12px"
-                  src="/assets/icons/leftArrow.svg"
-                />
+                Next <img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />
               </>
             )}
           </RQButton>

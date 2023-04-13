@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Radio, Tooltip } from 'antd';
-import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from 'store/selectors';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { setCurrentlySelectedRule } from '../../RuleBuilder/actions';
-import APP_CONSTANTS from 'config/constants';
-import { isDesktopMode } from 'utils/AppUtils';
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Radio, Tooltip } from "antd";
+import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store/selectors";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
+import APP_CONSTANTS from "config/constants";
+import { isDesktopMode } from "utils/AppUtils";
 //@ts-ignore
-import { ReactComponent as DesktopIcon } from 'assets/icons/desktop.svg';
-import { omit, set } from 'lodash';
-import { ResponseRuleResourceType } from 'types/rules';
-import './ResponseRuleResourceTypes.css';
+import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
+import { omit, set } from "lodash";
+import { ResponseRuleResourceType } from "types/rules";
+import "./ResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
   <a
@@ -36,11 +36,11 @@ const ResponseRuleResourceTypes: React.FC = () => {
       const pairIndex = 0; // response rule will only have one pair
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
 
-      let updatedPair = set(copyOfCurrentlySelectedRule?.pairs?.[pairIndex], 'response.resourceType', resourceType);
+      let updatedPair = set(copyOfCurrentlySelectedRule?.pairs?.[pairIndex], "response.resourceType", resourceType);
 
       if (clearGraphqlRequestPayload) {
         // clear graphql request payload on resource type change
-        updatedPair = omit(updatedPair, ['source.filters[0].requestPayload']);
+        updatedPair = omit(updatedPair, ["source.filters[0].requestPayload"]);
       }
 
       const updatedRule = {
@@ -53,7 +53,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
     [dispatch, currentlySelectedRuleData]
   );
 
-  const isNewResponseRule = 'resourceType' in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
+  const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
 
   useEffect(() => {
     if (isNewResponseRule) return;
@@ -82,7 +82,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
               overlayClassName="response-rule-resource-type-tooltip"
               title={
                 <span>
-                  This option is available only in desktop app due to technical constraints of chrome extension.{' '}
+                  This option is available only in desktop app due to technical constraints of chrome extension.{" "}
                   <DownloadDesktopAppLink />
                 </span>
               }

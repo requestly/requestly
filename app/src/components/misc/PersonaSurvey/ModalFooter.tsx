@@ -75,7 +75,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
         }
 
         if (isPersonaRecommendationFlagOn) {
-          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
           navigate(PATHS.GETTING_STARTED, {
             replace: true,
             state: {

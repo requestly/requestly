@@ -147,9 +147,7 @@ const MenuItem = (props) => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
       if (result) {
         const allRoutes = [...myRoutes];
-        const index = allRoutes.findIndex(
-          (route) => route.key === "header-collaboration"
-        );
+        const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
         allRoutes.splice(index, 0, {
           path: PATHS.MOBILE_DEBUGGER.RELATIVE,
           name: "Android Debugger",
@@ -158,9 +156,7 @@ const MenuItem = (props) => {
         });
         setMyRoutes(allRoutes);
       } else {
-        setMyRoutes((prev) =>
-          prev.filter((route) => route.key !== "android-debugger")
-        );
+        setMyRoutes((prev) => prev.filter((route) => route.key !== "android-debugger"));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,25 +182,14 @@ const MenuItem = (props) => {
       icon: <div className="icon-wrapper">{item.icon}</div>,
       onClick: onClose,
       style: { paddingLeft: "11px", paddingRight: "6px" },
-      className:
-        locationURL === item.path
-          ? "ant-menu-item-selected"
-          : "ant-menu-item-selected-in-active",
+      className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
       label:
         item.path === LINKS.YOUTUBE_TUTORIALS ? (
-          <a
-            href={LINKS.YOUTUBE_TUTORIALS}
-            target="_blank"
-            rel="noreferrer"
-            onClick={trackTutorialsClicked}
-          >
+          <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
             {item.name}
           </a>
         ) : (
-          <Link
-            onClick={() => trackSidebarClicked(snakeCase(item.name))}
-            to={item.path}
-          >
+          <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
             {item.name}
           </Link>
         ),
@@ -216,9 +201,7 @@ const MenuItem = (props) => {
       mode="inline"
       selectedKeys={[]}
       defaultOpenKeys={[
-        splitLocation.length === 5
-          ? splitLocation[splitLocation.length - 3]
-          : null,
+        splitLocation.length === 5 ? splitLocation[splitLocation.length - 3] : null,
         splitLocation[splitLocation.length - 2],
       ]}
       theme={appTheme}
