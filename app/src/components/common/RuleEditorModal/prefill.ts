@@ -7,11 +7,11 @@ import {
   ResponseRule,
   ResponseRulePair,
   ResponseRuleResourceType,
-} from 'types';
+} from "types";
 
 const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
   const source: RulePairSource = {
-    value: data?.url ?? '',
+    value: data?.url ?? "",
     key: SourceKey.URL,
     operator: SourceOperator.EQUALS,
   };
@@ -24,7 +24,7 @@ const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
 
 const prefillResponseRuleData = <T extends ResponseRule>(data: any, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const response: Partial<ResponseRulePair['response']> = {
+  const response: Partial<ResponseRulePair["response"]> = {
     resourceType: ResponseRuleResourceType.REST_API,
   };
 

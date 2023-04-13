@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
-import QueryParamModificationRow from '../Rows/RowsMarkup/QueryParamModificationRow';
-import RequestSourceRow from '../Rows/RowsMarkup/RequestSourceRow';
-import AddQueryParamModificationRow from '../Rows/RowsMarkup/AddQueryParamModificationRow';
-import { generateObjectId } from '../../../../../../utils/FormattingHelper';
-import { Row, Col } from 'antd';
+import React, { useCallback, useEffect } from "react";
+import QueryParamModificationRow from "../Rows/RowsMarkup/QueryParamModificationRow";
+import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
+import AddQueryParamModificationRow from "../Rows/RowsMarkup/AddQueryParamModificationRow";
+import { generateObjectId } from "../../../../../../utils/FormattingHelper";
+import { Row, Col } from "antd";
 
 const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
@@ -12,7 +12,7 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
     return { ...ruleDetails.EMPTY_MODIFICATION_FORMAT, id: generateObjectId() };
   };
   const addEmptyModification = (event) => {
-    pushValueToArrayInPair(event, pairIndex, 'modifications', stableGetEmptyModification());
+    pushValueToArrayInPair(event, pairIndex, "modifications", stableGetEmptyModification());
   };
 
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
@@ -30,7 +30,7 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
   const stableInitializeQueryParamRule = useCallback(initializeQueryParamRule, [stableAddEmptyModification]);
 
   const deleteModification = (event, pairIndex, modificationIndex) => {
-    deleteArrayValueByIndexInPair(event, pairIndex, 'modifications', modificationIndex);
+    deleteArrayValueByIndexInPair(event, pairIndex, "modifications", modificationIndex);
   };
 
   useEffect(() => {

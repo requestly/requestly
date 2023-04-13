@@ -1,17 +1,17 @@
-import { getValueAsPromise, removeValueAsPromise } from 'actions/FirebaseActions';
-import { isEmpty } from 'lodash';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { getCurrentlyActiveWorkspace } from 'store/features/teams/selectors';
+import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions";
+import { isEmpty } from "lodash";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
   getAllTeamUserRulesConfigPath,
   getTeamUserRuleConfigPath,
   getRecordsSyncPath,
-} from 'utils/syncing/syncDataUtils';
+} from "utils/syncing/syncDataUtils";
 
 // Broadcast channel setup
-window.activeWorkspaceBroadcastChannel = new BroadcastChannel('active-workspace');
-window.activeWorkspaceBroadcastChannel.addEventListener('message', (_event) => {
+window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
+window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
   // Refresh the webpage so that it could find updated state later on
   window.location.reload();
 });

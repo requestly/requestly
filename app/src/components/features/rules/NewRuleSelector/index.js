@@ -1,17 +1,17 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Row, Col, Button, Card } from 'antd';
-import { Modal } from 'antd';
-import { NavLink } from 'react-router-dom';
+import React from "react";
+import { useSelector } from "react-redux";
+import { Row, Col, Button, Card } from "antd";
+import { Modal } from "antd";
+import { NavLink } from "react-router-dom";
 //Config
-import APP_CONSTANTS from '../../../../config/constants';
+import APP_CONSTANTS from "../../../../config/constants";
 //CONSTANTS
-import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // Extension Actions
-import { isExtensionVersionCompatible } from '../../../../actions/ExtensionActions';
-import { getAppMode } from 'store/selectors';
-import { RightOutlined } from '@ant-design/icons';
-import { trackRuleCreationWorkflowStartedEvent } from 'modules/analytics/events/common/rules';
+import { isExtensionVersionCompatible } from "../../../../actions/ExtensionActions";
+import { getAppMode } from "store/selectors";
+import { RightOutlined } from "@ant-design/icons";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 
 const { PATHS, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
@@ -20,7 +20,7 @@ const NewRuleSelector = (props) => {
   const appMode = useSelector(getAppMode);
 
   const handleCreateClick = (ruleConfigType) => {
-    trackRuleCreationWorkflowStartedEvent(ruleConfigType, 'screen');
+    trackRuleCreationWorkflowStartedEvent(ruleConfigType, "screen");
   };
 
   return (
@@ -41,7 +41,7 @@ const NewRuleSelector = (props) => {
               RULE_CONFIG.TYPE === GLOBAL_CONSTANTS.RULE_TYPES.DELAY
             ) {
               if (!isExtensionVersionCompatible(APP_CONSTANTS.DELAY_COMPATIBILITY_VERSION)) {
-                console.log('Delay Rule is not compatible with your extension version');
+                console.log("Delay Rule is not compatible with your extension version");
                 return null;
               }
             }
@@ -60,13 +60,13 @@ const NewRuleSelector = (props) => {
                   loading={false}
                   hoverable={true}
                   style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexFlow: 'column',
-                    cursor: 'default',
+                    height: "100%",
+                    display: "flex",
+                    flexFlow: "column",
+                    cursor: "default",
                   }}
                   size="small"
-                  bodyStyle={{ flexGrow: '1' }}
+                  bodyStyle={{ flexGrow: "1" }}
                   actions={[
                     <NavLink to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_CONFIG.TYPE}`}>
                       <Button
@@ -81,7 +81,7 @@ const NewRuleSelector = (props) => {
                 >
                   <Card.Meta
                     avatar={<>{React.createElement(RULE_CONFIG.ICON)}</>}
-                    title={<>{RULE_CONFIG.NAME + ' '}</>}
+                    title={<>{RULE_CONFIG.NAME + " "}</>}
                     description={RULE_CONFIG.DESCRIPTION}
                   />
                 </Card>
