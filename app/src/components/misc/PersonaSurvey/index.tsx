@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getUserAuthDetails, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SurveyModalFooter } from "./ModalFooter";
@@ -31,7 +31,6 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
   const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
   const persona = userPersona.persona;
@@ -169,21 +168,30 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
     shouldShowPersonaSurvey(appMode).then((result) => {
       if (result) {
         if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          toggle();
-          trackPersonaSurveyViewed();
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
         } else {
           if (isExtensionInstalled()) {
-            if (currentPage === 4 && isPersonaRecommendationFlagOn) {
-              dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
-            } else {
-              dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
-            }
-            trackPersonaSurveyViewed();
+            const isRecommendationScreen = currentPage === 4 && isPersonaRecommendationFlagOn;
+            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen }));
           }
         }
       }
     });
-  }, [appMode, user.loggedIn, toggle, currentPage, dispatch, isPersonaRecommendationFlagOn]);
+  }, [appMode, toggle, currentPage, dispatch, isPersonaRecommendationFlagOn]);
+
+  useEffect(() => {
+    if (currentPage === 0) {
+      shouldShowPersonaSurvey(appMode).then((result) => {
+        if (result) {
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            trackPersonaSurveyViewed();
+          } else if (isExtensionInstalled()) {
+            trackPersonaSurveyViewed();
+          }
+        }
+      });
+    }
+  }, [appMode, currentPage]);
 
   return (
     <RQModal
