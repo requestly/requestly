@@ -17,10 +17,7 @@ const AddCustomScriptRow = ({ rowIndex, helperFunctions }) => {
           icon={<PlusOutlined />}
           className="add-custom-script-btn"
         >
-          <>
-            <span className="mr-1">Insert Custom Script</span>
-            <span className="text-gray">(scripts are executed serially)</span>
-          </>
+          Insert Custom Script (scripts are executed serially)
         </Button>
       </Col>
     </Row>

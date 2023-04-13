@@ -1,3 +1,11 @@
 .add-custom-script-btn.ant-btn-dashed {
-  padding: 0.5rem;
+  padding: 1rem;
+  color: var(--text-gray);
+}
+
+.add-custom-script-btn.ant-btn-dashed:hover,
+.add-custom-script-btn.ant-btn-dashed:active,
+.add-custom-script-btn.ant-btn-dashed:focus {
+  color: inherit;
+  border-color: var(--text-dark-gray);
 }
