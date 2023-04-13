@@ -96,10 +96,10 @@ const Sources = () => {
             })
           );
           trackAppConnectedEvent(getAppName(appId));
+          trackTrafficInterceptionStarted(getAppName(appId));
           // apps with instruction modals should not be force navigated
           if (!["system-wide", "existing-terminal"].includes(appId)) {
             redirectToTraffic(navigate);
-            trackTrafficInterceptionStarted(getAppName(appId));
           }
         } else if (res.metadata && res.metadata.closeConfirmRequired) {
           setAppIdToCloseConfirm(appId);
