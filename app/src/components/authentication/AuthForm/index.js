@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { Typography, Row, Col } from "antd";
+import { toast } from "utils/Toast";
+import { Typography, Row, Col, Modal } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
 
@@ -12,22 +13,27 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
+//UTILS
+import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
+import { getGreeting } from "utils/FormattingHelper";
+import { getAuthErrorMessage, AuthTypes } from "../utils";
+
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
 import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  handleEmailSignInButtonOnClick,
-  handleSignUpButtonOnClick,
+  handleEmailSignIn,
+  handleEmailSignUp,
   handleForgotPasswordButtonOnClick,
-  handleGoogleSignInButtonOnClick,
+  handleGoogleSignIn,
   handleResetPasswordOnClick,
 } from "./actions";
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode } from "../../../store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
@@ -49,9 +55,11 @@ const AuthForm = ({
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
+  const dispatch = useDispatch();
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const path = window.location.pathname;
   const [actionPending, setActionPending] = useState(false);
   const [name, setName] = useState("");
@@ -61,12 +69,18 @@ const AuthForm = ({
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
 
-  const currentTestimonialIndex = useMemo(
-    () => Math.floor(Math.random() * 3),
-    []
-  );
-  const emailOptin = false;
-  let isSignUp = true;
+  const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
+
+  const showVerifyEmailMessage = () => {
+    Modal.info({
+      title: "Verify email",
+      content: (
+        <Typography.Text>
+          Please click on the link that has just been sent to your email account to verify your email.
+        </Typography.Text>
+      ),
+    });
+  };
 
   useEffect(() => {
     // Updating reference code from query parameters
@@ -84,6 +98,80 @@ const AuthForm = ({
     }
   }, [eventSource, referralCode, trackEvent]);
 
+  const handleGoogleSignInButtonClick = () => {
+    setActionPending(true);
+    handleGoogleSignIn(appMode, MODE, eventSource)
+      .then((result) => {
+        if (result && result.uid) {
+          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          syncUserPersona(result.uid, dispatch, userPersona);
+          onSignInSuccess && onSignInSuccess();
+        }
+        setActionPending(false);
+      })
+      .catch((e) => {
+        setActionPending(false);
+      });
+  };
+
+  const handleEmailSignUpButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignUp(name, email, password, referralCode, eventSource)
+      .then(({ status, errorCode }) => {
+        if (status) {
+          showVerifyEmailMessage();
+          handleEmailSignIn(email, password, true, eventSource)
+            .then(({ result }) => {
+              if (result.user.uid) {
+                toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+                setEmail("");
+                setPassword("");
+                syncUserPersona(result.user.uid, dispatch, userPersona);
+                onSignInSuccess && onSignInSuccess(result.user.uid);
+              }
+            })
+            .catch(({ errorCode }) => {
+              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+              setActionPending(false);
+              setEmail("");
+              setPassword("");
+            });
+        } else {
+          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+          setActionPending(false);
+        }
+      })
+      .catch(({ errorCode }) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+        setActionPending(false);
+      });
+  };
+
+  const handleEmailSignInButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignIn(email, password, false, eventSource)
+      .then(({ result }) => {
+        if (result.user.uid) {
+          toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+          setEmail("");
+          setPassword("");
+          syncUserPersona(result.user.uid, dispatch, userPersona);
+          onSignInSuccess && onSignInSuccess(result.user.uid);
+        } else {
+          toast.error("Sorry we couldn't log you in. Can you please retry?");
+          setActionPending(true);
+        }
+      })
+      .catch(({ errorCode }) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+        setActionPending(false);
+        setEmail("");
+        setPassword("");
+      });
+  };
+
   const SocialAuthButtons = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.LOG_IN:
@@ -100,24 +188,9 @@ const AuthForm = ({
                     </span>
                     <span className="btn-inner--text">Github</span>
                   </Button> */}
-            <RQButton
-              className="btn-default text-bold w-full"
-              onClick={() =>
-                handleGoogleSignInButtonOnClick(
-                  setActionPending,
-                  src,
-                  onSignInSuccess,
-                  appMode,
-                  MODE,
-                  navigate,
-                  eventSource
-                )
-              }
-            >
+            <RQButton className="btn-default text-bold w-full" onClick={handleGoogleSignInButtonClick}>
               <img src={GoogleIcon} alt="google" className="auth-icons" />
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP
-                ? "Sign up with Google"
-                : "Sign in with Google"}
+              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
             </RQButton>
           </>
         );
@@ -131,8 +204,7 @@ const AuthForm = ({
       case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
         return (
           <Typography.Text className="secondary-text">
-            Enter your email address to reset your password. You may need to
-            check your spam folder or unblock{" "}
+            Enter your email address to reset your password. You may need to check your spam folder or unblock{" "}
             <strong>no-reply@requestly.io</strong>
           </Typography.Text>
         );
@@ -151,10 +223,7 @@ const AuthForm = ({
   const FormSubmitButton = () => {
     if (actionPending) {
       return (
-        <RQButton
-          className="w-full primary form-elements-margin"
-          type="primary"
-        >
+        <RQButton className="w-full primary form-elements-margin" type="primary">
           <FaSpinner className="icon-spin" />
         </RQButton>
       );
@@ -163,49 +232,14 @@ const AuthForm = ({
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
         return (
-          <RQButton
-            type="primary"
-            className="form-elements-margin w-full"
-            onClick={(event) =>
-              handleEmailSignInButtonOnClick(
-                event,
-                email,
-                password,
-                false,
-                appMode,
-                setActionPending,
-                src,
-                onSignInSuccess,
-                () => setPassword(""),
-                eventSource
-              )
-            }
-          >
+          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignInButtonClick}>
             Sign In with Email
           </RQButton>
         );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
         return (
-          <RQButton
-            type="primary"
-            className="form-elements-margin w-full"
-            onClick={(event) =>
-              handleSignUpButtonOnClick(
-                event,
-                name,
-                email,
-                password,
-                referralCode,
-                setActionPending,
-                navigate,
-                emailOptin,
-                isSignUp,
-                onSignInSuccess,
-                eventSource
-              )
-            }
-          >
+          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignUpButtonClick}>
             Create Account
           </RQButton>
         );
@@ -215,12 +249,7 @@ const AuthForm = ({
             type="primary"
             className="form-elements-margin w-full"
             onClick={(event) =>
-              handleForgotPasswordButtonOnClick(
-                event,
-                email,
-                setActionPending,
-                onRequestPasswordResetSuccess
-              )
+              handleForgotPasswordButtonOnClick(event, email, setActionPending, onRequestPasswordResetSuccess)
             }
           >
             Send reset link
@@ -232,12 +261,8 @@ const AuthForm = ({
             type="primary"
             className="form-elements-margin w-full"
             onClick={(event) =>
-              handleResetPasswordOnClick(
-                event,
-                password,
-                setActionPending,
-                navigate,
-                () => SET_MODE(AUTH_ACTION_LABELS.LOG_IN)
+              handleResetPasswordOnClick(event, password, setActionPending, navigate, () =>
+                SET_MODE(AUTH_ACTION_LABELS.LOG_IN)
               )
             }
           >
@@ -397,34 +422,20 @@ const AuthForm = ({
       case AUTH_ACTION_LABELS.SIGN_UP:
       case AUTH_ACTION_LABELS.DO_RESET_PASSWORD:
         return (
-          <Row
-            className={`${
-              MODE !== AUTH_ACTION_LABELS.DO_RESET_PASSWORD &&
-              "form-elements-margin"
-            } w-full`}
-          >
+          <Row className={`${MODE !== AUTH_ACTION_LABELS.DO_RESET_PASSWORD && "form-elements-margin"} w-full`}>
             {/* <InputGroupAddon addonType="prepend">
                 <InputGroupText>
                   <i className="ni ni-lock-circle-open" />
                 </InputGroupText>
               </InputGroupAddon> */}
-            <label
-              htmlFor="password"
-              className="text-bold auth-modal-input-label"
-            >
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP
-                ? "Choose password"
-                : "Password"}
+            <label htmlFor="password" className="text-bold auth-modal-input-label">
+              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Choose password" : "Password"}
             </label>
             <RQInput
               id="password"
               className="auth-modal-input"
               required={true}
-              placeholder={
-                MODE === AUTH_ACTION_LABELS.SIGN_UP
-                  ? "Minimum 8 characters"
-                  : "Enter your password"
-              }
+              placeholder={MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Minimum 8 characters" : "Enter your password"}
               type="password"
               onChange={(e) => setPassword(e.target.value)}
               value={password}
@@ -443,10 +454,7 @@ const AuthForm = ({
       case AUTH_ACTION_LABELS.SIGN_UP:
         return (
           <Row className="w-full">
-            <label
-              htmlFor="username"
-              className="text-bold auth-modal-input-label"
-            >
+            <label htmlFor="username" className="text-bold auth-modal-input-label">
               Your name
             </label>
             <RQInput
@@ -472,12 +480,7 @@ const AuthForm = ({
         return null;
       default:
         return (
-          <Row
-            className={`${
-              MODE !== AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD &&
-              "form-elements-margin"
-            } w-full`}
-          >
+          <Row className={`${MODE !== AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD && "form-elements-margin"} w-full`}>
             <label htmlFor="email" className="text-bold auth-modal-input-label">
               {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Work Email" : "Email"}
             </label>
@@ -486,8 +489,7 @@ const AuthForm = ({
               className="auth-modal-input "
               required={true}
               placeholder={
-                MODE === AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD ||
-                MODE === AUTH_ACTION_LABELS.LOG_IN
+                MODE === AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD || MODE === AUTH_ACTION_LABELS.LOG_IN
                   ? "Enter your email"
                   : "you@company.com"
               }
@@ -570,25 +572,14 @@ const AuthForm = ({
         <Col span={24}>
           <Row>
             <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} />
-            <Col
-              span={11}
-              className="signup-modal-section-wrapper signup-form-wrapper"
-            >
-              <Typography.Text
-                type="primary"
-                className="text-bold w-full header"
-              >
+            <Col span={11} className="signup-modal-section-wrapper signup-form-wrapper">
+              <Typography.Text type="primary" className="text-bold w-full header">
                 Create your Requestly account
               </Typography.Text>
 
               <Row align={"middle"} className="mt-1">
-                <Typography.Text className="secondary-text">
-                  Already using Requestly?
-                </Typography.Text>
-                <RQButton
-                  className="btn-default text-bold caption modal-signin-btn"
-                  onClick={onSignInClick}
-                >
+                <Typography.Text className="secondary-text">Already using Requestly?</Typography.Text>
+                <RQButton className="btn-default text-bold caption modal-signin-btn" onClick={onSignInClick}>
                   Sign in
                 </RQButton>
               </Row>
@@ -602,21 +593,11 @@ const AuthForm = ({
                 <SocialAuthButtons />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
-                  <a
-                    className="auth-modal-link"
-                    href="https://requestly.io/terms"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
                     Requestly Terms
                   </a>
                   . Learn about how we use and protect your data in our{" "}
-                  <a
-                    className="auth-modal-link"
-                    href="https://requestly.io/privacy"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a className="auth-modal-link" href="https://requestly.io/privacy" target="_blank" rel="noreferrer">
                     Privacy Policy
                   </a>
                   .
@@ -632,10 +613,7 @@ const AuthForm = ({
           </Typography.Text>
           <Row align={"middle"} className="mt-1">
             <Typography.Text className="secondary-text">or</Typography.Text>
-            <RQButton
-              className="btn-default text-bold caption modal-signin-btn"
-              onClick={onCreateAccountClick}
-            >
+            <RQButton className="btn-default text-bold caption modal-signin-btn" onClick={onCreateAccountClick}>
               Create a new account
             </RQButton>
           </Row>
@@ -650,9 +628,7 @@ const AuthForm = ({
       ) : (
         <Col span={24} className="login-modal-wrapper">
           <Typography.Text type="primary" className="text-bold w-full header">
-            {MODE === AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD
-              ? "Forgot your password?"
-              : "Create new password"}
+            {MODE === AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD ? "Forgot your password?" : "Create new password"}
           </Typography.Text>
           <Row className="mt-1">
             <InfoMessage />

@@ -17,16 +17,7 @@ import {
   signOut as signOutFirebaseFunction,
   sendEmailVerification,
 } from "firebase/auth";
-import {
-  getDatabase,
-  ref,
-  update,
-  onValue,
-  remove,
-  get,
-  set,
-  child,
-} from "firebase/database";
+import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
 import isEmpty from "is-empty";
 import { v4 as uuidv4 } from "uuid";
@@ -65,13 +56,12 @@ import { createNewUsername } from "backend/auth/username";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 
-const dummyUserImg =
-  "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
  * SignIn with Google in popup window and create profile node
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
  */
-export function signUp(name, email, password, refCode, source) {
+export async function signUp(name, email, password, refCode, source) {
   const email_type = getEmailType(email);
   const domain = email.split("@")[1];
   trackSignUpAttemptedEvent({
@@ -126,10 +116,7 @@ export function signUp(name, email, password, refCode, source) {
         .then(() => {
           const authData = getAuthData(result.user);
           const database = getDatabase();
-          return update(
-            ref(database, getUserProfilePath(authData.uid)),
-            authData
-          )
+          return update(ref(database, getUserProfilePath(authData.uid)), authData)
             .then(() => {
               Logger.log("Profile Created Successfully");
 
@@ -196,7 +183,7 @@ export function signUp(name, email, password, refCode, source) {
     });
 }
 
-export function emailSignIn(email, password, isSignUp, source) {
+export async function emailSignIn(email, password, isSignUp, source) {
   trackLoginAttemptedEvent({
     auth_provider: AUTH_PROVIDERS.EMAIL,
     email,
@@ -241,9 +228,7 @@ export function forgotPassword(email) {
   return sendPasswordResetEmail(auth, email)
     .then((result) => {
       trackForgotPasswordSuccessEvent({ email });
-      Logger.log(
-        "Please check your email for instructions to reset your password."
-      );
+      Logger.log("Please check your email for instructions to reset your password.");
       return Promise.resolve({
         status: true,
         msg: "Please check your email for instructions to reset your password.",
@@ -302,7 +287,7 @@ export function resetPassword(oobCode, password) {
     });
 }
 
-export function googleSignIn(callback, MODE, source) {
+export async function googleSignIn(callback, MODE, source) {
   const provider = new GoogleAuthProvider();
   provider.addScope("profile");
   provider.addScope("email");
@@ -393,11 +378,7 @@ export const signInWithEmailLink = async (email, callback) => {
   trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
   try {
     const auth = getAuth(firebaseApp);
-    const result = await signInWithEmailLinkFirebaseLib(
-      auth,
-      email,
-      window.location.href
-    );
+    const result = await signInWithEmailLinkFirebaseLib(auth, email, window.location.href);
 
     // Update details in db
     const authData = getAuthData(result.user);
@@ -465,10 +446,7 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
     } else {
       syncStatus = profile.isSyncEnabled;
       // Optional - Just in case!
-      if (!syncStatus)
-        await StorageService(appMode).removeRecordsWithoutSyncing([
-          "last-sync-target",
-        ]);
+      if (!syncStatus) await StorageService(appMode).removeRecordsWithoutSyncing(["last-sync-target"]);
     }
   } else {
     // Profile has not been created yet - user must have signed up recently

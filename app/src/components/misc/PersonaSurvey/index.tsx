@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  getAppMode,
-  getUserAuthDetails,
-  getUserPersonaSurveyDetails,
-} from "store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
@@ -30,14 +27,10 @@ interface PersonaModalProps {
   toggleImportRulesModal: () => void;
 }
 
-export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
-  isOpen,
-  toggle,
-  toggleImportRulesModal,
-}) => {
+export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle, toggleImportRulesModal }) => {
+  const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
   const persona = userPersona.persona;
@@ -49,9 +42,7 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
   const shuffledQ2 = useMemo(() => {
     if (persona) {
       const { conditional } = OptionsConfig[2];
-      const { options } = conditional.find((option: Conditional) =>
-        option.condition(persona)
-      );
+      const { options } = conditional.find((option: Conditional) => option.condition(persona));
       const otherOption = options.pop();
       const shuffled = shuffleOptions(options);
       //others options to remain at last always
@@ -121,13 +112,9 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     return (
       <>
         <SkippableButton />
-        <div className="text-center white text-bold survey-title">
-          {page.title}
-        </div>
+        <div className="text-center white text-bold survey-title">{page.title}</div>
         <div className="w-full survey-subtitle-wrapper">
-          <div className="text-gray text-center survey-sub-title">
-            {page.subTitle}
-          </div>
+          <div className="text-gray text-center survey-sub-title">{page.subTitle}</div>
         </div>
       </>
     );
@@ -181,17 +168,30 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     shouldShowPersonaSurvey(appMode).then((result) => {
       if (result) {
         if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          toggle();
-          trackPersonaSurveyViewed();
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
         } else {
           if (isExtensionInstalled()) {
-            toggle();
-            trackPersonaSurveyViewed();
+            const isRecommendationScreen = currentPage === 4 && isPersonaRecommendationFlagOn;
+            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen }));
           }
         }
       }
     });
-  }, [appMode, user.loggedIn, toggle]);
+  }, [appMode, toggle, currentPage, dispatch, isPersonaRecommendationFlagOn]);
+
+  useEffect(() => {
+    if (currentPage === 0) {
+      shouldShowPersonaSurvey(appMode).then((result) => {
+        if (result) {
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            trackPersonaSurveyViewed();
+          } else if (isExtensionInstalled()) {
+            trackPersonaSurveyViewed();
+          }
+        }
+      });
+    }
+  }, [appMode, currentPage]);
 
   return (
     <RQModal
@@ -204,17 +204,12 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({
     >
       <div
         className={`rq-modal-content survey-content-wrapper ${
-          currentPage === SurveyConfig.length - 1 &&
-          "survey-modal-border-radius"
+          currentPage === SurveyConfig.length - 1 && "survey-modal-border-radius"
         }`}
       >
-        {SurveyConfig.filter((config) => !config.skip).map(
-          (page: PageConfig, index) => (
-            <React.Fragment key={index}>
-              {currentPage === page.pageId && <>{renderPage(page, persona)}</>}
-            </React.Fragment>
-          )
-        )}
+        {SurveyConfig.filter((config) => !config.skip).map((page: PageConfig, index) => (
+          <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page, persona)}</>}</React.Fragment>
+        ))}
       </div>
       <SurveyModalFooter page={currentPage} />
     </RQModal>

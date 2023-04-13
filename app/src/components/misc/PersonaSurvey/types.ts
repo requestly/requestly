@@ -1,5 +1,14 @@
 import { ReactNode } from "react";
 
+export interface UserPersona {
+  page: number;
+  isSurveyCompleted: boolean;
+  persona: string;
+  referralChannel?: string;
+  useCases: multipleChoiceOption[];
+  numberOfEmployees?: string;
+}
+
 export interface Option {
   type?: string;
   title: string;
@@ -29,12 +38,7 @@ export interface SurveyOptionsConfig {
   key: string;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (
-    dispatch: any,
-    value: string,
-    clear: boolean,
-    optionType?: string
-  ) => void;
+  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
   conditional?: any;
   options?: Option[];
 }
@@ -64,4 +68,5 @@ export enum PersonaType {
   MARKETER = "Digital Marketer",
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
+  SALES = "Sales",
 }

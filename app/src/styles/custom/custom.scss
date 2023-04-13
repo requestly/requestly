@@ -1164,27 +1164,6 @@ input[id^="react-select-"] {
 }
 
 // desktop app log pane
-.navigation {
-  background-color: #1d1d1d;
-
-  div[class*="Navigation-controls"] {
-    padding: 0.8rem;
-    background-color: #1d1d1d;
-
-    button[class*="Navigation-button"] {
-      color: #ffffffd9;
-
-      &:hover {
-        background-color: #2d2d2d;
-      }
-
-      &[class*="Navigation-selected"] {
-        background-color: #2d2d2d;
-        border-bottom: 2px solid #ffffffd9;
-      }
-    }
-  }
-}
 
 .log-table {
   color: #ffffffd9;
@@ -1192,20 +1171,6 @@ input[id^="react-select-"] {
 
   & * {
     border: none !important;
-  }
-
-  thead[class*="Table-table-head"] {
-    color: #ffffffd9;
-    background-color: #1d1d1d;
-  }
-
-  tr[class*="Table-row"] {
-    color: inherit;
-    background-color: inherit;
-
-    &:nth-child(even) {
-      background-color: #282727;
-    }
   }
 
   &[class*="Table-table"]:last-child {

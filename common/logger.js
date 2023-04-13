@@ -6,20 +6,16 @@ var Logger = {
   enabled: false,
   ns: "Requestly: ",
 
-  log: function (msg) {
-    this.enabled &&
-      console.log.apply(
-        console,
-        [this.ns].concat(Array.prototype.slice.call(arguments))
-      );
+  log(...args) {
+    if (this.enabled) {
+      console.log(this.ns, ...args);
+    }
   },
 
-  error: function (msg) {
-    this.enabled &&
-      console.error.apply(
-        console,
-        [this.ns].concat(Array.prototype.slice.call(arguments))
-      );
+  error(...args) {
+    if (this.enabled) {
+      console.error(this.ns, ...args);
+    }
   },
 };
 

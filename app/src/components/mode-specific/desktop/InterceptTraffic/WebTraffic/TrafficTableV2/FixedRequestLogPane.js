@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Space, Divider, Typography } from "antd";
+import { Badge, Space, Divider, Typography, Row, Col } from "antd";
 import { Navigation } from "@devtools-ds/navigation";
 import { Table } from "@devtools-ds/table";
 import { CloseOutlined } from "@ant-design/icons";
@@ -8,6 +8,7 @@ import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import CopyButton from "components/misc/CopyButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./FixedRequestLogPane.css";
 
 const { Text } = Typography;
 
@@ -21,37 +22,25 @@ const CopyCurlButton = ({ requestShellCurl }) => {
     </Space>
   );
 };
+
 const Header = (props) => {
   return (
-    <Space
-      style={{
-        width: "100%",
-        justifyContent: "space-between",
-        margin: "10px 0px",
-      }}
-    >
+    <Row align="middle" style={{ width: "100%", margin: "10px 0px" }}>
       <Space>
         <div style={{ display: "flex", marginLeft: "4px", cursor: "pointer" }}>
-          <CloseOutlined
-            onClick={props.handleClosePane}
-            style={{ alignSelf: "center", margin: "0" }}
-          />
+          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
         </div>
         <Badge count={props.method} style={{ backgroundColor: "grey" }} />
-        <Badge
-          overflowCount={699}
-          count={props.statusCode}
-          style={{ backgroundColor: "#87d068" }}
-        />
-        <Text
-          ellipsis={{ tooltip: props.url }}
-          style={{ fontSize: "0.9rem", width: 800 }}
-        >
+        <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
+        <Text ellipsis={{ tooltip: props.url }} style={{ fontSize: "0.9rem", width: 800 }}>
           {props.url}
         </Text>
       </Space>
-      <CopyCurlButton requestShellCurl={props.requestShellCurl} />
-    </Space>
+
+      <Col className="ml-auto">
+        <CopyCurlButton requestShellCurl={props.requestShellCurl} />
+      </Col>
+    </Row>
   );
 };
 
@@ -71,24 +60,14 @@ const LogPane = (props) => {
   const timePassedInSeconds = (new Date() - new Date(timestamp * 1000)) / 1000;
 
   return (
-    <Navigation className="navigation">
+    <Navigation className="navigation request-log-pane">
       <Navigation.Controls>
         <Navigation.TabList>
           <Navigation.Tab id={title}>
-            <span
-              style={{
-                fontWeight: "bold",
-                fontSize: "0.9rem",
-              }}
-            >
-              {title + " Details"}{" "}
-            </span>
+            <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
           </Navigation.Tab>
           <Navigation.Tab id="Headers">Headers</Navigation.Tab>
-          <Navigation.Tab
-            id="Payload"
-            style={title === "Request" ? {} : { display: "none" }}
-          >
+          <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
             Payload
           </Navigation.Tab>
           <Navigation.Tab id="Body">Body</Navigation.Tab>
@@ -143,8 +122,7 @@ const LogPane = (props) => {
           >
             {body ? (
               body
-            ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING &&
-              timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
+            ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
               <h3>Loading Body...</h3>
             ) : (
               <h3>The request has no body available</h3>
@@ -168,12 +146,7 @@ const LogPane = (props) => {
   );
 };
 
-const RequestlogPane = ({
-  selectedRequestData,
-  upsertRequestAction,
-  handleClosePane,
-  visibility,
-}) => {
+const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleClosePane, visibility }) => {
   return (
     visibility && (
       <>
@@ -197,7 +170,7 @@ const RequestlogPane = ({
               requestState={selectedRequestData.requestState}
             />
           </div>
-          <Divider type="vertical" style={{ height: "auto" }} />
+          <Divider type="vertical" style={{ height: "auto", border: "none" }} />
           <div style={{ width: "50%" }}>
             <LogPane
               log_id={selectedRequestData.id}
