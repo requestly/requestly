@@ -166,7 +166,7 @@ const Sources = ({ isOpen, toggle }) => {
             onClick={() => handleActivateAppOnClick(appId)}
             loading={!isScanned || processingApps[appId]}
           >
-            Launch
+            {appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
         );
       } else {
