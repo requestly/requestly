@@ -1,4 +1,4 @@
-import { trackEvent } from 'modules/analytics';
+import { trackEvent } from "modules/analytics";
 import {
   BACKGROUND_PROCESS_STARTED,
   DESKTOP_APP_STARTED,
@@ -9,7 +9,7 @@ import {
   USER_DENIED_CLOSING_LAUNCHED_APPS,
   PROXY_PORT_CHANGE_REQUESTED,
   TRAFFIC_TABLE,
-} from './constants';
+} from "./constants";
 
 export const trackProxyServerStartedEvent = () => {
   const params = {};

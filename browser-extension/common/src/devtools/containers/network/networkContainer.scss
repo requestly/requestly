@@ -1,0 +1,17 @@
+.network-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .network-toolbar {
+    flex: 0 0 auto;
+  }
+
+  .network-table-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    position: relative;
+  }
+}

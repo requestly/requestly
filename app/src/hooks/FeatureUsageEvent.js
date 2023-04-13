@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { StorageService } from 'init';
-import { getAppMode, getUserAuthDetails } from 'store/selectors';
-import { getFeatureUsage } from 'utils/rules/getFeatureUsage';
-import { trackRuleFeatureUsageEvent } from 'modules/analytics/events/common/rules';
-import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
-import Logger from 'lib/logger';
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { StorageService } from "init";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getFeatureUsage } from "utils/rules/getFeatureUsage";
+import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rules";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import Logger from "lib/logger";
 
 const FeatureUsageEvent = () => {
   const appMode = useSelector(getAppMode);
@@ -13,7 +13,7 @@ const FeatureUsageEvent = () => {
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      Logger.log('Reading rules in useFeatureUsageEvent');
+      Logger.log("Reading rules in useFeatureUsageEvent");
       StorageService(appMode)
         .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
         .then((rules) => {

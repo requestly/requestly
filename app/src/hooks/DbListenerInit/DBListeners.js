@@ -1,17 +1,17 @@
-import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from 'store/features/teams/selectors';
-import { getAppMode, getUserAuthDetails } from '../../store/selectors';
-import availableTeamsListener from './availableTeamsListener';
-import syncingNodeListener from './syncingNodeListener';
-import userNodeListener from './userNodeListener';
-import userSubscriptionNodeListener from './userSubscriptionNodeListener';
-import { teamsActions } from 'store/features/teams/slice';
-import { clearCurrentlyActiveWorkspace } from 'actions/TeamWorkspaceActions';
-import { getAuth } from 'firebase/auth';
-import firebaseApp from '../../firebase';
-import Logger from 'lib/logger';
-import { actions } from 'store';
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
+import { getAppMode, getUserAuthDetails } from "../../store/selectors";
+import availableTeamsListener from "./availableTeamsListener";
+import syncingNodeListener from "./syncingNodeListener";
+import userNodeListener from "./userNodeListener";
+import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
+import { teamsActions } from "store/features/teams/slice";
+import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "../../firebase";
+import Logger from "lib/logger";
+import { actions } from "store";
 
 window.isFirstSyncComplete = false;
 
@@ -63,7 +63,7 @@ const DBListeners = () => {
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
-          'teamSync',
+          "teamSync",
           user?.details?.profile.uid,
           currentlyActiveWorkspace.id,
           appMode
@@ -73,7 +73,7 @@ const DBListeners = () => {
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
-          'sync',
+          "sync",
           user?.details?.profile.uid,
           null,
           appMode
@@ -123,7 +123,7 @@ const DBListeners = () => {
     getAuth(firebaseApp)
       .currentUser?.getIdTokenResult(true)
       ?.then((status) => {
-        Logger.log('force updated auth token');
+        Logger.log("force updated auth token");
       });
   }, [user?.details?.profile?.uid, user?.loggedIn, currentlyActiveWorkspace, currentTeamMembers, dispatch]);
 

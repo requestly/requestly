@@ -64,18 +64,8 @@ export default [
             src: "node_modules/@requestly/web-sdk/dist/requestly-web-sdk.js",
             dest: `${OUTPUT_DIR}/libs`,
           },
-          {
-            src: [
-              "src/devtools/devtools.html",
-              "src/devtools/devtools.js",
-              "../common/dist/devtools/network-panel",
-            ],
-            dest: `${OUTPUT_DIR}/devtools`,
-          },
-          {
-            src: "../common/dist/popup",
-            dest: OUTPUT_DIR,
-          },
+          { src: "../common/dist/devtools", dest: OUTPUT_DIR },
+          { src: "../common/dist/popup", dest: OUTPUT_DIR },
         ],
       }),
     ],
