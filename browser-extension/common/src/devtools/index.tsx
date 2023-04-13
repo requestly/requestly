@@ -6,12 +6,11 @@ import NetworkContainer from "./containers/network/NetworkContainer";
 import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
 import { ColorScheme } from "./types";
 import { getCurrentColorScheme, isExtensionManifestV3, onColorSchemeChange } from "./utils";
-import { sendEventFromDevtool } from "../analytics/eventUtils";
-import { EVENT_CONSTANTS } from "../analytics/eventContants";
 import useLocalStorageState from "./hooks/useLocalStorageState";
 import "./index.scss";
+import { EVENT, sendEvent } from "./events";
 
-sendEventFromDevtool(EVENT_CONSTANTS.DEVTOOL_OPENED);
+sendEvent(EVENT.DEVTOOL_OPENED);
 
 const token = {
   borderRadius: 4,
@@ -30,6 +29,10 @@ const App: React.FC = () => {
   useEffect(() => {
     onColorSchemeChange(setColorScheme);
   }, []);
+
+  useEffect(() => {
+    sendEvent(EVENT.DEVTOOL_TAB_SELECTED, { tab: selectedTab });
+  }, [selectedTab]);
 
   const antDesignTheme = useMemo(() => {
     let algorithm = [theme.compactAlgorithm];
