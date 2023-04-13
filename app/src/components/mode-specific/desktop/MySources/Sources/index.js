@@ -254,7 +254,7 @@ const Sources = ({ isOpen, toggle }) => {
       <>
         {source.isActive ? (
           <>
-            <CheckCircleOutlined style={{ color: "#069D4F" }} />
+            <CheckCircleOutlined className="system-wide-check-icon" />
             Requestly everywhere enabled to inspect all traffic from this device.
             <RQButton type="default" className="danger-btn" onClick={() => handleDisconnectAppOnClick(source.id)}>
               Disconnect
@@ -265,7 +265,7 @@ const Sources = ({ isOpen, toggle }) => {
             <QuestionCircleOutlined /> Want to capture requests from all your apps across this device?
             <RQButton
               type="default"
-              icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}
+              icon={<CheckCircleOutlined className="system-wide-check-icon" />}
               onClick={() => {
                 handleActivateAppOnClick(source.id);
                 trackSystemWideConnected("app_source_modal");
