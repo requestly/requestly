@@ -1,8 +1,8 @@
-import { useCallback, useEffect } from 'react';
-import firebaseApp from 'firebase.js';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { initIntegrations } from 'modules/analytics';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect } from "react";
+import firebaseApp from "firebase.js";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initIntegrations } from "modules/analytics";
+import { useDispatch } from "react-redux";
 
 const ThirdPartyIntegrationsHandler = () => {
   const dispatch = useDispatch();

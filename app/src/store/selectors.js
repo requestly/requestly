@@ -26,8 +26,7 @@ export const getMarketplaceRules = (state) => {
 export const getUniqueMarketplaceRuleID = (state) => {
   const onlyMarketplaceRules = getMarketplaceRules(state);
   const uniqueMarketplaceRuleIDs = onlyMarketplaceRules.filter(
-    (rule, index, self) =>
-      self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
+    (rule, index, self) => self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
   );
   return uniqueMarketplaceRuleIDs;
 };

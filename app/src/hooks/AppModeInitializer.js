@@ -1,26 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { actions } from '../store';
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "../store";
 // UTILS
-import { getAppMode, getDesktopSpecificDetails, getUserAuthDetails } from '../store/selectors';
+import { getAppMode, getDesktopSpecificDetails, getUserAuthDetails } from "../store/selectors";
 // CONSTANTS
-import { CONSTANTS as GLOBAL_CONSTANTS } from '@requestly/requestly-core';
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS
-import { startBackgroundProcess, invokeAppDetectionInBackground } from '../actions/DesktopActions';
-import { trackAppDetectedEvent, trackAppDisconnectedEvent } from 'modules/analytics/events/desktopApp/apps';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getAndUpdateInstallationDate, isDesktopMode } from 'utils/Misc';
-import firebaseApp from 'firebase.js';
-import { isExtensionInstalled, notifyAppLoadedToExtension } from 'actions/ExtensionActions';
+import { startBackgroundProcess, invokeAppDetectionInBackground } from "../actions/DesktopActions";
+import { trackAppDetectedEvent, trackAppDisconnectedEvent } from "modules/analytics/events/desktopApp/apps";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAndUpdateInstallationDate, isDesktopMode } from "utils/Misc";
+import firebaseApp from "firebase.js";
+import { isExtensionInstalled, notifyAppLoadedToExtension } from "actions/ExtensionActions";
 import {
   trackBackgroundProcessStartedEvent,
   trackDesktopAppStartedEvent,
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
-} from 'modules/analytics/events/desktopApp';
-import { StorageService } from 'init';
-import { getEventsEngineFlag, handleEventBatches } from 'modules/analytics/events/extension';
-import PSMH from '../config/PageScriptMessageHandler';
+} from "modules/analytics/events/desktopApp";
+import { StorageService } from "init";
+import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
+import PSMH from "../config/PageScriptMessageHandler";
 
 let hasAppModeBeenSet = false;
 
@@ -63,7 +63,7 @@ const AppModeInitializer = () => {
           trackBackgroundProcessStartedEvent();
           if (newStatus === true) {
             //Start proxy server
-            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG('start-proxy-server').then((res) => {
+            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("start-proxy-server").then((res) => {
               const { success, port, proxyIp, helperServerPort } = res;
               dispatch(
                 actions.updateDesktopSpecificDetails({
@@ -75,29 +75,29 @@ const AppModeInitializer = () => {
               );
               trackProxyServerStartedEvent();
               // Set handler for windows closed
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent('browser-closed', (payload) => {
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-closed", (payload) => {
                 dispatch(
                   actions.updateDesktopSpecificAppProperty({
                     appId: payload.appId,
-                    property: 'isActive',
+                    property: "isActive",
                     value: false,
                   })
                 );
                 trackAppDisconnectedEvent(appsListRef.current[payload.appId]?.name);
               });
               // Set handler for activable sources
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent('app-detected', (payload) => {
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("app-detected", (payload) => {
                 dispatch(
                   actions.updateDesktopSpecificAppProperty({
                     appId: payload.id,
-                    property: 'isScanned',
+                    property: "isScanned",
                     value: true,
                   })
                 );
                 dispatch(
                   actions.updateDesktopSpecificAppProperty({
                     appId: payload.id,
-                    property: 'isAvailable',
+                    property: "isAvailable",
                     value: payload.isAppActivatable,
                   })
                 );
@@ -110,7 +110,7 @@ const AppModeInitializer = () => {
               const appsListArray = Object.values(appsListRef.current);
               invokeAppDetectionInBackground(appsListArray);
 
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent('proxy-restarted', (payload) => {
+              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("proxy-restarted", (payload) => {
                 const { port, proxyIp } = payload;
                 dispatch(
                   actions.updateDesktopSpecificDetails({

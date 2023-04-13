@@ -1,15 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Input,
-  Button,
-  Form,
-  Row,
-  Col,
-  Timeline,
-  Typography,
-  Tooltip,
-} from "antd";
+import { Input, Button, Form, Row, Col, Timeline, Typography, Tooltip } from "antd";
 //Emulating the rule
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
 
@@ -101,11 +92,7 @@ const RuleSimulator = () => {
               pair.modifications["Request"]?.map((modification) => {
                 return {
                   operation:
-                    modification.type === "Add"
-                      ? "Added"
-                      : modification.type === "Modify"
-                      ? "Modified"
-                      : "Removed",
+                    modification.type === "Add" ? "Added" : modification.type === "Modify" ? "Modified" : "Removed",
                   header: modification.header,
                   newVal: modification.value,
                   target: "Request",
@@ -116,11 +103,7 @@ const RuleSimulator = () => {
               pair.modifications["Response"]?.map((modification) => {
                 return {
                   operation:
-                    modification.type === "Add"
-                      ? "Added"
-                      : modification.type === "Modify"
-                      ? "Modified"
-                      : "Removed",
+                    modification.type === "Add" ? "Added" : modification.type === "Modify" ? "Modified" : "Removed",
                   header: modification.header,
                   newVal: modification.value,
                   target: "Response",
@@ -130,9 +113,7 @@ const RuleSimulator = () => {
             return [...requestHeaders, ...responseHeaders];
           });
 
-    const lastIdxRequest = actions.lastIndexOf(
-      (rule) => rule.target === "Request"
-    );
+    const lastIdxRequest = actions.lastIndexOf((rule) => rule.target === "Request");
 
     actions.splice(lastIdxRequest, 0, {});
 
@@ -162,11 +143,7 @@ const RuleSimulator = () => {
           });
           setEditorFields({
             body: simulatedUrl.request,
-            mode:
-              simulatedUrl.requestType ===
-              GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
-                ? "javascript"
-                : "json",
+            mode: simulatedUrl.requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? "javascript" : "json",
           });
           break;
         case "Response":
@@ -177,11 +154,7 @@ const RuleSimulator = () => {
           });
           setEditorFields({
             body: simulatedUrl.response,
-            mode:
-              simulatedUrl.responseType ===
-              GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
-                ? "javascript"
-                : "json",
+            mode: simulatedUrl.responseType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json",
           });
           break;
         case "Delay":
@@ -317,11 +290,7 @@ const RuleSimulator = () => {
     switch (step.type) {
       case STEP_TYPES.REDIRECT:
         return (
-          <Timeline.Item
-            dot={<FaRandom className="fix-icon-is-up timeline-clock-icon" />}
-            color="green"
-            key={step.id}
-          >
+          <Timeline.Item dot={<FaRandom className="fix-icon-is-up timeline-clock-icon" />} color="green" key={step.id}>
             <span style={{ color: "green" }}>Redirected to</span>{" "}
             {
               <Paragraph
@@ -355,12 +324,8 @@ const RuleSimulator = () => {
                 }}
                 style={{ color: "rgba(0, 0, 0, 0.45)" }}
               >
-                <span
-                  style={{ fontWeight: "bold", color: "rgba(0, 0, 0, .8)" }}
-                >
-                  {step.headerType}
-                </span>
-                :{step.headerValue}
+                <span style={{ fontWeight: "bold", color: "rgba(0, 0, 0, .8)" }}>{step.headerType}</span>:
+                {step.headerValue}
               </Paragraph>
             }
           </Timeline.Item>
@@ -368,11 +333,7 @@ const RuleSimulator = () => {
 
       case STEP_TYPES.INSERT:
         return (
-          <Timeline.Item
-            dot={<FaCode className="fix-icon-is-up timeline-clock-icon" />}
-            color="green"
-            key={step.id}
-          >
+          <Timeline.Item dot={<FaCode className="fix-icon-is-up timeline-clock-icon" />} color="green" key={step.id}>
             <span style={{ color: "green" }}>Added</span>{" "}
             {step.data.jsScripts.map((js) => (
               <span
@@ -421,11 +382,7 @@ const RuleSimulator = () => {
 
       case STEP_TYPES.CANCEL:
         return (
-          <Timeline.Item
-            dot={<FaBan className="fix-icon-is-up timeline-clock-icon" />}
-            color="red"
-            key={step.id}
-          >
+          <Timeline.Item dot={<FaBan className="fix-icon-is-up timeline-clock-icon" />} color="red" key={step.id}>
             <span style={{ color: "red" }}>Request Blocked</span>{" "}
             {
               <Paragraph
@@ -444,11 +401,7 @@ const RuleSimulator = () => {
 
       case STEP_TYPES.DELAY:
         return (
-          <Timeline.Item
-            dot={<FaClock className="fix-icon-is-up timeline-clock-icon" />}
-            color="blue"
-            key={step.id}
-          >
+          <Timeline.Item dot={<FaClock className="fix-icon-is-up timeline-clock-icon" />} color="blue" key={step.id}>
             <span style={{ color: "blue" }}>Added </span>{" "}
             {
               <Paragraph
@@ -468,9 +421,7 @@ const RuleSimulator = () => {
       case STEP_TYPES.REQUEST:
         return (
           <Timeline.Item
-            dot={
-              <FaCodeBranch className="fix-icon-is-up timeline-clock-icon" />
-            }
+            dot={<FaCodeBranch className="fix-icon-is-up timeline-clock-icon" />}
             color="green"
             key={step.id}
           >
@@ -491,9 +442,7 @@ const RuleSimulator = () => {
       case STEP_TYPES.RESPONSE:
         return (
           <Timeline.Item
-            dot={
-              <FaCodeBranch className="fix-icon-is-up timeline-clock-icon" />
-            }
+            dot={<FaCodeBranch className="fix-icon-is-up timeline-clock-icon" />}
             color="green"
             key={step.id}
           >
@@ -523,13 +472,7 @@ const RuleSimulator = () => {
                 <FaTools className="fix-icon-is-up timeline-clock-icon" />
               ) : null
             }
-            color={
-              step.target === "Request"
-                ? "blue"
-                : step.target === "Response"
-                ? "green"
-                : "grey"
-            }
+            color={step.target === "Request" ? "blue" : step.target === "Response" ? "green" : "grey"}
             key={step.id}
           >
             {step.target === "Request" ? (
@@ -553,9 +496,7 @@ const RuleSimulator = () => {
                   : ``}
               </span>
             ) : (
-              <span style={{ color: "black" }}>
-                Sent request with modified headers
-              </span>
+              <span style={{ color: "black" }}>Sent request with modified headers</span>
             )}{" "}
             {
               <Paragraph

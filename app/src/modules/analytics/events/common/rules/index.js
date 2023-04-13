@@ -1,5 +1,5 @@
-import { trackEvent } from 'modules/analytics';
-import { RULES } from '../constants';
+import { trackEvent } from "modules/analytics";
+import { RULES } from "../constants";
 
 export const trackRuleCreatedEvent = (rule_type, description, destination_types, source) => {
   const params = {

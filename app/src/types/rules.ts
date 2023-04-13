@@ -1,26 +1,26 @@
-import { ExtensionRule } from 'modules/extension/types';
+import { ExtensionRule } from "modules/extension/types";
 
 export enum ObjectType {
-  GROUP = 'group',
-  RULE = 'rule',
+  GROUP = "group",
+  RULE = "rule",
 }
 
 export enum Status {
-  ACTIVE = 'Active',
-  INACTIVE = 'Inactive',
+  ACTIVE = "Active",
+  INACTIVE = "Inactive",
 }
 
 export enum RuleType {
-  REDIRECT = 'Redirect',
-  CANCEL = 'Cancel',
-  REPLACE = 'Replace',
-  HEADERS = 'Headers',
-  USERAGENT = 'UserAgent',
-  SCRIPT = 'Script',
-  QUERYPARAM = 'QueryParam',
-  RESPONSE = 'Response',
-  REQUEST = 'Request',
-  DELAY = 'Delay',
+  REDIRECT = "Redirect",
+  CANCEL = "Cancel",
+  REPLACE = "Replace",
+  HEADERS = "Headers",
+  USERAGENT = "UserAgent",
+  SCRIPT = "Script",
+  QUERYPARAM = "QueryParam",
+  RESPONSE = "Response",
+  REQUEST = "Request",
+  DELAY = "Delay",
 }
 
 export interface Rule extends Record<string, unknown> {
@@ -36,45 +36,45 @@ export interface Rule extends Record<string, unknown> {
 }
 
 export enum SourceKey {
-  URL = 'Url',
-  HOST = 'host',
-  PATH = 'path',
+  URL = "Url",
+  HOST = "host",
+  PATH = "path",
 }
 
 export enum SourceOperator {
-  EQUALS = 'Equals',
-  CONTAINS = 'Contains',
-  MATCHES = 'Matches',
-  WILDCARD_MATCHES = 'Wildcard_Matches',
+  EQUALS = "Equals",
+  CONTAINS = "Contains",
+  MATCHES = "Matches",
+  WILDCARD_MATCHES = "Wildcard_Matches",
 }
 
 export enum QueryParamModificationType {
-  ADD = 'Add',
-  REMOVE = 'Remove',
-  REMOVE_ALL = 'Remove All',
+  ADD = "Add",
+  REMOVE = "Remove",
+  REMOVE_ALL = "Remove All",
 }
 
 export enum HeaderRuleActionType {
-  ADD = 'Add',
-  REMOVE = 'Remove',
-  MODIFY = 'Modify',
+  ADD = "Add",
+  REMOVE = "Remove",
+  MODIFY = "Modify",
 }
 
 export enum ResponseRuleBodyType {
-  CODE = 'code',
-  STATIC = 'static',
+  CODE = "code",
+  STATIC = "static",
 }
 
 export enum ResponseRuleResourceType {
-  UNKNOWN = 'unknown',
-  REST_API = 'restApi',
-  GRAPHQL_API = 'graphqlApi',
-  STATIC = 'static', //  HTML / JS / CSS
+  UNKNOWN = "unknown",
+  REST_API = "restApi",
+  GRAPHQL_API = "graphqlApi",
+  STATIC = "static", //  HTML / JS / CSS
 }
 
 export enum RequestRuleBodyType {
-  CODE = 'code',
-  STATIC = 'static',
+  CODE = "code",
+  STATIC = "static",
 }
 
 export interface SourceFilter {
@@ -102,9 +102,9 @@ export interface ResponseRulePair {
 }
 
 export enum RedirectDestinationType {
-  URL = 'url',
-  MAP_LOCAL = 'map_local',
-  MOCK_OR_FILE_PICKER = 'mock_or_file_picker',
+  URL = "url",
+  MAP_LOCAL = "map_local",
+  MOCK_OR_FILE_PICKER = "mock_or_file_picker",
 }
 
 export interface RedirectRulePair {
