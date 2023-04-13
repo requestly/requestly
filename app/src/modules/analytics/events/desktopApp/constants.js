@@ -15,3 +15,10 @@ export const APPS = {
   SYSTEMWIDE_CONNECTED: "system_wide_connected",
   APP_SETUP_INSTRUCTIONS_VIEWED: "app_setup_instructions_viewed",
 };
+
+export const TRAFFIC_TABLE = {
+  TRAFFIC_INTERCEPTION_STARTED: "traffic_interception_started",
+  TRAFFIC_TABLE_REQUEST_CLICKED: "traffic_table_request_clicked",
+  TRAFFIC_TABLE_REQUEST_RIGHT_CLICKED: "traffic_table_request_right_clicked",
+  TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED: "traffic_table_request_dropdown_clicked",
+};

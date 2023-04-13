@@ -6,14 +6,17 @@ import React from "react";
 import { useState, useRef, useContext } from "react";
 import { FixedSizeList, FixedSizeListProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { ContextMenu } from "../ContextMenu";
 
 /** Context for cross component communication */
 const VirtualTableContext = React.createContext<{
+  selectedRowData: any;
   top: number;
   setTop: (top: number) => void;
   header: React.ReactNode;
   footer: React.ReactNode;
 }>({
+  selectedRowData: {},
   top: 0,
   setTop: (value: number) => {},
   header: <></>,
@@ -25,17 +28,19 @@ export const VirtualTable = ({
   row,
   header,
   footer,
+  selectedRowData,
   ...rest
 }: {
   header?: React.ReactNode;
   footer?: React.ReactNode;
+  selectedRowData: any;
   row: FixedSizeListProps["children"];
 } & Omit<FixedSizeListProps, "children" | "innerElementType">) => {
   const listRef = useRef<FixedSizeList | null>();
   const [top, setTop] = useState(0);
 
   return (
-    <VirtualTableContext.Provider value={{ top, setTop, header, footer }}>
+    <VirtualTableContext.Provider value={{ top, setTop, header, footer, selectedRowData }}>
       <AutoSizer>
         {({ height, width }) => (
           <FixedSizeList
@@ -86,31 +91,34 @@ export const VirtualTable = ({
  * Capture what would have been the top elements position and apply it to the table.
  * Other than that, render an optional header and footer.
  **/
-const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
-  function Inner({ children, ...rest }, ref) {
-    // To higlight the row
-    const [selected, setSelected] = useState(null);
+const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function Inner(
+  { children, ...rest },
+  ref
+) {
+  // To higlight the row
+  const [selected, setSelected] = useState(null);
 
-    const { header, footer, top } = useContext(VirtualTableContext);
-    return (
-      <div {...rest} ref={ref}>
-        <Table
-          style={{
-            top,
-            position: "absolute",
-            width: "100%",
-            cursor: "pointer",
-          }}
-          selected={selected}
-          onSelected={(id) => {
-            setSelected(id);
-          }}
-        >
-          {header}
+  const { header, footer, top, selectedRowData } = useContext(VirtualTableContext);
+  return (
+    <div {...rest} ref={ref}>
+      <Table
+        style={{
+          top,
+          position: "absolute",
+          width: "100%",
+          cursor: "pointer",
+        }}
+        selected={selected}
+        onSelected={(id) => {
+          setSelected(id);
+        }}
+      >
+        {header}
+        <ContextMenu log={selectedRowData}>
           <Table.Body>{children}</Table.Body>
-          {footer}
-        </Table>
-      </div>
-    );
-  }
-);
+        </ContextMenu>
+        {footer}
+      </Table>
+    </div>
+  );
+});

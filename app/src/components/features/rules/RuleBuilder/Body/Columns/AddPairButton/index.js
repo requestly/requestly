@@ -19,33 +19,21 @@ const AddPairButton = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   //STATE TO MAINTAIN CURRENTLY SELECTED RULE PAIR COUNT
-  const [currentlySelectedRuleCount, setCurrentlySelectedRuleCount] = useState(
-    0
-  );
+  const [currentlySelectedRuleCount, setCurrentlySelectedRuleCount] = useState(0);
 
   //TO SET CURRENTLY OPENED RULE - PAIRS COUNT
   useEffect(() => {
-    setCurrentlySelectedRuleCount(currentlySelectedRuleData.pairs.length);
+    setCurrentlySelectedRuleCount(currentlySelectedRuleData.pairs?.length ?? 0);
   }, [currentlySelectedRuleData]);
 
   const handleRulePairsOnClick = () => {
-    addEmptyPair(
-      currentlySelectedRuleData,
-      currentlySelectedRuleConfig,
-      dispatch
-    );
+    addEmptyPair(currentlySelectedRuleData, currentlySelectedRuleConfig, dispatch);
     trackRQLastActivity("rule_pair_created");
     trackRulePairCreated({ current_pairs_count: currentlySelectedRuleCount });
   };
 
   return (
-    <Button
-      block
-      type="dashed"
-      className="add-pair-btn"
-      onClick={handleRulePairsOnClick}
-      icon={<PlusOutlined />}
-    >
+    <Button block type="dashed" className="add-pair-btn" onClick={handleRulePairsOnClick} icon={<PlusOutlined />}>
       <span className="shrink-0">Add a new condition</span>
     </Button>
   );

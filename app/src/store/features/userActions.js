@@ -6,11 +6,9 @@ export const updateUserInfo = (prevState, action) => {
 export const updateUserProfile = (prevState, action) => {
   prevState.user.details.profile = action.payload.userProfile;
 
-  prevState.user.details.isSyncEnabled =
-    action.payload.userProfile?.isSyncEnabled || false;
+  prevState.user.details.isSyncEnabled = action.payload.userProfile?.isSyncEnabled || false;
 
-  prevState.user.details.isBackupEnabled =
-    action.payload.userProfile?.isBackupEnabled || false;
+  prevState.user.details.isBackupEnabled = action.payload.userProfile?.isBackupEnabled || false;
 };
 
 export const updateUserPlanDetails = (prevState, action) => {
@@ -35,17 +33,12 @@ export const updateSelectedPersonaUseCase = (prevState, action) => {
   const { useCases } = prevState.userPersona;
   const { payload } = action;
 
-  const index = useCases.findIndex(
-    (option) => JSON.stringify(option) === JSON.stringify(payload)
-  );
+  const index = useCases.findIndex((option) => JSON.stringify(option) === JSON.stringify(payload));
 
   if (index === -1) {
     prevState.userPersona.useCases = [...useCases, payload];
   } else {
-    prevState.userPersona.useCases = [
-      ...useCases.slice(0, index),
-      ...useCases.slice(index + 1),
-    ];
+    prevState.userPersona.useCases = [...useCases.slice(0, index), ...useCases.slice(index + 1)];
   }
 };
 
@@ -79,9 +72,13 @@ export const updateUserAttributes = (prevState, action) => {
   prevState.userAttributes = {
     ...prevState.userAttributes,
     ...action.payload,
-  }
-}
+  };
+};
 
 export const updateRedirectRuleTourCompleted = (prevState, action) => {
   prevState.misc.isRedirectRuleTourCompleted = true;
-}
+};
+
+export const updateTrafficTableTourCompleted = (prevState, action) => {
+  prevState.misc.isTrafficTableTourCompleted = true;
+};

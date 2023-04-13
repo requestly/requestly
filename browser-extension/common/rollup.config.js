@@ -49,9 +49,9 @@ export default [
     ],
   },
   {
-    input: "src/devtools/network-panel/index.tsx",
+    input: "src/devtools/index.tsx",
     output: {
-      file: `${OUTPUT_DIR}/devtools/network-panel/index.js`,
+      file: `${OUTPUT_DIR}/devtools/index.js`,
       format: "iife",
     },
     context: "window",
@@ -59,8 +59,8 @@ export default [
       copy({
         targets: [
           {
-            src: "src/devtools/network-panel/index.html",
-            dest: `${OUTPUT_DIR}/devtools/network-panel`,
+            src: ["src/devtools/devtools.html", "src/devtools/devtools.js", "src/devtools/index.html"],
+            dest: `${OUTPUT_DIR}/devtools`,
           },
         ],
       }),

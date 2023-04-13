@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { toast } from 'utils/Toast';
-import { doSyncDebounced } from 'hooks/DbListenerInit/syncingNodeListener';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAppMode, getUserAuthDetails } from 'store/selectors';
-import { get } from 'firebase/database';
-import { getNodeRef } from 'actions/FirebaseActions';
-import { getRecordsSyncPath } from 'utils/syncing/syncDataUtils';
-import { getCurrentlyActiveWorkspace } from 'store/features/teams/selectors';
-import SettingsItem from 'views/user/Settings/SettingsItem';
-import { trackSettingsToggled } from 'modules/analytics/events/misc/settings';
+import React, { useState } from "react";
+import { toast } from "utils/Toast";
+import { doSyncDebounced } from "hooks/DbListenerInit/syncingNodeListener";
+import { useDispatch, useSelector } from "react-redux";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { get } from "firebase/database";
+import { getNodeRef } from "actions/FirebaseActions";
+import { getRecordsSyncPath } from "utils/syncing/syncDataUtils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import SettingsItem from "views/user/Settings/SettingsItem";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const WorkspaceStatusSyncing = () => {
   const dispatch = useDispatch();
@@ -17,12 +17,12 @@ const WorkspaceStatusSyncing = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
-  const [syncRuleStatus, setSyncRuleStatus] = useState(localStorage.getItem('syncRuleStatus') === 'true' || false);
+  const [syncRuleStatus, setSyncRuleStatus] = useState(localStorage.getItem("syncRuleStatus") === "true" || false);
 
   const handleToggleStatusSyncing = async () => {
     const triggerSync = async () => {
       const syncNodeRef = getNodeRef(
-        getRecordsSyncPath('teamSync', user.details.profile.uid, currentlyActiveWorkspace.id)
+        getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
       );
 
       const syncNodeRefNode = await get(syncNodeRef);
@@ -32,21 +32,21 @@ const WorkspaceStatusSyncing = () => {
         appMode,
         dispatch,
         syncNodeRefNode.val(),
-        'teamSync',
+        "teamSync",
         user.details.profile.uid
       );
     };
 
     if (syncRuleStatus) {
-      localStorage.setItem('syncRuleStatus', 'false');
+      localStorage.setItem("syncRuleStatus", "false");
       setSyncRuleStatus(false);
-      toast.success('Status syncing turned off');
-      trackSettingsToggled('workspace_status_syncing', false);
+      toast.success("Status syncing turned off");
+      trackSettingsToggled("workspace_status_syncing", false);
     } else {
-      localStorage.setItem('syncRuleStatus', 'true');
+      localStorage.setItem("syncRuleStatus", "true");
       setSyncRuleStatus(true);
-      toast.success('Status syncing turned on');
-      trackSettingsToggled('workspace_status_syncing', true);
+      toast.success("Status syncing turned on");
+      trackSettingsToggled("workspace_status_syncing", true);
       triggerSync();
     }
   };

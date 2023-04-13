@@ -30,31 +30,28 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
         alt="tooltip pointer"
       />
       <CloseOutlined className="tour-close-icon" {...skipProps} />
-      <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>
+      {/* show steps counter only when no of steps > 1 */}
+      {size > 1 && <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>}
       <div className="title white">{step.title}</div>
       <div className="text-gray tour-tooltip-content">{step.content}</div>
       <div className="tour-tooltip-buttons-container">
-        <RQButton
-          type="default"
-          className="tour-tooltip-next-btn"
-          // used closeProps because primary props takes away the focus from input boxes when tooltip appears
-          {...closeProps}
-          disabled={step.disableNext?.(context)}
-        >
-          {isLastStep ? (
-            "Finish"
-          ) : (
-            <>
-              Next{" "}
-              <img
-                alt="back"
-                width="14px"
-                height="12px"
-                src="/assets/icons/leftArrow.svg"
-              />
-            </>
-          )}
-        </RQButton>
+        {size > 1 && (
+          <RQButton
+            type="default"
+            className="tour-tooltip-next-btn"
+            // used closeProps because primary props takes away the focus from input boxes when tooltip appears
+            {...closeProps}
+            disabled={step.disableNext?.(context)}
+          >
+            {isLastStep ? (
+              "Finish"
+            ) : (
+              <>
+                Next <img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />
+              </>
+            )}
+          </RQButton>
+        )}
       </div>
     </div>
   );

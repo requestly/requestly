@@ -1,24 +1,17 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-export const trackRuleCreatedEvent = (
-  rule_type,
-  description,
-  destination_types
-) => {
+export const trackRuleCreatedEvent = (rule_type, description, destination_types, source) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
+  if (source) params.source = source;
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (
-  rule_type,
-  description,
-  destination_types
-) => {
+export const trackRuleEditedEvent = (rule_type, description, destination_types) => {
   const params = {
     rule_type,
   };
@@ -109,8 +102,8 @@ export const trackRuleExecuted = (type, count, month, year) => {
   trackEvent(RULES.RULE_EXECUTED, params);
 };
 
-export const trackRuleCreationWorkflowStartedEvent = (ruleType) => {
-  const params = { ruleType };
+export const trackRuleCreationWorkflowStartedEvent = (ruleType, source) => {
+  const params = { ruleType, source };
   trackEvent(RULES.RULE_CREATION_WORKFLOW_STARTED, params);
 };
 
@@ -194,10 +187,7 @@ export const trackDocsSidebarPrimaryCategoryClicked = (rule_type, category) => {
   trackEvent(RULES.DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED, params);
 };
 
-export const trackDocsSidebarSecondaryCategoryClicked = (
-  rule_type,
-  category
-) => {
+export const trackDocsSidebarSecondaryCategoryClicked = (rule_type, category) => {
   const params = { rule_type, category };
   trackEvent(RULES.DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED, params);
 };

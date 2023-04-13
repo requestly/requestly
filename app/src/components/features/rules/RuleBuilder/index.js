@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
@@ -57,50 +51,32 @@ const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
 const RuleBuilder = (props) => {
   //Constants
-  const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(
-    props.location,
-    props.isSharedListViewRule
-  );
+  const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(props.location, props.isSharedListViewRule);
   const navigate = useNavigate();
 
   //Global State
   const { state } = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const currentlySelectedRuleConfig = useSelector(
-    getCurrentlySelectedRuleConfig
-  );
+  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
-    getIsCurrentlySelectedRuleHasUnsavedChanges
-  );
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
-  const redirectRuleOnboardingExp = useFeatureValue(
-    "redirect_rule_onboarding",
-    null
-  );
+  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
   const enableDocs = useMemo(() => {
     return (
       !props.isSharedListViewRule &&
-      currentlySelectedRuleData.ruleType ===
-        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
+      currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT &&
       redirectRuleOnboardingExp === "docs"
     );
-  }, [
-    currentlySelectedRuleData.ruleType,
-    props.isSharedListViewRule,
-    redirectRuleOnboardingExp,
-  ]);
+  }, [currentlySelectedRuleData.ruleType, props.isSharedListViewRule, redirectRuleOnboardingExp]);
 
-  const isRedirectRuleTourCompleted = useSelector(
-    getIsRedirectRuleTourCompleted
-  );
-  const isRedirectRuleTourEnabled =
-    redirectRuleOnboardingExp === "tour" && !isRedirectRuleTourCompleted;
+  const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
+  const isRedirectRuleTourEnabled = redirectRuleOnboardingExp === "tour" && !isRedirectRuleTourCompleted;
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -110,13 +86,8 @@ const RuleBuilder = (props) => {
 
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
-  const [
-    isChangeRuleGroupModalActive,
-    setIsChangeRuleGroupModalActive,
-  ] = useState(false);
-  const [selectedRules, setSelectedRules] = useState(
-    getSelectedRules(ruleSelection)
-  );
+  const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
+  const [selectedRules, setSelectedRules] = useState(getSelectedRules(ruleSelection));
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs, setShowDocs] = useState(true);
   const isDocsVisible = useMemo(() => {
@@ -147,9 +118,7 @@ const RuleBuilder = (props) => {
   const hasRuleToEditIdChanged = useHasChanged(RULE_TO_EDIT_ID);
 
   const toggleChangeRuleGroupModal = () => {
-    setIsChangeRuleGroupModalActive(
-      isChangeRuleGroupModalActive ? false : true
-    );
+    setIsChangeRuleGroupModalActive(isChangeRuleGroupModalActive ? false : true);
   };
   const toggleShareRulesModal = () => {
     setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
@@ -192,19 +161,15 @@ const RuleBuilder = (props) => {
       );
     });
   };
-  const stableSetCurrentlySelectedRuleConfig = useCallback(
+  const stableSetCurrentlySelectedRuleConfig = useCallback(setCurrentlySelectedRuleConfig, [
     setCurrentlySelectedRuleConfig,
-    [setCurrentlySelectedRuleConfig]
-  );
-
-  const stableSetCurrentlySelectedRule = useCallback(setCurrentlySelectedRule, [
-    setCurrentlySelectedRule,
   ]);
 
-  const stableInitiateBlankCurrentlySelectedRule = useCallback(
-    initiateBlankCurrentlySelectedRule,
-    [currentlySelectedRuleConfig]
-  );
+  const stableSetCurrentlySelectedRule = useCallback(setCurrentlySelectedRule, [setCurrentlySelectedRule]);
+
+  const stableInitiateBlankCurrentlySelectedRule = useCallback(initiateBlankCurrentlySelectedRule, [
+    currentlySelectedRuleConfig,
+  ]);
 
   const getRuleConfigInEditMode = (rule) => {
     if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
@@ -219,10 +184,8 @@ const RuleBuilder = (props) => {
   useEffect(() => {
     if (
       currentlySelectedRuleData === false ||
-      (MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
-        currentlySelectedRuleData.ruleType !== RULE_TYPE_TO_CREATE) ||
-      (MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
-        currentlySelectedRuleConfig.TYPE !== RULE_TYPE_TO_CREATE) ||
+      (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && currentlySelectedRuleData.ruleType !== RULE_TYPE_TO_CREATE) ||
+      (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && currentlySelectedRuleConfig.TYPE !== RULE_TYPE_TO_CREATE) ||
       (MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
         currentlySelectedRuleConfig.TYPE !== currentlySelectedRuleData.ruleType)
     ) {
@@ -233,11 +196,7 @@ const RuleBuilder = (props) => {
           RULE_TYPE_TO_CREATE,
           setCurrentlySelectedRule
         );
-        stableSetCurrentlySelectedRuleConfig(
-          dispatch,
-          RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE],
-          navigate
-        );
+        stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
         Logger.log("Reading to storage in RuleBuilder");
         StorageService(appMode)
@@ -249,11 +208,7 @@ const RuleBuilder = (props) => {
               //Prevent updating state when component is about to unmount
               if (!isCleaningUpRef.current) {
                 stableSetCurrentlySelectedRule(dispatch, rule);
-                stableSetCurrentlySelectedRuleConfig(
-                  dispatch,
-                  getRuleConfigInEditMode(rule),
-                  navigate
-                );
+                stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
               }
             }
           });
@@ -263,11 +218,7 @@ const RuleBuilder = (props) => {
           //Prevent updating state when component is about to unmount
           if (!isCleaningUpRef.current) {
             stableSetCurrentlySelectedRule(dispatch, props.rule);
-            stableSetCurrentlySelectedRuleConfig(
-              dispatch,
-              RULE_TYPES_CONFIG[props.rule.ruleType],
-              navigate
-            );
+            stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[props.rule.ruleType], navigate);
           }
         }
       } else {
@@ -303,10 +254,7 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (
-      MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
-      RULE_TYPE_TO_CREATE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-    ) {
+    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && RULE_TYPE_TO_CREATE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
       setStartWalkthrough(true);
     }
   }, [MODE, RULE_TYPE_TO_CREATE]);
@@ -324,18 +272,10 @@ const RuleBuilder = (props) => {
       isDesktopOnlyRule(currentlySelectedRuleData) &&
       appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
     ) {
-      if (
-        currentlySelectedRuleConfig.TYPE ===
-        GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-      )
+      if (currentlySelectedRuleConfig.TYPE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT)
         trackDesktopRuleViewedOnExtension("map_local");
     }
-  }, [
-    MODE,
-    appMode,
-    currentlySelectedRuleConfig.TYPE,
-    currentlySelectedRuleData,
-  ]);
+  }, [MODE, appMode, currentlySelectedRuleConfig.TYPE, currentlySelectedRuleData]);
 
   useEffect(() => {
     return () => {
@@ -387,8 +327,7 @@ const RuleBuilder = (props) => {
     currentlySelectedRuleConfig === undefined ||
     currentlySelectedRuleConfig.NAME === undefined ||
     currentlySelectedRuleData.name === undefined ||
-    (MODE === RULE_EDITOR_CONFIG.MODES.CREATE &&
-      currentlySelectedRuleData.ruleType !== RULE_TYPE_TO_CREATE)
+    (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && currentlySelectedRuleData.ruleType !== RULE_TYPE_TO_CREATE)
   ) {
     return <SpinnerCard renderHeader />;
   }
@@ -400,6 +339,7 @@ const RuleBuilder = (props) => {
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         runTourWithABTest={isRedirectRuleTourEnabled}
+        onTourComplete={() => dispatch(actions.updateRedirectRuleTourCompleted({}))}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
@@ -413,11 +353,7 @@ const RuleBuilder = (props) => {
 
       <Row className="w-full relative">
         <Col span={isDocsVisible ? 17 : 24}>
-          <Body
-            mode={MODE}
-            showDocs={isDocsVisible}
-            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-          />
+          <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
 
         {enableDocs ? (
@@ -436,10 +372,7 @@ const RuleBuilder = (props) => {
               </Button>
             ) : (
               <Col span={7}>
-                <Help
-                  setShowDocs={setShowDocs}
-                  ruleType={currentlySelectedRuleData.ruleType}
-                />
+                <Help setShowDocs={setShowDocs} ruleType={currentlySelectedRuleData.ruleType} />
               </Col>
             )}
           </>

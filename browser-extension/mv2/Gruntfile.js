@@ -1,7 +1,6 @@
 /**
  *  @References
  * [0] http://gruntjs.com/getting-started to install grunt-cli
- * [2]: https://github.com/gruntjs/grunt-contrib-handlebars
  * [3]: http://gruntjs.com/configuring-tasks#files
  **/
 
@@ -22,9 +21,7 @@ const processManifest = (content) => {
   contentScripts[1].exclude_matches = [webUrlPattern];
 
   if (env !== "prod") {
-    manifestJson.description = `[${env.toUpperCase()}] ${
-      manifestJson.description
-    }`;
+    manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
   }
 
   if (!isProductionBuildMode) {
@@ -53,9 +50,7 @@ module.exports = function (grunt) {
           "dist/generated/shared.js": jsList["shared"],
           "dist/generated/pages/main.js": jsList["pages"],
           "dist/generated/client/client.js": jsList["client"],
-          "dist/generated/devtools/panel/panel.js": jsList["devtools-panel"],
-          "dist/generated/background/background-bundled.js":
-            jsList["background"],
+          "dist/generated/background/background-bundled.js": jsList["background"],
         },
       },
     },
@@ -69,36 +64,9 @@ module.exports = function (grunt) {
       dist: {
         files: {
           "dist/generated/shared.js": ["dist/generated/shared.js"],
-          "dist/generated/background/background-bundled.js": [
-            "dist/generated/background/background-bundled.js",
-          ],
+          "dist/generated/background/background-bundled.js": ["dist/generated/background/background-bundled.js"],
           "dist/generated/pages/main.js": ["dist/generated/pages/main.js"],
-          "dist/generated/client/client.js": [
-            "dist/generated/client/client.js",
-          ],
-        },
-      },
-    },
-
-    /**
-     * Task handlebars: Pre-Compile template files, concat them and save output to templates.hbs.js
-     */
-    handlebars: {
-      compile: {
-        options: {
-          namespace: "RQ.Templates",
-          partialsUseNamespace: true,
-          processName: function (filePath) {
-            var pieces = filePath.split("/"),
-              fileName = pieces[pieces.length - 1];
-
-            return fileName.replace(/(\.hbs)/gi, "");
-          },
-        },
-        files: {
-          "dist/generated/devtools/panel/templates.hbs.js": [
-            "src/devtools/panel/templates/**/*.hbs",
-          ],
+          "dist/generated/client/client.js": ["dist/generated/client/client.js"],
         },
       },
     },
@@ -110,10 +78,6 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      templates: {
-        files: ["**/*.hbs"],
-        tasks: ["handlebars"],
-      },
       scripts: {
         files: ["**/*.js"],
         tasks: ["concat"],
@@ -173,7 +137,7 @@ module.exports = function (grunt) {
           {
             cwd: "../common/dist/popup",
             src: "**/*",
-            dest: "dist/generated/popup",
+            dest: "dist/popup",
             expand: true,
           },
         ],
@@ -181,46 +145,23 @@ module.exports = function (grunt) {
       devtools: {
         files: [
           {
-            src: "src/devtools/devtools.html",
-            dest: "dist/generated/devtools/devtools.html",
+            cwd: "../common/dist/devtools",
+            src: "**/*",
+            dest: "dist/devtools",
+            expand: true,
           },
-          {
-            src: "src/devtools/bootstrap.js",
-            dest: "dist/generated/devtools/bootstrap.js",
-          },
-          {
-            src: "src/devtools/panel/panel.html",
-            dest: "dist/generated/devtools/panel/panel.html",
-          },
-          {
-            src: "src/devtools/panel/css/main.css",
-            dest: "dist/generated/devtools/panel/panel.css",
-          },
-          // {
-          //   cwd: "../common/dist/devtools/network-panel",
-          //   src: "**/*",
-          //   dest: "dist/generated/devtools/network-panel",
-          //   expand: true,
-          // },
         ],
       },
     },
   });
 
-  grunt.loadNpmTasks("grunt-contrib-handlebars");
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-uglify");
 
-  grunt.registerTask("dist", [
-    "handlebars",
-    "concat",
-    "copy:popup",
-    "copy:devtools",
-    "copy:static_content",
-  ]);
+  grunt.registerTask("dist", ["concat", "copy:popup", "copy:devtools", "copy:static_content"]);
 
   grunt.registerTask("build", ["dist", `copy:manifest_${browser}`]);
 

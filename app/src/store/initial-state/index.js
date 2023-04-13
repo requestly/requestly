@@ -99,6 +99,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    ruleEditorModal: {
+      isActive: false,
+      props: {},
+    },
     connectedAppsModal: {
       isActive: false,
       props: {},
@@ -150,6 +154,7 @@ const INITIAL_STATE = {
 
   misc: {
     isRedirectRuleTourCompleted: false,
+    isTrafficTableTourCompleted: false,
   },
 };
 

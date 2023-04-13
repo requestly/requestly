@@ -1,5 +1,6 @@
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import FEATURES from "config/constants/sub/features";
 import { Step } from "react-joyride";
 
 export interface CustomSteps extends Step {
@@ -26,10 +27,8 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Add Source condition to set criteria for the rules",
       content: (
         <>
-          You can use <strong>URL</strong> , <strong>Host</strong> or{" "}
-          <strong>Path</strong> with <strong>Regex</strong>,
-          <strong> Contains</strong>, <strong>Wildcard</strong> or{" "}
-          <strong>Equals </strong>to match the source request.
+          You can use <strong>URL</strong> , <strong>Host</strong> or <strong>Path</strong> with <strong>Regex</strong>,
+          <strong> Contains</strong>, <strong>Wildcard</strong> or <strong>Equals </strong>to match the source request.
         </>
       ),
       disableBeacon: true,
@@ -41,8 +40,7 @@ export const productTours: Record<string, CustomSteps[]> = {
     {
       target: tourTarget("rule-editor-destination-url"),
       title: "Add Destination URL",
-      content:
-        "The destination to which the users will be redirected to based on the source condition",
+      content: "The destination to which the users will be redirected to based on the source condition",
       disableBeacon: true,
       offset: 12,
       pointerPlacement: "center",
@@ -57,6 +55,17 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 12,
       pointerPlacement: "right",
       placement: "bottom-start",
+    },
+  ],
+  [FEATURES.DESKTOP_APP_TRAFFIC_TABLE]: [
+    {
+      target: tourTarget("traffic-table-row"),
+      title: "Right-click to modify request, copy cURL and more. Try it now!",
+      content: null,
+      disableBeacon: true,
+      offset: 12,
+      pointerPlacement: "center",
+      placement: "bottom",
     },
   ],
 };

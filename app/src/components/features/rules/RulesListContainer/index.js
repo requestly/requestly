@@ -18,10 +18,7 @@ import {
   getActiveModals,
   getAppMode,
 } from "../../../../store/selectors";
-import {
-  submitAttrUtil,
-  trackRQLastActivity,
-} from "../../../../utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
 //ACTIONS
 import { getSelectedRules } from "../actions";
@@ -36,10 +33,7 @@ import {
   trackNewRuleButtonClicked,
   trackRuleCreationWorkflowStartedEvent,
 } from "modules/analytics/events/common/rules";
-import {
-  trackRulesImportStarted,
-  trackUploadRulesButtonClicked,
-} from "modules/analytics/events/features/rules";
+import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
 const { PATHS } = APP_CONSTANTS;
@@ -57,9 +51,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
 
   //Component State
-  const [selectedRules, setSelectedRules] = useState(
-    getSelectedRules(rulesSelection)
-  );
+  const [selectedRules, setSelectedRules] = useState(getSelectedRules(rulesSelection));
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -70,28 +62,15 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   //Modals
-  const [
-    isCreateNewRuleGroupModalActive,
-    setIsCreateNewRuleGroupModalActive,
-  ] = useState(false);
-  const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(
-    false
-  );
-  const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(
-    false
-  );
-  const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(
-    false
-  );
-  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(
-    false
-  );
+  const [isCreateNewRuleGroupModalActive, setIsCreateNewRuleGroupModalActive] = useState(false);
+  const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
+  const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(false);
+  const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
+  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const toggleCreateNewRuleGroupModal = () => {
-    setIsCreateNewRuleGroupModalActive(
-      isCreateNewRuleGroupModalActive ? false : true
-    );
+    setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
   };
   const toggleChangeGroupModal = () => {
     setIsChangeGroupModalActive(isChangeGroupModalActive ? false : true);
@@ -152,13 +131,11 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleNewRuleOnClick = async (_e, ruleType) => {
-    if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType);
+    if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
     else trackNewRuleButtonClicked();
     if (!user.loggedIn) {
       if (await isSignUpRequired(allRules, appMode, user)) {
-        promptUserToSignup(() =>
-          redirectToCreateNewRule(navigate, ruleType, "my_rules")
-        );
+        promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
         return;
       }
     }
@@ -167,9 +144,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleShareRulesOnClick = () => {
-    user.loggedIn
-      ? verifySharedListsLimit()
-      : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? verifySharedListsLimit() : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
   };
 
   const getCurrentSharedListsCount = (result) => {
@@ -192,11 +167,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     trackRulesImportStarted();
     user.loggedIn
       ? verifyImportRulesLimitAndContinue()
-      : promptUserToSignup(
-          () => verifyImportRulesLimitAndContinue(),
-          "Sign up to import rules",
-          "import_rules"
-        );
+      : promptUserToSignup(() => verifyImportRulesLimitAndContinue(), "Sign up to import rules", "import_rules");
   };
 
   const verifyImportRulesLimitAndContinue = () => {
@@ -206,11 +177,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const handleExportRulesOnClick = () => {
     user.loggedIn
       ? verifyExportRulesLimitAndContinue()
-      : promptUserToSignup(
-          () => verifyExportRulesLimitAndContinue(),
-          "Sign up to export rules",
-          "export rules"
-        );
+      : promptUserToSignup(() => verifyExportRulesLimitAndContinue(), "Sign up to export rules", "export rules");
   };
 
   const verifyExportRulesLimitAndContinue = () => {
@@ -230,9 +197,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //TO SUBMIT ATTRIBUTE OF TYPES OF RULES MADE BY USER AS USER ATTRIBUTES IN FIREBASE
   useEffect(() => {
     availableRuleTypeArray.forEach((ruleType) => {
-      const thatRuleTypeUserRulesArray = allRules.filter(
-        (rule) => rule.ruleType === ruleType
-      );
+      const thatRuleTypeUserRulesArray = allRules.filter((rule) => rule.ruleType === ruleType);
       //TO SUBMIT NO OF TYPE THAT RULE ON FIREBASE ATTRIBUTES
       submitAttrUtil(ruleType + "_rules", thatRuleTypeUserRulesArray.length);
     });
@@ -244,10 +209,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     if (user && user.details && user.details.profile) {
       fetchSharedLists(user.details.profile.uid).then((result) => {
         const currentSharedListsCount = getCurrentSharedListsCount(result);
-        submitAttrUtil(
-          APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SHARED_LISTS,
-          currentSharedListsCount
-        );
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SHARED_LISTS, currentSharedListsCount);
         if (currentSharedListsCount > 0) {
           submitAttrUtil("iscreatesharedlisttask", true);
         }
@@ -263,9 +225,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     setTotalRulesCount(allRules.length);
   }, [allRules]);
 
-  const recordsToDelete = allRules.filter((rule) =>
-    selectedRules.some((ruleId) => ruleId === rule.id)
-  );
+  const recordsToDelete = allRules.filter((rule) => selectedRules.some((ruleId) => ruleId === rule.id));
 
   const clearSearch = useCallback(() => {
     setSearch(false);
@@ -277,10 +237,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       {/* Page content */}
 
       {/* Table */}
-      <ProCard
-        title={null}
-        className="rules-table-container rules-list-container"
-      >
+      <ProCard title={null} className="rules-table-container rules-list-container">
         <RulesTable
           search={search}
           setSearch={setSearch}
@@ -320,10 +277,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
       {/* Modals */}
       {isCreateNewRuleGroupModalActive ? (
-        <CreateNewRuleGroupModal
-          isOpen={isCreateNewRuleGroupModalActive}
-          toggle={toggleCreateNewRuleGroupModal}
-        />
+        <CreateNewRuleGroupModal isOpen={isCreateNewRuleGroupModalActive} toggle={toggleCreateNewRuleGroupModal} />
       ) : null}
 
       {isChangeGroupModalActive ? (
@@ -352,10 +306,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         />
       ) : null}
       {isImportRulesModalActive ? (
-        <ImportRulesModal
-          isOpen={isImportRulesModalActive}
-          toggle={toggleImportRulesModal}
-        />
+        <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
       {isShareRulesModalActive ? (
         <CreateSharedListModal

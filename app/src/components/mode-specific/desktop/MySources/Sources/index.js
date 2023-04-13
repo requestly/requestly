@@ -24,6 +24,7 @@ import {
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.css";
+import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 
 const Sources = ({ isOpen, toggle }) => {
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ const Sources = ({ isOpen, toggle }) => {
             // apps with instruction modals should not be force navigated
             if (!["system-wide", "existing-terminal"].includes(appId)) {
               redirectToTraffic(navigate);
+              trackTrafficInterceptionStarted(getAppName(appId));
             }
           } else if (res.metadata && res.metadata.closeConfirmRequired) {
             setAppIdToCloseConfirm(appId);
