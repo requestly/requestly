@@ -9,44 +9,24 @@
 // @import "./icons.scss";
 
 $theme-primary-color: #0a48b3;
-$theme-primary-color-gradient: linear-gradient(
-  87deg,
-  #0b52cb 0,
-  $theme-primary-color 100%
-);
+$theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
 
 .typeform-btn {
-  background-color: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background-color: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 
 //React-Notifications
 .Toastify__toast--default {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--info {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--success {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
   border-radius: 7px !important;
 }
 .Toastify__toast--warning {
@@ -92,11 +72,7 @@ $theme-primary-color-gradient: linear-gradient(
 // }
 // background gradient
 .bg-gradient-blue {
-  background: linear-gradient(
-    87deg,
-    #0b52cb 0,
-    $theme-primary-color 100%
-  ) !important;
+  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
 }
 
 .checkbox-empty-label {
@@ -1193,27 +1169,6 @@ input[id^="react-select-"] {
 }
 
 // desktop app log pane
-.navigation {
-  background-color: #1d1d1d;
-
-  div[class*="Navigation-controls"] {
-    padding: 0.8rem;
-    background-color: #1d1d1d;
-
-    button[class*="Navigation-button"] {
-      color: #ffffffd9;
-
-      &:hover {
-        background-color: #2d2d2d;
-      }
-
-      &[class*="Navigation-selected"] {
-        background-color: #2d2d2d;
-        border-bottom: 2px solid #ffffffd9;
-      }
-    }
-  }
-}
 
 .log-table {
   color: #ffffffd9;
@@ -1221,20 +1176,6 @@ input[id^="react-select-"] {
 
   & * {
     border: none !important;
-  }
-
-  thead[class*="Table-table-head"] {
-    color: #ffffffd9;
-    background-color: #1d1d1d;
-  }
-
-  tr[class*="Table-row"] {
-    color: inherit;
-    background-color: inherit;
-
-    &:nth-child(even) {
-      background-color: #282727;
-    }
   }
 
   &[class*="Table-table"]:last-child {

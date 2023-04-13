@@ -17,6 +17,7 @@ const RequestPayloadPreview = ({ query_params, body }) => {
         bordered={false}
         defaultActiveKey={["1"]}
         expandIconPosition="left"
+        className="payload-preview-collapse"
       >
         {query_params ? (
           <Collapse.Panel key="1" header="Query String Parameters">

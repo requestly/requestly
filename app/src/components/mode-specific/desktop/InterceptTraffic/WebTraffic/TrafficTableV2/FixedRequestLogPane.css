@@ -1,0 +1,54 @@
+.request-log-pane {
+  font-size: 13px;
+  background-color: transparent;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.request-log-pane div[class*="Navigation-controls"] {
+  padding: 8px;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"] {
+  border: none;
+  margin-right: 2px;
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--white);
+  border-radius: var(--border-radius-sm);
+}
+
+.request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"]:hover,
+.request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"][class*="Navigation-selected"] {
+  background-color: #3e404497;
+}
+
+/* log table */
+.request-log-pane .log-table {
+  color: var(--white);
+}
+
+.request-log-pane .log-table thead tr {
+  background-color: rgb(40, 42, 46);
+}
+
+.request-log-pane .log-table thead tr th [class*="Table-content"] {
+  font-weight: 600;
+  letter-spacing: 0.25px;
+}
+
+.request-log-pane .log-table tbody tr[class*="Table-row"]:nth-child(odd) {
+  background-color: #242529;
+}
+
+.request-log-pane .log-table tbody tr[class*="Table-row"]:nth-child(even) {
+  color: inherit;
+  background-color: #2a2a2d;
+}
+
+/* payload preview */
+.payload-preview-collapse .ant-collapse-item {
+  padding: 8px;
+}
