@@ -29,12 +29,7 @@ export interface SurveyOptionsConfig {
   key: string;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (
-    dispatch: any,
-    value: string,
-    clear: boolean,
-    optionType?: string
-  ) => void;
+  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
   conditional?: any;
   options?: Option[];
 }
@@ -64,4 +59,5 @@ export enum PersonaType {
   MARKETER = "Digital Marketer",
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
+  SALES = "Sales",
 }

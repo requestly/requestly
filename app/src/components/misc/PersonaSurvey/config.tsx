@@ -1,11 +1,7 @@
 import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { UserRecommendations } from "./Recommendations";
-import {
-  handleUseCaseActiveOption,
-  setPersonaUseCase,
-  setUserPersona,
-} from "./actions";
+import { handleUseCaseActiveOption, setPersonaUseCase, setUserPersona } from "./actions";
 
 // import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
 // import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
@@ -17,8 +13,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     key: "persona",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) =>
-      setUserPersona(dispatch, value, clear, "persona"),
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "persona"),
     options: [
       {
         title: PersonaType.FRONTEND,
@@ -44,15 +39,17 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         title: PersonaType.FULLSTACK,
         icon: "👨🏽‍💻",
       },
+      {
+        title: PersonaType.SALES,
+        icon: "💵",
+      },
     ],
   },
   2: {
     key: "useCases",
     questionType: "multiple",
-    isActive: ({ key, title, optionType }) =>
-      handleUseCaseActiveOption(key, title, optionType),
-    action: (dispatch, value, clear, optionType) =>
-      setPersonaUseCase(dispatch, value, clear, optionType),
+    isActive: ({ key, title, optionType }) => handleUseCaseActiveOption(key, title, optionType),
+    action: (dispatch, value, clear, optionType) => setPersonaUseCase(dispatch, value, clear, optionType),
     conditional: [
       {
         condition: (answer: string) => answer === PersonaType.BACKEND,
@@ -76,8 +73,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         condition: (answer: string) => answer === PersonaType.QUALITY,
         options: [
           {
-            title:
-              "Testing newly developed features on different hosts/environments",
+            title: "Testing newly developed features on different hosts/environments",
           },
           {
             title: "Testing new features on client websites",
@@ -116,7 +112,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) => answer === PersonaType.MARKETER,
+        condition: (answer: string) => answer === PersonaType.MARKETER || answer === PersonaType.SALES,
         options: [
           {
             title: "Replace production script with development script",
@@ -137,8 +133,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) =>
-          answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
+        condition: (answer: string) => answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
         options: [
           {
             title: "Local development before the backend is ready",
@@ -180,8 +175,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     key: "numberOfEmployees",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) =>
-      setUserPersona(dispatch, value, clear, "numberOfEmployees"),
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "numberOfEmployees"),
     options: [
       {
         title: "Just me",
@@ -260,8 +254,7 @@ export const SurveyConfig: PageConfig[] = [
   {
     pageId: 0,
     title: "Welcome to Requestly!",
-    subTitle:
-      "Help us personalise your experience by answering the following questionnaire",
+    subTitle: "Help us personalise your experience by answering the following questionnaire",
     render: () => <GettingStartedWithSurvey />,
   },
   {
@@ -287,10 +280,7 @@ export const SurveyConfig: PageConfig[] = [
   {
     pageId: 4,
     title: "✨ Where would you like to start?",
-    subTitle:
-      "Choose a use case you want to work on and we will help you get started",
-    render: ({ toggleImportRulesModal }) => (
-      <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />
-    ),
+    subTitle: "Choose a use case you want to work on and we will help you get started",
+    render: ({ toggleImportRulesModal }) => <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />,
   },
 ];
