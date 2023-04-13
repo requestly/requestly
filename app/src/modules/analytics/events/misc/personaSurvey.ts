@@ -4,7 +4,6 @@ import { trackEvent } from "modules/analytics";
 type PersonaSurveySource = "modal" | "screen";
 
 export const trackPersonaSurveyViewed = () => {
-  console.log("VIEWED");
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_VIEWED);
 };
 
