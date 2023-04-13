@@ -8,6 +8,7 @@ import { ColorScheme } from "./types";
 import { getCurrentColorScheme, isExtensionManifestV3, onColorSchemeChange } from "./utils";
 import { sendEventFromDevtool } from "../analytics/eventUtils";
 import { EVENT_CONSTANTS } from "../analytics/eventContants";
+import useLocalStorageState from "./hooks/useLocalStorageState";
 import "./index.scss";
 
 sendEventFromDevtool(EVENT_CONSTANTS.DEVTOOL_OPENED);
@@ -17,8 +18,14 @@ const token = {
   fontSize: 13,
 };
 
+enum DevtoolsTabKeys {
+  NETWORK = "network",
+  EXECUTIONS = "executions",
+}
+
 const App: React.FC = () => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(getCurrentColorScheme());
+  const [selectedTab, setSelectedTab] = useLocalStorageState("lastTab", DevtoolsTabKeys.NETWORK);
 
   useEffect(() => {
     onColorSchemeChange(setColorScheme);
@@ -44,20 +51,21 @@ const App: React.FC = () => {
         ) : (
           <Tabs
             className="devtools-tabs"
-            defaultActiveKey="1"
+            activeKey={selectedTab}
+            onChange={setSelectedTab}
             tabPosition="left"
             tabBarStyle={{ minWidth: 150 }}
             tabBarGutter={0}
             items={[
               {
                 label: "Network Traffic",
-                key: "network",
+                key: DevtoolsTabKeys.NETWORK,
                 children: <NetworkContainer />,
                 forceRender: true,
               },
               {
                 label: "Rule Executions",
-                key: "executions",
+                key: DevtoolsTabKeys.EXECUTIONS,
                 children: <ExecutionsContainer />,
                 forceRender: true,
               },
