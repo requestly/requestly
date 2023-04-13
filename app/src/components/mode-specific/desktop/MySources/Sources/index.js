@@ -105,11 +105,10 @@ const Sources = ({ isOpen, toggle }) => {
             );
             trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId));
             toggle();
-            // apps with instruction modals should not be force navigated
-            if (!["system-wide", "existing-terminal"].includes(appId)) {
-              redirectToTraffic(navigate);
-              trackTrafficInterceptionStarted(getAppName(appId));
-            }
+
+            // navigate to traffic table
+            redirectToTraffic(navigate);
+            trackTrafficInterceptionStarted(getAppName(appId));
           } else if (res.metadata && res.metadata.closeConfirmRequired) {
             setAppIdToCloseConfirm(appId);
             setIsCloseConfirmModalActive(true);
