@@ -136,7 +136,7 @@ const ManualProxySetup = ({ setShowInstructions }) => {
             title="Install and Trust Certificate"
             status="process"
             description={
-              <List itemLayout="horizontal">
+              <List itemLayout="horizontal" className="mt-16">
                 <List.Item.Meta
                   title={
                     <>
