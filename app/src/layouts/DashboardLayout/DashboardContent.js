@@ -8,9 +8,10 @@ import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { actions } from "store";
 //UTILS
-import { getActiveModals, getUserPersonaSurveyDetails } from "store/selectors";
+import { getActiveModals, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -30,6 +31,7 @@ const DashboardContent = () => {
 
   //Global state
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -116,6 +118,9 @@ const DashboardContent = () => {
       <div id="dashboardMainContent">
         <Routes>
           {getRoutes(routes)}
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+            <Route path={PATHS.ROOT} element={<Navigate to={PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE} />} />
+          )}
           <Route path={PATHS.ROOT} element={<Navigate to={PATHS.RULES.ABSOLUTE} />} />
           <Route path={PATHS.INDEX_HTML} element={<Navigate to={PATHS.RULES.ABSOLUTE} />} />
           <Route path={PATHS.FEEDBACK.ABSOLUTE} element={<Navigate to={PATHS.FEEDBACK.ABSOLUTE} />} />
