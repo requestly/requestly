@@ -286,7 +286,7 @@ const CurrentTrafficTable = ({
     <>
       <Row wrap={false}>
         <Col flex="197px" className="traffic-table-sidebar">
-          <Menu theme="dark" onClick={handleSidebarMenuItemClick} mode="inline" items={items} />
+          <Menu theme="dark" mode="inline" items={items} onClick={handleSidebarMenuItemClick} />
         </Col>
         <Col flex="auto">
           <ActionHeader
