@@ -27,7 +27,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       id: "time",
       title: "Time",
       dataIndex: "timestamp",
-      width: "5%",
+      width: "7%",
       render: (timestamp: any) => {
         return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
           hour12: false,
@@ -38,7 +38,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       id: "url",
       title: "URL",
       dataIndex: "url",
-      width: "50%",
+      width: "48%",
     },
     {
       id: "method",
@@ -123,7 +123,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       <VirtualTable
         height="100%"
         width="100%"
-        itemCount={logs.length}
+        itemCount={logs?.length ?? 0}
         itemSize={ITEM_SIZE}
         header={renderHeader()}
         row={Row}
