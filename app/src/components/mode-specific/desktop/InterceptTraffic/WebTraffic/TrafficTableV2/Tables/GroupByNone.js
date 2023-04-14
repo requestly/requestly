@@ -140,7 +140,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     );
   };
 
-  if (requestsLog.length === 0) {
+  if (requestsLog?.length === 0) {
     return renderNoTrafficCTA();
   }
 
