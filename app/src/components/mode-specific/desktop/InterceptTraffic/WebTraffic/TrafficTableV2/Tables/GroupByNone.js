@@ -34,53 +34,53 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("activate-app", {
-      id: systemWideSource.appId,
+      id: systemWideSource.id,
     })
       .then((res) => {
         if (res.success) {
-          toast.success(`Connected ${systemWideSource.appName}`);
+          toast.success(`Connected ${systemWideSource.name}`);
           dispatch(
             actions.updateDesktopSpecificAppProperty({
-              appId: systemWideSource.appId,
+              appId: systemWideSource.id,
               property: "isActive",
               value: true,
             })
           );
-          trackAppConnectedEvent(systemWideSource.appName);
+          trackAppConnectedEvent(systemWideSource.name);
           trackSystemWideConnected("traffic_table");
         } else {
-          toast.error(`Unable to activate ${systemWideSource.appName}. Issue reported.`);
-          trackAppConnectFailureEvent(systemWideSource.appName);
+          toast.error(`Unable to activate ${systemWideSource.name}. Issue reported.`);
+          trackAppConnectFailureEvent(systemWideSource.name);
         }
       })
       .catch(Logger.log);
-  }, [dispatch, systemWideSource.appId, systemWideSource.appName]);
+  }, [dispatch, systemWideSource.id, systemWideSource.name]);
 
   const disconnectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
-      id: systemWideSource.appId,
+      id: systemWideSource.id,
     })
       .then((res) => {
         // Notify user and update state
         if (res.success) {
-          toast.info(`Disconnected ${systemWideSource.appName}`);
+          toast.info(`Disconnected ${systemWideSource.name}`);
 
           dispatch(
             actions.updateDesktopSpecificAppProperty({
-              appId: systemWideSource.appId,
+              appId: systemWideSource.id,
               property: "isActive",
               value: false,
             })
           );
-          trackAppDisconnectedEvent(systemWideSource.appName);
+          trackAppDisconnectedEvent(systemWideSource.name);
         } else {
-          toast.error(`Unable to deactivate ${systemWideSource.appName}. Issue reported.`);
+          toast.error(`Unable to deactivate ${systemWideSource.name}. Issue reported.`);
         }
       })
       .catch((err) => Logger.log(err));
-  }, [dispatch, systemWideSource.appId, systemWideSource.appName]);
+  }, [dispatch, systemWideSource.id, systemWideSource.name]);
 
   const openConnectedAppsModal = useCallback(() => {
     dispatch(
@@ -93,7 +93,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     trackConnectAppsClicked("traffic_table");
   }, [dispatch]);
 
-  const renderInterceptSystemWideSourceToggle = useCallback(() => {
+  const renderEmptyTablePlaceholder = useCallback(() => {
     if (!systemWideSource.isAvailable) {
       return null;
     }
@@ -160,7 +160,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       <Row className="empty-traffic-table-container" justify={"center"}>
         <Col>
           <Space direction="vertical" align="center">
-            {renderInterceptSystemWideSourceToggle()}
+            {renderEmptyTablePlaceholder()}
           </Space>
         </Col>
       </Row>
