@@ -1,8 +1,13 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message } from "antd";
-import { getActiveModals, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
+import {
+  getActiveModals,
+  getAppMode,
+  getCurrentlySelectedRuleConfig,
+  getCurrentlySelectedRuleData,
+} from "store/selectors";
 import { RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
@@ -16,12 +21,19 @@ import {
   initiateBlankCurrentlySelectedRule,
 } from "components/features/rules/RuleBuilder/actions";
 import { RULE_EDITOR_FIELD_SELECTOR } from "./dom-selectors";
+import { StorageService } from "init";
 import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
+import { getRuleConfigInEditMode } from "utils/rules/misc";
+import { redirectTo404, redirectToRuleEditor } from "utils/RedirectionUtils";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
+
+enum EditorMode {
+  EDIT = "edit",
+  CREATE = "create",
+}
 
 interface props {
   isOpen: boolean;
@@ -33,20 +45,40 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const appMode = useSelector(getAppMode);
   const { ruleEditorModal } = useSelector(getActiveModals);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
-  const { ruleData, ruleType = "" } = ruleEditorModal.props;
-  const ruleConfig = RULE_TYPES_CONFIG[ruleType];
+  const [isLoading, setIsLoading] = useState(false);
+  const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   useEffect(() => {
-    setCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[ruleType], navigate);
-    const newRule = initiateBlankCurrentlySelectedRule(
-      dispatch,
-      currentlySelectedRuleConfig,
-      ruleType,
-      setCurrentlySelectedRule
-    );
+    if (mode === EditorMode.CREATE || !ruleId) return;
+
+    setIsLoading(true);
+    StorageService(appMode)
+      .getRecord(ruleId)
+      .then((rule) => {
+        if (rule === undefined) {
+          redirectTo404(navigate);
+        } else {
+          setCurrentlySelectedRule(dispatch, rule);
+          setCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
+        }
+      })
+      .finally(() => setIsLoading(false));
+
+    return () => {
+      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+    };
+  }, [mode, appMode, ruleId, dispatch, navigate]);
+
+  useEffect(() => {
+    if (mode === EditorMode.EDIT) return;
+
+    const ruleConfig = RULE_TYPES_CONFIG[ruleType];
+    const newRule = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
+    setCurrentlySelectedRuleConfig(dispatch, ruleConfig, navigate);
 
     if (newRule) {
       const prefilledRule: Rule = {
@@ -62,9 +94,11 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     return () => {
       dispatch(actions.clearCurrentlySelectedRuleAndConfig());
     };
-  }, [dispatch, ruleData, currentlySelectedRuleConfig, ruleType, navigate]);
+  }, [mode, dispatch, ruleData, ruleType, navigate]);
 
   useEffect(() => {
+    if (mode === EditorMode.EDIT) return;
+
     setTimeout(() => {
       const element = document.querySelector(
         //@ts-ignore
@@ -75,7 +109,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         element.focus();
       }
     }, 0); // finish all the state updates then run this
-  }, [ruleType]);
+  }, [mode, ruleType]);
 
   const handleRuleTitleChange = useCallback(
     (key: "name" | "description", value: string) => {
@@ -110,7 +144,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   );
 
   const ruleCreatedCallback = useCallback(
-    (ruleId: any) => {
+    (ruleId: string) => {
       handleModalClose();
       showRuleCreatedFromModalToast(ruleId);
     },
@@ -131,38 +165,43 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       onCancel={handleModalClose}
       className="rule-editor-modal"
     >
-      <div className="rq-modal-content">
-        <Row align="middle" justify="space-between" className="rule-editor-modal-header">
-          <RQEditorTitle
-            mode="create"
-            name={currentlySelectedRuleData?.name ?? ""}
-            nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
-            namePlaceholder="Enter rule name"
-            description={currentlySelectedRuleData?.description ?? ""}
-            descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
-            descriptionPlaceholder="Add description (optional)"
-          />
+      {isLoading ? (
+        <p>loading...</p>
+      ) : (
+        <div className="rq-modal-content">
+          <Row align="middle" justify="space-between" className="rule-editor-modal-header">
+            <RQEditorTitle
+              mode={mode}
+              name={currentlySelectedRuleData?.name ?? ""}
+              nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
+              namePlaceholder="Enter rule name"
+              description={currentlySelectedRuleData?.description ?? ""}
+              descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
+              descriptionPlaceholder="Add description (optional)"
+            />
 
-          <CreateRuleButton
-            location={location}
-            isRuleEditorModal={true}
-            analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
-            ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
-          />
-        </Row>
+            <CreateRuleButton
+              location={location}
+              isRuleEditorModal={true}
+              ruleEditorModalMode={mode}
+              analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+              ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
+            />
+          </Row>
 
-        <div className="rule-editor-modal-container">
-          <RulePairs mode="create" currentlySelectedRuleConfig={ruleConfig} />
+          <div className="rule-editor-modal-container">
+            <RulePairs mode={mode} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
 
-          {ruleConfig.ALLOW_ADD_PAIR ? (
-            <Row justify="end">
-              <Col span={24}>
-                <AddPairButton currentlySelectedRuleConfig={ruleConfig} />
-              </Col>
-            </Row>
-          ) : null}
+            {currentlySelectedRuleConfig?.ALLOW_ADD_PAIR ? (
+              <Row justify="end">
+                <Col span={24}>
+                  <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                </Col>
+              </Row>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
     </RQModal>
   );
 };
