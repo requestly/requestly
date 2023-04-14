@@ -9,7 +9,7 @@ RQ.RuleExecutionHandler.setup = () => {
         const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(message.ruleId);
 
         RQ.RuleExecutionHandler.appliedRuleIds.add(message.ruleId);
-        sendResponse({ isFirstExecution });
+        sendResponse(isFirstExecution);
         break;
 
       case RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS:
@@ -17,8 +17,11 @@ RQ.RuleExecutionHandler.setup = () => {
         break;
 
       case RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES:
-        RQ.RuleExecutionHandler.syncCachedAppliedRules(message.appliedRuleDetails, message.isConsoleLoggerEnabled);
-        sendResponse();
+        const newRules = RQ.RuleExecutionHandler.syncCachedAppliedRules(
+          message.appliedRuleDetails,
+          message.isConsoleLoggerEnabled
+        );
+        sendResponse(newRules);
         return true;
     }
     return false;
@@ -26,7 +29,12 @@ RQ.RuleExecutionHandler.setup = () => {
 };
 
 RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleLoggerEnabled) => {
+  const newRules = [];
   appliedRuleDetails.forEach((appliedRule) => {
+    // capturing new rules for tracking rule execution
+    if (!RQ.RuleExecutionHandler.appliedRuleIds.has(message.ruleId)) {
+      newRules.push(appliedRule.rule);
+    }
     RQ.RuleExecutionHandler.appliedRuleIds.add(appliedRule.rule.id);
 
     RQ.ConsoleLogger.handleMessage({
@@ -35,4 +43,6 @@ RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleL
       isConsoleLoggerEnabled,
     });
   });
+
+  return newRules;
 };

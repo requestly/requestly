@@ -182,16 +182,19 @@ EventActions.stopPeriodicEventWriter = () => {
 
 /* CONSUMER UTILITIES */
 EventActions.EVENTS = {
-  RULE_EXECUTED: "RULE_EXECUTED",
+  RULE_EXECUTED: "rule_executed",
 };
 
 EventActions.sendRuleExecutionEvent = (rule) => {
+  const eventParams = {
+    rule_type: rule.ruleType,
+    rule_id: rule.id,
+  };
+
+  eventParams["log_source"] = "extension";
   EventActions.queueEventToWrite({
     eventNamae: EventActions.EVENTS.RULE_EXECUTED,
-    eventParams: {
-      rule_type: rule.ruleType,
-      rule_id: rule.id,
-    },
+    eventParams,
     eventTs: Date.now(),
   });
 };
