@@ -1029,13 +1029,8 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
         appliedRuleDetails: cachedAppliesRules,
         isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
       },
-      (unsentRuleExecutions) => {
-        // Sending the cached applied rules.
-        // happens in case of top level document redirect.
-        unsentRuleExecutions?.map((rule) => {
-          EventActions.sendRuleExecutionEvent(rule);
-        });
-
+      () => {
+        cachedAppliesRules.forEach((appliedRules) => EventActions.sendRuleExecutionEvent(appliedRules?.rule));
         window.tabService.removeData(tabId, "appliedRuleDetails");
       }
     );
