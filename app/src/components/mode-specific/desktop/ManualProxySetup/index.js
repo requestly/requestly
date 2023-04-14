@@ -13,6 +13,51 @@ import installWinCert from "assets/img/screenshots/install_win_cert.gif";
 
 const { Text } = Typography;
 
+const windowsInstructions = [
+  {
+    title: (
+      <Text>
+        2. Open start menu and search for <b>Manage user certificates</b>
+      </Text>
+    ),
+  },
+  {
+    title: (
+      <Text>
+        3. Open <b>Trusted Root Certification Authorities</b> from the left panel
+      </Text>
+    ),
+  },
+  {
+    title: (
+      <Text>
+        4. Right click on <b>Certificates</b>
+      </Text>
+    ),
+  },
+  {
+    title: (
+      <Text>
+        5. Click on <b>Certificates &gt; import ...</b>
+      </Text>
+    ),
+  },
+  {
+    title: <Text>6. Import the certificate you downloaded in the previous step (RQProxyCA.pem)</Text>,
+  },
+];
+
+const macInstructions = [
+  {
+    title: <Text>2. To import certificate in Keychain, go to keychain access (press cmd+enter and type keychain)</Text>,
+    description: `select “Login” keychain from sidebar -> click on “File” in Mac's top menu bar -> click on “Import items” to select the certificate installed in the first step`,
+  },
+  {
+    title: <Text>3. To mark the certificate as trusted, double click the imported certificate (RQProxyCA.pem)</Text>,
+    description: `select “Always Trust” for “When Using the certificate” in the trust section`,
+  },
+];
+
 const ManualProxySetup = ({ setShowInstructions }) => {
   //Global State
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
@@ -42,24 +87,9 @@ const ManualProxySetup = ({ setShowInstructions }) => {
   const renderOsxInstructions = () => {
     return (
       <>
-        <List.Item.Meta
-          title={
-            <>
-              <Text>
-                2. To import certificate in Keychain, go to keychain access (press cmd+enter and type keychain)
-              </Text>
-            </>
-          }
-          description={`select “Login” keychain from sidebar -> click on “File” in Mac's top menu bar -> click on “Import items” to select the certificate installed in the first step`}
-        />
-        <List.Item.Meta
-          title={
-            <>
-              <Text>3. To mark the certificate as trusted, double click the imported certificate (RQProxyCA.pem)</Text>
-            </>
-          }
-          description={`select “Always Trust” for “When Using the certificate” in the trust section`}
-        />
+        {macInstructions.map((step) => {
+          return <List.Item.Meta title={step.title} description={step.description} />;
+        })}
         <Image src={trustCertGif} />
       </>
     );
@@ -68,37 +98,9 @@ const ManualProxySetup = ({ setShowInstructions }) => {
   const renderWindowsInstructions = () => {
     return (
       <>
-        <List.Item.Meta
-          title={
-            <Text>
-              2. Open start menu and search for <b>Manage user certificates</b>
-            </Text>
-          }
-        />
-        <List.Item.Meta
-          title={
-            <Text>
-              3. Open <b>Trusted Root Certification Authorities</b> from the left panel
-            </Text>
-          }
-        />
-        <List.Item.Meta
-          title={
-            <Text>
-              4. Right click on <b>Certificates</b>
-            </Text>
-          }
-        />
-        <List.Item.Meta
-          title={
-            <Text>
-              5. Click on <b>Certificates &gt; import ...</b>
-            </Text>
-          }
-        />
-        <List.Item.Meta
-          title={<Text>6. Import the certificate you downloaded in the previous step (RQProxyCA.pem)</Text>}
-        />
+        {windowsInstructions.map((step) => {
+          return <List.Item.Meta title={step.title} />;
+        })}
         <Image src={installWinCert} />
       </>
     );

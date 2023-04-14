@@ -1,5 +1,5 @@
 import { Dropdown, Row, Steps } from "antd";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
@@ -35,6 +35,31 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
     );
   };
 
+  const instructionSteps = useMemo(() => {
+    return [
+      {
+        title: "Configure Wifi Proxy",
+        status: "process",
+        description: <WifiInstructions device_id={selectedDevice} />,
+      },
+      {
+        title: "Test HTTP Proxy",
+        status: "process",
+        description: <TestProxyInstructions />,
+      },
+      {
+        title: "Download certificate",
+        status: "process",
+        description: <CertificateDownloadInstructions device_id={selectedDevice} />,
+      },
+      {
+        title: "Install and Trust Certificate",
+        status: "process",
+        description: <CertificateTrustInstructions device_id={selectedDevice} />,
+      },
+    ];
+  }, [selectedDevice]);
+
   return (
     <>
       <InstructionsHeader
@@ -46,18 +71,9 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
       />
       <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1} className="mt-8">
-          <Steps.Step
-            title="Configure Wifi Proxy"
-            status="process"
-            description={<WifiInstructions device_id={selectedDevice} />}
-          />
-          <Steps.Step title="Test HTTP Proxy" status="process" description={<TestProxyInstructions />} />
-          <Steps.Step title="Download certificate" status="process" description={<CertificateDownloadInstructions />} />
-          <Steps.Step
-            title="Trust Certificate"
-            status="process"
-            description={<CertificateTrustInstructions device_id={selectedDevice} />}
-          />
+          {instructionSteps.map((step, key) => (
+            <Steps.Step key={key} title={step.title} status={step.status} description={step.description} />
+          ))}
         </Steps>
       </Row>
     </>
