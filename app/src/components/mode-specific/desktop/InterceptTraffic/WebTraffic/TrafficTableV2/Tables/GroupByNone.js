@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Button, Col, Row, Space, Typography } from "antd";
 import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/NetworkInspector";
 import { RQButton } from "lib/design-system/components";
@@ -23,7 +23,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
   const source = desktopSpecificDetails.appsList["system-wide"];
   const { id: appId, name: appName } = source;
 
-  const connectSystemWide = () => {
+  const connectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("activate-app", {
@@ -47,9 +47,9 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         }
       })
       .catch(Logger.log);
-  };
+  }, [appId, appName, dispatch]);
 
-  const disconnectSystemWide = () => {
+  const disconnectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
@@ -73,7 +73,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         }
       })
       .catch((err) => Logger.log(err));
-  };
+  }, [appId, appName, dispatch]);
 
   const renderInterceptSystemWideSourceToggle = () => {
     if (!source.isAvailable) {
