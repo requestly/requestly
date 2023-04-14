@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Space, Typography } from "antd";
 import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/NetworkInspector";
 import { RQButton } from "lib/design-system/components";
@@ -20,93 +20,69 @@ import "./index.css";
 const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc }) => {
   const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
-  const source = desktopSpecificDetails.appsList["system-wide"];
-  const { id: appId, name: appName } = source;
+
+  const { appsList } = desktopSpecificDetails;
+  const systemWideSource = desktopSpecificDetails.appsList["system-wide"];
+
+  const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
+
+  useEffect(() => {
+    setNumberOfConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
+  }, [appsList, numberOfConnectedApps]);
 
   const connectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("activate-app", {
-      id: appId,
+      id: systemWideSource.appId,
     })
       .then((res) => {
         if (res.success) {
-          toast.success(`Connected ${appName}`);
+          toast.success(`Connected ${systemWideSource.appName}`);
           dispatch(
             actions.updateDesktopSpecificAppProperty({
-              appId: appId,
+              appId: systemWideSource.appId,
               property: "isActive",
               value: true,
             })
           );
-          trackAppConnectedEvent(appName);
+          trackAppConnectedEvent(systemWideSource.appName);
           trackSystemWideConnected("traffic_table");
         } else {
-          toast.error(`Unable to activate ${appName}. Issue reported.`);
-          trackAppConnectFailureEvent(appName);
+          toast.error(`Unable to activate ${systemWideSource.appName}. Issue reported.`);
+          trackAppConnectFailureEvent(systemWideSource.appName);
         }
       })
       .catch(Logger.log);
-  }, [appId, appName, dispatch]);
+  }, [dispatch, systemWideSource.appId, systemWideSource.appName]);
 
   const disconnectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
-      id: appId,
+      id: systemWideSource.appId,
     })
       .then((res) => {
         // Notify user and update state
         if (res.success) {
-          toast.info(`Disconnected ${appName}`);
+          toast.info(`Disconnected ${systemWideSource.appName}`);
 
           dispatch(
             actions.updateDesktopSpecificAppProperty({
-              appId: appId,
+              appId: systemWideSource.appId,
               property: "isActive",
               value: false,
             })
           );
-          trackAppDisconnectedEvent(appName);
+          trackAppDisconnectedEvent(systemWideSource.appName);
         } else {
-          toast.error(`Unable to deactivate ${appName}. Issue reported.`);
+          toast.error(`Unable to deactivate ${systemWideSource.appName}. Issue reported.`);
         }
       })
       .catch((err) => Logger.log(err));
-  }, [appId, appName, dispatch]);
+  }, [dispatch, systemWideSource.appId, systemWideSource.appName]);
 
-  const renderInterceptSystemWideSourceToggle = () => {
-    if (!source.isAvailable) {
-      return null;
-    }
-
-    return (
-      <>
-        {source.isActive ? (
-          <>
-            <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
-            <RQButton type="default" className="danger-btn" onClick={disconnectSystemWide}>
-              Disconnect
-            </RQButton>
-          </>
-        ) : (
-          <>
-            <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
-            <RQButton type="primary" onClick={openConnectedAppsModal}>
-              Connect Apps
-            </RQButton>
-            <Typography.Text>Or</Typography.Text>
-            <Typography.Text>Capture all the requests from this device</Typography.Text>
-            <RQButton onClick={connectSystemWide} icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}>
-              Enable Requestly system-wide
-            </RQButton>
-          </>
-        )}
-      </>
-    );
-  };
-
-  const openConnectedAppsModal = () => {
+  const openConnectedAppsModal = useCallback(() => {
     dispatch(
       actions.toggleActiveModal({
         modalName: "connectedAppsModal",
@@ -115,7 +91,58 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       })
     );
     trackConnectAppsClicked("traffic_table");
-  };
+  }, [dispatch]);
+
+  const renderInterceptSystemWideSourceToggle = useCallback(() => {
+    if (!systemWideSource.isAvailable) {
+      return null;
+    }
+
+    if (systemWideSource.isActive) {
+      return (
+        <>
+          <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
+          <RQButton type="default" className="danger-btn" onClick={disconnectSystemWide}>
+            Disconnect
+          </RQButton>
+        </>
+      );
+    }
+
+    if (numberOfConnectedApps > 0) {
+      return (
+        <>
+          <Typography.Text>
+            {numberOfConnectedApps} app connected. All the intercepted network logs will be displayed here.
+          </Typography.Text>
+          <RQButton type="primary" onClick={openConnectedAppsModal}>
+            Connect Another App
+          </RQButton>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
+        <RQButton type="primary" onClick={openConnectedAppsModal}>
+          Connect Apps
+        </RQButton>
+        <Typography.Text>Or</Typography.Text>
+        <Typography.Text>Capture all the requests from this device</Typography.Text>
+        <RQButton onClick={connectSystemWide} icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}>
+          Enable Requestly system-wide
+        </RQButton>
+      </>
+    );
+  }, [
+    connectSystemWide,
+    disconnectSystemWide,
+    numberOfConnectedApps,
+    openConnectedAppsModal,
+    systemWideSource.isActive,
+    systemWideSource.isAvailable,
+  ]);
 
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
