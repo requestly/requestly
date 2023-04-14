@@ -23,9 +23,11 @@ export const isRulesIndexPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.RULES.MY_RULES.RELATIVE);
 };
 
-export const isMobileInterceptorPage = (
-  pathname = window.location.pathname
-) => {
+export const isInterceptTrafficPage = (pathname = window.location.pathname) => {
+  return pathname.includes(APP_CONSTANTS.PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
+};
+
+export const isMobileInterceptorPage = (pathname = window.location.pathname) => {
   return (
     pathname !== APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE &&
     pathname.includes(APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE) &&
@@ -34,18 +36,11 @@ export const isMobileInterceptorPage = (
 };
 
 export const getSessionRecordingSharedLink = (recordingId) => {
-  return (
-    window.location.origin +
-    APP_CONSTANTS.PATHS.SESSIONS.SAVED.ABSOLUTE +
-    "/" +
-    recordingId
-  );
+  return window.location.origin + APP_CONSTANTS.PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + recordingId;
 };
 
 export const getSharedListURL = (shareId, sharedListName) => {
-  const formattedSharedListName = sharedListName
-    .replace(new RegExp(" +|/+", "g"), "-")
-    .replace(/-+/g, "-");
+  const formattedSharedListName = sharedListName.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
   return (
     window.location.origin +
     APP_CONSTANTS.PATHS.RULES.RELATIVE +

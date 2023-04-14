@@ -46,7 +46,7 @@ export const groupByApp = (requestsLog) => {
   requestsLog.forEach((element) => {
     const ua = element.request.headers["user-agent"];
     if (ua) {
-      const appName = getAppNameFromUA(ua);
+      const appName = getAppNameFromUA(ua)?.trim();
       appSet.add(appName);
       if (!(appName in appLogs)) {
         appLogs[appName] = [];
@@ -58,7 +58,7 @@ export const groupByApp = (requestsLog) => {
   const appArray = [];
   appSet.forEach((appName) => {
     appArray.push({
-      appName,
+      appName: appName.trim(),
     });
   });
 
