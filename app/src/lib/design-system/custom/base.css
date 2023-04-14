@@ -120,15 +120,6 @@
   display: flex;
   align-items: center;
 }
-.self-start {
-  align-self: start;
-}
-.self-center {
-  align-self: center;
-}
-.self-end {
-  align-self: end;
-}
 
 .w-full {
   width: 100%;
