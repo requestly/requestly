@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Col, Menu, Row } from "antd";
+import { Alert, Col, Menu, Row, Tag } from "antd";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
+
+import { makeOriginalLog } from "capture-console-logs";
+
 import { getActiveModals } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
@@ -12,11 +15,12 @@ import RuleEditorModal from "components/common/RuleEditorModal";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
-import { makeOriginalLog } from "capture-console-logs";
 import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import { convertProxyLogToUILog, getAppLogsMenuItem, getDomainLogsMenuItem } from "./utils/logUtils";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
+import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
+import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -34,7 +38,7 @@ const CurrentTrafficTable = ({
 
   // Component State
   const previousLogsRef = useRef(logs);
-
+  const newLogs = useSelector(getAllLogs);
   // {id: log, ...}
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -42,6 +46,9 @@ const CurrentTrafficTable = ({
   const [searchKeyword, setSearchKeyword] = useState("");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
+
+  const selectedRequestResponse = useSelector(getLogResponseById(selectedRequestData?.id));
+
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
 
@@ -175,8 +182,27 @@ const CurrentTrafficTable = ({
 
   const clearLogs = () => {
     setNetworkLogsMap({});
+    dispatch(desktopTrafficTableActions.logResponsesClearAll());
+    dispatch(desktopTrafficTableActions.logsClearAll());
+
     if (clearLogsCallback) clearLogsCallback();
   };
+
+  const stableDispatch = useCallback(dispatch, [dispatch]);
+
+  const saveLogInRedux = useCallback(
+    (log) => {
+      if (log) {
+        if (log.response && log.response.body) {
+          stableDispatch(desktopTrafficTableActions.logResponseBodyAdd(log));
+          log.response.body = null; // Setting this to null so that it doesn't get saved in logs state
+        }
+
+        stableDispatch(desktopTrafficTableActions.logUpsert(log));
+      }
+    },
+    [stableDispatch]
+  );
 
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
@@ -186,8 +212,10 @@ const CurrentTrafficTable = ({
     });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
       const rqLog = convertProxyLogToUILog(payload);
+
+      saveLogInRedux(rqLog);
       printLogsToConsole(rqLog);
-      upsertNetworkLogMap(rqLog);
+      // upsertNetworkLogMap(rqLog);
     });
 
     return () => {
@@ -197,7 +225,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -217,11 +245,22 @@ const CurrentTrafficTable = ({
       const reg = new RegExp(searchKeyword, "i");
       return logs.filter((log) => log.url.match(reg));
     }
+
     return logs;
   }, []);
 
   const getRequestLogs = useCallback(
-    (desc = true) => Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp),
+    (desc = true) => {
+      let logs = null;
+      // Old Logs or Mobile Debugger Logs
+      if (Object.keys(networkLogsMap).length > 0) {
+        logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
+      }
+      // New Redux
+      else {
+        logs = newLogs;
+      }
+    },
     [networkLogsMap]
   );
 
@@ -289,13 +328,18 @@ const CurrentTrafficTable = ({
           <Menu theme="dark" mode="inline" items={items} onClick={handleSidebarMenuItemClick} />
         </Col>
         <Col flex="auto">
-          <ActionHeader
-            handleOnSearchChange={handleOnSearchChange}
-            clearLogs={clearLogs}
-            setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
-            showDeviceSelector={showDeviceSelector}
-            deviceId={deviceId}
-          />
+          <Row align={"middle"}>
+            <ActionHeader
+              handleOnSearchChange={handleOnSearchChange}
+              handleOnGroupParameterChange={handleOnGroupParameterChange}
+              groupByParameter={groupByParameter}
+              clearLogs={clearLogs}
+              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+              showDeviceSelector={showDeviceSelector}
+              deviceId={deviceId}
+            />
+            <Tag>{newLogs.length} requests</Tag>
+          </Row>
           <Split
             sizes={rulePaneSizes}
             minSize={[75, 0]}
@@ -331,7 +375,10 @@ const CurrentTrafficTable = ({
                 bodyStyle={{ padding: "0px 20px" }}
               >
                 <FixedRequestLogPane
-                  selectedRequestData={selectedRequestData}
+                  selectedRequestData={{
+                    ...selectedRequestData,
+                    response: { ...selectedRequestData.response, body: selectedRequestResponse },
+                  }}
                   upsertRequestAction={upsertRequestAction}
                   handleClosePane={handleClosePane}
                   visibility={isPreviewOpen}
