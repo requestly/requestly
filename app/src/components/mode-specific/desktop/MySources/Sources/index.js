@@ -116,11 +116,15 @@ const Sources = ({ isOpen, toggle }) => {
           } else {
             toast.error(`Unable to activate ${getAppName(appId)}. Issue reported.`);
             trackAppConnectFailureEvent(getAppName(appId));
+
+            if (appId === "system-wide") {
+              renderInstructionsModal("system-wide");
+            }
           }
         })
         .catch(Logger.log);
     },
-    [dispatch, getAppCount, navigate, processingApps, toggle]
+    [dispatch, getAppCount, navigate, processingApps, renderInstructionsModal, toggle]
   );
 
   const handleDisconnectAppOnClick = useCallback(

@@ -3,6 +3,7 @@ import AndroidInstructions from "./Android";
 import ExistingTerminalInstructions from "./ExistingTerminal";
 import IOSInstructions from "./IOS";
 import ManualProxySetup from "components/mode-specific/desktop/ManualProxySetup";
+import SystemWideInstructions from "./SystemWide";
 
 const SetupInstructions = ({ appId, setShowInstructions }) => {
   switch (appId) {
@@ -10,8 +11,8 @@ const SetupInstructions = ({ appId, setShowInstructions }) => {
       return <AndroidInstructions setShowInstructions={setShowInstructions} />;
     case "ios":
       return <IOSInstructions setShowInstructions={setShowInstructions} />;
-    // case "system-wide":
-    //   return <SystemWideInstructions isVisible={isVisible} handleCancel={handleCancel} />;
+    case "system-wide":
+      return <SystemWideInstructions setShowInstructions={setShowInstructions} />;
     // case "fresh-safari":
     //   return <SafariInstructions isVisible={isVisible} handleCancel={handleCancel} />;
     case "existing-terminal":
