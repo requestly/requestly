@@ -34,3 +34,8 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:focus {
   background-color: var(--component-background);
 }
+
+.traffic-table-split-container .gutter-vertical,
+.traffic-table-split-container .ant-row.request-log-pane-container {
+  margin-left: 1.25rem;
+}

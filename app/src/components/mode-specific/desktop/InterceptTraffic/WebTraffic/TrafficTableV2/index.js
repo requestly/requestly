@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Menu, Row } from "antd";
+import { Alert, Col, Menu, Row } from "antd";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
@@ -304,6 +304,7 @@ const CurrentTrafficTable = ({
             direction="vertical"
             cursor="row-resize"
             style={{ height: "75vh" }}
+            className="traffic-table-split-container"
           >
             <Row className="gap-case-1" style={{ overflow: "hidden" }}>
               <ProCard
@@ -319,7 +320,7 @@ const CurrentTrafficTable = ({
               </ProCard>
             </Row>
 
-            <Row style={{ overflow: "auto", height: "100%" }}>
+            <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
               <ProCard
                 className="primary-card github-like-border"
                 style={{
@@ -338,6 +339,15 @@ const CurrentTrafficTable = ({
               </ProCard>
             </Row>
           </Split>
+
+          <Alert
+            closable
+            showIcon
+            type="info"
+            message="Network logger works only when you are on this page."
+            style={{ paddingLeft: "24px", paddingRight: "24px", margin: "1rem 0 1rem 1.25rem" }}
+          />
+
           {/* ssl proxying is currently hidden */}
           <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />
         </Col>
