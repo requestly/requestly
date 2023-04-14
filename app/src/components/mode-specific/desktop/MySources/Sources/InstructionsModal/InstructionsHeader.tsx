@@ -7,7 +7,7 @@ interface InstructionsHeaderProps {
   heading: string;
   description: string;
   setShowInstructions: (value: boolean) => void;
-  RightComponent?: React.ReactNode;
+  ExtraContentOnRight?: React.ReactNode;
 }
 
 const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
@@ -15,7 +15,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
   heading,
   description,
   setShowInstructions,
-  RightComponent,
+  ExtraContentOnRight,
 }) => {
   const navigateBackToSources = () => {
     setShowInstructions(false);
@@ -49,7 +49,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
             <Typography.Text className="text-gray">{description}</Typography.Text>
           </Row>
         </Col>
-        {RightComponent ? <Col span={4}>{RightComponent}</Col> : null}
+        {ExtraContentOnRight ? <Col span={4}>{ExtraContentOnRight}</Col> : null}
       </Row>
     </>
   );

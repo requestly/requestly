@@ -67,7 +67,7 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
         heading="iOS setup"
         description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
         setShowInstructions={setShowInstructions}
-        RightComponent={renderDeviceSelector()}
+        ExtraContentOnRight={renderDeviceSelector()}
       />
       <Row className="mt-8 setup-instructions-body">
         <Steps direction="vertical" current={1} className="mt-8">
