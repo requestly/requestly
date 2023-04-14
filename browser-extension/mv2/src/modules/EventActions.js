@@ -189,11 +189,11 @@ EventActions.sendRuleExecutionEvent = (rule) => {
   const eventParams = {
     rule_type: rule.ruleType,
     rule_id: rule.id,
+    platform: "extension",
   };
 
-  eventParams["log_source"] = "extension";
   EventActions.queueEventToWrite({
-    eventNamae: EventActions.EVENTS.RULE_EXECUTED,
+    eventName: EventActions.EVENTS.RULE_EXECUTED,
     eventParams,
     eventTs: Date.now(),
   });
