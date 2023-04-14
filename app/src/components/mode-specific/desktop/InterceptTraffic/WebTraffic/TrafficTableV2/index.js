@@ -212,21 +212,17 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
+  const getSearchedLogs = useCallback((logs, searchKeyword) => {
+    if (searchKeyword) {
+      const reg = new RegExp(searchKeyword, "i");
+      return logs.filter((log) => log.url.match(reg));
+    }
+    return logs;
+  }, []);
+
   const getRequestLogs = useCallback(
-    (desc = true) => {
-      const logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
-
-      if (searchKeyword) {
-        const reg = new RegExp(searchKeyword, "i");
-        const filteredLogs = logs.filter((log) => {
-          return log.url.match(reg);
-        });
-
-        return filteredLogs;
-      }
-      return logs;
-    },
-    [networkLogsMap, searchKeyword]
+    (desc = true) => Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp),
+    [networkLogsMap]
   );
 
   const getDomainLogs = useCallback(() => {
@@ -255,10 +251,11 @@ const CurrentTrafficTable = ({
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
     const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : getRequestLogs();
+    const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
       <GroupByNone
-        requestsLog={logs}
+        requestsLog={searchedLogs}
         handleRowClick={handleRowClick}
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}
