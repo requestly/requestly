@@ -13,6 +13,7 @@ import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import SpinnerColumn from "components/misc/SpinnerColumn";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
 import { actions } from "store";
 import {
@@ -165,43 +166,45 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       onCancel={handleModalClose}
       className="rule-editor-modal"
     >
-      {isLoading ? (
-        <p>loading...</p>
-      ) : (
-        <div className="rq-modal-content">
-          <Row align="middle" justify="space-between" className="rule-editor-modal-header">
-            <RQEditorTitle
-              mode={mode}
-              name={currentlySelectedRuleData?.name ?? ""}
-              nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
-              namePlaceholder="Enter rule name"
-              description={currentlySelectedRuleData?.description ?? ""}
-              descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
-              descriptionPlaceholder="Add description (optional)"
-            />
+      <div className="rq-modal-content">
+        {isLoading ? (
+          <SpinnerColumn skeletonCount={2} />
+        ) : (
+          <>
+            <Row align="middle" justify="space-between" className="rule-editor-modal-header">
+              <RQEditorTitle
+                mode={mode}
+                name={currentlySelectedRuleData?.name ?? ""}
+                nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
+                namePlaceholder="Enter rule name"
+                description={currentlySelectedRuleData?.description ?? ""}
+                descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
+                descriptionPlaceholder="Add description (optional)"
+              />
 
-            <CreateRuleButton
-              location={location}
-              isRuleEditorModal={true}
-              ruleEditorModalMode={mode}
-              analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
-              ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
-            />
-          </Row>
+              <CreateRuleButton
+                location={location}
+                isRuleEditorModal={true}
+                ruleEditorModalMode={mode}
+                analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+                ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
+              />
+            </Row>
 
-          <div className="rule-editor-modal-container">
-            <RulePairs mode={mode} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+            <div className="rule-editor-modal-container">
+              <RulePairs mode={mode} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
 
-            {currentlySelectedRuleConfig?.ALLOW_ADD_PAIR ? (
-              <Row justify="end">
-                <Col span={24}>
-                  <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
-                </Col>
-              </Row>
-            ) : null}
-          </div>
-        </div>
-      )}
+              {currentlySelectedRuleConfig?.ALLOW_ADD_PAIR ? (
+                <Row justify="end">
+                  <Col span={24}>
+                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                  </Col>
+                </Row>
+              ) : null}
+            </div>
+          </>
+        )}
+      </div>
     </RQModal>
   );
 };
