@@ -3,13 +3,13 @@ import { Layout, Row } from "antd";
 import { useLocation } from "react-router-dom";
 import MenuItem from "./MenuItem";
 import MenuMobile from "./MenuMobile";
-// import MenuFooter from "./MenuFooter";
 import APP_CONSTANTS from "config/constants";
 import SideBarHeader from "./SideBarHeader";
 import SidebarFooter from "./SidebarFooter";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ProductAnnouncement from "./ProductAnnouncement";
+import { isInterceptTrafficPage } from "utils/PathUtils";
 import "./Sidebar.css";
 
 const { Sider } = Layout;
@@ -39,6 +39,12 @@ const Sidebar = ({ visible, setVisible, collapsed, setCollapsed }) => {
     }
     setCheckedCollapseState(true);
   }, [setCollapsed]);
+
+  useEffect(() => {
+    if (isInterceptTrafficPage(location.pathname)) {
+      setCollapsed(true);
+    }
+  }, [setCollapsed, location.pathname]);
 
   return (
     <Sider
