@@ -33,6 +33,7 @@
   width: 96%;
   height: 1.875rem;
   font-size: 13px;
+  line-height: 20px;
   margin: 0 4px 2px 4px;
   background-color: transparent;
   padding: 0 8px !important; /* overides inline style by antd */
@@ -42,6 +43,34 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:hover,
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:focus {
   background-color: var(--component-background);
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content {
+  overflow: auto;
+  text-overflow: unset;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content > span {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .log-name {
+  width: 7.3rem;
+  margin-right: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
+  font-size: 12px;
 }
 
 .traffic-table-split-container .gutter-vertical,
