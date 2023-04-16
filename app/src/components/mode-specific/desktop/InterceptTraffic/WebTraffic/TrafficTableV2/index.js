@@ -47,7 +47,8 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
-  const selectedRequestResponse = useSelector(getLogResponseById(selectedRequestData?.id));
+  const selectedRequestResponse =
+    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
@@ -260,8 +261,9 @@ const CurrentTrafficTable = ({
       else {
         logs = newLogs;
       }
+      return logs;
     },
-    [networkLogsMap]
+    [networkLogsMap, newLogs]
   );
 
   const getDomainLogs = useCallback(() => {
