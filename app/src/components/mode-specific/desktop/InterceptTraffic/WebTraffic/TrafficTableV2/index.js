@@ -39,7 +39,6 @@ const CurrentTrafficTable = ({
   const { ruleEditorModal } = useSelector(getActiveModals);
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
-  console.log("isTablePeristenceEnabled", isTablePeristenceEnabled);
 
   // Component State
   const previousLogsRef = useRef(logs);
