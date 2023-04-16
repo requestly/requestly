@@ -21,6 +21,8 @@ import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import Logger from "lib/logger";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -35,6 +37,9 @@ const CurrentTrafficTable = ({
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
+
+  const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
+  console.log("isTablePeristenceEnabled", isTablePeristenceEnabled);
 
   // Component State
   const previousLogsRef = useRef(logs);
@@ -214,9 +219,13 @@ const CurrentTrafficTable = ({
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
       const rqLog = convertProxyLogToUILog(payload);
 
-      saveLogInRedux(rqLog);
       printLogsToConsole(rqLog);
-      // upsertNetworkLogMap(rqLog);
+
+      if (isTablePeristenceEnabled) {
+        saveLogInRedux(rqLog);
+      } else {
+        upsertNetworkLogMap(rqLog);
+      }
     });
 
     return () => {
@@ -226,7 +235,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -243,8 +252,13 @@ const CurrentTrafficTable = ({
 
   const getSearchedLogs = useCallback((logs, searchKeyword) => {
     if (searchKeyword) {
-      const reg = new RegExp(searchKeyword, "i");
-      return logs.filter((log) => log.url.match(reg));
+      try {
+        // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+        const reg = new RegExp(searchKeyword, "i");
+        return logs.filter((log) => log.url.match(reg));
+      } catch (err) {
+        Logger.log(err);
+      }
     }
 
     return logs;
@@ -338,7 +352,7 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
             />
-            <Tag>{newLogs.length} requests</Tag>
+            {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
           <Split
             sizes={rulePaneSizes}
