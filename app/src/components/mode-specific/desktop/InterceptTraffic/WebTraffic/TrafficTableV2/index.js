@@ -186,7 +186,10 @@ const CurrentTrafficTable = ({
   );
 
   const clearLogs = () => {
+    // Old Logs Clear
     setNetworkLogsMap({});
+
+    // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
 
