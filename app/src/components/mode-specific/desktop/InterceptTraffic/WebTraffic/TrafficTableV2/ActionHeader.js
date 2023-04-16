@@ -21,7 +21,7 @@ const ActionHeader = ({
         marginTop: 6,
         padding: 3,
         paddingLeft: "24px",
-        paddingRight: "24px",
+        paddingRight: "12px",
       }}
     >
       <Space direction="horizontal">
