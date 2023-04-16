@@ -331,8 +331,6 @@ const CurrentTrafficTable = ({
           <Row align={"middle"}>
             <ActionHeader
               handleOnSearchChange={handleOnSearchChange}
-              handleOnGroupParameterChange={handleOnGroupParameterChange}
-              groupByParameter={groupByParameter}
               clearLogs={clearLogs}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               showDeviceSelector={showDeviceSelector}
