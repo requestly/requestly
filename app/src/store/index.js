@@ -15,6 +15,7 @@ import { teamsReducer } from "./features/teams/slice";
 
 import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
+import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -33,30 +34,27 @@ const globalSlice = createSlice({
 
 export const { actions } = globalSlice;
 
-const globalReducer = getReducerWithLocalStorageSync(
-  "root",
-  globalSlice.reducer,
-  [
-    "user",
-    "appMode",
-    "appTheme",
-    // "rules",
-    // "desktopSpecificDetails.appsList",
-    "userPersona",
-    "country",
-    "mobileDebugger",
-    "initializations",
-    "userPreferences",
-    "userAttributes",
-    "misc",
-  ]
-);
+const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer, [
+  "user",
+  "appMode",
+  "appTheme",
+  // "rules",
+  // "desktopSpecificDetails.appsList",
+  "userPersona",
+  "country",
+  "mobileDebugger",
+  "initializations",
+  "userPreferences",
+  "userAttributes",
+  "misc",
+]);
 
 export const reduxStore = configureStore({
   reducer: {
     [ReducerKeys.GLOBAL]: globalReducer,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
+    [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
