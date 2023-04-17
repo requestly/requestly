@@ -14,10 +14,7 @@ const PinnedRecords: React.FC = () => {
     <>
       <div className="empty-pinned-rules-message">
         <div className="empty-records-title">No pinned rules found</div>
-        <Typography.Text
-          type="secondary"
-          className="empty-pinned-rules-caption-message"
-        >
+        <Typography.Text type="secondary" className="empty-pinned-rules-caption-message">
           Here are some recently used rules that you may want to pin
         </Typography.Text>
       </div>
@@ -30,7 +27,7 @@ const PinnedRecords: React.FC = () => {
           <GroupItem key={group.id} group={group} />
         ))}
         {pinnedRules.map((rule) => (
-          <RuleItem key={rule.id} rule={rule} isParentPinnedRecords={true} />
+          <RuleItem key={rule.id} rule={rule} isParentPinnedRecords={true} tab="pinned_rules" />
         ))}
       </ul>
     </TabContentSection>

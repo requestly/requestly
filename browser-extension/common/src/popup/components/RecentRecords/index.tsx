@@ -24,7 +24,7 @@ const RecentRecords: React.FC = () => {
     <TabContentSection>
       <ul className="record-list">
         {recentRules.map((rule) => (
-          <RuleItem key={rule.id} rule={rule} />
+          <RuleItem key={rule.id} rule={rule} tab="recently_used" />
         ))}
       </ul>
     </TabContentSection>
