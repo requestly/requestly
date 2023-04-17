@@ -333,17 +333,19 @@ const CurrentTrafficTable = ({
 
       return (
         <>
-          <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length > 20 ? logName : ""}>
+          <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
             <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
             <span className="log-name">{`  ${logName}`}</span>
             {isSelected && (
-              <Button
-                size="small"
-                shape="circle"
-                icon={<CloseOutlined />}
-                onClick={handleClearFilter}
-                className="clear-log-filter-btn"
-              />
+              <Tooltip mouseEnterDelay={0.5} placement="bottom" title="Clear filter">
+                <Button
+                  size="small"
+                  shape="circle"
+                  icon={<CloseOutlined />}
+                  onClick={handleClearFilter}
+                  className="clear-log-filter-btn"
+                />
+              </Tooltip>
             )}
           </Tooltip>
         </>
