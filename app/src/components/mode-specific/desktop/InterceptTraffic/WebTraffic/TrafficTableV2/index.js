@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Col, Menu, Row, Tag } from "antd";
+import { Alert, Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
-
 import { makeOriginalLog } from "capture-console-logs";
-
 import { getActiveModals } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
@@ -16,7 +15,8 @@ import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableU
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
 import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
-import { convertProxyLogToUILog, getAppLogsMenuItem, getDomainLogsMenuItem } from "./utils/logUtils";
+import { convertProxyLogToUILog, getSortedMenuItems } from "./utils/logUtils";
+import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
@@ -282,17 +282,17 @@ const CurrentTrafficTable = ({
     [networkLogsMap, newLogs]
   );
 
+  const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
+
   const getDomainLogs = useCallback(() => {
-    const logs = getRequestLogs();
-    const { domainArray: domainList, domainLogs } = groupByDomain(logs);
+    const { domainArray: domainList, domainLogs } = groupByDomain(requestLogs);
     return { domainLogs, domainList };
-  }, [getRequestLogs]);
+  }, [requestLogs]);
 
   const getAppLogs = useCallback(() => {
-    const logs = getRequestLogs();
-    const { appArray: appList, appLogs } = groupByApp(logs);
+    const { appArray: appList, appLogs } = groupByApp(requestLogs);
     return { appLogs, appList };
-  }, [getRequestLogs]);
+  }, [requestLogs]);
 
   const upsertRequestAction = (log_id, action) => {
     let _networkLogsMap = { ...networkLogsMap };
@@ -307,7 +307,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : getRequestLogs();
+    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -320,6 +320,79 @@ const CurrentTrafficTable = ({
       />
     );
   };
+
+  const handleClearFilter = useCallback((e) => {
+    e.stopPropagation();
+    setFilterType(null);
+  }, []);
+
+  const getLogAvatar = useCallback(
+    (logName = "", avatarUrl) => {
+      const filter = filterType?.split(" ")?.[1] ?? [];
+      const isSelected = logName === filter;
+
+      return (
+        <>
+          <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
+            <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
+            <span className="log-name">{`  ${logName}`}</span>
+            {isSelected && (
+              <Tooltip mouseEnterDelay={0.5} placement="bottom" title="Clear filter">
+                <Button
+                  size="small"
+                  shape="circle"
+                  icon={<CloseOutlined />}
+                  onClick={handleClearFilter}
+                  className="clear-log-filter-btn"
+                />
+              </Tooltip>
+            )}
+          </Tooltip>
+        </>
+      );
+    },
+    [filterType, handleClearFilter]
+  );
+
+  const getApplogAvatar = useCallback(
+    (logName) => {
+      const logNameURI = decodeURIComponent(logName.trim());
+      const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
+      const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
+      return getLogAvatar(logNameURI, avatarUrl);
+    },
+    [getLogAvatar]
+  );
+
+  const getDomainLogAvatar = useCallback(
+    (logName) => {
+      const domainParts = logName.trim().split(".");
+      const avatarDomain = domainParts.splice(domainParts.length - 2, 2).join(".");
+      const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
+      return getLogAvatar(logName, avatarUrl);
+    },
+    [getLogAvatar]
+  );
+
+  const getAppLogsMenuItem = useCallback(
+    (apps) => {
+      return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
+        key: `app ${appName}`,
+        label: getApplogAvatar(appName),
+      }));
+    },
+    [getApplogAvatar]
+  );
+
+  const getDomainLogsMenuItem = useCallback(
+    (domains) => {
+      return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
+        key: `domain ${domain}`,
+        label: getDomainLogAvatar(domain),
+      }));
+    },
+    [getDomainLogAvatar]
+  );
 
   const items = useMemo(
     () => [
@@ -334,7 +407,7 @@ const CurrentTrafficTable = ({
         children: getDomainLogsMenuItem(domainList),
       },
     ],
-    [appList, domainList]
+    [appList, domainList, getAppLogsMenuItem, getDomainLogsMenuItem]
   );
 
   const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
@@ -343,7 +416,13 @@ const CurrentTrafficTable = ({
     <>
       <Row wrap={false}>
         <Col flex="197px" className="traffic-table-sidebar">
-          <Menu theme="dark" mode="inline" items={items} onClick={handleSidebarMenuItemClick} />
+          <Menu
+            theme="dark"
+            mode="inline"
+            items={items}
+            onClick={handleSidebarMenuItemClick}
+            selectedKeys={filterType ? [filterType] : []}
+          />
         </Col>
         <Col flex="auto">
           <Row align={"middle"}>
