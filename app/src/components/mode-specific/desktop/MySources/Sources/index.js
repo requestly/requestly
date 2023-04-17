@@ -252,7 +252,7 @@ const Sources = ({ isOpen, toggle }) => {
     [renderSources]
   );
 
-  const renderInterceptSystemWideSourceToggle = () => {
+  const renderInterceptSystemWideSourceToggle = useCallback(() => {
     const source = desktopSpecificDetails.appsList["system-wide"];
 
     return (
@@ -282,7 +282,7 @@ const Sources = ({ isOpen, toggle }) => {
         )}
       </>
     );
-  };
+  }, [desktopSpecificDetails.appsList, handleActivateAppOnClick, handleDisconnectAppOnClick]);
 
   return (
     <React.Fragment>

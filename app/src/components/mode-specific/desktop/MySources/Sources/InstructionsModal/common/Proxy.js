@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Badge, Tag, List, Image } from "antd";
 import { CheckCircleTwoTone } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../../store/selectors";
@@ -7,20 +7,19 @@ import proxyStepsGif from "assets/img/screenshots/proxy_steps.gif";
 import winProxyStepsGif from "assets/img/screenshots/win_proxy_steps.gif";
 import UAParser from "ua-parser-js";
 import Logger from "lib/logger";
+import { actions } from "store";
 
 const { TabPane } = Tabs;
 
 const ProxyInstructions = () => {
+  const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
 
   const { proxyPort } = desktopSpecificDetails;
   const [proxyStatus, setProxyStatus] = useState({ http: false, https: false });
 
   const fetchProxyStatus = () => {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-      "system-wide-proxy-status",
-      {}
-    )
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("system-wide-proxy-status", {})
       .then((res) => {
         setProxyStatus(res);
       })
@@ -32,12 +31,16 @@ const ProxyInstructions = () => {
   }, [proxyPort]);
 
   const onClickHandler = () => {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-      "system-wide-proxy-start",
-      {}
-    )
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("system-wide-proxy-start", {})
       .then((_res) => {
         fetchProxyStatus();
+        dispatch(
+          actions.updateDesktopSpecificAppProperty({
+            appId: "system-wide",
+            property: "isActive",
+            value: true,
+          })
+        );
       })
       .catch((err) => Logger.log(err));
   };
