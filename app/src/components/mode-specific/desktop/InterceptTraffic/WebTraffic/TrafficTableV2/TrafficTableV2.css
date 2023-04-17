@@ -13,7 +13,9 @@
   background-color: var(--body-background);
 }
 
-.traffic-table-sidebar .ant-menu.ant-menu-dark.ant-menu-dark:not(.ant-menu-horizontal) .ant-menu-item-selected {
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
+  color: var(--primary);
+  border: 1px solid var(--primary);
   background-color: var(--component-background);
 }
 
@@ -37,6 +39,7 @@
   margin: 0 4px 2px 4px;
   background-color: transparent;
   padding: 0 8px !important; /* overides inline style by antd */
+  border: 1px solid transparent;
   border-radius: var(--border-radius-sm);
 }
 
@@ -65,8 +68,14 @@
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn {
+  border: none;
   flex-shrink: 0;
   margin-left: auto;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn:hover,
+.traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn:focus {
+  opacity: 0.7;
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
