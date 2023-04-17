@@ -30,6 +30,20 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     setNumberOfConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
   }, [appsList, numberOfConnectedApps]);
 
+  const openConnectedAppsModal = useCallback(
+    (props = {}) => {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "connectedAppsModal",
+          newValue: true,
+          newProps: props,
+        })
+      );
+      trackConnectAppsClicked("traffic_table");
+    },
+    [dispatch]
+  );
+
   const connectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
 
@@ -51,10 +65,14 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         } else {
           toast.error(`Unable to activate ${systemWideSource.name}. Issue reported.`);
           trackAppConnectFailureEvent(systemWideSource.name);
+          openConnectedAppsModal({
+            showInstructions: true,
+            appId: "system-wide",
+          });
         }
       })
       .catch(Logger.log);
-  }, [dispatch, systemWideSource.id, systemWideSource.name]);
+  }, [dispatch, openConnectedAppsModal, systemWideSource.id, systemWideSource.name]);
 
   const disconnectSystemWide = useCallback(() => {
     if (!window.RQ || !window.RQ.DESKTOP) return;
@@ -81,17 +99,6 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       })
       .catch((err) => Logger.log(err));
   }, [dispatch, systemWideSource.id, systemWideSource.name]);
-
-  const openConnectedAppsModal = useCallback(() => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "connectedAppsModal",
-        newValue: true,
-        newProps: {},
-      })
-    );
-    trackConnectAppsClicked("traffic_table");
-  }, [dispatch]);
 
   const renderEmptyTablePlaceholder = useCallback(() => {
     if (!systemWideSource.isAvailable) {

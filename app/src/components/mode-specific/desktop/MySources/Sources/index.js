@@ -27,7 +27,7 @@ import "./index.css";
 import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
 
-const Sources = ({ isOpen, toggle }) => {
+const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
 
   // Global State
@@ -39,9 +39,9 @@ const Sources = ({ isOpen, toggle }) => {
   const [isCloseConfirmModalActive, setIsCloseConfirmModalActive] = useState(false);
   const [appIdToCloseConfirm, setAppIdToCloseConfirm] = useState(false);
   const [appsListArray, setAppsListArray] = useState([]);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(props.showInstructions ?? false);
   const [activeSourceTab, setActiveSourceTab] = useState("browser");
-  const [currentApp, setCurrentApp] = useState(null);
+  const [currentApp, setCurrentApp] = useState(props.appId ?? null);
 
   const { appsList } = desktopSpecificDetails;
 

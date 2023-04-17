@@ -3,7 +3,7 @@ if (typeof isReactApp === "undefined") {
 }
 
 var Logger = {
-  enabled: true,
+  enabled: false,
   ns: "Requestly: ",
 
   log(...args) {
