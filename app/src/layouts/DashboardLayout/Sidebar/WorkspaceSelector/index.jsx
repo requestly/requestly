@@ -36,10 +36,10 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import Logger from "lib/logger";
 import { getTeamInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import "./WorkSpaceSelector.css";
-import Logger from "lib/logger";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -59,7 +59,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName[0].toUpperCase();
 };
 
-const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
+const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, menu }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -71,15 +71,20 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
+  const handleWorkspaceDropdownClick = (open) => {
+    if (open) {
+      handleSidebarCollapsed(false);
+      trackSidebarClicked("workspace");
+    }
+  };
+
   return (
     <Row align="middle" justify="center">
       <Dropdown
         overlay={menu}
         trigger={["click"]}
         className="workspace-dropdown"
-        onOpenChange={(open) => {
-          open && trackSidebarClicked("workspace");
-        }}
+        onOpenChange={handleWorkspaceDropdownClick}
       >
         <div className="cursor-pointer items-center">
           <Avatar
@@ -116,7 +121,7 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
   );
 };
 
-const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
+const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSidebarClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -483,7 +488,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           }}
           overlayClassName="join-workspace-menu-dropdown-container"
         >
-          <div className="join-workspace-menu-dropdown-trigger">
+          <div onClick={(e) => e.stopPropagation()} className="join-workspace-menu-dropdown-trigger">
             <span>Join or create workspace</span>
 
             <div>
@@ -531,7 +536,11 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
   return (
     <>
-      <WorkSpaceDropDown isCollapsed={isCollapsed} menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
+      <WorkSpaceDropDown
+        isCollapsed={isCollapsed}
+        handleSidebarCollapsed={handleSidebarCollapsed}
+        menu={user.loggedIn ? menu : unauthenticatedUserMenu}
+      />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 
