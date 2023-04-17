@@ -1030,7 +1030,9 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
         isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
       },
       () => {
-        cachedAppliesRules.forEach((appliedRules) => EventActions.sendRuleExecutionEvent(appliedRules?.rule));
+        cachedAppliesRules.forEach((appliedRules) => {
+          EventActions.sendRuleExecutionEvent(appliedRules?.rule);
+        });
         window.tabService.removeData(tabId, "appliedRuleDetails");
       }
     );
@@ -1250,7 +1252,6 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
     {
       action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
       ruleId: rule.id,
-      ruleType: rule.ruleType,
     },
     (isFirstExecution) => {
       if (isFirstExecution) {
