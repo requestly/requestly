@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message, Dropdown, Menu } from "antd";
-import { DeleteOutlined, MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined } from "@ant-design/icons";
 import {
   getActiveModals,
   getAppMode,
@@ -210,13 +210,12 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                   {mode === EditorMode.EDIT && (
                     <>
                       <DeleteButton
-                        icon={<DeleteOutlined />}
                         rule={currentlySelectedRuleData}
                         isDisabled={mode === EditorMode.CREATE}
+                        isRuleEditorModal={true}
                         ruleDeletedCallback={() => handleModalClose()}
-                      >
-                        {null}
-                      </DeleteButton>
+                      />
+
                       <Dropdown overlay={ruleMenuOptions} open={true}>
                         <MoreOutlined />
                       </Dropdown>

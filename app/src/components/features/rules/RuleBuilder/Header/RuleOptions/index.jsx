@@ -44,9 +44,7 @@ const RuleOptions = ({ mode, rule }) => {
           rule={rule}
           isDisabled={isDisabled}
           ruleDeletedCallback={() => navigate(APP_CONSTANTS.PATHS.RULES.MY_RULES.ABSOLUTE)}
-        >
-          Delete rule
-        </DeleteButton>
+        />
       </Menu.Item>
     </Menu>
   );

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
 import { getModeData } from "../../../actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 
-const DeleteButton = ({ rule, isDisabled, icon, ruleDeletedCallback, children }) => {
+const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
 
@@ -19,8 +20,13 @@ const DeleteButton = ({ rule, isDisabled, icon, ruleDeletedCallback, children })
 
   return (
     <>
-      <Button type="text" disabled={isDisabled} onClick={handleDeleteRuleClick} icon={icon}>
-        {children}
+      <Button
+        type="text"
+        disabled={isDisabled}
+        onClick={handleDeleteRuleClick}
+        icon={isRuleEditorModal && <DeleteOutlined />}
+      >
+        {!isRuleEditorModal && "Delete rule"}
       </Button>
 
       {isDeleteConfirmationModalActive ? (
