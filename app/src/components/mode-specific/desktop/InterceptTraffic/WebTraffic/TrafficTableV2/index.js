@@ -14,15 +14,21 @@ import RuleEditorModal from "components/common/RuleEditorModal";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
-import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import { convertProxyLogToUILog, getSortedMenuItems } from "./utils/logUtils";
 import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
-import "./css/draggable.css";
-import "./TrafficTableV2.css";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
+import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
+import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import {
+  trackSidebarFilterCollapsed,
+  trackSidebarFilterExpanded,
+  trackSidebarFilterSelected,
+} from "modules/analytics/events/common/traffic-table";
+import "./css/draggable.css";
+import "./TrafficTableV2.css";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -56,6 +62,7 @@ const CurrentTrafficTable = ({
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
+  const [expandedLogTypes, setExpandedLogTypes] = useState([]);
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -377,8 +384,11 @@ const CurrentTrafficTable = ({
   const getAppLogsMenuItem = useCallback(
     (apps) => {
       return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
-        key: `app ${appName}`,
+        key: `${logType.APP} ${appName}`,
         label: getApplogAvatar(appName),
+        onClick: () => {
+          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
+        },
       }));
     },
     [getApplogAvatar]
@@ -387,27 +397,45 @@ const CurrentTrafficTable = ({
   const getDomainLogsMenuItem = useCallback(
     (domains) => {
       return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
-        key: `domain ${domain}`,
+        key: `${logType.DOMAIN} ${domain}`,
         label: getDomainLogAvatar(domain),
+        onClick: () => {
+          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
+        },
       }));
     },
     [getDomainLogAvatar]
   );
 
+  const handleSubMenuTitleClick = useCallback(
+    (key) => {
+      if (expandedLogTypes.includes(key)) {
+        setExpandedLogTypes((prev) => prev.filter((logType) => key !== logType));
+        trackSidebarFilterCollapsed(ANALYTIC_EVENT_SOURCE, key);
+      } else {
+        setExpandedLogTypes((prev) => [...prev, key]);
+        trackSidebarFilterExpanded(ANALYTIC_EVENT_SOURCE, key);
+      }
+    },
+    [expandedLogTypes]
+  );
+
   const items = useMemo(
     () => [
       {
-        key: "0",
+        key: logType.APP,
         label: `Apps (${appList?.length ?? 0})`,
         children: getAppLogsMenuItem(appList),
+        onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
       {
-        key: "1",
+        key: logType.DOMAIN,
         label: `Domains (${domainList?.length ?? 0})`,
         children: getDomainLogsMenuItem(domainList),
+        onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ],
-    [appList, domainList, getAppLogsMenuItem, getDomainLogsMenuItem]
+    [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]
   );
 
   const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
@@ -420,6 +448,7 @@ const CurrentTrafficTable = ({
             theme="dark"
             mode="inline"
             items={items}
+            openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
             selectedKeys={filterType ? [filterType] : []}
           />
