@@ -4,7 +4,7 @@ import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/
 import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
 import { getDesktopSpecificDetails } from "store/selectors";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { DesktopOutlined } from "@ant-design/icons";
 import { actions } from "store";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
@@ -137,7 +137,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         </RQButton>
         <Typography.Text>Or</Typography.Text>
         <Typography.Text>Capture all the requests from this device</Typography.Text>
-        <RQButton onClick={connectSystemWide} icon={<CheckCircleOutlined style={{ color: "#069D4F" }} />}>
+        <RQButton onClick={connectSystemWide} icon={<DesktopOutlined />}>
           Enable Requestly system-wide
         </RQButton>
       </>

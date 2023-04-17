@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Row, Avatar, Tabs } from "antd";
-import { QuestionCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
@@ -270,7 +270,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             <QuestionCircleOutlined /> Want to capture requests from all your apps across this device?
             <RQButton
               type="default"
-              icon={<CheckCircleOutlined className="system-wide-check-icon" />}
+              icon={<DesktopOutlined />}
               onClick={() => {
                 handleActivateAppOnClick(source.id);
                 trackSystemWideConnected("app_source_modal");
@@ -302,7 +302,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             </>
           ) : (
             <>
-              <Row className="white header text-bold">Connected apps</Row>
+              <Row className="white header text-bold">Connect apps</Row>
               <Row className="text-gray mt-8">
                 Connect your system apps to Requestly. After connecting the required app, click&nbsp;
                 <Link to="/" className="connected-apps-secondary-link" onClick={toggle}>
