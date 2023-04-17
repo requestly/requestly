@@ -15,6 +15,7 @@ import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
+import APP_CONSTANTS from "config/constants";
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
@@ -39,7 +40,7 @@ const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
   if (syncTarget === "sync") desiredValue = uid;
 
   await StorageService(appMode).saveRecord({
-    "last-sync-target": desiredValue,
+    [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
 };
 
@@ -61,7 +62,7 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
     return;
   }
   // Consistency check. Merge records if inconsistent
-  const lastSyncTarget = await StorageService(appMode).getRecord("last-sync-target");
+  const lastSyncTarget = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
   let consistencyCheckPassed = false;
   if (syncTarget === "teamSync") {
     if (lastSyncTarget === team_id) consistencyCheckPassed = true;
