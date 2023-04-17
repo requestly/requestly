@@ -73,7 +73,7 @@ EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
   );
 
   if (batchesToDelete.length > 0) {
-    EventActions.deleteBatches(batchesToDelete);
+    await EventActions.deleteBatches(batchesToDelete);
 
     batchesToDelete.forEach((batchId) => {
       EventActions.stopWaitingForAcknowledgement(batchId);
@@ -190,6 +190,7 @@ EventActions.sendRuleExecutionEvent = (rule) => {
     rule_type: rule.ruleType,
     rule_id: rule.id,
     platform: "extension",
+    log_source: "extension",
   };
 
   EventActions.queueEventToWrite({
