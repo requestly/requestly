@@ -35,6 +35,7 @@ import { redirectTo404, redirectToRuleEditor } from "utils/RedirectionUtils";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
+import ShareRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ShareRuleButton";
 
 enum EditorMode {
   EDIT = "edit",
@@ -56,19 +57,20 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   const ruleMenuOptions = useMemo(
     () => (
       <Menu className="editor-rule-options-menu">
-        <Menu.Item key="1" className="editor-rule-options-menu-item">
+        <Menu.Item key="1" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
           <PinButton rule={currentlySelectedRuleData} isRuleEditorModal={true} />
         </Menu.Item>
-        <Menu.Item key="2" className="editor-rule-options-menu-item">
+        <Menu.Item key="2" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
           <ExportButton rule={currentlySelectedRuleData} isDisabled={false} />
         </Menu.Item>
-        <Menu.Item key="3" className="editor-rule-options-menu-item">
-          Share rule
+        <Menu.Item key="3" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
+          <ShareRuleButton isRuleEditorModal={true} />
         </Menu.Item>
       </Menu>
     ),
@@ -216,7 +218,12 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                         ruleDeletedCallback={() => handleModalClose()}
                       />
 
-                      <Dropdown overlay={ruleMenuOptions} open={true}>
+                      <Dropdown
+                        overlay={ruleMenuOptions}
+                        open={isOptionsVisible}
+                        trigger={["click"]}
+                        onOpenChange={setIsOptionsVisible}
+                      >
                         <MoreOutlined />
                       </Dropdown>
                     </>

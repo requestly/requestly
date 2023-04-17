@@ -12,7 +12,7 @@ import RuleOptions from "./RuleOptions";
 import { capitalize } from "lodash";
 import "./RuleEditorHeader.css";
 
-const Header = ({ mode, location, shareBtnClickHandler, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
+const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   const dispatch = useDispatch();
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
@@ -63,7 +63,7 @@ const Header = ({ mode, location, shareBtnClickHandler, currentlySelectedRuleDat
               <EditorGroupDropdown mode={mode} />
             </Col>
             <Col>
-              <ActionButtons location={location} shareBtnClickHandler={shareBtnClickHandler} />
+              <ActionButtons location={location} />
             </Col>
           </Row>
         </Col>
