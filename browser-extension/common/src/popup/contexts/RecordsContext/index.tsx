@@ -1,11 +1,4 @@
-import React, {
-  useMemo,
-  useContext,
-  createContext,
-  useReducer,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { useMemo, useContext, createContext, useReducer, useEffect, useCallback } from "react";
 import { Group, Rule } from "../../../types";
 import { EXTENSION_MESSAGES } from "../../../constants";
 import { recordsInitialState, recordsReducer } from "./recordsReducer";
@@ -28,39 +21,28 @@ interface RecordsProviderProps {
   children: React.ReactNode;
 }
 
-export const RecordsProvider: React.FC<RecordsProviderProps> = ({
-  children,
-}) => {
-  const [{ rules, groups }, recordsDispatch] = useReducer(
-    recordsReducer,
-    recordsInitialState
-  );
+export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) => {
+  const [{ rules, groups }, recordsDispatch] = useReducer(recordsReducer, recordsInitialState);
 
   useEffect(() => {
-    chrome.runtime.sendMessage(
-      { action: EXTENSION_MESSAGES.GET_RULES_AND_GROUPS },
-      (records) => {
-        recordsDispatch({
-          type: RecordsActionType.INITIALIZE_RULES_AND_GROUPS,
-          payload: records,
-        });
-      }
-    );
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.GET_RULES_AND_GROUPS }, (records) => {
+      recordsDispatch({
+        type: RecordsActionType.INITIALIZE_RULES_AND_GROUPS,
+        payload: records,
+      });
+    });
   }, []);
 
-  const updateRule = useCallback(
-    (updatedRule: Rule, isUpdateFromPinnedRecords: boolean = false) => {
-      const updatedRuleCopy = { ...updatedRule };
-      delete updatedRuleCopy.isRemoved;
+  const updateRule = useCallback((updatedRule: Rule, isUpdateFromPinnedRecords: boolean = false) => {
+    const updatedRuleCopy = { ...updatedRule };
+    delete updatedRuleCopy.isRemoved;
 
-      saveRecord(updatedRuleCopy.id, updatedRuleCopy);
-      recordsDispatch({
-        type: RecordsActionType.UPDATE_RULE,
-        payload: { rule: updatedRule, isUpdateFromPinnedRecords },
-      });
-    },
-    []
-  );
+    saveRecord(updatedRuleCopy.id, updatedRuleCopy);
+    recordsDispatch({
+      type: RecordsActionType.UPDATE_RULE,
+      payload: { rule: updatedRule, isUpdateFromPinnedRecords },
+    });
+  }, []);
 
   const updateGroup = useCallback((updatedGroup: Group) => {
     const updatedGroupCopy = { ...updatedGroup };
@@ -82,9 +64,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({
                 ...pinnedGroups,
                 {
                   ...group,
-                  children: Object.values(rules).filter(
-                    (rule: Rule) => rule.groupId === group.id
-                  ),
+                  children: Object.values(rules).filter((rule: Rule) => rule.groupId === group.id),
                 },
               ]
             : pinnedGroups,
@@ -94,15 +74,10 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({
   );
 
   const pinnedRules = useMemo(() => {
-    const groupIdSet = pinnedGroups.reduce(
-      (result: Set<string>, group) => result.add(group.id),
-      new Set()
-    );
+    const groupIdSet = pinnedGroups.reduce((result: Set<string>, group) => result.add(group.id), new Set());
 
     return Object.values(rules).filter(
-      (rule) =>
-        !groupIdSet.has(rule.groupId) &&
-        (rule.isFavourite || (!rule.isFavourite && rule.isRemoved))
+      (rule) => !groupIdSet.has(rule.groupId) && (rule.isFavourite || (!rule.isFavourite && rule.isRemoved))
     );
   }, [rules, groups]);
 
@@ -119,9 +94,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({
     [rules, groups, pinnedRules, pinnedGroups]
   );
 
-  return (
-    <RecordsContext.Provider value={values}>{children}</RecordsContext.Provider>
-  );
+  return <RecordsContext.Provider value={values}>{children}</RecordsContext.Provider>;
 };
 
 export const useRecords = () => useContext(RecordsContext);
