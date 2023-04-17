@@ -12,6 +12,7 @@ import MobileDebuggerAppSelector from "components/features/mobileDebugger/compon
 import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
+import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
 const { PATHS } = APP_CONSTANTS;
 
 const SHOW_SESSION_RECORDING_BANNER = false;
@@ -124,17 +125,15 @@ export default function HeaderText() {
     );
   };
 
-  // const renderProxyInfo = () => {
-  //   return (
-  //     <>
-  //       <Col xl={14} lg={12}>
-  //         <Link to="/">
-  //           <DesktopAppProxyInfo />
-  //         </Link>
-  //       </Col>
-  //     </>
-  //   );
-  // };
+  const renderProxyInfo = () => {
+    return (
+      <>
+        <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
+          <DesktopAppProxyInfo />
+        </Col>
+      </>
+    );
+  };
 
   const renderMobileInterceptorAppSelector = () => {
     return (
@@ -151,7 +150,7 @@ export default function HeaderText() {
   }
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-    return null;
+    return renderProxyInfo();
   }
 
   if (isMobileInterceptorPage(location.pathname) && user.details?.isLoggedIn) {

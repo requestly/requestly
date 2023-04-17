@@ -37,7 +37,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 22rem;
+  max-width: 25rem;
 }
 
 .header-right-section {

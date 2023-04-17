@@ -4,7 +4,6 @@ import { Layout, Button, Row, Col, Tooltip, Dropdown, Menu, Divider } from "antd
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
@@ -25,9 +24,6 @@ import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import { trackHeaderClicked, trackHelpdeskClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
-import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 
 const { Header } = Layout;
 
@@ -45,7 +41,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     "/pricing",
     "/invite",
   ];
-  const appMode = useSelector(getAppMode);
 
   const showMenuHeader = () => {
     //don't show general app header component for editor screens
@@ -133,22 +128,15 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               </Col>
             ) : null}
 
-            {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-              <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 12) : 16}>
-                <div className="header-middle-section hidden-on-small-screen">
-                  <HeaderText />
-                </div>
-              </Col>
-            ) : null}
+            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 14) : 16}>
+              <div className="header-middle-section hidden-on-small-screen">
+                <HeaderText />
+              </div>
+            </Col>
 
             <Col className="ml-auto">
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-                    <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
-                      <DesktopAppProxyInfo />{" "}
-                    </Col>
-                  ) : null}
                   {randomNumberBetween1And2 === 1 ? (
                     <Col className="hidden-on-small-screen">
                       <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>

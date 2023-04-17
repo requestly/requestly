@@ -1,11 +1,12 @@
 .desktop-app-proxy-info-container.ant-col {
   line-height: initial;
+  padding: 4px 8px 4px 12px;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
 }
 
 .desktop-app-proxy-info {
-  padding: 8px;
-  border: 1px solid var(--border-dark);
-  border-radius: var(--border-radius-sm);
+  height: 22px;
 
   & .proxy-status-text {
     margin-left: 4px;

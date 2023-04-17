@@ -133,7 +133,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       <>
         <Typography.Text>Connect apps to start intercepting traffic</Typography.Text>
         <RQButton type="primary" onClick={openConnectedAppsModal}>
-          Connect Apps
+          Connect apps
         </RQButton>
         <Typography.Text>Or</Typography.Text>
         <Typography.Text>Capture all the requests from this device</Typography.Text>

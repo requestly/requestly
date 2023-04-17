@@ -53,7 +53,7 @@ const DesktopAppProxyInfo = () => {
             trackConnectAppsClicked("app_header");
           }}
         >
-          Connect Apps
+          Connect apps
           {numberOfConnectedApps > 0 ? <div className="rq-count-badge">{numberOfConnectedApps}</div> : null}
         </RQButton>
       </>
