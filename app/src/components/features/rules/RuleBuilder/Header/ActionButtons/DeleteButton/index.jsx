@@ -4,7 +4,7 @@ import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
 import { getModeData } from "../../../actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 
-const DeleteButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose, icon, ruleDeletedCallback, children }) => {
+const DeleteButton = ({ rule, isDisabled, icon, ruleDeletedCallback, children }) => {
   const { MODE } = getModeData(window.location);
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
 
@@ -14,7 +14,6 @@ const DeleteButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose, icon, 
 
   const handleDeleteRuleClick = () => {
     setIsDeleteConfirmationModalActive(true);
-    handleRuleOptionsDropdownClose?.();
     trackRuleEditorHeaderClicked("delete_button", rule.ruleType, MODE);
   };
 

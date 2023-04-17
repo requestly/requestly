@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Col, Row, message } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Button, Col, Row, message, Dropdown, Menu } from "antd";
+import { DeleteOutlined, MoreOutlined } from "@ant-design/icons";
 import {
   getActiveModals,
   getAppMode,
@@ -14,6 +14,7 @@ import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
 import DeleteButton from "components/features/rules/RuleBuilder/Header/ActionButtons/DeleteButton";
+import ExportButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ExportButton";
 import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
@@ -55,6 +56,19 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
+
+  const ruleMenuOptions = useMemo(
+    () => (
+      <Menu>
+        <Menu.Item key="1">Pin rule</Menu.Item>
+        <Menu.Item key="2">
+          <ExportButton rule={currentlySelectedRuleData} isDisabled={false} />
+        </Menu.Item>
+        <Menu.Item key="3">Share rule</Menu.Item>
+      </Menu>
+    ),
+    [currentlySelectedRuleData]
+  );
 
   useEffect(() => {
     if (mode === EditorMode.CREATE || !ruleId) return;
@@ -189,16 +203,21 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                 <Row align="middle" justify="space-evenly" wrap={false}>
                   <RuleStatusButton location={window.location} />
                   {mode === EditorMode.EDIT && (
-                    <DeleteButton
-                      icon={<DeleteOutlined />}
-                      rule={currentlySelectedRuleData}
-                      isDisabled={mode === EditorMode.CREATE}
-                      handleRuleOptionsDropdownClose={null}
-                      ruleDeletedCallback={() => handleModalClose()}
-                    >
-                      {null}
-                    </DeleteButton>
+                    <>
+                      <DeleteButton
+                        icon={<DeleteOutlined />}
+                        rule={currentlySelectedRuleData}
+                        isDisabled={mode === EditorMode.CREATE}
+                        ruleDeletedCallback={() => handleModalClose()}
+                      >
+                        {null}
+                      </DeleteButton>
+                      <Dropdown overlay={ruleMenuOptions} open={true}>
+                        <MoreOutlined />
+                      </Dropdown>
+                    </>
                   )}
+
                   <CreateRuleButton
                     location={location}
                     isRuleEditorModal={true}

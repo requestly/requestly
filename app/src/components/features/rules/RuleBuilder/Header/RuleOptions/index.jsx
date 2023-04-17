@@ -25,23 +25,24 @@ const RuleOptions = ({ mode, rule }) => {
           handleRuleOptionsDropdownClose={handleRuleOptionsDropdownClose}
         />
       </Menu.Item>
-      <Menu.Item key="1" disabled={isDisabled} className="editor-rule-options-menu-item">
-        <ExportButton
-          rule={rule}
-          isDisabled={isDisabled}
-          handleRuleOptionsDropdownClose={handleRuleOptionsDropdownClose}
-        />
+      <Menu.Item
+        key="1"
+        disabled={isDisabled}
+        className="editor-rule-options-menu-item"
+        onClick={handleRuleOptionsDropdownClose}
+      >
+        <ExportButton rule={rule} isDisabled={isDisabled} />
       </Menu.Item>
       <Divider className="editor-rule-options-menu-divider" />
       <Menu.Item
         key="2"
         disabled={isDisabled}
         className="editor-rule-options-menu-item editor-rule-options-danger-menu-item"
+        onClick={handleRuleOptionsDropdownClose}
       >
         <DeleteButton
           rule={rule}
           isDisabled={isDisabled}
-          handleRuleOptionsDropdownClose={handleRuleOptionsDropdownClose}
           ruleDeletedCallback={() => navigate(APP_CONSTANTS.PATHS.RULES.MY_RULES.ABSOLUTE)}
         >
           Delete rule
