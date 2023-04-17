@@ -12,6 +12,7 @@ import { RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
+import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
@@ -182,13 +183,18 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                 descriptionPlaceholder="Add description (optional)"
               />
 
-              <CreateRuleButton
-                location={location}
-                isRuleEditorModal={true}
-                ruleEditorModalMode={mode}
-                analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
-                ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
-              />
+              <Col>
+                <Row align="middle" justify="space-evenly" wrap={false}>
+                  <RuleStatusButton location={window.location} />
+                  <CreateRuleButton
+                    location={location}
+                    isRuleEditorModal={true}
+                    ruleEditorModalMode={mode}
+                    analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+                    ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
+                  />
+                </Row>
+              </Col>
             </Row>
 
             <div className="rule-editor-modal-container">
