@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import {
   getActiveModals,
   getAppMode,
@@ -12,6 +13,7 @@ import { RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
+import DeleteButton from "components/features/rules/RuleBuilder/Header/ActionButtons/DeleteButton";
 import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
@@ -186,6 +188,17 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               <Col>
                 <Row align="middle" justify="space-evenly" wrap={false}>
                   <RuleStatusButton location={window.location} />
+                  {mode === EditorMode.EDIT && (
+                    <DeleteButton
+                      icon={<DeleteOutlined />}
+                      rule={currentlySelectedRuleData}
+                      isDisabled={mode === EditorMode.CREATE}
+                      handleRuleOptionsDropdownClose={null}
+                      ruleDeletedCallback={() => handleModalClose()}
+                    >
+                      {null}
+                    </DeleteButton>
+                  )}
                   <CreateRuleButton
                     location={location}
                     isRuleEditorModal={true}
