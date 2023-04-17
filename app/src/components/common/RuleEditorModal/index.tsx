@@ -9,7 +9,7 @@ import {
   getCurrentlySelectedRuleConfig,
   getCurrentlySelectedRuleData,
 } from "store/selectors";
-import { RQEditorTitle, RQModal } from "lib/design-system/components";
+import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
@@ -206,7 +206,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                 descriptionPlaceholder="Add description (optional)"
               />
 
-              <Col>
+              <Col span={7}>
                 <Row align="middle" justify="space-evenly" wrap={false}>
                   <RuleStatusButton location={window.location} />
                   {mode === EditorMode.EDIT && (
@@ -224,7 +224,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                         trigger={["click"]}
                         onOpenChange={setIsOptionsVisible}
                       >
-                        <MoreOutlined />
+                        <RQButton iconOnly type="default" icon={<MoreOutlined />} />
                       </Dropdown>
                     </>
                   )}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "antd";
+import { RQButton } from "lib/design-system/components";
 import { DeleteOutlined } from "@ant-design/icons";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
 import { getModeData } from "../../../actions";
@@ -20,14 +20,15 @@ const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal
 
   return (
     <>
-      <Button
-        type="text"
+      <RQButton
+        iconOnly={isRuleEditorModal}
+        type={isRuleEditorModal ? "default" : "text"}
         disabled={isDisabled}
         onClick={handleDeleteRuleClick}
         icon={isRuleEditorModal && <DeleteOutlined />}
       >
         {!isRuleEditorModal && "Delete rule"}
-      </Button>
+      </RQButton>
 
       {isDeleteConfirmationModalActive ? (
         <DeleteRulesModal
