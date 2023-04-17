@@ -447,7 +447,7 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
     } else {
       syncStatus = profile.isSyncEnabled;
       // Optional - Just in case!
-      if (!syncStatus) await StorageService(appMode).removeRecordsWithoutSyncing(["last-sync-target"]);
+      if (!syncStatus) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
     }
   } else {
     // Profile has not been created yet - user must have signed up recently
