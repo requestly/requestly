@@ -3,6 +3,7 @@ import { Button, Col, Row, Typography } from "antd";
 import config from "../../../config";
 import { icons } from "../../ruleTypeIcons";
 import "./onboardingScreen.css";
+import { EVENT, sendEvent } from "../../events";
 
 interface RuleSelectorProps {
   editorLink: string;
@@ -41,13 +42,8 @@ const RuleSelector: React.FC<RuleSelectorProps> = (props) => {
         window.open(props.editorLink, "_blank");
       }}
     >
-      <Button
-        className="rule-icon"
-        icon={<span className="icon-wrapper">{props.icon}</span>}
-      />
-      <Typography.Text className="rule-selector-text">
-        {props.title}
-      </Typography.Text>
+      <Button className="rule-icon" icon={<span className="icon-wrapper">{props.icon}</span>} />
+      <Typography.Text className="rule-selector-text">{props.title}</Typography.Text>
     </Col>
   );
 };
@@ -60,9 +56,7 @@ const OnboardingScreen: React.FC = () => {
           <Typography.Title level={4} className="onboarding-header-title">
             Welcome to Requestly! 👋
           </Typography.Title>
-          <Typography.Text type="secondary">
-            Intercept and modify HTTP(s) requests
-          </Typography.Text>
+          <Typography.Text type="secondary">Intercept and modify HTTP(s) requests</Typography.Text>
         </div>
       </div>
 
@@ -78,10 +72,7 @@ const OnboardingScreen: React.FC = () => {
           type="text"
           className="view-all-link"
           onClick={() => {
-            window.open(
-              `${config.WEB_URL}/rules/create?source=popup`,
-              "_blank"
-            );
+            window.open(`${config.WEB_URL}/rules/create?source=popup`, "_blank");
           }}
         >
           <Typography.Text>View all modification options</Typography.Text>
@@ -90,10 +81,8 @@ const OnboardingScreen: React.FC = () => {
           className="watch-demo-link"
           type="text"
           onClick={() => {
-            window.open(
-              `${config.WEB_URL}/rules/my-rules?source=popup`,
-              "_blank"
-            );
+            window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
+            sendEvent(EVENT.WATCH_DEMO_VIDEO_CLICKED);
           }}
         >
           <Typography.Text type="secondary" underline>

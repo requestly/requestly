@@ -16,7 +16,9 @@ const Popup: React.FC = () => {
 
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, setIsExtensionEnabled);
 
-    sendEvent(EVENT.POPUP_OPENED);
+    sendEvent(EVENT.POPUP_OPENED, {
+      onboarding_screen_viewed: ifNoRulesPresent,
+    });
   }, []);
 
   const handleToggleExtensionStatus = useCallback(() => {
