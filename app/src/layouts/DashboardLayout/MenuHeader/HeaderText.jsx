@@ -1,22 +1,18 @@
 import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  isPricingPage,
-  isMobileInterceptorPage,
-  isGoodbyePage,
-} from "utils/PathUtils";
+import { isPricingPage, isMobileInterceptorPage, isGoodbyePage } from "utils/PathUtils";
 import RQ_LOGO from "assets/img/brand/rq.png";
 import RQ_LOGO_LIGHT_BLUE from "assets/img/brand/rq-full-logo-light-blue.svg";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
-import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FaStackOverflow } from "react-icons/fa";
 import MobileDebuggerAppSelector from "components/features/mobileDebugger/components/AppSelector";
 import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
+import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
 const { PATHS } = APP_CONSTANTS;
 
 const SHOW_SESSION_RECORDING_BANNER = false;
@@ -40,10 +36,7 @@ export default function HeaderText() {
           <span
             className="hp-font-weight-300 hp-text-color-danger-3 cursor-pointer"
             onClick={(e) => {
-              trackPromoHeaderClicked(
-                "session_recording",
-                PATHS.SESSIONS.ABSOLUTE
-              );
+              trackPromoHeaderClicked("session_recording", PATHS.SESSIONS.ABSOLUTE);
               navigate(PATHS.SESSIONS.ABSOLUTE);
             }}
           >
@@ -71,8 +64,7 @@ export default function HeaderText() {
     return (
       <Col xl={14} lg={12} style={{ maxWidth: "max-content" }}>
         <span>
-          Find out how Developers and QAs use Requestly to solve their
-          problems&nbsp;
+          Find out how Developers and QAs use Requestly to solve their problems&nbsp;
           <span
             className="  hp-text-color-danger-3 cursor-pointer"
             onClick={(e) => {
@@ -136,10 +128,8 @@ export default function HeaderText() {
   const renderProxyInfo = () => {
     return (
       <>
-        <Col xl={14} lg={12}>
-          <Link to="/">
-            <DesktopAppProxyInfo />
-          </Link>
+        <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
+          <DesktopAppProxyInfo />
         </Col>
       </>
     );

@@ -11,30 +11,17 @@ interface Props<ResourceType> {
   close: () => void;
 }
 
-const ResourceDetailsTabs = <ResourceType,>({
-  resource,
-  tabs,
-  close,
-}: Props<ResourceType>): ReactElement => {
+const ResourceDetailsTabs = <ResourceType,>({ resource, tabs, close }: Props<ResourceType>): ReactElement => {
   return (
     <div className="rq-resource-details">
       <Navigation>
         <Navigation.Controls className="rq-resource-details-header">
           <Navigation.Left>
-            <Navigation.Button
-              icon={<span>&times;</span>}
-              aria-label="Close"
-              title="Close"
-              onClick={close}
-            />
+            <Navigation.Button icon={<span>&times;</span>} aria-label="Close" title="Close" onClick={close} />
           </Navigation.Left>
           <Navigation.TabList>
             {tabs.map((tab) => (
-              <Navigation.Tab
-                key={tab.key}
-                className="rq-resource-details-tab"
-                id={tab.key}
-              >
+              <Navigation.Tab key={tab.key} className="rq-resource-details-tab" id={tab.key}>
                 {tab.label}
               </Navigation.Tab>
             ))}
@@ -42,10 +29,7 @@ const ResourceDetailsTabs = <ResourceType,>({
         </Navigation.Controls>
         <Navigation.Panels>
           {tabs.map((tab) => (
-            <Navigation.Panel
-              key={tab.key}
-              className="rq-resource-details-content"
-            >
+            <Navigation.Panel key={tab.key} className="rq-resource-details-content">
               {tab.render(resource)}
             </Navigation.Panel>
           ))}

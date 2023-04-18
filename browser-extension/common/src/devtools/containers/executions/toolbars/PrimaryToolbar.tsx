@@ -9,11 +9,7 @@ interface Props {
   onSettingsChange: (settings: NetworkSettings) => void;
 }
 
-const PrimaryToolbar: React.FC<Props> = ({
-  clearEvents,
-  settings,
-  onSettingsChange,
-}) => {
+const PrimaryToolbar: React.FC<Props> = ({ clearEvents, settings, onSettingsChange }) => {
   const onPreserveLogSettingChanged = useCallback(
     (newPreserveLogSetting: boolean) => {
       onSettingsChange({
@@ -27,12 +23,7 @@ const PrimaryToolbar: React.FC<Props> = ({
   return (
     <div className="executions-toolbar primary">
       <div>
-        <Button
-          icon={<StopOutlined />}
-          type="text"
-          className="clear-events-button"
-          onClick={clearEvents}
-        >
+        <Button icon={<StopOutlined />} type="text" className="clear-events-button" onClick={clearEvents}>
           Clear logs
         </Button>
         <Divider type="vertical" className="divider" />

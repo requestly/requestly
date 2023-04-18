@@ -26,11 +26,7 @@ const IconButton: React.FC<Props> = ({
 
   return (
     <Tooltip placement={tooltipPosition} title={tooltip}>
-      <Icon
-        onClick={handleButtonClick}
-        {...props}
-        className={`icon-button ${className}`}
-      />
+      <Icon onClick={handleButtonClick} {...props} className={`icon-button ${className}`} />
     </Tooltip>
   );
 };

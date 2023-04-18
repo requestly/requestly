@@ -1,8 +1,6 @@
 import { ExecutionEvent, NetworkResourceType } from "../../types";
 
-export const getResourceType = (
-  requestType: ExecutionEvent["requestType"]
-): NetworkResourceType => {
+export const getResourceType = (requestType: ExecutionEvent["requestType"]): NetworkResourceType => {
   switch (requestType) {
     case "main_frame":
     case "sub_frame":
