@@ -7,11 +7,7 @@ import { SurveyConfig, OptionsConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey, shuffleOptions } from "./utils";
 import { Option, PageConfig } from "./types";
-import {
-  trackPersonaSurveyViewed,
-  trackPersonaRecommendationSkipped,
-  trackPersonaSurveySignInClicked,
-} from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaSurveyViewed, trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
@@ -80,23 +76,6 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
               }}
             >
               Sign in
-            </RQButton>
-          </div>
-        );
-
-      case SurveyConfig.length - 1:
-        return (
-          <div className="skip-recommendation-wrapper">
-            <RQButton
-              type="link"
-              onClick={() => {
-                toggle();
-                dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                trackPersonaRecommendationSkipped("modal");
-              }}
-              className="white skip-recommendation-btn"
-            >
-              Skip
             </RQButton>
           </div>
         );
