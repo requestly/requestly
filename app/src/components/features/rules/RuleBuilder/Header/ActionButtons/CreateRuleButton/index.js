@@ -36,7 +36,7 @@ const CreateRuleButton = ({
   location,
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
-  analyticEventRuleCreatedSource = "rule_editor_screen",
+  analyticEventRuleCreatedSource = "rule_editor_screen_header",
   ruleCreatedFromEditorModalCallback = (ruleId) => {},
   ruleEditorModalMode = APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE,
 }) => {

@@ -233,7 +233,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                     location={location}
                     isRuleEditorModal={true}
                     ruleEditorModalMode={mode}
-                    analyticEventRuleCreatedSource={"rule_editor_modal"}
+                    analyticEventRuleCreatedSource={"rule_editor_modal_header"}
                     ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
                   />
                 </Row>

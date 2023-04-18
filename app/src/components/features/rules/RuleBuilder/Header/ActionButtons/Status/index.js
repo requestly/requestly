@@ -108,7 +108,7 @@ const Status = ({ location, isRuleEditorModal }) => {
             "toggle_status",
             currentlySelectedRuleData.ruleType,
             location.pathname.indexOf("create") !== -1 ? "create" : "edit",
-            isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
+            isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
       />

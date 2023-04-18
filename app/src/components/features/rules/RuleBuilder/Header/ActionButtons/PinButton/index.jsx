@@ -36,7 +36,7 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
           "pin_button",
           rule.ruleType,
           MODE,
-          isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
+          isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
         );
       });
   };
