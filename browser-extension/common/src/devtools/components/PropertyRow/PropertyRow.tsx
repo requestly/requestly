@@ -15,9 +15,7 @@ const PropertyRow: React.FC<Props> = ({ name, value, actions, className }) => {
       <Typography.Text type="secondary" className="property-name">
         {name}:
       </Typography.Text>
-      <Typography.Text className="property-value">
-        {value ?? "(empty)"}
-      </Typography.Text>
+      <Typography.Text className="property-value">{value ?? "(empty)"}</Typography.Text>
       {actions ? <div className="property-actions">{actions}</div> : null}
     </div>
   );

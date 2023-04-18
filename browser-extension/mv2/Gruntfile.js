@@ -21,9 +21,7 @@ const processManifest = (content) => {
   contentScripts[1].exclude_matches = [webUrlPattern];
 
   if (env !== "prod") {
-    manifestJson.description = `[${env.toUpperCase()}] ${
-      manifestJson.description
-    }`;
+    manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
   }
 
   if (!isProductionBuildMode) {
@@ -52,8 +50,7 @@ module.exports = function (grunt) {
           "dist/generated/shared.js": jsList["shared"],
           "dist/generated/pages/main.js": jsList["pages"],
           "dist/generated/client/client.js": jsList["client"],
-          "dist/generated/background/background-bundled.js":
-            jsList["background"],
+          "dist/generated/background/background-bundled.js": jsList["background"],
         },
       },
     },
@@ -67,13 +64,9 @@ module.exports = function (grunt) {
       dist: {
         files: {
           "dist/generated/shared.js": ["dist/generated/shared.js"],
-          "dist/generated/background/background-bundled.js": [
-            "dist/generated/background/background-bundled.js",
-          ],
+          "dist/generated/background/background-bundled.js": ["dist/generated/background/background-bundled.js"],
           "dist/generated/pages/main.js": ["dist/generated/pages/main.js"],
-          "dist/generated/client/client.js": [
-            "dist/generated/client/client.js",
-          ],
+          "dist/generated/client/client.js": ["dist/generated/client/client.js"],
         },
       },
     },
@@ -168,12 +161,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-uglify");
 
-  grunt.registerTask("dist", [
-    "concat",
-    "copy:popup",
-    "copy:devtools",
-    "copy:static_content",
-  ]);
+  grunt.registerTask("dist", ["concat", "copy:popup", "copy:devtools", "copy:static_content"]);
 
   grunt.registerTask("build", ["dist", `copy:manifest_${browser}`]);
 

@@ -10,13 +10,8 @@ import {
   AiFillYoutube,
 } from "react-icons/ai";
 import { BsHandbag, BsCameraVideo } from "react-icons/bs";
-import {
-  MdOutlineFileDownload,
-  MdOutlineGroupAdd,
-  MdReportGmailerrorred,
-} from "react-icons/md";
+import { MdOutlineFileDownload, MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
 import { TbArrowsDownUp } from "react-icons/tb";
-import { RiApps2Line } from "react-icons/ri";
 import { BiRocket, BiBook } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
 import {
@@ -28,7 +23,6 @@ import {
   redirectToSharedList,
   redirectToTemplates,
   redirectToTraffic,
-  redirectToApps,
   redirectToAccountDetails,
   redirectToPricingPlans,
   redirectToSettings,
@@ -37,14 +31,7 @@ import {
   redirectToCreateNewRule,
 } from "utils/RedirectionUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
-import {
-  ActionProps,
-  CommandBarItem,
-  CommandItemType,
-  PageConfig,
-  Page,
-  TitleProps,
-} from "./types";
+import { ActionProps, CommandBarItem, CommandItemType, PageConfig, Page, TitleProps } from "./types";
 import { Tag } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -92,8 +79,7 @@ export const config: PageConfig[] = [
           },
           {
             id: "open rule",
-            title: ({ rules }: TitleProps) =>
-              rules?.length ? "Open a rule" : null,
+            title: ({ rules }: TitleProps) => (rules?.length ? "Open a rule" : null),
             icon: <AiOutlineFolderOpen />,
             nextPage: Page.MY_RULES,
           },
@@ -167,14 +153,6 @@ export const config: PageConfig[] = [
               redirectToTraffic(navigate);
             },
           },
-          {
-            id: "connected apps",
-            title: "Connected apps",
-            icon: <RiApps2Line />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToApps(navigate);
-            },
-          },
         ],
       },
       {
@@ -184,8 +162,7 @@ export const config: PageConfig[] = [
         children: [
           {
             id: "my account",
-            title: ({ user }: TitleProps) =>
-              !user?.loggedIn ? null : "My Account",
+            title: ({ user }: TitleProps) => (!user?.loggedIn ? null : "My Account"),
             icon: <AiOutlineUser />,
             action: ({ navigate }: ActionProps) => {
               redirectToAccountDetails(navigate);
@@ -193,8 +170,7 @@ export const config: PageConfig[] = [
           },
           {
             id: "upgrade plan",
-            title: ({ user }: TitleProps) =>
-              user.loggedIn || user?.details?.isPremium ? null : "Upgrade Plan",
+            title: ({ user }: TitleProps) => (user.loggedIn || user?.details?.isPremium ? null : "Upgrade Plan"),
             icon: <BiRocket />,
             action: ({ navigate }: ActionProps) => {
               redirectToPricingPlans(navigate);
@@ -255,8 +231,7 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
         title: NAME,
         icon: <ICON />,
         action: async ({ navigate, dispatch, user, appMode, rules }) => {
-          if (user.loggedIn)
-            redirectToCreateNewRule(navigate, TYPE, "command_bar");
+          if (user.loggedIn) redirectToCreateNewRule(navigate, TYPE, "command_bar");
           else {
             if (await isSignUpRequired(rules, appMode, user))
               dispatch(
@@ -264,8 +239,7 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
                   modalName: "authModal",
                   newValue: true,
                   newProps: {
-                    callback: () =>
-                      redirectToCreateNewRule(navigate, TYPE, "command_bar"),
+                    callback: () => redirectToCreateNewRule(navigate, TYPE, "command_bar"),
                     authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
                     eventSource: AUTH.SOURCE.COMMAND_BAR,
                   },
