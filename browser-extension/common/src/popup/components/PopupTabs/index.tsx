@@ -3,12 +3,15 @@ import { Badge, Tabs } from "antd";
 import ExecutedRules from "../ExecutedRules";
 import PinnedRecords from "../PinnedRecords";
 import RecentRecords from "../RecentRecords";
-import {
-  PushpinFilled,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
+import { PushpinFilled, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import "./popupTabs.css";
+import { EVENT, sendEvent } from "../../events";
+
+const tabKeyNameMap: Record<string, string> = {
+  "0": "pinned_rules",
+  "1": "recently_used",
+  "2": "executed_rules",
+};
 
 const PopupTabs: React.FC = () => {
   const [executedRulesCount, setExecutedRulesCount] = useState(0);
@@ -40,16 +43,10 @@ const PopupTabs: React.FC = () => {
           <span>
             <CheckCircleOutlined />
             Executed rules
-            <Badge
-              size="small"
-              count={executedRulesCount}
-              className="popup-tab-badge"
-            />
+            <Badge size="small" count={executedRulesCount} className="popup-tab-badge" />
           </span>
         ),
-        children: (
-          <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />
-        ),
+        children: <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />,
       },
     ];
   }, [executedRulesCount]);
@@ -61,6 +58,7 @@ const PopupTabs: React.FC = () => {
       defaultActiveKey="0"
       className="popup-tabs"
       destroyInactiveTabPane
+      onChange={(key) => sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: tabKeyNameMap[key] })}
     />
   );
 };
