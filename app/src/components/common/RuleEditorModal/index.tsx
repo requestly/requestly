@@ -57,20 +57,19 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const [isRuleNotFound, setIsRuleNotFound] = useState(false);
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   const ruleMenuOptions = useMemo(
     () => (
       <Menu className="editor-rule-options-menu">
-        <Menu.Item key="1" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
+        <Menu.Item key="1" className="editor-rule-options-menu-item">
           <PinButton rule={currentlySelectedRuleData} isRuleEditorModal={true} />
         </Menu.Item>
-        <Menu.Item key="2" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
+        <Menu.Item key="2" className="editor-rule-options-menu-item">
           <ExportButton rule={currentlySelectedRuleData} isDisabled={false} />
         </Menu.Item>
-        <Menu.Item key="3" className="editor-rule-options-menu-item" onClick={() => setIsOptionsVisible(false)}>
+        <Menu.Item key="3" className="editor-rule-options-menu-item">
           <ShareRuleButton isRuleEditorModal={true} />
         </Menu.Item>
       </Menu>
@@ -224,13 +223,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                         ruleDeletedCallback={() => handleModalClose()}
                       />
 
-                      <Dropdown
-                        overlay={ruleMenuOptions}
-                        open={isOptionsVisible}
-                        trigger={["click"]}
-                        placement="bottomRight"
-                        onOpenChange={setIsOptionsVisible}
-                      >
+                      <Dropdown overlay={ruleMenuOptions} trigger={["click"]} placement="bottomRight">
                         <RQButton iconOnly type="default" icon={<MoreOutlined />} />
                       </Dropdown>
                     </>
