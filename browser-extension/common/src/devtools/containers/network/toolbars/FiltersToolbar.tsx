@@ -1,10 +1,7 @@
 import { Input } from "antd";
 import React, { useCallback } from "react";
 import { ResourceFilters } from "../../../types";
-import {
-  ResourceTypeFilter,
-  ResourceTypeFilterValue,
-} from "../../../components/ResourceTypeFilter";
+import { ResourceTypeFilter, ResourceTypeFilterValue } from "../../../components/ResourceTypeFilter";
 
 interface Props {
   filters: ResourceFilters;
@@ -41,10 +38,7 @@ const FiltersToolbar: React.FC<Props> = ({ filters, onFiltersChange }) => {
         onChange={(e) => onUrlFilterChange(e.target.value)}
         allowClear
       />
-      <ResourceTypeFilter
-        value={filters.resourceType}
-        onChange={onResourceTypeFilterChange}
-      />
+      <ResourceTypeFilter value={filters.resourceType} onChange={onResourceTypeFilterChange} />
     </div>
   );
 };

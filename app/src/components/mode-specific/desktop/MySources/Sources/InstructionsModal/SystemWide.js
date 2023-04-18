@@ -1,47 +1,27 @@
-import { Modal, Steps } from "antd";
+import { Row, Steps } from "antd";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { redirectToTraffic } from "utils/RedirectionUtils";
 import CertsInstructions from "./common/Certs";
-import CompleteStep from "./common/Complete";
 import ProxyInstructions from "./common/Proxy";
+import InstructionsHeader from "./InstructionsHeader";
 
-const SystemWideInstructionModal = ({ isVisible, handleCancel }) => {
-  const navigate = useNavigate();
-  const navigateToTraffic = () => {
-    redirectToTraffic(navigate);
-  };
+const SystemWideInstructions = ({ setShowInstructions }) => {
   return (
     <>
-      <Modal
-        title="Steps to setup System Wide Proxy"
-        visible={isVisible}
-        onOk={navigateToTraffic}
-        okText="Inspect Traffic"
-        onCancel={handleCancel}
-        cancelText="Close"
-        width="50%"
-      >
+      <InstructionsHeader
+        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/package.png"}
+        heading="Setting up system proxy"
+        description="Requestly requires your applications to send their network traffic through its local proxy server before
+            going to the destination."
+        setShowInstructions={setShowInstructions}
+      />
+      <Row className="mt-16  setup-instructions-body">
         <Steps direction="vertical" current={1}>
-          <Steps.Step
-            title="Install & Trust Certs"
-            status="process"
-            description={<CertsInstructions />}
-          />
-          <Steps.Step
-            title="Setup Proxy"
-            status="process"
-            description={<ProxyInstructions />}
-          />
-          <Steps.Step
-            title="All Set to go"
-            status="process"
-            description={<CompleteStep appId={"system-wide"} />}
-          />
+          <Steps.Step title="Install & Trust Certs" status="process" description={<CertsInstructions />} />
+          <Steps.Step title="Setup Proxy" status="process" description={<ProxyInstructions />} />
         </Steps>
-      </Modal>
+      </Row>
     </>
   );
 };
 
-export default SystemWideInstructionModal;
+export default SystemWideInstructions;

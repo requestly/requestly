@@ -1,0 +1,10 @@
+.empty-traffic-table-container {
+  height: 100%;
+  align-content: center;
+  background: var(--component-dark-background);
+}
+
+.empty-traffic-table-container .rq-btn.danger-btn {
+  background: rgba(var(--danger-rgb), 0.2);
+  border-color: rgba(var(--danger-rgb), 0.6);
+}
