@@ -26,6 +26,7 @@ import Logger from "lib/logger";
 import "./index.css";
 import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
+import PATHS from "config/constants/sub/paths";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -305,7 +306,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               <Row className="white header text-bold">Connect apps</Row>
               <Row className="text-gray mt-8">
                 Connect your system apps to Requestly. After connecting the required app, click&nbsp;
-                <Link to="/" className="connected-apps-secondary-link" onClick={toggle}>
+                <Link to={PATHS.RULES.RELATIVE} className="connected-apps-secondary-link" onClick={toggle}>
                   here
                 </Link>
                 &nbsp;to setup rules.

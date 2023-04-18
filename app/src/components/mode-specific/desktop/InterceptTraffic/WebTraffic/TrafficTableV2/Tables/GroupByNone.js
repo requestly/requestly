@@ -137,7 +137,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         </RQButton>
         <Typography.Text>Or</Typography.Text>
         <Typography.Text>Capture all the requests from this device</Typography.Text>
-        <RQButton onClick={connectSystemWide} icon={<DesktopOutlined />}>
+        <RQButton type="default" onClick={connectSystemWide} icon={<DesktopOutlined />}>
           Enable Requestly system-wide
         </RQButton>
       </>
