@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Col, Menu, Row } from "antd";
+import { Alert, Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
+import { makeOriginalLog } from "capture-console-logs";
 import { getActiveModals } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
@@ -12,9 +14,19 @@ import RuleEditorModal from "components/common/RuleEditorModal";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
-import { makeOriginalLog } from "capture-console-logs";
+import { convertProxyLogToUILog, getSortedMenuItems } from "./utils/logUtils";
+import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
+import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
+import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import Logger from "lib/logger";
+import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
-import { convertProxyLogToUILog, getAppLogsMenuItem, getDomainLogsMenuItem } from "./utils/logUtils";
+import {
+  trackSidebarFilterCollapsed,
+  trackSidebarFilterExpanded,
+  trackSidebarFilterSelected,
+} from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 
@@ -32,9 +44,11 @@ const CurrentTrafficTable = ({
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
 
+  const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
+
   // Component State
   const previousLogsRef = useRef(logs);
-
+  const newLogs = useSelector(getAllLogs);
   // {id: log, ...}
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -42,8 +56,13 @@ const CurrentTrafficTable = ({
   const [searchKeyword, setSearchKeyword] = useState("");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
+
+  const selectedRequestResponse =
+    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
+
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
+  const [expandedLogTypes, setExpandedLogTypes] = useState([]);
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -174,9 +193,31 @@ const CurrentTrafficTable = ({
   );
 
   const clearLogs = () => {
+    // Old Logs Clear
     setNetworkLogsMap({});
+
+    // New Logs Clear
+    dispatch(desktopTrafficTableActions.logResponsesClearAll());
+    dispatch(desktopTrafficTableActions.logsClearAll());
+
     if (clearLogsCallback) clearLogsCallback();
   };
+
+  const stableDispatch = useCallback(dispatch, [dispatch]);
+
+  const saveLogInRedux = useCallback(
+    (log) => {
+      if (log) {
+        if (log.response && log.response.body) {
+          stableDispatch(desktopTrafficTableActions.logResponseBodyAdd(log));
+          log.response.body = null; // Setting this to null so that it doesn't get saved in logs state
+        }
+
+        stableDispatch(desktopTrafficTableActions.logUpsert(log));
+      }
+    },
+    [stableDispatch]
+  );
 
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
@@ -186,8 +227,14 @@ const CurrentTrafficTable = ({
     });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
       const rqLog = convertProxyLogToUILog(payload);
+
       printLogsToConsole(rqLog);
-      upsertNetworkLogMap(rqLog);
+
+      if (isTablePeristenceEnabled) {
+        saveLogInRedux(rqLog);
+      } else {
+        upsertNetworkLogMap(rqLog);
+      }
     });
 
     return () => {
@@ -197,7 +244,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -214,28 +261,45 @@ const CurrentTrafficTable = ({
 
   const getSearchedLogs = useCallback((logs, searchKeyword) => {
     if (searchKeyword) {
-      const reg = new RegExp(searchKeyword, "i");
-      return logs.filter((log) => log.url.match(reg));
+      try {
+        // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+        const reg = new RegExp(searchKeyword, "i");
+        return logs.filter((log) => log.url.match(reg));
+      } catch (err) {
+        Logger.log(err);
+      }
     }
+
     return logs;
   }, []);
 
   const getRequestLogs = useCallback(
-    (desc = true) => Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp),
-    [networkLogsMap]
+    (desc = true) => {
+      let logs = null;
+      // Old Logs or Mobile Debugger Logs
+      if (Object.keys(networkLogsMap).length > 0) {
+        logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
+      }
+      // New Redux
+      else {
+        logs = newLogs;
+      }
+      return logs;
+    },
+    [networkLogsMap, newLogs]
   );
 
+  const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
+
   const getDomainLogs = useCallback(() => {
-    const logs = getRequestLogs();
-    const { domainArray: domainList, domainLogs } = groupByDomain(logs);
+    const { domainArray: domainList, domainLogs } = groupByDomain(requestLogs);
     return { domainLogs, domainList };
-  }, [getRequestLogs]);
+  }, [requestLogs]);
 
   const getAppLogs = useCallback(() => {
-    const logs = getRequestLogs();
-    const { appArray: appList, appLogs } = groupByApp(logs);
+    const { appArray: appList, appLogs } = groupByApp(requestLogs);
     return { appLogs, appList };
-  }, [getRequestLogs]);
+  }, [requestLogs]);
 
   const upsertRequestAction = (log_id, action) => {
     let _networkLogsMap = { ...networkLogsMap };
@@ -250,7 +314,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : getRequestLogs();
+    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -264,20 +328,114 @@ const CurrentTrafficTable = ({
     );
   };
 
+  const handleClearFilter = useCallback((e) => {
+    e.stopPropagation();
+    setFilterType(null);
+  }, []);
+
+  const getLogAvatar = useCallback(
+    (logName = "", avatarUrl) => {
+      const filter = filterType?.split(" ")?.[1] ?? [];
+      const isSelected = logName === filter;
+
+      return (
+        <>
+          <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
+            <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
+            <span className="log-name">{`  ${logName}`}</span>
+            {isSelected && (
+              <Tooltip mouseEnterDelay={0.5} placement="bottom" title="Clear filter">
+                <Button
+                  size="small"
+                  shape="circle"
+                  icon={<CloseOutlined />}
+                  onClick={handleClearFilter}
+                  className="clear-log-filter-btn"
+                />
+              </Tooltip>
+            )}
+          </Tooltip>
+        </>
+      );
+    },
+    [filterType, handleClearFilter]
+  );
+
+  const getApplogAvatar = useCallback(
+    (logName) => {
+      const logNameURI = decodeURIComponent(logName.trim());
+      const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
+      const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
+      return getLogAvatar(logNameURI, avatarUrl);
+    },
+    [getLogAvatar]
+  );
+
+  const getDomainLogAvatar = useCallback(
+    (logName) => {
+      const domainParts = logName.trim().split(".");
+      const avatarDomain = domainParts.splice(domainParts.length - 2, 2).join(".");
+      const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
+      return getLogAvatar(logName, avatarUrl);
+    },
+    [getLogAvatar]
+  );
+
+  const getAppLogsMenuItem = useCallback(
+    (apps) => {
+      return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
+        key: `${logType.APP} ${appName}`,
+        label: getApplogAvatar(appName),
+        onClick: () => {
+          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
+        },
+      }));
+    },
+    [getApplogAvatar]
+  );
+
+  const getDomainLogsMenuItem = useCallback(
+    (domains) => {
+      return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
+        key: `${logType.DOMAIN} ${domain}`,
+        label: getDomainLogAvatar(domain),
+        onClick: () => {
+          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
+        },
+      }));
+    },
+    [getDomainLogAvatar]
+  );
+
+  const handleSubMenuTitleClick = useCallback(
+    (key) => {
+      if (expandedLogTypes.includes(key)) {
+        setExpandedLogTypes((prev) => prev.filter((logType) => key !== logType));
+        trackSidebarFilterCollapsed(ANALYTIC_EVENT_SOURCE, key);
+      } else {
+        setExpandedLogTypes((prev) => [...prev, key]);
+        trackSidebarFilterExpanded(ANALYTIC_EVENT_SOURCE, key);
+      }
+    },
+    [expandedLogTypes]
+  );
+
   const items = useMemo(
     () => [
       {
-        key: "0",
+        key: logType.APP,
         label: `Apps (${appList?.length ?? 0})`,
         children: getAppLogsMenuItem(appList),
+        onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
       {
-        key: "1",
+        key: logType.DOMAIN,
         label: `Domains (${domainList?.length ?? 0})`,
         children: getDomainLogsMenuItem(domainList),
+        onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ],
-    [appList, domainList]
+    [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]
   );
 
   const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
@@ -286,16 +444,26 @@ const CurrentTrafficTable = ({
     <>
       <Row wrap={false}>
         <Col flex="197px" className="traffic-table-sidebar">
-          <Menu theme="dark" mode="inline" items={items} onClick={handleSidebarMenuItemClick} />
+          <Menu
+            theme="dark"
+            mode="inline"
+            items={items}
+            openKeys={expandedLogTypes}
+            onClick={handleSidebarMenuItemClick}
+            selectedKeys={filterType ? [filterType] : []}
+          />
         </Col>
         <Col flex="auto">
-          <ActionHeader
-            handleOnSearchChange={handleOnSearchChange}
-            clearLogs={clearLogs}
-            setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
-            showDeviceSelector={showDeviceSelector}
-            deviceId={deviceId}
-          />
+          <Row align={"middle"}>
+            <ActionHeader
+              handleOnSearchChange={handleOnSearchChange}
+              clearLogs={clearLogs}
+              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+              showDeviceSelector={showDeviceSelector}
+              deviceId={deviceId}
+            />
+            {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
+          </Row>
           <Split
             sizes={rulePaneSizes}
             minSize={[75, 0]}
@@ -331,7 +499,10 @@ const CurrentTrafficTable = ({
                 bodyStyle={{ padding: "0px 20px" }}
               >
                 <FixedRequestLogPane
-                  selectedRequestData={selectedRequestData}
+                  selectedRequestData={{
+                    ...selectedRequestData,
+                    response: { ...selectedRequestData.response, body: selectedRequestResponse },
+                  }}
                   upsertRequestAction={upsertRequestAction}
                   handleClosePane={handleClosePane}
                   visibility={isPreviewOpen}
