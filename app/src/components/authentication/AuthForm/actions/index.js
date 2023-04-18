@@ -16,10 +16,7 @@ import {
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { redirectToForgotPassword } from "../../../../utils/RedirectionUtils";
-import {
-  getAuthErrorMessage,
-  AuthTypes,
-} from "components/authentication/utils";
+import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
@@ -49,29 +46,16 @@ export const handleEmailSignIn = (email, password, isSignUp, eventSource) => {
 };
 export const handleGoogleSignIn = (appMode, MODE, eventSource) => {
   const functionToCall =
-    appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-      ? googleSignInDesktopApp
-      : googleSignIn;
+    appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? googleSignInDesktopApp : googleSignIn;
 
   return functionToCall(null, MODE, eventSource);
 };
 
-export const handleEmailSignUp = (
-  name,
-  email,
-  password,
-  referralCode,
-  eventSource
-) => {
+export const handleEmailSignUp = (name, email, password, referralCode, eventSource) => {
   return signUp(name, email, password, referralCode, eventSource);
 };
 
-export const handleForgotPasswordButtonOnClick = (
-  event,
-  email,
-  setLoader,
-  callbackOnSuccess
-) => {
+export const handleForgotPasswordButtonOnClick = (event, email, setLoader, callbackOnSuccess) => {
   event && event.preventDefault();
   if (isEmpty(email) || !isEmail(email)) {
     showWarning("Please enter a valid email");
@@ -107,13 +91,7 @@ const getOobCode = () => {
   }
 };
 
-const doResetPassword = (
-  oobCode,
-  email,
-  newPassword,
-  setLoader,
-  callbackOnSuccess
-) => {
+const doResetPassword = (oobCode, email, newPassword, setLoader, callbackOnSuccess) => {
   const handleResponse = (status) => {
     if (status) {
       setLoader(false);
@@ -123,9 +101,7 @@ const doResetPassword = (
         handleEmailSignIn(email, newPassword, null, "password_reset");
       }
     } else {
-      showError(
-        "Please try again with a stronger password or request a new reset link."
-      );
+      showError("Please try again with a stronger password or request a new reset link.");
       setLoader(false);
     }
   };
@@ -144,13 +120,7 @@ const doResetPassword = (
     });
 };
 
-export const handleResetPasswordOnClick = (
-  event,
-  password,
-  setLoader,
-  navigate,
-  callbackOnSuccess
-) => {
+export const handleResetPasswordOnClick = (event, password, setLoader, navigate, callbackOnSuccess) => {
   event && event.preventDefault();
   if (isEmpty(password)) {
     showWarning("Please set a new password");
@@ -164,9 +134,7 @@ export const handleResetPasswordOnClick = (
     if (status) {
       doResetPassword(oobCode, email, password, setLoader, callbackOnSuccess);
     } else {
-      showError(
-        "This Link has been expired. Please create a new reset request."
-      );
+      showError("This Link has been expired. Please create a new reset request.");
       setLoader(false);
       redirectToForgotPassword(navigate);
     }
@@ -186,11 +154,7 @@ export const handleResetPasswordOnClick = (
     });
 };
 
-export const handleLogoutButtonOnClick = async (
-  appMode,
-  isWorkspaceMode,
-  dispatch
-) => {
+export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispatch) => {
   try {
     if (window.location.host.includes("app.requestly.io")) {
       posthog.reset();
