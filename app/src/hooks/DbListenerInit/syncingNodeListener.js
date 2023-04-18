@@ -131,7 +131,6 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
         doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
       }
     };
-    invokeSyncingIfRequired();
 
     return onValue(syncNodeRef, async (snap) => {
       await invokeSyncingIfRequired(snap.val());
