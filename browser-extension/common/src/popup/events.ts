@@ -1,7 +1,7 @@
 import { sendEventToBackground } from "../eventUtils";
 
 export enum EVENT {
-  EXTENSION_STATUS_TOGGLED = "status_toggled",
+  EXTENSION_STATUS_TOGGLED = "extension_status_toggled",
   GROUP_TOGGLED = "group_toggled",
   OPEN_APP_CLICKED = "open_app_clicked",
   POPUP_OPENED = "popup_opened",

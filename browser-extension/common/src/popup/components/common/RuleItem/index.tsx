@@ -53,6 +53,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
 
   const handleGroupActiveClick = useCallback(() => {
     updateGroup({ ...group, status: Status.ACTIVE });
+    sendEvent(EVENT.GROUP_TOGGLED);
   }, [group, updateGroup]);
 
   return (
