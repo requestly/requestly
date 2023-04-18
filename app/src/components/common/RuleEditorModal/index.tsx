@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Col, Row, message, Dropdown, Menu } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import { Button, Col, Row, message, Dropdown, Menu, Typography } from "antd";
+import { MoreOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import {
   getActiveModals,
   getAppMode,
@@ -31,7 +31,7 @@ import { StorageService } from "init";
 import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
-import { redirectTo404, redirectToRuleEditor } from "utils/RedirectionUtils";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
@@ -58,6 +58,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+  const [isRuleNotFound, setIsRuleNotFound] = useState(false);
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   const ruleMenuOptions = useMemo(
@@ -85,7 +86,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       .getRecord(ruleId)
       .then((rule) => {
         if (rule === undefined) {
-          redirectTo404(navigate);
+          setIsRuleNotFound(true);
         } else {
           setCurrentlySelectedRule(dispatch, rule);
           setCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
@@ -185,7 +186,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       centered
       key={ruleType}
       open={isOpen}
-      width="920px"
+      width={isRuleNotFound ? "350px" : "920px"}
       maskClosable={false}
       onCancel={handleModalClose}
       className="rule-editor-modal"
@@ -193,6 +194,11 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       <div className="rq-modal-content">
         {isLoading ? (
           <SpinnerColumn skeletonCount={2} />
+        ) : isRuleNotFound ? (
+          <>
+            <CloseCircleOutlined className="error-icon display-row-center w-full" />
+            <Typography.Text className="header display-row-center mt-1">Rule not found</Typography.Text>
+          </>
         ) : (
           <>
             <Row align="middle" justify="space-between" className="rule-editor-modal-header">
