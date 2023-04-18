@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { shouldShowPersonaSurvey, shuffleOptions } from "./utils";
-import { Conditional, Option, PageConfig } from "./types";
+import { Option, PageConfig } from "./types";
 import {
   trackPersonaSurveyViewed,
   trackPersonaRecommendationSkipped,
@@ -28,7 +27,6 @@ interface PersonaModalProps {
 }
 
 export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle, toggleImportRulesModal }) => {
-  const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -39,21 +37,21 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
     return shuffleOptions(OptionsConfig[1].options);
   }, []);
 
-  const shuffledQ2 = useMemo(() => {
-    if (persona) {
-      const { conditional } = OptionsConfig[2];
-      const { options } = conditional.find((option: Conditional) => option.condition(persona));
-      const otherOption = options.pop();
-      const shuffled = shuffleOptions(options);
-      //others options to remain at last always
-      return [...shuffled, otherOption];
-    }
-    return null;
-  }, [persona]);
+  // const shuffledQ2 = useMemo(() => {
+  //   if (persona) {
+  //     const { conditional } = OptionsConfig[2];
+  //     const { options } = conditional.find((option: Conditional) => option.condition(persona));
+  //     const otherOption = options.pop();
+  //     const shuffled = shuffleOptions(options);
+  //     //others options to remain at last always
+  //     return [...shuffled, otherOption];
+  //   }
+  //   return null;
+  // }, [persona]);
 
-  const shuffledQ3 = useMemo(() => {
-    return shuffleOptions(OptionsConfig[3].options);
-  }, []);
+  // const shuffledQ3 = useMemo(() => {
+  //   return shuffleOptions(OptionsConfig[3].options);
+  // }, []);
 
   const SkippableButton = () => {
     switch (currentPage) {
@@ -124,10 +122,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
     switch (optionSet) {
       case 1:
         return renderOptions(shuffledQ1, optionSet);
-      case 2:
-        return renderOptions(shuffledQ2, optionSet);
-      case 3:
-        return renderOptions(shuffledQ3, optionSet);
+      // case 2:
+      //   return renderOptions(shuffledQ2, optionSet);
+      // case 3:
+      //   return renderOptions(shuffledQ3, optionSet);
       default:
         return null;
     }
@@ -171,13 +169,13 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
           dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
         } else {
           if (isExtensionInstalled()) {
-            const isRecommendationScreen = currentPage === 4 && isPersonaRecommendationFlagOn;
+            const isRecommendationScreen = currentPage === 4;
             dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen }));
           }
         }
       }
     });
-  }, [appMode, toggle, currentPage, dispatch, isPersonaRecommendationFlagOn]);
+  }, [appMode, toggle, currentPage, dispatch]);
 
   useEffect(() => {
     if (currentPage === 0) {
