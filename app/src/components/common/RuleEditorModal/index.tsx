@@ -67,7 +67,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
           <PinButton rule={currentlySelectedRuleData} isRuleEditorModal={true} />
         </Menu.Item>
         <Menu.Item key="2" className="editor-rule-options-menu-item">
-          <ExportButton rule={currentlySelectedRuleData} isDisabled={false} />
+          <ExportButton rule={currentlySelectedRuleData} isDisabled={false} isRuleEditorModal={true} />
         </Menu.Item>
         <Menu.Item key="3" className="editor-rule-options-menu-item">
           <ShareRuleButton isRuleEditorModal={true} />
@@ -213,7 +213,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
 
               <Col span={7}>
                 <Row align="middle" justify="space-evenly" wrap={false}>
-                  <RuleStatusButton location={window.location} />
+                  <RuleStatusButton location={window.location} isRuleEditorModal={true} />
                   {mode === EditorMode.EDIT && (
                     <>
                       <DeleteButton
@@ -233,7 +233,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                     location={location}
                     isRuleEditorModal={true}
                     ruleEditorModalMode={mode}
-                    analyticEventRuleCreatedSource={analyticEventEditorViewedSource}
+                    analyticEventRuleCreatedSource={"rule_editor_modal"}
                     ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
                   />
                 </Row>

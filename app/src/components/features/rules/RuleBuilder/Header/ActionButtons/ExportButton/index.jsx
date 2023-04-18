@@ -9,7 +9,7 @@ import { getModeData } from "../../../actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 
-const ExportButton = ({ rule, isDisabled }) => {
+const ExportButton = ({ rule, isDisabled, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -27,7 +27,12 @@ const ExportButton = ({ rule, isDisabled }) => {
       return;
     }
 
-    trackRuleEditorHeaderClicked("export_button", ruleType, MODE);
+    trackRuleEditorHeaderClicked(
+      "export_button",
+      ruleType,
+      MODE,
+      isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
+    );
     if (user.loggedIn) {
       setIsExportRuleModalActive(true);
       return;

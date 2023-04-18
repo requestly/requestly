@@ -17,7 +17,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 
-const Status = ({ location }) => {
+const Status = ({ location, isRuleEditorModal }) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -107,7 +107,8 @@ const Status = ({ location }) => {
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
-            location.pathname.indexOf("create") !== -1 ? "create" : "edit"
+            location.pathname.indexOf("create") !== -1 ? "create" : "edit",
+            isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
           );
         }}
       />

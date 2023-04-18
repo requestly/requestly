@@ -32,7 +32,12 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })
       .then(() => {
         trackRulePinToggled(updateValue);
-        trackRuleEditorHeaderClicked("pin_button", rule.ruleType, MODE);
+        trackRuleEditorHeaderClicked(
+          "pin_button",
+          rule.ruleType,
+          MODE,
+          isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
+        );
       });
   };
 

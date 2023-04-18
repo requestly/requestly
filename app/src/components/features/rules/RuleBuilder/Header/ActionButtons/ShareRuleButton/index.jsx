@@ -64,7 +64,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           type="text"
           onClick={() => {
             shareRuleClickHandler();
-            trackRuleEditorHeaderClicked("share_button", currentlySelectedRuleData.ruleType, MODE);
+            trackRuleEditorHeaderClicked("share_button", currentlySelectedRuleData.ruleType, MODE, "rule_editor_modal");
           }}
         >
           Share rule
@@ -84,7 +84,12 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
             }
             onClick={() => {
               shareRuleClickHandler();
-              trackRuleEditorHeaderClicked("share_button", currentlySelectedRuleData.ruleType, MODE);
+              trackRuleEditorHeaderClicked(
+                "share_button",
+                currentlySelectedRuleData.ruleType,
+                MODE,
+                "rule_editor_screen"
+              );
             }}
           />
         </Tooltip>

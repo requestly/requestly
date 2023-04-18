@@ -11,12 +11,13 @@ export const trackRuleCreatedEvent = (rule_type, description, destination_types,
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (rule_type, description, destination_types) => {
+export const trackRuleEditedEvent = (rule_type, description, destination_types, source) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
+  if (source) params.source = source;
   trackEvent(RULES.RULE_EDITED, params);
 };
 
@@ -132,8 +133,8 @@ export const trackRuleEditorClosed = (reason, rule_type, mode) => {
   trackEvent(RULES.RULE_EDITOR_CLOSED, params);
 };
 
-export const trackRuleEditorHeaderClicked = (action, rule_type, mode) => {
-  const params = { action, rule_type, mode };
+export const trackRuleEditorHeaderClicked = (action, rule_type, mode, source) => {
+  const params = { action, rule_type, mode, source };
   trackEvent(RULES.RULE_EDITOR_HEADER_CLICKED, params);
 };
 

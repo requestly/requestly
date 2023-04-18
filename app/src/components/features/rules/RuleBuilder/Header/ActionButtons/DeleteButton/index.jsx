@@ -15,7 +15,12 @@ const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal
 
   const handleDeleteRuleClick = () => {
     setIsDeleteConfirmationModalActive(true);
-    trackRuleEditorHeaderClicked("delete_button", rule.ruleType, MODE);
+    trackRuleEditorHeaderClicked(
+      "delete_button",
+      rule.ruleType,
+      MODE,
+      isRuleEditorModal ? "rule_editor_modal" : "rule_editor_screen"
+    );
   };
 
   return (

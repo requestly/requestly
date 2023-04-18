@@ -36,7 +36,7 @@ const CreateRuleButton = ({
   location,
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
-  analyticEventRuleCreatedSource = "rule_editor_screen_header",
+  analyticEventRuleCreatedSource = "rule_editor_screen",
   ruleCreatedFromEditorModalCallback = (ruleId) => {},
   ruleEditorModalMode = APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE,
 }) => {
@@ -108,7 +108,8 @@ const CreateRuleButton = ({
             currentlySelectedRuleData.description,
             currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
               ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-              : null
+              : null,
+            analyticEventRuleCreatedSource
           );
         }
         ruleModifiedAnalytics(user);
