@@ -11,6 +11,9 @@ export const APPS = {
   APP_CONNECTED: "app_connected",
   APP_DISCONNECTED: "app_disconnected",
   APP_CONNECT_FAILURE: "app_connect_failure",
+  CONNECT_APPS_CLICKED: "connect_apps_clicked",
+  SYSTEMWIDE_CONNECTED: "system_wide_connected",
+  APP_SETUP_INSTRUCTIONS_VIEWED: "app_setup_instructions_viewed",
 };
 
 export const TRAFFIC_TABLE = {
