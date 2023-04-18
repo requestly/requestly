@@ -187,7 +187,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       key={ruleType}
       open={isOpen}
       width={isRuleNotFound ? "350px" : "920px"}
-      maskClosable={false}
+      maskClosable={isRuleNotFound}
       onCancel={handleModalClose}
       className="rule-editor-modal"
     >
@@ -228,6 +228,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                         overlay={ruleMenuOptions}
                         open={isOptionsVisible}
                         trigger={["click"]}
+                        placement="bottomRight"
                         onOpenChange={setIsOptionsVisible}
                       >
                         <RQButton iconOnly type="default" icon={<MoreOutlined />} />
