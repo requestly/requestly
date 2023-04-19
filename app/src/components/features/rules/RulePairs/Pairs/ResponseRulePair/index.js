@@ -1,10 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Row, Col } from "antd";
 import { useSelector } from "react-redux";
-import {
-  getCurrentlySelectedRuleData,
-  getResponseRuleResourceType,
-} from "store/selectors";
+import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store/selectors";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
 import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
@@ -20,32 +17,16 @@ const {
   PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
 } = APP_CONSTANTS;
 
-const ResponseRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => {
+const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const currentPayloadKey = useMemo(
-    () =>
-      getObjectValue(
-        currentlySelectedRuleData,
-        pairIndex,
-        SOURCE_REQUEST_PAYLOAD_KEY
-      ),
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY),
     [pairIndex, currentlySelectedRuleData]
   );
 
   const currentPayloadValue = useMemo(
-    () =>
-      getObjectValue(
-        currentlySelectedRuleData,
-        pairIndex,
-        SOURCE_REQUEST_PAYLOAD_VALUE
-      ),
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE),
     [pairIndex, currentlySelectedRuleData]
   );
 
@@ -55,10 +36,7 @@ const ResponseRulePair = ({
   });
 
   const canOverrideStatus = useMemo(() => {
-    return (
-      isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) &&
-      window?.RQ?.DESKTOP?.VERSION !== "1.0"
-    );
+    return isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) && window?.RQ?.DESKTOP?.VERSION !== "1.0";
   }, []);
 
   return (

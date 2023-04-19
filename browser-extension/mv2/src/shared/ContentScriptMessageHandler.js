@@ -30,15 +30,11 @@ RQ.ContentScriptMessageHandler = {
   },
 
   invokeCallback: function (event) {
-    const callbackRef = this.eventCallbackMap[
-      event.data.action + "_" + event.data.requestId
-    ];
+    const callbackRef = this.eventCallbackMap[event.data.action + "_" + event.data.requestId];
 
     if (typeof callbackRef === "function") {
       // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
-      delete this.eventCallbackMap[
-        event.data.action + "_" + event.data.requestId
-      ];
+      delete this.eventCallbackMap[event.data.action + "_" + event.data.requestId];
       callbackRef.call(this, event.data.response);
     }
   },
@@ -71,23 +67,14 @@ RQ.ContentScriptMessageHandler = {
 
     if (event && event.origin !== RQ.configs.WEB_URL) {
       if (RQ.configs.logLevel === "debug") {
-        console.log(
-          "Ignoring message from the following domain",
-          event.origin,
-          event.data
-        );
+        console.log("Ignoring message from the following domain", event.origin, event.data);
       }
 
       return;
     }
 
-    if (
-      event &&
-      event.data &&
-      event.data.source === this.constants.PAGE_SCRIPT
-    ) {
-      RQ.configs.logLevel === "debug" &&
-        console.log("Received message:", event.data);
+    if (event && event.data && event.data.source === this.constants.PAGE_SCRIPT) {
+      RQ.configs.logLevel === "debug" && console.log("Received message:", event.data);
 
       // Check whether it is a response to invoke callback or a request to perform an action
       if (typeof event.data.response !== "undefined") {
@@ -108,10 +95,7 @@ RQ.ContentScriptMessageHandler = {
           chrome.storage[storageType].get(null, (superObject) => {
             const storageCachedRecords = [];
             for (let key in superObject) {
-              if (
-                superObject[key].hasOwnProperty("objectType") ||
-                superObject[key].hasOwnProperty("ruleType")
-              ) {
+              if (superObject[key].hasOwnProperty("objectType") || superObject[key].hasOwnProperty("ruleType")) {
                 storageCachedRecords.push(superObject[key]);
               }
             }

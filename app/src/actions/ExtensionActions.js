@@ -20,9 +20,7 @@ export function isExtensionInstalled() {
 
 export function isExtensionVersionCompatible(compatibleVersion = "0.0.1") {
   let currentExtensionVersion = getExtensionVersion();
-  currentExtensionVersion = currentExtensionVersion
-    ? currentExtensionVersion
-    : "0.0.1";
+  currentExtensionVersion = currentExtensionVersion ? currentExtensionVersion : "0.0.1";
   return semver.gte(currentExtensionVersion, compatibleVersion);
 }
 
@@ -81,10 +79,7 @@ export function clearStorage() {
 
 export function setStorageType(storageType) {
   return new Promise((resolve) => {
-    PSMH.sendMessage(
-      { action: "SET_STORAGE_TYPE", storageType: storageType },
-      resolve
-    );
+    PSMH.sendMessage({ action: "SET_STORAGE_TYPE", storageType: storageType }, resolve);
   });
 }
 

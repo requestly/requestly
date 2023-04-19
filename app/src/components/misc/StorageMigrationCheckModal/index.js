@@ -20,9 +20,7 @@ const StorageMigrationCheckModal = () => {
   //Component State
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const renderLoader = () => (
-    <SpinnerColumn message="Verifying storage integrity, just a sec" />
-  );
+  const renderLoader = () => <SpinnerColumn message="Verifying storage integrity, just a sec" />;
 
   useEffect(() => {
     // Check if appMode is extension
@@ -49,12 +47,7 @@ const StorageMigrationCheckModal = () => {
   }, 4000);
 
   return (
-    <Modal
-      className="modal-dialog-centered "
-      visible={isModalOpen}
-      onCancel={() => null}
-      footer={null}
-    >
+    <Modal className="modal-dialog-centered " visible={isModalOpen} onCancel={() => null} footer={null}>
       <div className="modal-body ">{renderLoader()}</div>
     </Modal>
   );

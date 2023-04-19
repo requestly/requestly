@@ -6,20 +6,10 @@ import APP_CONSTANTS from "config/constants";
 import { redirectToFileViewer } from "utils/RedirectionUtils";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { Typography, Button, Space, Tooltip, Input } from "antd";
-import {
-  IoLogoHtml5,
-  IoLogoCss3,
-  IoLogoJavascript,
-  IoImage,
-} from "react-icons/io5";
+import { IoLogoHtml5, IoLogoCss3, IoLogoJavascript, IoImage } from "react-icons/io5";
 import UploadFileBtn from "../../UploadFileBtn";
 import * as FilesService from "../../../../../utils/files/FilesService";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-  CopyOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, CopyOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { toast } from "utils/Toast.js";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -100,11 +90,7 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
       textWrap: "word-break",
       ellipsis: true,
       render: (_, record) => {
-        return (
-          <Link onClick={(e) => redirectToFileViewer(navigate, record.id)}>
-            {record.name}
-          </Link>
-        );
+        return <Link onClick={(e) => redirectToFileViewer(navigate, record.id)}>{record.name}</Link>;
       },
     },
 
@@ -145,11 +131,7 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
       render: (_, record) => {
         if (mode === APP_CONSTANTS.FILES_TABLE_CONSTANTS.MODES.FILE_PICKER) {
           return (
-            <Button
-              size="small"
-              type="secondary"
-              onClick={() => callback(record.shortUrl)}
-            >
+            <Button size="small" type="secondary" onClick={() => callback(record.shortUrl)}>
               Insert
             </Button>
           );
@@ -161,9 +143,7 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
                 size="small"
                 type="secondary"
                 icon={<EditOutlined />}
-                onClick={(e) =>
-                  redirectToFileViewer(navigate, record.id || record.mockID)
-                }
+                onClick={(e) => redirectToFileViewer(navigate, record.id || record.mockID)}
               ></Button>
             </Tooltip>
             <Tooltip title="Delete">
@@ -195,18 +175,10 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
         render: (_, record) => {
           return (
             <span style={{ cursor: "pointer" }}>
-              <CopyToClipboard
-                text={record.shortUrl || getMockUrl(record.mockID)}
-                onCopy={() => onCopyHandler(record)}
-              >
+              <CopyToClipboard text={record.shortUrl || getMockUrl(record.mockID)} onCopy={() => onCopyHandler(record)}>
                 <Tooltip
                   placement="topLeft"
-                  title={
-                    copiedText ===
-                    (record.shortUrl || getMockUrl(record.mockID))
-                      ? "Copied"
-                      : "Click to Copy"
-                  }
+                  title={copiedText === (record.shortUrl || getMockUrl(record.mockID)) ? "Copied" : "Click to Copy"}
                 >
                   <CopyOutlined />
                 </Tooltip>
@@ -252,15 +224,10 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
     setSearch(false);
   };
 
-  const [
-    isNewRuleSelectorModalActive,
-    setIsNewRuleSelectorModalActive,
-  ] = useState(false);
+  const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
 
   const toggleNewRuleSelectorModal = () => {
-    setIsNewRuleSelectorModalActive(
-      isNewRuleSelectorModalActive ? false : true
-    );
+    setIsNewRuleSelectorModalActive(isNewRuleSelectorModalActive ? false : true);
   };
 
   return (
@@ -283,17 +250,10 @@ const MyFilesView = ({ filesList = {}, updateCollection, mode, callback }) => {
           </>
         }
         toolBarRender={() => [
-          <Button
-            type="primary"
-            onClick={() => setIsNewRuleSelectorModalActive(true)}
-            icon={<PlusOutlined />}
-          >
+          <Button type="primary" onClick={() => setIsNewRuleSelectorModalActive(true)} icon={<PlusOutlined />}>
             New File (HTML / CSS / JS)
           </Button>,
-          <UploadFileBtn
-            updateCollection={updateCollection}
-            buttonType="secondary"
-          />,
+          <UploadFileBtn updateCollection={updateCollection} buttonType="secondary" />,
         ]}
         options={false}
         pagination={false}

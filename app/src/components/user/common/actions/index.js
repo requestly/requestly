@@ -3,16 +3,10 @@ import { actions } from "../../../../store";
 // Firebase
 import firebaseApp from "../../../../firebase";
 import { getAuth } from "firebase/auth";
-import {
-  getAuthData,
-  getValueAsPromise,
-} from "../../../../actions/FirebaseActions";
+import { getAuthData, getValueAsPromise } from "../../../../actions/FirebaseActions";
 import { getPlanName, isPremiumUser } from "../../../../utils/PremiumUtils";
 import APP_CONSTANTS from "../../../../config/constants";
-import {
-  resetUserDetails,
-  setAndUpdateUserDetails,
-} from "utils/helpers/appDetails/UserProvider";
+import { resetUserDetails, setAndUpdateUserDetails } from "utils/helpers/appDetails/UserProvider";
 
 // This function is similar to useLayout of App.js.
 // Only difference is that this is invoked once only on-demand
@@ -37,21 +31,14 @@ export const refreshUserInGlobalState = async (dispatch) => {
           isLoggedIn: true,
           planDetails: {
             ...planDetails,
-            planName: isPremiumUser(planDetails)
-              ? getPlanName(planDetails)
-              : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
+            planName: isPremiumUser(planDetails) ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
           },
           isPremium: isPremiumUser(planDetails),
         };
       })
       .then(async () => {
         // Fetch rule backups details
-        const isBackupEnabled = await getValueAsPromise([
-          "users",
-          user.uid,
-          "profile",
-          "isBackupEnabled",
-        ]);
+        const isBackupEnabled = await getValueAsPromise(["users", user.uid, "profile", "isBackupEnabled"]);
         if (isBackupEnabled) {
           newUserDetailsObject["isBackupEnabled"] = true;
         } else {

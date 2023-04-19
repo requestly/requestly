@@ -51,14 +51,7 @@ const withAppDetailsHoc = (WrappedComponent) => {
         });
     }, [appId, dispatch, navigate]);
 
-    return (
-      <WrappedComponent
-        {...props}
-        appId={appId}
-        appDetails={appDetails}
-        isDetailsLoading={isDetailsLoading}
-      />
-    );
+    return <WrappedComponent {...props} appId={appId} appDetails={appDetails} isDetailsLoading={isDetailsLoading} />;
   };
 };
 

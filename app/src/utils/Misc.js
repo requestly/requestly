@@ -34,11 +34,7 @@ export const isUserRegisteredOnInstallationDate = async (user, appMode) => {
 // doUpdate - (bool) Tells if we need to write installation date or not.
 // In App.js, we set. In others, we don't!
 // Else it would cause invalid date for users who First used desktop app and then later switched to Extension,
-export const getAndUpdateInstallationDate = async (
-  appMode,
-  doUpdate,
-  isUserLoggedIn
-) => {
+export const getAndUpdateInstallationDate = async (appMode, doUpdate, isUserLoggedIn) => {
   let attrName = APP_CONSTANTS.GA_EVENTS.ATTR.EXTENSION_INSTALL_DATE;
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
     attrName = APP_CONSTANTS.GA_EVENTS.ATTR.DESKTOP_INSTALL_DATE;
@@ -65,11 +61,7 @@ export const getAndUpdateInstallationDate = async (
       // return oldestInstallationDate;
     } else {
       // User is not logged in - return/set date in local storage
-      const localInstallationDate = getLocalInstallationDate(
-        attrName,
-        doUpdate,
-        appMode
-      );
+      const localInstallationDate = getLocalInstallationDate(attrName, doUpdate, appMode);
       resolve(localInstallationDate);
     }
   });
@@ -103,12 +95,7 @@ const setLocalInstallationDate = (attrName, newValue) => {
 };
 
 export const isDesktopMode = () => {
-  if (
-    window.RQ &&
-    window.RQ.MODE &&
-    window.RQ.MODE === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-  )
-    return true;
+  if (window.RQ && window.RQ.MODE && window.RQ.MODE === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) return true;
   else return false;
 };
 
@@ -164,23 +151,12 @@ export const getUserOS = () => {
 // Modifies the original object! Deep clone prior if required
 export const sanitizeDataForFirebase = (myObject) => {
   // Remove undefined values, if any
-  if (
-    typeof myObject === "object" &&
-    !Array.isArray(myObject) &&
-    myObject !== null
-  ) {
-    myObject = JSON.parse(
-      JSON.stringify(myObject, (k, v) => (v === undefined ? null : v))
-    );
+  if (typeof myObject === "object" && !Array.isArray(myObject) && myObject !== null) {
+    myObject = JSON.parse(JSON.stringify(myObject, (k, v) => (v === undefined ? null : v)));
   }
   return myObject;
 };
 
 export const getSignupDate = async (uid) => {
-  return await getValueAsPromise([
-    "customProfile",
-    uid,
-    "signup",
-    "signup_date",
-  ]);
+  return await getValueAsPromise(["customProfile", uid, "signup", "signup_date"]);
 };

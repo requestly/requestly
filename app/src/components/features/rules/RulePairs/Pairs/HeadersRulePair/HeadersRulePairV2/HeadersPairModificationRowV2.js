@@ -50,10 +50,7 @@ const HeadersPairModificationRowV2 = ({
     () => (
       <Menu>
         {pairTypeMenuItems.map(({ title, type }, index) => (
-          <Menu.Item
-            key={index}
-            onClick={(e) => handlePairTypeMenuItemClick(e, type)}
-          >
+          <Menu.Item key={index} onClick={(e) => handlePairTypeMenuItemClick(e, type)}>
             {title}
           </Menu.Item>
         ))}
@@ -64,20 +61,10 @@ const HeadersPairModificationRowV2 = ({
 
   return (
     <Row gutter={16} align="middle">
-      <Col
-        span={3}
-        align="right"
-        className="min-dropdown-tile-width margin-bottom-one"
-      >
+      <Col span={3} align="right" className="min-dropdown-tile-width margin-bottom-one">
         <Dropdown overlay={pairTypeMenu} disabled={isInputDisabled}>
-          <Text
-            strong
-            className="ant-dropdown-link cursor-pointer uppercase"
-            onClick={(e) => e.preventDefault()}
-          >
-            {modification.type === GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY
-              ? "Override"
-              : modification.type}{" "}
+          <Text strong className="ant-dropdown-link cursor-pointer uppercase" onClick={(e) => e.preventDefault()}>
+            {modification.type === GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY ? "Override" : modification.type}{" "}
             <DownOutlined />
           </Text>
         </Dropdown>
@@ -93,9 +80,7 @@ const HeadersPairModificationRowV2 = ({
               value
             )
           }
-          filterOption={(input, option) =>
-            option?.value.toLowerCase().includes(input.toLowerCase())
-          }
+          filterOption={(input, option) => option?.value.toLowerCase().includes(input.toLowerCase())}
           value={modification.header}
           disabled={isInputDisabled}
           style={{ width: "100%" }}
@@ -110,13 +95,7 @@ const HeadersPairModificationRowV2 = ({
         </AutoComplete>
       </Col>
       {modification.type !== "Remove" ? (
-        <Col
-          span={14}
-          offset={3}
-          lg={{ span: 9, offset: 0 }}
-          align="right"
-          className="margin-bottom-one"
-        >
+        <Col span={14} offset={3} lg={{ span: 9, offset: 0 }} align="right" className="margin-bottom-one">
           <Input
             addonBefore="Value"
             placeholder="Header Value"
@@ -124,11 +103,7 @@ const HeadersPairModificationRowV2 = ({
             value={modification.value}
             data-selectionid="header-value"
             onChange={(event) =>
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                `modifications[${modificationType}][${modificationIndex}].value`
-              )
+              modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationType}][${modificationIndex}].value`)
             }
             disabled={isInputDisabled}
           />
@@ -139,14 +114,7 @@ const HeadersPairModificationRowV2 = ({
           <ImCross
             id="delete-pair"
             className="text-gray cursor-pointer"
-            onClick={(e) =>
-              deleteModification(
-                e,
-                pairIndex,
-                modificationIndex,
-                modificationType
-              )
-            }
+            onClick={(e) => deleteModification(e, pairIndex, modificationIndex, modificationType)}
           />
         </Tooltip>
       </Col>

@@ -5,10 +5,7 @@ import { Notification, Danger } from "react-iconly";
 import moment from "moment";
 import { groupBy } from "lodash";
 import { getUserAuthDetails } from "store/selectors";
-import {
-  isEmailVerified,
-  resendVerificationEmailHandler,
-} from "utils/AuthUtils";
+import { isEmailVerified, resendVerificationEmailHandler } from "utils/AuthUtils";
 import Logger from "lib/logger";
 const direction = "ltr";
 
@@ -94,9 +91,7 @@ export default function HeaderNotifications() {
   if (!emailVerified) {
     const resendMailHandler = () => {
       setIsResendEmailLoading(true);
-      resendVerificationEmailHandler({}).finally(() =>
-        setIsResendEmailLoading(false)
-      );
+      resendVerificationEmailHandler({}).finally(() => setIsResendEmailLoading(false));
     };
 
     notices.push({
@@ -108,30 +103,18 @@ export default function HeaderNotifications() {
       title: "Verify Email",
       avatar: <Danger size={16} className="hp-text-color-warning-1" />,
       clickHandler: () => resendMailHandler(),
-      description: (
-        <>
-          {isResendEmailLoading ? (
-            <span>Sending...</span>
-          ) : (
-            <span>Click here to resend</span>
-          )}
-        </>
-      ),
+      description: <>{isResendEmailLoading ? <span>Sending...</span> : <span>Click here to resend</span>}</>,
     });
   }
 
   const noticeData = getNoticeData(notices);
   const unreadMsg = getUnreadData(noticeData || {});
-  const notificationsCount =
-    notices.length && notices.length >= 1 ? notices.length : 0;
+  const notificationsCount = notices.length && notices.length >= 1 ? notices.length : 0;
 
   const renderNotificationItems = () => {
     return (
       <>
-        <div
-          className="hp-overflow-y-auto hp-px-10"
-          style={{ maxHeight: 300, marginRight: -10, marginLeft: -10 }}
-        >
+        <div className="hp-overflow-y-auto hp-px-10" style={{ maxHeight: 300, marginRight: -10, marginLeft: -10 }}>
           {/* <Divider className="hp-my-4" /> */}
 
           {noticeData.notification &&
@@ -145,17 +128,11 @@ export default function HeaderNotifications() {
                   onClick={item.clickHandler}
                 >
                   <Col className="hp-mr-8">
-                    <Avatar
-                      size={38}
-                      icon={item.avatar}
-                      className="hp-d-flex-center-full hp-bg-warning-4"
-                    />
+                    <Avatar size={38} icon={item.avatar} className="hp-d-flex-center-full hp-bg-warning-4" />
                   </Col>
 
                   <Col>
-                    <span className="hp-d-block hp-w-100 hp-mb-4 hp-font-weight-500 hp-p1-body">
-                      {item.title}
-                    </span>
+                    <span className="hp-d-block hp-w-100 hp-mb-4 hp-font-weight-500 hp-p1-body">{item.title}</span>
 
                     <span className="hp-d-block hp-badge-text hp-font-weight-400 hp-text-color-black-60 hp-text-color-dark-40">
                       {item.description}
@@ -206,18 +183,14 @@ export default function HeaderNotifications() {
       <Row align="middle" justify="space-between" className="hp-mb-18">
         <Col>Notifications</Col>
 
-        {notificationsCount > 0 &&
-        unreadMsg.notification &&
-        unreadMsg.notification > 0 ? (
+        {notificationsCount > 0 && unreadMsg.notification && unreadMsg.notification > 0 ? (
           <Col style={{ padding: "0 2px" }}>{unreadMsg.notification} New</Col>
         ) : null}
       </Row>
 
       <Divider className="hp-my-4" />
 
-      {noticeData?.notification?.length > 0
-        ? renderNotificationItems()
-        : renderNoNotification()}
+      {noticeData?.notification?.length > 0 ? renderNotificationItems() : renderNoNotification()}
     </div>
   );
 
@@ -228,16 +201,8 @@ export default function HeaderNotifications() {
         icon={
           <Dropdown overlay={notificationMenu} placement="bottomRight">
             <div className="display-row-center">
-              <div
-                style={
-                  direction === "rtl"
-                    ? { left: -5, top: -5 }
-                    : { right: -5, top: -5 }
-                }
-              >
-                {notificationsCount > 0 &&
-                unreadMsg.notification &&
-                unreadMsg.notification > 0 ? (
+              <div style={direction === "rtl" ? { left: -5, top: -5 } : { right: -5, top: -5 }}>
+                {notificationsCount > 0 && unreadMsg.notification && unreadMsg.notification > 0 ? (
                   <Badge dot status="processing" />
                 ) : null}
               </div>

@@ -25,22 +25,12 @@ const Header = (props) => {
     <Space style={{ width: "100%", justifyContent: "space-between" }}>
       <Space>
         <div style={{ display: "flex", marginLeft: "4px" }}>
-          <CloseOutlined
-            onClick={props.handleClosePane}
-            style={{ alignSelf: "center", margin: "0" }}
-          />
+          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
         </div>
 
         <Badge count={props.method} style={{ backgroundColor: "grey" }} />
-        <Badge
-          overflowCount={699}
-          count={props.statusCode}
-          style={{ backgroundColor: "#87d068" }}
-        />
-        <Text
-          ellipsis={{ tooltip: props.url }}
-          style={{ fontSize: "0.9rem", width: 800 }}
-        >
+        <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
+        <Text ellipsis={{ tooltip: props.url }} style={{ fontSize: "0.9rem", width: 800 }}>
           {props.url}
         </Text>
       </Space>
@@ -76,10 +66,7 @@ const LogPane = (props) => {
             </span>
           </Navigation.Tab>
           <Navigation.Tab id="Headers">Headers</Navigation.Tab>
-          <Navigation.Tab
-            id="Payload"
-            style={title === "Request" ? {} : { display: "none" }}
-          >
+          <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
             Payload
           </Navigation.Tab>
           <Navigation.Tab id="Body">Body</Navigation.Tab>
@@ -120,10 +107,7 @@ const LogPane = (props) => {
           </div>
         </Navigation.Panel>
         <Navigation.Panel>
-          <div
-            style={{ overflowY: "scroll", height: "400px" }}
-            className="fix-dark-mode-color"
-          >
+          <div style={{ overflowY: "scroll", height: "400px" }} className="fix-dark-mode-color">
             {body ? body : <h3>The request has no body available</h3>}
           </div>
         </Navigation.Panel>
@@ -144,12 +128,7 @@ const LogPane = (props) => {
   );
 };
 
-const RequestlogPane = ({
-  selectedRequestData,
-  handleClosePane,
-  visibility,
-  upsertRequestAction,
-}) => {
+const RequestlogPane = ({ selectedRequestData, handleClosePane, visibility, upsertRequestAction }) => {
   return (
     <>
       <Drawer

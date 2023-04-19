@@ -37,12 +37,9 @@ export const isEmailVerified = (userId) => {
 
 export const setEmailVerified = async (userId, value) => {
   submitAttrUtil(TRACKING.ATTR.EMAIL_VERIFIED, value);
-  return DataStoreUtils.updateValueAsPromise(
-    ["customProfile", userId, "signup"],
-    {
-      emailVerified: value,
-    }
-  );
+  return DataStoreUtils.updateValueAsPromise(["customProfile", userId, "signup"], {
+    emailVerified: value,
+  });
 };
 
 // Intended to only be called on account creation
@@ -70,12 +67,9 @@ export const sendVerificationEmail = ({ url }) => {
       url: url ? url : window.location.href,
       handleCodeInApp: false,
     });
-  } else
-    return Promise.reject({ status: false, errorCode: "Could not send Email" });
+  } else return Promise.reject({ status: false, errorCode: "Could not send Email" });
 };
-export const resendVerificationEmailHandler = async ({
-  callbackURL = APP_CONSTANTS.PROD_RULES_URL,
-}) => {
+export const resendVerificationEmailHandler = async ({ callbackURL = APP_CONSTANTS.PROD_RULES_URL }) => {
   trackEmailVerificationSendAttempted();
 
   try {
@@ -131,11 +125,7 @@ export const isSignUpRequired = async (allRules, appMode, user) => {
   let installationDate = null;
 
   try {
-    installationDate = await getAndUpdateInstallationDate(
-      appMode,
-      false,
-      user?.loggedIn
-    );
+    installationDate = await getAndUpdateInstallationDate(appMode, false, user?.loggedIn);
     installationDate = Date.parse(installationDate);
   } catch (error) {
     installationDate = null;
@@ -145,8 +135,7 @@ export const isSignUpRequired = async (allRules, appMode, user) => {
     return false;
   }
 
-  const daysSinceInstallation =
-    (currentDate - installationDate) / (1000 * 60 * 60 * 24);
+  const daysSinceInstallation = (currentDate - installationDate) / (1000 * 60 * 60 * 24);
 
   if (daysSinceInstallation >= 15) {
     return true;

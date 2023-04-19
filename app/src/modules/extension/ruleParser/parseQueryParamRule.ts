@@ -1,19 +1,8 @@
-import {
-  QueryParamRule,
-  QueryParamModificationType,
-  QueryParamRuleModification,
-} from "../../../types/rules";
-import {
-  ExtensionRule,
-  ExtensionRuleAction,
-  QueryParamRuleTransform,
-  RuleActionType,
-} from "../types";
+import { QueryParamRule, QueryParamModificationType, QueryParamRuleModification } from "../../../types/rules";
+import { ExtensionRule, ExtensionRuleAction, QueryParamRuleTransform, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseQueryParams = (
-  modifications: QueryParamRuleModification[]
-): QueryParamRuleTransform => {
+const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryParamRuleTransform => {
   const transform: QueryParamRuleTransform = {
     queryTransform: {
       addOrReplaceParams: [],

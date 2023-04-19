@@ -1,11 +1,5 @@
 import firebaseApp from "../../firebase";
-import {
-  getFirestore,
-  Timestamp,
-  updateDoc,
-  addDoc,
-  collection,
-} from "firebase/firestore";
+import { getFirestore, Timestamp, updateDoc, addDoc, collection } from "firebase/firestore";
 import { RQMockSchema } from "components/features/mocksV2/types";
 import { getOwnerId } from "backend/utils";
 import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
@@ -14,11 +8,7 @@ import { createResponseBodyFilepath } from "./utils";
 import { updateMockFromFirebase } from "./updateMock";
 import Logger from "lib/logger";
 
-export const createMock = async (
-  uid: string,
-  mockData: RQMockSchema,
-  teamId?: string
-): Promise<string> => {
+export const createMock = async (uid: string, mockData: RQMockSchema, teamId?: string): Promise<string> => {
   if (!uid) {
     return null;
   }
@@ -51,11 +41,7 @@ export const createMock = async (
   return null;
 };
 
-const createMockFromFirebase = async (
-  uid: string,
-  mockData: RQMockSchema,
-  teamId?: string
-): Promise<string | null> => {
+const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamId?: string): Promise<string | null> => {
   const db = getFirestore(firebaseApp);
   const rootMocksCollectionRef = collection(db, "mocks");
 
@@ -83,18 +69,9 @@ const createMockFromFirebase = async (
   return mockId;
 };
 
-const updateResponseFilePath = async (
-  uid: string,
-  mockData: RQMockSchema,
-  teamId?: string
-) => {
+const updateResponseFilePath = async (uid: string, mockData: RQMockSchema, teamId?: string) => {
   mockData.responses.map((response) => {
-    response.filePath = createResponseBodyFilepath(
-      uid,
-      mockData.id,
-      response.id,
-      teamId
-    );
+    response.filePath = createResponseBodyFilepath(uid, mockData.id, response.id, teamId);
     return null;
   });
 

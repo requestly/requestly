@@ -1,21 +1,13 @@
 import { CLIENT_MESSAGES } from "common/constants";
 import { getRecord, saveRecord } from "common/storage";
-import {
-  SessionRecordingConfig,
-  SourceKey,
-  SourceOperator,
-} from "common/types";
+import { SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
-const getSessionRecordingConfig = async (
-  url: string
-): Promise<SessionRecordingConfig> => {
-  const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(
-    CONFIG_STORAGE_KEY
-  );
+const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingConfig> => {
+  const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
   const pageSources = sessionRecordingConfig?.pageSources || [];
   if (await isExtensionEnabled()) {
     if (pageSources.some((pageSource) => matchSourceUrl(pageSource, url))) {
@@ -38,9 +30,7 @@ export const initSessionRecording = async (
       operator: SourceOperator.CONTAINS,
       value: new URL(url).hostname,
     };
-    const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(
-      CONFIG_STORAGE_KEY
-    );
+    const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
     const pageSources = sessionRecordingConfig?.pageSources || [];
 
     await saveRecord(CONFIG_STORAGE_KEY, {

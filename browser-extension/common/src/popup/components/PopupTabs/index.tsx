@@ -3,11 +3,7 @@ import { Badge, Tabs } from "antd";
 import ExecutedRules from "../ExecutedRules";
 import PinnedRecords from "../PinnedRecords";
 import RecentRecords from "../RecentRecords";
-import {
-  PushpinFilled,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
+import { PushpinFilled, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import "./popupTabs.css";
 
 const PopupTabs: React.FC = () => {
@@ -40,29 +36,15 @@ const PopupTabs: React.FC = () => {
           <span>
             <CheckCircleOutlined />
             Executed rules
-            <Badge
-              size="small"
-              count={executedRulesCount}
-              className="popup-tab-badge"
-            />
+            <Badge size="small" count={executedRulesCount} className="popup-tab-badge" />
           </span>
         ),
-        children: (
-          <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />
-        ),
+        children: <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />,
       },
     ];
   }, [executedRulesCount]);
 
-  return (
-    <Tabs
-      size="middle"
-      items={tabItems}
-      defaultActiveKey="0"
-      className="popup-tabs"
-      destroyInactiveTabPane
-    />
-  );
+  return <Tabs size="middle" items={tabItems} defaultActiveKey="0" className="popup-tabs" destroyInactiveTabPane />;
 };
 
 export default PopupTabs;

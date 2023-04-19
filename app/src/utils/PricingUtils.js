@@ -1,8 +1,7 @@
 export const defaultCurrency = "USD";
 export const defaultCountry = "US";
 
-export const paypalClientId =
-  "AaORQLcfr4mtfVD4txtvqn723JIUJ1vCzlQ358CTCiGaqBttyZquK7UmuUu5l4Gma12ikrP8FztIECQt";
+export const paypalClientId = "AaORQLcfr4mtfVD4txtvqn723JIUJ1vCzlQ358CTCiGaqBttyZquK7UmuUu5l4Gma12ikrP8FztIECQt";
 
 export const getDurationTitleFromDays = (days) => {
   switch (parseInt(days)) {

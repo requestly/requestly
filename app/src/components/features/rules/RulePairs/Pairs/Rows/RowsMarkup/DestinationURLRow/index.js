@@ -22,30 +22,17 @@ import {
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import "./index.css";
 
-const DestinationURLRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
 
   //Component State
   const [destinationType, setDestinationType] = useState(pair.destinationType);
-  const [
-    destinationTypePopupVisible,
-    setDestinationTypePopupVisible,
-  ] = useState(false);
-  const [destinationPopupSelection, setDestinationPopupSelection] = useState(
-    null
-  );
+  const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
+  const [destinationPopupSelection, setDestinationPopupSelection] = useState(null);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
-  const currentlySelectedRuleConfig = useSelector(
-    getCurrentlySelectedRuleConfig
-  );
+  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
   const handleMockPickerVisibilityChange = (visible) => {
     // seems like an unnecessary abstraction
@@ -60,21 +47,13 @@ const DestinationURLRow = ({
 
   const handleFileSelectCallback = (filePath) => {
     trackSelectMapLocalFile(filePath);
-    modifyPairAtGivenPath(
-      undefined,
-      pairIndex,
-      "destination",
-      `file://${filePath}`
-    );
+    modifyPairAtGivenPath(undefined, pairIndex, "destination", `file://${filePath}`);
   };
 
   const preValidateURL = () => {
     const currentDestinationURL = pair.destination;
     if (isEmpty(currentDestinationURL)) return;
-    if (
-      !isValidUrl(currentDestinationURL) &&
-      !currentDestinationURL.startsWith("$")
-    ) {
+    if (!isValidUrl(currentDestinationURL) && !currentDestinationURL.startsWith("$")) {
       // Try auto-fixing
       if (
         !currentDestinationURL.startsWith("$") &&
@@ -133,18 +112,12 @@ const DestinationURLRow = ({
   };
 
   const handleDestinationTypeChange = () => {
-    modifyPairAtGivenPath(
-      undefined,
-      pairIndex,
-      "destinationType",
-      destinationPopupSelection,
-      [
-        {
-          path: "destination",
-          value: "",
-        },
-      ]
-    );
+    modifyPairAtGivenPath(undefined, pairIndex, "destinationType", destinationPopupSelection, [
+      {
+        path: "destination",
+        value: "",
+      },
+    ]);
     setDestinationType(destinationPopupSelection);
   };
 
@@ -154,14 +127,9 @@ const DestinationURLRow = ({
         data-tour-id="rule-editor-destination-url"
         data-selectionid="destination-url"
         className="display-inline-block"
-        placeholder={generatePlaceholderText(
-          pair.source.operator,
-          "destination"
-        )}
+        placeholder={generatePlaceholderText(pair.source.operator, "destination")}
         type="text"
-        onChange={(event) =>
-          modifyPairAtGivenPath(event, pairIndex, "destination")
-        }
+        onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "destination")}
         onBlur={preValidateURL}
         value={pair.destination}
         disabled={isInputDisabled}
@@ -185,9 +153,7 @@ const DestinationURLRow = ({
           {pair.destination ? "Change file" : " Select mock/file"}
         </RQButton>
         <span className="destination-file-path">
-          {pair.destination.length
-            ? pair.destination
-            : " No mock or file chosen"}
+          {pair.destination.length ? pair.destination : " No mock or file chosen"}
         </span>
         {pair.destination && (
           <a href={pair.destination} target="_blank" rel="noreferrer">
@@ -203,9 +169,7 @@ const DestinationURLRow = ({
       <Col span={24} className="picker-container">
         <RQButton
           onPointerEnter={() => trackDesktopActionInterestCaptured("map_local")}
-          disabled={
-            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) || isInputDisabled
-          }
+          disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) || isInputDisabled}
           type="default"
           onClick={() => {
             displayFileSelector(handleFileSelectCallback);
@@ -216,20 +180,15 @@ const DestinationURLRow = ({
         </RQButton>
         <span
           className={`${
-            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) &&
-            "highlight-file-path"
+            !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && "highlight-file-path"
           } destination-file-path`}
         >
           {" "}
           {pair.destination.length ? pair.destination : " No file chosen"}
         </span>{" "}
-        {pair.destination &&
-          isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
-            <HiOutlineExternalLink
-              className="external-link-icon"
-              onClick={handleOpenLocalFileInBrowser}
-            />
-          )}
+        {pair.destination && isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
+          <HiOutlineExternalLink className="external-link-icon" onClick={handleOpenLocalFileInBrowser} />
+        )}
         <span>
           {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
             <InfoTag
@@ -237,15 +196,9 @@ const DestinationURLRow = ({
               tooltipWidth="400px"
               description={
                 <>
-                  This rule cannot be executed using Extension because the
-                  request redirects to a local file that cannot be accessed by
-                  the browser.{" "}
-                  <a
-                    className="tooltip-link"
-                    href="https://requestly.io/downloads"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  This rule cannot be executed using Extension because the request redirects to a local file that cannot
+                  be accessed by the browser.{" "}
+                  <a className="tooltip-link" href="https://requestly.io/downloads" target="_blank" rel="noreferrer">
                     Use this on Desktop App!
                   </a>
                 </>
@@ -272,9 +225,7 @@ const DestinationURLRow = ({
 
   useEffect(() => {
     if (!pair.destinationType) {
-      const destinationType = getDestinationTypeForExistingRule(
-        pair.destination
-      );
+      const destinationType = getDestinationTypeForExistingRule(pair.destination);
       setDestinationType(destinationType);
     }
   }, [pair.destination, pair.destinationType]);
@@ -313,11 +264,7 @@ const DestinationURLRow = ({
                 onCancel={() => setDestinationTypePopupVisible(false)}
                 open={destinationTypePopupVisible}
               >
-                <Radio.Group
-                  value={destinationType}
-                  onChange={showPopup}
-                  disabled={isInputDisabled}
-                >
+                <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
                   <MoreInfo
                     text="Redirect URL to another URL"
                     analyticsContext="url_destination"
@@ -326,11 +273,7 @@ const DestinationURLRow = ({
                     <Radio value={RedirectDestinationType.URL}>URL</Radio>
                   </MoreInfo>
                   <Tooltip
-                    trigger={
-                      !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
-                        ? ["hover", "focus"]
-                        : [null]
-                    }
+                    trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) ? ["hover", "focus"] : [null]}
                     onOpenChange={(open) => {
                       if (open) trackDesktopActionInterestCaptured("map_local");
                     }}
@@ -351,9 +294,7 @@ const DestinationURLRow = ({
                   >
                     <Radio
                       value={RedirectDestinationType.MAP_LOCAL}
-                      disabled={
-                        !isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)
-                      }
+                      disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     >
                       Local file
                     </Radio>
@@ -363,9 +304,7 @@ const DestinationURLRow = ({
                     analyticsContext="pick_mock_or_file_destination"
                     source={currentlySelectedRuleConfig.TYPE}
                   >
-                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>
-                      Pick from Files/Mock server
-                    </Radio>
+                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
                   </MoreInfo>
                 </Radio.Group>
               </Popconfirm>

@@ -9,8 +9,7 @@ export const formatDate = (dateInMillis: number, format: string): string => {
       dateString = String(date.getDate());
 
     dateString = dateString.length < 2 ? "0" + dateString : String(dateString);
-    monthString =
-      monthString.length < 2 ? "0" + monthString : String(monthString);
+    monthString = monthString.length < 2 ? "0" + monthString : String(monthString);
 
     return date.getFullYear() + "-" + monthString + "-" + dateString;
   }

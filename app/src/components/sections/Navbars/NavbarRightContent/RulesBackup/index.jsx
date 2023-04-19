@@ -24,10 +24,7 @@ const RulesBackupToggle = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   // Component State
-  const [
-    isBackupStatusChangeProcessing,
-    setIsBackupStatusChangeProcessing,
-  ] = useState(false);
+  const [isBackupStatusChangeProcessing, setIsBackupStatusChangeProcessing] = useState(false);
 
   // Premium Check
   const isPremiumUser = user?.details?.isPremium;
@@ -69,10 +66,7 @@ const RulesBackupToggle = () => {
   const offerToTurnOnBackups = () => {
     return (
       <div style={{ maxWidth: "350px" }}>
-        <p>
-          Securely backup your Rules to Requestly servers so that you don't ever
-          lose them while switching devices.
-        </p>
+        <p>Securely backup your Rules to Requestly servers so that you don't ever lose them while switching devices.</p>
 
         <Space>
           <Button
@@ -84,10 +78,7 @@ const RulesBackupToggle = () => {
             Turn on backups
           </Button>
           {!user.loggedIn || !user.details || !user.details.profile ? null : (
-            <Button
-              type="secondary"
-              onClick={() => redirectToBackups(navigate)}
-            >
+            <Button type="secondary" onClick={() => redirectToBackups(navigate)}>
               View previous backups
             </Button>
           )}
@@ -99,23 +90,13 @@ const RulesBackupToggle = () => {
   const offerToTurnOffBackups = () => {
     return (
       <div style={{ maxWidth: "300px" }}>
-        <p>
-          Securely backup your Rules to Requestly servers so that you don't ever
-          lose them while switching devices.
-        </p>
+        <p>Securely backup your Rules to Requestly servers so that you don't ever lose them while switching devices.</p>
         <Space>
-          <Button
-            type="primary"
-            onClick={() => changeIsBackupEnabled(false)}
-            loading={isBackupStatusChangeProcessing}
-          >
+          <Button type="primary" onClick={() => changeIsBackupEnabled(false)} loading={isBackupStatusChangeProcessing}>
             Turn off backups
           </Button>
           {!user.loggedIn || !user.details || !user.details.profile ? null : (
-            <Button
-              onClick={() => redirectToBackups(navigate)}
-              type="secondary"
-            >
+            <Button onClick={() => redirectToBackups(navigate)} type="secondary">
               Existing Backups
             </Button>
           )}
@@ -130,10 +111,7 @@ const RulesBackupToggle = () => {
       return offerToTurnOnBackups();
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      isPremiumUser
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && isPremiumUser) {
       // Premium User - Has Backup Enabled
       if (user.details.isBackupEnabled) {
         return offerToTurnOffBackups();
@@ -144,10 +122,7 @@ const RulesBackupToggle = () => {
       }
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      !isPremiumUser
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && !isPremiumUser) {
       // Non Premium User - Has Backup Enabled (implementation TBD)
       if (user.details.isBackupEnabled) {
         return offerToTurnOffBackups();
@@ -169,17 +144,8 @@ const RulesBackupToggle = () => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
       return (
         <Col className="display-row-center">
-          <Popover
-            trigger={["click"]}
-            content={getPopoverContent()}
-            placement="bottomRight"
-            title="Working locally"
-          >
-            <Button
-              type="text"
-              className="header-icon-btn"
-              icon={<MdCloudOff className="hp-text-color-black-60 " />}
-            />
+          <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight" title="Working locally">
+            <Button type="text" className="header-icon-btn" icon={<MdCloudOff className="hp-text-color-black-60 " />} />
           </Popover>
         </Col>
       );
@@ -187,10 +153,7 @@ const RulesBackupToggle = () => {
 
     if (currentlyActiveWorkspace?.id) return;
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      isPremiumUser
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && isPremiumUser) {
       // Premium User - Has Backup Enabled
       if (user.details.isBackupEnabled) {
         return (
@@ -214,12 +177,7 @@ const RulesBackupToggle = () => {
       else {
         return (
           <Col className="display-row-center">
-            <Popover
-              trigger={["click"]}
-              content={getPopoverContent()}
-              placement="bottomRight"
-              title="Working locally"
-            >
+            <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight" title="Working locally">
               <Button
                 type="text"
                 className="header-icon-btn"
@@ -231,25 +189,16 @@ const RulesBackupToggle = () => {
       }
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      !isPremiumUser
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && !isPremiumUser) {
       // Non Premium User - Has Backup Enabled (implementation TBD)
       if (user.details.isBackupEnabled) {
         return (
           <Col className="display-row-center">
-            <Popover
-              trigger={["click"]}
-              content={getPopoverContent()}
-              placement="bottomRight"
-            >
+            <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight">
               <Button
                 type="text"
                 className="header-icon-btn"
-                icon={
-                  <IoCloudDoneOutline className="hp-text-color-black-60 " />
-                }
+                icon={<IoCloudDoneOutline className="hp-text-color-black-60 " />}
               />
             </Popover>
           </Col>
@@ -258,12 +207,7 @@ const RulesBackupToggle = () => {
         // Non - Premium User - Backup NOT Enabled
         return (
           <Col className="display-row-center">
-            <Popover
-              trigger={["click"]}
-              content={getPopoverContent()}
-              placement="bottomRight"
-              title="Working locally"
-            >
+            <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight" title="Working locally">
               <Button
                 type="text"
                 className="header-icon-btn"

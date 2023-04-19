@@ -8,22 +8,22 @@ import useGrowthBookIntegration, { GrowthbookExperimentHelperComponent } from ".
 
 const LocalUserAttributesHelperComponent = () => {
   const dispatch = useDispatch();
-  const stableDispatch = useCallback(dispatch, [dispatch])
-  
+  const stableDispatch = useCallback(dispatch, [dispatch]);
+
   const userAttributes = useSelector(getUserAttributes);
 
   // deviceId generation. Only once
   useEffect(() => {
-    if(!userAttributes?.deviceId) {
+    if (!userAttributes?.deviceId) {
       const deviceId = uuidv4();
-      stableDispatch(actions.updateUserAttributes({deviceId}))
+      stableDispatch(actions.updateUserAttributes({ deviceId }));
     }
   }, [userAttributes?.deviceId, stableDispatch]);
 
   // sessionId generation. Reset after every refresh
   useEffect(() => {
     const sessionId = uuidv4();
-    stableDispatch(actions.updateUserAttributes({sessionId}))
+    stableDispatch(actions.updateUserAttributes({ sessionId }));
   }, [stableDispatch]);
 
   useGrowthBookIntegration();
@@ -33,6 +33,6 @@ const LocalUserAttributesHelperComponent = () => {
       <GrowthbookExperimentHelperComponent />
     </>
   );
-}
+};
 
 export default LocalUserAttributesHelperComponent;

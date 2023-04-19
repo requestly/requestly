@@ -29,10 +29,7 @@ const parseScriptRule = (rule: ScriptRule): ExtensionRule[] => {
         ],
       };
 
-      condition.resourceTypes = [
-        "main_frame" as ExtensionResourceType,
-        "sub_frame" as ExtensionResourceType,
-      ];
+      condition.resourceTypes = ["main_frame" as ExtensionResourceType, "sub_frame" as ExtensionResourceType];
 
       return { action, condition };
     }

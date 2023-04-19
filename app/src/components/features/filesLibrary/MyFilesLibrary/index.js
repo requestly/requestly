@@ -7,12 +7,7 @@ import FilesLibView from "../FilesLibraryTableContainer/myFilesLibraryView";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import GetStartedWithFiles from "../GetStartedWithFiles";
 //ACTIONS
-import {
-  fetchUserMocks,
-  fetchFiles,
-  checkMigrationDone,
-  migrateAndUpdate,
-} from "../FilesLibraryIndexPage/actions";
+import { fetchUserMocks, fetchFiles, checkMigrationDone, migrateAndUpdate } from "../FilesLibraryIndexPage/actions";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -48,10 +43,7 @@ const FilesLib = () => {
         let filesData = [];
         let i = 0;
         for (i = 0; i < list.length; i++) {
-          if (
-            list[i].isMock === false ||
-            !Object.prototype.hasOwnProperty.call(list[i], "isMock")
-          ) {
+          if (list[i].isMock === false || !Object.prototype.hasOwnProperty.call(list[i], "isMock")) {
             filesData.push(list[i]);
           }
         }

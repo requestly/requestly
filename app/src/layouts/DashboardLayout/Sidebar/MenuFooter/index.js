@@ -6,10 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import fallbackAvatar from "assets/images/memoji/memoji-1.png";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
-import {
-  isPlanExpired as checkIfPlanIsExpired,
-  isTrialPlan,
-} from "utils/PremiumUtils";
+import { isPlanExpired as checkIfPlanIsExpired, isTrialPlan } from "utils/PremiumUtils";
 import APP_CONSTANTS from "config/constants";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
 import { parseGravatarImage } from "utils/Misc";
@@ -22,14 +19,9 @@ const MenuFooter = (props) => {
   // Global State
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const userName =
-    user.loggedIn && user?.details?.profile?.displayName
-      ? user.details.profile.displayName
-      : "User";
+  const userName = user.loggedIn && user?.details?.profile?.displayName ? user.details.profile.displayName : "User";
   const userPhoto =
-    user.loggedIn && user?.details?.profile?.photoURL
-      ? parseGravatarImage(user.details.profile.photoURL)
-      : null;
+    user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
 
   // Component State
   const [isPlanExpired, setIsPlanExpired] = useState(false);
@@ -44,10 +36,7 @@ const MenuFooter = (props) => {
       if (!user.loggedIn) return () => {};
       const userOrganization = user?.details?.profile?.email?.split("@")[1];
       const firestore = getFirestore();
-      const organizationRef = doc(
-        collection(firestore, `companies`),
-        userOrganization
-      );
+      const organizationRef = doc(collection(firestore, `companies`), userOrganization);
       const doesOrganizationExist = (await getDoc(organizationRef)).exists();
 
       if (!doesOrganizationExist) return () => {};
@@ -69,11 +58,7 @@ const MenuFooter = (props) => {
           <Row align="middle" justify="space-around" style={{ width: "100%" }}>
             <Col>
               <Row align="middle">
-                <Avatar
-                  size={36}
-                  src={userPhoto ? userPhoto : fallbackAvatar}
-                  className="menu-footer-avatar"
-                />
+                <Avatar size={36} src={userPhoto ? userPhoto : fallbackAvatar} className="menu-footer-avatar" />
 
                 <div className="menu-user-info">
                   <span className="max-chars-130">{userName}</span>
@@ -95,10 +80,7 @@ const MenuFooter = (props) => {
 
             <Col>
               <Link to="#" onClick={onClose}>
-                <RiSettings3Line
-                  className="remix-icon hp-text-color-black-100 hp-text-color-dark-0"
-                  size={24}
-                />
+                <RiSettings3Line className="remix-icon hp-text-color-black-100 hp-text-color-dark-0" size={24} />
               </Link>
             </Col>
           </Row>
@@ -116,11 +98,7 @@ const MenuFooter = (props) => {
           <Row align="middle" justify="space-around" style={{ width: "100%" }}>
             <Col>
               <Row align="middle">
-                <Avatar
-                  size={36}
-                  src={userPhoto ? userPhoto : fallbackAvatar}
-                  className="menu-footer-avatar"
-                />
+                <Avatar size={36} src={userPhoto ? userPhoto : fallbackAvatar} className="menu-footer-avatar" />
 
                 <div className="menu-user-info">
                   <span className="max-chars-130">{userName}</span>
@@ -150,10 +128,7 @@ const MenuFooter = (props) => {
                   return false;
                 }}
               >
-                <RiSettings3Line
-                  className="remix-icon hp-text-color-black-100 hp-text-color-dark-0"
-                  size={24}
-                />
+                <RiSettings3Line className="remix-icon hp-text-color-black-100 hp-text-color-dark-0" size={24} />
               </Link>
             </Col>
           </Row>
@@ -167,24 +142,13 @@ const MenuFooter = (props) => {
       <>
         {user.loggedIn ? (
           <>
-            <Row
-              align="middle"
-              style={{ marginTop: "auto", marginBottom: "1rem" }}
-            >
+            <Row align="middle" style={{ marginTop: "auto", marginBottom: "1rem" }}>
               <Divider />
 
-              <Row
-                align="middle"
-                justify="space-around"
-                style={{ width: "100%" }}
-              >
+              <Row align="middle" justify="space-around" style={{ width: "100%" }}>
                 <Col>
                   <Row align="middle">
-                    <Avatar
-                      size={36}
-                      src={userPhoto ? userPhoto : fallbackAvatar}
-                      className="menu-footer-avatar"
-                    />
+                    <Avatar size={36} src={userPhoto ? userPhoto : fallbackAvatar} className="menu-footer-avatar" />
 
                     <div className="menu-user-info">
                       <span className="max-chars-130">{userName}</span>
@@ -214,11 +178,7 @@ const MenuFooter = (props) => {
                       }}
                     >
                       <Tooltip title="Unlock More Features">
-                        <IoRocketSharp
-                          size={24}
-                          className="remix-icon mr-9"
-                          color="LightPink"
-                        />
+                        <IoRocketSharp size={24} className="remix-icon mr-9" color="LightPink" />
                       </Tooltip>
                     </Link>
                   </Col>

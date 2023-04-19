@@ -1,14 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { AUTH } from "../../constants";
 
-export const trackLoginAttemptedEvent = ({
-  auth_provider,
-  email,
-  place,
-  email_type,
-  domain,
-  source,
-}) => {
+export const trackLoginAttemptedEvent = ({ auth_provider, email, place, email_type, domain, source }) => {
   const params = {
     auth_provider,
     email,
@@ -20,13 +13,7 @@ export const trackLoginAttemptedEvent = ({
   trackEvent(AUTH.LOGIN.ATTEMPTED, params);
 };
 
-export const trackLoginFailedEvent = ({
-  auth_provider,
-  place,
-  email,
-  error_message,
-  source,
-}) => {
+export const trackLoginFailedEvent = ({ auth_provider, place, email, error_message, source }) => {
   const params = {
     auth_provider,
     place,
@@ -45,15 +32,7 @@ export const trackLoginRequestedEvent = ({ auth_provider, place }) => {
   trackEvent(AUTH.LOGIN.REQUESTED, params);
 };
 
-export const trackLoginSuccessEvent = ({
-  auth_provider,
-  uid,
-  place,
-  email,
-  email_type,
-  domain,
-  source,
-}) => {
+export const trackLoginSuccessEvent = ({ auth_provider, uid, place, email, email_type, domain, source }) => {
   const params = {
     auth_provider,
     uid,

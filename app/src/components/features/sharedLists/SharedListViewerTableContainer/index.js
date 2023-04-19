@@ -4,10 +4,7 @@ import { Button } from "antd";
 import { toast } from "utils/Toast.js";
 import { useLocation, useNavigate } from "react-router-dom";
 //ACTIONS
-import {
-  addRulesAndGroupsToStorage,
-  processDataToImport,
-} from "../../rules/ImportRulesModal/actions";
+import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/ImportRulesModal/actions";
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
 import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
@@ -54,10 +51,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
   const [areRulesImporting, setAreRulesImporting] = useState(false);
 
   const functions = getFunctions();
-  const sendSharedListImportAsEmail = httpsCallable(
-    functions,
-    "sendSharedListImportAsEmail"
-  );
+  const sendSharedListImportAsEmail = httpsCallable(functions, "sendSharedListImportAsEmail");
 
   const openAuthModal = (source) => {
     dispatch(
@@ -78,10 +72,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
   const handleImportListOnClick = (_e) => {
     trackSharedListImportStartedEvent();
 
-    if (
-      appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-      !isExtensionInstalled()
-    ) {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
         actions.toggleActiveModal({
           modalName: "extensionModal",
@@ -120,11 +111,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
     });
 
     //process Data
-    processDataToImport(
-      [...rulesToImport, ...groupsToImport],
-      user,
-      allRules
-    ).then((result) => {
+    processDataToImport([...rulesToImport, ...groupsToImport], user, allRules).then((result) => {
       const migratedRules = isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)
         ? migrateHeaderRulesToV2(result.data)
         : result.data;
@@ -133,9 +120,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
         toast.info(`Successfully imported rules`);
         trackSharedListImportCompleted();
         if (isTemplate) {
-          trackTemplateImportCompleted(
-            snakeCase("Load Google Analytics in Debug Mode")
-          );
+          trackTemplateImportCompleted(snakeCase("Load Google Analytics in Debug Mode"));
         }
         redirectToRules(navigate);
       });
@@ -159,9 +144,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
           }}
           rules={rules}
           groups={groups}
-          headerTitle={
-            isTemplate ? "Template - Content" : "Shared List - Content"
-          }
+          headerTitle={isTemplate ? "Template - Content" : "Shared List - Content"}
           toolBarRender={() => [
             <Button
               type="primary"

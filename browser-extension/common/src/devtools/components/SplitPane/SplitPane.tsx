@@ -8,12 +8,7 @@ interface Props {
   leftPaneSize?: number; // percentage
   sizes?: [number, number];
 }
-const SplitPane: React.FC<Props> = ({
-  children = [],
-  className = "",
-  leftPaneSize = 50,
-  ...props
-}) => {
+const SplitPane: React.FC<Props> = ({ children = [], className = "", leftPaneSize = 50, ...props }) => {
   const left = children[0];
   const right = children[1];
 
@@ -22,9 +17,7 @@ const SplitPane: React.FC<Props> = ({
   }
 
   const positionDragger = useCallback(([leftSize]: [number]) => {
-    const dragger = document.querySelector(
-      ".split-pane .gutter"
-    ) as HTMLDivElement;
+    const dragger = document.querySelector(".split-pane .gutter") as HTMLDivElement;
     if (dragger) {
       dragger.style.position = "absolute";
       dragger.style.left = `${leftSize}%`;

@@ -1,13 +1,7 @@
 import React from "react";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 
-const CancelRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => (
+const CancelRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => (
   <RequestSourceRow
     rowIndex={1}
     pair={pair}

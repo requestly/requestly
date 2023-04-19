@@ -24,10 +24,7 @@ const WifiInstructions = ({ device_id }) => {
                 title="a. Open Wifi Settings"
                 description={
                   <>
-                    Navigate to:{" "}
-                    <code>
-                      {`Settings > Wi-Fi > Select current Wi-Fi > Modify`}
-                    </code>
+                    Navigate to: <code>{`Settings > Wi-Fi > Select current Wi-Fi > Modify`}</code>
                   </>
                 }
               />

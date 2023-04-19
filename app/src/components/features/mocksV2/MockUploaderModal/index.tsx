@@ -9,10 +9,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
-import {
-  redirectToFileMockEditorEditMock,
-  redirectToMockEditorEditMock,
-} from "utils/RedirectionUtils";
+import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { MockType, RQMockSchema } from "../types";
 import { createMockFromUploadedFile } from "../utils";
@@ -25,11 +22,7 @@ interface Props {
   mockType: MockType;
 }
 
-const MockUploaderModal: React.FC<Props> = ({
-  visible,
-  toggleModalVisibility,
-  mockType,
-}) => {
+const MockUploaderModal: React.FC<Props> = ({ visible, toggleModalVisibility, mockType }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -64,22 +57,14 @@ const MockUploaderModal: React.FC<Props> = ({
   };
 
   return (
-    <Modal
-      open={visible}
-      onCancel={() => toggleModalVisibility(false)}
-      footer={null}
-      centered
-    >
+    <Modal open={visible} onCancel={() => toggleModalVisibility(false)} footer={null} centered>
       <Dragger {...uploadProps}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">
-          Click or drag file to this area to upload
-        </p>
+        <p className="ant-upload-text">Click or drag file to this area to upload</p>
         <p className="ant-upload-hint">
-          Supports a single file (
-          {mockType === MockType.FILE ? "JS, CSS, HTML" : "JSON"}) upload.
+          Supports a single file ({mockType === MockType.FILE ? "JS, CSS, HTML" : "JSON"}) upload.
         </p>
       </Dragger>
     </Modal>

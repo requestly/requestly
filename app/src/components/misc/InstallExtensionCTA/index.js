@@ -70,22 +70,13 @@ const InstallExtensionCTA = ({
 
   return (
     <>
-      <ProCard
-        className={`primary-card ${hasBorder ? "github-like-border" : null}`}
-      >
-        <h1
-          className="display-3"
-          style={{ textAlign: "center" }}
-          align="center"
-        >
+      <ProCard className={`primary-card ${hasBorder ? "github-like-border" : null}`}>
+        <h1 className="display-3" style={{ textAlign: "center" }} align="center">
           {heading}
         </h1>
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h2 className="display-3">{subHeadingExtension}</h2>
               {browser ? (
                 <Space>
@@ -97,12 +88,7 @@ const InstallExtensionCTA = ({
                   >
                     <Button type="primary" style={{ fontSize: "16px" }}>
                       <span style={{ paddingRight: "3px" }}>
-                        <img
-                          alt={browser.alt}
-                          src={browser.iconURL}
-                          height="32px"
-                          width="32px"
-                        />
+                        <img alt={browser.alt} src={browser.iconURL} height="32px" width="32px" />
                       </span>
                       {`Install ${browser.name} extension`}
                     </Button>
@@ -114,10 +100,7 @@ const InstallExtensionCTA = ({
 
               {reloadPage && (
                 <p style={{ marginTop: "20px" }}>
-                  <Text keyboard>
-                    After installation, please reload this page to use the
-                    feature.
-                  </Text>
+                  <Text keyboard>After installation, please reload this page to use the feature.</Text>
                 </p>
               )}
 
@@ -125,18 +108,8 @@ const InstallExtensionCTA = ({
                 Also available for browsers :
                 {otherBrowsers.map((item, key) => {
                   return (
-                    <a
-                      key={key}
-                      href={item.downloadURL}
-                      rel="noreferrer"
-                      style={{ paddingLeft: "5px" }}
-                    >
-                      <img
-                        src={item.iconURL}
-                        alt={item.alt}
-                        height="32px"
-                        width="32px"
-                      />
+                    <a key={key} href={item.downloadURL} rel="noreferrer" style={{ paddingLeft: "5px" }}>
+                      <img src={item.iconURL} alt={item.alt} height="32px" width="32px" />
                     </a>
                   );
                 })}
@@ -146,15 +119,11 @@ const InstallExtensionCTA = ({
                 <Alert
                   message={
                     <p style={{ marginBottom: "0px" }}>
-                      Already installed the extension and still seeing this
-                      message? Read our{" "}
+                      Already installed the extension and still seeing this message? Read our{" "}
                       <AntLink
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={
-                          APP_CONSTANTS.LINKS
-                            .REQUESTLY_EXTENSION_TROUBLESHOOTING
-                        }
+                        href={APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING}
                       >
                         Troubleshooting guide
                       </AntLink>
@@ -169,13 +138,8 @@ const InstallExtensionCTA = ({
           </Col>
           {supportsMobileDevice && (
             <Col span={24}>
-              <Jumbotron
-                style={{ background: "transparent" }}
-                className="text-center"
-              >
-                <Divider style={{ marginBottom: "1em", marginTop: "1em" }}>
-                  or
-                </Divider>
+              <Jumbotron style={{ background: "transparent" }} className="text-center">
+                <Divider style={{ marginBottom: "1em", marginTop: "1em" }}>or</Divider>
                 <h2 className="display-3">{subHeadingMobileDebugger}</h2>
                 <p className="lead">
                   <AntLink

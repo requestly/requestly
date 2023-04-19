@@ -88,13 +88,7 @@ const Logger = ({ sdkId, deviceId, showDeviceSelector }) => {
         getAndUpdateLocalDeleteTimestamp();
       }
     }
-  }, [
-    deviceId,
-    sdkId,
-    clearTimestamp,
-    unsubscribeListeners,
-    getAndUpdateLocalDeleteTimestamp,
-  ]);
+  }, [deviceId, sdkId, clearTimestamp, unsubscribeListeners, getAndUpdateLocalDeleteTimestamp]);
 
   const renderTrafficTable = () => {
     return (

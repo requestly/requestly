@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Row,
-  Card,
-  CardHeader,
-  Col,
-  CardBody,
-  Input,
-  InputGroup,
-  InputGroupText,
-} from "reactstrap";
+import { Row, Card, CardHeader, Col, CardBody, Input, InputGroup, InputGroupText } from "reactstrap";
 import { Button as AntButton } from "antd";
 import { toast } from "utils/Toast.js";
 //SUB COMPONENTS
@@ -102,9 +93,7 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
   const menu = (
     <Menu onClick={handleMenuClick}>
       {Object.keys(allRoles).map((key) => (
-        <Menu.Item key={key}>
-          {getDesignationDisplayValue(allRoles[key])}
-        </Menu.Item>
+        <Menu.Item key={key}>{getDesignationDisplayValue(allRoles[key])}</Menu.Item>
       ))}
     </Menu>
   );
@@ -113,8 +102,7 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
     <Dropdown overlay={menu}>
       <AntButton>
         <span style={{ textTransform: "capitalize", cursor: "pointer" }}>
-          {isEmpty(currentValue) ? "Choose" : currentValue}{" "}
-          <RiArrowDropDownLine className="remix-icon" />
+          {isEmpty(currentValue) ? "Choose" : currentValue} <RiArrowDropDownLine className="remix-icon" />
         </span>
       </AntButton>
     </Dropdown>
@@ -138,16 +126,11 @@ const ManageAccount = () => {
   // const [confirmLoading, setConfirmLoading] = useState(false);
   // const [cancelSubscriptionModal, setCancelSubscriptionModal] = useState(false);
   // Fallback image
-  const defaultImageSrc =
-    "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+  const defaultImageSrc = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
   const isUserPremium = user.details?.isPremium;
-  let userImageSrc = user.details.profile.photoURL
-    ? user.details.profile.photoURL
-    : defaultImageSrc;
+  let userImageSrc = user.details.profile.photoURL ? user.details.profile.photoURL : defaultImageSrc;
 
-  const userDisplayName = user.details.profile.displayName
-    ? user.details.profile.displayName
-    : "User";
+  const userDisplayName = user.details.profile.displayName ? user.details.profile.displayName : "User";
 
   // Reqeust larger gravatar
   if ("URLSearchParams" in window) {
@@ -166,12 +149,9 @@ const ManageAccount = () => {
     // Update local state
     setUserDesignation(newDisplayValue);
     // Save change to DB
-    DataStoreUtils.updateValueAsPromise(
-      ["customProfile", user.details.profile.uid],
-      {
-        position: newValue,
-      }
-    ).then(() => {
+    DataStoreUtils.updateValueAsPromise(["customProfile", user.details.profile.uid], {
+      position: newValue,
+    }).then(() => {
       // Refresh user in global state
       refreshUserInGlobalState(dispatch);
     });
@@ -179,12 +159,9 @@ const ManageAccount = () => {
 
   const handleSaveProfileOnClick = () => {
     // Save change to DB
-    DataStoreUtils.updateValueAsPromise(
-      ["customProfile", user.details.profile.uid],
-      {
-        companyName: userCompanyName,
-      }
-    ).then(() => {
+    DataStoreUtils.updateValueAsPromise(["customProfile", user.details.profile.uid], {
+      companyName: userCompanyName,
+    }).then(() => {
       // Notify
       toast.info("Profile saved");
       setAreChangesPending(false);
@@ -197,15 +174,12 @@ const ManageAccount = () => {
   useEffect(() => {
     // Initial values. Fetch full profile
     if (user.details) {
-      DataStoreUtils.getValue(["customProfile", user.details.profile.uid]).then(
-        (customProfile) => {
-          if (!customProfile) return;
-          const { position, companyName } = customProfile;
-          if (position)
-            setUserDesignation(getDesignationDisplayValue(position));
-          if (companyName) setUserCompanyName(companyName);
-        }
-      );
+      DataStoreUtils.getValue(["customProfile", user.details.profile.uid]).then((customProfile) => {
+        if (!customProfile) return;
+        const { position, companyName } = customProfile;
+        if (position) setUserDesignation(getDesignationDisplayValue(position));
+        if (companyName) setUserCompanyName(companyName);
+      });
     }
   }, [user.details.profile.uid, user]);
 
@@ -214,42 +188,25 @@ const ManageAccount = () => {
       {/* Page content */}
       <ProCard className="primary-card github-like-border">
         <Row className="profile-container">
-          <Col
-            className="profile-container-left profile-container-child"
-            xl="8"
-          >
+          <Col className="profile-container-left profile-container-child" xl="8">
             <UserInfo shadow={true} hideBillingAddress={true} />
             {/* Active License Info */}
             <br />
             <ActiveLicenseInfo customHeading={"Active Subscription"} />
           </Col>
-          <Col
-            className="profile-container-right profile-container-child mb-5 mb-xl-0"
-            xl="4"
-          >
+          <Col className="profile-container-right profile-container-child mb-5 mb-xl-0" xl="4">
             <Card className="profile-card profile-card-shadow">
               <Row className="justify-content-center">
                 <Col className="order-lg-2" lg="3">
                   <div className="card-profile-image">
-                    <a
-                      href="https://gravatar.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        alt="..."
-                        className="rounded-circle"
-                        src={userImageSrc}
-                      />
+                    <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer">
+                      <img alt="..." className="rounded-circle" src={userImageSrc} />
                     </a>
                   </div>
                 </Col>
               </Row>
               <CardHeader className="profile-card-header border-0 pt-1 pt-md-1 pb-0 pb-md-1"></CardHeader>
-              <CardBody
-                className="profile-card-body pt-0 pt-md-1"
-                style={{ fontSize: "14px" }}
-              >
+              <CardBody className="profile-card-body pt-0 pt-md-1" style={{ fontSize: "14px" }}>
                 <Row>
                   <div className="col">
                     <div className="card-profile-stats d-flex justify-content-center mt-md-5"></div>
@@ -259,10 +216,7 @@ const ManageAccount = () => {
                   <h3>{userDisplayName}</h3>
                   <div className="h5 mt-4">
                     <i className="ni business_briefcase-24 mr-2" />
-                    {getUserProfileDropdown(
-                      userDesignation,
-                      handleDesignationDropdownOnChange
-                    )}
+                    {getUserProfileDropdown(userDesignation, handleDesignationDropdownOnChange)}
                   </div>
                   <div style={{ margin: "1rem 0" }}>
                     <InputGroup className="input-group mb-4">
@@ -318,12 +272,7 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() =>
-                            window.open(
-                              APP_CONSTANTS.LINKS.GDPR.EXPORT_DATA,
-                              "_blank"
-                            )
-                          }
+                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.EXPORT_DATA, "_blank")}
                         >
                           Request Data Download
                         </AntButton>
@@ -334,12 +283,7 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() =>
-                            window.open(
-                              APP_CONSTANTS.LINKS.GDPR.DELETE_ACCOUNT,
-                              "_blank"
-                            )
-                          }
+                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.DELETE_ACCOUNT, "_blank")}
                         >
                           Request Account Deletion
                         </AntButton>
