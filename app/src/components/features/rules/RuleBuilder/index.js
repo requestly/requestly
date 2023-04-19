@@ -8,24 +8,19 @@ import Header from "./Header";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
-import CreateSharedListModal from "../../../../components/features/sharedLists/CreateSharedListModal";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { AUTH } from "modules/analytics/events/common/constants";
 import { StorageService } from "../../../../init";
 import {
   cleanup,
   getModeData,
-  getSelectedRules,
   setCurrentlySelectedRule,
   initiateBlankCurrentlySelectedRule,
   setCurrentlySelectedRuleConfig,
 } from "./actions";
-import { fetchSharedLists } from "../../../../components/features/sharedLists/SharedListsIndexPage/actions";
 import {
   getAppMode,
   getAllRules,
-  getUserAuthDetails,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
@@ -39,12 +34,12 @@ import {
   trackDesktopRuleViewedOnExtension,
   trackDocsSidebarViewed,
 } from "modules/analytics/events/common/rules";
-import { isDesktopOnlyRule } from "utils/rules/misc";
+import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
-import "./RuleBuilder.css";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import "./RuleBuilder.css";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -63,7 +58,6 @@ const RuleBuilder = (props) => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
 
   // TODO: use feature flag
   const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
@@ -84,10 +78,8 @@ const RuleBuilder = (props) => {
   const ruleSelection = {};
   ruleSelection[currentlySelectedRuleData.id] = true;
 
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
-  const [selectedRules, setSelectedRules] = useState(getSelectedRules(ruleSelection));
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs, setShowDocs] = useState(true);
   const isDocsVisible = useMemo(() => {
@@ -120,47 +112,7 @@ const RuleBuilder = (props) => {
   const toggleChangeRuleGroupModal = () => {
     setIsChangeRuleGroupModalActive(isChangeRuleGroupModalActive ? false : true);
   };
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
-  };
 
-  const shareRuleClickHandler = () => {
-    if (user.loggedIn) {
-      verifySharedListsLimit();
-    } else {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: AUTH.SOURCE.SHARE_RULES,
-        })
-      );
-    }
-  };
-
-  const verifySharedListsLimit = () => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "loadingModal",
-        newValue: true,
-      })
-    );
-
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Create new shared list
-      setSelectedRules(getSelectedRules(ruleSelection));
-      setIsShareRulesModalActive(true);
-
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
-  };
   const stableSetCurrentlySelectedRuleConfig = useCallback(setCurrentlySelectedRuleConfig, [
     setCurrentlySelectedRuleConfig,
   ]);
@@ -170,16 +122,6 @@ const RuleBuilder = (props) => {
   const stableInitiateBlankCurrentlySelectedRule = useCallback(initiateBlankCurrentlySelectedRule, [
     currentlySelectedRuleConfig,
   ]);
-
-  const getRuleConfigInEditMode = (rule) => {
-    if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
-      if (!rule.version) {
-        return RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS_V1];
-      }
-    }
-
-    return RULE_TYPES_CONFIG[rule.ruleType];
-  };
 
   useEffect(() => {
     if (
@@ -345,7 +287,6 @@ const RuleBuilder = (props) => {
         <Header
           mode={MODE}
           location={props.location}
-          shareBtnClickHandler={shareRuleClickHandler}
           currentlySelectedRuleData={currentlySelectedRuleData}
           currentlySelectedRuleConfig={currentlySelectedRuleConfig}
         />
@@ -385,13 +326,6 @@ const RuleBuilder = (props) => {
           isOpen={isChangeRuleGroupModalActive}
           toggle={toggleChangeRuleGroupModal}
           mode="CURRENT_RULE"
-        />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={selectedRules}
         />
       ) : null}
     </>

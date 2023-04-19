@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
-import {
-  getUserAuthDetails,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-} from "store/selectors";
+import { getUserAuthDetails, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import ExportRulesModal from "components/features/rules/ExportRulesModal";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
@@ -12,13 +9,11 @@ import { getModeData } from "../../../actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 
-const ExportButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
+const ExportButton = ({ rule, isDisabled, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
-    getIsCurrentlySelectedRuleHasUnsavedChanges
-  );
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const [isExportRuleModalActive, setIsExportRuleModalActive] = useState(false);
   const { id, ruleType } = rule;
 
@@ -32,10 +27,14 @@ const ExportButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
       return;
     }
 
-    trackRuleEditorHeaderClicked("export_button", ruleType, MODE);
+    trackRuleEditorHeaderClicked(
+      "export_button",
+      ruleType,
+      MODE,
+      isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
+    );
     if (user.loggedIn) {
       setIsExportRuleModalActive(true);
-      handleRuleOptionsDropdownClose?.();
       return;
     }
 
@@ -62,11 +61,7 @@ const ExportButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
       </Button>
 
       {isExportRuleModalActive ? (
-        <ExportRulesModal
-          isOpen={isExportRuleModalActive}
-          toggle={toggleExportRuleModal}
-          rulesToExport={[id]}
-        />
+        <ExportRulesModal isOpen={isExportRuleModalActive} toggle={toggleExportRuleModal} rulesToExport={[id]} />
       ) : null}
     </>
   );

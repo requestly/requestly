@@ -15,14 +15,11 @@ const ActionButtons = (props) => {
   const rule = useSelector(getCurrentlySelectedRuleData);
 
   const isDisabled =
-    rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
-    !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
+    rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST && !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
 
   return (
     <div className="rule-editor-header-action-btns">
-      {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? (
-        <ShareRuleButton handleShareRuleClick={props.shareBtnClickHandler} />
-      ) : null}
+      {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? <ShareRuleButton /> : null}
 
       <CreateRuleButton isDisabled={isDisabled} location={props.location} />
     </div>
