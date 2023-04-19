@@ -30,12 +30,7 @@ export const getAttrFromFirebase = async (attrName) => {
   return new Promise((resolve, reject) => {
     DataStoreUtils.isUserAuthenticated(async (userData) => {
       if (userData && userData.uid) {
-        const currentDateInDB = await DataStoreUtils.getValue([
-          "customProfile",
-          userData.uid,
-          "attributes",
-          attrName,
-        ]);
+        const currentDateInDB = await DataStoreUtils.getValue(["customProfile", userData.uid, "attributes", attrName]);
         resolve(currentDateInDB);
         return currentDateInDB;
       } else {

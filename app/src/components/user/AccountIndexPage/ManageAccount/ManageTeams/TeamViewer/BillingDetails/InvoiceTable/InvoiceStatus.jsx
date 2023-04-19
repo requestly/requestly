@@ -16,15 +16,8 @@ const InvoiceStatus = ({ type = "paid", label = "" }) => {
 
   return (
     <span className="invoice-status-data">
-      <img
-        alt={label}
-        className="invoice-status-icon"
-        src={`/assets/img/workspaces/${invoiceTypeIcon[type]}`}
-      />
-      <span
-        className="invoice-status-label"
-        style={{ color: invoicesStatusColor[type] }}
-      >
+      <img alt={label} className="invoice-status-icon" src={`/assets/img/workspaces/${invoiceTypeIcon[type]}`} />
+      <span className="invoice-status-label" style={{ color: invoicesStatusColor[type] }}>
         {label}
       </span>
     </span>

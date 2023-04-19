@@ -18,11 +18,7 @@ const columns = [
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
       return (
         <>
-          <Avatar
-            size="small"
-            src={avatarUrl}
-            style={{ display: "inline-block" }}
-          />
+          <Avatar size="small" src={avatarUrl} style={{ display: "inline-block" }} />
           <span> {text}</span>
         </>
       );
@@ -37,10 +33,7 @@ const NestedTable = ({ appName, appLogs, handleRowClick }) => {
         height: `${Math.min(ITEM_SIZE * (appLogs[appName].length + 1), 400)}px`,
       }}
     >
-      <GroupByNone
-        requestsLog={appLogs[appName]}
-        handleRowClick={handleRowClick}
-      />
+      <GroupByNone requestsLog={appLogs[appName]} handleRowClick={handleRowClick} />
     </div>
   );
 };
@@ -65,13 +58,7 @@ const GroupByApp = ({ appList, appLogs, handleRowClick }) => {
       scroll={{ y: 600 }}
       expandable={{
         expandedRowRender: (record) => {
-          return (
-            <NestedTable
-              appName={record.appName}
-              appLogs={appLogs}
-              handleRowClick={handleRowClick}
-            />
-          );
+          return <NestedTable appName={record.appName} appLogs={appLogs} handleRowClick={handleRowClick} />;
         },
         expandRowByClick: true,
       }}

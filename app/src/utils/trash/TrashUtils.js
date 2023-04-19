@@ -17,8 +17,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // Adds single record to trash
 export const addRecordToTrash = async (uid, record) => {
   try {
-    record.groupId =
-      APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+    record.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
     record.status = GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE;
     const database = getFirestore();
     const ruleRef = doc(collection(database, `trash/${uid}/rules`), record.id);
@@ -47,14 +46,10 @@ export const addRecordsToTrash = async (uid, records) => {
     records.forEach(async (recordData) => {
       const record = { ...recordData };
       record.deletedDate = deletedDate;
-      record.groupId =
-        APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+      record.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
       record.status = GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE;
 
-      const recordRef = doc(
-        collection(database, `trash/${uid}/rules`),
-        record.id
-      );
+      const recordRef = doc(collection(database, `trash/${uid}/rules`), record.id);
 
       batch.set(recordRef, record);
     });
@@ -81,11 +76,7 @@ const isRuleInTrashDisabled = (rule, limit) => {
 
 const filterTotalRules = (rules) => {
   const filteredRules = rules.filter(
-    (rule) =>
-      !isRuleInTrashDisabled(
-        rule,
-        APP_CONSTANTS.TRASH_DURATION_OF_DELETED_RULES_TO_SHOW
-      )
+    (rule) => !isRuleInTrashDisabled(rule, APP_CONSTANTS.TRASH_DURATION_OF_DELETED_RULES_TO_SHOW)
   );
 
   return filteredRules;
@@ -135,10 +126,7 @@ export const deleteRecordsFromTrash = async (uid, records) => {
     const batch = writeBatch(database);
 
     recordIds.forEach((recordId) => {
-      const recordRef = doc(
-        collection(database, `trash/${uid}/rules`),
-        recordId
-      );
+      const recordRef = doc(collection(database, `trash/${uid}/rules`), recordId);
       batch.delete(recordRef);
     });
 

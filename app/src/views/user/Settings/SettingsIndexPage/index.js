@@ -41,9 +41,7 @@ const SettingsIndexPage = () => {
           )
         } */}
         <Col span={24} className="settings-container">
-          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
-            <DesktopPreference appMode={appMode} />
-          )}
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && <DesktopPreference appMode={appMode} />}
 
           <GlobalSettings appMode={appMode} />
         </Col>

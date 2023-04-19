@@ -3,16 +3,9 @@ import { Button, Form, FormGroup, Input, InputGroup } from "reactstrap";
 import { getFunctions, httpsCallable } from "firebase/functions";
 //ICONS
 import { FaSpinner } from "react-icons/fa";
-import {
-  trackCouponAppliedFailure,
-  trackCouponAppliedSuccess,
-} from "modules/analytics/events/misc/coupon";
+import { trackCouponAppliedFailure, trackCouponAppliedSuccess } from "modules/analytics/events/misc/coupon";
 
-const ApplyCouponBox = ({
-  setCouponDiscountValue,
-  couponCodeText,
-  setCouponCodeText,
-}) => {
+const ApplyCouponBox = ({ setCouponDiscountValue, couponCodeText, setCouponCodeText }) => {
   //Component State
   const [isApplied, setIsApplied] = useState(false);
   const [descriptionMessage, setDescriptionMessage] = useState("");
@@ -78,10 +71,7 @@ const ApplyCouponBox = ({
         <InputGroup style={{ width: "300px" }}>
           <Input
             placeholder="Enter Coupon"
-            className={[
-              isErrorMode ? "is-invalid" : "",
-              isSuccessMode ? "is-valid" : "",
-            ].join(" ")}
+            className={[isErrorMode ? "is-invalid" : "", isSuccessMode ? "is-valid" : ""].join(" ")}
             value={couponCodeText}
             disabled={isApplied || isBeingApplied}
             onChange={handleCouponBoxOnChange}
@@ -100,13 +90,9 @@ const ApplyCouponBox = ({
             </Button>
           )}
         </InputGroup>
-        {isErrorMode ? (
-          <p className="help is-danger">{descriptionMessage}</p>
-        ) : null}
+        {isErrorMode ? <p className="help is-danger">{descriptionMessage}</p> : null}
 
-        {isSuccessMode ? (
-          <p className="help is-success">{descriptionMessage}</p>
-        ) : null}
+        {isSuccessMode ? <p className="help is-success">{descriptionMessage}</p> : null}
       </FormGroup>
     </Form>
   );

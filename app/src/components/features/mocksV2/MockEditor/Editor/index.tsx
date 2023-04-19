@@ -9,32 +9,17 @@ import CodeEditor from "components/misc/CodeEditor";
 import CopyButton from "components/misc/CopyButton";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
-import React, {
-  ReactNode,
-  useState,
-  useMemo,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BsStars } from "react-icons/bs"
+import { BsStars } from "react-icons/bs";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType } from "../../types";
 import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
-import {
-  MockEditorDataSchema,
-  RequestMethod,
-  ValidationErrors,
-} from "../types";
-import {
-  getEditorLanguage,
-  validateEndpoint,
-  validateStatusCode,
-} from "../utils";
+import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
+import { getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -77,9 +62,7 @@ const MockEditor: React.FC<Props> = ({
   const [statusCode, setStatusCode] = useState<number>(mockData.statusCode);
   const [contentType, setContentType] = useState<string>(mockData.contentType);
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
-  const [headersString, setHeadersString] = useState<string>(
-    JSON.stringify(mockData.headers)
-  );
+  const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
@@ -140,13 +123,9 @@ const MockEditor: React.FC<Props> = ({
     let focusedInvalidFieldRef = null;
 
     if (!data.name) {
-      updatedErrors.name = `${
-        mockType === MockType.FILE ? "File" : "Mock"
-      } name is required`;
+      updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
     }
-    const statusCodeValidationError = validateStatusCode(
-      data.statusCode.toString()
-    );
+    const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
     if (statusCodeValidationError) {
       updatedErrors.statusCode = statusCodeValidationError;
       if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
@@ -249,9 +228,7 @@ const MockEditor: React.FC<Props> = ({
           status={errors.statusCode ? "error" : ""}
           placeholder="Response Code"
         />
-        <span className="field-error-prompt">
-          {errors.statusCode ? errors.statusCode : null}
-        </span>
+        <span className="field-error-prompt">{errors.statusCode ? errors.statusCode : null}</span>
       </Col>
     );
   };
@@ -279,12 +256,7 @@ const MockEditor: React.FC<Props> = ({
 
   const renderEndpoint = () => {
     return (
-      <Col
-        span={24}
-        className={`meta-data-option ${
-          mockType === MockType.API && "addon-option"
-        }`}
-      >
+      <Col span={24} className={`meta-data-option ${mockType === MockType.API && "addon-option"}`}>
         <label htmlFor="endpoint" className="meta-data-option-label">
           Endpoint
         </label>
@@ -292,11 +264,7 @@ const MockEditor: React.FC<Props> = ({
           ref={endpointRef}
           required
           id="endpoint"
-          addonBefore={
-            username
-              ? `https://${username}.requestly.dev/`
-              : "https://requestly.dev/"
-          }
+          addonBefore={username ? `https://${username}.requestly.dev/` : "https://requestly.dev/"}
           type="text"
           value={endpoint}
           name="path"
@@ -304,9 +272,7 @@ const MockEditor: React.FC<Props> = ({
           status={errors.endpoint ? "error" : ""}
           placeholder={errors.endpoint ? errors.endpoint : "Enter endpoint"}
         />
-        <span className="field-error-prompt">
-          {errors.endpoint ? errors.endpoint : null}
-        </span>
+        <span className="field-error-prompt">{errors.endpoint ? errors.endpoint : null}</span>
       </Col>
     );
   };
@@ -320,23 +286,10 @@ const MockEditor: React.FC<Props> = ({
         <Input
           id="url"
           addonAfter={
-            <CopyButton
-              title=""
-              copyText={generateFinalUrl(
-                endpoint,
-                user?.details?.profile?.uid,
-                username,
-                teamId
-              )}
-            />
+            <CopyButton title="" copyText={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)} />
           }
           type="text"
-          value={generateFinalUrl(
-            endpoint,
-            user?.details?.profile?.uid,
-            username,
-            teamId
-          )}
+          value={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)}
           name="url"
           disabled={true}
         />
@@ -431,13 +384,19 @@ const MockEditor: React.FC<Props> = ({
             defaultActiveKey="1"
             items={editors}
             tabBarExtraContent={
-              isAiResponseActive ?
-              (<Button className="generate-ai-response-button" type="primary" onClick={() => {
-                  trackAiResponseButtonClicked();
-                  setIsAiResponseModalOpen(true)
-                }}>
-                <BsStars />&nbsp;AI Response
-              </Button>): null
+              isAiResponseActive ? (
+                <Button
+                  className="generate-ai-response-button"
+                  type="primary"
+                  onClick={() => {
+                    trackAiResponseButtonClicked();
+                    setIsAiResponseModalOpen(true);
+                  }}
+                >
+                  <BsStars />
+                  &nbsp;AI Response
+                </Button>
+              ) : null
             }
           />
         </>
@@ -467,19 +426,16 @@ const MockEditor: React.FC<Props> = ({
         errors={errors}
       />
       <Row className="mock-editor-container">
-        <Col
-          span={22}
-          offset={1}
-          md={{ offset: 2, span: 20 }}
-          lg={{ offset: 4, span: 16 }}
-        >
+        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
             <AIResponseModal
               isOpen={isAiResponseModalOpen}
               toggleOpen={(open) => setIsAiResponseModalOpen(open)}
-              handleAiResponseUsed={(responseText) => { setBody(responseText) }}
+              handleAiResponseUsed={(responseText) => {
+                setBody(responseText);
+              }}
             />
           </Row>
         </Col>

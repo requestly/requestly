@@ -21,10 +21,7 @@ const GlobalSettings = ({ appMode }) => {
     }
   }, [appMode, setStorageType]);
 
-  const isCompatible = useMemo(
-    () => isFeatureCompatible(APP_CONSTANTS.FEATURES.EXTENSION_CONSOLE_LOGGER),
-    []
-  );
+  const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.EXTENSION_CONSOLE_LOGGER), []);
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !storageType) {
     return (

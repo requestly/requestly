@@ -6,15 +6,10 @@ import APP_CONSTANTS from "../../../../../../config/constants";
 
 const { PATHS } = APP_CONSTANTS;
 
-const EmailVerificationBanner = ({
-  resendVerificationEmailHandler,
-  currentPath,
-}) => {
+const EmailVerificationBanner = ({ resendVerificationEmailHandler, currentPath }) => {
   return (
     <TopBanner
-      content={() => (
-        <strong>Please check your email for the verification link</strong>
-      )}
+      content={() => <strong>Please check your email for the verification link</strong>}
       ctaText="Resend Email Verification link"
       ctaIcon={() => <i className="ni ni-send" />}
       bannerIcon={() => <i className="fas fa-exclamation-circle" />}

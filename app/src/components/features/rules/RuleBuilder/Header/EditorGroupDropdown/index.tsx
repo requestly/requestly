@@ -9,20 +9,14 @@ import {
   getIsRefreshRulesPending,
   getUserAuthDetails,
 } from "store/selectors";
-import {
-  createNewGroup,
-  updateGroupOfSelectedRules,
-} from "components/features/rules/ChangeRuleGroupModal/actions";
+import { createNewGroup, updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { actions } from "store";
 import { StorageService } from "init";
 import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  trackGroupChangedEvent,
-  trackGroupCreatedEvent,
-} from "modules/analytics/events/common/groups";
+import { trackGroupChangedEvent, trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
 import { Group } from "types/rules";
 import "./EditorGroupDropdown.css";
 import Logger from "lib/logger";
@@ -59,20 +53,14 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   useEffect(() => {
     if (!showDropdown) return;
 
-    const selectedGroup = groupList.filter(
-      (group: Group) => group.id === currentGroupId
-    );
+    const selectedGroup = groupList.filter((group: Group) => group.id === currentGroupId);
 
-    const remainingGroups = groupList.filter(
-      (group: Group) => group.id !== currentGroupId
-    );
+    const remainingGroups = groupList.filter((group: Group) => group.id !== currentGroupId);
 
     setModifiedGroups(selectedGroup.concat(remainingGroups));
   }, [groupList, currentGroupId, showDropdown]);
 
-  const handleGroupInputNameChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleGroupInputNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewGroupName(e.target.value);
   };
 
@@ -106,12 +94,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const handleGroupChange = (groupId: string) => {
     dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
-    updateGroupOfSelectedRules(
-      appMode,
-      { [rule.id]: true },
-      groupId,
-      user
-    ).then(() => {
+    updateGroupOfSelectedRules(appMode, { [rule.id]: true }, groupId, user).then(() => {
       dispatch(
         actions.updateRefreshPendingStatus({
           type: "rules",
@@ -126,11 +109,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   };
 
   const dropdownOverlay = (
-    <Menu
-      className={`editor-group-dropdown-menu ${
-        showInput ? "show-group-input" : ""
-      }`}
-    >
+    <Menu className={`editor-group-dropdown-menu ${showInput ? "show-group-input" : ""}`}>
       <div>
         {showInput && (
           <div className="editor-group-dropdown-input-container">
@@ -207,16 +186,9 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
           <Divider className="editor-group-menu-divider" />
           <Menu.Item
             danger
-            disabled={
-              currentGroupId ===
-              APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-            }
+            disabled={currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID}
             key="remove from group"
-            onClick={() =>
-              handleGroupChange(
-                APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-              )
-            }
+            onClick={() => handleGroupChange(APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID)}
             className="editor-group-menu-item"
           >
             Remove from group
@@ -224,9 +196,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         </>
       )}
 
-      {!showInput && groupList.length === 0 && (
-        <p className="editor-group-empty-message">No groups available</p>
-      )}
+      {!showInput && groupList.length === 0 && <p className="editor-group-empty-message">No groups available</p>}
     </Menu>
   );
 
@@ -240,21 +210,13 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         overlay={dropdownOverlay}
         disabled={mode === RULE_EDITOR_CONFIG.MODES.CREATE}
         onOpenChange={handleDropdownVisibleChange}
-        className={`editor-group-dropdown-trigger ${
-          showDropdown ? "editor-group-dropdown-active" : ""
-        }`}
+        className={`editor-group-dropdown-trigger ${showDropdown ? "editor-group-dropdown-active" : ""}`}
       >
         <span className="text-gray">
-          {currentGroupId ===
-          APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+          {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
             ? "Add to group"
             : "Edit group"}
-          <img
-            width={10}
-            height={6}
-            alt="down arrow"
-            src="/assets/icons/downArrow.svg"
-          />
+          <img width={10} height={6} alt="down arrow" src="/assets/icons/downArrow.svg" />
         </span>
       </Dropdown>
     </div>

@@ -1,16 +1,8 @@
 import { Group, Rule, RuleType, ObjectType, Status } from "./types";
-import {
-  ChangeType,
-  getAllRecords,
-  getRecord,
-  onRecordChange,
-} from "./storage";
+import { ChangeType, getAllRecords, getRecord, onRecordChange } from "./storage";
 
 const isRule = (record: unknown): boolean => {
-  return (
-    !!(record as Rule).ruleType ||
-    (record as Rule).objectType === ObjectType.RULE
-  );
+  return !!(record as Rule).ruleType || (record as Rule).objectType === ObjectType.RULE;
 };
 
 const isGroup = (record: unknown): boolean => {
@@ -64,29 +56,21 @@ export const onRuleOrGroupChange = (listener: () => void): void => {
       valueFilter: isRule,
     },
     (ruleChanges) => {
-      const shouldTriggerRuleChange = ruleChanges.some(
-        ({ changeType, oldValue, newValue }) => {
-          if (
-            changeType === ChangeType.CREATED &&
-            newValue.status === Status.ACTIVE
-          ) {
-            return true;
-          }
-
-          if (
-            changeType === ChangeType.DELETED &&
-            oldValue.status === Status.ACTIVE
-          ) {
-            return true;
-          }
-
-          if (changeType === ChangeType.MODIFIED) {
-            return true;
-          }
-
-          return false;
+      const shouldTriggerRuleChange = ruleChanges.some(({ changeType, oldValue, newValue }) => {
+        if (changeType === ChangeType.CREATED && newValue.status === Status.ACTIVE) {
+          return true;
         }
-      );
+
+        if (changeType === ChangeType.DELETED && oldValue.status === Status.ACTIVE) {
+          return true;
+        }
+
+        if (changeType === ChangeType.MODIFIED) {
+          return true;
+        }
+
+        return false;
+      });
 
       if (shouldTriggerRuleChange) {
         listener();
@@ -100,11 +84,9 @@ export const onRuleOrGroupChange = (listener: () => void): void => {
       changeTypes: [ChangeType.MODIFIED], // for newly created or deleted group, there will already be a groupId change in rule
     },
     (groupChanges) => {
-      const shouldTriggerGroupChange = groupChanges.some(
-        ({ oldValue, newValue }) => {
-          return oldValue.status !== newValue.status;
-        }
-      );
+      const shouldTriggerGroupChange = groupChanges.some(({ oldValue, newValue }) => {
+        return oldValue.status !== newValue.status;
+      });
 
       if (shouldTriggerGroupChange) {
         listener();

@@ -23,42 +23,22 @@ const DeleteWorkspaceModal: React.FC<DeleteWorkspaceModalProps> = ({
     <RQModal centered open={isOpen} onCancel={handleModalClose}>
       <div className="rq-modal-content">
         <div>
-          <img
-            alt="smile"
-            width="37px"
-            height="37px"
-            src="/assets/img/workspaces/oops.svg"
-          />
+          <img alt="smile" width="37px" height="37px" src="/assets/img/workspaces/oops.svg" />
         </div>
-        <div className="header delete-team-modal-header">
-          Are you sure you want to delete this workspace?
-        </div>
+        <div className="header delete-team-modal-header">Are you sure you want to delete this workspace?</div>
         <p className="text-gray">
-          This will{" "}
-          <span className="text-white delete-team-permanently-highlight">
-            permanently
-          </span>{" "}
-          delete the workspace <span className="text-white">{name}</span> and
-          all the associated data, such as rules, session recordings and etc for
-          all users.
+          This will <span className="text-white delete-team-permanently-highlight">permanently</span> delete the
+          workspace <span className="text-white">{name}</span> and all the associated data, such as rules, session
+          recordings and etc for all users.
         </p>
 
         <label className="text-sm delete-team-input-label">
           Please type <span className="text-bold">{name}</span> to confirm
         </label>
-        <Input
-          value={teamName}
-          onChange={(e) => setTeamName(e.target.value)}
-          className="delete-team-input"
-        />
+        <Input value={teamName} onChange={(e) => setTeamName(e.target.value)} className="delete-team-input" />
       </div>
 
-      <Row
-        align="middle"
-        wrap={false}
-        justify="space-between"
-        className="rq-modal-footer"
-      >
+      <Row align="middle" wrap={false} justify="space-between" className="rq-modal-footer">
         <Col className="ml-auto">
           <Button onClick={handleModalClose} className="delete-team-cancel-btn">
             Cancel

@@ -21,10 +21,7 @@ class RuleMatcher {
       matchValue = matchValue || "";
 
       // Replace all $index values in destinationUrl with the matched groups
-      finalString = finalString.replace(
-        new RegExp("[$]" + index, "g"),
-        matchValue
-      );
+      finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
 
     return finalString;
@@ -111,12 +108,7 @@ class RuleMatcher {
       }
     }
 
-    return RuleMatcher.matchUrlCriteria(
-      urlComponent,
-      operator,
-      value,
-      destination
-    );
+    return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
   }
 
   // Destination Url is not present in all rule types (e.g. Cancel, QueryParam)
@@ -143,11 +135,7 @@ class RuleMatcher {
       }
 
       case CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES: {
-        return RuleMatcher.checkWildCardMatch(
-          value,
-          urlComponent,
-          resultingUrl
-        );
+        return RuleMatcher.checkWildCardMatch(value, urlComponent, resultingUrl);
       }
     }
 
@@ -162,21 +150,11 @@ class RuleMatcher {
    */
   static matchUrlWithRulePair(pair, url, requestDetails) {
     // We pass destination as null in Cancel ruleType
-    let destination =
-      typeof pair.destination !== "undefined" ? pair.destination : null;
+    let destination = typeof pair.destination !== "undefined" ? pair.destination : null;
     let newResultingUrl = null;
 
-    if (
-      RuleMatcher.matchRequestWithRuleSourceFilters(
-        pair.source.filters,
-        requestDetails
-      )
-    ) {
-      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(
-        pair.source,
-        url,
-        destination
-      );
+    if (RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, requestDetails)) {
+      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(pair.source, url, destination);
     }
 
     return newResultingUrl;
@@ -195,11 +173,7 @@ class RuleMatcher {
       newResultingUrl = null;
 
     for (pairIndex = 0; pairIndex < pairs.length; pairIndex++) {
-      newResultingUrl = this.matchUrlWithRulePair(
-        pairs[pairIndex],
-        resultingUrl,
-        requestDetails
-      );
+      newResultingUrl = this.matchUrlWithRulePair(pairs[pairIndex], resultingUrl, requestDetails);
       if (newResultingUrl !== null) {
         resultingUrl = newResultingUrl;
       }
@@ -222,8 +196,7 @@ class RuleMatcher {
         let filterValues = sourceObject[filter] || [];
 
         // RQLY-61 Handle pageUrl value is object instead of array So wrap inside array
-        if (filterValues?.constructor?.name === "Object")
-          filterValues = [filterValues];
+        if (filterValues?.constructor?.name === "Object") filterValues = [filterValues];
 
         switch (filter) {
           case CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL:
@@ -237,22 +210,13 @@ class RuleMatcher {
             break;
 
           case CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD:
-            if (
-              !filterValues.some(
-                (requestMethodFilter) =>
-                  requestDetails.method === requestMethodFilter
-              )
-            ) {
+            if (!filterValues.some((requestMethodFilter) => requestDetails.method === requestMethodFilter)) {
               return false;
             }
             break;
 
           case CONSTANTS.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE:
-            if (
-              !filterValues.some(
-                (requestTypeFilter) => requestDetails.type === requestTypeFilter
-              )
-            ) {
+            if (!filterValues.some((requestTypeFilter) => requestDetails.type === requestTypeFilter)) {
               return false;
             }
             break;
@@ -262,10 +226,7 @@ class RuleMatcher {
               // although currently only accepts one entry from UI
               // but this is to be compatible with changes made to accept array of filter values
               !filterValues.some((filterValue) =>
-                this.isRequestPayloadFilterApplicable(
-                  requestDetails.requestData,
-                  filterValue
-                )
+                this.isRequestPayloadFilterApplicable(requestDetails.requestData, filterValue)
               )
             ) {
               return false;
@@ -293,13 +254,7 @@ class RuleMatcher {
       pageUrlFilter = [pageUrlFilter];
     }
     return pageUrlFilter.every((urlFilter) => {
-      return (
-        RuleMatcher.matchUrlCriteria(
-          pageUrl,
-          urlFilter.operator,
-          urlFilter.value
-        ) !== null
-      );
+      return RuleMatcher.matchUrlCriteria(pageUrl, urlFilter.operator, urlFilter.value) !== null;
     });
   }
 
@@ -319,28 +274,20 @@ class RuleMatcher {
       }
 
       let argumentPattern;
-      if (
-        preDefFunc.argument.constructor === Array &&
-        preDefFunc.argument.length > 0
-      ) {
+      if (preDefFunc.argument.constructor === Array && preDefFunc.argument.length > 0) {
         // multiple arguments
         argumentPattern = preDefFunc.argument[0];
         for (var index = 1; index < preDefFunc.argument.length; index++) {
-          argumentPattern +=
-            "(" + PATTERNS.COMMA + preDefFunc.argument[index] + ")?";
+          argumentPattern += "(" + PATTERNS.COMMA + preDefFunc.argument[index] + ")?";
         }
       } else {
         argumentPattern = preDefFunc.argument;
       }
 
-      const pattern =
-        preDefFunc.pattern ||
-        new RegExp(preDefFunc.name + "\\(" + argumentPattern + "\\)", "ig");
+      const pattern = preDefFunc.pattern || new RegExp(preDefFunc.name + "\\(" + argumentPattern + "\\)", "ig");
 
       value = value.replace(pattern, function (token) {
-        var matches = token.match(
-            new RegExp(preDefFunc.name + "\\((.*)\\)", "i")
-          ), // extract argument from rq_func(argument)
+        var matches = token.match(new RegExp(preDefFunc.name + "\\((.*)\\)", "i")), // extract argument from rq_func(argument)
           args = [];
 
         if (matches != null && matches.length > 1) {
@@ -392,10 +339,7 @@ class RuleMatcher {
   static modifyHeaderIfExists(headers, newHeader) {
     for (var i = headers.length - 1; i >= 0; i--) {
       var header = headers[i];
-      if (
-        header.name &&
-        header.name.toLowerCase() === newHeader.name.toLowerCase()
-      ) {
+      if (header.name && header.name.toLowerCase() === newHeader.name.toLowerCase()) {
         header.value = newHeader.value;
         break;
       }
@@ -409,11 +353,7 @@ class RuleMatcher {
   // Copied from browser-extension - responseRuleHandler.js
   static isRequestPayloadFilterApplicable(requestData, requestPayloadFilter) {
     if (!requestPayloadFilter) return true;
-    if (
-      typeof requestPayloadFilter === "object" &&
-      Object.keys(requestPayloadFilter).length === 0
-    )
-      return true;
+    if (typeof requestPayloadFilter === "object" && Object.keys(requestPayloadFilter).length === 0) return true;
 
     // We only allow request payload targeting when requestData is JSON
     if (!requestData || typeof requestData !== "object") return false;

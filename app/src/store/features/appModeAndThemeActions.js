@@ -1,7 +1,5 @@
 export const updateAppMode = (prevState, action) => {
-  prevState.appMode = action.payload.appMode
-    ? action.payload.appMode
-    : prevState.appMode;
+  prevState.appMode = action.payload.appMode ? action.payload.appMode : prevState.appMode;
 };
 
 export const updateAppTheme = (prevState, action) => {

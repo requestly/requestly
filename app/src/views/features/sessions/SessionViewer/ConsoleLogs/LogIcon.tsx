@@ -1,20 +1,11 @@
 import React, { CSSProperties } from "react";
 import { LogLevel } from "rrweb";
 
-const LogIcon: React.FC<{ level: LogLevel; style?: CSSProperties }> = ({
-  level,
-  style,
-}) => {
+const LogIcon: React.FC<{ level: LogLevel; style?: CSSProperties }> = ({ level, style }) => {
   switch (level) {
     case "info":
       return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="12"
-          width="12"
-          viewBox="0 0 18 18"
-          style={style}
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 18 18" style={style}>
           <path
             fill="#157af3"
             d="M9,1a8,8,0,1,0,8,8A8,8,0,0,0,9,1ZM8.85,3.15a1.359,1.359,0,0,1,1.43109,1.28286q.00352.06452.00091.12914A1.332,1.332,0,0,1,8.85,5.9935a1.3525,1.3525,0,0,1-1.432-1.432A1.3585,1.3585,0,0,1,8.72033,3.14907Q8.78516,3.14643,8.85,3.15ZM11,13.5a.5.5,0,0,1-.5.5h-3a.5.5,0,0,1-.5-.5v-1a.5.5,0,0,1,.5-.5H8V9H7.5A.5.5,0,0,1,7,8.5v-1A.5.5,0,0,1,7.5,7h2a.5.5,0,0,1,.5.5V12h.5a.5.5,0,0,1,.5.5Z"
@@ -23,13 +14,7 @@ const LogIcon: React.FC<{ level: LogLevel; style?: CSSProperties }> = ({
       );
     case "warn":
       return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="12"
-          width="12"
-          viewBox="0 0 18 18"
-          style={style}
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 18 18" style={style}>
           <path
             fill="#d3a403"
             d="M8.5635,1.2895.2,16.256A.5.5,0,0,0,.636,17H17.364a.5.5,0,0,0,.436-.744L9.4365,1.2895a.5.5,0,0,0-.873,0ZM10,14.75a.25.25,0,0,1-.25.25H8.25A.25.25,0,0,1,8,14.75v-1.5A.25.25,0,0,1,8.25,13h1.5a.25.25,0,0,1,.25.25Zm0-3a.25.25,0,0,1-.25.25H8.25A.25.25,0,0,1,8,11.75v-6a.25.25,0,0,1,.25-.25h1.5a.25.25,0,0,1,.25.25Z"
@@ -38,13 +23,7 @@ const LogIcon: React.FC<{ level: LogLevel; style?: CSSProperties }> = ({
       );
     case "error":
       return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="12"
-          width="12"
-          viewBox="0 0 18 18"
-          style={style}
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 18 18" style={style}>
           <path
             fill="#ec3840"
             d="M14.657,3.343a8,8,0,1,0-.00021,11.31371l.00021-.00021A8,8,0,0,0,14.657,3.343Zm-1.3435,9.265-.707.7055a.6.6,0,0,1-.84853.00147l-.00147-.00147L9,10.5555l-2.758,2.758a.6.6,0,0,1-.84853.00147L5.392,13.3135l-.7045-.7075a.6.6,0,0,1-.00147-.84853L4.6875,11.756,7.4445,9,4.6875,6.242A.6.6,0,0,1,4.686,5.39347L4.6875,5.392l.707-.707A.6.6,0,0,1,6.243,4.68353L6.2445,4.685,9,7.444l2.758-2.7575a.6.6,0,0,1,.84853-.00147l.00147.00147.707.707a.6.6,0,0,1,.00147.84853L13.315,6.2435,10.5555,9l2.758,2.758a.6.6,0,0,1,.00147.84853Z"

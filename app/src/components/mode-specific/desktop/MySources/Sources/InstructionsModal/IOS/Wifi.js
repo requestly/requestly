@@ -26,9 +26,7 @@ const WifiInstructions = ({ device_id }) => {
                   <>
                     Navigate to:{" "}
                     <b>
-                      <code>
-                        {`Settings -> Wi-Fi -> Select current Wi-Fi -> Configure Proxy`}
-                      </code>
+                      <code>{`Settings -> Wi-Fi -> Select current Wi-Fi -> Configure Proxy`}</code>
                     </b>
                   </>
                 }

@@ -12,9 +12,7 @@ const CODE_LANGUAGES = {
 };
 
 const AndroidIntegration = ({ sdkKey }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    CODE_LANGUAGES.KOTLIN
-  );
+  const [selectedLanguage, setSelectedLanguage] = useState(CODE_LANGUAGES.KOTLIN);
 
   const renderGradleDependencyStep = () => {
     return (
@@ -84,13 +82,11 @@ OkHttpClient client = new OkHttpClient.Builder().addInterceptor(rqInterceptor).b
           </Col>
         </Row>
         <p>
-          1. Initialize Requestly in your <Text code>Application</Text> Class{" "}
-          <Text code>onCreate</Text> method
+          1. Initialize Requestly in your <Text code>Application</Text> Class <Text code>onCreate</Text> method
         </p>
         <CodeHelper code={initStep} />
         <p>
-          2. Add the Requestly Interceptor to your{" "}
-          <Text code>okhttp/Retrofit</Text> Client
+          2. Add the Requestly Interceptor to your <Text code>okhttp/Retrofit</Text> Client
         </p>
         <CodeHelper code={okhttpStep} />
       </>

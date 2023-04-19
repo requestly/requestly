@@ -15,10 +15,7 @@ interface SettingsHeaderProps {
   };
 }
 
-const SettingsHeader: React.FC<SettingsHeaderProps> = ({
-  handleUpdateClick,
-  confirmationOptions,
-}) => {
+const SettingsHeader: React.FC<SettingsHeaderProps> = ({ handleUpdateClick, confirmationOptions }) => {
   const navigate = useNavigate();
 
   const handleCancelClick = () => navigate("/");
@@ -33,11 +30,7 @@ const SettingsHeader: React.FC<SettingsHeaderProps> = ({
               title={confirmationOptions.message}
               onConfirm={handleUpdateClick}
               onCancel={confirmationOptions.handleConfirmDeny}
-              okText={
-                confirmationOptions.confirmCTAText
-                  ? confirmationOptions.confirmCTAText
-                  : "Yes"
-              }
+              okText={confirmationOptions.confirmCTAText ? confirmationOptions.confirmCTAText : "Yes"}
               cancelText="No"
             >
               <Button type="primary">Update</Button>

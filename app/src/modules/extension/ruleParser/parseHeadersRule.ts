@@ -1,20 +1,8 @@
-import {
-  HeadersRule,
-  HeaderRuleActionType,
-  HeadersRuleModificationData,
-} from "../../../types/rules";
-import {
-  ExtensionRule,
-  ExtensionRuleAction,
-  HeadersRuleOperation,
-  ModifyHeaderInfo,
-  RuleActionType,
-} from "../types";
+import { HeadersRule, HeaderRuleActionType, HeadersRuleModificationData } from "../../../types/rules";
+import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, ModifyHeaderInfo, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseHeaders = (
-  headers: HeadersRuleModificationData[]
-): ModifyHeaderInfo[] => {
+const parseHeaders = (headers: HeadersRuleModificationData[]): ModifyHeaderInfo[] => {
   return headers.map((header) => {
     if (header.type === HeaderRuleActionType.REMOVE) {
       return {

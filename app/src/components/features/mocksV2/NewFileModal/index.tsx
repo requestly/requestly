@@ -5,10 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 //Config
-import {
-  redirectToFileMockEditorCreateMock,
-  redirectToMocksList,
-} from "utils/RedirectionUtils";
+import { redirectToFileMockEditorCreateMock, redirectToMocksList } from "utils/RedirectionUtils";
 import { IoLogoCss3, IoLogoHtml5, IoLogoJavascript } from "react-icons/io5";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { FileType } from "../types";
@@ -61,16 +58,11 @@ const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
           actions={[
             <AuthConfirmationPopover
               title={`You need to sign up to create a ${data.TYPE} file`}
-              callback={() =>
-                redirectToFileMockEditorCreateMock(navigate, type)
-              }
+              callback={() => redirectToFileMockEditorCreateMock(navigate, type)}
               source={AUTH.SOURCE.CREATE_FILE_MOCK}
             >
               <Button
-                onClick={() =>
-                  user?.details?.isLoggedIn &&
-                  redirectToFileMockEditorCreateMock(navigate, type)
-                }
+                onClick={() => user?.details?.isLoggedIn && redirectToFileMockEditorCreateMock(navigate, type)}
                 className="create-file-btn"
                 type="primary"
               >
@@ -79,11 +71,7 @@ const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
             </AuthConfirmationPopover>,
           ]}
         >
-          <Card.Meta
-            className="file-card-meta"
-            avatar={<>{React.createElement(data.ICON)}</>}
-            title={data.NAME}
-          />
+          <Card.Meta className="file-card-meta" avatar={<>{React.createElement(data.ICON)}</>} title={data.NAME} />
         </Card>
       </Col>
     );
@@ -102,8 +90,7 @@ const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
     >
       <div className="new-file-modal-title">Host new file</div>
       <p className="new-file-modal-description">
-        You can use File Server to host static files like HTML, CSS, JS & Images
-        only.
+        You can use File Server to host static files like HTML, CSS, JS & Images only.
       </p>
       <p className="new-file-modal-description">
         To host JSON or mock API responses, you can use our Mock Server&nbsp;
@@ -118,9 +105,7 @@ const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
         </Link>
       </p>
       <Row gutter={[16, 16]}>
-        {Object.entries(FILE_TYPES_CONFIG).map(([key, config]) =>
-          renderFileTypeCard(key, config)
-        )}
+        {Object.entries(FILE_TYPES_CONFIG).map(([key, config]) => renderFileTypeCard(key, config))}
       </Row>
     </RQModal>
   );

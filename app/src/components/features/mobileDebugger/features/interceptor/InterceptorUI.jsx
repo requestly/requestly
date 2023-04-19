@@ -14,10 +14,7 @@ import {
   trackDeviceIdSelectedEvent,
   trackDeviceIdSelectedFailureEvent,
 } from "modules/analytics/events/features/mobileDebugger";
-import {
-  getMobileDebuggerAppDetails,
-  getMobileDebuggerInterceptorDetails,
-} from "store/selectors";
+import { getMobileDebuggerAppDetails, getMobileDebuggerInterceptorDetails } from "store/selectors";
 import { actions } from "store";
 
 const { Title } = Typography;
@@ -26,9 +23,7 @@ const InterceptorUI = ({ appId }) => {
   // GLOBAL STATE
   const dispatch = useDispatch();
   const mobileDebuggerAppDetails = useSelector(getMobileDebuggerAppDetails);
-  const mobileDebuggerInterceptorDetails = useSelector(
-    getMobileDebuggerInterceptorDetails
-  );
+  const mobileDebuggerInterceptorDetails = useSelector(getMobileDebuggerInterceptorDetails);
 
   // LOCAL
   const [sdkId, setSdkId] = useState("");
@@ -44,10 +39,7 @@ const InterceptorUI = ({ appId }) => {
 
   const attachUserRulesToDevice = (sdkId, deviceId) => {
     let functions = getFunctions();
-    const createUserDeviceMapping = httpsCallable(
-      functions,
-      "createUserDeviceMapping"
-    );
+    const createUserDeviceMapping = httpsCallable(functions, "createUserDeviceMapping");
     createUserDeviceMapping({
       sdkId,
       deviceId,
@@ -123,11 +115,7 @@ const InterceptorUI = ({ appId }) => {
           }}
           message={
             <>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://docs.requestly.io/android-debugger/tutorial"
-              >
+              <a target="_blank" rel="noreferrer" href="https://docs.requestly.io/android-debugger/tutorial">
                 Click Here{" "}
               </a>{" "}
               to learn more about how Android Interceptor Works.
@@ -155,30 +143,17 @@ const InterceptorUI = ({ appId }) => {
       </Modal>
       {showLogger ? (
         <>
-          <Logger
-            sdkId={sdkId}
-            deviceId={deviceId}
-            showDeviceSelector={() => setIsDeviceSelectorVisible(true)}
-          />
+          <Logger sdkId={sdkId} deviceId={deviceId} showDeviceSelector={() => setIsDeviceSelectorVisible(true)} />
         </>
       ) : (
         <>
           <ProCard className="primary-card github-like-border">
             <Row style={{ textAlign: "center" }} align="center">
               <Col span={24}>
-                <Jumbotron
-                  style={{ background: "transparent" }}
-                  className="text-center"
-                >
-                  <Title level={4}>
-                    Connect Device to intercept & modify requests
-                  </Title>
+                <Jumbotron style={{ background: "transparent" }} className="text-center">
+                  <Title level={4}>Connect Device to intercept & modify requests</Title>
                   <Space>
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() => setIsDeviceSelectorVisible(true)}
-                    >
+                    <Button type="primary" size="small" onClick={() => setIsDeviceSelectorVisible(true)}>
                       Select Device
                     </Button>
                     <Button

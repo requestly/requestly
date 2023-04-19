@@ -20,9 +20,7 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
       return getPathname(pathname)
         .split("/")
         .slice(1)
-        .map((path) =>
-          capitalize(path.includes("-") ? path.split("-").join(" ") : path)
-        )
+        .map((path) => capitalize(path.includes("-") ? path.split("-").join(" ") : path))
         .slice(0, 2); // limiting the nesting because of some nested routes
       // which does not exist and on clicking over them will navigate to 404 page
       // e.g sessions/saved/:id clicking on "saved" will take to 404 page
@@ -32,8 +30,7 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
 
   const breadcrumbData = getBreadcrumb(pathname);
 
-  const checkIfLastRoute = (index: number) =>
-    index === breadcrumbData.length - 1;
+  const checkIfLastRoute = (index: number) => index === breadcrumbData.length - 1;
 
   const handleRouteClick = (index: number) => {
     if (checkIfLastRoute(index)) {
@@ -50,16 +47,9 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
   };
 
   return (
-    <Breadcrumb
-      {...props}
-      className={`rq-breadcrumb ${props?.className ?? ""}`}
-    >
+    <Breadcrumb {...props} className={`rq-breadcrumb ${props?.className ?? ""}`}>
       {breadcrumbData.map((item, index: number) => (
-        <Breadcrumb.Item
-          key={index}
-          className="rq-breadcrumb-item"
-          onClick={() => handleRouteClick(index)}
-        >
+        <Breadcrumb.Item key={index} className="rq-breadcrumb-item" onClick={() => handleRouteClick(index)}>
           {item}
         </Breadcrumb.Item>
       ))}

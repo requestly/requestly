@@ -22,22 +22,15 @@ interface Props {
   handleUploadRulesClick: () => void;
 }
 
-const PersonaRecommendation: React.FC<Props> = ({
-  isUserLoggedIn,
-  handleUploadRulesClick,
-}) => {
+const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRulesClick }) => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const dispatch = useDispatch();
   const [isViewAllOptions, setIsViewAllOptions] = useState<boolean>(false);
 
-  const data = useMemo(
-    () =>
-      isViewAllOptions
-        ? personaRecommendationData
-        : personaRecommendationData.slice(0, 3),
-    [isViewAllOptions]
-  );
+  const data = useMemo(() => (isViewAllOptions ? personaRecommendationData : personaRecommendationData.slice(0, 3)), [
+    isViewAllOptions,
+  ]);
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped("screen");
@@ -61,11 +54,7 @@ const PersonaRecommendation: React.FC<Props> = ({
   return (
     <>
       <Row align="middle" justify="end">
-        <Button
-          type="text"
-          onClick={handleSkipClick}
-          className="persona-recommendation-skip-btn"
-        >
+        <Button type="text" onClick={handleSkipClick} className="persona-recommendation-skip-btn">
           Skip
         </Button>
       </Row>
@@ -86,20 +75,14 @@ const PersonaRecommendation: React.FC<Props> = ({
 
         {!isViewAllOptions && (
           <Row align="middle" justify="center">
-            <Button
-              type="text"
-              className="view-all-options-btn"
-              onClick={handleViewAllOptionsClick}
-            >
+            <Button type="text" className="view-all-options-btn" onClick={handleViewAllOptionsClick}>
               View all options
             </Button>
           </Row>
         )}
 
         <div className="persona-recommendation-footer">
-          <div className="upload-rule-message">
-            or If you have existing rule, click here to upload them.{" "}
-          </div>
+          <div className="upload-rule-message">or If you have existing rule, click here to upload them. </div>
 
           <AuthConfirmationPopover
             title="You need to sign up to upload rules"
@@ -109,9 +92,7 @@ const PersonaRecommendation: React.FC<Props> = ({
             <RQButton
               className="items-center upload-btn"
               onClick={() => {
-                trackUploadRulesButtonClicked(
-                  AUTH.SOURCE.PERSONA_RECOMMENDATION_SCREEN
-                );
+                trackUploadRulesButtonClicked(AUTH.SOURCE.PERSONA_RECOMMENDATION_SCREEN);
                 if (isUserLoggedIn) {
                   handleUploadRulesClick();
                 }

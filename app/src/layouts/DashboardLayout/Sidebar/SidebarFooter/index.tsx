@@ -4,10 +4,7 @@ import { trackInviteTeammatesClicked } from "modules/analytics/events/common/tea
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  getIsWorkspaceMode,
-  getCurrentlyActiveWorkspace,
-} from "store/features/teams/selectors";
+import { getIsWorkspaceMode, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 
 interface SidebarFooterProps {
@@ -15,10 +12,7 @@ interface SidebarFooterProps {
   handleMobileSidebarClose?: () => void;
 }
 
-const SidebarFooter: React.FC<SidebarFooterProps> = ({
-  collapsed,
-  handleMobileSidebarClose,
-}) => {
+const SidebarFooter: React.FC<SidebarFooterProps> = ({ collapsed, handleMobileSidebarClose }) => {
   const navigate = useNavigate();
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -45,9 +39,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({
           type="text"
           title="Invite teammates"
           onClick={handleInviteTeammatesClick}
-          className={`sidebar-footer-invite-btn ${
-            collapsed ? "siderbar-footer-invite-btn-collapsed" : ""
-          }`}
+          className={`sidebar-footer-invite-btn ${collapsed ? "siderbar-footer-invite-btn-collapsed" : ""}`}
         >
           <PlusOutlined className="sidebar-footer-plus-icon" />
           {collapsed ? null : "Invite teammates"}

@@ -10,22 +10,11 @@ interface OptionProps {
   option: Option;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (
-    dispatch: any,
-    value: string,
-    clear: boolean,
-    optionType?: string
-  ) => void;
+  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
   fieldKey: string;
 }
 
-export const SurveyOption: React.FC<OptionProps> = ({
-  option,
-  questionType,
-  isActive,
-  action,
-  fieldKey,
-}) => {
+export const SurveyOption: React.FC<OptionProps> = ({ option, questionType, isActive, action, fieldKey }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const { title, type, icon } = option;
@@ -51,9 +40,7 @@ export const SurveyOption: React.FC<OptionProps> = ({
 
   useEffect(() => {
     if (type === "text") {
-      const option = key.find(
-        (option: multipleChoiceOption) => option.optionType === "other"
-      );
+      const option = key.find((option: multipleChoiceOption) => option.optionType === "other");
       if (option) setCustomInput(option.value);
       else setCustomInput(null);
     }
@@ -64,32 +51,18 @@ export const SurveyOption: React.FC<OptionProps> = ({
       {type !== "text" ? (
         // predefined options
         <div
-          className={`survey-option survey-select ${
-            isOptionActive && "outline-active-option"
-          }`}
+          className={`survey-option survey-select ${isOptionActive && "outline-active-option"}`}
           onClick={() => action(dispatch, title, isOptionActive, "select")}
         >
           <div className="white text-bold survey-option-title">
-            {
-              <span
-                className={`${
-                  typeof icon === "string" && "survey-modal-emoji"
-                }`}
-              >
-                {icon}
-              </span>
-            }
+            {<span className={`${typeof icon === "string" && "survey-modal-emoji"}`}>{icon}</span>}
             {title}
           </div>
           {questionType === "multiple" && <Checkbox checked={isOptionActive} />}
         </div>
       ) : (
         //Other: custom input option
-        <div
-          className={`survey-option survey-text ${
-            isOptionActive && "outline-active-option"
-          }`}
-        >
+        <div className={`survey-option survey-text ${isOptionActive && "outline-active-option"}`}>
           <div className="white text-bold survey-text-prefix">Other:</div>
           <RQInput
             bordered={false}
@@ -102,11 +75,7 @@ export const SurveyOption: React.FC<OptionProps> = ({
               action(dispatch, title, false, "other");
             }}
           />
-          <>
-            {isOptionActive && (
-              <Checkbox checked={true} className="survey-text-suffix" />
-            )}
-          </>
+          <>{isOptionActive && <Checkbox checked={true} className="survey-text-suffix" />}</>
         </div>
       )}
     </>
