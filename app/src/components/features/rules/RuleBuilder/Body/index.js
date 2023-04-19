@@ -5,11 +5,7 @@ import { Row, Col, Alert } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import {
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getCurrentlySelectedRuleErrors,
-} from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -51,21 +47,13 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                   message={
                     appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? (
                       <>
-                        This Rule type is currently available only in the
-                        desktop app. Download now{" "}
-                        <a href="https://requestly.io/desktop/">
-                          https://requestly.io/desktop/
-                        </a>
-                        .
+                        This Rule type is currently available only in the desktop app. Download now{" "}
+                        <a href="https://requestly.io/desktop/">https://requestly.io/desktop/</a>.
                       </>
                     ) : (
                       <>
-                        Please update your app to use this rule. Download latest
-                        version at{" "}
-                        <a href="https://requestly.io/desktop/">
-                          https://requestly.io/desktop/
-                        </a>
-                        .
+                        Please update your app to use this rule. Download latest version at{" "}
+                        <a href="https://requestly.io/desktop/">https://requestly.io/desktop/</a>.
                       </>
                     )
                   }
@@ -110,26 +98,16 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
         >
           <CardBody>
             {/* Info for some specific rule types */}
-            <RuleInfoBanner
-              appMode={appMode}
-              ruleType={currentlySelectedRuleConfig.TYPE}
-            />
+            <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
             {renderWarning()}
 
-            <RulePairs
-              mode={mode}
-              currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-            />
+            <RulePairs mode={mode} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
 
             {currentlySelectedRuleConfig.ALLOW_ADD_PAIR ? (
               <Row justify="end">
                 <Col span={24}>
-                  {mode !==
-                  APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES
-                    .SHARED_LIST_RULE_VIEW ? (
-                    <AddPairButton
-                      currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-                    />
+                  {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
+                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
                   ) : null}
                 </Col>
               </Row>

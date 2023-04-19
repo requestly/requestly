@@ -21,38 +21,26 @@ const UpdateDialog = () => {
 
   useEffect(() => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent(
-        "update-downloaded",
-        (payload) => {
-          if (payload && !_.isEqual(payload, updateDetailsRef.current)) {
-            setIsUpdateDownloaded(true);
-            updateDetailsRef.current = payload;
-          }
-        }
-      );
-
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent(
-        "download-progress",
-        (payload) => {
-          console.log(payload);
-          // {total: 115783355, delta: 155698, transferred: 155698, percent: 0.13447356055626478, bytesPerSecond: 146746}
-          setUpdateProgress(payload);
-        }
-      );
-
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent(
-        "update-available",
-        (payload) => {
-          console.log(payload);
-          setIsUpdateAvailable(true);
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("update-downloaded", (payload) => {
+        if (payload && !_.isEqual(payload, updateDetailsRef.current)) {
+          setIsUpdateDownloaded(true);
           updateDetailsRef.current = payload;
         }
-      );
+      });
 
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-        "check-for-updates-and-notify",
-        {}
-      );
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("download-progress", (payload) => {
+        console.log(payload);
+        // {total: 115783355, delta: 155698, transferred: 155698, percent: 0.13447356055626478, bytesPerSecond: 146746}
+        setUpdateProgress(payload);
+      });
+
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("update-available", (payload) => {
+        console.log(payload);
+        setIsUpdateAvailable(true);
+        updateDetailsRef.current = payload;
+      });
+
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("check-for-updates-and-notify", {});
     }
   }, []);
 
@@ -67,16 +55,8 @@ const UpdateDialog = () => {
   const isUICompatible = () => {
     const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
 
-    if (
-      desktop_app_version &&
-      APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION
-    ) {
-      if (
-        semver.lt(
-          desktop_app_version,
-          APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION
-        )
-      ) {
+    if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION) {
+      if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION)) {
         return false;
       }
     }
@@ -86,16 +66,8 @@ const UpdateDialog = () => {
   const isBreaking = () => {
     if (getUserOS() === "macOS") {
       const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
-      if (
-        desktop_app_version &&
-        APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION
-      ) {
-        if (
-          semver.lt(
-            desktop_app_version,
-            APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION
-          )
-        ) {
+      if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION) {
+        if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION)) {
           return true;
         }
       }
@@ -117,12 +89,7 @@ const UpdateDialog = () => {
         />
       );
     } else if (isUpdateDownloaded) {
-      return (
-        <NonBlockingDialog
-          updateDetails={updateDetailsRef.current}
-          quitAndInstall={quitAndInstall}
-        />
-      );
+      return <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />;
     }
   }
   return null;

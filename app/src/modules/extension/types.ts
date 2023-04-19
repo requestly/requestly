@@ -10,8 +10,7 @@ export interface ExtensionRuleSourceFilters {
 
 export type ExtensionRuleAction = chrome.declarativeNetRequest.RuleAction;
 
-export type ExtensionRuleCondition = chrome.declarativeNetRequest.RuleCondition &
-  ExtensionRuleSourceFilters;
+export type ExtensionRuleCondition = chrome.declarativeNetRequest.RuleCondition & ExtensionRuleSourceFilters;
 
 export type QueryParamRuleTransform = chrome.declarativeNetRequest.URLTransform;
 

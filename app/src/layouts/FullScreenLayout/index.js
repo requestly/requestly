@@ -14,18 +14,9 @@ const FullScreenLayout = () => {
           path={PATHS.EXTENSION_INSTALLED.ABSOLUTE}
           element={<Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />}
         ></Route> */}
-        <Route
-          path={PATHS.PAYMENT_SUCCESS.ABSOLUTE}
-          element={<PaymentSuccess />}
-        ></Route>
-        <Route
-          path={PATHS.PAYMENT_FAIL.ABSOLUTE}
-          element={<PaymentFail />}
-        ></Route>
-        <Route
-          path={PATHS.ANY}
-          element={<Navigate to={PATHS.PAGE404.ABSOLUTE} />}
-        />
+        <Route path={PATHS.PAYMENT_SUCCESS.ABSOLUTE} element={<PaymentSuccess />}></Route>
+        <Route path={PATHS.PAYMENT_FAIL.ABSOLUTE} element={<PaymentFail />}></Route>
+        <Route path={PATHS.ANY} element={<Navigate to={PATHS.PAGE404.ABSOLUTE} />} />
       </Routes>
     </React.Fragment>
   );

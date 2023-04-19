@@ -20,14 +20,12 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
 
   //Global state
   const dispatch = useDispatch();
@@ -70,7 +68,7 @@ const DashboardContent = () => {
   const prevProps = usePrevious({ location });
 
   useEffect(() => {
-    if (isPersonaRecommendationFlagOn && userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
+    if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
         state: {
@@ -79,13 +77,7 @@ const DashboardContent = () => {
         },
       });
     }
-  }, [
-    navigate,
-    location.state?.redirectTo,
-    userPersona.page,
-    userPersona.isSurveyCompleted,
-    isPersonaRecommendationFlagOn,
-  ]);
+  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {

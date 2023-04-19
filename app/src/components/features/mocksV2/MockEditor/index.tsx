@@ -10,16 +10,8 @@ import {
 import { toast } from "utils/Toast";
 import MockEditor from "./Editor/index";
 import { MockEditorDataSchema } from "./types";
-import {
-  editorDataToMockDataConverter,
-  mockDataToEditorDataAdapter,
-} from "../utils";
-import {
-  defaultCssEditorMock,
-  defaultEditorMock,
-  defaultHtmlEditorMock,
-  defaultJsEditorMock,
-} from "./constants";
+import { editorDataToMockDataConverter, mockDataToEditorDataAdapter } from "../utils";
+import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
 import { FileType, MockType } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useSelector } from "react-redux";
@@ -40,21 +32,14 @@ interface Props {
   fileType?: FileType;
 }
 
-const MockEditorIndex: React.FC<Props> = ({
-  isNew,
-  mockId,
-  mockType,
-  fileType,
-}) => {
+const MockEditorIndex: React.FC<Props> = ({ isNew, mockId, mockType, fileType }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(
-    null
-  );
+  const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 

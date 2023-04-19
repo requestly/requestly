@@ -6,10 +6,7 @@ import moment from "moment";
  * @param {Number} numDaysToAdd
  * @returns {Boolean}
  */
-export const getDateAfterAddingSomeDaysInUserSignupDate = (
-  signupDate,
-  numDaysToAdd
-) => {
+export const getDateAfterAddingSomeDaysInUserSignupDate = (signupDate, numDaysToAdd) => {
   // eslint-disable-next-line
   Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf());
@@ -114,11 +111,9 @@ export const secToMinutesAndSeconds = (sec) => {
   return addPadding(minutes) + ":" + addPadding(seconds);
 };
 
-export const epochToDateAndTimeString = (timestamp) =>
-  moment(timestamp).format("DD-MMM-YYYY HH:mm:ss");
+export const epochToDateAndTimeString = (timestamp) => moment(timestamp).format("DD-MMM-YYYY HH:mm:ss");
 
-export const msToHoursMinutesAndSeconds = (millis) =>
-  new Date(millis).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
+export const msToHoursMinutesAndSeconds = (millis) => new Date(millis).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
 
 export const getTimeDifferenceFromTimestamps = (time1, time2) => {
   // both are epoch times

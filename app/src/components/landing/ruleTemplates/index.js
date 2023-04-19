@@ -21,10 +21,7 @@ const TemplatesIndexPage = () => {
     return template.data.targetAppMode.includes(appMode);
   });
 
-  const [
-    isSharedListRuleViewerModalActive,
-    setIsSharedListRuleViewModalActive,
-  ] = useState(false);
+  const [isSharedListRuleViewerModalActive, setIsSharedListRuleViewModalActive] = useState(false);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
 
   const toggleSharedListRuleViewerModal = () => {
@@ -36,12 +33,7 @@ const TemplatesIndexPage = () => {
     setIsSharedListRuleViewModalActive(true);
   };
   const viewSharedList = (data) => {
-    redirectToSharedListViewer(
-      navigate,
-      data.shareId,
-      data.sharedListName,
-      true
-    );
+    redirectToSharedListViewer(navigate, data.shareId, data.sharedListName, true);
   };
 
   const columns = [
@@ -55,9 +47,7 @@ const TemplatesIndexPage = () => {
           href="/"
           onClick={(e) => {
             e.preventDefault();
-            record.isSharedList
-              ? viewSharedList(record.data)
-              : openRuleViewerInModal(record.data);
+            record.isSharedList ? viewSharedList(record.data) : openRuleViewerInModal(record.data);
             trackTemplateImportStarted(snakeCase(record.name));
             return false;
           }}
@@ -89,11 +79,7 @@ const TemplatesIndexPage = () => {
         return (
           <>
             {ruleTypes.map((ruleType, index) => (
-              <RuleTypeTag
-                key={index}
-                ruleType={ruleType}
-                title={ruleType.toUpperCase()}
-              />
+              <RuleTypeTag key={index} ruleType={ruleType} title={ruleType.toUpperCase()} />
             ))}
           </>
         );
@@ -110,9 +96,7 @@ const TemplatesIndexPage = () => {
               onClick={(e) => {
                 e.preventDefault();
                 trackTemplateImportStarted(snakeCase(record.name));
-                record.isSharedList
-                  ? viewSharedList(record.data)
-                  : openRuleViewerInModal(record.data);
+                record.isSharedList ? viewSharedList(record.data) : openRuleViewerInModal(record.data);
                 return false;
               }}
             >
@@ -135,11 +119,7 @@ const TemplatesIndexPage = () => {
             rule={ruleToViewInModal}
           />
         ) : null}
-        <Table
-          columns={columns}
-          dataSource={filteredRuleTemplates}
-          pagination={false}
-        />
+        <Table columns={columns} dataSource={filteredRuleTemplates} pagination={false} />
       </ProCard>
     </React.Fragment>
   );

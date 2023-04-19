@@ -27,18 +27,12 @@ const AvailableScriptsRow = ({ rowIndex, pairIndex, isInputDisabled }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const getReactSelectValue = (arrayPath, allOptions) => {
-    const currentArray = get(
-      currentlySelectedRuleData.pairs[pairIndex],
-      arrayPath,
-      []
-    );
+    const currentArray = get(currentlySelectedRuleData.pairs[pairIndex], arrayPath, []);
     return allOptions.filter((value) => currentArray.includes(value.value));
   };
 
   const reactSelectOnChangeHandler = (incomingValues, targetPath) => {
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
     let newValues = [];
     if (incomingValues) {
       newValues = incomingValues.map((value) => value.value);
@@ -52,10 +46,7 @@ const AvailableScriptsRow = ({ rowIndex, pairIndex, isInputDisabled }) => {
       <Col span={4}>
         <span>Insert Libraries</span>
       </Col>
-      <Col
-        span={20}
-        className="my-auto margin-bottom-1-when-xs margin-bottom-1-when-sm"
-      >
+      <Col span={20} className="my-auto margin-bottom-1-when-xs margin-bottom-1-when-sm">
         <ReactSelect
           isMulti={true}
           theme={(theme) => ({
@@ -72,15 +63,9 @@ const AvailableScriptsRow = ({ rowIndex, pairIndex, isInputDisabled }) => {
           name="resource-type"
           options={getAvailableScriptsOptions()}
           placeholder="None"
-          value={getReactSelectValue(
-            APP_CONSTANTS.PATH_FROM_PAIR.SCRIPT_LIBRARIES,
-            getAvailableScriptsOptions()
-          )}
+          value={getReactSelectValue(APP_CONSTANTS.PATH_FROM_PAIR.SCRIPT_LIBRARIES, getAvailableScriptsOptions())}
           onChange={(incomingValues) =>
-            reactSelectOnChangeHandler(
-              incomingValues,
-              APP_CONSTANTS.PATH_FROM_PAIR.SCRIPT_LIBRARIES
-            )
+            reactSelectOnChangeHandler(incomingValues, APP_CONSTANTS.PATH_FROM_PAIR.SCRIPT_LIBRARIES)
           }
         />
       </Col>

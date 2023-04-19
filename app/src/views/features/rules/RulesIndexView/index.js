@@ -43,10 +43,7 @@ const RulesIndexView = () => {
     }
   };
 
-  const safeCheckForAndroidDebugger = useCallback(checkForAndroidDebugger, [
-    user.details?.profile?.uid,
-    user.loggedIn,
-  ]);
+  const safeCheckForAndroidDebugger = useCallback(checkForAndroidDebugger, [user.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
     // setting if extension is disabled
@@ -93,12 +90,7 @@ const RulesIndexView = () => {
     );
   };
   if (showLoader) {
-    return (
-      <SpinnerCard
-        customLoadingMessage="Getting your rules ready"
-        skeletonType="list"
-      />
-    );
+    return <SpinnerCard customLoadingMessage="Getting your rules ready" skeletonType="list" />;
   } else {
     return <>{renderRulesIndex()}</>;
   }

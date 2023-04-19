@@ -11,10 +11,7 @@ interface Props {
   children: ReactNode;
 }
 
-const TutorialButton: React.FC<Props & ButtonProps> = ({
-  children,
-  ...buttonProps
-}) => {
+const TutorialButton: React.FC<Props & ButtonProps> = ({ children, ...buttonProps }) => {
   const [isDemoModalVisible, setDemoModalVisible] = useState(false);
 
   const openDemoVideo = useCallback(() => {

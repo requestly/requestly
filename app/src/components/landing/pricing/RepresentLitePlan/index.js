@@ -10,20 +10,14 @@ const { Text, Title } = Typography;
 const LitePlanMessage = () => {
   return (
     <>
-      <Title level={5}>
-        We are also offering a Lite Plan for Limited Time Only{" "}
-      </Title>
+      <Title level={5}>We are also offering a Lite Plan for Limited Time Only </Title>
     </>
   );
 };
 
 const LitePlanDescription = ({ currency, price }) => {
   const checkoutLitePlan = () => {
-    trackCheckoutInitiatedEvent(
-      "monthly",
-      APP_CONSTANTS.PRICING.PLAN_NAMES.LITE,
-      1
-    );
+    trackCheckoutInitiatedEvent("monthly", APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, 1);
     redirectToCheckout({
       planType: APP_CONSTANTS.PRICING.PLAN_NAMES.LITE,
       mode: "individual",
@@ -33,9 +27,7 @@ const LitePlanDescription = ({ currency, price }) => {
 
   return (
     <>
-      <Text type="secondary">
-        {"5 Rules, 3 Active Rules, 3 Rule Conditions, No Character Limits"}
-      </Text>
+      <Text type="secondary">{"5 Rules, 3 Active Rules, 3 Rule Conditions, No Character Limits"}</Text>
       <br />
       <Text strong>
         <Button type="link" onClick={checkoutLitePlan}>

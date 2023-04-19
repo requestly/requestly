@@ -15,12 +15,7 @@ const InviteView = () => {
       <Layout.Header className="pricing-navbar">
         <Row className="w-full" justify="space-between" align="middle">
           <Col>
-            <img
-              className="logo"
-              src={RQLogo}
-              alt="requestly logo"
-              onClick={() => redirectToRules(navigate)}
-            />
+            <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
           </Col>
           <HeaderUser />
         </Row>

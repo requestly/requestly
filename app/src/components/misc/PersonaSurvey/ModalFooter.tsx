@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
@@ -32,7 +31,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
   const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appMode = useSelector(getAppMode);
-  const isPersonaRecommendationFlagOn = useFeatureIsOn("persona_recommendation");
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = () => {
@@ -74,16 +72,14 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
           return;
         }
 
-        if (isPersonaRecommendationFlagOn) {
-          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
-          navigate(PATHS.GETTING_STARTED, {
-            replace: true,
-            state: {
-              src: "persona_survey_modal",
-              redirectTo: location.pathname,
-            },
-          });
-        }
+        dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
+        navigate(PATHS.GETTING_STARTED, {
+          replace: true,
+          state: {
+            src: "persona_survey_modal",
+            redirectTo: location.pathname,
+          },
+        });
       // break;
       //   case 2:
       //     trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));

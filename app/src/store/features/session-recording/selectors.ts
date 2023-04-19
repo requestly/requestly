@@ -1,21 +1,14 @@
 import { RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
 import { RootState } from "store/types";
-import {
-  SessionRecording,
-  Visibility,
-} from "views/features/sessions/SessionViewer/types";
+import { SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
 import { SessionRecordingState } from "./slice";
 
-export const getSessionRecordingState = (
-  state: RootState
-): SessionRecordingState => {
+export const getSessionRecordingState = (state: RootState): SessionRecordingState => {
   return state[ReducerKeys.SESSION_RECORDING];
 };
 
-export const getSessionRecordingEvents = (
-  state: RootState
-): RQSessionEvents => {
+export const getSessionRecordingEvents = (state: RootState): RQSessionEvents => {
   return getSessionRecordingState(state).events;
 };
 
@@ -23,9 +16,7 @@ export const getSessionRecording = (state: RootState): SessionRecording => {
   return getSessionRecordingState(state).sessionRecording;
 };
 
-export const getSessionRecordingAttributes = (
-  state: RootState
-): RQSessionAttributes => {
+export const getSessionRecordingAttributes = (state: RootState): RQSessionAttributes => {
   return getSessionRecording(state)?.sessionAttributes;
 };
 
@@ -49,9 +40,7 @@ export const getIsRequestedByOwner = (state: RootState): boolean => {
   return getSessionRecording(state)?.isRequestedByOwner;
 };
 
-export const getSessionRecordingStartTimeOffset = (
-  state: RootState
-): number => {
+export const getSessionRecordingStartTimeOffset = (state: RootState): number => {
   return getSessionRecording(state)?.startTimeOffset || 0;
 };
 

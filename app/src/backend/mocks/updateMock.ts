@@ -22,21 +22,14 @@ export const updateMock = async (
     responsesWithBody = [];
     // Update body to null and filePath
     mockData.responses.map((response) => {
-      response.filePath = createResponseBodyFilepath(
-        uid,
-        mockId,
-        response.id,
-        teamId
-      );
+      response.filePath = createResponseBodyFilepath(uid, mockId, response.id, teamId);
       responsesWithBody.push({ ...response });
       response.body = null;
       return null;
     });
   }
 
-  const success = await updateMockFromFirebase(uid, mockId, mockData).catch(
-    () => false
-  );
+  const success = await updateMockFromFirebase(uid, mockId, mockData).catch(() => false);
 
   if (success) {
     await updateUserMockSelectorsMap(ownerId, mockId, mockData);

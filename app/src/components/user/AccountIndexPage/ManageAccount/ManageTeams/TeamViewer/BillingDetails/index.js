@@ -18,10 +18,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
     setIsLoading(true);
 
     const functions = getFunctions();
-    const getTeamSubscriptionInfo = httpsCallable(
-      functions,
-      "getTeamSubscriptionInfo"
-    );
+    const getTeamSubscriptionInfo = httpsCallable(functions, "getTeamSubscriptionInfo");
 
     getTeamSubscriptionInfo({
       teamId: teamId,
@@ -30,9 +27,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
         setSubscriptionInfo(res.data);
       })
       .catch(() => {
-        toast.error(
-          "You might not have permission to manage the team members."
-        );
+        toast.error("You might not have permission to manage the team members.");
       })
       .finally(() => setIsLoading(false));
   }, [teamId]);
@@ -54,9 +49,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
     <div className="billing-details-container">
       <div className="title billing-title">Billing</div>
       {isSubscriptionActive ? (
-        <p className="text-dark-gray billing-subscription-info">
-          This workspace has an active subscription.
-        </p>
+        <p className="text-dark-gray billing-subscription-info">This workspace has an active subscription.</p>
       ) : (
         <p className="text-dark-gray billing-subscription-info">
           This workspace does not have an active subscription yet. <br />
@@ -88,9 +81,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
         ) : (
           <>
             <div className="title billing-invoices-title">Invoices</div>
-            <p className="text-sm text-dark-gray">
-              This workspace has no invoices yet.
-            </p>
+            <p className="text-sm text-dark-gray">This workspace has no invoices yet.</p>
           </>
         )}
       </div>
@@ -98,9 +89,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
       <BillingFooter />
     </div>
   ) : (
-    <p className="billing-non-admin-message">
-      Only admin can view the billing details.
-    </p>
+    <p className="billing-non-admin-message">Only admin can view the billing details.</p>
   );
 };
 

@@ -1,21 +1,10 @@
 import { RQMockSchema } from "components/features/mocksV2/types";
 import firebaseApp from "../../firebase";
-import {
-  collection,
-  doc,
-  deleteField,
-  getFirestore,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, doc, deleteField, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { createFile } from "services/firebaseStorageService";
 import { createResponseBodyFilepath } from "./utils";
 
-export const updateUserMockSelectorsMap = async (
-  ownerId: string,
-  mockId: string,
-  mockData: RQMockSchema
-) => {
+export const updateUserMockSelectorsMap = async (ownerId: string, mockId: string, mockData: RQMockSchema) => {
   const db = getFirestore(firebaseApp);
 
   const selectorData = {
@@ -37,10 +26,7 @@ export const updateUserMockSelectorsMap = async (
   );
 };
 
-export const removeUserMockSelector = async (
-  ownerId: string,
-  mockId: string
-) => {
+export const removeUserMockSelector = async (ownerId: string, mockId: string) => {
   const db = getFirestore(firebaseApp);
 
   const rootUserMocksMetadataRef = collection(db, "user-mocks-metadata");
@@ -51,12 +37,7 @@ export const removeUserMockSelector = async (
   });
 };
 
-export const uploadResponseBodyFiles = async (
-  responses: any[] = [],
-  uid: string,
-  mockId: string,
-  teamId?: string
-) => {
+export const uploadResponseBodyFiles = async (responses: any[] = [], uid: string, mockId: string, teamId?: string) => {
   return Promise.all(
     responses.map(async (response) => {
       return createFile(

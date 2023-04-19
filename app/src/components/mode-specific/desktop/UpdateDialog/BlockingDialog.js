@@ -4,13 +4,7 @@ import "./BlockingDialog.scss";
 
 const { Text, Title } = Typography;
 
-const BlockingDialog = ({
-  updateDetails,
-  isUpdateAvailable,
-  isUpdateDownloaded,
-  quitAndInstall,
-  updateProgress,
-}) => {
+const BlockingDialog = ({ updateDetails, isUpdateAvailable, isUpdateDownloaded, quitAndInstall, updateProgress }) => {
   const handleUpdateClick = () => {
     quitAndInstall();
   };
@@ -28,11 +22,7 @@ const BlockingDialog = ({
           <Col align="center" span={24}>
             <FiSun />
             <Row justify="center" className="w-full">
-              {percent >= 100 ? (
-                <Text>Download Complete</Text>
-              ) : (
-                <Text>Download in progress...</Text>
-              )}
+              {percent >= 100 ? <Text>Download Complete</Text> : <Text>Download in progress...</Text>}
             </Row>
             <Row justify="center" className="w-full">
               <Title level={3} className="download-progress-text">
@@ -40,20 +30,13 @@ const BlockingDialog = ({
               </Title>
             </Row>
           </Col>
-          <Progress
-            percent={percent}
-            status="active"
-            strokeColor="#00C8AF"
-            showInfo={false}
-          />
+          <Progress percent={percent} status="active" strokeColor="#00C8AF" showInfo={false} />
         </Row>
         <Row className="" align="center">
           <Col align="center" span={24}>
             <Button
               type="primary"
-              className={
-                !isUpdateDownloaded ? "disabled-download-btn" : "download-btn"
-              }
+              className={!isUpdateDownloaded ? "disabled-download-btn" : "download-btn"}
               onClick={() => {
                 if (!isUpdateDownloaded) return;
                 handleUpdateClick();

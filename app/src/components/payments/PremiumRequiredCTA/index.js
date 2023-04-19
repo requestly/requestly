@@ -12,18 +12,12 @@ const PremiumRequiredCTA = ({ message }) => {
       <ProCard className="primary-card github-like-border">
         <Row>
           <Col span={24} align="center">
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h2 className="display-3">{message ? message : null}</h2>
               {/* <p className="lead">{message ? message : null}</p> */}
 
               <p className="lead">
-                <Button
-                  type="secondary"
-                  onClick={() => redirectToPricingPlans(navigate)}
-                >
+                <Button type="secondary" onClick={() => redirectToPricingPlans(navigate)}>
                   Get Requestly Premium
                 </Button>
               </p>

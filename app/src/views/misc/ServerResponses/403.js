@@ -15,11 +15,7 @@ const Page403 = () => {
         subTitle="Oops! Looks like you are not authorized to access this
         page. Don't worry though, everything is STILL AWESOME!"
         extra={
-          <Button
-            type="primary"
-            onClick={() => redirectToRules(navigate)}
-            icon={<LeftOutlined />}
-          >
+          <Button type="primary" onClick={() => redirectToRules(navigate)} icon={<LeftOutlined />}>
             Back Home
           </Button>
         }

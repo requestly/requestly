@@ -4,12 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { toast } from "utils/Toast.js";
 // STRIPE
-import {
-  CardElement,
-  useStripe,
-  useElements,
-  Elements,
-} from "@stripe/react-stripe-js";
+import { CardElement, useStripe, useElements, Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 // SUB COMPONENTS
 import Alert from "../../misc/Alert";
@@ -17,11 +12,7 @@ import SpinnerColumn from "../../misc/SpinnerColumn";
 // FIREBASE
 import { getFunctions, httpsCallable } from "firebase/functions";
 // UTILS
-import {
-  redirectTo404,
-  redirectToTeam,
-  redirectToPersonalSubscription,
-} from "../../../utils/RedirectionUtils";
+import { redirectTo404, redirectToTeam, redirectToPersonalSubscription } from "../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "../../../store/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -46,15 +37,10 @@ const UpdatePaymentMethod = () => {
   const [success, setSuccess] = useState(false);
   const [cardError, setCardError] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [allowPaymentMethodUpdate, setAllowPaymentMethodUpdate] = useState(
-    false
-  );
+  const [allowPaymentMethodUpdate, setAllowPaymentMethodUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  if (
-    !(mode === "individual" || mode === "team") ||
-    (mode === "team" ? typeof teamId !== "string" : false)
-  ) {
+  if (!(mode === "individual" || mode === "team") || (mode === "team" ? typeof teamId !== "string" : false)) {
     redirectTo404(navigate);
   }
 
@@ -122,17 +108,11 @@ const UpdatePaymentMethod = () => {
       paymentMethodId = paymentMethod.id;
     }
 
-    const firebaseFunctionToCall =
-      mode === "individual"
-        ? "updateIndividualPaymentMethod"
-        : "updateTeamPaymentMethod";
+    const firebaseFunctionToCall = mode === "individual" ? "updateIndividualPaymentMethod" : "updateTeamPaymentMethod";
 
     if (!hasError) {
       const functions = getFunctions();
-      const updateTeamPaymentMethod = httpsCallable(
-        functions,
-        firebaseFunctionToCall
-      );
+      const updateTeamPaymentMethod = httpsCallable(functions, firebaseFunctionToCall);
 
       updateTeamPaymentMethod({
         teamId: teamId ? teamId : false,
@@ -168,9 +148,7 @@ const UpdatePaymentMethod = () => {
         <div className="col col-sm-12 col-md-8 col-lg-8 col-xl-6">
           <div className="card-deck">
             <div className="card mb-4">
-              <div className="card-header text-center">
-                Credit or debit card
-              </div>
+              <div className="card-header text-center">Credit or debit card</div>
               <div className="card-body">
                 <div className="row justify-content-md-center">
                   <div className="col col-12">
@@ -272,17 +250,11 @@ const UpdatePaymentMethodIndex = () => {
 
   useEffect(() => {
     // Initialize Stripe
-    if (!stripePromise)
-      setStripePromise(
-        loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY)
-      );
+    if (!stripePromise) setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY));
   }, [stripePromise]);
 
   return (
-    <ProCard
-      className="primary-card github-like-border"
-      title="Update Payment Method"
-    >
+    <ProCard className="primary-card github-like-border" title="Update Payment Method">
       <Row>
         <Col span={4} offset={10} align="center">
           {stripePromise !== false ? (

@@ -76,20 +76,12 @@ const CompanyLogo = ({ appTheme }) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: xl
-          ? "repeat(12,auto)"
-          : md
-          ? "repeat(5,auto)"
-          : "repeat(3,auto)",
+        gridTemplateColumns: xl ? "repeat(12,auto)" : md ? "repeat(5,auto)" : "repeat(3,auto)",
         justifyContent: "center",
         gap: "20px",
       }}
     >
-      {loading ? (
-        <Spin indicator />
-      ) : (
-        [returnCountryLogos(), returnDefaultLogos()]
-      )}
+      {loading ? <Spin indicator /> : [returnCountryLogos(), returnDefaultLogos()]}
     </div>
   );
 };

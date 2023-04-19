@@ -17,9 +17,7 @@ const Name = () => {
       type="text"
       className=" has-dark-text height-two-rem"
       value={currentlySelectedRuleData.name}
-      onChange={(event) =>
-        onChangeHandler(currentlySelectedRuleData, dispatch, event)
-      }
+      onChange={(event) => onChangeHandler(currentlySelectedRuleData, dispatch, event)}
       autoFocus
     />
   );
