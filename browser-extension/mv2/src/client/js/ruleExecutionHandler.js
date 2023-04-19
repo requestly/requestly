@@ -3,7 +3,7 @@ RQ.RuleExecutionHandler = {
 };
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
-  const eventName = "rule_execution";
+  const eventName = "rule_executed";
   const eventParams = {
     rule_type: rule.ruleType,
     rule_id: rule.id,
@@ -24,8 +24,6 @@ RQ.RuleExecutionHandler.setup = () => {
         if (isFirstExecution) {
           RQ.RuleExecutionHandler.sendRuleExecutionEvent(message.rule);
         }
-
-        sendResponse();
         break;
 
       case RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS:
@@ -43,12 +41,15 @@ RQ.RuleExecutionHandler.setup = () => {
 
 RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleLoggerEnabled) => {
   appliedRuleDetails.forEach((appliedRule) => {
+    const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(appliedRule.id);
     RQ.RuleExecutionHandler.appliedRuleIds.add(appliedRule.rule.id);
     RQ.ConsoleLogger.handleMessage({
       requestDetails: appliedRule.requestDetails,
       rule: appliedRule.rule,
       isConsoleLoggerEnabled,
     });
-    RQ.RuleExecutionHandler.sendRuleExecutionEvent(appliedRule.rule);
+    if (isFirstExecution) {
+      RQ.RuleExecutionHandler.sendRuleExecutionEvent(appliedRule.rule);
+    }
   });
 };
