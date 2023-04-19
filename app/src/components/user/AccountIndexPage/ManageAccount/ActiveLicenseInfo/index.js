@@ -17,8 +17,7 @@ const ActiveLicenseInfo = ({
   //Global State
   const user = useSelector(getUserAuthDetails);
 
-  const { type, status, planName, subscription } =
-    user.details?.planDetails ?? {};
+  const { type, status, planName, subscription } = user.details?.planDetails ?? {};
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
   const doesSubscriptionExist = !!type && !!status && !!planName;
 
@@ -26,9 +25,7 @@ const ActiveLicenseInfo = ({
     return (
       <SubscriptionInfo
         hideShadow={hideShadow}
-        hideManagePersonalSubscriptionButton={
-          hideManagePersonalSubscriptionButton
-        }
+        hideManagePersonalSubscriptionButton={hideManagePersonalSubscriptionButton}
         subscriptionDetails={{
           validFrom,
           validTill,
@@ -45,21 +42,15 @@ const ActiveLicenseInfo = ({
   };
 
   if (
-    (hideIfSubscriptionIsPersonal &&
-      user.details?.planDetails?.type === "individual") ||
+    (hideIfSubscriptionIsPersonal && user.details?.planDetails?.type === "individual") ||
     (hideIfNoSubscription && !doesSubscriptionExist)
   ) {
     return <React.Fragment></React.Fragment>;
   }
 
   return (
-    <ProCard
-      title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>}
-      className="primary-card github-like-border"
-    >
-      {doesSubscriptionExist
-        ? renderSubscriptionInfo()
-        : renderGetASubscription()}
+    <ProCard title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>} className="primary-card github-like-border">
+      {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
     </ProCard>
   );
 };

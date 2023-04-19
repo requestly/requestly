@@ -32,36 +32,32 @@ const MigrationCheckModal = () => {
 
   useEffect(() => {
     // Check if migration steps are already performed
-    checkIfSourceFilterMigrationStepsAreAlreadyPerformed(appMode).then(
-      (result) => {
-        if (!result) {
-          setIsModalOpen(true);
-          executeMigrationForSourceFilterFormat(appMode).then(() => {
-            setSourceFilterMigrationStepsDone(appMode).then(() => {
-              setIsModalOpen(false);
-            });
+    checkIfSourceFilterMigrationStepsAreAlreadyPerformed(appMode).then((result) => {
+      if (!result) {
+        setIsModalOpen(true);
+        executeMigrationForSourceFilterFormat(appMode).then(() => {
+          setSourceFilterMigrationStepsDone(appMode).then(() => {
+            setIsModalOpen(false);
           });
-        } else {
-          return;
-        }
+        });
+      } else {
+        return;
       }
-    );
+    });
   }, [appMode]);
 
   useEffect(() => {
     if (isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)) {
-      checkIfHeadersV2MigrationStepsAreAlreadyPerformed(appMode).then(
-        (result) => {
-          if (!result) {
-            executeV2MigrationForHeaderRules(appMode).then(() => {
-              setHeadersV2MigrationStepsDone(appMode);
-              trackHeaderRulesMigratedToV2();
-            });
-          } else {
-            return;
-          }
+      checkIfHeadersV2MigrationStepsAreAlreadyPerformed(appMode).then((result) => {
+        if (!result) {
+          executeV2MigrationForHeaderRules(appMode).then(() => {
+            setHeadersV2MigrationStepsDone(appMode);
+            trackHeaderRulesMigratedToV2();
+          });
+        } else {
+          return;
         }
-      );
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -72,12 +68,7 @@ const MigrationCheckModal = () => {
   }, 4000);
 
   return (
-    <Modal
-      className="modal-dialog-centered "
-      visible={isModalOpen}
-      onCancel={() => null}
-      footer={null}
-    >
+    <Modal className="modal-dialog-centered " visible={isModalOpen} onCancel={() => null} footer={null}>
       <div className="modal-body ">{renderLoader()}</div>
     </Modal>
   );

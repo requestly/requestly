@@ -24,10 +24,7 @@ import {
 } from "modules/analytics/events/misc/organization";
 import { getUserAuthDetails } from "store/selectors";
 import { generateGravatarURL } from "utils/ImageUtils";
-import {
-  redirectToCreateOrg,
-  redirectToVerifyEmail,
-} from "utils/RedirectionUtils";
+import { redirectToCreateOrg, redirectToVerifyEmail } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import firebaseApp from "../../../firebase";
 import Logger from "lib/logger";
@@ -39,12 +36,7 @@ const columns = [
     key: "id",
     render: (email) => (
       <center>
-        <Avatar
-          size={36}
-          src={generateGravatarURL(email)}
-          className="hp-mr-8 hp-bg-color-primary-3"
-          alt={email}
-        />
+        <Avatar size={36} src={generateGravatarURL(email)} className="hp-mr-8 hp-bg-color-primary-3" alt={email} />
       </center>
     ),
   },
@@ -101,17 +93,9 @@ const MyOrganization = () => {
     let records = [];
 
     const db = getFirestore(firebaseApp);
-    const collectionRef = collection(
-      doc(collection(db, "companies"), domain),
-      "users"
-    );
+    const collectionRef = collection(doc(collection(db, "companies"), domain), "users");
 
-    let query = firebaseQuery(
-      collectionRef,
-      orderBy("email", "asc"),
-      startAfter(lastDoc || null),
-      limit(20)
-    );
+    let query = firebaseQuery(collectionRef, orderBy("email", "asc"), startAfter(lastDoc || null), limit(20));
 
     getDocs(query)
       .then((documentSnapshots) => {
@@ -135,9 +119,7 @@ const MyOrganization = () => {
       .catch((err) => Logger.error(err));
   };
 
-  const stableFetchUsers = useCallback(fetchUsers, [
-    user.details.profile.email,
-  ]);
+  const stableFetchUsers = useCallback(fetchUsers, [user.details.profile.email]);
 
   const submitCreateTeam = () => {
     trackCreateTeamSubsClickedOnOrgsPage();
@@ -208,17 +190,12 @@ const MyOrganization = () => {
                 title={() => (
                   <Row align="middle" justify="space-between">
                     <Col span={8} style={{ textAlign: "left" }}>
-                      <span>
-                        My Organization{" "}
-                        {companyName ? <>- {companyName}</> : null}
-                      </span>
+                      <span>My Organization {companyName ? <>- {companyName}</> : null}</span>
                     </Col>
                     <Col span={8} style={{ textAlign: "right" }}>
                       {" "}
                       <span style={{ marginRight: 8 }}>
-                        {hasSelected
-                          ? `${selectedRowKeys.length} users selected`
-                          : ""}
+                        {hasSelected ? `${selectedRowKeys.length} users selected` : ""}
                       </span>
                       <Button
                         type="primary"

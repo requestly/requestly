@@ -12,12 +12,7 @@ import { deleteSharedList, refreshPendingStatus } from "./actions";
 import { LoadingOutlined } from "@ant-design/icons";
 import { actions } from "store";
 
-const DeleteSharedListModal = ({
-  sharedListIdsToDeleteArray,
-  userId,
-  isOpen,
-  toggle,
-}) => {
+const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, toggle }) => {
   //Global State
   const dispatch = useDispatch();
 
@@ -41,20 +36,11 @@ const DeleteSharedListModal = ({
       <Row>
         <Col span={24} align="center">
           <Space>
-            <Button
-              color="secondary"
-              data-dismiss="modal"
-              type="button"
-              onClick={toggle}
-            >
+            <Button color="secondary" data-dismiss="modal" type="button" onClick={toggle}>
               Close
             </Button>
             {showConfirmationBtn ? (
-              <Button
-                type="primary"
-                data-dismiss="modal"
-                onClick={() => setDeletionConfirmed(true)}
-              >
+              <Button type="primary" data-dismiss="modal" onClick={() => setDeletionConfirmed(true)}>
                 Yes
               </Button>
             ) : null}
@@ -130,10 +116,7 @@ const DeleteSharedListModal = ({
     return Promise.all(allPromises);
   };
 
-  const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [
-    dispatch,
-    sharedListIdsToDeleteArray,
-  ]);
+  const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [dispatch, sharedListIdsToDeleteArray]);
 
   const updateCurrentlySelectedLists = (dispatch, newValue) => {
     dispatch(actions.updateSelectedSharedLists(newValue));
@@ -153,27 +136,11 @@ const DeleteSharedListModal = ({
         toggle();
       });
     }
-  }, [
-    deletionConfirmed,
-    deletionSuccessful,
-    stableDoDeleteSharedLists,
-    toggle,
-    dispatch,
-  ]);
+  }, [deletionConfirmed, deletionSuccessful, stableDoDeleteSharedLists, toggle, dispatch]);
 
   return (
-    <Modal
-      className="modal-dialog-centered "
-      visible={isOpen}
-      onCancel={toggle}
-      footer={null}
-      title="Delete List"
-    >
-      {!deletionConfirmed
-        ? renderConfirmation()
-        : deletionSuccessful
-        ? renderDeleteSummary()
-        : renderLoader()}
+    <Modal className="modal-dialog-centered " visible={isOpen} onCancel={toggle} footer={null} title="Delete List">
+      {!deletionConfirmed ? renderConfirmation() : deletionSuccessful ? renderDeleteSummary() : renderLoader()}
     </Modal>
   );
 };

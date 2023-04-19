@@ -8,20 +8,13 @@ interface GroupMenuItemProps {
   handleMenuItemClick: () => void;
 }
 
-const GroupMenuItem: React.FC<GroupMenuItemProps> = ({
-  id = "",
-  name,
-  currentGroupId,
-  handleMenuItemClick,
-}) => {
+const GroupMenuItem: React.FC<GroupMenuItemProps> = ({ id = "", name, currentGroupId, handleMenuItemClick }) => {
   const menuItem = useMemo(
     () => (
       <Menu.Item
         key={id}
         onClick={handleMenuItemClick}
-        className={`editor-group-menu-item ${
-          id === currentGroupId ? "editor-group-menu-item-active" : ""
-        }`}
+        className={`editor-group-menu-item ${id === currentGroupId ? "editor-group-menu-item-active" : ""}`}
       >
         <span>{name}</span>
         {id === currentGroupId && (

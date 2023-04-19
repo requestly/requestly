@@ -17,9 +17,7 @@ const renderSummaryTable = (request_data) => {
           .map((key, index) => {
             return (
               <Table.Row key={index} id={index}>
-                <Table.Cell style={{ textTransform: "capitalize" }}>
-                  {key}
-                </Table.Cell>
+                <Table.Cell style={{ textTransform: "capitalize" }}>{key}</Table.Cell>
                 <Table.Cell>{request_data[key]}</Table.Cell>
               </Table.Row>
             );

@@ -8,12 +8,7 @@ interface YTVideoProps {
   handleOnPlay: () => void;
 }
 
-export const YouTubePlayer: React.FC<YTVideoProps> = ({
-  src,
-  width,
-  height,
-  handleOnPlay,
-}) => {
+export const YouTubePlayer: React.FC<YTVideoProps> = ({ src, width, height, handleOnPlay }) => {
   const getVideoIdFromURL = () => {
     const urlParts = src.split("/");
     return urlParts[urlParts.length - 1];
@@ -24,12 +19,5 @@ export const YouTubePlayer: React.FC<YTVideoProps> = ({
     height,
   };
 
-  return (
-    <YouTube
-      videoId={getVideoIdFromURL()}
-      opts={options}
-      title={src}
-      onPlay={handleOnPlay}
-    />
-  );
+  return <YouTube videoId={getVideoIdFromURL()} opts={options} title={src} onPlay={handleOnPlay} />;
 };

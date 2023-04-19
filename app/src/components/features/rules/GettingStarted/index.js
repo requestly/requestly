@@ -11,14 +11,8 @@ import { getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
-import {
-  trackGettingStartedVideoPlayed,
-  trackNewRuleButtonClicked,
-} from "modules/analytics/events/common/rules";
-import {
-  trackRulesImportStarted,
-  trackUploadRulesButtonClicked,
-} from "modules/analytics/events/features/rules";
+import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
+import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -32,14 +26,11 @@ const GettingStarted = () => {
   const user = useSelector(getUserAuthDetails);
 
   const gettingStartedVideo = useRef(null);
-  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(
-    false
-  );
+  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const isFeatureflagOn = useFeatureIsOn("persona_recommendation");
-  const isPersonaRecommendationFlagOn =
-    isFeatureflagOn && state?.src === "persona_survey_modal";
+  const isPersonaRecommendationFlagOn = isFeatureflagOn && state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -103,10 +94,7 @@ const GettingStarted = () => {
   return (
     <>
       {isPersonaRecommendationFlagOn ? (
-        <PersonaRecommendation
-          isUserLoggedIn={isUserLoggedIn}
-          handleUploadRulesClick={handleUploadRulesClick}
-        />
+        <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
         <Row className="getting-started-container">
           <Col
@@ -128,8 +116,8 @@ const GettingStarted = () => {
             <>
               <div className="getting-started-header-container">
                 <p className="text-gray getting-started-header">
-                  <span className="text-bold">👋 Welcome to Requestly!!</span>{" "}
-                  Here's a quick overview of what you can do with Requestly.
+                  <span className="text-bold">👋 Welcome to Requestly!!</span> Here's a quick overview of what you can
+                  do with Requestly.
                 </p>
               </div>
 
@@ -147,8 +135,7 @@ const GettingStarted = () => {
 
               <div className="getting-started-actions">
                 <p className="text-gray getting-started-subtitle">
-                  Create rules to modify HTTP requests & responses - URL
-                  redirects, Modify APIs, Modify Headers, etc.
+                  Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
                 </p>
                 <div>
                   <Button
@@ -166,9 +153,7 @@ const GettingStarted = () => {
                     <RQButton
                       type="default"
                       onClick={() => {
-                        trackUploadRulesButtonClicked(
-                          AUTH.SOURCE.GETTING_STARTED
-                        );
+                        trackUploadRulesButtonClicked(AUTH.SOURCE.GETTING_STARTED);
                         user?.details?.isLoggedIn && handleUploadRulesClick();
                       }}
                     >
@@ -181,10 +166,7 @@ const GettingStarted = () => {
               {showExistingRulesBanner ? (
                 <p className="text-gray">
                   👉 If you have existing rules, please{" "}
-                  <button
-                    onClick={handleLoginOnClick}
-                    className="getting-started-signin-link"
-                  >
+                  <button onClick={handleLoginOnClick} className="getting-started-signin-link">
                     Sign in
                   </button>{" "}
                   to access them.
@@ -196,10 +178,7 @@ const GettingStarted = () => {
       )}
 
       {isImportRulesModalActive ? (
-        <ImportRulesModal
-          isOpen={isImportRulesModalActive}
-          toggle={toggleImportRulesModal}
-        />
+        <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
     </>
   );

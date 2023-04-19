@@ -4,10 +4,7 @@ import { Result, Button } from "antd";
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 // Utils
-import {
-  redirectToTeam,
-  redirectToRules,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToTeam, redirectToRules } from "../../../../utils/RedirectionUtils";
 import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -37,9 +34,7 @@ const PaymentSuccess = () => {
             usersCount > 1 ? (
               <Button
                 type="primary"
-                onClick={() =>
-                  redirectToTeam(navigate, teamId, { hardRedirect: true })
-                }
+                onClick={() => redirectToTeam(navigate, teamId, { hardRedirect: true })}
                 key="go-to-teams"
               >
                 Manage your Team

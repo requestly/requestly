@@ -61,9 +61,7 @@ EventActions.getBatchesToSend = async () => {
 /* ACKNOWLEDGEMENT HANDLERS */
 
 EventActions.stopWaitingForAcknowledgement = (batchId) => {
-  const batchIndex = EventActions.batchesWaitingForAck.findIndex(
-    (batch) => batch === batchId
-  );
+  const batchIndex = EventActions.batchesWaitingForAck.findIndex((batch) => batch === batchId);
   if (batchIndex !== -1) {
     EventActions.batchesWaitingForAck.splice(batchIndex, 1);
   }
@@ -89,9 +87,7 @@ EventActions.handleAcknowledgements = async (acknowledgedBatchIds) => {
 EventActions.sendExtensionEvents = async () => {
   const lastTriedTabIds = [];
 
-  const useEngine = await RQ.StorageService.getRecord(
-    RQ.STORAGE_KEYS.USE_EVENTS_ENGINE
-  );
+  const useEngine = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE);
 
   while (useEngine !== false && BG.isAppOnline) {
     /* Getting one UI tab (that we haven't tried sending) */
@@ -115,10 +111,7 @@ EventActions.sendExtensionEvents = async () => {
       action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
       eventBatches: eventBatchesPayload,
     };
-    const response = await BG.Methods.sendMessageToApp(
-      extensionEventsMessage,
-      appTabId
-    )
+    const response = await BG.Methods.sendMessageToApp(extensionEventsMessage, appTabId)
       .then((payload) => {
         if (payload) {
           return { wasMessageSent: true, payload };

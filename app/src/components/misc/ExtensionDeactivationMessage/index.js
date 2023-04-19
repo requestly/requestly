@@ -13,18 +13,11 @@ const ExtensionDeactivationMessage = () => {
             <Jumbotron className="text-center">
               <h1 className="display-3">Extension is deactivated</h1>
               <p className="lead">
-                Please activate the extension by right clicking on it and
-                selecting{" "}
-                <span style={{ cursor: "auto", fontWeight: "bold" }}>
-                  Activate Requestly
-                </span>{" "}
-                option and then reload this page.
+                Please activate the extension by right clicking on it and selecting{" "}
+                <span style={{ cursor: "auto", fontWeight: "bold" }}>Activate Requestly</span> option and then reload
+                this page.
               </p>
-              <img
-                style={{ maxWidth: "40vh" }}
-                src={activateRequestly}
-                alt="activate requestly"
-              />
+              <img style={{ maxWidth: "40vh" }} src={activateRequestly} alt="activate requestly" />
             </Jumbotron>
           </Col>
         </Row>

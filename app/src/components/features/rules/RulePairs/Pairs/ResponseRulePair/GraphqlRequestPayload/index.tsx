@@ -17,22 +17,12 @@ import {
 import "./GraphqlRequestPayload.css";
 
 const {
-  PATH_FROM_PAIR: {
-    SOURCE_REQUEST_PAYLOAD,
-    SOURCE_REQUEST_PAYLOAD_KEY,
-    SOURCE_REQUEST_PAYLOAD_VALUE,
-  },
+  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD, SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
 } = APP_CONSTANTS;
 
-const debouncedTrackPayloadKeyModifiedEvent = debounce(
-  trackRequestPayloadKeyFilterModifiedEvent,
-  500
-);
+const debouncedTrackPayloadKeyModifiedEvent = debounce(trackRequestPayloadKeyFilterModifiedEvent, 500);
 
-const debouncedTrackPayloadValueModifiedEvent = debounce(
-  trackRequestPayloadValueFilterModifiedEvent,
-  500
-);
+const debouncedTrackPayloadValueModifiedEvent = debounce(trackRequestPayloadValueFilterModifiedEvent, 500);
 
 type RequestPayload = { key: string; value: string };
 
@@ -58,9 +48,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const isRequestPayloadFilterCompatible = isFeatureCompatible(
-    FEATURES.REQUEST_PAYLOAD_FILTER
-  );
+  const isRequestPayloadFilterCompatible = isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER);
 
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
@@ -92,9 +80,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  const handleRequestPayloadKeyChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleRequestPayloadKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
     const key = e.target.value;
 
@@ -109,9 +95,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  const handleRequestPayloadValueChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleRequestPayloadValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
     const value = e.target.value;
 
@@ -135,11 +119,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           title={
             <span>
               Target rule based on GraphQL operation name in request.{" "}
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}
-              >
+              <a target="_blank" rel="noreferrer" href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}>
                 Learn more
               </a>
             </span>

@@ -7,22 +7,14 @@ import "./ResponseStatusCodeRow.css";
 
 const { Option, OptGroup } = Select;
 
-const ResponseStatusCodeRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const [statusCode, setStatusCode] = useState(pair.response.statusCode);
 
   return (
     <Row key={rowIndex} className="w-full">
       <Col span={24} className="response-status-code-container">
-        <label className="subtitle response-status-code-label">
-          Response Status Code
-        </label>
+        <label className="subtitle response-status-code-label">Response Status Code</label>
         <AutoComplete
           showSearch={true}
           size="large"
@@ -32,26 +24,18 @@ const ResponseStatusCodeRow = ({
           value={statusCode || undefined}
           dropdownMatchSelectWidth={false}
           onChange={(value) => {
-            modifyPairAtGivenPath(
-              null,
-              pairIndex,
-              "response.statusCode",
-              value,
-              [
-                {
-                  path: "response.statusText",
-                  value: statusCodes[value] || "",
-                },
-              ]
-            );
+            modifyPairAtGivenPath(null, pairIndex, "response.statusCode", value, [
+              {
+                path: "response.statusText",
+                value: statusCodes[value] || "",
+              },
+            ]);
             setStatusCode(value);
           }}
           filterOption={(inputValue, option) => {
             // exclude category headings
             if (option.value) {
-              return option.children
-                ?.toLowerCase()
-                ?.includes(inputValue.toLowerCase());
+              return option.children?.toLowerCase()?.includes(inputValue.toLowerCase());
             }
           }}
         >

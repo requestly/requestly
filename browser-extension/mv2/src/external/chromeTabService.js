@@ -94,10 +94,7 @@
 
     addOnClosedListener: function (listener) {
       if (typeof listener !== "function") {
-        console.error(
-          "Chrome Tab Service: Invalid listener passed as onClosedListener ",
-          listener
-        );
+        console.error("Chrome Tab Service: Invalid listener passed as onClosedListener ", listener);
       }
 
       chrome.tabs.onRemoved.addListener(listener);

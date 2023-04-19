@@ -3,14 +3,8 @@ import { useSelector } from "react-redux";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Select, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
-import {
-  getMobileDebuggerAppDetails,
-  getUserAuthDetails,
-} from "store/selectors";
-import {
-  redirectToCreateNewApp,
-  redirectToMobileDebuggerHome,
-} from "utils/RedirectionUtils";
+import { getMobileDebuggerAppDetails, getUserAuthDetails } from "store/selectors";
+import { redirectToCreateNewApp, redirectToMobileDebuggerHome } from "utils/RedirectionUtils";
 import { APP_PLATFORMS_MAP } from "../screens/createApp/constants";
 import { getSdkApps } from "../utils/sdkUtils";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -45,9 +39,7 @@ const MobileDebuggerAppSelector = () => {
 
   useEffect(() => {
     if (mobileDebuggerAppDetails) {
-      setSelectedApp(
-        mobileDebuggerAppDetails && mobileDebuggerAppDetails["id"]
-      );
+      setSelectedApp(mobileDebuggerAppDetails && mobileDebuggerAppDetails["id"]);
     }
   }, [mobileDebuggerAppDetails, user]);
 
@@ -73,8 +65,7 @@ const MobileDebuggerAppSelector = () => {
         {apps.map((app) => {
           return (
             <Select.Option key={app.id} value={app.id}>
-              {APP_PLATFORMS_MAP[app.platform]?.icon || null}{" "}
-              {app.name || app.id}{" "}
+              {APP_PLATFORMS_MAP[app.platform]?.icon || null} {app.name || app.id}{" "}
             </Select.Option>
           );
         })}
@@ -98,10 +89,7 @@ const MobileDebuggerAppSelector = () => {
         onConfirm={createNewAppHandler}
         source={AUTH.SOURCE.CREATE_NEW_APP}
       >
-        <Button
-          type="primary"
-          onClick={user?.details?.isLoggedIn && createNewAppHandler}
-        >
+        <Button type="primary" onClick={user?.details?.isLoggedIn && createNewAppHandler}>
           <PlusOutlined /> Create New App
         </Button>
       </AuthConfirmationPopover>

@@ -13,8 +13,7 @@ const UpdateSubscriptionContactUs = () => {
             <img alt="" style={{ maxHeight: "50vh" }} src={WIPGif} />
             <div className="hp-landing-hero-title hp-text-center hp-mt-64 hp-px-24">
               <p className="h4 hp-font-weight-400 hp-text-color-black-60">
-                Meanwhile, to make changes to your subscription or add more
-                users to your plan, please say us Hi at{" "}
+                Meanwhile, to make changes to your subscription or add more users to your plan, please say us Hi at{" "}
                 <a
                   className="has-no-text-decoration"
                   href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}

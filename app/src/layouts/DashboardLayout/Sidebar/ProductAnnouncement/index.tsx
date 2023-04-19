@@ -15,9 +15,7 @@ const ProductAnnouncement: React.FC = () => {
 
   return (
     <>
-      <Typography.Text className="text-sm text-bold">
-        We're now Open-Source 🚀
-      </Typography.Text>
+      <Typography.Text className="text-sm text-bold">We're now Open-Source 🚀</Typography.Text>
       {/* <Typography.Text type="secondary">
         Contributions and feedback are welcome.
       </Typography.Text> */}
@@ -32,13 +30,7 @@ const ProductAnnouncement: React.FC = () => {
         target="_blank"
       >
         Checkout Github
-        <img
-          width="10.67px"
-          height="10px"
-          src={RightArrow}
-          alt="right arrow"
-          className="announcement-os-icon"
-        />
+        <img width="10.67px" height="10px" src={RightArrow} alt="right arrow" className="announcement-os-icon" />
       </Button>
     </>
   );

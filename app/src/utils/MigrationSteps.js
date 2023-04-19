@@ -9,24 +9,14 @@ import { setSourceFilterFormatOfRulePairs } from "./rules/setSourceFilterFormat"
 import { migrateHeaderRulesToV2 } from "./rules/migrateHeaderRulesToV2";
 import Logger from "lib/logger";
 
-export const checkIfSourceFilterMigrationStepsAreAlreadyPerformed = (
-  appMode
-) => {
-  Logger.log(
-    "Reading storage in checkIfSourceFilterMigrationStepsAreAlreadyPerformed"
-  );
-  return StorageService(appMode).getRecord(
-    APP_CONSTANTS.MIGRATED_TO_NEW_SOURCE_FILTER_FORMAT
-  );
+export const checkIfSourceFilterMigrationStepsAreAlreadyPerformed = (appMode) => {
+  Logger.log("Reading storage in checkIfSourceFilterMigrationStepsAreAlreadyPerformed");
+  return StorageService(appMode).getRecord(APP_CONSTANTS.MIGRATED_TO_NEW_SOURCE_FILTER_FORMAT);
 };
 
 export const checkIfHeadersV2MigrationStepsAreAlreadyPerformed = (appMode) => {
-  Logger.log(
-    "Reading storage in checkIfHeadersV2MigrationStepsAreAlreadyPerformed"
-  );
-  return StorageService(appMode).getRecord(
-    APP_CONSTANTS.MIGRATED_HEADER_RULES_TO_V2
-  );
+  Logger.log("Reading storage in checkIfHeadersV2MigrationStepsAreAlreadyPerformed");
+  return StorageService(appMode).getRecord(APP_CONSTANTS.MIGRATED_HEADER_RULES_TO_V2);
 };
 
 export const setHeadersV2MigrationStepsDone = (appMode) => {
@@ -45,9 +35,7 @@ export const setSourceFilterMigrationStepsDone = (appMode) => {
 
 export const executeMigrationSteps = async (appMode) => {
   Logger.log("Reading storage in executeMigrationSteps");
-  const rules = await StorageService(appMode).getRecords(
-    GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
-  );
+  const rules = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
   const rulesWithPairIdSet = setIdsOfRulePairs(rules);
   Logger.log("Reading storage in executeMigrationSteps");
   StorageService(appMode).saveMultipleRulesOrGroups(rulesWithPairIdSet);
@@ -55,22 +43,15 @@ export const executeMigrationSteps = async (appMode) => {
 
 export const executeMigrationForSourceFilterFormat = async (appMode) => {
   Logger.log("Reading storage in executeMigrationForSourceFilterFormat");
-  const rules = await StorageService(appMode).getRecords(
-    GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
-  );
-  const rulesWithNewSourceFilterFormat =
-    setSourceFilterFormatOfRulePairs(rules);
+  const rules = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
+  const rulesWithNewSourceFilterFormat = setSourceFilterFormatOfRulePairs(rules);
   Logger.log("Reading storage in executeMigrationForSourceFilterFormat");
-  StorageService(appMode).saveMultipleRulesOrGroups(
-    rulesWithNewSourceFilterFormat
-  );
+  StorageService(appMode).saveMultipleRulesOrGroups(rulesWithNewSourceFilterFormat);
 };
 
 export const executeV2MigrationForHeaderRules = async (appMode) => {
   Logger.log("Reading storage in executeV2MigrationForHeaderRules");
-  const rules = await StorageService(appMode).getRecords(
-    GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
-  );
+  const rules = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
 
   const migratedRules = migrateHeaderRulesToV2(rules);
 

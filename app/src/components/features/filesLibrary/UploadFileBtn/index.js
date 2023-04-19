@@ -70,11 +70,7 @@ const UploadFileBtn = ({ updateCollection, buttonType = "primary" }) => {
           onConfirm={handleUploadBtnOnClick}
           source={AUTH.SOURCE.UPLOAD_FILES}
         >
-          <Button
-            type={buttonType}
-            icon={<CloudUploadOutlined />}
-            onClick={handleUploadBtnOnClick}
-          >
+          <Button type={buttonType} icon={<CloudUploadOutlined />} onClick={handleUploadBtnOnClick}>
             Upload File
           </Button>
         </AuthConfirmationPopover>

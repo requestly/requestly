@@ -10,13 +10,7 @@ interface SettingsItemProps {
   onClick: (status: boolean) => void;
 }
 
-const SettingsItem: React.FC<SettingsItemProps> = ({
-  title,
-  caption,
-  isActive,
-  onClick,
-  isProcessing = false,
-}) => {
+const SettingsItem: React.FC<SettingsItemProps> = ({ title, caption, isActive, onClick, isProcessing = false }) => {
   return (
     <Row align="middle" className="w-full setting-item-container">
       <Col span={22}>

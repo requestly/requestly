@@ -12,7 +12,5 @@ export const getRandomAvatar = () => {
 };
 
 export const generateGravatarURL = (email = "sagar@requestly.io") => {
-  return `https://www.gravatar.com/avatar/${md5(
-    email
-  )}?s=200&d=${getRandomAvatar()}`;
+  return `https://www.gravatar.com/avatar/${md5(email)}?s=200&d=${getRandomAvatar()}`;
 };

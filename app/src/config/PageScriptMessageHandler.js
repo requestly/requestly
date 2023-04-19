@@ -34,9 +34,7 @@ const PageScriptMessageHandler = {
   },
 
   invokeCallback: function (data) {
-    const callbackRef = this.eventCallbackMap[
-      data.action + "_" + data.requestId
-    ];
+    const callbackRef = this.eventCallbackMap[data.action + "_" + data.requestId];
 
     if (typeof callbackRef === "function") {
       // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
@@ -70,28 +68,17 @@ const PageScriptMessageHandler = {
 
   handleMessageReceived: function (event) {
     if (event && event.origin !== this.constants.DOMAIN) {
-      Logger.log(
-        "Ignoring message from the following domain",
-        event.origin,
-        event.data
-      );
+      Logger.log("Ignoring message from the following domain", event.origin, event.data);
 
       return;
     }
 
-    if (
-      event &&
-      event.data &&
-      event.data.source === this.constants.CONTENT_SCRIPT
-    ) {
+    if (event && event.data && event.data.source === this.constants.CONTENT_SCRIPT) {
       Logger.log("Received message:", event.data);
 
       if (
         event.data.requestId &&
-        Object.hasOwn(
-          this.eventCallbackMap,
-          `${event.data.action}_${event.data.requestId}`
-        )
+        Object.hasOwn(this.eventCallbackMap, `${event.data.action}_${event.data.requestId}`)
       ) {
         this.invokeCallback(event.data);
       } else {

@@ -7,9 +7,7 @@ const PricingTable = () => {
     <>
       <div className="pricing-title-container">
         <div className="pricing-title ">Plans & pricing</div>
-        <h1 className="pricing-hero-title text-bold text-center">
-          Debug 5x faster with Requestly
-        </h1>
+        <h1 className="pricing-hero-title text-bold text-center">Debug 5x faster with Requestly</h1>
       </div>
       <FreeAndEnterprisePlanTable />
     </>

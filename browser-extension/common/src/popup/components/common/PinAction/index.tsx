@@ -14,17 +14,9 @@ const PinAction: React.FC<PinActionProps> = ({ record, updateRecord }) => {
   }, [record, updateRecord]);
 
   return record.isFavourite ? (
-    <PushpinFilled
-      rotate={-45}
-      className="pin-icon active"
-      onClick={handlePinClicked}
-    />
+    <PushpinFilled rotate={-45} className="pin-icon active" onClick={handlePinClicked} />
   ) : (
-    <PushpinOutlined
-      rotate={-45}
-      className="pin-icon"
-      onClick={handlePinClicked}
-    />
+    <PushpinOutlined rotate={-45} className="pin-icon" onClick={handlePinClicked} />
   );
 };
 

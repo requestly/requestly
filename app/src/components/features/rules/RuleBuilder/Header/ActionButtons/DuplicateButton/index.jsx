@@ -8,20 +8,12 @@ import { getModeData } from "../../../actions";
 import { toast } from "utils/Toast";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 
-const DuplicateButton = ({
-  rule,
-  isDisabled,
-  handleRuleOptionsDropdownClose,
-}) => {
+const DuplicateButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
   const { MODE } = getModeData(window.location);
   const dispatch = useDispatch();
 
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
-    getIsCurrentlySelectedRuleHasUnsavedChanges
-  );
-  const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(
-    false
-  );
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
 
   const closeDuplicateRuleModal = useCallback(() => {
     setIsDuplicateRuleModalActive(false);
@@ -50,11 +42,7 @@ const DuplicateButton = ({
 
   return (
     <>
-      <Button
-        type="text"
-        disabled={isDisabled}
-        onClick={handleDuplicateRuleClick}
-      >
+      <Button type="text" disabled={isDisabled} onClick={handleDuplicateRuleClick}>
         Duplicate
       </Button>
       {isDuplicateRuleModalActive ? (

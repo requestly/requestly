@@ -15,20 +15,14 @@ interface Props {
   updateCount: (count: number) => void;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({
-  networkLogs,
-  playerTimeOffset,
-  updateCount,
-}) => {
+const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, updateCount }) => {
   const visibleNetworkLogs = useMemo<NetworkLog[]>(() => {
     return networkLogs.filter((networkLog: NetworkLog) => {
       return networkLog.timeOffset <= playerTimeOffset;
     });
   }, [networkLogs, playerTimeOffset]);
 
-  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(
-    visibleNetworkLogs
-  );
+  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(visibleNetworkLogs);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
   const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
@@ -39,11 +33,7 @@ const NetworkLogsPanel: React.FC<Props> = ({
 
   const networkLogsTable = useMemo(
     () => (
-      <div
-        className="network-logs-table"
-        ref={containerRef}
-        onScroll={onScroll}
-      >
+      <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
         {visibleNetworkLogs.map((log, i) => (
           <NetworkLogRow
             key={i}
@@ -75,10 +65,7 @@ const NetworkLogsPanel: React.FC<Props> = ({
             snapOffset={30}
           >
             {networkLogsTable}
-            <NetworkLogDetails
-              {...visibleNetworkLogs[selectedLogIndex]}
-              onClose={() => setSelectedLogIndex(-1)}
-            />
+            <NetworkLogDetails {...visibleNetworkLogs[selectedLogIndex]} onClose={() => setSelectedLogIndex(-1)} />
           </Split>
         )
       ) : includeNetworkLogs === false ? (

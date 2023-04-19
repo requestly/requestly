@@ -45,9 +45,7 @@ const ChangeRuleGroupModal = (props) => {
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
-  const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState(
-    []
-  );
+  const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState([]);
 
   const generateOptionsForReactSelect = (groups) => {
     return groups.map((group) => {
@@ -62,15 +60,14 @@ const ChangeRuleGroupModal = (props) => {
     if (MODE === MODES.SELECTED_RULES) {
       return [];
     } else {
-      return allOptions.filter(
-        (option) => option.value === currentlySelectedRuleData.groupId
-      );
+      return allOptions.filter((option) => option.value === currentlySelectedRuleData.groupId);
     }
   };
-  const stableGetCurrentValueForReactSelect = useCallback(
-    getCurrentValueForReactSelect,
-    [MODE, MODES.SELECTED_RULES, currentlySelectedRuleData.groupId]
-  );
+  const stableGetCurrentValueForReactSelect = useCallback(getCurrentValueForReactSelect, [
+    MODE,
+    MODES.SELECTED_RULES,
+    currentlySelectedRuleData.groupId,
+  ]);
 
   const updateCurrentlySelectedRuleGroup = (newGroupId) => {
     if (MODE === MODES.CURRENT_RULE) {
@@ -102,12 +99,7 @@ const ChangeRuleGroupModal = (props) => {
 
   const handleReactSelectOnChange = (newSelectedOption) => {
     newSelectedOption.__isNew__
-      ? createNewGroup(
-          appMode,
-          newSelectedOption.label,
-          updateCurrentlySelectedRuleGroup,
-          user
-        )
+      ? createNewGroup(appMode, newSelectedOption.label, updateCurrentlySelectedRuleGroup, user)
       : updateCurrentlySelectedRuleGroup(newSelectedOption.value);
     props.toggle();
   };
@@ -125,22 +117,11 @@ const ChangeRuleGroupModal = (props) => {
     setAllOptionsForReactSelect(generateOptionsForReactSelect(allGroups));
   }, [allGroups]);
   useEffect(() => {
-    setCurrentValueForReactSelect(
-      stableGetCurrentValueForReactSelect(allOptionsForReactSelect)
-    );
-  }, [
-    setCurrentValueForReactSelect,
-    stableGetCurrentValueForReactSelect,
-    allOptionsForReactSelect,
-  ]);
+    setCurrentValueForReactSelect(stableGetCurrentValueForReactSelect(allOptionsForReactSelect));
+  }, [setCurrentValueForReactSelect, stableGetCurrentValueForReactSelect, allOptionsForReactSelect]);
 
   return (
-    <Modal
-      visible={props.isOpen}
-      onCancel={props.toggle}
-      footer={null}
-      title="Change Group"
-    >
+    <Modal visible={props.isOpen} onCancel={props.toggle} footer={null} title="Change Group">
       <div className="">
         {/* <Row className="one-padding-bottom  my-auto"> */}
         <Col className="my-auto">

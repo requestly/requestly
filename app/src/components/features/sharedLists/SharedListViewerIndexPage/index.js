@@ -11,11 +11,7 @@ import { StorageService } from "../../../../init";
 import { actions } from "../../../../store";
 //ACTIONS
 import { getSharedListIdFromURL, fetchSharedListData } from "./actions";
-import {
-  getAppMode,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "../../../../store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../../../store/selectors";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./sharedListViewerIndexPage.css";
@@ -42,13 +38,9 @@ const SharedListViewerIndexPage = () => {
 
   useEffect(() => {
     Logger.log("Reading storage (groups) in SharedListViewerIndexPage");
-    const groupsPromise = StorageService(appMode).getRecords(
-      GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP
-    );
+    const groupsPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
     Logger.log("Reading storage (rules) in SharedListViewerIndexPage");
-    const rulesPromise = StorageService(appMode).getRecords(
-      GLOBAL_CONSTANTS.OBJECT_TYPES.RULE
-    );
+    const rulesPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
 
     Promise.all([groupsPromise, rulesPromise]).then((data) => {
       const groups = data[0];
@@ -102,17 +94,9 @@ const SharedListViewerIndexPage = () => {
           </Col>
         </Row>
       ) : sharedListPresent && !isEmpty(rulesFromSharedList) ? (
-        <SharedListViewerTableContainer
-          rules={rulesFromSharedList}
-          groups={groupsFromSharedList}
-        />
+        <SharedListViewerTableContainer rules={rulesFromSharedList} groups={groupsFromSharedList} />
       ) : (
-        <Row
-          className="sharedList-viewer-error-wrapper"
-          type="flex"
-          align="middle"
-          justify="center"
-        >
+        <Row className="sharedList-viewer-error-wrapper" type="flex" align="middle" justify="center">
           <Col className="sharedList-viewer-error-message">
             <h1>
               <CloseCircleOutlined className="error-icon" />
@@ -122,19 +106,14 @@ const SharedListViewerIndexPage = () => {
                 <h2>This list is private. Please login to access it</h2>
                 <button
                   className="ant-btn ant-btn-primary"
-                  onClick={() =>
-                    promptUserToSignup(AUTH.SOURCE.ACCESS_SHARED_LIST)
-                  }
+                  onClick={() => promptUserToSignup(AUTH.SOURCE.ACCESS_SHARED_LIST)}
                 >
                   Login
                 </button>
               </>
             ) : (
               <>
-                <h2>
-                  Either you don’t have permission to access this shared list or
-                  this URL is invalid
-                </h2>
+                <h2>Either you don’t have permission to access this shared list or this URL is invalid</h2>
                 <p>
                   <a href="/">Go To Rules</a>
                 </p>

@@ -3,15 +3,10 @@ import { StorageService } from "init";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
-const UNGROUPED_GROUP_ID =
-  APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
 // Handle Rules whose Groups are missing!
-export const isGroupsSanitizationPassed = async ({
-  rules = [],
-  groups = [],
-  appMode,
-}) => {
+export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appMode }) => {
   return new Promise((resolve) => {
     const updatedRules = [...rules];
     let result = true; // This is tell the invoker to fetch rules again!

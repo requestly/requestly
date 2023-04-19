@@ -19,18 +19,12 @@ import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions"
 //EXTERNALS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILITIES
-import {
-  getCurrentlySelectedRuleData,
-  getResponseRuleResourceType,
-} from "../../../../store/selectors";
+import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import { FaTrash } from "react-icons/fa";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
-import {
-  sourceRuleOperatorPlaceholders,
-  destinationRuleOperatorPlaceholders,
-} from "./utils";
+import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } from "./utils";
 import "./RulePairs.css";
 
 const set = require("lodash/set");
@@ -64,10 +58,7 @@ const RulePairs = (props) => {
   const isInputDisabled = props.mode === "shared-list-rule-view" ? true : false;
 
   //Component State
-  const [
-    ruleFilterActiveWithPairIndex,
-    setRuleFilterActiveWithPairIndex,
-  ] = useState(false);
+  const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
 
   /**
    * Handles onChange event with side effects
@@ -88,32 +79,17 @@ const RulePairs = (props) => {
   ) => {
     event?.preventDefault?.();
 
-    const newValue =
-      customValue !== undefined ? customValue : event.target.value;
+    const newValue = customValue !== undefined ? customValue : event.target.value;
 
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
-    set(
-      copyOfCurrentlySelectedRule.pairs[pairIndex],
-      getFilterObjectPath(objectPath),
-      newValue
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
+    set(copyOfCurrentlySelectedRule.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
     if (arrayOfOtherValuesToModify) {
       arrayOfOtherValuesToModify.forEach((modification) => {
-        set(
-          copyOfCurrentlySelectedRule.pairs[pairIndex],
-          modification.path,
-          modification.value
-        );
+        set(copyOfCurrentlySelectedRule.pairs[pairIndex], modification.path, modification.value);
       });
     }
 
-    setCurrentlySelectedRule(
-      dispatch,
-      copyOfCurrentlySelectedRule,
-      triggerUnsavedChangesIndication
-    );
+    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, triggerUnsavedChangesIndication);
   };
 
   const getPairMarkup = (pair, pairIndex) => {
@@ -237,39 +213,25 @@ const RulePairs = (props) => {
   const deletePair = (event, pairIndex) => {
     event?.preventDefault();
 
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
 
     copyOfCurrentlySelectedRule.pairs.splice(pairIndex, 1);
     setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 
-  const migrateToNewSourceFilterFormat = (
-    pairIndex,
-    copyOfCurrentlySelectedRule
-  ) => {
+  const migrateToNewSourceFilterFormat = (pairIndex, copyOfCurrentlySelectedRule) => {
     copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters = [
       copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters,
     ];
     setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule);
   };
 
-  let isSourceFilterFormatUpgraded = (
-    pairIndex,
-    copyOfCurrentlySelectedRule
-  ) => {
-    return Array.isArray(
-      copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters
-    )
-      ? true
-      : false;
+  let isSourceFilterFormatUpgraded = (pairIndex, copyOfCurrentlySelectedRule) => {
+    return Array.isArray(copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters) ? true : false;
   };
 
   const openFilterModal = (pairIndex) => {
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
     if (!isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)) {
       migrateToNewSourceFilterFormat(pairIndex, copyOfCurrentlySelectedRule);
     }
@@ -283,72 +245,36 @@ const RulePairs = (props) => {
   };
 
   const getFilterCount = (pairIndex) => {
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
     return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-      ? Object.keys(
-          currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}
-        ).length
-      : Object.keys(
-          currentlySelectedRuleData.pairs[pairIndex].source.filters || {}
-        ).length;
+      ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).length
+      : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).length;
   };
 
   const pushValueToArrayInPair = (event, pairIndex, arrayPath, value) => {
     event && event.preventDefault();
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
-    const targetArray = get(
-      copyOfCurrentlySelectedRule.pairs[pairIndex],
-      arrayPath
-    );
-    set(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath, [
-      ...(targetArray || []),
-      value,
-    ]);
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
+    const targetArray = get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath);
+    set(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
     setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 
-  const deleteArrayValueByIndexInPair = (
-    event,
-    pairIndex,
-    arrayPath,
-    arrayIndex
-  ) => {
+  const deleteArrayValueByIndexInPair = (event, pairIndex, arrayPath, arrayIndex) => {
     event && event.preventDefault();
-    const copyOfCurrentlySelectedRule = JSON.parse(
-      JSON.stringify(currentlySelectedRuleData)
-    );
-    get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath).splice(
-      arrayIndex,
-      1
-    );
+    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
+    get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath).splice(arrayIndex, 1);
     setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 
-  if (
-    currentlySelectedRuleData.pairs &&
-    currentlySelectedRuleData.pairs.length === 0
-  ) {
-    addEmptyPair(
-      currentlySelectedRuleData,
-      props.currentlySelectedRuleConfig,
-      dispatch
-    );
+  if (currentlySelectedRuleData.pairs && currentlySelectedRuleData.pairs.length === 0) {
+    addEmptyPair(currentlySelectedRuleData, props.currentlySelectedRuleConfig, dispatch);
   }
 
   const deleteButton = (pairIndex) =>
-    (props.currentlySelectedRuleConfig.TYPE === "Replace" &&
-      !isInputDisabled) ||
-    (props.currentlySelectedRuleConfig.SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW &&
-      !isInputDisabled) ? (
+    (props.currentlySelectedRuleConfig.TYPE === "Replace" && !isInputDisabled) ||
+    (props.currentlySelectedRuleConfig.SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW && !isInputDisabled) ? (
       <Tooltip title="Remove Pair">
-        <FaTrash
-          className="delete-pair-icon cursor-pointer text-gray"
-          onClick={(e) => deletePair(e, pairIndex)}
-        />
+        <FaTrash className="delete-pair-icon cursor-pointer text-gray" onClick={(e) => deletePair(e, pairIndex)} />
       </Tooltip>
     ) : null;
 
@@ -361,17 +287,13 @@ const RulePairs = (props) => {
   };
 
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
-  const rulePairHeading =
-    currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
+  const rulePairHeading = currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
   return (
     <>
-      {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes />
-      ) : null}
+      {props.currentlySelectedRuleConfig.TYPE === "Response" ? <ResponseRuleResourceTypes /> : null}
 
-      {props.currentlySelectedRuleConfig.TYPE !== "Response" ||
-      responseRuleResourceType !== "" ? (
+      {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (
         <Collapse
           className="rule-pairs-collapse"
           defaultActiveKey={activePanelKey}
@@ -383,9 +305,7 @@ const RulePairs = (props) => {
                   key={pair.id || pairIndex}
                   className="rule-pairs-panel"
                   extra={deleteButton(pairIndex)}
-                  header={
-                    <span className="panel-header">{rulePairHeading}</span>
-                  }
+                  header={<span className="panel-header">{rulePairHeading}</span>}
                 >
                   {getPairMarkup(pair, pairIndex)}
                 </Collapse.Panel>

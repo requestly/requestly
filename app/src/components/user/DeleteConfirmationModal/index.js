@@ -58,22 +58,15 @@ const DeleteConfirmationModal = ({
                 </>
               ) : (
                 <>
-                  Are you sure you want to delete selected{" "}
-                  {rulesToDelete.length}{" "}
+                  Are you sure you want to delete selected {rulesToDelete.length}{" "}
                   {rulesToDelete.length === 1 ? "rule" : "rules"} permanently?
                   <br />
                   {!isWorkspaceMode ? (
                     <>
-                      <Button
-                        type="link"
-                        size="large"
-                        className="signin-link"
-                        onClick={promptToLogin}
-                      >
+                      <Button type="link" size="large" className="signin-link" onClick={promptToLogin}>
                         Sign in
                       </Button>
-                      to move rules to trash. You can recover rules from trash
-                      later on.
+                      to move rules to trash. You can recover rules from trash later on.
                     </>
                   ) : null}
                 </>

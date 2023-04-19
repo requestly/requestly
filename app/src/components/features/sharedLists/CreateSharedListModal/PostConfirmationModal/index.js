@@ -17,10 +17,7 @@ import { trackRQLastActivity } from "../../../../../utils/AnalyticsUtils";
 import { Typography } from "antd";
 import { getSharedListURL } from "utils/PathUtils";
 
-export const PostConfirmationModal = ({
-  sharedListAttributes,
-  onSharedListCreation,
-}) => {
+export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreation }) => {
   const [createdSharedListId, setCreatedSharedListId] = useState(null);
   const [sharedListPublicURL, setSharedListPublicURL] = useState("");
   const [sharedListData, setSharedListData] = useState("");
@@ -30,9 +27,7 @@ export const PostConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const rulesCount = sharedListAttributes.rulesCount;
   const sharedListAccessType =
-    Visibility.PUBLIC === sharedListAttributes.sharedListVisibility
-      ? "public_link"
-      : "specific_people";
+    Visibility.PUBLIC === sharedListAttributes.sharedListVisibility ? "public_link" : "specific_people";
 
   let modalTriggerPage,
     modalTriggerSource = "";
@@ -54,10 +49,7 @@ export const PostConfirmationModal = ({
     trackSharedListNotifyClicked();
     trackRQLastActivity("sharedList_notify_button_clicked");
     const functions = getFunctions();
-    const sendSharedListShareEmail = httpsCallable(
-      functions,
-      "sendSharedListShareEmail"
-    );
+    const sendSharedListShareEmail = httpsCallable(functions, "sendSharedListShareEmail");
 
     sendSharedListShareEmail({
       sharedListData: sharedListData,
@@ -85,17 +77,10 @@ export const PostConfirmationModal = ({
     setSharedListCreationDone(true);
     onSharedListCreation(publicUrlOfList);
     trackRQLastActivity("sharedList_created");
-    trackSharedListCreatedEvent(
-      rulesCount,
-      modalTriggerSource,
-      modalTriggerPage,
-      sharedListAccessType
-    );
+    trackSharedListCreatedEvent(rulesCount, modalTriggerSource, modalTriggerPage, sharedListAccessType);
   };
 
-  const stablePostCreationSteps = useCallback(postCreationSteps, [
-    onSharedListCreation,
-  ]);
+  const stablePostCreationSteps = useCallback(postCreationSteps, [onSharedListCreation]);
 
   useEffect(() => {
     if (!createdSharedListId) {
@@ -108,20 +93,18 @@ export const PostConfirmationModal = ({
           sharedListAttributes.sharedListVisibility,
           sharedListAttributes.sharedListRecipients,
           user.details.profile.uid
-        ).then(
-          ({ sharedListId, sharedListName, sharedListData, nonRQEmails }) => {
-            stablePostCreationSteps({
-              sharedListId,
-              sharedListName,
-              sharedListData,
-              nonRQEmails,
-              rulesCount,
-              modalTriggerPage,
-              modalTriggerSource,
-              sharedListAccessType,
-            });
-          }
-        );
+        ).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }) => {
+          stablePostCreationSteps({
+            sharedListId,
+            sharedListName,
+            sharedListData,
+            nonRQEmails,
+            rulesCount,
+            modalTriggerPage,
+            modalTriggerSource,
+            sharedListAccessType,
+          });
+        });
       } catch (e) {
         toast.error("Error creating shared list");
       }
@@ -154,13 +137,7 @@ export const PostConfirmationModal = ({
         rulesToShare: sharedListAttributes.rulesToShare,
       });
     }
-  }, [
-    shareSharedList,
-    sharedListAttributes,
-    sharedListCreationDone,
-    sharedListPublicURL,
-    user?.details?.profile?.uid,
-  ]);
+  }, [shareSharedList, sharedListAttributes, sharedListCreationDone, sharedListPublicURL, user?.details?.profile?.uid]);
 
   return (
     <div>
@@ -177,21 +154,12 @@ export const PostConfirmationModal = ({
               margin: "16px 0",
             }}
           >
-            <CheckCircleOutlined
-              style={{ fontSize: "4rem", marginBottom: "8px" }}
-            />{" "}
-            <span style={{ fontSize: "1rem" }}>
-              {" "}
-              Successfully generated the shareable link
-            </span>
+            <CheckCircleOutlined style={{ fontSize: "4rem", marginBottom: "8px" }} />{" "}
+            <span style={{ fontSize: "1rem" }}> Successfully generated the shareable link</span>
           </div>
           <Typography align="center">
             You can view previously created links{" "}
-            <a
-              href="https://app.requestly.io/shared-lists/my-lists"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://app.requestly.io/shared-lists/my-lists" target="_blank" rel="noreferrer">
               here
             </a>
           </Typography>
@@ -212,20 +180,12 @@ export const PostConfirmationModal = ({
                   marginBottom: "8px",
                 }}
               >
-                <AiFillInfoCircle style={{ fontSize: "20px" }} /> We couldn't
-                find any Requestly{" "}
+                <AiFillInfoCircle style={{ fontSize: "20px" }} /> We couldn't find any Requestly{" "}
                 <>{nonRQUserEmails.length > 1 ? "accounts" : "account"} </>
-                for the following{" "}
-                <>{nonRQUserEmails.length > 1 ? "emails" : "email"}</>
+                for the following <>{nonRQUserEmails.length > 1 ? "emails" : "email"}</>
               </Typography>
               {nonRQUserEmails.map((email) => {
-                return (
-                  <Typography
-                    style={{ marginLeft: "30px", fontWeight: "bold" }}
-                  >
-                    {email}
-                  </Typography>
-                );
+                return <Typography style={{ marginLeft: "30px", fontWeight: "bold" }}>{email}</Typography>;
               })}
             </div>
           ) : null}

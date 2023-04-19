@@ -13,22 +13,12 @@ class ReplaceRuleProcessor {
       pair = pairs[i];
       pair.from = pair.from || "";
 
-      if (
-        pair.source &&
-        !RuleHelper.matchRequestWithRuleSourceFilters(
-          pair.source.filters,
-          details
-        )
-      ) {
+      if (pair.source && !RuleHelper.matchRequestWithRuleSourceFilters(pair.source.filters, details)) {
         continue;
       }
 
       // If Source Value exists and does not match, proceed with next pair
-      if (
-        pair.source &&
-        pair.source.value &&
-        RuleHelper.matchUrlWithRuleSource(pair.source, resultingUrl) === null
-      ) {
+      if (pair.source && pair.source.value && RuleHelper.matchUrlWithRuleSource(pair.source, resultingUrl) === null) {
         continue;
       }
 
@@ -40,17 +30,12 @@ class ReplaceRuleProcessor {
 
       // Use String.match method when from is Regex otherwise use indexOf
       // Issue-86: String.match("?a=1") fails with an error
-      if (
-        (isFromPartRegex && resultingUrl.match(from)) ||
-        resultingUrl.indexOf(from) !== -1
-      ) {
+      if ((isFromPartRegex && resultingUrl.match(from)) || resultingUrl.indexOf(from) !== -1) {
         resultingUrl = resultingUrl.replace(from, pair.to);
       }
     }
 
-    return resultingUrl !== requestURL
-      ? { action: "redirect", url: resultingUrl }
-      : null;
+    return resultingUrl !== requestURL ? { action: "redirect", url: resultingUrl } : null;
   }
 }
 

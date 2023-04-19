@@ -24,10 +24,7 @@ const TeamsList = ({ teams = [] }) => {
     switch (subscriptionStatus) {
       case "active":
         return (
-          <span
-            style={{ width: "300px" }}
-            onClick={() => redirectToTeam(navigate, teamId)}
-          >
+          <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
             <Badge status="success" /> Active
           </span>
         );
@@ -35,12 +32,7 @@ const TeamsList = ({ teams = [] }) => {
       case "incomplete":
       case "canceled":
         return (
-          <Button
-            color="primary"
-            size="sm"
-            type="button"
-            onClick={() => redirectToTeam(navigate, teamId)}
-          >
+          <Button color="primary" size="sm" type="button" onClick={() => redirectToTeam(navigate, teamId)}>
             <span>Pay now</span>
           </Button>
         );
@@ -149,10 +141,7 @@ const TeamsList = ({ teams = [] }) => {
         ]}
       />
 
-      <CreateWorkspaceModal
-        isOpen={isCreateTeamModalOpen}
-        handleModalClose={toggleCreateTeamModal}
-      />
+      <CreateWorkspaceModal isOpen={isCreateTeamModalOpen} handleModalClose={toggleCreateTeamModal} />
     </>
   );
 };

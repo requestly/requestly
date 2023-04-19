@@ -2,10 +2,8 @@ export const SESSION_RECORDING = {
   session_recording_demo_video_opened: "session_recording_demo_video_opened",
   session_recordings_config_opened: "session_recordings_config_opened",
   session_recordings_config_saved: "session_recordings_config_saved",
-  session_recordings_install_extension_dialog_shown:
-    "session_recordings_extension_dialog_opened",
-  session_recordings_installation_button_clicked:
-    "session_recordings_installation_button_clicked",
+  session_recordings_install_extension_dialog_shown: "session_recordings_extension_dialog_opened",
+  session_recordings_installation_button_clicked: "session_recordings_installation_button_clicked",
   session_recording_failed: "session_recording_failed",
   draft_session_recording_viewed: "draft_session_recording_viewed",
   draft_session_discarded: "draft_session_discarded",
@@ -16,13 +14,11 @@ export const SESSION_RECORDING = {
   session_recording_share_clicked: "session_recording_share_clicked",
   session_recording_share_link_copied: "session_recording_share_link_copied",
   session_recording_visibility_updated: "session_recording_visibility_updated",
-  session_recording_start_time_offset_updated:
-    "session_recording_start_time_offset_updated",
+  session_recording_start_time_offset_updated: "session_recording_start_time_offset_updated",
   session_recording_deleted: "session_recording_deleted",
   session_recording_description_added: "session_recording_description_added",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
-  session_recording_panel_sample_session_clicked:
-    "session_recording_panel_sample_session_clicked",
+  session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
 };
 
 export const SHARED_LIST = {

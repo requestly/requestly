@@ -31,9 +31,7 @@ export const mockMethodColorMap: { [key: string]: string } = {
   default: "#00C8AF",
 };
 
-export const editorDataToMockDataConverter = (
-  mockEditorData: MockEditorDataSchema
-): RQMockSchema => {
+export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSchema): RQMockSchema => {
   // Add content-type Header to Response
   mockEditorData.headers = {
     ...mockEditorData.headers,
@@ -63,9 +61,7 @@ export const editorDataToMockDataConverter = (
   return mockData;
 };
 
-export const mockDataToEditorDataAdapter = (
-  mockData: RQMockSchema
-): MockEditorDataSchema => {
+export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorDataSchema => {
   if (!mockData) {
     return null;
   }
@@ -96,12 +92,7 @@ export const mockDataToEditorDataAdapter = (
 
 // TODO: This is temporary. Give subdomain to users based on username.
 // Handle rewrites/redirect on cloudfare
-export const generateFinalUrl = (
-  endpoint: string,
-  uid: string,
-  username: string = null,
-  teamId?: string
-) => {
+export const generateFinalUrl = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
   let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}`;
 
   if (isEnvBeta()) {
@@ -121,11 +112,7 @@ export const generateFinalUrl = (
   return finalUrl;
 };
 
-const getMockEditorDataForFile = (
-  fileType: string,
-  name: string,
-  data: string
-) => {
+const getMockEditorDataForFile = (fileType: string, name: string, data: string) => {
   let mockEditorData = { ...defaultEditorMock };
 
   switch (fileType) {
@@ -157,9 +144,7 @@ export const createMockFromUploadedFile = async (uid: string, file: File) => {
         file.name,
         e.target.result.toString()
       );
-      const mockData: RQMockSchema = editorDataToMockDataConverter(
-        mockEditorData
-      );
+      const mockData: RQMockSchema = editorDataToMockDataConverter(mockEditorData);
 
       await createMock(uid, mockData).then((mockId) => {
         if (mockId) {

@@ -5,8 +5,7 @@ import checkIcon from "../../../../assets/img/icons/common/check.svg";
 export default function FeatureRepresentation({ title, enabled }) {
   return (
     <div className="text-left text-gray plan-feature">
-      {enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
-      {title}
+      {enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />} {title}
     </div>
   );
 }

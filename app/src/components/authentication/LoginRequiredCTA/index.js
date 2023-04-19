@@ -10,16 +10,9 @@ const LoginRequiredCTA = ({ src, hardRedirect }) => {
       <ProCard className="primary-card github-like-border">
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h1 className="display-3">{"You need to login first!"}</h1>
-              <p className="lead">
-                {
-                  "Please make sure you're logged in to your account before accessing this page"
-                }{" "}
-              </p>
+              <p className="lead">{"Please make sure you're logged in to your account before accessing this page"} </p>
               <AuthButtons src={src} hardRedirect={hardRedirect} />
             </Jumbotron>
           </Col>

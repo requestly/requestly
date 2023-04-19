@@ -26,9 +26,7 @@ interface SplitButtonsProps {
   style?: React.CSSProperties;
 }
 
-const SplitButton: React.FC<
-  SplitButtonProps & CommonButtonProps & { className: string }
-> = (props) => {
+const SplitButton: React.FC<SplitButtonProps & CommonButtonProps & { className: string }> = (props) => {
   const buttonProps = {
     className: props.className,
     type: props.type,
@@ -38,11 +36,7 @@ const SplitButton: React.FC<
   };
 
   return (
-    <Tooltip
-      title={props.tooltip}
-      placement="bottom"
-      onOpenChange={props.onTooltipVisibilityChange}
-    >
+    <Tooltip title={props.tooltip} placement="bottom" onOpenChange={props.onTooltipVisibilityChange}>
       {props.isDropdown ? (
         <Dropdown overlay={props.menu}>
           <Button {...buttonProps}>
@@ -56,13 +50,7 @@ const SplitButton: React.FC<
   );
 };
 
-const SplitButtons: React.FC<SplitButtonsProps & CommonButtonProps> = ({
-  type,
-  left,
-  right,
-  disabled,
-  style,
-}) => {
+const SplitButtons: React.FC<SplitButtonsProps & CommonButtonProps> = ({ type, left, right, disabled, style }) => {
   return (
     <div className="rq-split-buttons" style={style}>
       {left && (

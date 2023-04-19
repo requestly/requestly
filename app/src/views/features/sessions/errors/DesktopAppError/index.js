@@ -31,16 +31,10 @@ const DesktopAppError = () => {
       </Row>
       <Row style={{ textAlign: "center" }} align="center">
         <Col span={24}>
-          <Jumbotron
-            style={{ background: "transparent" }}
-            className="text-center"
-          >
-            <h1 className="display-3">
-              Screen Recording is available with browser extension only.
-            </h1>
+          <Jumbotron style={{ background: "transparent" }} className="text-center">
+            <h1 className="display-3">Screen Recording is available with browser extension only.</h1>
             <p className="lead">
-              Record activity on a webpage and capture details like console logs
-              and network requests stitched together
+              Record activity on a webpage and capture details like console logs and network requests stitched together
             </p>
 
             <Space>

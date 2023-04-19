@@ -5,9 +5,7 @@ import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectJSAtRequestSource, isNonBrowserTab } from "./utils";
 
-const overrideResponse = async (
-  details: chrome.webRequest.WebRequestDetails
-) => {
+const overrideResponse = async (details: chrome.webRequest.WebRequestDetails) => {
   if (isNonBrowserTab(details.tabId)) {
     return;
   }
@@ -26,14 +24,11 @@ const overrideResponse = async (
   });
 
   if (matchingResponseRules.length > 0) {
-    const responseRule =
-      matchingResponseRules[matchingResponseRules.length - 1]; // last overridden response is final
+    const responseRule = matchingResponseRules[matchingResponseRules.length - 1]; // last overridden response is final
     const responseRulePair = responseRule.pairs[0] as ResponseRulePair;
 
     injectJSAtRequestSource(
-      `window.${PUBLIC_NAMESPACE}.responseRules['${
-        details.url
-      }'] = ${JSON.stringify({
+      `window.${PUBLIC_NAMESPACE}.responseRules['${details.url}'] = ${JSON.stringify({
         id: responseRule.id,
         response: responseRulePair.response,
         source: responseRule.pairs[0].source,

@@ -10,14 +10,7 @@ const FileMockEditorCreateView = () => {
 
   const fileType = searchParams.get("file_type") || FileType.JS;
 
-  return (
-    <ProtectedRoute
-      component={MockEditorIndex}
-      isNew={true}
-      mockType={MockType.FILE}
-      fileType={fileType}
-    />
-  );
+  return <ProtectedRoute component={MockEditorIndex} isNew={true} mockType={MockType.FILE} fileType={fileType} />;
 };
 
 export default FileMockEditorCreateView;

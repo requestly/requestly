@@ -85,10 +85,7 @@ export const onRecordChange = <T = unknown>(
           return;
         }
 
-        if (
-          filters?.changeTypes?.length &&
-          !filters.changeTypes.includes(changeType)
-        ) {
+        if (filters?.changeTypes?.length && !filters.changeTypes.includes(changeType)) {
           return;
         }
 

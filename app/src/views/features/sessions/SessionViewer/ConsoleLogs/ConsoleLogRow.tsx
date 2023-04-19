@@ -5,12 +5,7 @@ import SessionDetailsPanelRow from "../SessionDetailsPanelRow";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Space } from "antd";
 
-const ConsoleLogRow: React.FC<ConsoleLog> = ({
-  timeOffset,
-  level,
-  payload,
-  trace = [],
-}) => {
+const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace = [] }) => {
   const parsedLevel = useMemo(() => {
     if (level === "assert" && payload[0] === "false") {
       return "error";
@@ -35,9 +30,7 @@ const ConsoleLogRow: React.FC<ConsoleLog> = ({
         return "";
       }
 
-      const traceMatches = /^(https?):\/\/(.+)\/([^:]+)((:\d+)*)$/.exec(
-        trace[0]
-      );
+      const traceMatches = /^(https?):\/\/(.+)\/([^:]+)((:\d+)*)$/.exec(trace[0]);
       if (traceMatches) {
         const [, scheme, path, file, line] = traceMatches;
         const link = `${scheme}://${path}/${file}`;
@@ -66,13 +59,7 @@ const ConsoleLogRow: React.FC<ConsoleLog> = ({
               return <span key={index}>{parsedValue}</span>;
             }
 
-            return (
-              <ObjectInspector
-                key={index}
-                data={parsedValue}
-                includePrototypes={false}
-              />
-            );
+            return <ObjectInspector key={index} data={parsedValue} includePrototypes={false} />;
           } catch (e) {
             return <span key={index}>{value}</span>;
           }

@@ -10,10 +10,7 @@ const CancelPlanModal = ({ isOpen, handleToggleModal }) => {
       <div className="rq-modal-content">
         To make changes to your subscription plan or any other queries, <br />
         please write to us at{" "}
-        <a
-          className="text-underline"
-          href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}
-        >
+        <a className="text-underline" href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}>
           {GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
         </a>
         .

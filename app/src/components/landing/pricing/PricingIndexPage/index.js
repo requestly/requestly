@@ -46,12 +46,7 @@ const PricingIndexPage = () => {
       <Layout.Header className="pricing-navbar">
         <Row className="w-full" justify="space-between" align="middle">
           <Col>
-            <img
-              className="logo"
-              src={RQLogo}
-              alt="requestly logo"
-              onClick={() => redirectToRules(navigate)}
-            />
+            <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
           </Col>
           <HeaderUser />
         </Row>
@@ -63,9 +58,7 @@ const PricingIndexPage = () => {
             <PricingTable />
             <div>
               <ChromeStoreStats />
-              <div className="text-gray text-center">
-                Trusted by developer & QA teams from 5000+ organizations
-              </div>
+              <div className="text-gray text-center">Trusted by developer & QA teams from 5000+ organizations</div>
               <div className="company-marquee-wrapper">
                 <CompanyMarquee />
               </div>

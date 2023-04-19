@@ -189,9 +189,7 @@ RQ.Utils.getUrlWithoutQueryParamsAndHash = function (url) {
  */
 RQ.Utils.addQueryParamToURL = function (url, paramName, paramValue, overwrite) {
   let resultingUrl = url,
-    urlWithoutQueryParamsAndHash = RQ.Utils.getUrlWithoutQueryParamsAndHash(
-      url
-    ),
+    urlWithoutQueryParamsAndHash = RQ.Utils.getUrlWithoutQueryParamsAndHash(url),
     urlHash = RQ.Utils.extractUrlComponent(url, RQ.URL_COMPONENTS.HASH),
     queryString = RQ.Utils.extractUrlComponent(url, RQ.URL_COMPONENTS.QUERY),
     queryParamsMap = RQ.Utils.getQueryParamsMap(queryString);
@@ -206,9 +204,7 @@ RQ.Utils.addQueryParamToURL = function (url, paramName, paramValue, overwrite) {
 
   queryString = RQ.Utils.convertQueryParamMapToString(queryParamsMap);
 
-  resultingUrl = queryString
-    ? urlWithoutQueryParamsAndHash + "?" + queryString
-    : urlWithoutQueryParamsAndHash;
+  resultingUrl = queryString ? urlWithoutQueryParamsAndHash + "?" + queryString : urlWithoutQueryParamsAndHash;
   resultingUrl += urlHash;
 
   return resultingUrl;
@@ -273,9 +269,7 @@ RQ.Utils.convertSearchParamsToJSON = (url) => {
   // https://stackoverflow.com/a/50147341/816213
   // (URL decoding is already handled in URLSearchParams)
   const searchParamsString = url.split("?")[1];
-  const paramsObject = Object.fromEntries(
-    new URLSearchParams(searchParamsString)
-  );
+  const paramsObject = Object.fromEntries(new URLSearchParams(searchParamsString));
 
   // Traverse paramsObject to convert JSON strings into JSON object
   for (paramName in paramsObject) {
@@ -317,12 +311,7 @@ RQ.Utils.traverseJsonByPath = (jsonObject, path) => {
  * @returns value or undefined
  */
 RQ.Utils.setObjectValueAtPath = (incomingObject, path, value) => {
-  if (
-    typeof incomingObject !== "object" ||
-    Array.isArray(incomingObject) ||
-    incomingObject === null
-  )
-    return;
+  if (typeof incomingObject !== "object" || Array.isArray(incomingObject) || incomingObject === null) return;
 
   if (typeof path !== "string") return;
 

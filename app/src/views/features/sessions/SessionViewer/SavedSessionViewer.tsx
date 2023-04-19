@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Dropdown, Menu, Modal, Space, Typography } from "antd";
-import {
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-  MoreOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined, MoreOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
@@ -51,9 +47,7 @@ const SavedSessionViewer: React.FC = () => {
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
 
-  const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [
-    navigate,
-  ]);
+  const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
   const confirmDeleteAction = useCallback(() => {
     Modal.confirm({
@@ -81,11 +75,7 @@ const SavedSessionViewer: React.FC = () => {
   const sessionActionsDropdownMenu = useMemo(
     () => (
       <Menu className="session-viewer-more-actions">
-        <Menu.Item
-          key="delete"
-          className="more-action"
-          onClick={confirmDeleteAction}
-        >
+        <Menu.Item key="delete" className="more-action" onClick={confirmDeleteAction}>
           <DeleteOutlined className="more-action-icon" /> Delete Recording
         </Menu.Item>
       </Menu>
@@ -113,12 +103,7 @@ const SavedSessionViewer: React.FC = () => {
 
     setIsFetching(true);
 
-    getRecording(
-      id,
-      user?.details?.profile?.uid,
-      workspace?.id,
-      user?.details?.profile?.email
-    )
+    getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
 
@@ -129,9 +114,7 @@ const SavedSessionViewer: React.FC = () => {
           })
         );
 
-        const recordedSessionEvents: RQSessionEvents = decompressEvents(
-          res.events
-        );
+        const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
         dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
         setIsFetching(false);
       })
@@ -140,14 +123,7 @@ const SavedSessionViewer: React.FC = () => {
 
         err.name === "NotFound" && setShowNotFoundError(true);
       });
-  }, [
-    dispatch,
-    hasAuthInitialized,
-    id,
-    user?.details?.profile?.uid,
-    user?.details?.profile?.email,
-    workspace?.id,
-  ]);
+  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
   if (showPermissionError) return <PermissionError />;
   if (showNotFoundError) return <NotFoundError />;
@@ -171,20 +147,9 @@ const SavedSessionViewer: React.FC = () => {
           {isRequestedByOwner ? (
             <div className="session-viewer-actions">
               <Space>
-                <ShareButton
-                  recordingId={id}
-                  showShareModal={
-                    (location.state as NavigationState)?.viewAfterSave
-                  }
-                />
-                <Dropdown
-                  overlay={sessionActionsDropdownMenu}
-                  trigger={["click"]}
-                >
-                  <Button
-                    icon={<MoreOutlined />}
-                    onClick={(e) => e.preventDefault()}
-                  />
+                <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
+                <Dropdown overlay={sessionActionsDropdownMenu} trigger={["click"]}>
+                  <Button icon={<MoreOutlined />} onClick={(e) => e.preventDefault()} />
                 </Dropdown>
               </Space>
             </div>

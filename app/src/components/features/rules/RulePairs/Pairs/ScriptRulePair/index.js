@@ -12,32 +12,18 @@ import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/acti
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import "./styles.css";
 
-const ScriptRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => {
+const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const isInEditMode = location.pathname
-    .split("/rules/editor")[1]
-    ?.startsWith("/edit");
+  const isInEditMode = location.pathname.split("/rules/editor")[1]?.startsWith("/edit");
 
   const toShowLibraries = isInEditMode && pair?.libraries?.length;
 
-  const [
-    hasUserClickedDeleteIconInThisSession,
-    setHasUserClickedDeleteIconInThisSession,
-  ] = useState(false);
+  const [hasUserClickedDeleteIconInThisSession, setHasUserClickedDeleteIconInThisSession] = useState(false);
 
-  const {
-    pushValueToArrayInPair,
-    deleteArrayValueByIndexInPair,
-  } = helperFunctions;
+  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
 
   const addEmptyScript = (event) => {
     event && event.preventDefault();
@@ -67,11 +53,7 @@ const ScriptRulePair = ({
       if (hasUserClickedDeleteIconInThisSession) return;
       stableAddEmptyScript();
     }
-  }, [
-    stableAddEmptyScript,
-    pair.scripts,
-    hasUserClickedDeleteIconInThisSession,
-  ]);
+  }, [stableAddEmptyScript, pair.scripts, hasUserClickedDeleteIconInThisSession]);
 
   return (
     <React.Fragment>
@@ -107,22 +89,17 @@ const ScriptRulePair = ({
           isInputDisabled={isInputDisabled}
         />
       ))}
-      <AddCustomScriptRow
-        helperFunctions={{ ...helperFunctions, addEmptyScript }}
-      />
+      <AddCustomScriptRow helperFunctions={{ ...helperFunctions, addEmptyScript }} />
       {isExtensionManifestVersion3() ? (
         <div className="csp-header-removal-notice">
           <Checkbox
             checked={currentlySelectedRuleData.removeCSPHeader ?? true}
             name="removeCSPHeader"
-            onChange={(event) =>
-              onChangeHandler(currentlySelectedRuleData, dispatch, event)
-            }
+            onChange={(event) => onChangeHandler(currentlySelectedRuleData, dispatch, event)}
             className="csp-header-checkbox"
           >
             <Typography.Text type="secondary">
-              Ensure that the above scripts always execute on the website by
-              ignoring the CSP restriction
+              Ensure that the above scripts always execute on the website by ignoring the CSP restriction
             </Typography.Text>
           </Checkbox>
         </div>

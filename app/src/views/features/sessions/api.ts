@@ -1,12 +1,5 @@
 import firebaseApp from "../../../firebase";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getFirestore,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
 import { deleteObject, getStorage, ref } from "firebase/storage";
 import { toast } from "utils/Toast";
 import {
@@ -68,11 +61,7 @@ export const updateVisibility = async (
   }
 };
 
-export const updateStartTimeOffset = async (
-  userId: string,
-  id: string,
-  startTimeOffset: number
-) => {
+export const updateStartTimeOffset = async (userId: string, id: string, startTimeOffset: number) => {
   try {
     await updateSessionRecordingProperties(userId, id, { startTimeOffset });
     toast.success("Updated default start time for the recording");
@@ -83,11 +72,7 @@ export const updateStartTimeOffset = async (
   }
 };
 
-export const updateDescription = async (
-  userId: string,
-  id: string,
-  description: string
-) => {
+export const updateDescription = async (userId: string, id: string, description: string) => {
   try {
     await updateSessionRecordingProperties(userId, id, { description });
     toast.success("Updated description for the recording");
@@ -106,8 +91,5 @@ export const updateSessionRecordingProperties = async (
   const db = getFirestore(firebaseApp);
   partialUpdateObject.updatedTs = Date.now();
   partialUpdateObject.lastUpdatedBy = userId;
-  await updateDoc(
-    doc(collection(db, COLLECTION_NAME), id),
-    partialUpdateObject
-  );
+  await updateDoc(doc(collection(db, COLLECTION_NAME), id), partialUpdateObject);
 };

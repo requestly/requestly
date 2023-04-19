@@ -60,10 +60,7 @@ RQ.registerPredefinedFunction("rq_increment", {
 
   usage: "rq_increment(3,5)",
 
-  argument: [
-    RQ.PreDefinedFunction.patterns.NUMBER,
-    RQ.PreDefinedFunction.patterns.NUMBER,
-  ],
+  argument: [RQ.PreDefinedFunction.patterns.NUMBER, RQ.PreDefinedFunction.patterns.NUMBER],
 
   argumentEvaluator: function (num, step) {
     step = step || 1;
@@ -76,10 +73,7 @@ RQ.registerPredefinedFunction("rq_decrement", {
 
   usage: "rq_increment(5,2)",
 
-  argument: [
-    RQ.PreDefinedFunction.patterns.NUMBER,
-    RQ.PreDefinedFunction.patterns.NUMBER,
-  ],
+  argument: [RQ.PreDefinedFunction.patterns.NUMBER, RQ.PreDefinedFunction.patterns.NUMBER],
 
   argumentEvaluator: function (num, step) {
     step = step || 1;

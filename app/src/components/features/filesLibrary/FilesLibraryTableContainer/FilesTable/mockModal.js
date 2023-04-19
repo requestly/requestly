@@ -30,17 +30,11 @@ const NewMockSelector = (props) => {
         <div>
           <div style={{ marginBottom: "32px" }}>
             <h3 style={{ textAlign: "center" }}>
-              You can use File Server to host static files like HTML, CSS, JS &
-              Images only.
+              You can use File Server to host static files like HTML, CSS, JS & Images only.
             </h3>
             <h3 style={{ textAlign: "center" }}>
-              To host JSON or mock API responses, you can use our Mock Server
-              here.{" "}
-              <a
-                href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_SERVER}
-                target="_blank"
-                rel="noreferrer nofollow"
-              >
+              To host JSON or mock API responses, you can use our Mock Server here.{" "}
+              <a href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_SERVER} target="_blank" rel="noreferrer nofollow">
                 here
               </a>{" "}
             </h3>
@@ -64,19 +58,13 @@ const NewMockSelector = (props) => {
                     size="small"
                     bodyStyle={{ flexGrow: "1" }}
                     actions={[
-                      <Button
-                        onClick={() => handleCreateOnClick(MOCK_CONFIG.TYPE)}
-                        type="primary"
-                      >
+                      <Button onClick={() => handleCreateOnClick(MOCK_CONFIG.TYPE)} type="primary">
                         {" "}
                         Create new {`${MOCK_CONFIG.TYPE}`} file
                       </Button>,
                     ]}
                   >
-                    <Card.Meta
-                      avatar={<>{React.createElement(MOCK_CONFIG.ICON)}</>}
-                      title={MOCK_CONFIG.NAME}
-                    />
+                    <Card.Meta avatar={<>{React.createElement(MOCK_CONFIG.ICON)}</>} title={MOCK_CONFIG.NAME} />
                   </Card>
                 </Col>
               );

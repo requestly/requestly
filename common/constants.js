@@ -32,13 +32,7 @@ CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
  * We are calling them as BLACK_LIST_DOMAINS
  * however the usage is code is as the URL containing these substrings, We don't touch those requests
  */
-CONSTANTS.BLACK_LIST_DOMAINS = [
-  "requestly.in",
-  "requestly.io",
-  "rq.in",
-  "rq.io",
-  "__rq",
-];
+CONSTANTS.BLACK_LIST_DOMAINS = ["requestly.in", "requestly.io", "rq.in", "rq.io", "__rq"];
 
 CONSTANTS.OBJECT_TYPES = {
   GROUP: "group",
@@ -178,8 +172,7 @@ CONSTANTS.SCRIPT_LIBRARIES = {
   JQUERY: { name: "jQuery", src: "https://code.jquery.com/jquery-2.2.4.js" },
   UNDERSCORE: {
     name: "Underscore",
-    src:
-      "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js",
+    src: "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js",
   },
 };
 

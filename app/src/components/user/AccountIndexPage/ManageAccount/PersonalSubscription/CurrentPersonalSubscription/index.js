@@ -21,10 +21,7 @@ const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
 
   const fetchIndividualUserSubscriptionDetails = () => {
     const functions = getFunctions();
-    const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(
-      functions,
-      "fetchIndividualUserSubscriptionDetails"
-    );
+    const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(functions, "fetchIndividualUserSubscriptionDetails");
 
     fetchIndividualUserSubscriptionDetailsFF()
       .then((res) => {
@@ -40,12 +37,8 @@ const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
           setShowGetAPlan(true);
         }
         setPlanName(getPlanNameFromId(userSubscriptionDetails.rqPlanId));
-        setEndDate(
-          new Date(userSubscriptionDetails.endDate * 1000).toDateString()
-        );
-        setStartDate(
-          new Date(userSubscriptionDetails.startDate * 1000).toDateString()
-        );
+        setEndDate(new Date(userSubscriptionDetails.endDate * 1000).toDateString());
+        setStartDate(new Date(userSubscriptionDetails.startDate * 1000).toDateString());
         setIsLoading(false);
       })
       .catch((err) => {
@@ -54,10 +47,7 @@ const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
       });
   };
 
-  const stableFetchIndividualSubscriptionData = useCallback(
-    fetchIndividualUserSubscriptionDetails,
-    []
-  );
+  const stableFetchIndividualSubscriptionData = useCallback(fetchIndividualUserSubscriptionDetails, []);
 
   const renderLoader = () => {
     return (
@@ -96,15 +86,8 @@ const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
 
   return (
     <React.Fragment>
-      <ProCard
-        title={customHeading}
-        className="primary-card github-like-border"
-      >
-        {isLoading
-          ? renderLoader()
-          : showGetAPlan
-          ? renderGetASubscription()
-          : renderSubscriptionDetails()}
+      <ProCard title={customHeading} className="primary-card github-like-border">
+        {isLoading ? renderLoader() : showGetAPlan ? renderGetASubscription() : renderSubscriptionDetails()}
       </ProCard>
     </React.Fragment>
   );

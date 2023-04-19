@@ -15,10 +15,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const StatusLight: React.FC<Props> = ({
-  type = StatusLightType.NEUTRAL,
-  children,
-}) => {
+const StatusLight: React.FC<Props> = ({ type = StatusLightType.NEUTRAL, children }) => {
   return <div className={`status-light ${type}`}>{children}</div>;
 };
 

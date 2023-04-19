@@ -4,14 +4,7 @@ import { toast } from "utils/Toast.js";
 import { Modal, Button } from "antd";
 // Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
-const ChangeUserRoleModal = ({
-  isOpen,
-  toggleModal,
-  userId,
-  teamId,
-  isCurrentlyAdmin,
-  callbackOnSuccess,
-}) => {
+const ChangeUserRoleModal = ({ isOpen, toggleModal, userId, teamId, isCurrentlyAdmin, callbackOnSuccess }) => {
   // Component State
   const [showLoader, setShowLoader] = useState(false);
 
@@ -39,12 +32,7 @@ const ChangeUserRoleModal = ({
   };
 
   return (
-    <Modal
-      style={{ marginTop: "200px" }}
-      visible={isOpen}
-      onCancel={toggleModal}
-      footer={null}
-    >
+    <Modal style={{ marginTop: "200px" }} visible={isOpen} onCancel={toggleModal} footer={null}>
       <div>
         <h2>Change Role</h2>
       </div>
@@ -52,8 +40,7 @@ const ChangeUserRoleModal = ({
         {isCurrentlyAdmin ? (
           <h3>
             Remove admin access from this user? <br />
-            This user would no longer be able to add or remove members from this
-            team
+            This user would no longer be able to add or remove members from this team
           </h3>
         ) : (
           <h3>
@@ -69,19 +56,11 @@ const ChangeUserRoleModal = ({
           marginTop: "20px",
         }}
       >
-        <Button
-          type="primary"
-          onClick={() => changeTeamUserRole()}
-          disabled={showLoader}
-        >
+        <Button type="primary" onClick={() => changeTeamUserRole()} disabled={showLoader}>
           {showLoader ? (
             <span>
               <FaSpinner style={{ marginRight: "5px" }} className="icon-spin" />
-              <span>
-                {isCurrentlyAdmin
-                  ? "Revoking admin access"
-                  : "Granting admin access"}
-              </span>
+              <span>{isCurrentlyAdmin ? "Revoking admin access" : "Granting admin access"}</span>
             </span>
           ) : isCurrentlyAdmin ? (
             "Remove admin access"
@@ -89,12 +68,7 @@ const ChangeUserRoleModal = ({
             "Grant admin access"
           )}
         </Button>
-        <Button
-          style={{ marginRight: "10px" }}
-          type="secondary"
-          onClick={toggleModal}
-          disabled={showLoader}
-        >
+        <Button style={{ marginRight: "10px" }} type="secondary" onClick={toggleModal} disabled={showLoader}>
           Close
         </Button>
       </div>

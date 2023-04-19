@@ -30,29 +30,17 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   };
 
   return (
-    <RQModal
-      centered
-      open={isOpen}
-      onCancel={handleModalClose}
-      className="join-workspace-modal"
-    >
+    <RQModal centered open={isOpen} onCancel={handleModalClose} className="join-workspace-modal">
       <div className="rq-modal-content">
         {teamInvites?.length > 0 && (
-          <div className="join-workspace-modal-header header">
-            You have access to these workspaces
-          </div>
+          <div className="join-workspace-modal-header header">You have access to these workspaces</div>
         )}
 
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {teamInvites.map(({ id, metadata }) => (
               <li key={id}>
-                <Row
-                  wrap={false}
-                  align="middle"
-                  justify="space-between"
-                  className="w-full team-invite-row"
-                >
+                <Row wrap={false} align="middle" justify="space-between" className="w-full team-invite-row">
                   <Col>
                     <Avatar
                       size={28}
@@ -60,19 +48,13 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
                       className="workspace-avatar"
                       icon={metadata.teamName?.[0]?.toUpperCase() ?? "W"}
                       style={{
-                        backgroundColor: `${getUniqueColorForWorkspace(
-                          metadata.teamId,
-                          metadata.teamName
-                        )}`,
+                        backgroundColor: `${getUniqueColorForWorkspace(metadata.teamId, metadata.teamName)}`,
                       }}
                     />
                     <div>{metadata.teamName}</div>
                   </Col>
 
-                  <Button
-                    type="primary"
-                    onClick={() => handleJoinClick(metadata.teamId, id)}
-                  >
+                  <Button type="primary" onClick={() => handleJoinClick(metadata.teamId, id)}>
                     Join
                   </Button>
                 </Row>
@@ -81,12 +63,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
-            <img
-              alt="smile"
-              width="48px"
-              height="44px"
-              src="/assets/img/workspaces/smiles.svg"
-            />
+            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
             <div>You don't have any workspace invites!</div>
           </div>
         )}
@@ -98,10 +75,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
           <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
         </Col>
         <Col>
-          <Button
-            className="display-row-center"
-            onClick={handleCreateNewWorkspaceClick}
-          >
+          <Button className="display-row-center" onClick={handleCreateNewWorkspaceClick}>
             <PlusOutlined /> Create new workspace
           </Button>
         </Col>

@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Badge, Col, Row, Table } from "antd";
@@ -44,37 +38,16 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
   const [billingExclude, setBillingExclude] = useState([]);
 
-  const getTeamUsers = useMemo(
-    () => httpsCallable(getFunctions(), "getTeamUsers"),
-    []
-  );
+  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "getTeamUsers"), []);
 
-  const getPendingUsers = useMemo(
-    () => httpsCallable(getFunctions(), "getPendingUsers"),
-    []
-  );
+  const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "getPendingUsers"), []);
 
-  const getTeamSubscriptionInfo = useMemo(
-    () => httpsCallable(getFunctions(), "getTeamSubscriptionInfo"),
-    []
-  );
+  const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "getTeamSubscriptionInfo"), []);
 
-  const getTeamBillingExclude = useMemo(
-    () => httpsCallable(getFunctions(), "getTeamBillingExclude"),
-    []
-  );
+  const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "getTeamBillingExclude"), []);
 
-  const changeTeamUserRole = ({
-    teamId,
-    userId,
-    updatedRole,
-    isAdmin,
-    setIsLoading,
-  }) => {
-    if (
-      (isAdmin && updatedRole === "admin") ||
-      (!isAdmin && updatedRole === "user")
-    ) {
+  const changeTeamUserRole = ({ teamId, userId, updatedRole, isAdmin, setIsLoading }) => {
+    if ((isAdmin && updatedRole === "admin") || (!isAdmin && updatedRole === "user")) {
       return;
     }
 
@@ -118,23 +91,28 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       render: (member) => (
         <Row align="middle">
           <Col>
-            <Avatar
-              size={42}
-              shape="square"
-              src={member.photoUrl}
-              alt={member.displayName}
-              className="member-avatar"
-              />
+            <Avatar size={42} shape="square" src={member.photoUrl} alt={member.displayName} className="member-avatar" />
           </Col>
-          <Col>  
+          <Col>
             <Row className="text-bold">
-              { !member?.isPending? (member.displayName + (loggedInUserId === member.id ? " (You) " : "") +
-                (billingExclude.includes(member.id) ? " (Free) " : "")): null }
+              {!member?.isPending
+                ? member.displayName +
+                  (loggedInUserId === member.id ? " (You) " : "") +
+                  (billingExclude.includes(member.id) ? " (Free) " : "")
+                : null}
             </Row>
-            <Row align={"middle"}> 
-              <span className="member-email">{ member.email }</span>
-              { member?.isPending ? (
-                <Badge count={<div className="pending-tag-container"><span><ClockCircleOutlined /> Pending</span></div>} />
+            <Row align={"middle"}>
+              <span className="member-email">{member.email}</span>
+              {member?.isPending ? (
+                <Badge
+                  count={
+                    <div className="pending-tag-container">
+                      <span>
+                        <ClockCircleOutlined /> Pending
+                      </span>
+                    </div>
+                  }
+                />
               ) : null}
             </Row>
           </Col>
@@ -146,7 +124,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       dataIndex: "role",
       align: "center",
       render: (member) => {
-        if(member.isPending) {
+        if (member.isPending) {
           return (
             <PendingMemberRoleDropwdown
               showLoader
@@ -197,12 +175,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   ];
 
   const renderTable = () => (
-    <Table
-      pagination={false}
-      columns={columns}
-      dataSource={dataSource}
-      className="workspace-member-table"
-    />
+    <Table pagination={false} columns={columns} dataSource={dataSource} className="workspace-member-table" />
   );
 
   const fetchBillingExclude = () => {
@@ -241,7 +214,8 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
 
     getPendingUsers({
       teamId: teamId,
-    }).then((res) => {
+    })
+      .then((res) => {
         if (!mountedRef.current) return null;
         const response = res.data;
         if (response.success) {
@@ -256,27 +230,18 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   };
 
   //eslint-disable-next-line
-  const stableFetchTeamMembers = useCallback(fetchTeamMembers, [
-    teamId,
-    navigate,
-  ]);
+  const stableFetchTeamMembers = useCallback(fetchTeamMembers, [teamId, navigate]);
 
   const fetchTeamSubscriptionStatus = () => {
     getTeamSubscriptionInfo({ teamId: teamId })
       .then((res) => {
         const response = res.data;
-        setIsTeamPlanActive(
-          response.subscriptionStatus ===
-            APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE
-        );
+        setIsTeamPlanActive(response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE);
       })
       .catch((err) => new Error(err));
   };
 
-  const stableFetchTeamSubscriptionStatus = useCallback(
-    fetchTeamSubscriptionStatus,
-    [getTeamSubscriptionInfo, teamId]
-  );
+  const stableFetchTeamSubscriptionStatus = useCallback(fetchTeamSubscriptionStatus, [getTeamSubscriptionInfo, teamId]);
 
   const modifyMembersCallback = () => {
     setMembers([]); // To render loader
@@ -305,23 +270,17 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   useEffect(() => {
     setDataSource([]);
 
-    const currentUser = members.filter(
-      (member) => member.id === loggedInUserId
-    );
+    const currentUser = members.filter((member) => member.id === loggedInUserId);
 
-    const otherMembers = members.filter(
-      (member) => member.id !== loggedInUserId
-    );
+    const otherMembers = members.filter((member) => member.id !== loggedInUserId);
 
-    const membersData = [...currentUser, ...otherMembers, ...pendingMembers].map(
-      (member, idx) => ({
-        key: idx + 1,
-        img: member,
-        member: member,
-        role: member,
-        actions: member,
-      })
-    );
+    const membersData = [...currentUser, ...otherMembers, ...pendingMembers].map((member, idx) => ({
+      key: idx + 1,
+      img: member,
+      member: member,
+      role: member,
+      actions: member,
+    }));
 
     setDataSource(membersData);
     setIsLoggedInUserAdmin(currentUser[0]?.isAdmin);
@@ -346,10 +305,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
         callbackOnSuccess={modifyMembersCallback}
       />
 
-      <ContactUsModal
-        isOpen={contactUsModal}
-        toggleModal={toggleContactUsModal}
-      />
+      <ContactUsModal isOpen={contactUsModal} toggleModal={toggleContactUsModal} />
     </>
   );
 };
