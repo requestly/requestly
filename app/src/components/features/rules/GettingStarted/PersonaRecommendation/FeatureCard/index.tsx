@@ -15,7 +15,7 @@ export const FeatureCard: React.FC<Feature> = ({ icon, title, subTitle, link }) 
 
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      trackPersonaRecommendationSelected(snakeCase(title), "screen");
+      trackPersonaRecommendationSelected(snakeCase(title));
       dispatch(actions.updateIsPersonaSurveyCompleted(true));
       navigate(link, { replace: true });
     },

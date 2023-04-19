@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -29,8 +28,7 @@ const GettingStarted = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const isFeatureflagOn = useFeatureIsOn("persona_recommendation");
-  const isPersonaRecommendationFlagOn = isFeatureflagOn && state?.src === "persona_survey_modal";
+  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -93,7 +91,7 @@ const GettingStarted = () => {
 
   return (
     <>
-      {isPersonaRecommendationFlagOn ? (
+      {shouldShowPersonaRecommendations ? (
         <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
         <Row className="getting-started-container">

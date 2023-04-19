@@ -1,6 +1,5 @@
 import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
-import { UserRecommendations } from "./Recommendations";
 import { handleUseCaseActiveOption, setPersonaUseCase, setUserPersona } from "./actions";
 
 // import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
@@ -276,11 +275,5 @@ export const SurveyConfig: PageConfig[] = [
     title: "How many employees do you have in your organisation?",
     subTitle: "Select one",
     render: 3,
-  },
-  {
-    pageId: 4,
-    title: "✨ Where would you like to start?",
-    subTitle: "Choose a use case you want to work on and we will help you get started",
-    render: ({ toggleImportRulesModal }) => <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />,
   },
 ];
