@@ -8,6 +8,7 @@ import { RQButton } from "lib/design-system/components";
 import "./desktopAppProxyInfo.scss";
 import { actions } from "store";
 import { trackConnectAppsClicked } from "modules/analytics/events/desktopApp/apps";
+import { getConnectedAppsCount } from "utils/Misc";
 
 const DesktopAppProxyInfo = () => {
   // Global State
@@ -19,7 +20,7 @@ const DesktopAppProxyInfo = () => {
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
-    setNumberOfConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
+    setNumberOfConnectedApps(getConnectedAppsCount(Object.values(appsList)));
   }, [appsList]);
 
   const renderProxyBadgeStatus = () => {

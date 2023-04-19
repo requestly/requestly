@@ -20,6 +20,7 @@ import {
   trackAppConnectFailureEvent,
   trackSystemWideConnected,
   trackAppSetupInstructionsViewed,
+  trackConnectAppsModalClosed,
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
@@ -27,6 +28,8 @@ import "./index.css";
 import { trackTrafficInterceptionStarted } from "modules/analytics/events/desktopApp";
 import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshootButton";
 import PATHS from "config/constants/sub/paths";
+import { getConnectedAppsCount } from "utils/Misc";
+import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -49,7 +52,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const appsListRef = useRef(null);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
-  const getAppCount = useCallback(() => appsListArray.filter((app) => app.isActive).length, [appsListArray]);
+  const getAppCount = useCallback(() => getConnectedAppsCount(appsListArray), [appsListArray]);
   const getAppType = (appId) => appsListRef.current[appId]?.type;
 
   useEffect(() => {
@@ -294,13 +297,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         centered
         maskClosable={!showInstructions}
         closable={!showInstructions}
-        onCancel={toggle}
+        onCancel={() => {
+          toggle();
+          trackConnectAppsModalClosed(getAppCount());
+        }}
+        destroyOnClose
       >
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
-            <>
-              <SetupInstructions appId={currentApp} setShowInstructions={setShowInstructions} />
-            </>
+            <SetupInstructions appId={currentApp} setShowInstructions={setShowInstructions} />
           ) : (
             <>
               <Row className="white header text-bold">Connect apps</Row>
@@ -315,7 +320,10 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 <Tabs
                   className="source-tabs-container"
                   activeKey={activeSourceTab}
-                  onChange={setActiveSourceTab}
+                  onChange={(key) => {
+                    setActiveSourceTab(key);
+                    trackConnectAppsCategorySwitched(key);
+                  }}
                   items={sourceTabs}
                 />
               </Row>
