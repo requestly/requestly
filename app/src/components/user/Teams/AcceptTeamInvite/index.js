@@ -97,15 +97,13 @@ const AcceptTeamInvite = () => {
       <Col>
         <div style={{ textAlign: "center" }}>
           <h4>
-            You have been invited to join the team:{" "}
-            <span style={{ textTransform: "capitalize" }}>{teamName}</span>{" "}
+            You have been invited to join the team: <span style={{ textTransform: "capitalize" }}>{teamName}</span>{" "}
           </h4>
           {isProcessing ? (
             <React.Fragment>
               <br />
               <h5>
-                <FaExclamationCircle color="orange" /> This process may take a
-                few seconds. Do not close this page.
+                <FaExclamationCircle color="orange" /> This process may take a few seconds. Do not close this page.
               </h5>
             </React.Fragment>
           ) : null}
@@ -147,23 +145,16 @@ const AcceptTeamInvite = () => {
   const renderInvalidCode = () => {
     return (
       <Col>
-        <Jumbotron
-          style={{ background: "transparent" }}
-          className="text-center"
-        >
+        <Jumbotron style={{ background: "transparent" }} className="text-center">
           <h4>
-            This invite has either been expired or is not meant for you. Please
-            ask the team owner to add you directly.
+            This invite has either been expired or is not meant for you. Please ask the team owner to add you directly.
           </h4>
           <br />
           <br />
           <br />
           <h4>
             Click{" "}
-            <span
-              className="cursor-pointer"
-              onClick={() => redirectToAccountDetails(navigate)}
-            >
+            <span className="cursor-pointer" onClick={() => redirectToAccountDetails(navigate)}>
               here
             </span>{" "}
             to go back to account settings.
@@ -193,13 +184,7 @@ const AcceptTeamInvite = () => {
         <Col>
           <Card className=" shadow">
             <CardBody>
-              <Row>
-                {isLoading
-                  ? renderLoader()
-                  : isCodeValid
-                  ? renderAcceptInviteWindow()
-                  : renderInvalidCode()}
-              </Row>
+              <Row>{isLoading ? renderLoader() : isCodeValid ? renderAcceptInviteWindow() : renderInvalidCode()}</Row>
             </CardBody>
           </Card>
         </Col>

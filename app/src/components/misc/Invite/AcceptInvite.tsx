@@ -24,12 +24,7 @@ interface Props {
   invitedEmail?: string;
 }
 
-const AcceptInvite = ({
-  inviteId,
-  ownerName,
-  workspaceId,
-  workspaceName,
-}: Props) => {
+const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -68,23 +63,17 @@ const AcceptInvite = ({
               },
               appMode
             );
-            redirectToTeam(
-              navigate,
-              res?.data?.data?.invite?.metadata?.teamId,
-              {
-                state: {
-                  isNewTeam: false,
-                },
-              }
-            );
+            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
+              state: {
+                isNewTeam: false,
+              },
+            });
           }
         }
         setInProgress(false);
       })
       .catch((err) => {
-        toast.error(
-          "Error while accepting invitation. Please contact workspace admin"
-        );
+        toast.error("Error while accepting invitation. Please contact workspace admin");
         setInProgress(false);
       });
   };
@@ -113,12 +102,7 @@ const AcceptInvite = ({
     <Row className="invite-container" justify={"center"}>
       <Col xs={18} sm={16} md={14} lg={12} xl={8}>
         <div className="invite-content">
-          <RQButton
-            className="invite-skip-button"
-            type="text"
-            size="middle"
-            onClick={() => navigate("/")}
-          >
+          <RQButton className="invite-skip-button" type="text" size="middle" onClick={() => navigate("/")}>
             No, I'll skip
           </RQButton>
           <div className="workspace-image invite-accept-avatar-image">
@@ -127,44 +111,26 @@ const AcceptInvite = ({
               shape="square"
               icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
               style={{
-                backgroundColor: `${getUniqueColorForWorkspace(
-                  workspaceId ?? "",
-                  workspaceName
-                )}`,
+                backgroundColor: `${getUniqueColorForWorkspace(workspaceId ?? "", workspaceName)}`,
               }}
             />
           </div>
           <div className="header invite-header">
             {ownerName} has invited you to join workspace {workspaceName}
           </div>
-          <p className="text-gray invite-subheader">
-            Accept to start collaborating together
-          </p>
+          <p className="text-gray invite-subheader">Accept to start collaborating together</p>
 
           <div className="invite-accept-lottie-animation-container">
-            <div
-              className="invite-accept-lottie-animation"
-              id="inviteAcceptAnimation"
-            />
+            <div className="invite-accept-lottie-animation" id="inviteAcceptAnimation" />
           </div>
         </div>
         <div className="invite-footer">
           {inProgress ? (
-            <RQButton
-              loading={true}
-              className="invite-button"
-              type="primary"
-              size="middle"
-            >
+            <RQButton loading={true} className="invite-button" type="primary" size="middle">
               Accepting Invitation
             </RQButton>
           ) : (
-            <RQButton
-              className="invite-button"
-              type="primary"
-              size="middle"
-              onClick={handleAcceptInvitation}
-            >
+            <RQButton className="invite-button" type="primary" size="middle" onClick={handleAcceptInvitation}>
               Accept Invitation
             </RQButton>
           )}

@@ -25,9 +25,7 @@ PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER = {
   argumentEvaluator: function ([args], payload = {}) {
     const arg = args[0];
     var numDigits = Math.min(arg, 8),
-      valueToFit = PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER.getRandomNumber(
-        numDigits
-      );
+      valueToFit = PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER.getRandomNumber(numDigits);
 
     // Catch: For <rq_rand(4)>, we may get 3 digit value because leading zeros are omitted from numbers
     valueToFit = valueToFit.toString();

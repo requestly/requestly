@@ -4,12 +4,7 @@ import AndroidIntegration from "./integration/AndroidIntegration";
 
 const { Title } = Typography;
 
-const IntegrateCodeStep = ({
-  nextHandler,
-  backHandler,
-  sdkKey,
-  platformId,
-}) => {
+const IntegrateCodeStep = ({ nextHandler, backHandler, sdkKey, platformId }) => {
   const onNextClickHandler = () => {
     nextHandler();
   };

@@ -12,9 +12,7 @@ import { trackInstallExtensionDialogShown } from "modules/analytics/events/featu
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   return (
     <div>
-      <CheckOutlined
-        style={{ marginRight: "8px", fontSize: "16px", color: "#228B22" }}
-      />
+      <CheckOutlined style={{ marginRight: "8px", fontSize: "16px", color: "#228B22" }} />
       <span>{label}</span>
     </div>
   );
@@ -25,10 +23,7 @@ interface Props {
 }
 
 const OnboardingView: React.FC<Props> = ({ launchConfig }) => {
-  const [
-    isInstallExtensionModalVisible,
-    setIsInstallExtensionModalVisible,
-  ] = useState(false);
+  const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
   const openInstallExtensionModal = useCallback(() => {
     setIsInstallExtensionModalVisible(true);
     trackInstallExtensionDialogShown();
@@ -50,31 +45,21 @@ const OnboardingView: React.FC<Props> = ({ launchConfig }) => {
         margin: "30px",
       }}
     >
-      <Typography.Title level={1}>
-        Record &amp; Replay your browsing sessions
-      </Typography.Title>
+      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
       <Typography.Text type="secondary">
-        <div>
-          Record your browsing sessions on specified domains (or webpages)
-        </div>
+        <div>Record your browsing sessions on specified domains (or webpages)</div>
         <div>and Share with others for offline review or debugging.</div>
       </Typography.Text>
       <div>
         <AuthConfirmationPopover
           title="You need to sign up to configure webpages"
-          callback={
-            isExtensionInstalled() ? launchConfig : openInstallExtensionModal
-          }
+          callback={isExtensionInstalled() ? launchConfig : openInstallExtensionModal}
           source={AUTH.SOURCE.SESSION_RECORDING}
         >
           <Button
             type="primary"
             onClick={
-              user?.details?.isLoggedIn
-                ? isExtensionInstalled()
-                  ? launchConfig
-                  : openInstallExtensionModal
-                : null
+              user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig : openInstallExtensionModal) : null
             }
             style={{ margin: "24px" }}
           >
@@ -82,8 +67,7 @@ const OnboardingView: React.FC<Props> = ({ launchConfig }) => {
           </Button>
         </AuthConfirmationPopover>
         <TutorialButton>
-          See how it works{" "}
-          <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
+          See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
         </TutorialButton>
       </div>
       <Divider />

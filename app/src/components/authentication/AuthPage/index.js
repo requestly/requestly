@@ -20,9 +20,7 @@ const AuthPage = ({ authMode: authModeFromProps }) => {
   const user = useSelector(getUserAuthDetails);
 
   // Component State
-  const [authMode, setAuthMode] = useState(
-    authModeFromProps ? authModeFromProps : AUTH_ACTION_LABELS.LOG_IN
-  );
+  const [authMode, setAuthMode] = useState(authModeFromProps ? authModeFromProps : AUTH_ACTION_LABELS.LOG_IN);
   const [popoverVisible, setPopoverVisible] = useState(
     authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? true : true
   );
@@ -39,11 +37,7 @@ const AuthPage = ({ authMode: authModeFromProps }) => {
   const stablePostSignInSteps = useCallback(postSignInSteps, [navigate]);
 
   useEffect(() => {
-    if (
-      user.loggedIn &&
-      (authMode === AUTH_ACTION_LABELS.LOG_IN ||
-        authMode === AUTH_ACTION_LABELS.SIGN_UP)
-    ) {
+    if (user.loggedIn && (authMode === AUTH_ACTION_LABELS.LOG_IN || authMode === AUTH_ACTION_LABELS.SIGN_UP)) {
       stablePostSignInSteps();
     }
   }, [user.loggedIn, stablePostSignInSteps, authMode]);

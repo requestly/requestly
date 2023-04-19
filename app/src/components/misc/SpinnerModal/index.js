@@ -7,12 +7,7 @@ const SpinnerModal = (props) => {
   const { toggle: toggleModal, isOpen } = props;
 
   return (
-    <Modal
-      className="modal-dialog-centered "
-      visible={isOpen}
-      onCancel={toggleModal}
-      footer={null}
-    >
+    <Modal className="modal-dialog-centered " visible={isOpen} onCancel={toggleModal} footer={null}>
       <div className="modal-body ">
         <SpinnerColumn message="Loading" />
       </div>

@@ -46,13 +46,10 @@ const Feedback = () => {
 
   const handleSubmit = () => {
     if (!user.loggedIn) {
-      if (userEmail === "")
-        return toast.error("Please provide your e-mail address");
+      if (userEmail === "") return toast.error("Please provide your e-mail address");
       else if (
         userEmail !== "" &&
-        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-          userEmail.trim()
-        )
+        !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(userEmail.trim())
       ) {
         return toast.error("Please enter your valid e-mail address");
       }
@@ -71,26 +68,13 @@ const Feedback = () => {
       date: new Date().toJSON().slice(0, 10).replace(/-/g, "/"),
     };
     //saving data in excel sheet
-    axios.post(
-      "https://sheet.best/api/sheets/ffb1a7f7-9f6f-4e60-9fb1-982d43a17e25",
-      excelData
-    );
+    axios.post("https://sheet.best/api/sheets/ffb1a7f7-9f6f-4e60-9fb1-982d43a17e25", excelData);
 
     sendFeedbackResponse({
       email: user.loggedIn ? user.details.profile.email : userEmail,
       mailType: "pricing",
-      message:
-        "Rating:" +
-        response.recommend +
-        "," +
-        "Issue:" +
-        response.uses +
-        "," +
-        "Suggestions:" +
-        response.suggestions,
-      userName: user.loggedIn
-        ? user.details.profile.displayName
-        : "not signed in",
+      message: "Rating:" + response.recommend + ",Issue:" + response.uses + ",Suggestions:" + response.suggestions,
+      userName: user.loggedIn ? user.details.profile.displayName : "not signed in",
     })
       .then(() => {
         Logger.log("email-done");
@@ -138,12 +122,8 @@ const Feedback = () => {
                   <div style={{ textAlign: "center", verticalAlign: "middle" }}>
                     <h2>Feedback on Pricing Change</h2>
                     <div className="app">
-                      <h3 style={{ marginTop: "20px" }}>
-                        What's your overall feedback on pricing change
-                      </h3>
-                      <div
-                        style={{ margin: "20px auto 0px auto", width: "70%" }}
-                      >
+                      <h3 style={{ marginTop: "20px" }}>What's your overall feedback on pricing change</h3>
+                      <div style={{ margin: "20px auto 0px auto", width: "70%" }}>
                         <Rate
                           onChange={(e) => {
                             setResponse((prev) => {
@@ -168,8 +148,7 @@ const Feedback = () => {
                         {user.loggedIn ? null : (
                           <div style={{ marginTop: "20px" }}>
                             <h3>
-                              Enter your Email{" "}
-                              <span style={{ color: "red" }}>*</span>
+                              Enter your Email <span style={{ color: "red" }}>*</span>
                             </h3>
                             <Input
                               placeholder="Enter your email address"

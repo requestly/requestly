@@ -1,16 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSelect from "react-select";
-import {
-  Button,
-  Modal,
-  Row,
-  Col,
-  Input,
-  Typography,
-  Dropdown,
-  Menu,
-} from "antd";
+import { Button, Modal, Row, Col, Input, Typography, Dropdown, Menu } from "antd";
 //UTILITIES
 import { getCurrentlySelectedRuleData } from "../../../../../store/selectors";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -21,10 +12,7 @@ import APP_CONSTANTS from "config/constants";
 //actions
 import deleteObjectAtPath from "./actions/deleteObjectAtPath";
 import getObjectValue from "./actions/getObjectValue";
-import {
-  getReactSelectValue,
-  setReactSelectValue,
-} from "./actions/reactSelect";
+import { getReactSelectValue, setReactSelectValue } from "./actions/reactSelect";
 import { CloseCircleOutlined, DownOutlined } from "@ant-design/icons";
 import { isDesktopMode } from "utils/AppUtils";
 import {
@@ -40,15 +28,9 @@ import { debounce, snakeCase } from "lodash";
 
 const { Text, Link } = Typography;
 
-const debouncedTrackPayloadKeyModifiedEvent = debounce(
-  trackRequestPayloadKeyFilterModifiedEvent,
-  500
-);
+const debouncedTrackPayloadKeyModifiedEvent = debounce(trackRequestPayloadKeyFilterModifiedEvent, 500);
 
-const debouncedTrackPayloadValueModifiedEvent = debounce(
-  trackRequestPayloadValueFilterModifiedEvent,
-  500
-);
+const debouncedTrackPayloadValueModifiedEvent = debounce(trackRequestPayloadValueFilterModifiedEvent, 500);
 
 const RESOURCE_TYPE_OPTIONS = [
   { label: "All (default)", value: "all", isDisabled: true },
@@ -98,23 +80,15 @@ const Filters = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const isResponseRule = () => {
-    return (
-      currentlySelectedRuleData.ruleType ===
-      GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-    );
+    return currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE;
   };
 
   const hasLegacyPayloadFilter = () => {
-    return (
-      ResponseRuleResourceType.UNKNOWN ===
-      currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType
-    );
+    return ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
   const isRequestPayloadFilterCompatible =
-    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) &&
-    isResponseRule() &&
-    hasLegacyPayloadFilter();
+    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) && isResponseRule() && hasLegacyPayloadFilter();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
@@ -122,11 +96,7 @@ const Filters = (props) => {
 
   const getCurrentPageURLOperatorText = () => {
     switch (
-      getObjectValue(
-        currentlySelectedRuleData,
-        pairIndex,
-        APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR
-      )
+      getObjectValue(currentlySelectedRuleData, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR)
     ) {
       case GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES:
         return "Wildcard";
@@ -283,11 +253,7 @@ const Filters = (props) => {
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
             )}
             onChange={(event) => {
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
-              );
+              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY);
               clearRequestPayload(event.target.value);
               LOG_ANALYTICS.KEY();
             }}
@@ -306,11 +272,7 @@ const Filters = (props) => {
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
             )}
             onChange={(event) => {
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
-              );
+              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE);
               clearRequestPayload(event.target.value);
               LOG_ANALYTICS.VALUE();
             }}
@@ -320,12 +282,7 @@ const Filters = (props) => {
           <span style={{ fontSize: "0.75rem" }}>
             Through Request Payload you can also target GraphQL APIs.{" "}
             <Link
-              onClick={() =>
-                window.open(
-                  APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL,
-                  "_blank"
-                )
-              }
+              onClick={() => window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL, "_blank")}
               className="cursor-pointer"
             >
               Read more
@@ -390,9 +347,7 @@ const Filters = (props) => {
           />
         </Col>
         <Col span={2} align="right">
-          {renderClearFilterIcon(
-            GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD
-          )}
+          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD)}
         </Col>
       </Row>
     ) : null;
@@ -410,10 +365,7 @@ const Filters = (props) => {
           <span>Page URL</span>
         </Col>
         <Col span={6} align="center">
-          <Dropdown
-            overlay={urlOperatorOptions}
-            disabled={props.isInputDisabled}
-          >
+          <Dropdown overlay={urlOperatorOptions} disabled={props.isInputDisabled}>
             <Text
               strong
               className="ant-dropdown-link all-caps-text"
@@ -447,24 +399,14 @@ const Filters = (props) => {
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
             )}
             onChange={(event) => {
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
-              );
+              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
               LOG_ANALYTICS.PAGE_URL_MODIFIED();
             }}
-            disabled={
-              getCurrentPageURLOperatorText() === "Select"
-                ? true
-                : props.isInputDisabled
-            }
+            disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
           />
         </Col>
         <Col align="right" span={3}>
-          {renderClearFilterIcon(
-            GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          )}
+          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL)}
         </Col>
       </Row>
     ) : null;
@@ -524,9 +466,7 @@ const Filters = (props) => {
           />
         </Col>
         <Col span={2} align="right">
-          {renderClearFilterIcon(
-            GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE
-          )}
+          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE)}
         </Col>
       </Row>
     ) : null;

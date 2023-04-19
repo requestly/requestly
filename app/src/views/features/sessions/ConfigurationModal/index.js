@@ -23,16 +23,9 @@ const PAGE_SOURCES_TYPE = {
   NO_PAGES: "no-pages",
 };
 
-const ConfigurationModal = ({
-  config,
-  isModalVisible,
-  handleSaveConfig,
-  handleCancelModal,
-}) => {
+const ConfigurationModal = ({ config, isModalVisible, handleSaveConfig, handleCancelModal }) => {
   const [customPageSources, setCustomPageSources] = useState([]);
-  const [pageSourceType, setPageSourceType] = useState(
-    PAGE_SOURCES_TYPE.ALL_PAGES
-  );
+  const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -47,8 +40,7 @@ const ConfigurationModal = ({
     if (isModalVisible) {
       if (
         !config.pageSources ||
-        (config.pageSources.length === 1 &&
-          isEqual(config.pageSources[0], allPagesSourceData))
+        (config.pageSources.length === 1 && isEqual(config.pageSources[0], allPagesSourceData))
       ) {
         setPageSourceType(PAGE_SOURCES_TYPE.ALL_PAGES);
         setCustomPageSources(initialCustomPageSources);
@@ -107,10 +99,7 @@ const ConfigurationModal = ({
   };
 
   const addEmptyPageSource = () => {
-    setCustomPageSources((prevPageSources) => [
-      { ...emptyPageSourceData },
-      ...prevPageSources,
-    ]);
+    setCustomPageSources((prevPageSources) => [{ ...emptyPageSourceData }, ...prevPageSources]);
   };
 
   const pageSourceColumns = [
@@ -159,10 +148,7 @@ const ConfigurationModal = ({
           >
             {Object.keys(GLOBAL_CONSTANTS.RULE_OPERATORS).map((key) => {
               return (
-                <Select.Option
-                  key={key}
-                  value={GLOBAL_CONSTANTS.RULE_OPERATORS[key]}
-                >
+                <Select.Option key={key} value={GLOBAL_CONSTANTS.RULE_OPERATORS[key]}>
                   {key}
                 </Select.Option>
               );
@@ -193,13 +179,7 @@ const ConfigurationModal = ({
     {
       title: "Actions",
       render: (text, record, index) => {
-        return (
-          <Button
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => removePageSource(index)}
-          />
-        );
+        return <Button size="small" icon={<DeleteOutlined />} onClick={() => removePageSource(index)} />;
       },
     },
   ];
@@ -225,15 +205,9 @@ const ConfigurationModal = ({
               size="small"
               onChange={setPageSourceType}
             >
-              <Select.Option value={PAGE_SOURCES_TYPE.ALL_PAGES}>
-                All Pages
-              </Select.Option>
-              <Select.Option value={PAGE_SOURCES_TYPE.CUSTOM}>
-                Custom Pages
-              </Select.Option>
-              <Select.Option value={PAGE_SOURCES_TYPE.NO_PAGES}>
-                No Pages
-              </Select.Option>
+              <Select.Option value={PAGE_SOURCES_TYPE.ALL_PAGES}>All Pages</Select.Option>
+              <Select.Option value={PAGE_SOURCES_TYPE.CUSTOM}>Custom Pages</Select.Option>
+              <Select.Option value={PAGE_SOURCES_TYPE.NO_PAGES}>No Pages</Select.Option>
             </Select>
           </div>
           {pageSourceType === PAGE_SOURCES_TYPE.CUSTOM ? (
@@ -263,9 +237,7 @@ const ConfigurationModal = ({
         <div>
           <Alert
             showIcon
-            type={
-              pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES ? "warning" : "info"
-            }
+            type={pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES ? "warning" : "info"}
             message={
               pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES
                 ? "All the page sources in custom pages configuration will be removed!"

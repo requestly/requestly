@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Row,
-  Card,
-  CardHeader,
-  Col,
-  CardBody,
-  FormGroup,
-  Form,
-  Input,
-} from "reactstrap";
+import { Row, Card, CardHeader, Col, CardBody, FormGroup, Form, Input } from "reactstrap";
 import { Button, Typography } from "antd";
 import Select from "react-select";
 import { isEmpty } from "lodash";
@@ -126,10 +117,7 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
           <Row>
             <Col md="4">
               <FormGroup>
-                <label
-                  className="form-control-label"
-                  htmlFor="input-address-line1"
-                >
+                <label className="form-control-label" htmlFor="input-address-line1">
                   Line 1
                 </label>
                 <Input
@@ -147,10 +135,7 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
             </Col>
             <Col md="4">
               <FormGroup>
-                <label
-                  className="form-control-label"
-                  htmlFor="input-address-line2"
-                >
+                <label className="form-control-label" htmlFor="input-address-line2">
                   Line 2
                 </label>
                 <Input
@@ -168,10 +153,7 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
             </Col>
             <Col md="4">
               <FormGroup>
-                <label
-                  className="form-control-label"
-                  htmlFor="input-address-city"
-                >
+                <label className="form-control-label" htmlFor="input-address-city">
                   City
                 </label>
                 <Input
@@ -270,37 +252,29 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
 
   useEffect(() => {
     // Initial values. Fetch full profile
-    DataStoreUtils.getValue(["users", user.details.profile.uid]).then(
-      (userRef) => {
-        if (!userRef) return;
-        const { profile } = userRef;
-        if (profile) {
-          // Full Name
-          profile["displayName"] && setUserFullName(profile["displayName"]);
-          // Address
-          if (profile["address"]) {
-            // Address - Line 1
-            profile["address"]["line1"] &&
-              setUserAddrLine1(profile["address"]["line1"]);
-            // Address - Line 2
-            profile["address"]["line2"] &&
-              setUserAddrLine2(profile["address"]["line2"]);
-            // Address - City
-            profile["address"]["city"] &&
-              setUserAddrCity(profile["address"]["city"]);
-            // Address - State
-            profile["address"]["state"] &&
-              setUserAddrState(profile["address"]["state"]);
-            // Address - ZIP Code
-            profile["address"]["postal_code"] &&
-              setUserAddrZIP(profile["address"]["postal_code"]);
-            // Address - Country
-            profile["address"]["country"] &&
-              setUserAddrCountry(profile["address"]["country"]);
-          }
+    DataStoreUtils.getValue(["users", user.details.profile.uid]).then((userRef) => {
+      if (!userRef) return;
+      const { profile } = userRef;
+      if (profile) {
+        // Full Name
+        profile["displayName"] && setUserFullName(profile["displayName"]);
+        // Address
+        if (profile["address"]) {
+          // Address - Line 1
+          profile["address"]["line1"] && setUserAddrLine1(profile["address"]["line1"]);
+          // Address - Line 2
+          profile["address"]["line2"] && setUserAddrLine2(profile["address"]["line2"]);
+          // Address - City
+          profile["address"]["city"] && setUserAddrCity(profile["address"]["city"]);
+          // Address - State
+          profile["address"]["state"] && setUserAddrState(profile["address"]["state"]);
+          // Address - ZIP Code
+          profile["address"]["postal_code"] && setUserAddrZIP(profile["address"]["postal_code"]);
+          // Address - Country
+          profile["address"]["country"] && setUserAddrCountry(profile["address"]["country"]);
         }
       }
-    );
+    });
   }, [user]);
 
   return (
@@ -308,9 +282,7 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
       <CardHeader className="border-0">
         <Row className="align-items-center">
           <Col xs="8">
-            <h3 className="mb-0">
-              {customHeading ? customHeading : "My account"}
-            </h3>
+            <h3 className="mb-0">{customHeading ? customHeading : "My account"}</h3>
           </Col>
         </Row>
       </CardHeader>
@@ -373,11 +345,7 @@ const UserInfo = ({ customHeading, shadow, hideBillingAddress }) => {
           </div>
 
           {/* Address */}
-          {hideBillingAddress ? (
-            <React.Fragment></React.Fragment>
-          ) : (
-            renderBillingAddress()
-          )}
+          {hideBillingAddress ? <React.Fragment></React.Fragment> : renderBillingAddress()}
           {renderSaveButton()}
         </Form>
       </CardBody>

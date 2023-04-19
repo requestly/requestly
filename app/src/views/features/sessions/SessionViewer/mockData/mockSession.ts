@@ -8,9 +8,7 @@ const mockSession: RQSession = {
     // @ts-ignore
     url: mockRrwebEvents[0].data.href,
     startTime: mockRrwebEvents[0].timestamp,
-    duration:
-      mockRrwebEvents[mockRrwebEvents.length - 1].timestamp -
-      mockRrwebEvents[0].timestamp,
+    duration: mockRrwebEvents[mockRrwebEvents.length - 1].timestamp - mockRrwebEvents[0].timestamp,
     environment: mockEnvironment,
   },
   events: {

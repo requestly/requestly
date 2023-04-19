@@ -30,10 +30,7 @@ const ManageCompanyLicenseIndexPage = () => {
     setIsLoading(true);
     if (user.loggedIn) {
       const functions = getFunctions();
-      const getCompanyLicenseUsers = httpsCallable(
-        functions,
-        "getCompanyLicenseUsers"
-      );
+      const getCompanyLicenseUsers = httpsCallable(functions, "getCompanyLicenseUsers");
 
       getCompanyLicenseUsers({}).then((result) => {
         setIsAdmin(result.data.success);
@@ -73,10 +70,7 @@ const ManageCompanyLicenseIndexPage = () => {
         <SpinnerCard customLoadingMessage="Loading License Information" />
       ) : (
         <React.Fragment>
-          <ProCard
-            className="primary-card github-like-border"
-            title="License Details"
-          >
+          <ProCard className="primary-card github-like-border" title="License Details">
             <Row>
               <Col span={24} align="center">
                 <Card className="shadow">
@@ -117,11 +111,7 @@ const ManageCompanyLicenseIndexPage = () => {
                               align: "right",
                               render: (_, record) => {
                                 return (
-                                  <Button
-                                    danger={true}
-                                    onClick={(e) => handleRevoke(record.id)}
-                                    loading={isRevoking}
-                                  >
+                                  <Button danger={true} onClick={(e) => handleRevoke(record.id)} loading={isRevoking}>
                                     Revoke Access
                                   </Button>
                                 );
@@ -133,24 +123,15 @@ const ManageCompanyLicenseIndexPage = () => {
                           ]}
                         />
                       ) : (
-                        <Jumbotron
-                          style={{ background: "transparent" }}
-                          className="text-center"
-                        >
-                          <p className="lead">
-                            There are no users using license keys.
-                          </p>
+                        <Jumbotron style={{ background: "transparent" }} className="text-center">
+                          <p className="lead">There are no users using license keys.</p>
                         </Jumbotron>
                       )
                     ) : (
-                      <Jumbotron
-                        style={{ background: "transparent" }}
-                        className="text-center"
-                      >
+                      <Jumbotron style={{ background: "transparent" }} className="text-center">
                         <p className="lead">
-                          Only the company admin can manage licenses. Please
-                          talk to your company admin if you want to be added as
-                          an admin to your company.
+                          Only the company admin can manage licenses. Please talk to your company admin if you want to
+                          be added as an admin to your company.
                         </p>
                       </Jumbotron>
                     )}

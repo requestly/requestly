@@ -25,9 +25,7 @@ export const isPlanExpired = (planDetails) => {
 
   // Handle Backward Compatibility (Initially we saved current_period_end in the sub object (e.g. 1585497103.984)
   if (planDetails.subscription.current_period_end) {
-    endDate = new Date(
-      planDetails.subscription.current_period_end * 1000
-    ).toLocaleDateString("en-CA");
+    endDate = new Date(planDetails.subscription.current_period_end * 1000).toLocaleDateString("en-CA");
   }
 
   return endDate < new Date().toLocaleDateString("en-CA");
@@ -40,16 +38,12 @@ export const isPremiumUser = (userPlanDetails) => {
 
   // Handle Case - Status node is not there in referral type
   if (userPlanDetails.type === "referral") {
-    return (
-      isPremiumPlan(userPlanDetails.planId) && !isPlanExpired(userPlanDetails)
-    );
+    return isPremiumPlan(userPlanDetails.planId) && !isPlanExpired(userPlanDetails);
   }
 
   // For all other types eg Unlock, Team, Individual, Paypal
   return (
-    userPlanDetails.status === "active" &&
-    isPremiumPlan(userPlanDetails.planId) &&
-    !isPlanExpired(userPlanDetails)
+    userPlanDetails.status === "active" && isPremiumPlan(userPlanDetails.planId) && !isPlanExpired(userPlanDetails)
   );
 };
 
@@ -78,17 +72,13 @@ export const isBasicPlan = (planId) => {
 export const isProfessionalPlan = (planId) => {
   if (!planId) return false;
 
-  return (
-    getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL
-  );
+  return getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
 };
 
 export const isEnterprisePlan = (planId) => {
   if (!planId) return false;
 
-  return (
-    getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
-  );
+  return getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE;
 };
 
 export const isTrialPlan = (planType) => {
@@ -111,9 +101,7 @@ export const getEndDate = (planDetails) => {
 
   // Handle Backward Compatibility (Initially we saved current_period_end in the sub object (e.g. 1585497103.984)
   if (planDetails.subscription.current_period_end) {
-    endDate = new Date(planDetails.subscription.current_period_end * 1000)
-      .toISOString()
-      .split("T")[0];
+    endDate = new Date(planDetails.subscription.current_period_end * 1000).toISOString().split("T")[0];
   }
 
   return endDate;
@@ -149,9 +137,7 @@ export const isTrialPlanExpired = (planDetails) => {
 
   // Handle Backward Compatibility (Initially we saved current_period_end in the sub object (e.g. 1585497103.984)
   if (planDetails.subscription.current_period_end) {
-    endDate = new Date(
-      planDetails.subscription.current_period_end * 1000
-    ).toLocaleDateString("en-CA");
+    endDate = new Date(planDetails.subscription.current_period_end * 1000).toLocaleDateString("en-CA");
   }
 
   return endDate < new Date().toLocaleDateString("en-CA");

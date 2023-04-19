@@ -1,10 +1,5 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
-import {
-  NetworkEventData,
-  RQSessionEvents,
-  RQSessionEventType,
-  RRWebEventData,
-} from "@requestly/web-sdk";
+import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import { ConsoleLog } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
 
@@ -18,17 +13,10 @@ export const decompressEvents = (compressedEvents: string): RQSessionEvents => {
   return JSON.parse(strFromU8(unzlibSync(strToU8(compressedEvents, true))));
 };
 
-export const filterOutLargeNetworkResponses = (
-  events: RQSessionEvents
-): void => {
-  const networkEvents = events[
-    RQSessionEventType.NETWORK
-  ] as NetworkEventData[];
+export const filterOutLargeNetworkResponses = (events: RQSessionEvents): void => {
+  const networkEvents = events[RQSessionEventType.NETWORK] as NetworkEventData[];
   networkEvents?.forEach((networkEvent) => {
-    if (
-      JSON.stringify(networkEvent.response)?.length >
-      MAX_ALLOWED_NETWORK_RESPONSE_SIZE
-    ) {
+    if (JSON.stringify(networkEvent.response)?.length > MAX_ALLOWED_NETWORK_RESPONSE_SIZE) {
       networkEvent.response = "Response too large";
     }
   });
@@ -46,10 +34,7 @@ const isConsoleLogEvent = (rrwebEvent: RRWebEventData): boolean => {
   return false;
 };
 
-export const getConsoleLogs = (
-  rrwebEvents: RRWebEventData[],
-  startTime: number
-): ConsoleLog[] => {
+export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number): ConsoleLog[] => {
   return rrwebEvents
     .map((event) => {
       let logData: LogData = null;
@@ -71,8 +56,6 @@ export const getConsoleLogs = (
     .filter((event) => !!event);
 };
 
-export const filterOutConsoleLogs = (
-  rrwebEvents: RRWebEventData[]
-): RRWebEventData[] => {
+export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventData[] => {
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
 };

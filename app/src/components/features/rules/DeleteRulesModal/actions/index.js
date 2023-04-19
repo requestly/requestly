@@ -3,22 +3,14 @@ import Logger from "lib/logger";
 import { StorageService } from "../../../../../init";
 import { getExecutionLogsId } from "../../../../../utils/rules/misc";
 
-export const deleteRulesFromStorage = async (
-  appMode,
-  rulesToDelete,
-  callback
-) => {
+export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) => {
   try {
-    const executionLogsToDelete = rulesToDelete.map((ruleId) =>
-      getExecutionLogsId(ruleId)
-    );
+    const executionLogsToDelete = rulesToDelete.map((ruleId) => getExecutionLogsId(ruleId));
 
     Logger.log("Removing from storage in deleteRulesFromStorage");
     await StorageService(appMode).removeRecords(rulesToDelete);
     Logger.log("Removing from storage in deleteRulesFromStorage");
-    await StorageService(appMode).removeRecordsWithoutSyncing(
-      executionLogsToDelete
-    );
+    await StorageService(appMode).removeRecordsWithoutSyncing(executionLogsToDelete);
 
     return callback();
   } catch (e) {

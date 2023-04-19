@@ -8,19 +8,14 @@ import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./FeatureCard.css";
 
-export const FeatureCard: React.FC<Feature> = ({
-  icon,
-  title,
-  subTitle,
-  link,
-}) => {
+export const FeatureCard: React.FC<Feature> = ({ icon, title, subTitle, link }) => {
   const Icon = icon;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      trackPersonaRecommendationSelected(snakeCase(title), "screen");
+      trackPersonaRecommendationSelected(snakeCase(title));
       dispatch(actions.updateIsPersonaSurveyCompleted(true));
       navigate(link, { replace: true });
     },

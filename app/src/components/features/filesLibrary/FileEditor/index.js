@@ -6,10 +6,7 @@ import { MockEditorHeader } from "./Header";
 import CopyToClipboard from "react-copy-to-clipboard";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
-import {
-  redirectToFiles,
-  redirectToMocks,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToFiles, redirectToMocks } from "../../../../utils/RedirectionUtils";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 //TEXT EDITOR
@@ -18,18 +15,9 @@ import CodeEditor from "components/misc/CodeEditor";
 import ImageViewer from "./ImageViewer";
 import { getByteSize } from "../../../../utils/FormattingHelper";
 import { CopyOutlined, ReloadOutlined } from "@ant-design/icons";
-import {
-  getMockUrl,
-  getMockTypeFromUrl,
-  getDelayMockUrl,
-} from "utils/files/urlUtils";
+import { getMockUrl, getMockTypeFromUrl, getDelayMockUrl } from "utils/files/urlUtils";
 import isEmpty from "is-empty";
-import {
-  uniqueNamesGenerator,
-  adjectives,
-  colors,
-  animals,
-} from "unique-names-generator";
+import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast";
 import "../../mocksV2/MockEditor/Editor/index.css";
@@ -51,54 +39,31 @@ const FileEditor = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   //Component State
-  const [name, setName] = useState(
-    props.fileDetails ? props.fileDetails.name : ""
-  );
+  const [name, setName] = useState(props.fileDetails ? props.fileDetails.name : "");
   const [contentType, setContentType] = useState(
     props.fileDetails ? props.fileDetails.contentType : "application/json"
   );
-  const [method, setMethod] = useState(
-    props.fileDetails ? props.fileDetails.method : "GET"
-  );
-  const [delayMock, setDelayMock] = useState(
-    props.fileDetails ? (props.fileDetails.delay ? true : false) : false
-  );
-  const [delay, setDelay] = useState(
-    props.fileDetails ? props.fileDetails.delay : 0
-  );
+  const [method, setMethod] = useState(props.fileDetails ? props.fileDetails.method : "GET");
+  const [delayMock, setDelayMock] = useState(props.fileDetails ? (props.fileDetails.delay ? true : false) : false);
+  const [delay, setDelay] = useState(props.fileDetails ? props.fileDetails.delay : 0);
 
-  const [mockType, setMockType] = useState(
-    getMockTypeFromUrl(window.location.pathname)
-  );
-  const [path, setPath] = useState(
-    props.fileDetails ? props.fileDetails.path : ""
-  );
+  const [mockType, setMockType] = useState(getMockTypeFromUrl(window.location.pathname));
+  const [path, setPath] = useState(props.fileDetails ? props.fileDetails.path : "");
 
   const [randomPathSetOnce, setRandomPathSetOnce] = useState(false);
 
   const [isCopied, setIsCopied] = useState("Click To Copy");
 
-  const [description, setDescription] = useState(
-    props.fileDetails ? props.fileDetails.description : ""
-  );
-  const [statusCode, setStatusCode] = useState(
-    props.fileDetails ? props.fileDetails.statusCode : 200
-  );
-  const [headers, setHeaders] = useState(
-    props.fileDetails ? JSON.stringify(props.fileDetails.headers) : "{}"
-  );
+  const [description, setDescription] = useState(props.fileDetails ? props.fileDetails.description : "");
+  const [statusCode, setStatusCode] = useState(props.fileDetails ? props.fileDetails.statusCode : 200);
+  const [headers, setHeaders] = useState(props.fileDetails ? JSON.stringify(props.fileDetails.headers) : "{}");
   const [body, setBody] = useState(
-    props.fileDetails
-      ? props.fileDetails.body || props.fileDetails.body === ""
-        ? props.fileDetails.body
-        : ""
-      : ""
+    props.fileDetails ? (props.fileDetails.body || props.fileDetails.body === "" ? props.fileDetails.body : "") : ""
   );
   const [isEditorReadOnly, setEditorReadOnly] = useState(false);
   const [isContentLoading, setContentLoading] = useState(false);
 
-  const mockVersion =
-    mockType === RESOURCE_TYPE_LIST.MOCK ? (!path ? "v1" : "v2") : "v0";
+  const mockVersion = mockType === RESOURCE_TYPE_LIST.MOCK ? (!path ? "v1" : "v2") : "v0";
 
   const mockUrlPath = window.location.pathname;
 
@@ -193,10 +158,7 @@ const FileEditor = (props) => {
   };
   const renderResponseBody = useCallback(() => {
     return (
-      <Col
-        span={24}
-        className={`${mockType === RESOURCE_TYPE_LIST.MOCK ? null : "mt-1"}`}
-      >
+      <Col span={24} className={`${mockType === RESOURCE_TYPE_LIST.MOCK ? null : "mt-1"}`}>
         {isContentLoading === false ? (
           <CodeEditor
             language={codeEditorLanguage}
@@ -212,14 +174,7 @@ const FileEditor = (props) => {
         )}
       </Col>
     );
-  }, [
-    body,
-    codeEditorDefaultValue,
-    codeEditorLanguage,
-    isContentLoading,
-    isEditorReadOnly,
-    mockType,
-  ]);
+  }, [body, codeEditorDefaultValue, codeEditorLanguage, isContentLoading, isEditorReadOnly, mockType]);
   const changeResourceType = (newType, extension, resourceType) => {
     setContentType(newType);
   };
@@ -238,12 +193,7 @@ const FileEditor = (props) => {
   };
 
   const getPublicMockUrl = () => {
-    if (delayMock)
-      return getDelayMockUrl(
-        props.fileDetails.mockID,
-        delay,
-        user.details.profile.uid
-      );
+    if (delayMock) return getDelayMockUrl(props.fileDetails.mockID, delay, user.details.profile.uid);
     return (
       props.fileDetails.shortUrl ||
       getMockUrl(
@@ -288,10 +238,7 @@ const FileEditor = (props) => {
       }
     }
 
-    if (
-      isMock &&
-      getByteSize(body) > APP_CONSTANTS.MOCK_RESPONSE_BODY_CHARACTER_LIMIT
-    ) {
+    if (isMock && getByteSize(body) > APP_CONSTANTS.MOCK_RESPONSE_BODY_CHARACTER_LIMIT) {
       toast.warn("Response Body exceeds character limit");
       return;
     }
@@ -324,10 +271,7 @@ const FileEditor = (props) => {
       mockUrlPath.includes("API") || props.fileDetails.isMock === true
         ? redirectToMocks(navigate)
         : redirectToFiles(navigate);
-    } else if (
-      event.key === "s" &&
-      (navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey)
-    ) {
+    } else if (event.key === "s" && (navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey)) {
       if (!props.saving) {
         event.preventDefault();
         handleFileWrite();
@@ -347,22 +291,13 @@ const FileEditor = (props) => {
       if (props.fileDetails.isMock) {
         setMockType("API");
       }
-      if (
-        props.fileDetails.contentType === "application/javascript" &&
-        !props.fileDetails.isMock
-      ) {
+      if (props.fileDetails.contentType === "application/javascript" && !props.fileDetails.isMock) {
         setMockType("JS");
       }
-      if (
-        props.fileDetails.contentType === "text/html" &&
-        !props.fileDetails.isMock
-      ) {
+      if (props.fileDetails.contentType === "text/html" && !props.fileDetails.isMock) {
         setMockType("HTML");
       }
-      if (
-        props.fileDetails.contentType === "text/css" &&
-        !props.fileDetails.isMock
-      ) {
+      if (props.fileDetails.contentType === "text/css" && !props.fileDetails.isMock) {
         setMockType("CSS");
       }
     }
@@ -386,9 +321,7 @@ const FileEditor = (props) => {
     setDescription(desc);
   };
 
-  const stableFetchFileContent = useCallback(fetchFileContent, [
-    props.fileDetails,
-  ]);
+  const stableFetchFileContent = useCallback(fetchFileContent, [props.fileDetails]);
 
   const generateUniqueEndpoint = () => {
     return uniqueNamesGenerator({
@@ -460,11 +393,7 @@ const FileEditor = (props) => {
 
   // fetch uploaded file data
   useEffect(() => {
-    if (
-      props.fileDetails &&
-      !Object.prototype.hasOwnProperty.call(props.fileDetails, "body") &&
-      !isEditorReadOnly
-    ) {
+    if (props.fileDetails && !Object.prototype.hasOwnProperty.call(props.fileDetails, "body") && !isEditorReadOnly) {
       stableFetchFileContent();
       setContentLoading(true);
     }
@@ -484,21 +413,14 @@ const FileEditor = (props) => {
       <RQEditorTitle
         name={name}
         description={description}
-        namePlaceholder={
-          mockType === RESOURCE_TYPE_LIST.MOCK ? "Mock name" : "File name"
-        }
+        namePlaceholder={mockType === RESOURCE_TYPE_LIST.MOCK ? "Mock name" : "File name"}
         descriptionPlaceholder="Add your description here."
         nameChangeCallback={onNameChange}
         descriptionChangeCallback={onDescriptionChange}
       />
 
       <Row className="mock-editor-container">
-        <Col
-          span={22}
-          offset={1}
-          md={{ offset: 2, span: 20 }}
-          lg={{ offset: 4, span: 16 }}
-        >
+        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
           <Row className="mock-editor-body">
             <Row className="mock-editor-meta-data-row" gutter={16}>
               {mockType === RESOURCE_TYPE_LIST.MOCK ? (
@@ -543,10 +465,7 @@ const FileEditor = (props) => {
               {mockType === RESOURCE_TYPE_LIST.MOCK ? (
                 <>
                   <Col span={6} className="meta-data-option">
-                    <label
-                      htmlFor="status-code"
-                      className="meta-data-option-label"
-                    >
+                    <label htmlFor="status-code" className="meta-data-option-label">
                       Status code
                     </label>
                     <AutoComplete
@@ -568,10 +487,7 @@ const FileEditor = (props) => {
               {mockType === RESOURCE_TYPE_LIST.MOCK ? (
                 <>
                   <Col span={6} className="meta-data-option">
-                    <label
-                      htmlFor="content-type"
-                      className="meta-data-option-label"
-                    >
+                    <label htmlFor="content-type" className="meta-data-option-label">
                       Content type
                     </label>
                     <AutoComplete
@@ -601,10 +517,7 @@ const FileEditor = (props) => {
                     }
                     addonAfter={
                       <Tooltip title="Generate Random">
-                        <span
-                          className="cursor-pointer"
-                          onClick={() => setPath(generateUniqueEndpoint())}
-                        >
+                        <span className="cursor-pointer" onClick={() => setPath(generateUniqueEndpoint())}>
                           <ReloadOutlined />
                         </span>
                       </Tooltip>
@@ -618,8 +531,7 @@ const FileEditor = (props) => {
                 </Col>
               ) : null}
               {/* Show spinner if undefined */}
-              {newFile ? null : props.fileDetails.shortUrl ||
-                props.fileDetails.mockID ? (
+              {newFile ? null : props.fileDetails.shortUrl || props.fileDetails.mockID ? (
                 <Col span={24} className="meta-data-option mt-1">
                   <label htmlFor="endpoint" className="meta-data-option-label">
                     Endpoint

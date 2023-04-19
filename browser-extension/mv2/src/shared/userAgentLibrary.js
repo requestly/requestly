@@ -44,8 +44,7 @@ RQ.UserAgentLibrary = {
           },
           tablet: {
             name: "Windows Tablet",
-            value:
-              "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0; Touch; NOKIA; Lumia 920)",
+            value: "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0; Touch; NOKIA; Lumia 920)",
           },
         },
       },
@@ -96,18 +95,15 @@ RQ.UserAgentLibrary = {
         values: {
           windows: {
             name: "Firefox on Windows",
-            value:
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
+            value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
           },
           macintosh: {
             name: "Firfox on Macintosh",
-            value:
-              "Mozilla/5.0 (Macintosh; Intel Mac OS X 12.6; rv:104.0) Gecko/20100101 Firefox/104.0",
+            value: "Mozilla/5.0 (Macintosh; Intel Mac OS X 12.6; rv:104.0) Gecko/20100101 Firefox/104.0",
           },
           linux: {
             name: "Firefox on Linux",
-            value:
-              "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0",
+            value: "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0",
           },
         },
       },
@@ -121,8 +117,7 @@ RQ.UserAgentLibrary = {
         values: {
           msie11: {
             name: "Internet Explorer 11",
-            value:
-              "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
+            value: "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
           },
         },
       },

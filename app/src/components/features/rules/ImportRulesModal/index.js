@@ -9,12 +9,7 @@ import { AiOutlineWarning } from "react-icons/ai";
 import { BsFileEarmarkCheck } from "react-icons/bs";
 import { FiUpload } from "react-icons/fi";
 //UTILS
-import {
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-  getAppMode,
-  getAllRules,
-} from "../../../../store/selectors";
+import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 //ACTIONS
 import { actions } from "../../../../store";
@@ -75,9 +70,7 @@ const ImportRulesModal = (props) => {
           });
         } catch (error) {
           Logger.log(error);
-          alert(
-            "Imported file doesn't match Requestly format. Please choose another file."
-          );
+          alert("Imported file doesn't match Requestly format. Please choose another file.");
           trackRulesJsonParsed({
             successful: false,
           });
@@ -126,10 +119,7 @@ const ImportRulesModal = (props) => {
             )}
           />
           {conflictingRecords.length > 5 ? (
-            <h4>
-              + {conflictingRecords.length - 5} more rules are in conflict.
-              Select an option to continue?
-            </h4>
+            <h4>+ {conflictingRecords.length - 5} more rules are in conflict. Select an option to continue?</h4>
           ) : (
             <h4>Above rules are in conflict. Select an option to continue?</h4>
           )}
@@ -140,32 +130,18 @@ const ImportRulesModal = (props) => {
   };
 
   const renderImportConfirmation = () => {
-    return (rulesToImportCount && rulesToImportCount > 0) ||
-      (groupsToImportCount && groupsToImportCount > 0) ? (
-      <Col
-        lg="12"
-        md="12"
-        xl="12"
-        sm="12"
-        xs="12"
-        className="text-center"
-        style={{ textAlign: "center" }}
-      >
+    return (rulesToImportCount && rulesToImportCount > 0) || (groupsToImportCount && groupsToImportCount > 0) ? (
+      <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center" style={{ textAlign: "center" }}>
         <h1 className="display-2">
           <BsFileEarmarkCheck />
         </h1>
         <h4>
           Successfully parsed{" "}
-          {rulesToImportCount > 0 &&
-          rulesToImportCount - conflictingRecords.length > 0
+          {rulesToImportCount > 0 && rulesToImportCount - conflictingRecords.length > 0
             ? `${rulesToImportCount - (conflictingRecords.length || 0)} rules`
             : null}
-          {groupsToImportCount > 0
-            ? ", " + groupsToImportCount + " groups"
-            : null}{" "}
-          {conflictingRecords.length > 0
-            ? "and " + conflictingRecords.length + " conflicting rules."
-            : null}
+          {groupsToImportCount > 0 ? ", " + groupsToImportCount + " groups" : null}{" "}
+          {conflictingRecords.length > 0 ? "and " + conflictingRecords.length + " conflicting rules." : null}
         </h4>
         <RenderConflictingRules />
       </Col>
@@ -175,9 +151,7 @@ const ImportRulesModal = (props) => {
   };
 
   const doImportRules = (natureOfImport) => {
-    const migratedDataToImport = isFeatureCompatible(
-      FEATURES.HEADERS_V2_MIGRATION
-    )
+    const migratedDataToImport = isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)
       ? migrateHeaderRulesToV2(dataToImport)
       : dataToImport;
 
@@ -245,12 +219,7 @@ const ImportRulesModal = (props) => {
       rulesToImportCount &&
       rulesToImportCount > 0 &&
       conflictingRecords.length === 0 ? (
-      <Button
-        color="primary"
-        data-dismiss="modal"
-        type="button"
-        onClick={() => doImportRules("normal")}
-      >
+      <Button color="primary" data-dismiss="modal" type="button" onClick={() => doImportRules("normal")}>
         Import
       </Button>
     ) : null;
@@ -260,8 +229,7 @@ const ImportRulesModal = (props) => {
     return (
       <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center">
         <h4>
-          <AiOutlineWarning /> Could not find valid data in this file. Please
-          try another
+          <AiOutlineWarning /> Could not find valid data in this file. Please try another
         </h4>
       </Col>
     );
@@ -277,10 +245,7 @@ const ImportRulesModal = (props) => {
           const duplicateData = allRules[duplicateDataIndex];
           setConflictingRecords((prev) => {
             if (prev.findIndex((rule) => rule.id === duplicateData.id) === -1) {
-              return [
-                ...prev,
-                { id: duplicateData.id, name: duplicateData.name },
-              ];
+              return [...prev, { id: duplicateData.id, name: duplicateData.name }];
             } else return [...prev];
           });
         }
@@ -298,11 +263,7 @@ const ImportRulesModal = (props) => {
         title="Import Rules Wizard"
       >
         <div className="modal-body ">
-          {dataToImport
-            ? renderImportConfirmation()
-            : processingDataToImport
-            ? renderLoader()
-            : renderFilePicker()}
+          {dataToImport ? renderImportConfirmation() : processingDataToImport ? renderLoader() : renderFilePicker()}
         </div>
         <br />
         <div

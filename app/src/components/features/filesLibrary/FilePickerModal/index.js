@@ -15,11 +15,7 @@ import APP_CONSTANTS from "../../../../config/constants";
 import { Link } from "react-router-dom";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 
-const FilePickerModal = ({
-  isOpen,
-  toggle: toggleFilePickerModal,
-  callback,
-}) => {
+const FilePickerModal = ({ isOpen, toggle: toggleFilePickerModal, callback }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
 
@@ -107,9 +103,7 @@ const FilePickerModal = ({
         }
 
         // Handle case when duplicate/migrated files gets returned.
-        const key = mockServerObject.rId
-          ? mockServerObject.rId
-          : mockServerObject.mockID;
+        const key = mockServerObject.rId ? mockServerObject.rId : mockServerObject.mockID;
         fetchedFilesObj[key] = mockServerObject;
       });
       setFilesList(fetchedFilesObj);
@@ -142,16 +136,8 @@ const FilePickerModal = ({
   }, [user, stableUpdateCollection]);
 
   return (
-    <Modal
-      visible={isOpen}
-      onCancel={toggleFilePickerModal}
-      footer={null}
-      title={titleBar}
-      width="80%"
-    >
-      <div className="modal-body ">
-        {user.loggedIn ? renderMainContent() : renderNotLoggedInError()}
-      </div>
+    <Modal visible={isOpen} onCancel={toggleFilePickerModal} footer={null} title={titleBar} width="80%">
+      <div className="modal-body ">{user.loggedIn ? renderMainContent() : renderNotLoggedInError()}</div>
     </Modal>
   );
 };

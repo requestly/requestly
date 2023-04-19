@@ -16,11 +16,7 @@ const MOCK_TYPES_CONFIG = {
     TYPE: "HTML",
     NAME: "Host new HTML file",
     DESCRIPTION: "Mock an HTML Response",
-    ICON: () => (
-      <IoLogoHtml5
-        style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }}
-      />
-    ),
+    ICON: () => <IoLogoHtml5 style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }} />,
     PRIMARY_COLOR: "#2aa5e7",
     SECONDARY_COLOR: "#199ADE",
     TOOL_TIP_PLACEMENT: "top",
@@ -30,11 +26,7 @@ const MOCK_TYPES_CONFIG = {
     TYPE: "CSS",
     NAME: "Host new CSS file",
     DESCRIPTION: "Mock a CSS Response",
-    ICON: () => (
-      <IoLogoCss3
-        style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }}
-      />
-    ),
+    ICON: () => <IoLogoCss3 style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }} />,
     PRIMARY_COLOR: "#d32a0e",
     SECONDARY_COLOR: "#BB250C",
     TOOL_TIP_PLACEMENT: "top",
@@ -44,11 +36,7 @@ const MOCK_TYPES_CONFIG = {
     TYPE: "JS",
     NAME: "Host new JS file",
     DESCRIPTION: "Mock a JS Response",
-    ICON: () => (
-      <IoLogoJavascript
-        style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }}
-      />
-    ),
+    ICON: () => <IoLogoJavascript style={{ color: "#fff", fontSize: "1.2rem", marginTop: "4px" }} />,
     PRIMARY_COLOR: "#dd9d12",
     SECONDARY_COLOR: "#C58C10",
     TOOL_TIP_PLACEMENT: "top",

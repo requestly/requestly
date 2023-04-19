@@ -4,11 +4,7 @@ import firebaseApp from "../../firebase";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
-import {
-  RecordingOptions,
-  SessionRecording,
-  Visibility,
-} from "views/features/sessions/SessionViewer/types";
+import { RecordingOptions, SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
 
 export const saveRecording = async (
@@ -26,12 +22,7 @@ export const saveRecording = async (
     : `users/${uid}/session-events/${fileName}`;
 
   // Saving is as type=application/octet-stream, because it was previously saved like this
-  await createFile(
-    fileName,
-    "application/octet-stream",
-    events,
-    eventsFilePath
-  );
+  await createFile(fileName, "application/octet-stream", events, eventsFilePath);
 
   const data: any = {
     ...payload,

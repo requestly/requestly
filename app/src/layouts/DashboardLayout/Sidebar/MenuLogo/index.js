@@ -6,13 +6,7 @@ import "./MenuLogo.css";
 const MenuLogo = (props) => {
   return (
     <Link to="/" className="menu-logo-link" onClick={props.onClose}>
-      <img
-        src={RQLogo}
-        width="85px"
-        height="36px"
-        className="logo"
-        alt="requestly logo"
-      />
+      <img src={RQLogo} width="85px" height="36px" className="logo" alt="requestly logo" />
     </Link>
   );
 };

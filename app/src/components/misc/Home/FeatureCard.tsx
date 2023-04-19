@@ -11,13 +11,7 @@ interface FeatureCardProps {
   icon: React.ReactNode;
 }
 
-const FeatureCard = ({
-  name,
-  info,
-  navigateTo,
-  setupText,
-  icon,
-}: FeatureCardProps) => {
+const FeatureCard = ({ name, info, navigateTo, setupText, icon }: FeatureCardProps) => {
   return (
     <Card
       size="small"

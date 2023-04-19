@@ -1,9 +1,6 @@
 export const setSourceFilterFormatOfSingleRulePairs = (rule) => {
   // Check if its an object
-  if (
-    rule.pairs[0].source.filters &&
-    !Array.isArray(rule.pairs[0].source.filters)
-  ) {
+  if (rule.pairs[0].source.filters && !Array.isArray(rule.pairs[0].source.filters)) {
     rule.pairs[0].source.filters = [rule.pairs[0].source.filters];
   }
   return rule;

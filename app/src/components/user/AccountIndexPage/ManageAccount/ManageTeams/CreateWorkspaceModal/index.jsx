@@ -7,14 +7,8 @@ import { toast } from "utils/Toast";
 import lottie from "lottie-web/build/player/lottie_light";
 import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import {
-  trackNewTeamCreateFailure,
-  trackNewTeamCreateSuccess,
-} from "modules/analytics/events/features/teams";
-import {
-  trackNewWorkspaceCreated,
-  trackAddWorkspaceNameModalViewed,
-} from "modules/analytics/events/common/teams";
+import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
+import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./CreateWorkspaceModal.css";
@@ -147,10 +141,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
               className="create-workspace-modal-description"
               style={{ display: "none" }}
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Details about your workspace"
-              />
+              <Input.TextArea rows={4} placeholder="Details about your workspace" />
             </Form.Item>
           </div>
         </div>

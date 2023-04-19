@@ -13,13 +13,8 @@ const CertificateDownloadInstructions = ({ device_id }) => {
               <List.Item.Meta
                 title={
                   <>
-                    b. Go to{" "}
-                    <a href="http://requestly.io/ssl">
-                      http://requestly.io/ssl
-                    </a>{" "}
-                    <span style={{ color: "red" }}>
-                      (Use http here. Not https)
-                    </span>
+                    b. Go to <a href="http://requestly.io/ssl">http://requestly.io/ssl</a>{" "}
+                    <span style={{ color: "red" }}>(Use http here. Not https)</span>
                   </>
                 }
                 description={

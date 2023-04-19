@@ -30,10 +30,7 @@ const CertificateTrustInstructions = ({ device_id }) => {
               <List.Item.Meta
                 title={<>b. Install Certificate (Password Required)</>}
                 description={
-                  <>
-                    Press Install Anyway and Select the certificate
-                    (RQProxyCA.pem.cert) downloaded in step 3
-                  </>
+                  <>Press Install Anyway and Select the certificate (RQProxyCA.pem.cert) downloaded in step 3</>
                 }
               />
             </List.Item>

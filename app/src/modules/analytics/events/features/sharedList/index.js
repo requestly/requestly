@@ -2,12 +2,7 @@ import { trackEvent } from "modules/analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { SHARED_LIST } from "../constants";
 
-export const trackSharedListCreatedEvent = (
-  num_rules,
-  source,
-  page,
-  access_type
-) => {
+export const trackSharedListCreatedEvent = (num_rules, source, page, access_type) => {
   const params = {
     num_rules,
     source,

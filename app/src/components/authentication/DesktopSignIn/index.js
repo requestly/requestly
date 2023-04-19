@@ -24,10 +24,7 @@ import {
 } from "modules/analytics/events/common/auth/signup";
 //CONSTANTS
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-import {
-  trackLoginAttemptedEvent,
-  trackLoginSuccessEvent,
-} from "modules/analytics/events/common/auth/login";
+import { trackLoginAttemptedEvent, trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import Logger from "lib/logger";
 
 const DesktopSignIn = () => {
@@ -104,8 +101,7 @@ const DesktopSignIn = () => {
     return (
       <h4 className="display-6 desktop-auth-message">
         <FaCheck className="mr-2" />
-        You're now logged into the desktop app. This window can now be safely
-        closed.
+        You're now logged into the desktop app. This window can now be safely closed.
       </h4>
     );
   };
@@ -114,8 +110,7 @@ const DesktopSignIn = () => {
     return (
       <h4 className="display-6 desktop-auth-message">
         <FaExclamationCircle className="mr-2" />
-        An unexpected error has occurred. Please close this window and try
-        logging in again
+        An unexpected error has occurred. Please close this window and try logging in again
       </h4>
     );
   };
@@ -158,10 +153,7 @@ const DesktopSignIn = () => {
               <CardBody>
                 <Row>
                   <Col lg="12" md="12" className="text-center">
-                    <Jumbotron
-                      style={{ background: "transparent" }}
-                      className="text-center"
-                    >
+                    <Jumbotron style={{ background: "transparent" }} className="text-center">
                       {renderLoading()}
                     </Jumbotron>
                   </Col>

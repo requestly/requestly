@@ -33,10 +33,7 @@ export const createNewUsername = async (uid: string) => {
   }
 };
 
-export const updateUsername = async (
-  uid: string,
-  newUsername: string
-): Promise<any> => {
+export const updateUsername = async (uid: string, newUsername: string): Promise<any> => {
   if (!uid) {
     return null;
   }
@@ -54,9 +51,7 @@ export const updateUsername = async (
 
     await runTransaction(db, async (transaction) => {
       // check new Username alloted to someone else
-      const newUsernameDoc = await transaction.get(
-        doc(db, "usernames", newUsername)
-      );
+      const newUsernameDoc = await transaction.get(doc(db, "usernames", newUsername));
       if (newUsernameDoc.exists()) {
         const uid = newUsernameDoc.data()?.uid;
         if (uid) {
@@ -73,17 +68,11 @@ export const updateUsername = async (
 
       // Check current username belongs to user
       if (currentUsername) {
-        const currentUsernameDoc = await transaction.get(
-          doc(db, "usernames", currentUsername)
-        );
+        const currentUsernameDoc = await transaction.get(doc(db, "usernames", currentUsername));
         if (currentUsernameDoc.exists()) {
           if (currentUsernameDoc.data()?.uid === uid) {
             // Remove old mapping of username
-            transaction.set(
-              doc(db, "usernames", currentUsername),
-              { uid: null },
-              { merge: true }
-            );
+            transaction.set(doc(db, "usernames", currentUsername), { uid: null }, { merge: true });
           } else {
             // Do Nothing. Do not unlink old username
           }
@@ -92,11 +81,7 @@ export const updateUsername = async (
 
       // Assign new username
       transaction.set(userDocRef, { username: newUsername }, { merge: true });
-      transaction.set(
-        doc(db, "usernames", newUsername),
-        { uid: uid },
-        { merge: true }
-      );
+      transaction.set(doc(db, "usernames", newUsername), { uid: uid }, { merge: true });
     });
   } catch (e) {
     Logger.error("Error while updating new username");

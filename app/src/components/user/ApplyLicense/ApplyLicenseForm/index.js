@@ -39,13 +39,9 @@ const ApplyLicenseForm = () => {
     if (user.details.isLoggedIn) {
       setEmail(user.details.profile.email);
 
-      if (
-        user.details.planDetails &&
-        user.details.planDetails.type === "license"
-      ) {
+      if (user.details.planDetails && user.details.planDetails.type === "license") {
         const subscriptionObj = user.details.planDetails.subscription || {};
-        const endDate =
-          subscriptionObj.endDate || subscriptionObj.current_period_end * 1000;
+        const endDate = subscriptionObj.endDate || subscriptionObj.current_period_end * 1000;
         const formattedEndDate = new Date(endDate).toISOString().split("T")[0];
         //   const formattedCurrentDate = new Date().toISOString().split("T")[0];
 
@@ -71,35 +67,31 @@ const ApplyLicenseForm = () => {
     stableFetchLoginDetails();
   };
 
-  const stableGetSignInStatus = useCallback(getSigninStatus, [
-    stableFetchLoginDetails,
-  ]);
+  const stableGetSignInStatus = useCallback(getSigninStatus, [stableFetchLoginDetails]);
 
   const handleApplyLicense = () => {
     setIsApplying(true);
     const functions = getFunctions();
     const applyLicense = httpsCallable(functions, "applyLicense");
 
-    applyLicense({ license: licenseCode, company: company, email: email }).then(
-      (result) => {
-        setIsApplying(false);
-        setIsApplied(result.data.success);
-        setDescriptionMessage(result.data.message);
+    applyLicense({ license: licenseCode, company: company, email: email }).then((result) => {
+      setIsApplying(false);
+      setIsApplied(result.data.success);
+      setDescriptionMessage(result.data.message);
 
-        if (result.data.success) {
-          submitAttrUtil(TRACKING.ATTR.LICENSE, licenseCode);
-          submitAttrUtil(TRACKING.ATTR.COMPANY, company);
+      if (result.data.success) {
+        submitAttrUtil(TRACKING.ATTR.LICENSE, licenseCode);
+        submitAttrUtil(TRACKING.ATTR.COMPANY, company);
 
-          //Refresh page
-          window.location.reload();
-        } else {
-          //Reset Form
-          setLicenseCode("");
-        }
-
-        fetchLoginDetails();
+        //Refresh page
+        window.location.reload();
+      } else {
+        //Reset Form
+        setLicenseCode("");
       }
-    );
+
+      fetchLoginDetails();
+    });
   };
 
   const handleFormSubmit = (event) => {
@@ -117,31 +109,19 @@ const ApplyLicenseForm = () => {
     return (
       <Row>
         <Col span={24} align="center">
-          <Jumbotron
-            style={{ background: "transparent" }}
-            className="text-center"
-          >
+          <Jumbotron style={{ background: "transparent" }} className="text-center">
             {/* <h1 className="display-3">License Info</h1> */}
             <h3>
               <Alert color="secondary">
                 <strong>
-                  <span
-                    className="alert-inner--icon"
-                    role="img"
-                    aria-label="emoji"
-                  >
+                  <span className="alert-inner--icon" role="img" aria-label="emoji">
                     📢
                   </span>
                 </strong>{" "}
                 <span className="alert-inner--text">
                   License is being replaced by Teams.{" "}
                   <Link
-                    onClick={() =>
-                      window.open(
-                        APP_CONSTANTS.LINKS.REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION,
-                        "_blank"
-                      )
-                    }
+                    onClick={() => window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION, "_blank")}
                     className="cursor-pointer"
                   >
                     Read more
@@ -151,8 +131,7 @@ const ApplyLicenseForm = () => {
             </h3>
             <br />
             <p className="lead">
-              You have a <strong>{planId.split("_")[0].toUpperCase()}</strong>{" "}
-              License Key.
+              You have a <strong>{planId.split("_")[0].toUpperCase()}</strong> License Key.
             </p>
             <p className="lead">
               Your License is valid upto : <strong>{validUpto}</strong>
@@ -174,23 +153,14 @@ const ApplyLicenseForm = () => {
           <h3>
             <Alert color="secondary">
               <strong>
-                <span
-                  className="alert-inner--icon"
-                  role="img"
-                  aria-label="emoji"
-                >
+                <span className="alert-inner--icon" role="img" aria-label="emoji">
                   📢
                 </span>
               </strong>{" "}
               <span className="alert-inner--text">
                 License is being replaced by Teams.{" "}
                 <Link
-                  onClick={() =>
-                    window.open(
-                      APP_CONSTANTS.LINKS.REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION,
-                      "_blank"
-                    )
-                  }
+                  onClick={() => window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION, "_blank")}
                   className="cursor-pointer"
                 >
                   Read more
@@ -206,11 +176,7 @@ const ApplyLicenseForm = () => {
           <Row>
             <Col align="center" span={8} offset={8}>
               <FormGroup
-                className={[
-                  "mb-3",
-                  isErrorMode ? "has-danger" : "",
-                  isSuccessMode ? "has-success" : "",
-                ].join(" ")}
+                className={["mb-3", isErrorMode ? "has-danger" : "", isSuccessMode ? "has-success" : ""].join(" ")}
                 style={{ width: "50%" }}
               >
                 <Input
@@ -245,12 +211,7 @@ const ApplyLicenseForm = () => {
                   addonBefore={<KeyOutlined />}
                 />
                 {isApplied ? null : (
-                  <Button
-                    className="my-4"
-                    type="primary"
-                    style={{ marginTop: "2%" }}
-                    loading={isApplying}
-                  >
+                  <Button className="my-4" type="primary" style={{ marginTop: "2%" }} loading={isApplying}>
                     Apply License
                   </Button>
                 )}

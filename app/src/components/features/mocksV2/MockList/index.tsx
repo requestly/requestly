@@ -14,17 +14,11 @@ import {
 import MockUploaderModal from "../MockUploaderModal";
 import { DeleteMockModal } from "../DeleteMockModal";
 import { MockType, RQMockMetadataSchema } from "../types";
-import {
-  oldFileMockToNewMockMetadataAdapter,
-  oldMockToNewMockMetadataAdapter,
-} from "../utils/oldMockAdapter";
+import { oldFileMockToNewMockMetadataAdapter, oldMockToNewMockMetadataAdapter } from "../utils/oldMockAdapter";
 import MocksTable from "./MocksTable";
 import NewFileModal from "../NewFileModal";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks";
-import {
-  trackMockUploadWorkflowStarted,
-  trackNewMockButtonClicked,
-} from "modules/analytics/events/features/mocksV2";
+import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 /* eslint-disable no-unused-vars */
@@ -39,11 +33,7 @@ interface Props {
   mockSelectionCallback?: (url: string) => void;
 }
 
-const MockListIndex: React.FC<Props> = ({
-  source,
-  mockSelectionCallback,
-  type,
-}) => {
+const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -53,17 +43,11 @@ const MockListIndex: React.FC<Props> = ({
   const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
-  const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(
-    false
-  );
+  const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(false);
 
-  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(
-    false
-  );
+  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
 
-  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(
-    false
-  );
+  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
 
   // TODO: Remove this after all mocks are migrated to new schema
   const fetchOldMocks = useCallback(() => {
@@ -144,11 +128,7 @@ const MockListIndex: React.FC<Props> = ({
     handleEditAction(mockId, isOldMock);
   };
 
-  const handleItemSelect = (
-    mockId: string,
-    url: string,
-    isOldMock: boolean
-  ) => {
+  const handleItemSelect = (mockId: string, url: string, isOldMock: boolean) => {
     if (source === MockListSource.PICKER_MODAL) {
       return handleSelectAction(url);
     }
@@ -198,9 +178,7 @@ const MockListIndex: React.FC<Props> = ({
           <MockUploaderModal
             mockType={type}
             visible={uploadModalVisibility}
-            toggleModalVisibility={(visible) =>
-              setUploadModalVisibility(visible)
-            }
+            toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
           />
         </>
       );
@@ -236,19 +214,13 @@ const MockListIndex: React.FC<Props> = ({
           <MockUploaderModal
             mockType={type}
             visible={uploadModalVisibility}
-            toggleModalVisibility={(visible) =>
-              setUploadModalVisibility(visible)
-            }
+            toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
           />
           <DeleteMockModal
             visible={deleteModalVisibility}
-            toggleDeleteModalVisibility={(visible: boolean) =>
-              setDeleteModalVisibility(visible)
-            }
+            toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
             mock={selectedMock}
-            callbackOnSuccess={
-              selectedMock?.isOldMock ? fetchOldMocks : fetchMocks
-            }
+            callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
           />
         </>
       );

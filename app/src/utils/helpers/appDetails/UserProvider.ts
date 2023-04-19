@@ -18,10 +18,7 @@ let userDetails: User = {
   company: null,
 };
 
-export const setAndUpdateUserDetails = (
-  newUserDetails: Partial<User>,
-  addMissingProperties = true
-): void => {
+export const setAndUpdateUserDetails = (newUserDetails: Partial<User>, addMissingProperties = true): void => {
   for (const [attr, value] of Object.entries(newUserDetails)) {
     if (!addMissingProperties && !userDetails[attr as keyof User]) {
       continue;

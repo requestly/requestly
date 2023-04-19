@@ -34,16 +34,11 @@ const AppMode = () => {
                         <Col md="6 mb-6" key={appMode}>
                           <Card
                             className={`card-stats mb-4 mb-lg-0 reduce-opacity-on-hover ${
-                              AppModesConfig[appMode].actionLink
-                                ? "cursor-pointer"
-                                : "cursor-disabled"
+                              AppModesConfig[appMode].actionLink ? "cursor-pointer" : "cursor-disabled"
                             } `}
                             onClick={() =>
                               AppModesConfig[appMode].actionLink
-                                ? window.open(
-                                    AppModesConfig[appMode].actionLink,
-                                    "_blank"
-                                  )
+                                ? window.open(AppModesConfig[appMode].actionLink, "_blank")
                                 : null
                             }
                           >
@@ -53,31 +48,24 @@ const AppMode = () => {
                                   <CardTitle className="text-uppercase text-muted ">
                                     {getPrettyAppModeName(appMode)}
                                     {currentAppMode === appMode ? (
-                                      <span className="badge badge-pill badge-sm badge-success ml-2">
-                                        Current
-                                      </span>
+                                      <span className="badge badge-pill badge-sm badge-success ml-2">Current</span>
                                     ) : null}
                                   </CardTitle>
-                                  <span>
-                                    {AppModesConfig[appMode].description}
-                                  </span>
+                                  <span>{AppModesConfig[appMode].description}</span>
                                 </div>
                                 <Col className="col-auto">
                                   <div
                                     className={`icon icon-shape text-white rounded-circle shadow bg-gradient-${AppModesConfig[appMode].iconBackgroundColor}`}
                                     style={{ fontSize: "1.5em" }}
                                   >
-                                    {React.createElement(
-                                      AppModesConfig[appMode].Icon
-                                    )}
+                                    {React.createElement(AppModesConfig[appMode].Icon)}
                                   </div>
                                 </Col>
                               </Row>
                               <p className="mt-3  text-muted text-sm">
                                 {appMode === currentAppMode ? (
                                   <span className="text-nowrap">
-                                    You are currently using Requestly{" "}
-                                    {getPrettyAppModeName(appMode)}
+                                    You are currently using Requestly {getPrettyAppModeName(appMode)}
                                   </span>
                                 ) : (
                                   <span className="text-nowrap">

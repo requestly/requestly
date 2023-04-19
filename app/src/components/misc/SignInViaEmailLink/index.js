@@ -73,17 +73,12 @@ const SignInViaEmailLink = () => {
         <Col>
           <Card className="shadow">
             <CardBody>
-              <Jumbotron
-                style={{ background: "transparent" }}
-                className="text-center"
-              >
+              <Jumbotron style={{ background: "transparent" }} className="text-center">
                 <Row className="justify-content-md-center">
                   <Col lg="3">
                     <Form>
                       <FormGroup>
-                        <label htmlFor="SignInViaEmailLinkInputField">
-                          Confirm email address
-                        </label>
+                        <label htmlFor="SignInViaEmailLinkInputField">Confirm email address</label>
                         <Input
                           id="SignInViaEmailLinkInputField"
                           placeholder="name@example.com"
@@ -101,12 +96,7 @@ const SignInViaEmailLink = () => {
                             Login
                           </Button>
                         ) : (
-                          <Button
-                            color="primary"
-                            type="button"
-                            onClick={handleLogin}
-                            id="SignInViaEmailLinkLoginBtn"
-                          >
+                          <Button color="primary" type="button" onClick={handleLogin} id="SignInViaEmailLinkLoginBtn">
                             Login
                           </Button>
                         )}

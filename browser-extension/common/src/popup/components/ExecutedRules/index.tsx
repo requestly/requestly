@@ -10,9 +10,7 @@ interface ExecutedRulesProps {
   setExecutedRulesCount: (count: number) => void;
 }
 
-const ExecutedRules: React.FC<ExecutedRulesProps> = ({
-  setExecutedRulesCount,
-}) => {
+const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) => {
   const [executedRules, setExecutedRules] = useState<Rule[]>([]);
 
   useEffect(() => {
@@ -31,28 +29,20 @@ const ExecutedRules: React.FC<ExecutedRulesProps> = ({
   }, []);
 
   const updateExecutedRule = useCallback((updatedRule: Rule) => {
-    setExecutedRules((executedRules) =>
-      updateItemInCollection<Rule>(executedRules, updatedRule)
-    );
+    setExecutedRules((executedRules) => updateItemInCollection<Rule>(executedRules, updatedRule));
   }, []);
 
   return executedRules.length > 0 ? (
     <TabContentSection heading="Rules executed in this tab:">
       <ul className="record-list">
         {executedRules.map((rule) => (
-          <RuleItem
-            rule={rule}
-            key={rule.id}
-            onRuleUpdated={updateExecutedRule}
-          />
+          <RuleItem rule={rule} key={rule.id} onRuleUpdated={updateExecutedRule} />
         ))}
       </ul>
     </TabContentSection>
   ) : (
     <Row align="middle" justify="center">
-      <span className="empty-records-title">
-        No rules executed in this tab.
-      </span>
+      <span className="empty-records-title">No rules executed in this tab.</span>
     </Row>
   );
 };

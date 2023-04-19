@@ -13,10 +13,7 @@ const UpgradeCTA = ({ heading, content }) => {
       <ProCard className="primary-card github-like-border">
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h1 className="display-3">{heading}</h1>
               <p className="lead">{content}</p>
 

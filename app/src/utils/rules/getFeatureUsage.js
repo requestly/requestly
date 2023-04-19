@@ -19,16 +19,12 @@ export const getFeatureUsage = (rules) => {
         incrementFeatureUsage(featureName);
       }
 
-      const sourceFilters = Array.isArray(source.filters)
-        ? source.filters
-        : [source.filters];
+      const sourceFilters = Array.isArray(source.filters) ? source.filters : [source.filters];
 
       sourceFilters.forEach((sourceFilter) => {
         if (!sourceFilter?.pageUrl) return;
 
-        const pageUrlFilters = Array.isArray(sourceFilter.filters)
-          ? sourceFilter.pageUrl
-          : [sourceFilter.pageUrl];
+        const pageUrlFilters = Array.isArray(sourceFilter.filters) ? sourceFilter.pageUrl : [sourceFilter.pageUrl];
 
         pageUrlFilters.forEach((pageUrlFilter) => {
           if (pageUrlFilter.operator) {

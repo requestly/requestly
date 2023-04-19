@@ -53,10 +53,12 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
       })
     );
   };
-  const stableHandleSignUpButtonOnClick = useCallback(
-    handleSignUpButtonOnClick,
-    [dispatch, hardRedirect, navigate, src]
-  );
+  const stableHandleSignUpButtonOnClick = useCallback(handleSignUpButtonOnClick, [
+    dispatch,
+    hardRedirect,
+    navigate,
+    src,
+  ]);
 
   useEffect(() => {
     if (autoPrompt && !hardRedirect) stableHandleSignUpButtonOnClick();

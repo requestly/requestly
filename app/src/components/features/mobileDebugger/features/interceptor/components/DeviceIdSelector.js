@@ -7,12 +7,7 @@ import CopyButton from "components/misc/CopyButton";
 
 const db = getFirestore(firebaseApp);
 
-const DeviceSelector = ({
-  sdkId,
-  deviceIdInput,
-  setSelectedDeviceId,
-  updateDeviceIdInput,
-}) => {
+const DeviceSelector = ({ sdkId, deviceIdInput, setSelectedDeviceId, updateDeviceIdInput }) => {
   const [availableDeviceIds, setAvailableDeviceIds] = useState([]);
   const [autoCompleteOptions, setAutoCompleteOptions] = useState([]);
   const getOptionObject = (arrayData) => {
@@ -30,22 +25,19 @@ const DeviceSelector = ({
   useEffect(() => {
     let unsubscribeDeviceListListener;
     if (sdkId) {
-      unsubscribeDeviceListListener = onSnapshot(
-        doc(db, "sdks", sdkId),
-        async (snapshot) => {
-          if (snapshot) {
-            const sdkData = snapshot.data();
-            let deviceIds = [];
-            if (sdkData?.devices) {
-              // device = {id: "", model: "", name: "" }
-              deviceIds = sdkData.devices.map((device) => {
-                return device?.id;
-              });
-            }
-            setAvailableDeviceIds(deviceIds || []);
+      unsubscribeDeviceListListener = onSnapshot(doc(db, "sdks", sdkId), async (snapshot) => {
+        if (snapshot) {
+          const sdkData = snapshot.data();
+          let deviceIds = [];
+          if (sdkData?.devices) {
+            // device = {id: "", model: "", name: "" }
+            deviceIds = sdkData.devices.map((device) => {
+              return device?.id;
+            });
           }
+          setAvailableDeviceIds(deviceIds || []);
         }
-      );
+      });
     }
     return () => {
       if (unsubscribeDeviceListListener) unsubscribeDeviceListListener();
@@ -58,10 +50,7 @@ const DeviceSelector = ({
       //   return id.startsWith(query);
       // });
       // https://stackoverflow.com/a/28321100/11565176
-      let reg = new RegExp(
-        query.split("-").join("\\w*").replace(/\W/, ""),
-        "i"
-      );
+      let reg = new RegExp(query.split("-").join("\\w*").replace(/\W/, ""), "i");
       return availableDeviceIds.filter((id) => {
         if (id.match(reg)) return true;
         else return false;
@@ -71,9 +60,7 @@ const DeviceSelector = ({
     return [];
   };
 
-  const stableMatchInputToAvailableIds = useCallback(matchInputToAvailableIds, [
-    availableDeviceIds,
-  ]);
+  const stableMatchInputToAvailableIds = useCallback(matchInputToAvailableIds, [availableDeviceIds]);
 
   const renderSdkDeviceSelector = () => {
     return (
@@ -98,9 +85,7 @@ const DeviceSelector = ({
     setAutoCompleteOptions(getOptionObject(matches));
   };
 
-  const stableHandleAutocompleteSearch = useCallback(handleAutocompleteSearch, [
-    stableMatchInputToAvailableIds,
-  ]);
+  const stableHandleAutocompleteSearch = useCallback(handleAutocompleteSearch, [stableMatchInputToAvailableIds]);
 
   useEffect(() => {
     stableHandleAutocompleteSearch();

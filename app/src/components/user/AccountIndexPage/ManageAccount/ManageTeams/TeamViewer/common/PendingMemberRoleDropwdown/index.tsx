@@ -31,18 +31,19 @@ const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
     setIsLoading(true);
     revokeInvite({ inviteId: inviteId })
       .then((res: any) => {
-        if(res?.data?.success) {
+        if (res?.data?.success) {
           toast.success("Successfully Revoked invite");
           fetchTeamMembers();
         } else {
           toast.error("Only admins can revoke invites");
         }
         setIsLoading(false);
-      }).catch(err => {
+      })
+      .catch((err) => {
         setIsLoading(false);
         toast.error("Only admins can revoke invites");
-      })
-  }
+      });
+  };
 
   const stableHandleRevokeInvite = useCallback(handleRevokeInvite, [inviteId, fetchTeamMembers]);
 
@@ -50,10 +51,7 @@ const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
     () => (
       <Menu className="dropdown-menu">
         <Menu.Item key="remove" onClick={() => stableHandleRevokeInvite()}>
-          <Typography.Text
-            type="danger"
-            className="remove-user-menu-item-text"
-          >
+          <Typography.Text type="danger" className="remove-user-menu-item-text">
             Revoke Invite
           </Typography.Text>
         </Menu.Item>
@@ -63,17 +61,8 @@ const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
   );
 
   return (
-    <Dropdown
-      overlay={items}
-      trigger={["click"]}
-      {...props}
-      disabled={isLoading || !!props.disabled}
-    >
-      <div
-        className={`dropdown-trigger ${
-          isHoverEffect ? "member-role-dropdown-trigger" : ""
-        }`}
-      >
+    <Dropdown overlay={items} trigger={["click"]} {...props} disabled={isLoading || !!props.disabled}>
+      <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className="cursor-pointer">
           {isAdmin ? "Admin" : "Member"} access{" "}
           <img
@@ -85,12 +74,7 @@ const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
           />
         </Typography.Text>
 
-        {showLoader && isLoading ? (
-          <Spin
-            className="role-change-spinner"
-            indicator={<LoadingOutlined />}
-          />
-        ) : null}
+        {showLoader && isLoading ? <Spin className="role-change-spinner" indicator={<LoadingOutlined />} /> : null}
       </div>
     </Dropdown>
   );

@@ -18,9 +18,7 @@ class HeadersRuleProcessor {
     let modifications;
     for (let index = 0; index < rulePairs.length; index++) {
       let rulePair = rulePairs[index];
-      if (
-        RuleHelper.matchUrlWithRulePair(rulePair, requestURL, details) === null
-      ) {
+      if (RuleHelper.matchUrlWithRulePair(rulePair, requestURL, details) === null) {
         continue;
       }
 
@@ -30,30 +28,17 @@ class HeadersRuleProcessor {
         modifications = [rulePair];
       }
 
-      for (
-        var modificationIndex = 0;
-        modificationIndex < modifications.length;
-        ++modificationIndex
-      ) {
-        let modification = RuleHelper.getHeaderModification(
-          ruleType,
-          modifications[modificationIndex]
-        );
+      for (var modificationIndex = 0; modificationIndex < modifications.length; ++modificationIndex) {
+        let modification = RuleHelper.getHeaderModification(ruleType, modifications[modificationIndex]);
 
-        if (
-          (!(rule.version > 1) && modification.target !== typeOfHeaders) ||
-          !modification.header
-        ) {
+        if ((!(rule.version > 1) && modification.target !== typeOfHeaders) || !modification.header) {
           continue;
         }
 
         isRuleApplied = true;
 
         // Check if user has used predefinedFunction in (add/modify) header value
-        let valueWithPreDefFunctionsApplied = RuleHelper.matchValueForPredefinedFunctions(
-          modification.value,
-          payload
-        );
+        let valueWithPreDefFunctionsApplied = RuleHelper.matchValueForPredefinedFunctions(modification.value, payload);
 
         switch (modification.type) {
           case CONSTANTS.MODIFICATION_TYPES.ADD:

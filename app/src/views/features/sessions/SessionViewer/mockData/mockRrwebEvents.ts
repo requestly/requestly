@@ -85,8 +85,7 @@ const mockRrwebEvents: RRWebEventData[] = [
                     tagName: "script",
                     attributes: {
                       type: "text/javascript",
-                      src:
-                        "chrome-extension://gaojjkmedkaoaocolihelfilpljnlfbf/libs/requestly-web-sdk.js",
+                      src: "chrome-extension://gaojjkmedkaoaocolihelfilpljnlfbf/libs/requestly-web-sdk.js",
                       class: "__REQUESTLY__SCRIPT",
                     },
                     childNodes: [],
@@ -122,9 +121,7 @@ const mockRrwebEvents: RRWebEventData[] = [
                     type: 2,
                     tagName: "button",
                     attributes: { id: "start-logs-btn" },
-                    childNodes: [
-                      { type: 3, textContent: "Start logs", id: 25 },
-                    ],
+                    childNodes: [{ type: 3, textContent: "Start logs", id: 25 }],
                     id: 24,
                   },
                   { type: 3, textContent: "\n    ", id: 26 },
@@ -733,10 +730,7 @@ const mockRrwebEvents: RRWebEventData[] = [
       payload: {
         level: "assert",
         trace: [":1:9"],
-        payload: [
-          "false",
-          '{"reason":"Resulting value does not match the expected value."}',
-        ],
+        payload: ["false", '{"reason":"Resulting value does not match the expected value."}'],
       },
     },
     timestamp: 1653654863540,
@@ -748,10 +742,7 @@ const mockRrwebEvents: RRWebEventData[] = [
       payload: {
         level: "assert",
         trace: [":1:9"],
-        payload: [
-          "true",
-          '{"reason":"Resulting value does not match the expected value."}',
-        ],
+        payload: ["true", '{"reason":"Resulting value does not match the expected value."}'],
       },
     },
     timestamp: 1653654863544,
@@ -906,9 +897,7 @@ const mockRrwebEvents: RRWebEventData[] = [
           "beginWork$1 (https://example.com/static/js/bundle.js:499612:18)",
           "https://example.com/static/js/bundle.js:883383:11",
         ],
-        payload: [
-          '"Uncaught TypeError: ctr.unknownFunction is not a function"',
-        ],
+        payload: ['"Uncaught TypeError: ctr.unknownFunction is not a function"'],
       },
     },
     timestamp: 1653654866109,

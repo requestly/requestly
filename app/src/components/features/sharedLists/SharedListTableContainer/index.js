@@ -16,20 +16,12 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //import APP_CONSTANTS from "../../../../config/constants";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
-import {
-  ImportOutlined,
-  DeleteOutlined,
-  CopyOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { ImportOutlined, DeleteOutlined, CopyOutlined, EyeOutlined } from "@ant-design/icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import moment from "moment";
 import ReactHoverObserver from "react-hover-observer";
 import ImportSharedListFromURLModal from "../ImportSharedListFromURLModal";
-import {
-  trackSharedListDeleteClicked,
-  trackSharedListUrlCopied,
-} from "modules/analytics/events/features/sharedList";
+import { trackSharedListDeleteClicked, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import { getSharedListURL } from "utils/PathUtils";
 
 const { Link } = Typography;
@@ -42,27 +34,17 @@ const SharedListTableContainer = ({ sharedLists }) => {
 
   // Component State
   const [copiedText, setCopiedText] = useState("");
-  const [sharedListsToDeleteIdArray, setSharedListsToDeleteIdArray] = useState(
-    []
-  );
-  const [
-    isImportSharedListFromURLModalVisible,
-    setIsImportSharedListFromURLModalVisible,
-  ] = useState(false);
+  const [sharedListsToDeleteIdArray, setSharedListsToDeleteIdArray] = useState([]);
+  const [isImportSharedListFromURLModalVisible, setIsImportSharedListFromURLModalVisible] = useState(false);
   const [size, setSize] = useState(window.innerWidth);
 
   //CONSTANTS
   const navigate = useNavigate();
   //Component State
-  const [
-    isDeleteSharedListModalActive,
-    setIsDeleteSharedListModalActive,
-  ] = useState(false);
+  const [isDeleteSharedListModalActive, setIsDeleteSharedListModalActive] = useState(false);
 
   const toggleDeleteSharedListModal = () => {
-    setIsDeleteSharedListModalActive(
-      isDeleteSharedListModalActive ? false : true
-    );
+    setIsDeleteSharedListModalActive(isDeleteSharedListModalActive ? false : true);
   };
 
   const handleDeleteSharedListOnClick = (id) => {
@@ -72,13 +54,9 @@ const SharedListTableContainer = ({ sharedLists }) => {
     trackRQLastActivity("sharedList_deleted");
   };
 
-  const sharedListsToShow = useMemo(
-    () =>
-      Object.values(sharedLists).sort(
-        (a, b) => b.creationDate - a.creationDate
-      ),
-    [sharedLists]
-  );
+  const sharedListsToShow = useMemo(() => Object.values(sharedLists).sort((a, b) => b.creationDate - a.creationDate), [
+    sharedLists,
+  ]);
 
   //Search
   const [proData, setProData] = useState(sharedListsToShow);
@@ -102,19 +80,7 @@ const SharedListTableContainer = ({ sharedLists }) => {
       textWrap: "word-break",
       ellipsis: true,
       render: (_, record) => {
-        return (
-          <Link
-            onClick={(e) =>
-              redirectToSharedListViewer(
-                navigate,
-                record.shareId,
-                record.listName
-              )
-            }
-          >
-            {_}
-          </Link>
-        );
+        return <Link onClick={(e) => redirectToSharedListViewer(navigate, record.shareId, record.listName)}>{_}</Link>;
       },
     },
     {
@@ -131,15 +97,8 @@ const SharedListTableContainer = ({ sharedLists }) => {
         return (
           <span>
             <span style={{ marginRight: "1%", cursor: "pointer" }}>
-              <CopyToClipboard
-                text={urlOfList}
-                onCopy={() => onCopyHandler(urlOfList)}
-              >
-                <Tooltip
-                  title={
-                    copiedText === urlOfList ? "Copied!" : "Copy To Clipboard"
-                  }
-                >
+              <CopyToClipboard text={urlOfList} onCopy={() => onCopyHandler(urlOfList)}>
+                <Tooltip title={copiedText === urlOfList ? "Copied!" : "Copy To Clipboard"}>
                   <CopyOutlined />
                 </Tooltip>
               </CopyToClipboard>
@@ -193,21 +152,13 @@ const SharedListTableContainer = ({ sharedLists }) => {
           <ReactHoverObserver>
             {({ isHovering }) => (
               <Space>
-                <Button
-                  size="small"
-                  onClick={() =>
-                    handleViewSharedListOnClick(record.shareId, record.listName)
-                  }
-                >
+                <Button size="small" onClick={() => handleViewSharedListOnClick(record.shareId, record.listName)}>
                   <Tooltip title="View shared list">
                     <EyeOutlined />
                     {size > 1100 ? " View" : null}
                   </Tooltip>
                 </Button>
-                <Button
-                  size="small"
-                  onClick={() => handleDeleteSharedListOnClick(record.shareId)}
-                >
+                <Button size="small" onClick={() => handleDeleteSharedListOnClick(record.shareId)}>
                   <Tooltip title="Delete shared list">
                     <DeleteOutlined />
                     {size > 1100 ? " Delete" : null}
@@ -225,9 +176,7 @@ const SharedListTableContainer = ({ sharedLists }) => {
     let flag = 0;
     if (searchText !== "") {
       for (let i = 0; i < proData.length; i++) {
-        if (
-          proData[i].listName.toLowerCase().includes(searchText.toLowerCase())
-        ) {
+        if (proData[i].listName.toLowerCase().includes(searchText.toLowerCase())) {
           setProData([proData[i]]);
           flag = 1;
           setSearch(true);
@@ -309,11 +258,7 @@ const SharedListTableContainer = ({ sharedLists }) => {
       {isImportSharedListFromURLModalVisible ? (
         <ImportSharedListFromURLModal
           isOpen={isImportSharedListFromURLModalVisible}
-          toggle={() =>
-            setIsImportSharedListFromURLModalVisible(
-              !isImportSharedListFromURLModalVisible
-            )
-          }
+          toggle={() => setIsImportSharedListFromURLModalVisible(!isImportSharedListFromURLModalVisible)}
         />
       ) : null}
     </>

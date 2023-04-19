@@ -8,11 +8,7 @@ interface TagProps {
   tooltipWidth: string;
 }
 
-export const InfoTag: React.FC<TagProps> = ({
-  title,
-  description,
-  tooltipWidth,
-}) => {
+export const InfoTag: React.FC<TagProps> = ({ title, description, tooltipWidth }) => {
   return (
     <Tooltip
       title={description}

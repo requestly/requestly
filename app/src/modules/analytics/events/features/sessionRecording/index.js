@@ -2,11 +2,9 @@ import { trackEvent } from "modules/analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "../constants";
 
-export const trackDemoVideoOpened = () =>
-  trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
+export const trackDemoVideoOpened = () => trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
 
-export const trackConfigurationOpened = () =>
-  trackEvent(SESSION_RECORDING.session_recordings_config_opened);
+export const trackConfigurationOpened = () => trackEvent(SESSION_RECORDING.session_recordings_config_opened);
 
 export const trackConfigurationSaved = (params) => {
   trackEvent(SESSION_RECORDING.session_recordings_config_saved, params);
@@ -14,10 +12,7 @@ export const trackConfigurationSaved = (params) => {
 };
 
 export const trackInstallExtensionDialogShown = (params) =>
-  trackEvent(
-    SESSION_RECORDING.session_recordings_install_extension_dialog_shown,
-    params
-  );
+  trackEvent(SESSION_RECORDING.session_recordings_install_extension_dialog_shown, params);
 
 export const trackSessionRecordingFailed = (reason) =>
   trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
@@ -27,11 +22,9 @@ export const trackDraftSessionViewed = () => {
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
 };
 
-export const trackDraftSessionDiscarded = () =>
-  trackEvent(SESSION_RECORDING.draft_session_discarded);
+export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.draft_session_discarded);
 
-export const trackDraftSessionNamed = () =>
-  trackEvent(SESSION_RECORDING.draft_session_recording_named);
+export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
 export const trackDraftSessionSaved = (sessionLength, options) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {

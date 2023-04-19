@@ -5,12 +5,7 @@ export function getAppVersion() {
 }
 
 const isDesktopStorageServiceAvailable = () => {
-  return (
-    window.RQ &&
-    window.RQ.DESKTOP &&
-    window.RQ.DESKTOP.SERVICES &&
-    window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE
-  );
+  return window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE;
 };
 
 export function isAppInstalled() {
@@ -20,9 +15,7 @@ export function isAppInstalled() {
 export function getStorageSuperObject() {
   return new Promise((resolve, reject) => {
     if (isDesktopStorageServiceAvailable()) {
-      resolve(
-        window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.getStorageSuperObject()
-      );
+      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.getStorageSuperObject());
     } else reject("Couldnt hit desktop API");
   });
 }
@@ -38,9 +31,7 @@ export function getStorageObject(key) {
 export function saveStorageObject(object) {
   return new Promise((resolve, reject) => {
     if (isDesktopStorageServiceAvailable()) {
-      resolve(
-        window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.setStorageObject(object)
-      );
+      resolve(window.RQ.DESKTOP.SERVICES.STORAGE_SERVICE.setStorageObject(object));
     } else reject("Couldnt hit desktop API");
   });
 }
@@ -84,9 +75,7 @@ export const startBackgroundProcess = async () => {
 
   // If not active, activate it
   if (!isBackgroundProcessActive) {
-    const status = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-      "start-background-process"
-    );
+    const status = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("start-background-process");
     return status;
   }
 
@@ -116,8 +105,5 @@ export const invokeAppDetectionInBackground = (arrayOfApps) => {
       arrayOfAppIds.push(app.id);
     }
   });
-  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-    "detect-available-apps",
-    arrayOfAppIds
-  );
+  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("detect-available-apps", arrayOfAppIds);
 };

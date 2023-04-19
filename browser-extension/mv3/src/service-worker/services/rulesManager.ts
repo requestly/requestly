@@ -1,18 +1,11 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import {
-  getVariable,
-  onVariableChange,
-  setVariable,
-  Variable,
-} from "../variable";
+import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { Rule } from "common/types";
 import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
 
-const ALL_RESOURCE_TYPES = Object.values(
-  chrome.declarativeNetRequest.ResourceType
-);
+const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
 interface RuleIdsMap {
   [id: string]: string;
@@ -31,23 +24,17 @@ const getExecutedScriptRuleIds = async (tabId: number): Promise<string[]> => {
 };
 
 export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
-  const {
-    rulesMatchedInfo,
-  } = await chrome.declarativeNetRequest.getMatchedRules({
+  const { rulesMatchedInfo } = await chrome.declarativeNetRequest.getMatchedRules({
     tabId,
   });
 
   const appliedRuleIds = new Set<string>();
 
-  const ruleIdsMap = await getVariable<RuleIdsMap>(
-    Variable.ENABLED_RULE_IDS_MAP,
-    {}
-  );
+  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
 
   rulesMatchedInfo.forEach(
     (matchedRule) =>
-      matchedRule.rule.rulesetId === "_dynamic" &&
-      appliedRuleIds.add(ruleIdsMap[matchedRule.rule.ruleId])
+      matchedRule.rule.rulesetId === "_dynamic" && appliedRuleIds.add(ruleIdsMap[matchedRule.rule.ruleId])
   );
 
   const appliedResponseRuleIds = await getExecutedResponseRuleIds(tabId);
@@ -63,9 +50,7 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
   return [];
 };
 
-const updateDynamicRules = async (
-  options: chrome.declarativeNetRequest.UpdateRuleOptions
-): Promise<void> => {
+const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
   return new Promise((resolve) => {
     chrome.declarativeNetRequest.updateDynamicRules(options, resolve);
   });
@@ -83,10 +68,7 @@ const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
   const parsedExtensionRules: chrome.declarativeNetRequest.Rule[] = [];
 
-  const ruleIdsMap = await getVariable<RuleIdsMap>(
-    Variable.ENABLED_RULE_IDS_MAP,
-    {}
-  );
+  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
 
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
@@ -111,11 +93,7 @@ const addExtensionRules = async (): Promise<void> => {
   });
 
   if (config.logLevel === "debug") {
-    console.log(
-      "Setting extension rules from requestly rules",
-      parsedExtensionRules,
-      enabledRules
-    );
+    console.log("Setting extension rules from requestly rules", parsedExtensionRules, enabledRules);
   }
 
   await updateDynamicRules({
@@ -126,10 +104,7 @@ const addExtensionRules = async (): Promise<void> => {
 const applyExtensionRules = async (): Promise<void> => {
   await deleteExtensionRules();
 
-  const isExtensionEnabled = await getVariable<boolean>(
-    Variable.IS_EXTENSION_ENABLED,
-    true
-  );
+  const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
   if (isExtensionEnabled) {
     await addExtensionRules();
   }

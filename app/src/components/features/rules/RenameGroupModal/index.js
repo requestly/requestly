@@ -9,11 +9,7 @@ import { FaSpinner } from "react-icons/fa";
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //SERVICES
 import { StorageService } from "../../../../init";
-import {
-  getAppMode,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "../../../../store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../../../store/selectors";
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
@@ -51,11 +47,7 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
         </div>
         <br />
         <div className="modal-footer ">
-          <Button
-            color="primary"
-            type="button"
-            onClick={handleSaveRuleNameOnClick}
-          >
+          <Button color="primary" type="button" onClick={handleSaveRuleNameOnClick}>
             {isSavingGroup ? <FaSpinner className="icon-spin" /> : "Save"}
           </Button>
         </div>

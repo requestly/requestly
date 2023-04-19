@@ -93,9 +93,7 @@ Object.keys(statusCodes).forEach((code) => {
   statusCodesGroupedByCategory[codeCategory].codes.push(code);
 });
 
-export const STATUS_CODE_OPTIONS = Object.values(
-  statusCodesGroupedByCategory
-).map(({ label, codes }) => {
+export const STATUS_CODE_OPTIONS = Object.values(statusCodesGroupedByCategory).map(({ label, codes }) => {
   return {
     label,
     options: codes.map((code) => {

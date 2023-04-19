@@ -19,10 +19,7 @@ const parseRedirectRule = (rule: RedirectRule): ExtensionRule[] => {
       };
 
       if (condition.regexFilter) {
-        action.redirect.regexSubstitution = rulePair.destination.replace(
-          /\$([1-9])/g,
-          "\\$1"
-        );
+        action.redirect.regexSubstitution = rulePair.destination.replace(/\$([1-9])/g, "\\$1");
       } else {
         action.redirect.url = rulePair.destination;
       }

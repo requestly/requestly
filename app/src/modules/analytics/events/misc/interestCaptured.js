@@ -1,8 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import {
-  INTEREST_CAPTURED,
-  DESKTOP_ACTION_INTEREST_CAPTURED,
-} from "./constants";
+import { INTEREST_CAPTURED, DESKTOP_ACTION_INTEREST_CAPTURED } from "./constants";
 
 export const interestCaptured = (feature) => {
   const params = {

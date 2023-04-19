@@ -6,17 +6,9 @@ import debounce from "lodash.debounce";
 import SpinnerCard from "../../misc/SpinnerCard";
 import { toast } from "utils/Toast.js";
 //UTILS
-import {
-  getLastBackupTimeStamp,
-  getAppMode,
-  getUserAuthDetails,
-} from "../../../store/selectors";
+import { getLastBackupTimeStamp, getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { actions } from "../../../store";
-import {
-  createNewBackup,
-  getBackupFromFirestore,
-  updateRecordWithBackup,
-} from "../../../utils/BackupUtils";
+import { createNewBackup, getBackupFromFirestore, updateRecordWithBackup } from "../../../utils/BackupUtils";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 //CONSTANTS
@@ -68,16 +60,11 @@ const BackupPage = () => {
         })
         .then(() => redirectToRules(navigate))
         .catch(() => {
-          console.log(
-            "Error: Caught trying to copy empty backup to storage, please Report!"
-          );
+          console.log("Error: Caught trying to copy empty backup to storage, please Report!");
 
           setIsRollbackProcessing(false);
         });
-    } else
-      console.log(
-        "Error: Caught trying to copy empty backup to storage, please Report!"
-      );
+    } else console.log("Error: Caught trying to copy empty backup to storage, please Report!");
   };
 
   const BackupsTableColumns = [
@@ -156,11 +143,7 @@ const BackupPage = () => {
                     </h2>
                     <p>
                       <em>
-                        <a
-                          href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_BACKUP_DATA}
-                        >
-                          Learn how it works
-                        </a>
+                        <a href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_BACKUP_DATA}>Learn how it works</a>
                       </em>
                     </p>
                   </Col>
@@ -178,11 +161,7 @@ const BackupPage = () => {
                       headerTitle="Recent backups"
                       columns={BackupsTableColumns}
                       toolBarRender={() => [
-                        <Button
-                          type="secondary"
-                          onClick={sendBackup}
-                          icon={<FileSyncOutlined />}
-                        >
+                        <Button type="secondary" onClick={sendBackup} icon={<FileSyncOutlined />}>
                           Initiate a Backup
                         </Button>,
                       ]}
@@ -193,15 +172,9 @@ const BackupPage = () => {
             ) : (
               <Row>
                 <Col lg="12" md="12" className="text-center">
-                  <Jumbotron
-                    style={{ background: "transparent" }}
-                    className="text-center"
-                  >
+                  <Jumbotron style={{ background: "transparent" }} className="text-center">
                     <h1 className="display-3">Create Your First Backup</h1>
-                    <p className="lead">
-                      Never loose your rules data anymore. Your rules are backed
-                      up every 6-hours.
-                    </p>
+                    <p className="lead">Never loose your rules data anymore. Your rules are backed up every 6-hours.</p>
                     <p>
                       <Button color="primary" onClick={() => sendBackup()}>
                         Backup Your Data

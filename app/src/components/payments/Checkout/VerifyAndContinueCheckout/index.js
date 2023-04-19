@@ -4,10 +4,7 @@ import { toast } from "utils/Toast.js";
 // Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUserAuthDetails } from "../../../../store/selectors";
-import {
-  redirectToPaymentFailed,
-  redirectToUpdateSubscription,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToPaymentFailed, redirectToUpdateSubscription } from "../../../../utils/RedirectionUtils";
 // Constants
 import APP_CONSTANTS from "../../../../config/constants";
 
@@ -27,13 +24,8 @@ const VerifyAndContinueCheckout = ({
   const user = useSelector(getUserAuthDetails);
 
   // Component State
-  const [isSubscriptionCheckPassed, setIsSubscriptionCheckPassed] = useState(
-    false
-  );
-  const [
-    isCheckoutSessionProcessing,
-    setIsCheckoutSessionProcessing,
-  ] = useState(false);
+  const [isSubscriptionCheckPassed, setIsSubscriptionCheckPassed] = useState(false);
+  const [isCheckoutSessionProcessing, setIsCheckoutSessionProcessing] = useState(false);
 
   const initiateCheckoutSession = async () => {
     if (!mountedRef.current) return null;
@@ -58,10 +50,7 @@ const VerifyAndContinueCheckout = ({
         return null;
     }
     const functions = getFunctions();
-    const createSubscriptionUsingStripeCheckout = httpsCallable(
-      functions,
-      FFName
-    );
+    const createSubscriptionUsingStripeCheckout = httpsCallable(functions, FFName);
 
     createSubscriptionUsingStripeCheckout({
       rqPlanId: rqPlanId,
@@ -168,10 +157,7 @@ const VerifyAndContinueCheckout = ({
           if (!mountedRef.current) return null;
           const userSubscriptionDetails = res.data.data;
 
-          if (
-            res.data.success === true &&
-            userSubscriptionDetails.status === "active"
-          ) {
+          if (res.data.success === true && userSubscriptionDetails.status === "active") {
             setIsSubscriptionCheckPassed(false);
             redirectToUpdateSubscription({
               mode: "individual",
@@ -198,14 +184,7 @@ const VerifyAndContinueCheckout = ({
       } else if (mode === "individual") {
         stableFetchUserInfo();
       }
-      if (
-        mode &&
-        currency &&
-        duration &&
-        planType &&
-        isPlanVerificationPassed &&
-        isSubscriptionCheckPassed
-      ) {
+      if (mode && currency && duration && planType && isPlanVerificationPassed && isSubscriptionCheckPassed) {
         stableInitiateCheckoutSession();
       }
     }

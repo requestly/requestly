@@ -8,12 +8,7 @@ import { ReactMultiEmail, isEmail } from "react-multi-email";
 import EditableTable from "./editableTable";
 import { PostConfirmationModal } from "./PostConfirmationModal";
 //UTILS
-import {
-  getAllRules,
-  getAppMode,
-  getGroupwiseRulesToPopulate,
-  getUserAuthDetails,
-} from "../../../../store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "../../../../store/selectors";
 import { unselectAllRules } from "../../rules/actions";
 
 //ICONS
@@ -46,22 +41,15 @@ const CreateSharedListModal = (props) => {
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
   //Component State
-  const [createSharedListConfirmed, setCreateSharedListConfirmed] = useState(
-    false
-  );
+  const [createSharedListConfirmed, setCreateSharedListConfirmed] = useState(false);
   const [isSharedListCreated, setIsSharedListCreated] = useState(false);
   const [sharedListURL, setSharedListURL] = useState(null);
   const [permittedEmailsList, setPermittedEmailsList] = useState([]);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
-  const [sharedListVisibility, setSharedListVisibility] = useState(
-    Visibility.PUBLIC
-  );
+  const [sharedListVisibility, setSharedListVisibility] = useState(Visibility.PUBLIC);
   const [copiedText, setCopiedText] = useState("");
   const [sharedListName, setSharedListName] = useState(() => {
-    const rule =
-      rulesCount === 1
-        ? rules.find((rule) => rule.id === rulesToShare[0])
-        : null;
+    const rule = rulesCount === 1 ? rules.find((rule) => rule.id === rulesToShare[0]) : null;
 
     if (rule) {
       return rule.name;
@@ -153,17 +141,13 @@ const CreateSharedListModal = (props) => {
     switch (currentVisibility) {
       default:
       case Visibility.PUBLIC:
-        return (
-          <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />
-        );
+        return <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />;
 
       case Visibility.CUSTOM:
         return <FiUsers size={size} className="remix-icon radio-hero-icon" />;
 
       case Visibility.ORGANIZATION:
-        return (
-          <BsBuilding size={size} className="remix-icon radio-hero-icon" />
-        );
+        return <BsBuilding size={size} className="remix-icon radio-hero-icon" />;
     }
   };
 
@@ -192,21 +176,11 @@ const CreateSharedListModal = (props) => {
         {showConfirmationBtn ? (
           <>
             <br />
-            <Button
-              style={{ pointerEvents: "all" }}
-              color="primary"
-              data-dismiss="modal"
-              type="primary"
-            >
+            <Button style={{ pointerEvents: "all" }} color="primary" data-dismiss="modal" type="primary">
               Skip
             </Button>
             &nbsp;&nbsp;
-            <Button
-              style={{ pointerEvents: "all" }}
-              color="primary"
-              data-dismiss="modal"
-              type="primary"
-            >
+            <Button style={{ pointerEvents: "all" }} color="primary" data-dismiss="modal" type="primary">
               Create
             </Button>
           </>
@@ -216,13 +190,7 @@ const CreateSharedListModal = (props) => {
   };
 
   const renderPostConfirmationFooter = () => {
-    return isSharedListCreated ? (
-      <CopyButton
-        copyText={sharedListURL}
-        type="primary"
-        title={"Copy Text"}
-      />
-    ) : null;
+    return isSharedListCreated ? <CopyButton copyText={sharedListURL} type="primary" title={"Copy Text"} /> : null;
   };
 
   const handleVisibilityChange = (e) => {
@@ -252,31 +220,18 @@ const CreateSharedListModal = (props) => {
       <React.Fragment>
         <Row>
           <Col span={24}>
-            <Radio.Group
-              value={sharedListVisibility}
-              onChange={handleVisibilityChange}
-            >
+            <Radio.Group value={sharedListVisibility} onChange={handleVisibilityChange}>
               <Space direction="vertical">
                 {allOptions.map((option) => {
                   return (
-                    <Col
-                      span={24}
-                      className="radio-share-option"
-                      key={option.key}
-                    >
+                    <Col span={24} className="radio-share-option" key={option.key}>
                       <Radio disabled={option.disabled} value={option.key}>
                         {renderHeroIcon(option.key)} {option.label}
-                        {option.tag && (
-                          <Tag style={{ marginLeft: "0.5rem" }}>
-                            {option.tag}
-                          </Tag>
-                        )}
+                        {option.tag && <Tag style={{ marginLeft: "0.5rem" }}>{option.tag}</Tag>}
                       </Radio>
                       {sharedListVisibility === option.key && (
                         <div className="share-option-description">
-                          <p className="hp-p1-body hp-text-color-black-60">
-                            {getPrettyDescription(option.key)}
-                          </p>
+                          <p className="hp-p1-body hp-text-color-black-60">{getPrettyDescription(option.key)}</p>
                         </div>
                       )}
                     </Col>
@@ -324,11 +279,7 @@ const CreateSharedListModal = (props) => {
         )}
 
         <br />
-        <EditableTable
-          dataSource={nameDataSource}
-          columns={nameColumns}
-          setDataSource={setNameDataSource}
-        />
+        <EditableTable dataSource={nameDataSource} columns={nameColumns} setDataSource={setNameDataSource} />
       </React.Fragment>
     );
   };
@@ -366,10 +317,7 @@ const CreateSharedListModal = (props) => {
     const isSharedListNameNotValid = validateSharedListName();
     if (isSharedListNameNotValid) {
       toast.error("Shared list name cannot have special characters");
-    } else if (
-      sharedListVisibility === Visibility.CUSTOM &&
-      !sharedListRecipients.length
-    ) {
+    } else if (sharedListVisibility === Visibility.CUSTOM && !sharedListRecipients.length) {
       toast.error("Please add at least one recipient");
     } else {
       setCreateSharedListConfirmed(true);
@@ -391,22 +339,15 @@ const CreateSharedListModal = (props) => {
           ) : (
             <Row justify="space-between">
               <div style={{ display: "flex", gap: "0.5rem" }}></div>
-              <Button
-                key="submit"
-                type="primary"
-                onClick={handleSharedListCreation}
-              >
-                {sharedListVisibility === Visibility.PUBLIC
-                  ? "Generate Link"
-                  : "Share"}
+              <Button key="submit" type="primary" onClick={handleSharedListCreation}>
+                {sharedListVisibility === Visibility.PUBLIC ? "Generate Link" : "Share"}
               </Button>
             </Row>
           )
         }
         title={
           <span>
-            <ShareAltOutlined style={{ marginRight: 5 }} /> Share rules with
-            others
+            <ShareAltOutlined style={{ marginRight: 5 }} /> Share rules with others
           </span>
         }
       >

@@ -52,9 +52,8 @@ const CreateSessionGuide: React.FC<Props> = ({ launchConfig }) => {
               title="Browse webpages and view recorded session"
               description={
                 <Typography.Text type="secondary">
-                  When you browse configured webpages and notice a bug, click
-                  Requestly icon in browser extension toolbar and click "View
-                  Recording" button in the popup
+                  When you browse configured webpages and notice a bug, click Requestly icon in browser extension
+                  toolbar and click "View Recording" button in the popup
                 </Typography.Text>
               }
             />
@@ -62,10 +61,7 @@ const CreateSessionGuide: React.FC<Props> = ({ launchConfig }) => {
             <Steps.Step title="Share with your teammates" />
           </Steps>
           <TutorialButton>
-            Watch full demo{" "}
-            <YoutubeFilled
-              style={{ color: "red", fontSize: 18, marginTop: 4 }}
-            />
+            Watch full demo <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
           </TutorialButton>
         </div>
         <img

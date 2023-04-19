@@ -14,9 +14,7 @@ export const getSharedListIdFromURL = (url) => {
   const urlArray = url.split("/");
 
   // Use path varible to determine which index of this array would contain shared list id
-  const numberOfSlashesInKnownPath = PATHS.SHARED_LISTS.VIEWER.ABSOLUTE.split(
-    "/"
-  ).length;
+  const numberOfSlashesInKnownPath = PATHS.SHARED_LISTS.VIEWER.ABSOLUTE.split("/").length;
   const requiredIndex = numberOfSlashesInKnownPath + 1 - 1; // +1 to Count the HOST part, -1 to convert arr length to arr index
 
   // Split by "-" to distinguish id and name
@@ -40,10 +38,7 @@ export const getSharedListIdFromImportURL = (url) => {
 export const getSharedListNameFromUrl = (url) => {
   try {
     const urlStringArray = url.split("/");
-    return urlStringArray[urlStringArray.length - 1]
-      .split("-")
-      .splice(1)
-      .join("-");
+    return urlStringArray[urlStringArray.length - 1].split("-").splice(1).join("-");
   } catch (err) {
     return null;
   }

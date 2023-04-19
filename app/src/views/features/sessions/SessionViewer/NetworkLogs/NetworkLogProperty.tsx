@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 interface Props {
   label: string;
@@ -6,11 +6,7 @@ interface Props {
   isCodeBlock?: boolean;
 }
 
-const NetworkLogProperty: React.FC<Props> = ({
-  label,
-  children,
-  isCodeBlock,
-}) => {
+const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock }) => {
   return children ? (
     <div
       style={{

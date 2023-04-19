@@ -3,33 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import { StorageService } from "../../../../init";
-import {
-  getAppMode,
-  getGroupwiseRulesToPopulate,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getGroupwiseRulesToPopulate, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { toast } from "utils/Toast.js";
 import { deleteGroup } from "../RulesListContainer/RulesTable/actions";
-import {
-  deleteGroupsFromStorage,
-  deleteRulesFromStorage,
-} from "../DeleteRulesModal/actions";
+import { deleteGroupsFromStorage, deleteRulesFromStorage } from "../DeleteRulesModal/actions";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 
-const UNGROUPED_GROUP_ID =
-  APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
-const UngroupOrDeleteRulesModal = ({
-  isOpen,
-  toggle,
-  data: groupData,
-  setData,
-}) => {
+const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData }) => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -191,13 +177,7 @@ const UngroupOrDeleteRulesModal = ({
         >
           Delete rules
         </Button>
-        <Button
-          type="default"
-          data-dismiss="modal"
-          key="submit"
-          loading={loadingSomething}
-          onClick={moveToUngrouped}
-        >
+        <Button type="default" data-dismiss="modal" key="submit" loading={loadingSomething} onClick={moveToUngrouped}>
           Keep the rules
         </Button>
       </div>

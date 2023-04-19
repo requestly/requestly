@@ -4,24 +4,14 @@ import { Button, Tag } from "antd";
 import _ from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
-import {
-  createResponseRule,
-  updateResponseRule,
-} from "../../../../../../features/rules/RuleBuilder/actions/utils";
+import { createResponseRule, updateResponseRule } from "../../../../../../features/rules/RuleBuilder/actions/utils";
 import AppliedRules from "../Tables/columns/AppliedRules";
 import JsonPreview from "./JsonPreview";
 import { getAppMode } from "store/selectors";
 
 const JSON_CONTENT_TYPE = "application/json";
 
-const RequestBodyPreview = ({
-  data,
-  type,
-  url,
-  actions,
-  log_id,
-  upsertRequestAction,
-}) => {
+const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAction }) => {
   //Global State
   const appMode = useSelector(getAppMode);
 
@@ -34,9 +24,7 @@ const RequestBodyPreview = ({
   const [modifiedData, setModifiedData] = useState(data);
 
   const filterResponseActions = () => {
-    return actions.filter(
-      (action) => action.rule_type === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-    );
+    return actions.filter((action) => action.rule_type === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE);
   };
 
   const createResponseAction = (rule_id) => {
@@ -55,12 +43,7 @@ const RequestBodyPreview = ({
       upsertRequestAction(log_id, createResponseAction(rule.id));
       toast.success("Rule Created Successfully");
     } else {
-      updateResponseRule(
-        appMode,
-        responseActions[0].rule_id,
-        url,
-        modifiedData
-      );
+      updateResponseRule(appMode, responseActions[0].rule_id, url, modifiedData);
       toast.success("Rule Modified Successfully");
     }
     // setUpdateAllowed(false);

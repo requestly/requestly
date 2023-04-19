@@ -62,14 +62,7 @@ const VerifyEmail = () => {
           trackEmailVerificationFailed();
         });
     }
-  }, [
-    user.loggedIn,
-    user.details,
-    checkedActionCode,
-    verified,
-    appMode,
-    navigate,
-  ]);
+  }, [user.loggedIn, user.details, checkedActionCode, verified, appMode, navigate]);
 
   return (
     <React.Fragment>
@@ -77,18 +70,13 @@ const VerifyEmail = () => {
         <ProCard className="primary-card github-like-border" title={null}>
           {isVerificationFailed ? (
             <>
-              <h3>
-                Oops! Looks like the email verification link is invalid or
-                expired.
-              </h3>
+              <h3>Oops! Looks like the email verification link is invalid or expired.</h3>
               <Button
                 color="primary"
                 type="button"
                 onClick={() =>
                   resendVerificationEmailHandler({
-                    callbackURL: params["callbackURL"]
-                      ? new URL(params["callbackURL"]).href
-                      : null,
+                    callbackURL: params["callbackURL"] ? new URL(params["callbackURL"]).href : null,
                   })
                 }
               >
@@ -112,9 +100,7 @@ const VerifyEmail = () => {
                         type="button"
                         onClick={() =>
                           resendVerificationEmailHandler({
-                            callbackURL: params["callbackURL"]
-                              ? new URL(params["callbackURL"]).href
-                              : null,
+                            callbackURL: params["callbackURL"] ? new URL(params["callbackURL"]).href : null,
                           })
                         }
                       >

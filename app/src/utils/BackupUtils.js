@@ -38,10 +38,7 @@ export const isNewBackupRequired = (backupTimestamp) => {
   let isExpired = false;
 
   if (backupTimestamp) {
-    let timeDifference = getTimeDifferenceFromTimestamps(
-      Date.now(),
-      backupTimestamp
-    );
+    let timeDifference = getTimeDifferenceFromTimestamps(Date.now(), backupTimestamp);
     let daysDifference = Math.floor(timeDifference / 1000 / 60 / 60 / 24);
 
     if (daysDifference > backupPeriod) {
@@ -80,10 +77,7 @@ export const createBackupIfRequired = async (appMode) => {
   const currentTimestamp = Date.now();
   if (timestamp) {
     lastBackupTimestamp = timestamp;
-    timeDifference = getTimeDifferenceFromTimestamps(
-      currentTimestamp,
-      lastBackupTimestamp
-    );
+    timeDifference = getTimeDifferenceFromTimestamps(currentTimestamp, lastBackupTimestamp);
   }
   const hoursDifference = Math.floor(timeDifference / 1000 / 60 / 60);
   // Only send backups after at-least 6 hours
@@ -95,20 +89,18 @@ export const createBackupIfRequired = async (appMode) => {
   }
 };
 
-export const getBackupFromFirestore = (uid) => {
-  return new Promise(async (resolve) => {
-    const database = getFirestore();
-    const ref = doc(collection(database, "backup"), uid);
-    const docSnap = await getDoc(ref);
+export const getBackupFromFirestore = async (uid) => {
+  const database = getFirestore();
+  const ref = doc(collection(database, "backup"), uid);
+  const docSnap = await getDoc(ref);
 
-    if (docSnap.exists()) {
-      const backupData = docSnap.data();
-      resolve({ data: backupData });
-    } else {
-      // doc.data() will be undefined in this case
-      resolve({ data: null });
-    }
-  });
+  if (docSnap.exists()) {
+    const backupData = docSnap.data();
+    return { data: backupData };
+  } else {
+    // doc.data() will be undefined in this case
+    return { data: null };
+  }
 };
 
 export const updateRecordWithBackup = (appMode, backupData) => {

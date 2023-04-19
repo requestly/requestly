@@ -92,11 +92,7 @@ const ShareAppAccessModal = ({ isVisible, setVisible, appId, appName }) => {
       </Row>
       <Row>
         <Col span={24} align="center">
-          <Button
-            type="primary"
-            loading={isLoading}
-            onClick={handleShareAppAccess}
-          >
+          <Button type="primary" loading={isLoading} onClick={handleShareAppAccess}>
             Share Access
           </Button>
         </Col>

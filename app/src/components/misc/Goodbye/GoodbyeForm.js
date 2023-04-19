@@ -37,9 +37,7 @@ const GoodbyeForm = () => {
     } else {
       setResponse({
         ...response,
-        reasonsArray: response.reasonsArray.filter(
-          (check) => check !== e.target.data
-        ),
+        reasonsArray: response.reasonsArray.filter((check) => check !== e.target.data),
       });
     }
   };
@@ -55,10 +53,7 @@ const GoodbyeForm = () => {
     }
 
     const functions = getFunctions();
-    const submitUninstallFeedback = httpsCallable(
-      functions,
-      "submitUninstallFeedback"
-    );
+    const submitUninstallFeedback = httpsCallable(functions, "submitUninstallFeedback");
 
     setIsActionLoading(true);
 
@@ -97,9 +92,7 @@ const GoodbyeForm = () => {
         <TextArea
           value={response.feedbackText}
           className="feedback-textarea"
-          onChange={(e) =>
-            setResponse({ ...response, feedbackText: e.target.value })
-          }
+          onChange={(e) => setResponse({ ...response, feedbackText: e.target.value })}
           placeholder="Any other feedback? (optional)"
           autoSize={{
             minRows: 3,
