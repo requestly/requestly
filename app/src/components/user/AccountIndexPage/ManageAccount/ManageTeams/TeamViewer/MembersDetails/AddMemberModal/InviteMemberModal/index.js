@@ -5,13 +5,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import "./InviteMemberModal.css";
 
-const InviteMemberModal = ({
-  isOpen,
-  teamId,
-  emails,
-  isAdmin,
-  handleModalClose,
-}) => {
+const InviteMemberModal = ({ isOpen, teamId, emails, isAdmin, handleModalClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleInviteUser = () => {
@@ -44,30 +38,20 @@ const InviteMemberModal = ({
     <RQModal centered open={isOpen} onCancel={handleModalClose}>
       <div className="rq-modal-content">
         <div>
-          <img
-            alt="oops"
-            className="inivite-modal-oops-icon"
-            src="/assets/img/workspaces/oops.svg"
-          />
+          <img alt="oops" className="inivite-modal-oops-icon" src="/assets/img/workspaces/oops.svg" />
         </div>
         <div className="header invite-member-modal-header">Oops!</div>
         <p className="text-gray">{emails.join(", ")}</p>
 
         <div className="text-gray text-sm no-account-message">
-          Does not seem to have a Requestly account yet. Do you want to send
-          them a magic invite link via email? <br />
-          They will be automatically added to this team upon signup using that
-          link.
+          Does not seem to have a Requestly account yet. Do you want to send them a magic invite link via email? <br />
+          They will be automatically added to this team upon signup using that link.
         </div>
       </div>
 
       <Row align="right" className="rq-modal-footer">
         <Col className="ml-auto">
-          <Button
-            data-dismiss="modal"
-            onClick={handleModalClose}
-            disabled={isProcessing}
-          >
+          <Button data-dismiss="modal" onClick={handleModalClose} disabled={isProcessing}>
             No, I'll add them later
           </Button>
           <Button

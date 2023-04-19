@@ -14,9 +14,7 @@ const MoveToProfessionalModal = ({ isOpen, toggle, dontRefreshPage }) => {
   const handleError = () => {
     setConfirmLoading(false);
 
-    toast.error(
-      "You don't have a payment method attached. Please write to us at contact@requestly.io"
-    );
+    toast.error("You don't have a payment method attached. Please write to us at contact@requestly.io");
   };
 
   const handleSuccess = () => {
@@ -84,16 +82,10 @@ const MoveToProfessionalModal = ({ isOpen, toggle, dontRefreshPage }) => {
                   <Row align="middle" justify="space-between">
                     <Col>
                       <Row align="middle">
-                        <Filter
-                          size={24}
-                          set="curved"
-                          className="remix-icon hp-text-color-primary-1 hp-mr-8"
-                        />
+                        <Filter size={24} set="curved" className="remix-icon hp-text-color-primary-1 hp-mr-8" />
 
                         <Col>
-                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">
-                            Unlimited Rules
-                          </p>
+                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">Unlimited Rules</p>
                         </Col>
                       </Row>
                     </Col>
@@ -105,16 +97,10 @@ const MoveToProfessionalModal = ({ isOpen, toggle, dontRefreshPage }) => {
                   <Row align="middle" justify="space-between">
                     <Col>
                       <Row align="middle">
-                        <Document
-                          size={24}
-                          set="curved"
-                          className="remix-icon hp-text-color-primary-1 hp-mr-8"
-                        />
+                        <Document size={24} set="curved" className="remix-icon hp-text-color-primary-1 hp-mr-8" />
 
                         <Col>
-                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">
-                            Unlimited Mocks
-                          </p>
+                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">Unlimited Mocks</p>
                         </Col>
                       </Row>
                     </Col>
@@ -126,16 +112,10 @@ const MoveToProfessionalModal = ({ isOpen, toggle, dontRefreshPage }) => {
                   <Row align="middle" justify="space-between">
                     <Col>
                       <Row align="middle">
-                        <AddUser
-                          size={24}
-                          set="curved"
-                          className="remix-icon hp-text-color-primary-1 hp-mr-8"
-                        />
+                        <AddUser size={24} set="curved" className="remix-icon hp-text-color-primary-1 hp-mr-8" />
 
                         <Col>
-                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">
-                            Unlimited Sharing
-                          </p>
+                          <p className="hp-mb-0 hp-badge-text hp-font-weight-400">Unlimited Sharing</p>
                         </Col>
                       </Row>
                     </Col>
@@ -147,10 +127,7 @@ const MoveToProfessionalModal = ({ isOpen, toggle, dontRefreshPage }) => {
           </Row>
         </div>
         <br />
-        <p>
-          You'll be upgraded to Requestly Professional plan ($25/month). This
-          process might take a few seconds.
-        </p>
+        <p>You'll be upgraded to Requestly Professional plan ($25/month). This process might take a few seconds.</p>
       </Modal>
     </>
   );

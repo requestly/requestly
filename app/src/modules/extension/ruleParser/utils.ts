@@ -1,14 +1,6 @@
-import {
-  RulePairSource,
-  SourceKey,
-  SourceOperator,
-} from "../../../types/rules";
+import { RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
-import {
-  ExtensionRequestMethod,
-  ExtensionResourceType,
-  ExtensionRuleCondition,
-} from "../types";
+import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
 const createRegexForWildcardString = (value: string): string => {
   // TODO: convert all * to .* and escape all special chars for regex
@@ -25,9 +17,7 @@ const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   return { pattern: regex };
 };
 
-const parseUrlParametersFromSource = (
-  source: RulePairSource
-): ExtensionRuleCondition => {
+const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
     return {
@@ -74,9 +64,7 @@ const parseUrlParametersFromSource = (
       }
 
       case SourceOperator.WILDCARD_MATCHES: {
-        const { pattern, flags } = parseRegex(
-          createRegexForWildcardString(source.value)
-        );
+        const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         return {
           regexFilter: `^https?://${pattern}(/|$)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
@@ -88,9 +76,7 @@ const parseUrlParametersFromSource = (
   if (source.key === SourceKey.PATH) {
     switch (source.operator) {
       case SourceOperator.EQUALS: {
-        const path = source.value.startsWith("/")
-          ? source.value
-          : "/" + source.value;
+        const path = source.value.startsWith("/") ? source.value : "/" + source.value;
         return { urlFilter: `${path}^` }; // both "/path/to/resource" and "/to/" match https://example.com/path/to/resource. TODO: fix
       }
 
@@ -112,9 +98,7 @@ const parseUrlParametersFromSource = (
   return null;
 };
 
-export const parseFiltersFromSource = (
-  source: RulePairSource
-): ExtensionRuleCondition => {
+export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
   const filters = source.filters?.filter((filter) => filter !== null);
 
@@ -141,9 +125,7 @@ export const parseFiltersFromSource = (
   return condition;
 };
 
-export const parseConditionFromSource = (
-  source: RulePairSource
-): ExtensionRuleCondition => {
+export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   return {
     ...parseUrlParametersFromSource(source),
     ...parseFiltersFromSource(source),

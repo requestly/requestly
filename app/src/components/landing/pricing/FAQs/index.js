@@ -8,69 +8,49 @@ const PricingFAQs = () => {
 
   const FAQs = [
     {
-      ques: (
-        <React.Fragment>
-          Do individual developers need to pay for Requestly?
-        </React.Fragment>
-      ),
+      ques: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
       answer: (
         <React.Fragment>
-          No, developers working individually without a team are not required to
-          pay for Requestly. The basic plan provides liberal limits and includes
-          many features you know and love, including capturing requests and
+          No, developers working individually without a team are not required to pay for Requestly. The basic plan
+          provides liberal limits and includes many features you know and love, including capturing requests and
           modifying requests, mocking APIs, session replays, and much more.
         </React.Fragment>
       ),
     },
     {
-      ques: (
-        <React.Fragment>
-          How can I remove limits from the basic plan?
-        </React.Fragment>
-      ),
+      ques: <React.Fragment>How can I remove limits from the basic plan?</React.Fragment>,
       answer: (
         <React.Fragment>
-          Requestly is an open-source platform. Downloading the source code from
-          GitHub allows you to use the basic plan without any limitations, but
-          sharing and other collaboration features will be unavailable.
+          Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the basic plan
+          without any limitations, but sharing and other collaboration features will be unavailable.
         </React.Fragment>
       ),
     },
     {
-      ques: (
-        <React.Fragment>When should I switch to the Team plan?</React.Fragment>
-      ),
+      ques: <React.Fragment>When should I switch to the Team plan?</React.Fragment>,
       answer: (
         <React.Fragment>
-          Users should look forward to creating teams when there is a need for
-          collaboration, as team workspaces provide real-time modification of
-          rules and synchronization within the team and thereby enhances the
-          productivity of teams.
+          Users should look forward to creating teams when there is a need for collaboration, as team workspaces provide
+          real-time modification of rules and synchronization within the team and thereby enhances the productivity of
+          teams.
         </React.Fragment>
       ),
     },
     {
-      ques: (
-        <React.Fragment>
-          Does unlimited really mean unlimited in the case of Team Plan?
-        </React.Fragment>
-      ),
+      ques: <React.Fragment>Does unlimited really mean unlimited in the case of Team Plan?</React.Fragment>,
       answer: (
         <React.Fragment>
-          Yes. Rarely some things might get restricted due to storage or
-          performance reasons. Please contact us in case that happens.
+          Yes. Rarely some things might get restricted due to storage or performance reasons. Please contact us in case
+          that happens.
         </React.Fragment>
       ),
     },
     {
-      ques: (
-        <React.Fragment>Which payment methods do you accept?</React.Fragment>
-      ),
+      ques: <React.Fragment>Which payment methods do you accept?</React.Fragment>,
       answer: (
         <React.Fragment>
-          We are using Stripe as our payment processor. Stripe supports the
-          majority of credit and debit card networks, including Visa &
-          Mastercard.
+          We are using Stripe as our payment processor. Stripe supports the majority of credit and debit card networks,
+          including Visa & Mastercard.
         </React.Fragment>
       ),
     },
@@ -88,11 +68,7 @@ const PricingFAQs = () => {
       </>
       <div className="more-questions-container">
         <div className="header text-gray">Still have more questions?</div>
-        <RQButton
-          type="primary"
-          className="faq-contact-btn"
-          onClick={() => setIsContactUsModalOpen(true)}
-        >
+        <RQButton type="primary" className="faq-contact-btn" onClick={() => setIsContactUsModalOpen(true)}>
           Contact us
         </RQButton>
       </div>

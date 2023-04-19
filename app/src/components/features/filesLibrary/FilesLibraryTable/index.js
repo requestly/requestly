@@ -27,11 +27,7 @@ const FilesLibraryTable = ({ filesList, updateCollection, mode, callback }) => {
         <div>
           <a
             href={`/mock-server/viewer/${data.id}`}
-            target={
-              mode === APP_CONSTANTS.FILES_TABLE_CONSTANTS.MODES.FILE_PICKER
-                ? "_blank"
-                : null
-            }
+            target={mode === APP_CONSTANTS.FILES_TABLE_CONSTANTS.MODES.FILE_PICKER ? "_blank" : null}
             rel="noreferrer"
           >
             {data.name}
@@ -63,9 +59,7 @@ const FilesLibraryTable = ({ filesList, updateCollection, mode, callback }) => {
       dataIndex: "tagType",
       render: (tagType) => (
         <span>
-          <Tag color={tagType === "API" ? "green" : "geekblue"}>
-            {tagType.toUpperCase()}
-          </Tag>
+          <Tag color={tagType === "API" ? "green" : "geekblue"}>{tagType.toUpperCase()}</Tag>
         </span>
       ),
       filters: [
@@ -111,13 +105,7 @@ const FilesLibraryTable = ({ filesList, updateCollection, mode, callback }) => {
   ];
   const dataSource = createDataSource(filesList);
 
-  return (
-    <Table
-      columns={columns}
-      dataSource={dataSource}
-      pagination={{ defaultPageSize: 4 }}
-    />
-  );
+  return <Table columns={columns} dataSource={dataSource} pagination={{ defaultPageSize: 4 }} />;
 };
 
 export default FilesLibraryTable;

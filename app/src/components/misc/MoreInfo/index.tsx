@@ -13,13 +13,7 @@ interface InfoProps {
   analyticsContext: string;
 }
 
-export const MoreInfo: React.FC<InfoProps> = ({
-  children,
-  text,
-  showIcon,
-  source,
-  analyticsContext,
-}) => {
+export const MoreInfo: React.FC<InfoProps> = ({ children, text, showIcon, source, analyticsContext }) => {
   const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
   const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip";
 

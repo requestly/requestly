@@ -42,32 +42,20 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     }
   };
 
-  const isRequestPayloadFilterApplicable = (
-    { requestData, method },
-    sourceFilters
-  ) => {
-    const sourceFiltersArray = Array.isArray(sourceFilters)
-      ? sourceFilters
-      : [sourceFilters];
+  const isRequestPayloadFilterApplicable = ({ requestData, method }, sourceFilters) => {
+    const sourceFiltersArray = Array.isArray(sourceFilters) ? sourceFilters : [sourceFilters];
 
     return (
       !sourceFiltersArray.length ||
       sourceFiltersArray.some((sourceFilter) => {
-        if (
-          sourceFilter?.requestMethod?.length &&
-          !sourceFilter.requestMethod.includes(method)
-        ) {
+        if (sourceFilter?.requestMethod?.length && !sourceFilter.requestMethod.includes(method)) {
           return false;
         }
 
         let requestPayloadFilter = sourceFilter?.requestPayload;
 
         if (!requestPayloadFilter) return true;
-        if (
-          typeof requestPayloadFilter === "object" &&
-          Object.keys(requestPayloadFilter).length === 0
-        )
-          return true;
+        if (typeof requestPayloadFilter === "object" && Object.keys(requestPayloadFilter).length === 0) return true;
 
         // We only allow request payload targeting when requestData is JSON
         if (!requestData || typeof requestData !== "object") return false;
@@ -78,10 +66,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
         // tagettedKey is the json path e.g. a.b.0.c
         if (targettedKey) {
-          const valueInRequestData = traverseJsonByPath(
-            requestData,
-            targettedKey
-          );
+          const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
           return valueInRequestData == requestPayloadFilter?.value;
         }
 
@@ -123,9 +108,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     // https://stackoverflow.com/a/50147341/816213
     // (URL decoding is already handled in URLSearchParams)
     const searchParamsString = url.split("?")[1];
-    const paramsObject = Object.fromEntries(
-      new URLSearchParams(searchParamsString)
-    );
+    const paramsObject = Object.fromEntries(new URLSearchParams(searchParamsString));
 
     // Traverse paramsObject to convert JSON strings into JSON object
     for (let paramName in paramsObject) {
@@ -149,22 +132,16 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const isPromise = (obj) =>
-    !!obj &&
-    (typeof obj === "object" || typeof obj === "function") &&
-    typeof obj.then === "function";
+    !!obj && (typeof obj === "object" || typeof obj === "function") && typeof obj.then === "function";
 
-  const isContentTypeJSON = (contentType) =>
-    !!contentType?.includes("application/json");
+  const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
   /**
    * ********** Within Context Functions end here *************
    */
   // Intercept XMLHttpRequest
   const onReadyStateChange = async function () {
-    if (
-      this.readyState === this.HEADERS_RECEIVED ||
-      this.readyState === this.DONE
-    ) {
+    if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
       let url;
 
       if (isApplicableOnUrl(this.responseURL)) {
@@ -201,10 +178,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus =
-          responseModification.statusCode || this.status || 200;
-        const responseStatusText =
-          responseModification.statusText || this.statusText;
+        const responseStatus = responseModification.statusCode || this.status || 200;
+        const responseStatusText = responseModification.statusText || this.statusText;
 
         Object.defineProperty(this, "status", {
           get: () => responseStatus,
@@ -235,14 +210,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           customResponse = await customResponse;
         }
 
-        const isUnsupportedResponseType =
-          responseType && !["json", "text"].includes(responseType);
+        const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
         // We do not support statically modifying responses of type - blob, arraybuffer, document etc.
-        if (
-          responseModification.type === "static" &&
-          isUnsupportedResponseType
-        ) {
+        if (responseModification.type === "static" && isUnsupportedResponseType) {
           customResponse = this.response;
         }
 
@@ -257,10 +228,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
         Object.defineProperty(this, "response", {
           get: function () {
-            if (
-              responseModification.type === "static" &&
-              responseType === "json"
-            ) {
+            if (responseModification.type === "static" && responseType === "json") {
               if (typeof customResponse === "object") {
                 return customResponse;
               }
@@ -295,11 +263,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   const XHR = XMLHttpRequest;
   XMLHttpRequest = function () {
     const xhr = new XHR();
-    xhr.addEventListener(
-      "readystatechange",
-      onReadyStateChange.bind(xhr),
-      false
-    );
+    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
     return xhr;
   };
   XMLHttpRequest.prototype = XHR.prototype;
@@ -386,12 +350,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       requestData = convertSearchParamsToJSON(url);
     }
 
-    if (
-      !isRequestPayloadFilterApplicable(
-        { requestData, method },
-        responseRuleData.source?.filters
-      )
-    ) {
+    if (!isRequestPayloadFilterApplicable({ requestData, method }, responseRuleData.source?.filters)) {
       return fetchedResponse;
     }
 
@@ -415,9 +374,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (fetchedResponse) {
         const fetchedResponseData = await fetchedResponse.text();
         const responseType = fetchedResponse.headers.get("content-type");
-        const fetchedResponseDataAsJson = jsonifyValidJSONString(
-          fetchedResponseData
-        );
+        const fetchedResponseDataAsJson = jsonifyValidJSONString(fetchedResponseData);
 
         evaluatorArgs = {
           ...evaluatorArgs,
@@ -435,10 +392,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         customResponse = await customResponse;
       }
 
-      if (
-        typeof customResponse === "object" &&
-        isContentTypeJSON(evaluatorArgs?.responseType)
-      ) {
+      if (typeof customResponse === "object" && isContentTypeJSON(evaluatorArgs?.responseType)) {
         customResponse = JSON.stringify(customResponse);
       }
     } else {
@@ -456,10 +410,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     return new Response(new Blob([customResponse]), {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      status:
-        responseRuleData.response.statusCode || fetchedResponse?.status || 200,
-      statusText:
-        responseRuleData.response.statusText || fetchedResponse?.statusText,
+      status: responseRuleData.response.statusCode || fetchedResponse?.status || 200,
+      statusText: responseRuleData.response.statusText || fetchedResponse?.statusText,
       headers: fetchedResponse?.headers,
     });
   };

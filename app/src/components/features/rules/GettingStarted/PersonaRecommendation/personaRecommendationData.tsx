@@ -92,8 +92,7 @@ export const personaRecommendationData: FeatureSection[] = [
             <Video set="curved" />
           </span>
         ),
-        subTitle:
-          "Record your browsing sessions along with network and console logs",
+        subTitle: "Record your browsing sessions along with network and console logs",
         link: PATHS.SESSIONS.ABSOLUTE,
       },
       {
@@ -103,8 +102,7 @@ export const personaRecommendationData: FeatureSection[] = [
             <PaperUpload set="curved" />
           </span>
         ),
-        subTitle:
-          "Host your JS/CSS/HTML files and use them anywhere for debugging",
+        subTitle: "Host your JS/CSS/HTML files and use them anywhere for debugging",
         link: PATHS.FILE_SERVER_V2.ABSOLUTE,
       },
     ],

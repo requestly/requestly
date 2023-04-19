@@ -21,11 +21,7 @@ interface Props {
   handleUploadAction: () => void;
 }
 
-export const GettingStartedWithMocks: React.FC<Props> = ({
-  mockType,
-  handleCreateNew,
-  handleUploadAction,
-}) => {
+export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreateNew, handleUploadAction }) => {
   const user = useSelector(getUserAuthDetails);
 
   const renderDescription = () => {
@@ -103,11 +99,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
             <AuthConfirmationPopover
               title="You need to sign up to upload mocks"
               callback={handleUploadAction}
-              source={
-                mockType === MockType.API
-                  ? AUTH.SOURCE.CREATE_API_MOCK
-                  : AUTH.SOURCE.CREATE_FILE_MOCK
-              }
+              source={mockType === MockType.API ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}
             >
               <RQButton
                 type="default"
@@ -127,10 +119,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
               <RQButton
                 type="primary"
                 className="getting-started-btn"
-                onClick={
-                  (user?.loggedIn || mockType === MockType.FILE) &&
-                  handleCreateNew
-                }
+                onClick={(user?.loggedIn || mockType === MockType.FILE) && handleCreateNew}
               >
                 {renderCreateMockText()}
               </RQButton>
@@ -167,8 +156,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({
                 rel="noreferrer"
                 className="helper-item"
               >
-                <AiOutlineQuestionCircle /> Learn more about{" "}
-                {mockType === MockType.API ? "mock" : "file"} server
+                <AiOutlineQuestionCircle /> Learn more about {mockType === MockType.API ? "mock" : "file"} server
               </a>
             </div>
           </>

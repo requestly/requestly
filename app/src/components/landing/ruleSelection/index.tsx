@@ -8,9 +8,7 @@ import { trackRuleTypeSwitched } from "modules/analytics/events/common/rules";
 import "./ruleSelection.css";
 
 const RuleSelectionIndexPage: React.FC = () => {
-  const [selectedRuleType, setSelectedRuleType] = useState<RuleType>(
-    RuleType.REDIRECT
-  );
+  const [selectedRuleType, setSelectedRuleType] = useState<RuleType>(RuleType.REDIRECT);
 
   const handleRuleClick = useCallback((ruleType: RuleType) => {
     trackRuleTypeSwitched(ruleType);
@@ -20,10 +18,7 @@ const RuleSelectionIndexPage: React.FC = () => {
   return (
     <Row>
       <Col span={8}>
-        <RuleList
-          selectedRuleType={selectedRuleType}
-          handleRuleClick={handleRuleClick}
-        />
+        <RuleList selectedRuleType={selectedRuleType} handleRuleClick={handleRuleClick} />
       </Col>
       <Col span={16} className="rules-info-container">
         <RuleHeader selectedRuleType={selectedRuleType} />

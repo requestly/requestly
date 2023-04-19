@@ -21,13 +21,7 @@ const FreeTrialExpiredModal = ({ isOpen, closable = false }) => {
   }, []);
 
   return (
-    <Modal
-      visible={isOpen}
-      footer={null}
-      closable={closable}
-      onCancel={null}
-      onClose={null}
-    >
+    <Modal visible={isOpen} footer={null} closable={closable} onCancel={null} onClose={null}>
       <>
         <ProCard className="primary-card github-like-border">
           <Row style={{ textAlign: "center" }} align="center">
@@ -35,10 +29,8 @@ const FreeTrialExpiredModal = ({ isOpen, closable = false }) => {
               <Jumbotron className="text-center">
                 <h1 className="display-3">Your free trial is over.</h1>
                 <p className="lead">
-                  <span style={{ cursor: "auto", fontWeight: "bold" }}>
-                    Please upgrade
-                  </span>{" "}
-                  to continue using Requestly.
+                  <span style={{ cursor: "auto", fontWeight: "bold" }}>Please upgrade</span> to continue using
+                  Requestly.
                   <br />
                   Our Prices start as low as $5/month.
                 </p>

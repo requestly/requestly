@@ -21,20 +21,13 @@ import { UserIcon } from "components/common/UserIcon";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { MockType, RQMockMetadataSchema } from "../../types";
-import {
-  generateFinalUrl,
-  fileTypeColorMap,
-  mockMethodColorMap,
-} from "../../utils";
+import { generateFinalUrl, fileTypeColorMap, mockMethodColorMap } from "../../utils";
 import CopyButton from "components/misc/CopyButton";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import "../../../../../styles/custom/RQTable.css";
 import "./index.css";
-import {
-  getCurrentlyActiveWorkspace,
-  getIsWorkspaceMode,
-} from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
@@ -66,9 +59,7 @@ const MocksTable: React.FC<Props> = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>(
-    mocks
-  );
+  const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>(mocks);
 
   useEffect(() => {
     setFilteredMocks([...mocks]);
@@ -115,11 +106,7 @@ const MocksTable: React.FC<Props> = ({
       title: (
         <div className="rq-col-title">
           <AppstoreOutlined />
-          {mockType
-            ? mockType === MockType.FILE
-              ? "Type"
-              : "Method"
-            : "Method/Type"}
+          {mockType ? (mockType === MockType.FILE ? "Type" : "Method") : "Method/Type"}
         </div>
       ),
       dataIndex: "method",
@@ -131,8 +118,7 @@ const MocksTable: React.FC<Props> = ({
               style={{
                 color:
                   record?.type === MockType.API
-                    ? mockMethodColorMap[record.method] ||
-                      mockMethodColorMap["default"]
+                    ? mockMethodColorMap[record.method] || mockMethodColorMap["default"]
                     : fileTypeColorMap[record.fileType],
               }}
               className="mock-tag"
@@ -187,8 +173,7 @@ const MocksTable: React.FC<Props> = ({
       render: (_: any, record: RQMockMetadataSchema) => {
         return (
           <>
-            {moment(record.updatedTs).format("MMM DD, YYYY") +
-              (record.isOldMock ? "." : "")}{" "}
+            {moment(record.updatedTs).format("MMM DD, YYYY") + (record.isOldMock ? "." : "")}{" "}
             {isWorkspaceMode && (
               <>
                 by <UserIcon uid={record.lastUpdatedBy ?? record.createdBy} />
@@ -240,12 +225,7 @@ const MocksTable: React.FC<Props> = ({
                 copyText={
                   record.isOldMock
                     ? record.url
-                    : generateFinalUrl(
-                        record.endpoint,
-                        user?.details?.profile?.uid,
-                        user?.details?.username,
-                        teamId
-                      )
+                    : generateFinalUrl(record.endpoint, user?.details?.profile?.uid, user?.details?.username, teamId)
                 }
                 disableTooltip={true}
                 showIcon={false}
@@ -264,12 +244,7 @@ const MocksTable: React.FC<Props> = ({
                     url = record.url;
                   } else {
                     // Not sending username as it might change
-                    url = generateFinalUrl(
-                      record.endpoint,
-                      user?.details?.profile?.uid,
-                      null,
-                      teamId
-                    );
+                    url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId);
                   }
                   handleSelectAction(url);
                 }}
@@ -313,17 +288,8 @@ const MocksTable: React.FC<Props> = ({
   return (
     <>
       <Col span={24} className="mock-table-container">
-        <Row
-          justify="space-between"
-          align="middle"
-          wrap={true}
-          gutter={[0, 16]}
-        >
-          <Col
-            xs={{ span: 24 }}
-            sm={{ span: 3 }}
-            className="mocks-header-left-section"
-          >
+        <Row justify="space-between" align="middle" wrap={true} gutter={[0, 16]}>
+          <Col xs={{ span: 24 }} sm={{ span: 3 }} className="mocks-header-left-section">
             {renderMockTableTitle()}
           </Col>
           <Col flex={1}>
@@ -335,9 +301,7 @@ const MocksTable: React.FC<Props> = ({
                     className="mock-search-input"
                     size="small"
                     prefix={<SearchOutlined />}
-                    placeholder={`Search by ${
-                      mockType === MockType.API ? "mock" : "file"
-                    } name`}
+                    placeholder={`Search by ${mockType === MockType.API ? "mock" : "file"} name`}
                     onChange={(e) => {
                       handleSearch(e.target.value);
                     }}
@@ -353,10 +317,7 @@ const MocksTable: React.FC<Props> = ({
               >
                 <RQButton
                   type="primary"
-                  onClick={
-                    (user?.loggedIn || mockType === MockType.FILE) &&
-                    handleCreateNew
-                  }
+                  onClick={(user?.loggedIn || mockType === MockType.FILE) && handleCreateNew}
                   icon={<PlusOutlined />}
                 >
                   Create New
@@ -367,17 +328,11 @@ const MocksTable: React.FC<Props> = ({
                   <AuthConfirmationPopover
                     title="You need to sign up to upload mocks"
                     callback={handleUploadAction}
-                    source={
-                      mockType === MockType.API
-                        ? AUTH.SOURCE.CREATE_API_MOCK
-                        : AUTH.SOURCE.CREATE_FILE_MOCK
-                    }
+                    source={mockType === MockType.API ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}
                   >
                     <RQButton
                       type="default"
-                      onClick={() =>
-                        user?.details?.isLoggedIn && handleUploadAction()
-                      }
+                      onClick={() => user?.details?.isLoggedIn && handleUploadAction()}
                       icon={<CloudUploadOutlined />}
                     >
                       Upload
@@ -397,10 +352,7 @@ const MocksTable: React.FC<Props> = ({
                 e.preventDefault();
                 const url = record.isOldMock
                   ? record.url
-                  : generateFinalUrl(
-                      record.endpoint,
-                      user?.details?.profile?.uid
-                    );
+                  : generateFinalUrl(record.endpoint, user?.details?.profile?.uid);
                 handleItemSelect(record.id, url, record.isOldMock);
               },
             };

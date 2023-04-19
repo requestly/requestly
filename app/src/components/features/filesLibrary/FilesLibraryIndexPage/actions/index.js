@@ -1,8 +1,5 @@
 //UTILS
-import {
-  getUserFilesPath,
-  getMigrationPath,
-} from "../../../../../utils/db/UserModel";
+import { getUserFilesPath, getMigrationPath } from "../../../../../utils/db/UserModel";
 import DataStoreUtils from "../../../../../utils/DataStoreUtils";
 // FIREBASE
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -26,8 +23,7 @@ export const fetchUserMocks = async () => {
 export const checkMigrationDone = async (uid) => {
   const pathArray = getMigrationPath(uid);
   const userData = await DataStoreUtils.getValue(pathArray);
-  const isMigrationDone =
-    userData.migrations && userData.migrations.filesToMock;
+  const isMigrationDone = userData.migrations && userData.migrations.filesToMock;
   return !!isMigrationDone;
 };
 

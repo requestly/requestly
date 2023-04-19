@@ -4,17 +4,12 @@ RQ.ConsoleLogger = {
 
 RQ.ConsoleLogger.setup = () => {
   window.addEventListener("message", function (event) {
-    if (
-      event.source !== window ||
-      event.data.source !== "requestly:consoleLogger"
-    ) {
+    if (event.source !== window || event.data.source !== "requestly:consoleLogger") {
       return;
     }
 
     if (event.data.action === "showInitialMessage") {
-      RQ.ConsoleLogger.showInitialMessage(
-        event.data.payload?.isConsoleLoggerEnabled
-      );
+      RQ.ConsoleLogger.showInitialMessage(event.data.payload?.isConsoleLoggerEnabled);
     }
   });
 

@@ -39,8 +39,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
       default:
         return (
           <span>
-            <LockOutlined />{" "}
-            {isWorkspaceMode ? "Private to workspace" : "Private to me"}
+            <LockOutlined /> {isWorkspaceMode ? "Private to workspace" : "Private to me"}
           </span>
         );
 
@@ -66,11 +65,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
 
   const handleVisibilityChange = async (newVisibility) => {
     if (currentVisibility !== newVisibility) {
-      await updateVisibility(
-        user?.details?.profile?.uid,
-        recordingId,
-        newVisibility
-      );
+      await updateVisibility(user?.details?.profile?.uid, recordingId, newVisibility);
       updateVisibilityInStore(newVisibility);
     }
 
@@ -92,9 +87,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
 
     if (currentVisibility !== Visibility.ONLY_ME) {
       options.push({
-        label: isWorkspaceMode
-          ? "Make private to workspace"
-          : "Make private to me",
+        label: isWorkspaceMode ? "Make private to workspace" : "Make private to me",
         key: Visibility.ONLY_ME,
         icon: <LockOutlined />,
       });
@@ -137,12 +130,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
             setIsShareModalVisible(true);
           },
           isDropdown: true,
-          menu: (
-            <Menu
-              onClick={({ key }) => handleVisibilityChange(key)}
-              items={shareOptions}
-            />
-          ),
+          menu: <Menu onClick={({ key }) => handleVisibilityChange(key)} items={shareOptions} />,
         }}
         right={
           currentVisibility !== Visibility.ONLY_ME && {

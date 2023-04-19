@@ -14,10 +14,7 @@ const TestProxyInstructions = () => {
           <List.Item.Meta
             title={
               <>
-                b. Go to{" "}
-                <a href="http://amiusing.requestly.io">
-                  http://amiusing.requestly.io
-                </a>
+                b. Go to <a href="http://amiusing.requestly.io">http://amiusing.requestly.io</a>
                 &nbsp;
                 <span style={{ color: "red" }}>(Use http here. Not https)</span>
               </>

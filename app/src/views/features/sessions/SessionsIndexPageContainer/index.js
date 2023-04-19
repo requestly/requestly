@@ -11,11 +11,7 @@ const SessionsIndexPageContainer = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   useEffect(() => {
-    setIsFeatureCompatible(
-      isExtensionVersionCompatible(
-        APP_CONSTANTS.SESSION_RECORDING_COMPATIBILITY_VERSION
-      )
-    );
+    setIsFeatureCompatible(isExtensionVersionCompatible(APP_CONSTANTS.SESSION_RECORDING_COMPATIBILITY_VERSION));
   }, []);
 
   if (!isFeatureCompatible && !isWorkspaceMode) {

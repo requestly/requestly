@@ -8,18 +8,9 @@ interface Props {
   mockSelectionCallback: (mockUrl: string) => void;
 }
 
-const MockPickerModal: React.FC<Props> = ({
-  isVisible,
-  onVisibilityChange,
-  mockSelectionCallback,
-}) => {
+const MockPickerModal: React.FC<Props> = ({ isVisible, onVisibilityChange, mockSelectionCallback }) => {
   const renderMockList = () => {
-    return (
-      <MockListIndex
-        mockSelectionCallback={mockSelectionCallback}
-        source={MockListSource.PICKER_MODAL}
-      />
-    );
+    return <MockListIndex mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />;
   };
 
   return (

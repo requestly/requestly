@@ -10,10 +10,7 @@ import { getAppDetails } from "./AppUtils";
 export function isFeatureCompatible(featureName) {
   const { app_mode, app_version } = getAppDetails();
   const compatibilityVersionMap = FEATURE_COMPATIBLE_VERSION[featureName] || {};
-  return checkVersionCompatibility(
-    app_version,
-    compatibilityVersionMap[app_mode]
-  );
+  return checkVersionCompatibility(app_version, compatibilityVersionMap[app_mode]);
 }
 
 const checkVersionCompatibility = (currentVersion, compatibleVersion) => {

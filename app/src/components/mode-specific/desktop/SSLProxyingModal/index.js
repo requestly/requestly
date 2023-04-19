@@ -1,21 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  Modal,
-  Typography,
-  Table,
-  Switch,
-  Button,
-  Select,
-  Input,
-  message,
-  Row,
-  Col,
-} from "antd";
-import {
-  DeleteOutlined,
-  PlusOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { Modal, Typography, Table, Switch, Button, Select, Input, message, Row, Col } from "antd";
+import { DeleteOutlined, PlusOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
 
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -37,9 +22,7 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
       title: "Key",
       dataIndex: "key",
       key: "key",
-      render: (text) => (
-        <Text code>{GLOBAL_CONSTANTS.URL_COMPONENTS.HOST}</Text>
-      ),
+      render: (text) => <Text code>{GLOBAL_CONSTANTS.URL_COMPONENTS.HOST}</Text>,
     },
     {
       title: "Operator",
@@ -55,11 +38,7 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
             }}
           >
             {Object.keys(GLOBAL_CONSTANTS.RULE_OPERATORS).map((key) => {
-              return (
-                <Select.Option value={GLOBAL_CONSTANTS.RULE_OPERATORS[key]}>
-                  {key}
-                </Select.Option>
-              );
+              return <Select.Option value={GLOBAL_CONSTANTS.RULE_OPERATORS[key]}>{key}</Select.Option>;
             })}
           </Select>
         );
@@ -83,13 +62,7 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
     {
       title: "Actions",
       render: (text, record, index) => {
-        return (
-          <Button
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => removeSource(index)}
-          />
-        );
+        return <Button size="small" icon={<DeleteOutlined />} onClick={() => removeSource(index)} />;
       },
     },
   ];
@@ -101,13 +74,10 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
         action_type = "SSL_PROXYING:GET_INCLUSION_LIST";
       }
 
-      const sslProxyingData = await window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain(
-        "rq-storage:storage-action",
-        {
-          type: "SSL_PROXYING:GET_ALL",
-          payload: {},
-        }
-      );
+      const sslProxyingData = await window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain("rq-storage:storage-action", {
+        type: "SSL_PROXYING:GET_ALL",
+        payload: {},
+      });
 
       let _enabledAll = sslProxyingData?.enabledAll;
       if (_enabledAll === undefined || _enabledAll === null) {
@@ -115,13 +85,10 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
       }
       setEnabledAll(_enabledAll);
 
-      const _sourceList = await window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain(
-        "rq-storage:storage-action",
-        {
-          type: action_type,
-          payload: {},
-        }
-      );
+      const _sourceList = await window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain("rq-storage:storage-action", {
+        type: action_type,
+        payload: {},
+      });
       setSourceList(_sourceList);
     };
     doIt();
@@ -141,19 +108,14 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
 
   const handleOnEnableChange = (checked) => {
     setEnabledAll(checked);
-    const action_type = checked
-      ? "SSL_PROXYING:ENABLE_ALL"
-      : "SSL_PROXYING:DISABLE_ALL";
+    const action_type = checked ? "SSL_PROXYING:ENABLE_ALL" : "SSL_PROXYING:DISABLE_ALL";
 
-    window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain(
-      "rq-storage:storage-action",
-      {
-        type: action_type,
-        payload: {
-          data: sourceList,
-        },
-      }
-    );
+    window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain("rq-storage:storage-action", {
+      type: action_type,
+      payload: {
+        data: sourceList,
+      },
+    });
   };
 
   const renderEnabledAll = () => {
@@ -167,13 +129,11 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
         </Col>
         {enabledAll ? (
           <Text code>
-            <InfoCircleOutlined /> Intercepting all SSL traffic except Exclusion
-            List Rules
+            <InfoCircleOutlined /> Intercepting all SSL traffic except Exclusion List Rules
           </Text>
         ) : (
           <Text code>
-            <InfoCircleOutlined /> Intercepting SSL traffic only matching
-            Inclusion List Rules
+            <InfoCircleOutlined /> Intercepting SSL traffic only matching Inclusion List Rules
           </Text>
         )}
         <Col></Col>
@@ -187,21 +147,9 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
         <Title level={5}>
           {enabledAll ? "Exclusion List" : "Inclusion List"}
           &nbsp;&nbsp;
-          <Button
-            size="small"
-            shape="circle"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={addEmptySource}
-          />
+          <Button size="small" shape="circle" type="primary" icon={<PlusOutlined />} onClick={addEmptySource} />
         </Title>
-        <Table
-          rowKey={"id"}
-          columns={sourceColumns}
-          dataSource={sourceList}
-          pagination={false}
-          showHeader={false}
-        />
+        <Table rowKey={"id"} columns={sourceColumns} dataSource={sourceList} pagination={false} showHeader={false} />
       </>
     );
   };
@@ -220,20 +168,15 @@ const SSLProxyingModal = ({ isVisible, setIsVisible }) => {
   };
 
   const saveSourcesList = () => {
-    let action_type = enabledAll
-      ? "SSL_PROXYING:UPDATE_EXCLUSION_LIST"
-      : "SSL_PROXYING:UPDATE_INCLUSION_LIST";
+    let action_type = enabledAll ? "SSL_PROXYING:UPDATE_EXCLUSION_LIST" : "SSL_PROXYING:UPDATE_INCLUSION_LIST";
 
     // Exclusion List
-    window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain(
-      "rq-storage:storage-action",
-      {
-        type: action_type,
-        payload: {
-          data: sourceList,
-        },
-      }
-    );
+    window?.RQ?.DESKTOP?.SERVICES?.IPC.invokeEventInMain("rq-storage:storage-action", {
+      type: action_type,
+      payload: {
+        data: sourceList,
+      },
+    });
     message.success("Saved SSL Proxying List");
   };
 

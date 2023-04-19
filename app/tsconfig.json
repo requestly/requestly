@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "noUnusedLocals": true,
     "noImplicitAny": true,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": false,

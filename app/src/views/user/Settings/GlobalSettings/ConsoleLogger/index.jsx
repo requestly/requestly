@@ -38,10 +38,7 @@ const ConsoleLogger = ({ isCompatible }) => {
       caption="You may enable logging to log rules applied by Requestly on the page in your developer console."
     />
   ) : (
-    <ErrorCard
-      type="warning"
-      customErrorMessage="Please upgrade the extension to enable console logger."
-    />
+    <ErrorCard type="warning" customErrorMessage="Please upgrade the extension to enable console logger." />
   );
 };
 

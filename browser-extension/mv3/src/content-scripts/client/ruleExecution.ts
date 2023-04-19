@@ -20,9 +20,7 @@ export const initRuleExecutionHandler = () => {
         sendResponse(Array.from(appliedResponseRuleIds));
         break;
       case CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES:
-        message.ruleIds.forEach((ruleId: string) =>
-          appliedScriptRuleIds.add(ruleId)
-        );
+        message.ruleIds.forEach((ruleId: string) => appliedScriptRuleIds.add(ruleId));
         break;
       case CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES:
         sendResponse(Array.from(appliedScriptRuleIds));

@@ -17,8 +17,8 @@ const CloseConfirmModal = (props) => {
         <Row className="one-padding-bottom  my-auto">
           <Col className="my-auto">
             <p>
-              This requires existing instance of browser to be closed. Please
-              save your work and click Continue to relaunch it.
+              This requires existing instance of browser to be closed. Please save your work and click Continue to
+              relaunch it.
             </p>
           </Col>
         </Row>

@@ -4,8 +4,8 @@
 
 .rule-info-banner.ant-alert {
   padding: 8px;
-  background-color: rgba(var(--danger-border), 0.03);
-  border: 1px dashed rgb(var(--danger-border));
+  background-color: rgba(var(--danger-rgb), 0.03);
+  border: 1px dashed rgb(var(--danger-rgb));
   border-radius: var(--border-radius-sm);
 }
 

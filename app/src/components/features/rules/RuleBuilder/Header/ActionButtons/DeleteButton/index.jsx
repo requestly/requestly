@@ -1,19 +1,13 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "antd";
+import { useState } from "react";
+import { RQButton } from "lib/design-system/components";
+import { DeleteOutlined } from "@ant-design/icons";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
-import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 
-const DeleteButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
+const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
-  const [
-    isDeleteConfirmationModalActive,
-    setIsDeleteConfirmationModalActive,
-  ] = useState(false);
-
-  const navigate = useNavigate();
+  const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
 
   const toggleDeleteConfirmationModal = () => {
     setIsDeleteConfirmationModalActive(!isDeleteConfirmationModalActive);
@@ -21,19 +15,25 @@ const DeleteButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
 
   const handleDeleteRuleClick = () => {
     setIsDeleteConfirmationModalActive(true);
-    handleRuleOptionsDropdownClose?.();
-    trackRuleEditorHeaderClicked("delete_button", rule.ruleType, MODE);
+    trackRuleEditorHeaderClicked(
+      "delete_button",
+      rule.ruleType,
+      MODE,
+      isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
+    );
   };
-
-  const handleNavigationAfterDelete = useCallback(() => {
-    navigate(APP_CONSTANTS.PATHS.RULES.MY_RULES.ABSOLUTE);
-  }, [navigate]);
 
   return (
     <>
-      <Button type="text" disabled={isDisabled} onClick={handleDeleteRuleClick}>
-        Delete rule
-      </Button>
+      <RQButton
+        iconOnly={isRuleEditorModal}
+        type={isRuleEditorModal ? "default" : "text"}
+        disabled={isDisabled}
+        onClick={handleDeleteRuleClick}
+        icon={isRuleEditorModal && <DeleteOutlined />}
+      >
+        {!isRuleEditorModal && "Delete rule"}
+      </RQButton>
 
       {isDeleteConfirmationModalActive ? (
         <DeleteRulesModal
@@ -42,7 +42,7 @@ const DeleteButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
           toggle={toggleDeleteConfirmationModal}
           recordsToDelete={[rule]}
           ruleIdsToDelete={[rule.id]}
-          handleNavigationAfterDelete={handleNavigationAfterDelete}
+          ruleDeletedCallback={ruleDeletedCallback}
         />
       ) : null}
     </>

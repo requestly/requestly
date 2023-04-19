@@ -10,10 +10,7 @@ interface DemoVideoCardProps {
   ruleType: string;
 }
 
-const DemoVideoCard: React.FC<DemoVideoCardProps> = ({
-  demoVideo,
-  ruleType,
-}) => {
+const DemoVideoCard: React.FC<DemoVideoCardProps> = ({ demoVideo, ruleType }) => {
   const onVideoPlay = () => {
     trackRuleDemoVideoClicked(ruleType);
   };
@@ -21,12 +18,7 @@ const DemoVideoCard: React.FC<DemoVideoCardProps> = ({
     <Col className="demo-video-card" span={24}>
       <Row>
         <Col className="demo-video">
-          <YouTubePlayer
-            src={demoVideo.src}
-            width="520"
-            height="320"
-            handleOnPlay={onVideoPlay}
-          />
+          <YouTubePlayer src={demoVideo.src} width="520" height="320" handleOnPlay={onVideoPlay} />
         </Col>
       </Row>
       <Row>

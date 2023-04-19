@@ -9,10 +9,7 @@ import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import lottie from "lottie-web/build/player/lottie_light";
 import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
-import {
-  trackNewTeamCreateFailure,
-  trackNewTeamCreateSuccess,
-} from "modules/analytics/events/features/teams";
+import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import Logger from "lib/logger";
 
@@ -78,10 +75,7 @@ const CreateWorkspace = () => {
             <Row>
               <Col className="hp-text-center" span={24}>
                 <center>
-                  <div
-                    id="CreateWorkspace-teamSolvingPuzzle"
-                    style={{ height: "45vh" }}
-                  />
+                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "45vh" }} />
                 </center>
 
                 <Form
@@ -106,13 +100,7 @@ const CreateWorkspace = () => {
                   </Form.Item>
 
                   <Form.Item className="hp-mb-0">
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      block
-                      icon={<PlusOutlined />}
-                      loading={isSubmitProcess}
-                    >
+                    <Button type="primary" htmlType="submit" block icon={<PlusOutlined />} loading={isSubmitProcess}>
                       Create Workspace
                     </Button>
                   </Form.Item>

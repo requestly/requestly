@@ -20,10 +20,7 @@ const DesktopPreference = ({ appMode }) => {
 
   const closeInterceptingApps = () => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
-      return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-        "deactivate-traffic-sources",
-        {}
-      );
+      return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-traffic-sources", {});
     }
   };
 
@@ -35,13 +32,10 @@ const DesktopPreference = ({ appMode }) => {
 
     const setNewPort = (port) => {
       // make IPC call
-      return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-        "rq-storage:storage-action",
-        {
-          type: "USER_PREFERENCE:UPDATE_DEFAULT_PORT",
-          payload: { data: port },
-        }
-      );
+      return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("rq-storage:storage-action", {
+        type: "USER_PREFERENCE:UPDATE_DEFAULT_PORT",
+        payload: { data: port },
+      });
     };
 
     setPortSubmitLoading(true);
@@ -51,9 +45,7 @@ const DesktopPreference = ({ appMode }) => {
       await closeInterceptingApps();
       await setNewPort(parseInt(newPort));
 
-      toast.success(
-        `Default port changed to ${newPort}. Restart app to start proxy on the new port`
-      );
+      toast.success(`Default port changed to ${newPort}. Restart app to start proxy on the new port`);
       trackProxyPortChanged(newPort);
     } else {
       toast.error(`Please use a valid port number`);
@@ -67,9 +59,7 @@ const DesktopPreference = ({ appMode }) => {
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
     <>
       <div className="settings-header header">🖥️ Desktop Settings</div>
-      <p className="text-gray text-sm settings-caption">
-        Following are desktop preference settings
-      </p>
+      <p className="text-gray text-sm settings-caption">Following are desktop preference settings</p>
 
       <div>
         {isFeatureCompatible(FEATURES.DESKTOP_USER_PREFERENCES) ? (
@@ -84,9 +74,7 @@ const DesktopPreference = ({ appMode }) => {
               flex="0 1 420px"
               align="left"
             >
-              <label className="caption text-bold desktop-setting-port-input-label">
-                Set default proxy port
-              </label>
+              <label className="caption text-bold desktop-setting-port-input-label">Set default proxy port</label>
               <Input
                 value={portInput}
                 disabled={portSubmitLoading}
@@ -103,10 +91,7 @@ const DesktopPreference = ({ appMode }) => {
                 onConfirm={handlePortChange}
                 onCancel={trackUserDeniedClosingLaunchedApps}
               >
-                <Button
-                  className="desktop-port-update-btn"
-                  onClick={trackProxyPortChangeRequested}
-                >
+                <Button className="desktop-port-update-btn" onClick={trackProxyPortChangeRequested}>
                   Update
                 </Button>
               </Popconfirm>

@@ -55,12 +55,7 @@ const createResponseRulePair = (source_url, response_body) => {
   return pair;
 };
 
-export const updateResponseRule = (
-  appMode,
-  rule_id,
-  source_url,
-  response_body
-) => {
+export const updateResponseRule = (appMode, rule_id, source_url, response_body) => {
   const rule_type = GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE;
 
   let rule = generate_blank_rule_format(rule_type, rule_id);

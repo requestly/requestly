@@ -110,10 +110,8 @@ export const RULES = {
   // rule editor docs
   DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",
   DOCS_SIDEBAR_CLOSED: "docs_sidebar_closed",
-  DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED:
-    "docs_sidebar_primary_category_clicked",
-  DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED:
-    "docs_sidebar_secondary_category_clicked",
+  DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED: "docs_sidebar_primary_category_clicked",
+  DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED: "docs_sidebar_secondary_category_clicked",
   DOCS_SIDEBAR_CONTACT_US_CLICKED: "docs_sidebar_contact_us_clicked",
   DOCS_SIDEBAR_DEMOVIDEO_WATCHED: "docs_sidebar_demovideo_watched",
 };
@@ -150,6 +148,11 @@ export const TEAMS = {
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
   UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
-  ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED:
-    "add_members_in_worskpace_modal_viewed",
+  ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
+};
+
+export const TRAFFIC_TABLE = {
+  SIDEBAR_FILTER_SELECTED: "sidebar_filter_selected",
+  SIDEBAR_FILTER_EXPANDED: "sidebar_filter_expanded",
+  SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
 };

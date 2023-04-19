@@ -12,17 +12,11 @@ const columns = [
     render: (text) => {
       text = text.trim();
       const domainParts = text.split(".");
-      const avatarDomain = domainParts
-        .splice(domainParts.length - 2, 2)
-        .join(".");
+      const avatarDomain = domainParts.splice(domainParts.length - 2, 2).join(".");
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
       return (
         <>
-          <Avatar
-            size="small"
-            style={{ display: "inline-block" }}
-            src={avatarUrl}
-          />
+          <Avatar size="small" style={{ display: "inline-block" }} src={avatarUrl} />
           <span>{`  ${text}`}</span>
         </>
       );
@@ -35,16 +29,10 @@ const NestedTable = ({ domain, domainLogs, handleRowClick }) => {
     // HACK
     <div
       style={{
-        height: `${Math.min(
-          ITEM_SIZE * (domainLogs[domain].length + 1),
-          400
-        )}px`,
+        height: `${Math.min(ITEM_SIZE * (domainLogs[domain].length + 1), 400)}px`,
       }}
     >
-      <GroupByNone
-        requestsLog={domainLogs[domain]}
-        handleRowClick={handleRowClick}
-      />
+      <GroupByNone requestsLog={domainLogs[domain]} handleRowClick={handleRowClick} />
     </div>
   );
 };
@@ -69,13 +57,7 @@ const GroupByDomain = ({ domainList, domainLogs, handleRowClick }) => {
       scroll={{ y: 600 }}
       expandable={{
         expandedRowRender: (record) => {
-          return (
-            <NestedTable
-              domain={record.domain}
-              domainLogs={domainLogs}
-              handleRowClick={handleRowClick}
-            />
-          );
+          return <NestedTable domain={record.domain} domainLogs={domainLogs} handleRowClick={handleRowClick} />;
         },
         expandRowByClick: true,
       }}

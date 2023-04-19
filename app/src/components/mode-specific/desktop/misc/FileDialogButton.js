@@ -10,16 +10,8 @@ export function displayFileSelector(callback) {
     }
   };
 
-  if (
-    window.RQ &&
-    window.RQ.DESKTOP &&
-    window.RQ.DESKTOP.SERVICES &&
-    window.RQ.DESKTOP.SERVICES.IPC
-  ) {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
-      "open-file-dialog",
-      {}
-    ).then((result) => {
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {}).then((result) => {
       handleDialogPromise(result);
     });
   }
@@ -27,10 +19,7 @@ export function displayFileSelector(callback) {
 
 const FileDialogButton = ({ text, callback }) => {
   return (
-    <Button
-      onClick={() => displayFileSelector(callback)}
-      style={{ marginRight: 8 }}
-    >
+    <Button onClick={() => displayFileSelector(callback)} style={{ marginRight: 8 }}>
       {text || "Select File"}
     </Button>
   );

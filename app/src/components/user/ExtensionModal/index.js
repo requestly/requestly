@@ -13,9 +13,7 @@ const ExtensionModal = (props) => {
         <InstallExtensionCTA
           heading={"Browser Extension Required"}
           subHeadingExtension={"Start intercepting HTTP requests"}
-          content={
-            "Please install Requestly Browser Extension to use Marketplace Rules."
-          }
+          content={"Please install Requestly Browser Extension to use Marketplace Rules."}
           supportsMobileDevice={false}
         />
       )}

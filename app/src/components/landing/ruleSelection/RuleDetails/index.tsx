@@ -10,21 +10,14 @@ interface RuleDetailsProps {
 }
 
 const RuleDetails: React.FC<RuleDetailsProps> = ({ selectedRuleType }) => {
-  const { description } = useMemo(() => getRuleDetails(selectedRuleType), [
-    selectedRuleType,
-  ]);
+  const { description } = useMemo(() => getRuleDetails(selectedRuleType), [selectedRuleType]);
 
   return (
     <div className="rule-details-container">
       <Row className="rule-details-description-container">
         <Col span={24}>
-          <div className="title text-bold rule-details-description-title">
-            Description
-          </div>
-          <div
-            className="text-gray rule-details-description"
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
+          <div className="title text-bold rule-details-description-title">Description</div>
+          <div className="text-gray rule-details-description" dangerouslySetInnerHTML={{ __html: description }} />
         </Col>
       </Row>
 

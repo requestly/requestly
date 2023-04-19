@@ -1,22 +1,9 @@
 import firebaseApp from "../../firebase";
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  where,
-} from "firebase/firestore";
-import {
-  MockType,
-  RQMockMetadataSchema,
-} from "components/features/mocksV2/types";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { getOwnerId } from "backend/utils";
 
-export const getMocks = async (
-  uid: string,
-  type: MockType,
-  teamId?: string
-): Promise<RQMockMetadataSchema[]> => {
+export const getMocks = async (uid: string, type: MockType, teamId?: string): Promise<RQMockMetadataSchema[]> => {
   if (!uid) {
     return [];
   }
@@ -26,18 +13,11 @@ export const getMocks = async (
   return mocks;
 };
 
-const getMocksFromFirebase = async (
-  ownerId: string,
-  type?: MockType
-): Promise<RQMockMetadataSchema[]> => {
+const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<RQMockMetadataSchema[]> => {
   const db = getFirestore(firebaseApp);
   const rootMocksRef = collection(db, "mocks");
 
-  let q = query(
-    rootMocksRef,
-    where("ownerId", "==", ownerId),
-    where("deleted", "in", [false])
-  );
+  let q = query(rootMocksRef, where("ownerId", "==", ownerId), where("deleted", "in", [false]));
 
   if (type) {
     q = query(q, where("type", "==", type));

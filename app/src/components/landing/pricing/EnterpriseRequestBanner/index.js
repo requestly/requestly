@@ -20,14 +20,8 @@ export default function EnterpriseRequestBanner({ user }) {
 
   // FIREBASE FUNCTIONS
   const functions = getFunctions();
-  const getEnterpriseAdminDetails = httpsCallable(
-    functions,
-    "getEnterpriseAdminDetails"
-  );
-  const requestEnterprisePlanFromAdmin = httpsCallable(
-    functions,
-    "requestEnterprisePlanFromAdmin"
-  );
+  const getEnterpriseAdminDetails = httpsCallable(functions, "getEnterpriseAdminDetails");
+  const requestEnterprisePlanFromAdmin = httpsCallable(functions, "requestEnterprisePlanFromAdmin");
 
   function requestPremiumToAdmin() {
     setEnterpriseRequestedState(1);
@@ -57,26 +51,18 @@ export default function EnterpriseRequestBanner({ user }) {
         getEnterpriseAdminDetails({}).then((response) => {
           setEnterpriseContactDetails(response);
           if (response.data.success) {
-            trackTeamPlanCardShown(
-              response.data?.enterpriseData?.admin?.email?.split("@")?.[1]
-            );
+            trackTeamPlanCardShown(response.data?.enterpriseData?.admin?.email?.split("@")?.[1]);
           }
         });
       }
     }
-  }, [
-    enterpriseContactDetails,
-    getEnterpriseAdminDetails,
-    user?.details?.isLoggedIn,
-  ]);
+  }, [enterpriseContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
 
   if (user?.details?.isPremium) return null;
 
   return (
     <React.Fragment>
-      {enterpriseContactDetails &&
-      enterpriseContactDetails.data &&
-      enterpriseContactDetails.data.success ? (
+      {enterpriseContactDetails && enterpriseContactDetails.data && enterpriseContactDetails.data.success ? (
         enterpriseRequestedState === 1 ? (
           <>
             <br />
@@ -99,12 +85,8 @@ export default function EnterpriseRequestBanner({ user }) {
                     color="secondary"
                     message={
                       <>
-                        {
-                          enterpriseContactDetails.data.enterpriseData.admin
-                            .name
-                        }{" "}
-                        has been notified. Please get in touch with them for
-                        further details.
+                        {enterpriseContactDetails.data.enterpriseData.admin.name} has been notified. Please get in touch
+                        with them for further details.
                       </>
                     }
                   ></Alert>
@@ -115,17 +97,10 @@ export default function EnterpriseRequestBanner({ user }) {
                     icon={<AiOutlineQuestionCircle />}
                     message={
                       <>
-                        Your organization is already on Requestly Premium Plan
-                        managed by{" "}
-                        {
-                          enterpriseContactDetails.data.enterpriseData.admin
-                            .name
-                        }
+                        Your organization is already on Requestly Premium Plan managed by{" "}
+                        {enterpriseContactDetails.data.enterpriseData.admin.name}
                         . <br />
-                        <span
-                          onClick={requestPremiumToAdmin}
-                          className="text-white text-underline cursor-pointer"
-                        >
+                        <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here
                         </span>{" "}
                         to request Premium subscription for you.

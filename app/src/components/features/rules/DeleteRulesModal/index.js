@@ -10,10 +10,7 @@ import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import {
-  trackRulesTrashedEvent,
-  trackRulesDeletedEvent,
-} from "modules/analytics/events/common/rules";
+import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
 
 const DeleteRulesModal = (props) => {
   const {
@@ -22,7 +19,7 @@ const DeleteRulesModal = (props) => {
     ruleIdsToDelete,
     recordsToDelete,
     clearSearch,
-    handleNavigationAfterDelete,
+    ruleDeletedCallback,
   } = props;
 
   //Global State
@@ -101,7 +98,7 @@ const DeleteRulesModal = (props) => {
 
     //Close Modal
     toggleDeleteRulesModal();
-    handleNavigationAfterDelete?.();
+    ruleDeletedCallback?.();
 
     //Unselect all rules
     unselectAllRules(dispatch);
@@ -110,7 +107,7 @@ const DeleteRulesModal = (props) => {
   const stablePostDeletionSteps = useCallback(postDeletionSteps, [
     dispatch,
     toggleDeleteRulesModal,
-    handleNavigationAfterDelete,
+    ruleDeletedCallback,
     clearSearch,
   ]);
 

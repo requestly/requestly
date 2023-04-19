@@ -3,31 +3,14 @@ import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 
-const CopyButton = ({
-  title,
-  copyText,
-  disableTooltip = false,
-  showIcon = true,
-  type = "text",
-  size = "small",
-}) => {
+const CopyButton = ({ title, copyText, disableTooltip = false, showIcon = true, type = "text", size = "small" }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
-    <Tooltip
-      title={copyClicked ? "copied!" : "copy"}
-      overlayStyle={{ display: disableTooltip && "none" }}
-    >
+    <Tooltip title={copyClicked ? "copied!" : "copy"} overlayStyle={{ display: disableTooltip && "none" }}>
       <RQButton
         type={type}
         size={"small" | size}
-        icon={
-          showIcon &&
-          (copyClicked ? (
-            <CheckCircleFilled style={{ color: "green" }} />
-          ) : (
-            <CopyOutlined />
-          ))
-        }
+        icon={showIcon && (copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : <CopyOutlined />)}
         onClick={(e) => {
           e.stopPropagation();
           navigator.clipboard.writeText(copyText);

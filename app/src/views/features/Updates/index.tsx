@@ -20,8 +20,7 @@ const VersionedChangelogs: React.FC = () => {
                 {changeLog.logs.map((log, index) => {
                   return (
                     <li key={`${changeLog.version}_${index}`}>
-                      {log.title}{" "}
-                      {log.link ? <a href={log.link}>Read More</a> : null}
+                      {log.title} {log.link ? <a href={log.link}>Read More</a> : null}
                     </li>
                   );
                 })}
@@ -41,15 +40,9 @@ const Updates: React.FC = () => {
       <div>
         <Row>
           <Col span={24}>
-            <Card
-              title={null}
-              bordered={false}
-              className="primary-card"
-              bodyStyle={{ color: "#c2c2c2" }}
-            >
+            <Card title={null} bordered={false} className="primary-card" bodyStyle={{ color: "#c2c2c2" }}>
               <Typography.Title level={2}>
-                Congratulations 🎉 Requestly has been upgraded to{" "}
-                {getExtensionVersion()}
+                Congratulations 🎉 Requestly has been upgraded to {getExtensionVersion()}
               </Typography.Title>
               <Divider orientation="left">
                 <Typography.Title level={4} style={{ margin: 0 }}>

@@ -24,12 +24,10 @@ export const getAppDetails = () => {
 export const isDesktopMode = () => {
   return getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 };
-export const isProductionUI = (
-    window.location.host.includes("app.requestly.io") || window.location.host.includes("beta.requestly.io")
-  ) && !window.testMode;
+export const isProductionUI =
+  (window.location.host.includes("app.requestly.io") || window.location.host.includes("beta.requestly.io")) &&
+  !window.testMode;
 
 export const isLocalStoragePresent = (appMode) => {
-  return !(
-    appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()
-  );
+  return !(appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled());
 };

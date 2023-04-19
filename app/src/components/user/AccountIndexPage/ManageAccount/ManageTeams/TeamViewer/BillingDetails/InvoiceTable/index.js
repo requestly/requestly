@@ -25,9 +25,7 @@ import "./InvoiceTable.css";
 
 const InvoiceTable = ({ mode, teamId }) => {
   const params = new URLSearchParams(window.location.search);
-  const autoRefresh = params.has("autoRefresh")
-    ? params.get("autoRefresh") === "true"
-    : false;
+  const autoRefresh = params.has("autoRefresh") ? params.get("autoRefresh") === "true" : false;
   const invoicesCount = 10; // Initial Count only | TODO - SAGAR - Replace with Bootstrap Pagination Table
   const mountedRef = useRef(true);
 
@@ -44,31 +42,17 @@ const InvoiceTable = ({ mode, teamId }) => {
     if (!mode) return;
     setIsLoading(true);
     let records = [];
-    const collectionName =
-      mode === "individual" ? "individualSubscriptions" : "teams";
-    const documentName =
-      mode === "individual" ? user.details.profile.uid : teamId;
+    const collectionName = mode === "individual" ? "individualSubscriptions" : "teams";
+    const documentName = mode === "individual" ? user.details.profile.uid : teamId;
     const db = getFirestore(firebaseApp);
-    const collectionRef = collection(
-      doc(collection(db, collectionName), documentName),
-      "invoices"
-    );
+    const collectionRef = collection(doc(collection(db, collectionName), documentName), "invoices");
 
     let query = null;
 
     if (lastDoc) {
-      query = firebaseQuery(
-        collectionRef,
-        orderBy("created", "desc"),
-        startAfter(lastDoc),
-        limit(invoicesCount)
-      );
+      query = firebaseQuery(collectionRef, orderBy("created", "desc"), startAfter(lastDoc), limit(invoicesCount));
     } else {
-      query = firebaseQuery(
-        collectionRef,
-        orderBy("created", "desc"),
-        limit(invoicesCount)
-      );
+      query = firebaseQuery(collectionRef, orderBy("created", "desc"), limit(invoicesCount));
     }
 
     getDocs(query).then((documentSnapshots) => {
@@ -91,9 +75,7 @@ const InvoiceTable = ({ mode, teamId }) => {
             status: doc.data().status,
             hosted_invoice_url: doc.data().hosted_invoice_url,
             number: doc.data().number,
-            productStart: new Date(
-              doc.data().productStart * 1000
-            ).toDateString(),
+            productStart: new Date(doc.data().productStart * 1000).toDateString(),
             productEnd: new Date(doc.data().productEnd * 1000).toDateString(),
           });
         });
@@ -106,18 +88,13 @@ const InvoiceTable = ({ mode, teamId }) => {
     });
   };
 
-  const stableFetchInvoices = useCallback(fetchInvoices, [
-    mode,
-    teamId,
-    user.details.profile.uid,
-  ]);
+  const stableFetchInvoices = useCallback(fetchInvoices, [mode, teamId, user.details.profile.uid]);
 
   const renderLoader = () => <SpinnerColumn message="Loading your invoices" />;
 
   const renderEmptyInvoice = () => (
     <div className="subtitle">
-      There are currently no invoices. If you have recently made a purchase,
-      please wait a minute or two.
+      There are currently no invoices. If you have recently made a purchase, please wait a minute or two.
     </div>
   );
 
@@ -189,10 +166,7 @@ const InvoiceTable = ({ mode, teamId }) => {
               title: "Amount",
               render: (_, invoice) => {
                 return (
-                  <span
-                    className="font-weight-bold"
-                    style={{ textTransform: "uppercase" }}
-                  >{`${invoice.currency} $${
+                  <span className="font-weight-bold" style={{ textTransform: "uppercase" }}>{`${invoice.currency} $${
                     parseInt(invoice.total) > 0 ? parseInt(invoice.total) : 0
                   }`}</span>
                 );
@@ -208,9 +182,7 @@ const InvoiceTable = ({ mode, teamId }) => {
         />
         <br />
         {reachedEnd ? (
-          <div className="text-sm text-dark-gray text-center">
-            No more invoices
-          </div>
+          <div className="text-sm text-dark-gray text-center">No more invoices</div>
         ) : (
           <Button
             type="link"
@@ -248,13 +220,7 @@ const InvoiceTable = ({ mode, teamId }) => {
   return (
     <>
       <Row>
-        <Col span={24}>
-          {isLoading
-            ? renderLoader()
-            : isEmpty(invoices)
-            ? renderEmptyInvoice()
-            : renderTable()}
-        </Col>
+        <Col span={24}>{isLoading ? renderLoader() : isEmpty(invoices) ? renderEmptyInvoice() : renderTable()}</Col>
       </Row>
     </>
   );

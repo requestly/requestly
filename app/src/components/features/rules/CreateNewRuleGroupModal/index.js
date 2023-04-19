@@ -9,11 +9,7 @@ import { StorageService } from "../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // REDUCER ACTIONS
 import { actions } from "../../../../store";
-import {
-  getAppMode,
-  getIsRefreshRulesPending,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 //FUNCTIONS
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
@@ -28,9 +24,7 @@ const CreateNewRuleGroupModal = (props) => {
   const appMode = useSelector(getAppMode);
 
   //Component State
-  const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState(
-    []
-  );
+  const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState([]);
 
   const handleReactSelectOnChange = (newSelectedOption) => {
     setCurrentValueForReactSelect(newSelectedOption.label);

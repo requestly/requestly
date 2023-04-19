@@ -16,11 +16,7 @@ const SessionsHomeView = () => {
     return <DesktopAppError />;
   }
 
-  return isExtensionInstalled() || isWorkspaceMode ? (
-    <SessionsIndexPageContainer />
-  ) : (
-    <OnboardingView />
-  );
+  return isExtensionInstalled() || isWorkspaceMode ? <SessionsIndexPageContainer /> : <OnboardingView />;
 };
 
 export default SessionsHomeView;

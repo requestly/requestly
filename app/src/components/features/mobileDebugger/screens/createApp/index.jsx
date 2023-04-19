@@ -41,9 +41,7 @@ const CreateApp = (props) => {
 
     switch (currentStep) {
       case 0:
-        return (
-          <CreateAppStep nextHandler={nextHandler} backHandler={backHandler} />
-        );
+        return <CreateAppStep nextHandler={nextHandler} backHandler={backHandler} />;
       case 1:
         return (
           <IntegrateCodeStep
@@ -54,12 +52,7 @@ const CreateApp = (props) => {
           />
         );
       case 2:
-        return (
-          <TestIntegrationStep
-            nextHandler={nextHandler}
-            backHandler={backHandler}
-          />
-        );
+        return <TestIntegrationStep nextHandler={nextHandler} backHandler={backHandler} />;
       default:
         return null;
     }
@@ -107,11 +100,7 @@ const CreateApp = (props) => {
           return {};
         }
 
-        trackSdkKeyCreatedEvent(
-          response?.data?.id,
-          response?.data?.name,
-          response?.data?.platform
-        );
+        trackSdkKeyCreatedEvent(response?.data?.id, response?.data?.name, response?.data?.platform);
         return response;
       })
       .catch((err) => {

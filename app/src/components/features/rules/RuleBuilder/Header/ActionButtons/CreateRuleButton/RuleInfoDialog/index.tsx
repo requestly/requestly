@@ -16,21 +16,17 @@ interface RuleInfoDialogContent {
 
 const ruleInfoDialogContent: Record<string, RuleInfoDialogContent> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE]: {
-    title:
-      "Modified response body and status will not be visible in browser network dev tools.",
+    title: "Modified response body and status will not be visible in browser network dev tools.",
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
-    readMoreLink:
-      "https://docs.requestly.io/browser-extension/chrome/http-modifications/response-rule",
+    readMoreLink: "https://docs.requestly.io/browser-extension/chrome/http-modifications/response-rule",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
   },
   [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: {
-    title:
-      "Modified request body will not be visible in browser network dev tools.",
+    title: "Modified request body will not be visible in browser network dev tools.",
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
-    readMoreLink:
-      "https://docs.requestly.io/desktop-app/mac/http-modifications/request-body-rule",
+    readMoreLink: "https://docs.requestly.io/desktop-app/mac/http-modifications/request-body-rule",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.DESKTOP],
   },
 };
@@ -38,10 +34,7 @@ const ruleInfoDialogContent: Record<string, RuleInfoDialogContent> = {
 const ruleInfoDialog = (ruleType: string, appMode: string): void => {
   if (!(ruleType in ruleInfoDialogContent)) return;
   // if appMode is not present in <ruleInfoDialogContent> then show for all app modes
-  if (
-    ruleInfoDialogContent[ruleType].appMode?.length > 0 &&
-    !ruleInfoDialogContent[ruleType].appMode.includes(appMode)
-  )
+  if (ruleInfoDialogContent[ruleType].appMode?.length > 0 && !ruleInfoDialogContent[ruleType].appMode.includes(appMode))
     return;
 
   notification.open({
@@ -65,9 +58,7 @@ const MessageComponent: React.FC<{ ruleType: string }> = ({ ruleType }) => {
         <span className="rule-info-dialog-title">{ruleInfo.title}</span>
       </Col>
       <Col>
-        <span className="rule-info-dialog-description">
-          {ruleInfo.description}
-        </span>
+        <span className="rule-info-dialog-description">{ruleInfo.description}</span>
       </Col>
       <Col className="rule-info-dialog-btn">
         <Space>
@@ -75,11 +66,7 @@ const MessageComponent: React.FC<{ ruleType: string }> = ({ ruleType }) => {
             Close
           </RQButton>
           {ruleInfoDialogContent[ruleType].readMoreLink ? (
-            <RQButton
-              type="default"
-              href={ruleInfo.readMoreLink}
-              target="__blank"
-            >
+            <RQButton type="default" href={ruleInfo.readMoreLink} target="__blank">
               Read More
             </RQButton>
           ) : null}

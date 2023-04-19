@@ -86,4 +86,3 @@ export const updateRedirectRuleTourCompleted = (prevState, action) => {
 export const updateTrafficTableTourCompleted = (prevState, action) => {
   prevState.misc.isTrafficTableTourCompleted = true;
 };
-

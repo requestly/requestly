@@ -24,18 +24,11 @@ const CreateTeamRuleCTA = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
   //Component State
-  const [
-    isNewRuleSelectorModalActive,
-    setIsNewRuleSelectorModalActive,
-  ] = useState(false);
-  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(
-    false
-  );
+  const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
+  const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleNewRuleSelectorModal = () => {
-    setIsNewRuleSelectorModalActive(
-      isNewRuleSelectorModalActive ? false : true
-    );
+    setIsNewRuleSelectorModalActive(isNewRuleSelectorModalActive ? false : true);
   };
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -62,22 +55,15 @@ const CreateTeamRuleCTA = () => {
       <ProCard className="primary-card github-like-border">
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <center>
-                <div
-                  id="CreateTeamRuleCTA-teamSolvingPuzzle"
-                  style={{ height: 150, width: 150 }}
-                />
+                <div id="CreateTeamRuleCTA-teamSolvingPuzzle" style={{ height: 150, width: 150 }} />
               </center>
               <br />
               <br />
               <h1 className="display-3">This is a shared workspace</h1>
               <p className="lead">
-                Rules created here can be accessed by your teammates. To manage
-                your teammates click{" "}
+                Rules created here can be accessed by your teammates. To manage your teammates click{" "}
                 <a
                   href="https://requestly.io/"
                   className="cursor-pointer"
@@ -100,10 +86,7 @@ const CreateTeamRuleCTA = () => {
                 >
                   Create your first rule
                 </Button>
-                <Button
-                  color="secondary"
-                  onClick={() => setIsImportRulesModalActive(true)}
-                >
+                <Button color="secondary" onClick={() => setIsImportRulesModalActive(true)}>
                   Upload Rules
                 </Button>
               </Space>
@@ -112,9 +95,7 @@ const CreateTeamRuleCTA = () => {
                 If you have existing Rules you can{" "}
                 <Button
                   type="link"
-                  onClick={() =>
-                    clearCurrentlyActiveWorkspace(dispatch, appMode)
-                  }
+                  onClick={() => clearCurrentlyActiveWorkspace(dispatch, appMode)}
                   style={{ paddingLeft: "0", paddingRight: "0" }}
                 >
                   <strong>switch to personal workspace</strong>
@@ -127,16 +108,10 @@ const CreateTeamRuleCTA = () => {
       </ProCard>
 
       {isNewRuleSelectorModalActive ? (
-        <NewRuleSelector
-          isOpen={isNewRuleSelectorModalActive}
-          toggle={toggleNewRuleSelectorModal}
-        />
+        <NewRuleSelector isOpen={isNewRuleSelectorModalActive} toggle={toggleNewRuleSelectorModal} />
       ) : null}
       {isImportRulesModalActive ? (
-        <ImportRulesModal
-          isOpen={isImportRulesModalActive}
-          toggle={toggleImportRulesModal}
-        />
+        <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
     </React.Fragment>
   );

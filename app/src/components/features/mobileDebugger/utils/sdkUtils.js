@@ -9,9 +9,7 @@ export const getSdkApps = async (uid) => {
   let sdkDetails = [];
 
   const sdksRef = collection(db, "sdks");
-  return await getDocs(
-    query(sdksRef, ...[where("accessIds", "array-contains", uid)])
-  ).then((snapshot) => {
+  return await getDocs(query(sdksRef, ...[where("accessIds", "array-contains", uid)])).then((snapshot) => {
     if (snapshot && snapshot.docs) {
       const sdkDetailsDocs = snapshot.docs || [];
       sdkDetails = sdkDetailsDocs.map((doc) => {
@@ -29,13 +27,7 @@ export const getSdkApps = async (uid) => {
 export const isUserUsingAndroidDebugger = async (uid) => {
   if (!uid) return false;
   const sdksRef = collection(db, "sdks");
-  return await getDocs(
-    query(
-      sdksRef,
-      where("accessIds", "array-contains", uid),
-      where("ownerId", "==", uid)
-    )
-  )
+  return await getDocs(query(sdksRef, where("accessIds", "array-contains", uid), where("ownerId", "==", uid)))
     .then((snapshot) => {
       return !!(snapshot && snapshot.docs.length);
     })

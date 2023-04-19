@@ -21,10 +21,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { filterUniqueObjects } from "utils/FormattingHelper";
-import {
-  trackConfigurationOpened,
-  trackConfigurationSaved,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
@@ -33,10 +30,7 @@ import { actions } from "../../../../../store";
 import CreateSessionGuide from "./CreateFirstSessionGuide";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import Logger from "lib/logger";
-import {
-  getCurrentlyActiveWorkspace,
-  getIsWorkspaceMode,
-} from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
 
 const _ = require("lodash");
@@ -132,10 +126,7 @@ const SessionsIndexPage = () => {
     });
   };
 
-  const stableFetchRecordings = useCallback(fetchRecordings, [
-    user?.details?.profile?.uid,
-    workspace,
-  ]);
+  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
   const openConfigModal = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
@@ -178,12 +169,7 @@ const SessionsIndexPage = () => {
   const ConfigureButton = () => (
     <Button type="primary" onClick={openConfigModal} icon={<SettingOutlined />}>
       Configure
-      {config.pageSources?.length ? (
-        <Badge
-          count={config.pageSources?.length}
-          style={{ marginLeft: "10px" }}
-        />
-      ) : null}
+      {config.pageSources?.length ? <Badge count={config.pageSources?.length} style={{ marginLeft: "10px" }} /> : null}
     </Button>
   );
 
@@ -204,30 +190,19 @@ const SessionsIndexPage = () => {
         stableFetchRecordings();
       }
     }
-  }, [
-    hasUserChanged,
-    workspace,
-    stableFetchRecordings,
-    user?.details?.profile?.uid,
-  ]);
+  }, [hasUserChanged, workspace, stableFetchRecordings, user?.details?.profile?.uid]);
 
   const filteredRecordings = filterUniqueObjects(sessionRecordings);
 
   useEffect(() => {
     if (filteredRecordings?.length >= 0 && !isWorkspaceMode) {
-      submitAttrUtil(
-        APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS,
-        filteredRecordings?.length
-      );
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS, filteredRecordings?.length);
     }
   }, [filteredRecordings?.length, isWorkspaceMode]);
 
   useEffect(() => {
     if (!isWorkspaceMode) {
-      submitAttrUtil(
-        APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED,
-        config?.pageSources?.length > 0
-      );
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
   }, [config?.pageSources?.length, isWorkspaceMode]);
 
@@ -291,9 +266,7 @@ const SessionsIndexPage = () => {
                 currentVisibility={selectedRowVisibility}
                 onVisibilityChange={(newVisibility) => {
                   // Update local table
-                  const foundIndex = sessionRecordings.findIndex(
-                    (recording) => recording.id === sharingRecordId
-                  );
+                  const foundIndex = sessionRecordings.findIndex((recording) => recording.id === sharingRecordId);
 
                   const recordings = _.cloneDeep(sessionRecordings);
                   recordings[foundIndex].visibility = newVisibility;

@@ -19,17 +19,11 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 const PersonalSubscription = () => {
   const mountedRef = useRef(true);
   // Component State
-  const [
-    isPersonalSubscriptionActive,
-    setIsPersonalSubscriptionActive,
-  ] = useState(true);
+  const [isPersonalSubscriptionActive, setIsPersonalSubscriptionActive] = useState(true);
 
   const fetchIndividualUserSubscriptionDetails = () => {
     const functions = getFunctions();
-    const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(
-      functions,
-      "fetchIndividualUserSubscriptionDetails"
-    );
+    const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(functions, "fetchIndividualUserSubscriptionDetails");
 
     fetchIndividualUserSubscriptionDetailsFF()
       .then((res) => {
@@ -48,17 +42,11 @@ const PersonalSubscription = () => {
       });
   };
 
-  const stableFetchIndividualSubscriptionData = useCallback(
-    fetchIndividualUserSubscriptionDetails,
-    []
-  );
+  const stableFetchIndividualSubscriptionData = useCallback(fetchIndividualUserSubscriptionDetails, []);
 
   const renderBillingDetails = () => {
     return (
-      <ProCard
-        title={<h3 style={{ marginBottom: "0" }}>Billing</h3>}
-        className="primary-card github-like-border"
-      >
+      <ProCard title={<h3 style={{ marginBottom: "0" }}>Billing</h3>} className="primary-card github-like-border">
         <CardBody className="border-0">
           <InvoiceTable mode="individual" />
         </CardBody>
@@ -74,10 +62,7 @@ const PersonalSubscription = () => {
   }, [stableFetchIndividualSubscriptionData]);
   return (
     <ProCard gutter={[16, 16]}>
-      <ProCard
-        title={<h2 className="mb-0">Requestly Premium</h2>}
-        className="primary-card github-like-border"
-      >
+      <ProCard title={<h2 className="mb-0">Requestly Premium</h2>} className="primary-card github-like-border">
         <Container className=" mt--7" fluid>
           <Row>
             <Col>
@@ -112,14 +97,8 @@ const PersonalSubscription = () => {
                   <Row>
                     <Col>
                       <h4 style={{ textAlign: "center" }}>
-                        You can manage your personal subscription here. If you
-                        want to manage a subscription for a Team instead, click{" "}
-                        <Link
-                          to={APP_CONSTANTS.PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE}
-                        >
-                          here
-                        </Link>
-                        .
+                        You can manage your personal subscription here. If you want to manage a subscription for a Team
+                        instead, click <Link to={APP_CONSTANTS.PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE}>here</Link>.
                       </h4>
                     </Col>
                   </Row>
@@ -131,22 +110,14 @@ const PersonalSubscription = () => {
                     hideIfNoSubscription={true}
                   />
                   <br />
-                  <CurrentPersonalSubscription
-                    hideShadow={true}
-                    customHeading={"Personal Subscription"}
-                  />
+                  <CurrentPersonalSubscription hideShadow={true} customHeading={"Personal Subscription"} />
                   <br />
                   {renderBillingDetails()}
 
                   <Row>
-                    <Col
-                      style={{ fontSize: "0.8125rem" }}
-                      className="text-center fix-dark-mode-color"
-                    >
+                    <Col style={{ fontSize: "0.8125rem" }} className="text-center fix-dark-mode-color">
                       Any questions? Reach our payment support team at{" "}
-                      <a
-                        href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}
-                      >
+                      <a href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}>
                         {GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
                       </a>
                     </Col>

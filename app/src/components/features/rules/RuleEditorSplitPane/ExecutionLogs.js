@@ -26,11 +26,7 @@ const columns = [
     width: "15%",
     renderText: (timestamp) => {
       if (isNaN(timestamp)) return "-";
-      return (
-        epochToLocaleDate(Number(timestamp)) +
-        " " +
-        epochToLocaleTime(Number(timestamp))
-      );
+      return epochToLocaleDate(Number(timestamp)) + " " + epochToLocaleTime(Number(timestamp));
     },
     sorter: (a, b) => a.timestamp - b.timestamp,
   },
@@ -75,21 +71,14 @@ const ExecutionLogs = () => {
       .getRecord(executionLogsId)
       .then((fetchedExecutionLogs) => {
         if (fetchedExecutionLogs) {
-          setExecutionLogs(
-            fetchedExecutionLogs.sort(
-              (log1, log2) => log2.timestamp - log1.timestamp
-            )
-          );
+          setExecutionLogs(fetchedExecutionLogs.sort((log1, log2) => log2.timestamp - log1.timestamp));
         }
         setIsLoading(false);
       });
   };
 
   // memoizing to prevent unnecessary renders
-  const stableFetchLogs = useCallback(fetchExecutionLogs, [
-    appMode,
-    executionLogsId,
-  ]);
+  const stableFetchLogs = useCallback(fetchExecutionLogs, [appMode, executionLogsId]);
 
   useEffect(() => {
     stableFetchLogs();
@@ -107,17 +96,9 @@ const ExecutionLogs = () => {
   return (
     <>
       <Skeleton loading={isLoading}>
-        <Row
-          align="middle"
-          justify="space-between"
-          style={{ paddingBottom: "6px" }}
-        >
+        <Row align="middle" justify="space-between" style={{ paddingBottom: "6px" }}>
           <Col span={2} xxl={{ pull: 0 }} lg={{ pull: 1 }} sm={{ pull: 2 }}>
-            <Button
-              onClick={handleRefreshBtnOnClick}
-              type="default"
-              icon={<SyncOutlined />}
-            >
+            <Button onClick={handleRefreshBtnOnClick} type="default" icon={<SyncOutlined />}>
               Refresh
             </Button>
           </Col>

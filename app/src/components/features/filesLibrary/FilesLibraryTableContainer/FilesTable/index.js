@@ -9,12 +9,7 @@ import { redirectToFileViewer } from "utils/RedirectionUtils";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { Typography, Button, Space, Tooltip, Input, Tag } from "antd";
 import * as FilesService from "../../../../../utils/files/FilesService";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-  CopyOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, CopyOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { toast } from "utils/Toast.js";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -41,14 +36,9 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
   const [proData, setProData] = useState(allMocks);
   const [search, setSearch] = useState(false);
 
-  const [
-    isCreateNewRuleGroupModalActive,
-    setIsCreateNewRuleGroupModalActive,
-  ] = useState(false);
+  const [isCreateNewRuleGroupModalActive, setIsCreateNewRuleGroupModalActive] = useState(false);
   const toggleCreateNewRuleGroupModal = () => {
-    setIsCreateNewRuleGroupModalActive(
-      isCreateNewRuleGroupModalActive ? false : true
-    );
+    setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
   };
 
   const deleteFile = (fileDetails, callback) => {
@@ -89,11 +79,7 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
       textWrap: "word-break",
       ellipsis: true,
       render: (_, record) => {
-        return (
-          <Link onClick={(e) => redirectToFileViewer(navigate, record.id)}>
-            {_}
-          </Link>
-        );
+        return <Link onClick={(e) => redirectToFileViewer(navigate, record.id)}>{_}</Link>;
       },
     },
 
@@ -151,11 +137,7 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
       render: (_, record) => {
         if (mode === APP_CONSTANTS.FILES_TABLE_CONSTANTS.MODES.FILE_PICKER) {
           return (
-            <Button
-              size="small"
-              type="secondary"
-              onClick={() => callback(record.shortUrl)}
-            >
+            <Button size="small" type="secondary" onClick={() => callback(record.shortUrl)}>
               Insert
             </Button>
           );
@@ -167,9 +149,7 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
                 size="small"
                 type="secondary"
                 icon={<EditOutlined />}
-                onClick={(e) =>
-                  redirectToFileViewer(navigate, record.id || record.mockID)
-                }
+                onClick={(e) => redirectToFileViewer(navigate, record.id || record.mockID)}
               ></Button>
             </Tooltip>
             <Tooltip title="Delete">
@@ -266,15 +246,10 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
     setSearch(false);
   };
 
-  const [
-    isNewRuleSelectorModalActive,
-    setIsNewRuleSelectorModalActive,
-  ] = useState(false);
+  const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
 
   const toggleNewRuleSelectorModal = () => {
-    setIsNewRuleSelectorModalActive(
-      isNewRuleSelectorModalActive ? false : true
-    );
+    setIsNewRuleSelectorModalActive(isNewRuleSelectorModalActive ? false : true);
   };
 
   return (
@@ -297,11 +272,7 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
           </>
         }
         toolBarRender={() => [
-          <Button
-            type="primary"
-            onClick={() => redirectToCreateNewFile(navigate, "API")}
-            icon={<PlusOutlined />}
-          >
+          <Button type="primary" onClick={() => redirectToCreateNewFile(navigate, "API")} icon={<PlusOutlined />}>
             Create New
           </Button>,
         ]}
@@ -320,10 +291,7 @@ const FilesTable = ({ filesList = {}, updateCollection, mode, callback }) => {
         />
       ) : null}
       {isCreateNewRuleGroupModalActive ? (
-        <CreateNewRuleGroupModal
-          isOpen={isCreateNewRuleGroupModalActive}
-          toggle={toggleCreateNewRuleGroupModal}
-        />
+        <CreateNewRuleGroupModal isOpen={isCreateNewRuleGroupModalActive} toggle={toggleCreateNewRuleGroupModal} />
       ) : null}
     </React.Fragment>
   );

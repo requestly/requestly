@@ -225,9 +225,7 @@ export function addQueryParamToURL(url, paramName, paramValue, overwrite) {
 
   queryString = convertQueryParamMapToString(queryParamsMap);
 
-  resultingUrl = queryString
-    ? urlWithoutQueryParamsAndHash + "?" + queryString
-    : urlWithoutQueryParamsAndHash;
+  resultingUrl = queryString ? urlWithoutQueryParamsAndHash + "?" + queryString : urlWithoutQueryParamsAndHash;
   resultingUrl += urlHash;
 
   return resultingUrl;

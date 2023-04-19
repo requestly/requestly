@@ -55,9 +55,7 @@ const convertHarJsonToRQLog = (har, id) => {
       contentType: response?.content?.mimeType,
       // Hack to fix dictionary coming into body
       body:
-        typeof response?.content?.text == "string"
-          ? response?.content?.text
-          : JSON.stringify(response?.content?.text),
+        typeof response?.content?.text == "string" ? response?.content?.text : JSON.stringify(response?.content?.text),
     },
     requestShellCurl: "",
     actions: [],

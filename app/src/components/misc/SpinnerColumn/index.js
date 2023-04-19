@@ -28,11 +28,7 @@ const SpinnerColumn = (props) => {
         {Array(skeletonCount)
           .fill(0)
           .map((_, i) => (
-            <Skeleton
-              key={i}
-              loading={true}
-              style={{ padding: "1.5rem 1.5rem 8px 1.5rem" }}
-            />
+            <Skeleton key={i} loading={true} style={{ padding: "1.5rem 1.5rem 8px 1.5rem" }} />
           ))}
       </Jumbotron>
     </Col>

@@ -2,19 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  AddUser,
-  Bag2,
-  Category,
-  Delete,
-  Document,
-  Filter,
-  PaperUpload,
-  Swap,
-  Video,
-  Play,
-  People,
-} from "react-iconly";
+import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
@@ -126,13 +114,7 @@ const MenuItem = (props) => {
     if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       const allRoutes = [...myRoutes];
       // Check if doesn't exist already!
-      if (allRoutes.some((route) => route.key === "my-apps")) return;
-      allRoutes.unshift({
-        path: PATHS.DESKTOP.MY_APPS.ABSOLUTE,
-        key: "my-apps",
-        name: "Connected Apps",
-        icon: <Category set="curved" className="remix-icon" />,
-      });
+      if (allRoutes.some((route) => route.key === "network-traffic")) return;
       allRoutes.unshift({
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
         key: "network-traffic",

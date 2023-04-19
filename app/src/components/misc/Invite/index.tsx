@@ -53,11 +53,7 @@ const Invite = ({ inviteId }: Props) => {
           setVerificationSuccess(true);
         } else {
           setVerificationError(res?.data?.error as VerifyInviteErrors);
-          trackWorkspaceInviteScreenError(
-            res?.data?.error,
-            invite?.metadata?.teamId,
-            inviteId
-          );
+          trackWorkspaceInviteScreenError(res?.data?.error, invite?.metadata?.teamId, inviteId);
         }
         setIsLoading(false);
       })

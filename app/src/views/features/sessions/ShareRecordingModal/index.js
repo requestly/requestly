@@ -24,9 +24,7 @@ export const renderHeroIcon = (currentVisibility, size = 16) => {
   switch (currentVisibility) {
     default:
     case Visibility.PUBLIC:
-      return (
-        <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />
-      );
+      return <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />;
 
     case Visibility.CUSTOM:
       return <FiUsers size={size} className="remix-icon radio-hero-icon" />;
@@ -46,9 +44,7 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
     case Visibility.PUBLIC:
       return "Anyone with the link";
     case Visibility.CUSTOM:
-      return isWorkspaceMode
-        ? "Only with specific people outside this workspace"
-        : "Only with specific people";
+      return isWorkspaceMode ? "Only with specific people outside this workspace" : "Only with specific people";
     case Visibility.ORGANIZATION:
       return "All members of my organization";
 
@@ -57,13 +53,7 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
   }
 };
 
-const ShareRecordingModal = ({
-  currentVisibility,
-  isVisible,
-  setVisible,
-  recordingId,
-  onVisibilityChange,
-}) => {
+const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
@@ -91,11 +81,7 @@ const ShareRecordingModal = ({
   };
 
   const handleVisibilityChange = async (newVisibility) => {
-    await updateVisibility(
-      user?.details?.profile?.uid,
-      recordingId,
-      newVisibility
-    );
+    await updateVisibility(user?.details?.profile?.uid, recordingId, newVisibility);
     onVisibilityChange && onVisibilityChange(newVisibility);
   };
 
@@ -136,9 +122,7 @@ const ShareRecordingModal = ({
     },
     {
       key: Visibility.CUSTOM,
-      label: isWorkspaceMode
-        ? "Only with specific people outside this workspace"
-        : "Only with specific people",
+      label: isWorkspaceMode ? "Only with specific people outside this workspace" : "Only with specific people",
     },
   ];
 
@@ -146,30 +130,15 @@ const ShareRecordingModal = ({
     setConfirmLoading(true);
 
     if (_.isEmpty(currentEmails)) {
-      await updateVisibility(
-        user?.details?.profile?.uid,
-        recordingId,
-        Visibility.ONLY_ME,
-        currentEmails
-      );
+      await updateVisibility(user?.details?.profile?.uid, recordingId, Visibility.ONLY_ME, currentEmails);
       onVisibilityChange && onVisibilityChange(Visibility.ONLY_ME);
     } else {
-      const recipients = currentEmails.filter(
-        (email) => !sentEmails.current.includes(email)
-      );
+      const recipients = currentEmails.filter((email) => !sentEmails.current.includes(email));
 
-      await updateVisibility(
-        user?.details?.profile?.uid,
-        recordingId,
-        "custom",
-        currentEmails
-      );
+      await updateVisibility(user?.details?.profile?.uid, recordingId, "custom", currentEmails);
 
       const functions = getFunctions(firebaseApp);
-      const sendSessionRecordingAsEmail = httpsCallable(
-        functions,
-        "sessionRecording-sendRecordingAsEmail"
-      );
+      const sendSessionRecordingAsEmail = httpsCallable(functions, "sessionRecording-sendRecordingAsEmail");
 
       if (recipients.length > 0) {
         await sendSessionRecordingAsEmail({
@@ -220,11 +189,7 @@ const ShareRecordingModal = ({
         {isAnyListChangePending ? (
           <Row>
             <Col span={24} style={{ marginTop: "8px" }}>
-              <Button
-                type="primary"
-                onClick={handleSave}
-                loading={confirmLoading}
-              >
+              <Button type="primary" onClick={handleSave} loading={confirmLoading}>
                 Save list
               </Button>
             </Col>
@@ -279,10 +244,7 @@ const ShareRecordingModal = ({
                   </div>
                 </Button>
                 {copiedText && (
-                  <Typography.Text
-                    style={{ alignSelf: "center" }}
-                    type="secondary"
-                  >
+                  <Typography.Text style={{ alignSelf: "center" }} type="secondary">
                     Copied!
                   </Typography.Text>
                 )}
@@ -311,23 +273,12 @@ const ShareRecordingModal = ({
                   >
                     {allOptions.map((option) => {
                       return (
-                        <Col
-                          span={24}
-                          className="radio-share-option"
-                          key={option.key}
-                        >
-                          <Radio
-                            value={option.key}
-                            disabled={option.disabled}
-                            className="share-recording-radio"
-                          >
+                        <Col span={24} className="radio-share-option" key={option.key}>
+                          <Radio value={option.key} disabled={option.disabled} className="share-recording-radio">
                             <Row align="middle">
                               {renderHeroIcon(option.key)} {option.label}{" "}
                               {option.tag && (
-                                <Tag
-                                  style={{ marginLeft: "0.5rem" }}
-                                  color="green"
-                                >
+                                <Tag style={{ marginLeft: "0.5rem" }} color="green">
                                   {option.tag}
                                 </Tag>
                               )}
@@ -335,9 +286,7 @@ const ShareRecordingModal = ({
                           </Radio>
                           {sessionVisibility === option.key && (
                             <div className="share-option-description">
-                              <p className="hp-p1-body hp-text-color-black-60">
-                                {getPrettyDescription(option.key)}
-                              </p>
+                              <p className="hp-p1-body hp-text-color-black-60">{getPrettyDescription(option.key)}</p>
                             </div>
                           )}
                         </Col>
@@ -345,9 +294,7 @@ const ShareRecordingModal = ({
                     })}
 
                     {sessionVisibility === Visibility.CUSTOM && (
-                      <div className="share-option-description">
-                        {renderRestrictedUsersList()}
-                      </div>
+                      <div className="share-option-description">{renderRestrictedUsersList()}</div>
                     )}
                   </Radio.Group>
                 </Col>

@@ -6,8 +6,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
-//CONSTANTS
-const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
+
+const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
 
 const processRules = (rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules = true) => {
@@ -25,6 +25,16 @@ const sanitizeRule = (rule) => {
   const sanitizedRule = rule;
   delete sanitizedRule.isFavourite; // https://github.com/requestly/requestly/issues/205
   return sanitizedRule;
+};
+
+export const getRuleConfigInEditMode = (rule) => {
+  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
+    if (!rule.version) {
+      return RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS_V1];
+    }
+  }
+
+  return RULE_TYPES_CONFIG[rule.ruleType];
 };
 
 export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds, groupwiseRules) => {

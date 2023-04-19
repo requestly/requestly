@@ -20,15 +20,12 @@ const PermissionError = () => {
   const [authAutoPrompt, setAuthAutoPrompt] = useState(false);
 
   const renderAuthOptions = () => {
-    if (!user?.details?.profile?.email)
-      return <AuthButtons autoPrompt={authAutoPrompt} />;
+    if (!user?.details?.profile?.email) return <AuthButtons autoPrompt={authAutoPrompt} />;
 
     return (
       <>
         <p>
-          <span>
-            You're currently signed in as {user?.details?.profile?.email}
-          </span>
+          <span>You're currently signed in as {user?.details?.profile?.email}</span>
         </p>
         <br />
         <center>
@@ -48,10 +45,7 @@ const PermissionError = () => {
 
   return (
     <React.Fragment>
-      <ProCard
-        className="primary-card github-like-border"
-        style={{ height: "100%" }}
-      >
+      <ProCard className="primary-card github-like-border" style={{ height: "100%" }}>
         <Row className="hp-text-center">
           <Col span={24}>
             <Row justify="center">
@@ -69,14 +63,10 @@ const PermissionError = () => {
 
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h1 className="display-3">You need permission</h1>
               <p className="lead">
-                Want in? Ask for access to owner of this recording, or switch to
-                an account with permission.
+                Want in? Ask for access to owner of this recording, or switch to an account with permission.
               </p>
               {renderAuthOptions()}
             </Jumbotron>

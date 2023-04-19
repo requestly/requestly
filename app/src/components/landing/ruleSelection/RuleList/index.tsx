@@ -20,10 +20,7 @@ interface RuleListProps {
   handleRuleClick: (ruleType: RuleType) => void;
 }
 
-const RuleList: React.FC<RuleListProps> = ({
-  selectedRuleType,
-  handleRuleClick,
-}) => {
+const RuleList: React.FC<RuleListProps> = ({ selectedRuleType, handleRuleClick }) => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
 
@@ -34,13 +31,9 @@ const RuleList: React.FC<RuleListProps> = ({
         if (
           type === RuleType.DELAY &&
           appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-          !isExtensionVersionCompatible(
-            APP_CONSTANTS.DELAY_COMPATIBILITY_VERSION
-          )
+          !isExtensionVersionCompatible(APP_CONSTANTS.DELAY_COMPATIBILITY_VERSION)
         ) {
-          console.log(
-            "Delay Rule is not compatible with your extension version"
-          );
+          console.log("Delay Rule is not compatible with your extension version");
           return null;
         }
 
@@ -67,11 +60,7 @@ const RuleList: React.FC<RuleListProps> = ({
     <div className="rule-list-container">
       <Row className="header" align="middle">
         <Col>
-          <Button
-            icon={<ArrowLeftOutlined />}
-            className="rule-list-back-btn"
-            onClick={handleBackButtonClick}
-          />
+          <Button icon={<ArrowLeftOutlined />} className="rule-list-back-btn" onClick={handleBackButtonClick} />
         </Col>
         <Col>Create New Rule</Col>
       </Row>

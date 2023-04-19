@@ -6,10 +6,7 @@ const MyFilesLibraryView = ({ filesList = {}, updateCollection }) => {
   return (
     <>
       <ProCard className="primary-card" title={null}>
-        <MyFilesView
-          filesList={filesList}
-          updateCollection={updateCollection}
-        />
+        <MyFilesView filesList={filesList} updateCollection={updateCollection} />
       </ProCard>
     </>
   );

@@ -43,13 +43,7 @@ const TeamViewer = ({ teamId }) => {
       {
         key: "Members",
         label: "Members",
-        children: (
-          <MembersDetails
-            key={teamId}
-            teamId={teamId}
-            isTeamAdmin={isTeamAdmin}
-          />
-        ),
+        children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
       },
       {
         key: "Workspace settings",
@@ -73,13 +67,7 @@ const TeamViewer = ({ teamId }) => {
             </>
           </span>
         ),
-        children: (
-          <BillingDetails
-            key={teamId}
-            teamId={teamId}
-            isTeamAdmin={isTeamAdmin}
-          />
-        ),
+        children: <BillingDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
       },
     ],
     [teamId, teamOwnerId, isTeamArchived, isTeamAdmin]
@@ -106,39 +94,22 @@ const TeamViewer = ({ teamId }) => {
           />
         ) : null}
 
-        <Row
-          align="middle"
-          justify="space-between"
-          className="manage-workspace-header-container"
-        >
+        <Row align="middle" justify="space-between" className="manage-workspace-header-container">
           <Col>
-            <Row
-              wrap={false}
-              align="middle"
-              className="manage-workspace-header"
-            >
+            <Row wrap={false} align="middle" className="manage-workspace-header">
               <Avatar
                 size={28}
                 shape="square"
                 icon={name ? name?.[0]?.toUpperCase() : "P"}
                 style={{
-                  backgroundColor: `${getUniqueColorForWorkspace(
-                    teamId,
-                    name
-                  )}`,
+                  backgroundColor: `${getUniqueColorForWorkspace(teamId, name)}`,
                 }}
               />{" "}
-              <span className="header">
-                Manage {name ?? "private"} workspace
-              </span>
+              <span className="header">Manage {name ?? "private"} workspace</span>
             </Row>
           </Col>
           <Col>
-            <Row
-              wrap={false}
-              align="middle"
-              className="manage-workspace-header"
-            >
+            <Row wrap={false} align="middle" className="manage-workspace-header">
               <SwitchWorkspaceButton
                 teamName={name}
                 selectedTeamId={teamId}

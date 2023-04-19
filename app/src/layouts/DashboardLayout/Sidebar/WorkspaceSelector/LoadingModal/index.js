@@ -23,19 +23,9 @@ const LoadingModal = ({ isModalOpen, closeModal }) => {
   }, []);
 
   return (
-    <Modal
-      title={null}
-      open={isModalOpen}
-      onCancel={closeModal}
-      footer={null}
-      closeIcon={<></>}
-      destroyOnClose={true}
-    >
+    <Modal title={null} open={isModalOpen} onCancel={closeModal} footer={null} closeIcon={<></>} destroyOnClose={true}>
       <center>
-        <div
-          id="LoadingModal-astronautAnimation"
-          style={{ height: 300, width: 300 }}
-        />
+        <div id="LoadingModal-astronautAnimation" style={{ height: 300, width: 300 }} />
         <span>
           <LoadingOutlined spin className="mr-2" /> Switching workspace
         </span>

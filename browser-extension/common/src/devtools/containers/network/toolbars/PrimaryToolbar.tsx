@@ -4,20 +4,9 @@ import React, { useCallback } from "react";
 import UserAgentRuleIcon from "../../../../../resources/icons/rule-icons/useragent.svg";
 import CodeIcon from "../../../../../resources/icons/code.svg";
 import CSSIcon from "../../../../../resources/icons/css.svg";
-import {
-  createRule,
-  generateRuleName,
-  getHostFromUrl,
-  getPageOrigin,
-} from "../../../utils";
+import { createRule, generateRuleName, getHostFromUrl, getPageOrigin } from "../../../utils";
 import { NetworkSettings, RuleEditorUrlFragment } from "../../../types";
-import {
-  ScriptCodeType,
-  ScriptRulePair,
-  ScriptType,
-  SourceKey,
-  SourceOperator,
-} from "../../../../types";
+import { ScriptCodeType, ScriptRulePair, ScriptType, SourceKey, SourceOperator } from "../../../../types";
 
 interface Props {
   clearEvents: () => void;
@@ -25,11 +14,7 @@ interface Props {
   onSettingsChange: (settings: NetworkSettings) => void;
 }
 
-const PrimaryToolbar: React.FC<Props> = ({
-  clearEvents,
-  settings,
-  onSettingsChange,
-}) => {
+const PrimaryToolbar: React.FC<Props> = ({ clearEvents, settings, onSettingsChange }) => {
   const onPreserveLogSettingChanged = useCallback(
     (newPreserveLogSetting: boolean) => {
       onSettingsChange({
@@ -121,12 +106,7 @@ const PrimaryToolbar: React.FC<Props> = ({
   return (
     <div className="network-toolbar primary">
       <div>
-        <Button
-          icon={<StopOutlined />}
-          type="text"
-          className="clear-events-button"
-          onClick={clearEvents}
-        >
+        <Button icon={<StopOutlined />} type="text" className="clear-events-button" onClick={clearEvents}>
           Clear logs
         </Button>
         <Divider type="vertical" className="divider" />
@@ -139,25 +119,13 @@ const PrimaryToolbar: React.FC<Props> = ({
         </Checkbox>
       </div>
       <Space>
-        <Button
-          icon={<Icon component={CodeIcon} />}
-          type="text"
-          onClick={addJSInPage}
-        >
+        <Button icon={<Icon component={CodeIcon} />} type="text" onClick={addJSInPage}>
           Add JavaScript to page
         </Button>
-        <Button
-          icon={<Icon component={CSSIcon} />}
-          type="text"
-          onClick={addCSSInPage}
-        >
+        <Button icon={<Icon component={CSSIcon} />} type="text" onClick={addCSSInPage}>
           Add CSS to page
         </Button>
-        <Button
-          icon={<Icon component={UserAgentRuleIcon} />}
-          type="text"
-          onClick={emulateDevice}
-        >
+        <Button icon={<Icon component={UserAgentRuleIcon} />} type="text" onClick={emulateDevice}>
           Emulate for different device
         </Button>
       </Space>

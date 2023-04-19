@@ -1,17 +1,6 @@
 import config from "common/config";
-import {
-  APP_MESSAGES,
-  EXTENSION_MESSAGES,
-  STORAGE_TYPE,
-} from "common/constants";
-import {
-  clearAllRecords,
-  getAllRecords,
-  getRecord,
-  getSuperObject,
-  removeRecord,
-  saveObject,
-} from "common/storage";
+import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
+import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
 
 interface ContentScriptMessage {
   action: string;
@@ -32,10 +21,7 @@ const constants = {
   ACTION_USER_LOGGED_IN: "user:loggedIn",
 };
 
-const registerCallback = (
-  message: ContentScriptMessage,
-  callback: MessageCallback
-): void => {
+const registerCallback = (message: ContentScriptMessage, callback: MessageCallback): void => {
   if (!callback) return;
 
   // Message has requestId when we are sending response
@@ -45,8 +31,7 @@ const registerCallback = (
 };
 
 const invokeCallback = (event: MessageEvent): void => {
-  const callbackRef =
-    eventCallbackMap[event.data.action + "_" + event.data.requestId];
+  const callbackRef = eventCallbackMap[event.data.action + "_" + event.data.requestId];
 
   if (typeof callbackRef === "function") {
     // We should remove the entry from map first before executing the callback otherwise we will store stale references of functions
@@ -61,10 +46,7 @@ const delegateMessageToBackground = (message: ContentScriptMessage): void => {
   });
 };
 
-export const sendExtensionMessage = (
-  message: ContentScriptMessage,
-  callback?: MessageCallback
-): void => {
+export const sendExtensionMessage = (message: ContentScriptMessage, callback?: MessageCallback): void => {
   if (!message.action) {
     return;
   }
@@ -77,10 +59,7 @@ export const sendExtensionMessage = (
   window.postMessage(message, constants.DOMAIN);
 };
 
-const sendResponse = (
-  originalEventData: ContentScriptMessage,
-  response?: unknown
-): void => {
+const sendResponse = (originalEventData: ContentScriptMessage, response?: unknown): void => {
   sendExtensionMessage({
     action: originalEventData.action,
     requestId: originalEventData.requestId,
@@ -94,18 +73,13 @@ export const initMessageHandler = () => {
     async (event: MessageEvent): Promise<void> => {
       if (event && event.origin !== config.WEB_URL) {
         if (config.logLevel === "debug") {
-          console.log(
-            "Ignoring message from the following domain",
-            event.origin,
-            event.data
-          );
+          console.log("Ignoring message from the following domain", event.origin, event.data);
         }
         return;
       }
 
       if (event && event.data && event.data.source === constants.PAGE_SCRIPT) {
-        config.logLevel === "debug" &&
-          console.log("Received message:", event.data);
+        config.logLevel === "debug" && console.log("Received message:", event.data);
 
         // Check whether it is a response to invoke callback or a request to perform an action
         if (typeof event.data.response !== "undefined") {

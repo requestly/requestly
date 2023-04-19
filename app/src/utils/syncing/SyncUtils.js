@@ -1,7 +1,4 @@
-import {
-  removeValueAsPromise,
-  updateValueAsPromise,
-} from "../../actions/FirebaseActions";
+import { removeValueAsPromise, updateValueAsPromise } from "../../actions/FirebaseActions";
 import {
   updateUserSyncRecords,
   removeUserSyncRecords,
@@ -26,19 +23,9 @@ import Logger from "lib/logger";
  *
  * syncing is disabled when storage is remote
  */
-export const doSyncRecords = async (
-  records,
-  syncType,
-  appMode,
-  options = {}
-) => {
+export const doSyncRecords = async (records, syncType, appMode, options = {}) => {
   if (!window.uid) return; // If user is not logged in
-  if (
-    !options.forceSync &&
-    !window.isSyncEnabled &&
-    !window.currentlyActiveWorkspaceTeamId
-  )
-    return; // If personal syncing is disabled and user has no active workspace
+  if (!options.forceSync && !window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return; // If personal syncing is disabled and user has no active workspace
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
@@ -64,10 +51,7 @@ export const setSyncState = async (uid, state, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
-        if (!state)
-          await StorageService(appMode).removeRecordsWithoutSyncing([
-            "last-sync-target",
-          ]);
+        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing(["last-sync-target"]);
         trackSyncToggled(uid, state);
         resolve(true);
       })
@@ -84,11 +68,7 @@ export const setSyncState = async (uid, state, appMode) => {
  * @param {String} appMode
  */
 export const syncRecordsRemoval = async (recordIds, appMode) => {
-  trackSyncTriggered(
-    window.uid,
-    recordIds.length,
-    SYNC_CONSTANTS.SYNC_REMOVE_RECORDS
-  );
+  trackSyncTriggered(window.uid, recordIds.length, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS);
 
   try {
     window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
@@ -102,11 +82,7 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
 
     trackSyncCompleted(window.uid);
   } catch (e) {
-    trackSyncFailed(
-      window.uid,
-      SYNC_CONSTANTS.SYNC_REMOVE_RECORDS,
-      JSON.stringify(e)
-    );
+    trackSyncFailed(window.uid, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS, JSON.stringify(e));
   }
 };
 
@@ -116,11 +92,5 @@ const syncSessionRecordingPageConfig = async (object, appMode) => {
     .then(() => {
       trackSyncCompleted(window.uid);
     })
-    .catch((e) =>
-      trackSyncFailed(
-        window.uid,
-        SYNC_CONSTANTS.SESSION_PAGE_CONFIG,
-        JSON.stringify(e)
-      )
-    );
+    .catch((e) => trackSyncFailed(window.uid, SYNC_CONSTANTS.SESSION_PAGE_CONFIG, JSON.stringify(e)));
 };

@@ -43,10 +43,7 @@ import MobileDebuggerHomeView from "views/features/mobileDebugger/home";
 import MobileDebuggerDashboardView from "views/features/mobileDebugger";
 import MobileDebuggerInterceptorView from "views/features/mobileDebugger/features/interceptor";
 import MobileDebuggerUnauthorized from "components/features/mobileDebugger/screens/unauthorized";
-import {
-  DraftSessionViewer,
-  SavedSessionViewer,
-} from "views/features/sessions/SessionViewer";
+import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import SessionsHomeView from "./views/features/sessions";
 import Updates from "views/features/Updates";
 import DesktopPreference from "views/user/Settings/DesktopPreferences";
@@ -112,11 +109,7 @@ var routes = [
     path: PATHS.RULES.RELATIVE,
     name: "Rules",
     icon: "fas fa-exchange-alt",
-    component: () => (
-      <Navigate
-        to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`}
-      />
-    ),
+    component: () => <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`} />,
   },
   {
     path: PATHS.INSTALL_EXTENSION.RELATIVE,

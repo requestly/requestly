@@ -7,9 +7,7 @@ interface LearnMoreAboutWorkspaceProps {
   linkText: string;
 }
 
-const LearnMoreAboutWorkspace: React.FC<LearnMoreAboutWorkspaceProps> = ({
-  linkText,
-}) => {
+const LearnMoreAboutWorkspace: React.FC<LearnMoreAboutWorkspaceProps> = ({ linkText }) => {
   return (
     <div className="text-gray cursor-pointer workspace-learn-more-link-container">
       <QuestionCircleOutlined className="workspace-learn-more-icon" />
