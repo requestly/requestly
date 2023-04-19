@@ -1,12 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
 
-export const trackCreateMockEvent = (
-  id: string,
-  type: string,
-  file_type: string,
-  source?: string
-) => {
+export const trackCreateMockEvent = (id: string, type: string, file_type: string, source?: string) => {
   const params = {
     version: 2,
     id,
@@ -17,11 +12,7 @@ export const trackCreateMockEvent = (
   trackEvent(MOCKSV2.CREATED, params);
 };
 
-export const trackUpdateMockEvent = (
-  id: string,
-  type: string,
-  file_type: string
-) => {
+export const trackUpdateMockEvent = (id: string, type: string, file_type: string) => {
   const params = {
     version: 2,
     id,
@@ -31,11 +22,7 @@ export const trackUpdateMockEvent = (
   trackEvent(MOCKSV2.UPDATED, params);
 };
 
-export const trackDeleteMockEvent = (
-  id: string,
-  type: string,
-  file_type: string
-) => {
+export const trackDeleteMockEvent = (id: string, type: string, file_type: string) => {
   const params = {
     version: 2,
     id,

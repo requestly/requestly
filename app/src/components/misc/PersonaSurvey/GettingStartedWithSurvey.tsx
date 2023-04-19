@@ -23,10 +23,7 @@ export const GettingStartedWithSurvey = () => {
 
   return (
     <div className="survey-lottie-animation-container">
-      <div
-        className="survey-lottie-animation"
-        id="PersonaSurvey-welcomeAnimation"
-      />
+      <div className="survey-lottie-animation" id="PersonaSurvey-welcomeAnimation" />
     </div>
   );
 };

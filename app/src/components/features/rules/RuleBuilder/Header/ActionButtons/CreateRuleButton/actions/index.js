@@ -51,10 +51,7 @@ export const validateRule = (rule, dispatch) => {
         };
       }
       //Destination should be a valid URL
-      else if (
-        !isValidUrl(pair.destination) &&
-        !pair.destination.startsWith("$")
-      ) {
+      else if (!isValidUrl(pair.destination) && !pair.destination.startsWith("$")) {
         output = {
           result: false,
           message: `Please enter a valid redirect URL`,
@@ -96,10 +93,7 @@ export const validateRule = (rule, dispatch) => {
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
     if (rule.version > 1) {
       rule.pairs.forEach((pair) => {
-        if (
-          pair.modifications.Request?.length === 0 &&
-          pair.modifications.Response?.length === 0
-        ) {
+        if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
             message: `Please add atleast one modification to the rule.`,
@@ -261,9 +255,7 @@ export const validateRule = (rule, dispatch) => {
       else if (isEmpty(pair.response.value)) {
         let message = `Please specify response body`;
         let error = "missing response body";
-        if (
-          pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE
-        ) {
+        if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
           message = "Please select a file first";
           error = "file not selected";
         }

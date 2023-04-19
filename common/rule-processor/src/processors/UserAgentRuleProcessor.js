@@ -2,12 +2,7 @@ import RuleHelper from "../RuleHelper";
 import CONSTANTS from "../../../constants";
 
 class UserAgentRuleProcessor {
-  static process({
-    rule,
-    requestURL,
-    originalRequestHeaders = [],
-    details = {},
-  }) {
+  static process({ rule, requestURL, originalRequestHeaders = [], details = {} }) {
     let isRuleApplied = false;
     let newRequestHeaders = [...originalRequestHeaders];
     const ruleType = rule.ruleType;
@@ -25,17 +20,12 @@ class UserAgentRuleProcessor {
       // In UA Rule Type, we match Source Object with mainFrame as well
       if (
         modification.source.value &&
-        RuleHelper.matchUrlWithRuleSource(modification.source, requestURL) ===
-          null &&
+        RuleHelper.matchUrlWithRuleSource(modification.source, requestURL) === null &&
         !(
           ruleType === CONSTANTS.RULE_TYPES.USERAGENT &&
-          modification.source.requestType ===
-            CONSTANTS.REQUEST_TYPES.MAIN_FRAME &&
+          modification.source.requestType === CONSTANTS.REQUEST_TYPES.MAIN_FRAME &&
           mainFrameUrl &&
-          RuleHelper.matchUrlWithRuleSource(
-            modification.source,
-            mainFrameUrl
-          ) !== null
+          RuleHelper.matchUrlWithRuleSource(modification.source, mainFrameUrl) !== null
         )
       ) {
         continue;

@@ -1,10 +1,5 @@
 import { UserAgentRule } from "../../../types/rules";
-import {
-  ExtensionRule,
-  ExtensionRuleAction,
-  HeadersRuleOperation,
-  RuleActionType,
-} from "../types";
+import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
 const USER_AGENT_HEADER = "User-Agent";

@@ -21,8 +21,7 @@ const hasRecordingAccess = (
 
   if (!uid) return false;
 
-  if (recording.visibility === "only-me" && uid === recording.ownerId)
-    return true;
+  if (recording.visibility === "only-me" && uid === recording.ownerId) return true;
 
   // TODO: We should ideally keep uids here instead of keeping emails.
   if (recording.accessEmails.includes(email)) return true;
@@ -49,9 +48,7 @@ export const getRecording = async (
   const ownerId = getOwnerId(uid, workspaceId);
 
   if (!snapshot.exists()) {
-    const err = new Error(
-      "The session recording you were looking for does not exist."
-    );
+    const err = new Error("The session recording you were looking for does not exist.");
     err.name = "NotFound";
     throw err;
   }
@@ -71,9 +68,7 @@ export const getRecording = async (
   if (hasRecordingAccess(data, ownerId, email)) {
     events = await fetchRecordingEvents(data?.eventsFilePath);
   } else {
-    const err = new Error(
-      "You do not have permission to access this recording"
-    );
+    const err = new Error("You do not have permission to access this recording");
     err.name = "PermissionDenied";
     throw err;
   }

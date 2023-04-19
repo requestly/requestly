@@ -1,25 +1,14 @@
 import React, { useCallback } from "react";
-import {
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-  ShareAltOutlined,
-  QuestionCircleOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import { Avatar, Modal, Space, Tag, Tooltip, Typography } from "antd";
 import ReactHoverObserver from "react-hover-observer";
 import Text from "antd/lib/typography/Text";
-import {
-  epochToDateAndTimeString,
-  msToHoursMinutesAndSeconds,
-} from "utils/DateTimeUtils";
+import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import {
-  getPrettyVisibilityName,
-  renderHeroIcon,
-} from "../../../ShareRecordingModal";
+import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecordingModal";
 import { deleteRecording } from "../../../api";
 import TutorialButton from "../TutorialButton";
 import { useSelector } from "react-redux";
@@ -70,10 +59,7 @@ const RecordingsList = ({
         width: "30%",
         render: (name, record) => {
           return (
-            <Link
-              to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id}
-              state={{ fromApp: true }}
-            >
+            <Link to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
               {name}
             </Link>
           );
@@ -166,20 +152,9 @@ const RecordingsList = ({
                         </Tooltip>
                       </Text>
 
-                      <Text
-                        type={isHovering ? "primary" : "secondary"}
-                        style={{ cursor: "pointer" }}
-                      >
+                      <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
                         <Tooltip title="Delete" placement="bottom">
-                          <Tag
-                            onClick={() =>
-                              confirmDeleteAction(
-                                id,
-                                record.eventsFilePath,
-                                callbackOnDeleteSuccess
-                              )
-                            }
-                          >
+                          <Tag onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}>
                             <DeleteOutlined
                               style={{
                                 padding: "5px 0px",
@@ -218,10 +193,7 @@ const RecordingsList = ({
   ]);
 
   return (
-    <ProCard
-      className="primary-card github-like-border rules-table-container"
-      title={null}
-    >
+    <ProCard className="primary-card github-like-border rules-table-container" title={null}>
       <ProTable
         loading={isTableLoading}
         dataSource={filteredRecordings}

@@ -1,14 +1,4 @@
-import {
-  Input,
-  Radio,
-  Typography,
-  Space,
-  Row,
-  Col,
-  Button,
-  Divider,
-  Badge,
-} from "antd";
+import { Input, Radio, Typography, Space, Row, Col, Button, Divider, Badge } from "antd";
 import ProCard from "@ant-design/pro-card";
 import { useState } from "react";
 import { APP_PLATFORMS } from "../constants";
@@ -47,13 +37,8 @@ const CreateAppStep = ({ nextHandler }) => {
           <Space direction="vertical">
             {APP_PLATFORMS.map((platform) => {
               return (
-                <Radio
-                  value={platform.id}
-                  key={platform.id}
-                  disabled={platform.id !== "android"}
-                >
-                  {platform.icon} {platform.name}{" "}
-                  {platform.tag ? <Badge count={platform.tag} /> : null}
+                <Radio value={platform.id} key={platform.id} disabled={platform.id !== "android"}>
+                  {platform.icon} {platform.name} {platform.tag ? <Badge count={platform.tag} /> : null}
                 </Radio>
               );
             })}

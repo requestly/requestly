@@ -13,20 +13,10 @@ import { fetchUserMocks } from "../FilesLibraryIndexPage/actions";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 import * as FilesService from "../../../../utils/files/FilesService";
-import {
-  redirectTo403,
-  redirectTo404,
-  redirectToFileViewer,
-} from "../../../../utils/RedirectionUtils";
+import { redirectTo403, redirectTo404, redirectToFileViewer } from "../../../../utils/RedirectionUtils";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-import {
-  trackCreateMockEvent,
-  trackUpdateMockEvent,
-} from "modules/analytics/events/features/mockServer/mocks";
-import {
-  trackCreateFileEvent,
-  trackUpdateFileEvent,
-} from "modules/analytics/events/features/mockServer/files";
+import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mockServer/mocks";
+import { trackCreateFileEvent, trackUpdateFileEvent } from "modules/analytics/events/features/mockServer/files";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
@@ -104,19 +94,17 @@ const FileViewerIndexPage = () => {
       mockVersion,
     };
     if (!isMock) {
-      FilesService.updateFile(fileDetails.filePath, body, fileDetailsCopy).then(
-        (result) => {
-          setIsFileSaving(false);
-          if (result.success) {
-            toast.info("File Edited Successfully");
-            trackRQLastActivity("file_edited");
-            trackUpdateFileEvent();
-            redirectToFileViewer(navigate, fileId);
-          } else {
-            toast.error("Unable to edit file");
-          }
+      FilesService.updateFile(fileDetails.filePath, body, fileDetailsCopy).then((result) => {
+        setIsFileSaving(false);
+        if (result.success) {
+          toast.info("File Edited Successfully");
+          trackRQLastActivity("file_edited");
+          trackUpdateFileEvent();
+          redirectToFileViewer(navigate, fileId);
+        } else {
+          toast.error("Unable to edit file");
         }
-      );
+      });
     } else {
       const functions = getFunctions();
       const editMock = httpsCallable(functions, "editMock");
@@ -212,12 +200,7 @@ const FileViewerIndexPage = () => {
   };
 
   useEffect(() => {
-    if (
-      user.loggedIn &&
-      user.details &&
-      user.details.profile &&
-      user.details.profile.uid
-    )
+    if (user.loggedIn && user.details && user.details.profile && user.details.profile.uid)
       stableFetchData(user.details.profile.uid);
   }, [stableFetchData, user]);
 

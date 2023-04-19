@@ -25,9 +25,7 @@ class ScriptRuleProcessor {
     });
 
     var jsScripts = scripts.filter(function (script) {
-      return (
-        !script.codeType || script.codeType === CONSTANTS.SCRIPT_CODE_TYPES.JS
-      );
+      return !script.codeType || script.codeType === CONSTANTS.SCRIPT_CODE_TYPES.JS;
     });
 
     return {

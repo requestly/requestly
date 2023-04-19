@@ -1,10 +1,7 @@
 import { isEmpty } from "lodash";
 import { FileType, MockType, RQMockMetadataSchema } from "../types";
 
-export const oldMockToNewMockMetadataAdapter = (
-  uid: string,
-  data: any
-): RQMockMetadataSchema => {
+export const oldMockToNewMockMetadataAdapter = (uid: string, data: any): RQMockMetadataSchema => {
   let url = "";
 
   if (!isEmpty(data?.path)) {
@@ -28,10 +25,7 @@ export const oldMockToNewMockMetadataAdapter = (
   return mockMetadata;
 };
 
-export const oldFileMockToNewMockMetadataAdapter = (
-  uid: string,
-  data: any
-): RQMockMetadataSchema => {
+export const oldFileMockToNewMockMetadataAdapter = (uid: string, data: any): RQMockMetadataSchema => {
   let fileType = FileType.JS;
 
   switch (data?.contentType) {

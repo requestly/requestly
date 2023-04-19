@@ -2,37 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { Button, Row, Col } from "antd";
-import {
-  getAvailableTeams,
-  getCurrentlyActiveWorkspace,
-} from "store/features/teams/selectors";
+import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
-import {
-  trackAddTeamMemberFailure,
-  trackAddTeamMemberSuccess,
-} from "modules/analytics/events/features/teams";
+import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 
-const AddMemberModal = ({
-  isOpen,
-  handleModalClose,
-  callback,
-  teamId: currentTeamId,
-}) => {
+const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTeamId }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
-  const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(
-    false
-  );
+  const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
 
@@ -68,26 +55,28 @@ const AddMemberModal = ({
     createTeamInvites({
       teamId: teamId,
       emails: userEmail,
-      role: makeUserAdmin ? "admin": "write",
-    }).then((res) => {
-      if(res?.data?.success) {
-        toast.success("Sent invites successfully");
-        callback?.();
-        trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin);
-        setIsProcessing(false);
-        handleModalClose();
-      } else {
-          const inviteErrors = res?.data?.results.filter(result => result?.success !== true);
+      role: makeUserAdmin ? "admin" : "write",
+    })
+      .then((res) => {
+        if (res?.data?.success) {
+          toast.success("Sent invites successfully");
+          callback?.();
+          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin);
+          setIsProcessing(false);
+          handleModalClose();
+        } else {
+          const inviteErrors = res?.data?.results.filter((result) => result?.success !== true);
           callback?.();
           setInviteErrors([...inviteErrors]);
           setInviteErrorModalActive(true);
           trackAddTeamMemberFailure(teamId, userEmail, null);
           setIsProcessing(false);
-      }
-    }).catch(err => {
-      toast.error("Error while creating invitations. Make sure you are an admin");
-      trackAddTeamMemberFailure(teamId, userEmail, null);
-    })
+        }
+      })
+      .catch((err) => {
+        toast.error("Error while creating invitations. Make sure you are an admin");
+        trackAddTeamMemberFailure(teamId, userEmail, null);
+      });
   };
 
   useEffect(() => {
@@ -99,24 +88,14 @@ const AddMemberModal = ({
       <RQModal centered open={isOpen} onCancel={handleModalClose}>
         <div className="rq-modal-content">
           <div>
-            <img
-              alt="smile"
-              width="48px"
-              height="44px"
-              src="/assets/img/workspaces/smiles.svg"
-            />
+            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
           </div>
           <div className="header add-member-modal-header">
-            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""}{" "}
-            workspace
+            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
           </div>
-          <p className="text-gray">
-            Get the most out of Requestly by inviting your teammates.
-          </p>
+          <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-          <label className="text-bold text-sm add-member-modal-email-label">
-            Email address
-          </label>
+          <label className="text-bold text-sm add-member-modal-email-label">Email address</label>
           <ReactMultiEmail
             className="members-email-input"
             placeholder="Email Address"
@@ -127,11 +106,7 @@ const AddMemberModal = ({
             getLabel={(email, index, removeEmail) => (
               <div data-tag key={index} className="multi-email-tag">
                 {email}
-                <span
-                  title="Remove"
-                  data-tag-handle
-                  onClick={() => removeEmail(index)}
-                >
+                <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
                   <img alt="remove" src="/assets/img/workspaces/cross.svg" />
                 </span>
               </div>
@@ -148,10 +123,7 @@ const AddMemberModal = ({
             </Col>
           </Row>
           <div className="text-gray add-members-modal-info-text">
-            <div>
-              Workspaces enable you to organize and collaborate on rules within
-              your team.
-            </div>
+            <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
           </div>
         </div>
 
@@ -160,12 +132,7 @@ const AddMemberModal = ({
             <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
           </Col>
           <Col>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={handleAddMember}
-              loading={isProcessing}
-            >
+            <Button type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
               Invite People
             </Button>
           </Col>

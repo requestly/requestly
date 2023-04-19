@@ -1,33 +1,20 @@
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import FeatureCard from "./FeatureCard";
-import {
-  CloudOutlined,
-  BugOutlined,
-  MobileOutlined,
-  CreditCardOutlined,
-} from "@ant-design/icons";
+import { CloudOutlined, BugOutlined, MobileOutlined, CreditCardOutlined } from "@ant-design/icons";
 
 const Home = () => {
   const user = useSelector(getUserAuthDetails);
 
   return (
     <div className="home-container">
-      <h2>
-        Welcome to Requestly,{" "}
-        {user.loggedIn ? user.details.profile.displayName : "User"}!
-      </h2>
+      <h2>Welcome to Requestly, {user.loggedIn ? user.details.profile.displayName : "User"}!</h2>
+      <p className="home-sm-text">Here are the most common tools for modifying network (HTTP(s)) requests.</p>
       <p className="home-sm-text">
-        Here are the most common tools for modifying network (HTTP(s)) requests.
-      </p>
-      <p className="home-sm-text">
-        For more info, visit the{" "}
-        <a href="https://requestly.io/contact-us/">Support Center</a>
+        For more info, visit the <a href="https://requestly.io/contact-us/">Support Center</a>
       </p>
       <h2 style={{ marginTop: "1rem" }}>Quick ways to get started</h2>
-      <p className="home-sm-text ">
-        You Don't need much to get started, just these few basic things!
-      </p>
+      <p className="home-sm-text ">You Don't need much to get started, just these few basic things!</p>
       <div className="feature-card-container">
         <FeatureCard
           name="Web Debugger"

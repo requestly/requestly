@@ -1,13 +1,7 @@
 import firebaseApp from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, remove } from "firebase/database";
-import {
-  getStorage,
-  ref as storageRef,
-  deleteObject,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 //UTILS
@@ -17,9 +11,7 @@ function deleteFileFromDatabase(fileId) {
   const auth = getAuth(firebaseApp);
 
   const database = getDatabase();
-  return remove(
-    ref(database, "/users/" + auth.currentUser.uid + "/files/" + fileId)
-  );
+  return remove(ref(database, "/users/" + auth.currentUser.uid + "/files/" + fileId));
 }
 
 export function deleteFile(file) {
@@ -87,24 +79,13 @@ function uploadFile(newFile, fileDetails) {
   const auth = getAuth(firebaseApp);
 
   return uploadBytes(
-    storageRef(
-      storage,
-      "/users/" +
-        auth.currentUser.uid +
-        "/files/" +
-        Date.now().toString() +
-        fileDetails.name
-    ),
+    storageRef(storage, "/users/" + auth.currentUser.uid + "/files/" + Date.now().toString() + fileDetails.name),
     newFile
   ).then((result) => {
     return getDownloadURL(result.ref).then((downloadURL) => {
       return getShortenedUrl(downloadURL).then((shortUrl) => {
         fileDetails.shortUrl = shortUrl;
-        const fileObject = getFileMetadataObject(
-          result,
-          fileDetails,
-          downloadURL
-        );
+        const fileObject = getFileMetadataObject(result, fileDetails, downloadURL);
         return addMock(fileObject).then((mockFileId) => {
           const data = {
             id: mockFileId.data,
@@ -123,20 +104,18 @@ export function updateFile(filePath, fileData, file) {
   const metadata = {
     contentType: file.contentType,
   };
-  return uploadBytes(storageRef(storage, filePath), blob, metadata).then(
-    (response) => {
-      return getDownloadURL(response.ref).then((downloadURL) => {
-        const fileObject = getFileMetadataObject(response, file, downloadURL);
-        fileObject.id = file.id;
-        return { success: true, data: fileObject };
-        // updateFileDetailsInDatabase  not used as Files of all types are being stored in FireStore
-        // Canbe Used for Testing
-        // return updateFileDetailsInDatabase(fileObject).then(() => {
-        //   return { success: true, data: fileObject };
-        // });
-      });
-    }
-  );
+  return uploadBytes(storageRef(storage, filePath), blob, metadata).then((response) => {
+    return getDownloadURL(response.ref).then((downloadURL) => {
+      const fileObject = getFileMetadataObject(response, file, downloadURL);
+      fileObject.id = file.id;
+      return { success: true, data: fileObject };
+      // updateFileDetailsInDatabase  not used as Files of all types are being stored in FireStore
+      // Canbe Used for Testing
+      // return updateFileDetailsInDatabase(fileObject).then(() => {
+      //   return { success: true, data: fileObject };
+      // });
+    });
+  });
 }
 
 export function createFile(fileDetails, fileData) {

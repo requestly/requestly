@@ -1,22 +1,10 @@
 import React from "react";
 import { Row, Col, Input } from "antd";
 
-const ReplacePartRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const ReplacePartRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   return (
-    <Row
-      align="middle"
-      key={rowIndex}
-      span={24}
-      gutter={16}
-      className="margin-top-one"
-    >
+    <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one">
       <Col span={12}>
         <Input
           type="text"

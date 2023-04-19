@@ -17,9 +17,7 @@ const MenuMobile = ({ onClose, visible, collapsed, setCollapsed }) => {
       onClose={onClose}
       className="mobile-sidebar-container"
       title={<MenuLogo onClose={onClose} />}
-      closeIcon={
-        <RiCloseFill className="remix-icon hp-text-color-black-80" size={24} />
-      }
+      closeIcon={<RiCloseFill className="remix-icon hp-text-color-black-80" size={24} />}
     >
       <SideBarHeader
         isMobileMenu

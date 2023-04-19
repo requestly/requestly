@@ -27,33 +27,26 @@ const UserOnboarding = () => {
   useEffect(() => {
     //  Fetch user attributes
     if (user && user.details.profile && user.details) {
-      DataStoreUtils.getValue(["customProfile", user.details.profile.uid]).then(
-        (attributesRef) => {
-          if (attributesRef) {
-            setShowOnboardingInSidebar(
-              getDateAfterAddingSomeDaysInUserSignupDate(
-                attributesRef.signup.signup_date,
-                GLOBAL_CONSTANTS.ONBOARDING_DAYS_TO_EXPIRE
-              )
-            );
-            if (!attributesRef.attributes.hasInitiallyVisited) {
-              if (window.location.pathname === "/rules") {
-                setShowOnboardingTooltip(true);
-                DataStoreUtils.setValue(
-                  [
-                    "customProfile",
-                    user.details.profile.uid,
-                    "attributes",
-                    "hasInitiallyVisited",
-                  ],
-                  true
-                );
-              }
-            } else setShowOnboardingTooltip(false);
-          }
-          if (!mountedRef.current) return null;
+      DataStoreUtils.getValue(["customProfile", user.details.profile.uid]).then((attributesRef) => {
+        if (attributesRef) {
+          setShowOnboardingInSidebar(
+            getDateAfterAddingSomeDaysInUserSignupDate(
+              attributesRef.signup.signup_date,
+              GLOBAL_CONSTANTS.ONBOARDING_DAYS_TO_EXPIRE
+            )
+          );
+          if (!attributesRef.attributes.hasInitiallyVisited) {
+            if (window.location.pathname === "/rules") {
+              setShowOnboardingTooltip(true);
+              DataStoreUtils.setValue(
+                ["customProfile", user.details.profile.uid, "attributes", "hasInitiallyVisited"],
+                true
+              );
+            }
+          } else setShowOnboardingTooltip(false);
         }
-      );
+        if (!mountedRef.current) return null;
+      });
       // Cleanup
       return () => {
         mountedRef.current = false;
@@ -65,11 +58,7 @@ const UserOnboarding = () => {
     <>
       {showOnboardingInSidebar ? (
         <>
-          <Tooltip
-            placement="bottom"
-            isOpen={showOnboardingTooltip}
-            target="tooltip"
-          >
+          <Tooltip placement="bottom" isOpen={showOnboardingTooltip} target="tooltip">
             Click here to get started.
           </Tooltip>
           <Button
@@ -86,9 +75,7 @@ const UserOnboarding = () => {
               <BsCardChecklist className="fix-icon-is-down" />
             </span>
 
-            <span className="ml-2 mr-4 text-sm font-weight-bold">
-              Getting Started
-            </span>
+            <span className="ml-2 mr-4 text-sm font-weight-bold">Getting Started</span>
           </Button>
         </>
       ) : null}

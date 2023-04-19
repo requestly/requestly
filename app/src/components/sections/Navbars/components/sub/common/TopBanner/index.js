@@ -36,10 +36,7 @@ const TopBanner = ({
   };
 
   const renderCtaBtnIcon = () => {
-    if (ctaIcon)
-      return (
-        <span className="btn-inner--icon">{React.createElement(ctaIcon)} </span>
-      );
+    if (ctaIcon) return <span className="btn-inner--icon">{React.createElement(ctaIcon)} </span>;
     else return <React.Fragment></React.Fragment>;
   };
 
@@ -58,9 +55,7 @@ const TopBanner = ({
             <span>
               {renderBannerIcon()}
 
-              <span className="banner-text mr-2">
-                {React.createElement(content)}
-              </span>
+              <span className="banner-text mr-2">{React.createElement(content)}</span>
               <Button
                 color="default"
                 className="btn btn-email btn-xs btn-white btn-icon"
@@ -68,9 +63,7 @@ const TopBanner = ({
                 size="sm"
               >
                 {ctaIconPostion === "start" ? renderCtaBtnIcon() : null}
-                <span className="btn-inner--text">
-                  {ctaText ? ctaText : "Click Here"}
-                </span>
+                <span className="btn-inner--text">{ctaText ? ctaText : "Click Here"}</span>
                 {ctaIconPostion === "end" ? renderCtaBtnIcon() : null}
               </Button>
             </span>

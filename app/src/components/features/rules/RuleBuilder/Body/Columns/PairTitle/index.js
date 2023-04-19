@@ -10,8 +10,7 @@ const PairTitle = (props) => {
   return (
     <Col xl="10" lg="11" md="11" sm="10" xs="9">
       {/* <span>{currentlySelectedRuleConfig.PAIR_CONFIG.TITLE}</span> */}
-      {currentlySelectedRuleConfig.TYPE ===
-      GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE ? (
+      {currentlySelectedRuleConfig.TYPE === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE ? (
         <Button
           icon={<QuestionCircleOutlined />}
           type="link"

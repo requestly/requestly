@@ -7,10 +7,7 @@ export const setIdsOfSingleRulePairs = (rule) => {
     case GLOBAL_CONSTANTS.RULE_TYPES.QUERYPARAM:
       rule.pairs.map((pair) => {
         pair.id = pair.id || generateObjectId();
-        pair.modifications.map(
-          (modification) =>
-            (modification.id = modification.id || generateObjectId())
-        );
+        pair.modifications.map((modification) => (modification.id = modification.id || generateObjectId()));
         return pair;
       });
       break;
@@ -18,9 +15,7 @@ export const setIdsOfSingleRulePairs = (rule) => {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
       rule.pairs.map((pair) => {
         pair.id = pair.id || generateObjectId();
-        pair.scripts.map(
-          (script) => (script.id = script.id || generateObjectId())
-        );
+        pair.scripts.map((script) => (script.id = script.id || generateObjectId()));
         return pair;
       });
       break;

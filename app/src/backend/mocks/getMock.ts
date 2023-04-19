@@ -5,11 +5,7 @@ import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 import { getFile } from "services/firebaseStorageService";
 
-export const getMock = async (
-  uid: string,
-  mockId: string,
-  teamId?: string
-): Promise<RQMockSchema> => {
+export const getMock = async (uid: string, mockId: string, teamId?: string): Promise<RQMockSchema> => {
   if (!uid) {
     return null;
   }
@@ -37,22 +33,12 @@ const getMockFromFirebase = async (mockId: string): Promise<RQMockSchema> => {
   }
 };
 
-const fetchResponsesBodyFromBucket = async (
-  uid: string,
-  mockId: string,
-  responses: any[],
-  teamId?: string
-) => {
+const fetchResponsesBodyFromBucket = async (uid: string, mockId: string, responses: any[], teamId?: string) => {
   await Promise.all(
     responses.map(async (response) => {
       // Only fetch from file if filePath exists
       if (response?.filePath) {
-        const filePath = createResponseBodyFilepath(
-          uid,
-          mockId,
-          response.id,
-          teamId
-        );
+        const filePath = createResponseBodyFilepath(uid, mockId, response.id, teamId);
         const body = await getFile(filePath);
         response.body = body;
       }

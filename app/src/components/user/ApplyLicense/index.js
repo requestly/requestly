@@ -17,11 +17,7 @@ const ApplyLicense = () => {
         className="primary-card github-like-border"
         title="License Details"
         extra={
-          <Button
-            type="primary"
-            onClick={(e) => redirectToManageLicense(navigate)}
-            icon={<SettingOutlined />}
-          >
+          <Button type="primary" onClick={(e) => redirectToManageLicense(navigate)} icon={<SettingOutlined />}>
             Manage License
           </Button>
         }

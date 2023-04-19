@@ -8,12 +8,8 @@ import * as ExtensionActions from "../actions/ExtensionActions";
 import Logger from "lib/logger";
 
 export const checkIfStorageMigrationStepsAreAlreadyPerformed = (appMode) => {
-  Logger.log(
-    "Reading storage in checkIfStorageMigrationStepsAreAlreadyPerformed"
-  );
-  return StorageService(appMode).getRecord(
-    APP_CONSTANTS.STORAGE_MIGRATED_TO_LOCAL
-  );
+  Logger.log("Reading storage in checkIfStorageMigrationStepsAreAlreadyPerformed");
+  return StorageService(appMode).getRecord(APP_CONSTANTS.STORAGE_MIGRATED_TO_LOCAL);
 };
 
 export const setStorageMigrationStepsDone = (appMode) => {

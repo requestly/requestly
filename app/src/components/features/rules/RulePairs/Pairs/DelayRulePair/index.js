@@ -2,13 +2,7 @@ import { Row, Col } from "antd";
 import DelayRow from "../Rows/RowsMarkup/DelayRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 
-const DelayRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => (
+const DelayRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => (
   <Row gutter={16} align="middle">
     <Col span={15} lg={17}>
       <RequestSourceRow

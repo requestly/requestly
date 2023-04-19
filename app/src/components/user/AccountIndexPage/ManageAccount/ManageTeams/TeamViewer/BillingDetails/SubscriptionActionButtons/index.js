@@ -20,11 +20,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   return (
     <div>
       {isSubscriptionActive ? (
-        <Button
-          danger
-          className="billing-cancel-plan-btn"
-          onClick={() => setIsCancelPlanModalActive(true)}
-        >
+        <Button danger className="billing-cancel-plan-btn" onClick={() => setIsCancelPlanModalActive(true)}>
           Cancel plan
         </Button>
       ) : (
@@ -49,17 +45,11 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
       </Button>
 
       {isContactUsModalActive ? (
-        <ContactUsModal
-          isOpen={isContactUsModalActive}
-          handleToggleModal={toggleContactUsModal}
-        />
+        <ContactUsModal isOpen={isContactUsModalActive} handleToggleModal={toggleContactUsModal} />
       ) : null}
 
       {isCancelPlanModalActive ? (
-        <CancelPlanModal
-          isOpen={isCancelPlanModalActive}
-          handleToggleModal={handleCancelPlanModalClose}
-        />
+        <CancelPlanModal isOpen={isCancelPlanModalActive} handleToggleModal={handleCancelPlanModalClose} />
       ) : null}
     </div>
   );

@@ -22,12 +22,9 @@ const slice = createSlice({
     },
     setCurrentlyActiveWorkspace: (state, action) => {
       const payload = action.payload;
-      if (payload.id !== undefined)
-        state.currentlyActiveWorkspace.id = payload.id;
-      if (payload.name !== undefined)
-        state.currentlyActiveWorkspace.name = payload.name;
-      if (payload.membersCount !== undefined)
-        state.currentlyActiveWorkspace.membersCount = payload.membersCount;
+      if (payload.id !== undefined) state.currentlyActiveWorkspace.id = payload.id;
+      if (payload.name !== undefined) state.currentlyActiveWorkspace.name = payload.name;
+      if (payload.membersCount !== undefined) state.currentlyActiveWorkspace.membersCount = payload.membersCount;
     },
     setCurrentlyActiveWorkspaceMembers: (state, action) => {
       state.currentlyActiveWorkspaceMembers = action.payload;

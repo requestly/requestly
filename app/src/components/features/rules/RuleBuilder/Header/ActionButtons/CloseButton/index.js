@@ -11,9 +11,7 @@ import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 const CloseButton = ({ ruleType, mode }) => {
   //Constants
   const navigate = useNavigate();
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
-    getIsCurrentlySelectedRuleHasUnsavedChanges
-  );
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
   //Global State
   const dispatch = useDispatch();
@@ -36,14 +34,7 @@ const CloseButton = ({ ruleType, mode }) => {
     } else {
       closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
     }
-  }, [
-    dispatch,
-    isCurrentlySelectedRuleHasUnsavedChanges,
-    mode,
-    navigate,
-    ruleType,
-    showConfirmModal,
-  ]);
+  }, [dispatch, isCurrentlySelectedRuleHasUnsavedChanges, mode, navigate, ruleType, showConfirmModal]);
 
   return (
     <Tooltip title="Back to rules" placement="bottom">
@@ -51,14 +42,7 @@ const CloseButton = ({ ruleType, mode }) => {
         iconOnly
         type="default"
         data-dismiss="modal"
-        icon={
-          <img
-            alt="back"
-            width="14px"
-            height="12px"
-            src="/assets/icons/leftArrow.svg"
-          />
-        }
+        icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
         onClick={closeButtonHandler}
       />
     </Tooltip>

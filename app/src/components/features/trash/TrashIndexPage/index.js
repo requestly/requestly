@@ -35,16 +35,14 @@ const TrashIndexPage = () => {
     setLoadingRecords(true);
     setError(false);
     setRecords([]);
-    getAllRecordsFromTrash(user.details.profile.uid, trashLimit).then(
-      (result) => {
-        if (result.success) {
-          setRecords(result.data);
-        } else {
-          setError(true);
-        }
-        setLoadingRecords(false);
+    getAllRecordsFromTrash(user.details.profile.uid, trashLimit).then((result) => {
+      if (result.success) {
+        setRecords(result.data);
+      } else {
+        setError(true);
       }
-    );
+      setLoadingRecords(false);
+    });
   };
 
   const updateTrash = (selectedRules) => {
@@ -90,10 +88,7 @@ const TrashIndexPage = () => {
     return <ExtensionDeactivationMessage />;
   }
 
-  if (
-    appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-    !isExtensionInstalled()
-  ) {
+  if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
     return (
       <InstallExtensionCTA
         heading={"Get Started"}

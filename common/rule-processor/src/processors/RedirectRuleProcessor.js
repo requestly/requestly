@@ -3,11 +3,7 @@ import RuleHelper from "../RuleHelper";
 
 class RedirectRuleProcessor {
   static process({ rule, requestURL, details }) {
-    let resultingUrl = RuleHelper.matchUrlWithRulePairs(
-      rule.pairs,
-      requestURL,
-      details
-    );
+    let resultingUrl = RuleHelper.matchUrlWithRulePairs(rule.pairs, requestURL, details);
     // processedUrl = RuleMatcher.matchValueForPredefinedFunctions(
     //   processedUrl,
     //   RQ.PreDefinedFunctions

@@ -22,10 +22,7 @@ const checkRegexMatch = (regexString: string, inputString: string): boolean => {
   return regex?.test(inputString);
 };
 
-const checkWildCardMatch = (
-  wildCardString: string,
-  inputString: string
-): boolean => {
+const checkWildCardMatch = (wildCardString: string, inputString: string): boolean => {
   const regexString = "/^" + wildCardString.replaceAll("*", ".*") + "$/";
   return checkRegexMatch(regexString, inputString);
 };
@@ -43,10 +40,7 @@ const extractUrlComponent = (url: string, key: SourceKey): string => {
   }
 };
 
-export const matchSourceUrl = (
-  sourceObject: UrlSource,
-  url: string
-): boolean => {
+export const matchSourceUrl = (sourceObject: UrlSource, url: string): boolean => {
   const urlComponent = extractUrlComponent(url, sourceObject.key);
   const value = sourceObject.value;
 

@@ -7,13 +7,7 @@ import APP_CONSTANTS from "../../../../config/constants";
 
 const { Text } = Typography;
 
-export default function PlanPriceRepresentation({
-  currency,
-  price,
-  duration,
-  showOnlyExactAmount,
-  plan,
-}) {
+export default function PlanPriceRepresentation({ currency, price, duration, showOnlyExactAmount, plan }) {
   const getEnterprisePrice = () => {
     return +price;
   };
@@ -210,23 +204,15 @@ export default function PlanPriceRepresentation({
               <span>
                 /month
                 {/* TO SHOW '/user' ONLY TO ENTERPRISE PLAN COLUMN */}
-                {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
-                  ? "/user"
-                  : null}
+                {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
               </span>
             </h1>
             <h4 style={{ textAlign: "center" }}>
               ~ {getCurrencySymbol(null, currency)}
-              <b>
-                {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
-                  ? getEnterprisePrice()
-                  : +price}
-              </b>
+              <b>{plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? getEnterprisePrice() : +price}</b>
               /year
               {/* TO SHOW '/user' ONLY TO ENTERPRISE PLAN COLUMN */}
-              {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
-                ? "/user"
-                : null}
+              {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
             </h4>
             {/* {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? (
               <>

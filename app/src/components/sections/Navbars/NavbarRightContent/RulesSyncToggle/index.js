@@ -18,10 +18,7 @@ const RulesSyncToggle = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   // Component State
-  const [
-    isSyncStatusChangeProcessing,
-    setIsSyncStatusChangeProcessing,
-  ] = useState(false);
+  const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
 
   // Premium Check
   const isSyncingAllowed = true;
@@ -47,16 +44,10 @@ const RulesSyncToggle = () => {
       setIsSyncStatusChangeProcessing(true);
       setSyncState(user.details.profile.uid, syncState, appMode)
         .then(() => {
-          toast.info(
-            `We ${
-              syncState ? "will" : "won't"
-            } be syncing your rules automatically hereon.`
-          );
+          toast.info(`We ${syncState ? "will" : "won't"} be syncing your rules automatically hereon.`);
         })
         .catch(() => {
-          toast.error(
-            `Sorry, we are experiencing issues updating the sync state.`
-          );
+          toast.error(`Sorry, we are experiencing issues updating the sync state.`);
         });
       setIsSyncStatusChangeProcessing(false);
     };
@@ -67,9 +58,7 @@ const RulesSyncToggle = () => {
   const offerToTurnOnSync = () => {
     return (
       <div style={{ maxWidth: "350px" }}>
-        <p>
-          Always keep your rules in sync irrespective of the device you use.
-        </p>
+        <p>Always keep your rules in sync irrespective of the device you use.</p>
 
         <Button
           type="text"
@@ -86,15 +75,9 @@ const RulesSyncToggle = () => {
   const offerToTurnOffSync = () => {
     return (
       <div style={{ maxWidth: "300px" }}>
-        <p>
-          Always keep your rules in sync irrespective of the device you use.
-        </p>
+        <p>Always keep your rules in sync irrespective of the device you use.</p>
         {/* <Space> */}
-        <Button
-          type="primary"
-          onClick={() => changeIsSyncEnabled(false)}
-          loading={isSyncStatusChangeProcessing}
-        >
+        <Button type="primary" onClick={() => changeIsSyncEnabled(false)} loading={isSyncStatusChangeProcessing}>
           Turn off syncing
         </Button>
       </div>
@@ -107,10 +90,7 @@ const RulesSyncToggle = () => {
       return offerToTurnOnSync();
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      isSyncingAllowed
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && isSyncingAllowed) {
       // Premium User - Has Backup Enabled
       if (user.details.isSyncEnabled) {
         return offerToTurnOffSync();
@@ -121,10 +101,7 @@ const RulesSyncToggle = () => {
       }
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      !isSyncingAllowed
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && !isSyncingAllowed) {
       // Non Premium User - Has Backup Enabled (implementation TBD)
       if (user.details.isSyncEnabled) {
         return offerToTurnOffSync();
@@ -140,17 +117,8 @@ const RulesSyncToggle = () => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
       return (
         <Col className="display-row-center">
-          <Popover
-            trigger={["click"]}
-            content={getPopoverContent()}
-            title="Working locally"
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              className="header-icon-btn"
-              icon={<MdSyncDisabled />}
-            />
+          <Popover trigger={["click"]} content={getPopoverContent()} title="Working locally" placement="bottomRight">
+            <Button type="text" className="header-icon-btn" icon={<MdSyncDisabled />} />
           </Popover>
         </Col>
       );
@@ -160,20 +128,13 @@ const RulesSyncToggle = () => {
       return (
         <Col className="display-row-center">
           <Tooltip title="Syncing is on" placement="bottomRight">
-            <Button
-              type="text"
-              className="header-icon-btn"
-              icon={<MdSync id="sync-icon" />}
-            />
+            <Button type="text" className="header-icon-btn" icon={<MdSync id="sync-icon" />} />
           </Tooltip>
         </Col>
       );
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      isSyncingAllowed
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && isSyncingAllowed) {
       // Premium User - Has Sync Enabled
       if (user.details.isSyncEnabled) {
         return (
@@ -184,11 +145,7 @@ const RulesSyncToggle = () => {
               placement="bottomRight"
               title="Syncing is enabled"
             >
-              <Button
-                type="text"
-                className="header-icon-btn"
-                icon={<MdSync id="sync-icon" />}
-              />
+              <Button type="text" className="header-icon-btn" icon={<MdSync id="sync-icon" />} />
             </Popover>
           </Col>
         );
@@ -197,41 +154,21 @@ const RulesSyncToggle = () => {
       else {
         return (
           <Col className="display-row-center">
-            <Popover
-              trigger={["click"]}
-              content={getPopoverContent()}
-              placement="bottomRight"
-              title="Working locally"
-            >
-              <Button
-                type="text"
-                className="header-icon-btn"
-                icon={<MdSyncDisabled />}
-              />
+            <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight" title="Working locally">
+              <Button type="text" className="header-icon-btn" icon={<MdSyncDisabled />} />
             </Popover>
           </Col>
         );
       }
     }
 
-    if (
-      (user.details.profile || user.details || user.loggedIn) &&
-      !isSyncingAllowed
-    ) {
+    if ((user.details.profile || user.details || user.loggedIn) && !isSyncingAllowed) {
       // Non Premium User - Has Backup Enabled (implementation TBD)
       if (user.details.isSyncEnabled) {
         return (
           <Col className="display-row-center">
-            <Popover
-              trigger={["click"]}
-              content={getPopoverContent()}
-              placement="bottomRight"
-            >
-              <Button
-                type="text"
-                className="header-icon-btn"
-                icon={<MdSync id="sync-icon" />}
-              />
+            <Popover trigger={["click"]} content={getPopoverContent()} placement="bottomRight">
+              <Button type="text" className="header-icon-btn" icon={<MdSync id="sync-icon" />} />
             </Popover>
           </Col>
         );
@@ -249,10 +186,7 @@ const RulesSyncToggle = () => {
                   placement="bottomRight"
                   title="Working locally"
                 >
-                  <div
-                    style={{ fontSize: "1.5em" }}
-                    className="display-row-center"
-                  >
+                  <div style={{ fontSize: "1.5em" }} className="display-row-center">
                     <MdSyncDisabled />
                   </div>
                 </Popover>

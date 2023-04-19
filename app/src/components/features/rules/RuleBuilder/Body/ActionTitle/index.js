@@ -8,9 +8,7 @@ const ActionTitle = ({ currentlySelectedRuleConfig }) => {
     <>
       <Space>
         <Row align="middle" className="rule-header-action-title">
-          <Typography.Text strong>
-            {`${currentlySelectedRuleConfig.NAME} Rule `}
-          </Typography.Text>
+          <Typography.Text strong>{`${currentlySelectedRuleConfig.NAME} Rule `}</Typography.Text>
 
           <Tooltip
             placement="right"

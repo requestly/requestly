@@ -34,10 +34,7 @@ const PaymentFail = () => {
         />
         <Row>
           <Col span={24} align="center">
-            <Text type="secondary">
-              To pay via PayPal or wire transfer, write to us at
-              contact@requestly.io
-            </Text>
+            <Text type="secondary">To pay via PayPal or wire transfer, write to us at contact@requestly.io</Text>
           </Col>
         </Row>
       </ProCard>

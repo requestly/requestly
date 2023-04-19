@@ -28,11 +28,7 @@ const NetworkPayload: React.FC<Props> = ({ label, payload }) => {
     return (
       <NetworkLogProperty label={label}>
         <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
-          <ObjectInspector
-            data={parsedPayload}
-            includePrototypes={false}
-            className="network-payload-object"
-          />
+          <ObjectInspector data={parsedPayload} includePrototypes={false} className="network-payload-object" />
         </ThemeProvider>
       </NetworkLogProperty>
     );
