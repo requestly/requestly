@@ -2,14 +2,30 @@ RQ.RuleExecutionHandler = {
   appliedRuleIds: new Set(),
 };
 
+RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
+  const eventName = "rule_execution";
+  const eventParams = {
+    rule_type: rule.ruleType,
+    rule_id: rule.id,
+    platform: "extension",
+  };
+  eventParams["source"] = "content_script";
+
+  RQ.ClientUtils.sendEventToBackground(eventName, eventParams);
+};
+
 RQ.RuleExecutionHandler.setup = () => {
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID:
-        const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(message.ruleId);
+        const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(message.rule.id);
+        RQ.RuleExecutionHandler.appliedRuleIds.add(message.rule.id);
 
-        RQ.RuleExecutionHandler.appliedRuleIds.add(message.ruleId);
-        sendResponse(isFirstExecution);
+        if (isFirstExecution) {
+          RQ.RuleExecutionHandler.sendRuleExecutionEvent(message.rule);
+        }
+
+        sendResponse();
         break;
 
       case RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS:
@@ -28,11 +44,11 @@ RQ.RuleExecutionHandler.setup = () => {
 RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleLoggerEnabled) => {
   appliedRuleDetails.forEach((appliedRule) => {
     RQ.RuleExecutionHandler.appliedRuleIds.add(appliedRule.rule.id);
-
     RQ.ConsoleLogger.handleMessage({
       requestDetails: appliedRule.requestDetails,
       rule: appliedRule.rule,
       isConsoleLoggerEnabled,
     });
+    RQ.RuleExecutionHandler.sendRuleExecutionEvent(appliedRule.rule);
   });
 };
