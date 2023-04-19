@@ -160,3 +160,7 @@ export const sanitizeDataForFirebase = (myObject) => {
 export const getSignupDate = async (uid) => {
   return await getValueAsPromise(["customProfile", uid, "signup", "signup_date"]);
 };
+
+export const getConnectedAppsCount = (appsListArray) => {
+  return appsListArray?.filter((app) => app.isActive).length;
+};

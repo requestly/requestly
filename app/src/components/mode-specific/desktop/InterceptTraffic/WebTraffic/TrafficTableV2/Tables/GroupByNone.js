@@ -16,6 +16,7 @@ import {
   trackSystemWideConnected,
 } from "modules/analytics/events/desktopApp/apps";
 import "./index.css";
+import { getConnectedAppsCount } from "utils/Misc";
 
 const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc }) => {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
-    setNumberOfConnectedApps(Object.values(appsList).filter((app) => app.isActive).length);
+    setNumberOfConnectedApps(getConnectedAppsCount(Object.values(appsList)));
   }, [appsList, numberOfConnectedApps]);
 
   const openConnectedAppsModal = useCallback(

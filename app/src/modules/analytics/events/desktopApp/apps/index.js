@@ -35,3 +35,11 @@ export const trackAppSetupInstructionsViewed = (app_name, app_count) => {
   const params = { app_count, app_name };
   trackEvent(APPS.APP_SETUP_INSTRUCTIONS_VIEWED, params);
 };
+
+export const trackConnectAppsCategorySwitched = (category_name) => {
+  trackEvent(APPS.CONNECT_APPS_CATEGORY_SWITCHED, { category_name });
+};
+
+export const trackConnectAppsModalClosed = (app_count) => {
+  trackEvent(APPS.CONNECT_APPS_MODAL_CLOSED, { app_count });
+};
