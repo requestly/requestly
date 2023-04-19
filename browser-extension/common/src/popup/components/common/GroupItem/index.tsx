@@ -24,7 +24,9 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
       ...group,
       status: isGroupActive ? Status.INACTIVE : Status.ACTIVE,
     });
-    sendEvent(EVENT.GROUP_TOGGLED);
+    sendEvent(EVENT.GROUP_TOGGLED, {
+      status: isGroupActive ? Status.INACTIVE : Status.ACTIVE,
+    });
   }, [group, isGroupActive, updateGroup]);
 
   return (

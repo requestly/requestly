@@ -36,7 +36,7 @@ const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) 
     <TabContentSection heading="Rules executed in this tab:">
       <ul className="record-list">
         {executedRules.map((rule) => (
-          <RuleItem rule={rule} key={rule.id} onRuleUpdated={updateExecutedRule} tab="executed_rules" />
+          <RuleItem rule={rule} key={rule.id} onRuleUpdated={updateExecutedRule} />
         ))}
       </ul>
     </TabContentSection>

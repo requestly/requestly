@@ -7,18 +7,18 @@ import { PushpinFilled, CheckCircleOutlined, ClockCircleOutlined } from "@ant-de
 import "./popupTabs.css";
 import { EVENT, sendEvent } from "../../events";
 
-const tabKeyNameMap: Record<string, string> = {
-  "0": "pinned_rules",
-  "1": "recently_used",
-  "2": "executed_rules",
-};
+enum PopupTabKey {
+  PINNED_RULES = "pinned_rules",
+  RECENTLY_USED = "recently_used",
+  EXECUTED_RULES = "executed_rules",
+}
 
 const PopupTabs: React.FC = () => {
   const [executedRulesCount, setExecutedRulesCount] = useState(0);
   const tabItems = useMemo(() => {
     return [
       {
-        key: "0",
+        key: PopupTabKey.PINNED_RULES,
         label: (
           <span>
             <PushpinFilled rotate={-45} />
@@ -28,7 +28,7 @@ const PopupTabs: React.FC = () => {
         children: <PinnedRecords />,
       },
       {
-        key: "1",
+        key: PopupTabKey.RECENTLY_USED,
         label: (
           <span>
             <ClockCircleOutlined />
@@ -38,7 +38,7 @@ const PopupTabs: React.FC = () => {
         children: <RecentRecords />,
       },
       {
-        key: "2",
+        key: PopupTabKey.EXECUTED_RULES,
         label: (
           <span>
             <CheckCircleOutlined />
@@ -55,10 +55,10 @@ const PopupTabs: React.FC = () => {
     <Tabs
       size="middle"
       items={tabItems}
-      defaultActiveKey="0"
+      defaultActiveKey={PopupTabKey.PINNED_RULES}
       className="popup-tabs"
       destroyInactiveTabPane
-      onChange={(key) => sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: tabKeyNameMap[key] })}
+      onChange={(key) => sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key })}
     />
   );
 };

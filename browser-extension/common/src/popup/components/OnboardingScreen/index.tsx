@@ -81,8 +81,8 @@ const OnboardingScreen: React.FC = () => {
           className="watch-demo-link"
           type="text"
           onClick={() => {
-            window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
             sendEvent(EVENT.WATCH_DEMO_VIDEO_CLICKED);
+            window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
           }}
         >
           <Typography.Text type="secondary" underline>

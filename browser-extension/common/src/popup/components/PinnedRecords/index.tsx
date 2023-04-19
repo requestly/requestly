@@ -27,7 +27,7 @@ const PinnedRecords: React.FC = () => {
           <GroupItem key={group.id} group={group} />
         ))}
         {pinnedRules.map((rule) => (
-          <RuleItem key={rule.id} rule={rule} isParentPinnedRecords={true} tab="pinned_rules" />
+          <RuleItem key={rule.id} rule={rule} isParentPinnedRecords={true} />
         ))}
       </ul>
     </TabContentSection>

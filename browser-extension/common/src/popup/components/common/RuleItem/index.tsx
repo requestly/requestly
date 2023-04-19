@@ -14,7 +14,6 @@ interface RuleItemProps {
   rule: Rule;
   isChildren?: boolean;
   isParentPinnedRecords?: boolean;
-  tab?: string;
   onRuleUpdated?: (rule: Rule) => void;
 }
 
@@ -23,7 +22,6 @@ const RuleItem: React.FC<RuleItemProps> = ({
   isChildren = false,
   isParentPinnedRecords = false,
   onRuleUpdated,
-  tab,
 }) => {
   const { groups, updateRule, updateGroup } = useRecords();
   const group = groups[rule.groupId];
@@ -46,14 +44,14 @@ const RuleItem: React.FC<RuleItemProps> = ({
 
     handleUpdateRule(updatedRule);
     sendEvent(EVENT.RULE_TOGGLED, {
-      tab,
       type: rule.ruleType,
+      status: isRuleActive ? Status.INACTIVE : Status.ACTIVE,
     });
   }, [rule, isRuleActive, handleUpdateRule]);
 
   const handleGroupActiveClick = useCallback(() => {
     updateGroup({ ...group, status: Status.ACTIVE });
-    sendEvent(EVENT.GROUP_TOGGLED);
+    sendEvent(EVENT.GROUP_TOGGLED, { status: Status.ACTIVE });
   }, [group, updateGroup]);
 
   return (
