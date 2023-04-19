@@ -17,7 +17,7 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 RQ.RuleExecutionHandler.setup = () => {
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID:
+      case RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED:
         const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(message.rule.id);
         RQ.RuleExecutionHandler.appliedRuleIds.add(message.rule.id);
 
