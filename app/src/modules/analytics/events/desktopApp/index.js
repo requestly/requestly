@@ -68,3 +68,7 @@ export const trackTrafficTableDropdownClicked = (action) => {
   const params = { action };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED, params);
 };
+
+export const trackTrafficTableLogsCleared = (app_status) => {
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_LOGS_CLEARED, { app_status });
+};
