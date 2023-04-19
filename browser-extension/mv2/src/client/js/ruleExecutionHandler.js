@@ -9,7 +9,6 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
     rule_id: rule.id,
     platform: "extension",
   };
-  eventParams["source"] = "content_script";
 
   RQ.ClientUtils.sendEventToBackground(eventName, eventParams);
 };
