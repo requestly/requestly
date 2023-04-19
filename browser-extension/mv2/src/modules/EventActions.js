@@ -179,23 +179,3 @@ EventActions.stopPeriodicEventWriter = () => {
     EventActions.eventWriterInterval = null;
   }
 };
-
-/* CONSUMER UTILITIES */
-EventActions.EVENTS = {
-  RULE_EXECUTED: "rule_executed",
-};
-
-EventActions.sendRuleExecutionEvent = (rule) => {
-  const eventParams = {
-    rule_type: rule.ruleType,
-    rule_id: rule.id,
-    platform: "extension",
-    log_source: "extension",
-  };
-
-  EventActions.queueEventToWrite({
-    eventName: EventActions.EVENTS.RULE_EXECUTED,
-    eventParams,
-    eventTs: Date.now(),
-  });
-};

@@ -1029,12 +1029,7 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
         appliedRuleDetails: cachedAppliesRules,
         isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
       },
-      () => {
-        cachedAppliesRules.forEach((appliedRules) => {
-          EventActions.sendRuleExecutionEvent(appliedRules?.rule);
-        });
-        window.tabService.removeData(tabId, "appliedRuleDetails");
-      }
+      () => window.tabService.removeData(tabId, "appliedRuleDetails")
     );
   }
 };
@@ -1247,18 +1242,10 @@ BG.Methods.getTabSession = (tabId, callback) => {
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
   const { tabId } = requestDetails;
 
-  chrome.tabs.sendMessage(
-    tabId,
-    {
-      action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
-      ruleId: rule.id,
-    },
-    (isFirstExecution) => {
-      if (isFirstExecution) {
-        EventActions.sendRuleExecutionEvent(rule);
-      }
-    }
-  );
+  chrome.tabs.sendMessage(tabId, {
+    action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
+    rule,
+  });
 
   // Cache execution details until content script loads
   if (BG.Methods.isTopDocumentRequest(requestDetails)) {
