@@ -1,10 +1,13 @@
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
 import { Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import RULE_TYPES_CONFIG from "../../../../../../../../config/constants/sub/rule-types";
+import { actions as storeActions } from "store";
+import APP_CONSTANTS from "config/constants";
+
+const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
@@ -18,9 +21,20 @@ const AppliedRules = ({ actions }) => {
     });
   };
 
-  const rule_icon_on_click_handler = (rule_id) => {
-    redirectToRuleEditor(navigate, rule_id);
-  };
+  const handleRuleIconClick = useCallback(
+    (e, ruleId) => {
+      e.stopPropagation();
+
+      dispatch(
+        storeActions.toggleActiveModal({
+          newValue: true,
+          modalName: "ruleEditorModal",
+          newProps: { ruleId, mode: RULE_EDITOR_CONFIG.MODES.EDIT },
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const render_rule_icon = (rule) => {
     if (!rule) {
@@ -29,10 +43,7 @@ const AppliedRules = ({ actions }) => {
 
     return (
       <Tooltip title={rule.rule_id} key={rule.rule_id}>
-        <span
-          style={{ paddingRight: "8px", cursor: "pointer" }}
-          onClick={() => rule_icon_on_click_handler(rule.rule_id)}
-        >
+        <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => handleRuleIconClick(e, rule.rule_id)}>
           {RULE_TYPES_CONFIG[rule.rule_type].ICON()}
         </span>
       </Tooltip>

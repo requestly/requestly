@@ -9,13 +9,15 @@ import {
   getCurrentlySelectedRuleData,
   getUserAuthDetails,
 } from "../../../../../../../store/selectors";
+import FEATURES from "config/constants/sub/features";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
-import "./RuleEditorStatus.css";
-import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { StorageService } from "init";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
+import "./RuleEditorStatus.css";
 
-const Status = ({ isDisabled, location }) => {
+const Status = ({ location, isRuleEditorModal }) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -23,21 +25,18 @@ const Status = ({ isDisabled, location }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
+  const isDisabled =
+    currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
+    !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
+
   //Component State
-  const [
-    hasUserTriedToChangeRuleStatus,
-    setHasUserTriedToChangeRuleStatus,
-  ] = useState(false);
+  const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
 
   // fetch planName from global state
-  const planNameFromState =
-    user.details?.planDetails?.planName ||
-    APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
+  const planNameFromState = user.details?.planDetails?.planName || APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
 
   const isRuleCurrentlyActive = () => {
-    return (
-      currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-    );
+    return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
   };
 
   const changeRuleStatus = (newValue) => {
@@ -91,22 +90,13 @@ const Status = ({ isDisabled, location }) => {
         stableChangeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE);
       }
     }
-  }, [
-    allRules,
-    stableChangeRuleStatus,
-    user,
-    location.pathname,
-    hasUserTriedToChangeRuleStatus,
-    planNameFromState,
-  ]);
+  }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus, planNameFromState]);
 
   const isChecked = isRuleCurrentlyActive();
 
   return (
     <div className="display-row-center ml-2 rule-editor-header-switch">
-      <span className="rule-editor-header-switch-text text-gray">
-        {isChecked ? "Enabled" : "Disabled"}
-      </span>
+      <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
       <Switch
         size="small"
         className="ml-3"
@@ -117,7 +107,8 @@ const Status = ({ isDisabled, location }) => {
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
-            location.pathname.indexOf("create") !== -1 ? "create" : "edit"
+            location.pathname.indexOf("create") !== -1 ? "create" : "edit",
+            isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
       />
