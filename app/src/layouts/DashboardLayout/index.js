@@ -25,9 +25,7 @@ const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const AppFooter = () => {
-    return appMode &&
-      appMode ===
-        GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? null : location.pathname.includes(
+    return appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? null : location.pathname.includes(
         PATHS.RULES.MY_RULES.ABSOLUTE
       ) ||
       location.pathname.includes(PATHS.PRICING.ABSOLUTE) ||
@@ -37,17 +35,10 @@ const DashboardLayout = () => {
   };
 
   const isPersonaRecommendationFeatureflagOn =
-    useFeatureIsOn("persona_recommendation") &&
-    location?.state?.src === "persona_survey_modal";
+    useFeatureIsOn("persona_recommendation") && location?.state?.src === "persona_survey_modal";
 
   const isSidebarVisible = useMemo(
-    () =>
-      !(
-        isPricingPage() ||
-        isGoodbyePage() ||
-        isInvitePage() ||
-        isPersonaRecommendationFeatureflagOn
-      ),
+    () => !(isPricingPage() || isGoodbyePage() || isInvitePage() || isPersonaRecommendationFeatureflagOn),
     [isPersonaRecommendationFeatureflagOn]
   );
 
@@ -55,28 +46,18 @@ const DashboardLayout = () => {
     <>
       <Layout className="hp-app-layout">
         {isSidebarVisible && (
-          <Sidebar
-            visible={visible}
-            setVisible={setVisible}
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-          />
+          <Sidebar visible={visible} setVisible={setVisible} collapsed={collapsed} setCollapsed={setCollapsed} />
         )}
 
         <Layout className="hp-bg-color-dark-90">
-          {!isPersonaRecommendationFeatureflagOn && (
-            <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />
-          )}
+          {!isPersonaRecommendationFeatureflagOn && <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />}
 
           <Content className="hp-content-main">
             <Row justify="center" style={{ height: "100%" }}>
               <Col span={24}>
                 <React.Fragment>
                   <Routes>
-                    <Route
-                      path={PATHS.DASHBOARD + PATHS.ANY}
-                      element={<DashboardContent />}
-                    />
+                    <Route path={PATHS.DASHBOARD + PATHS.ANY} element={<DashboardContent />} />
                   </Routes>
                 </React.Fragment>
               </Col>

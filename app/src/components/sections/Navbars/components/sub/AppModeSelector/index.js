@@ -28,15 +28,9 @@ const AppModeSelector = () => {
 
   return (
     <React.Fragment>
-      <span
-        id="UncontrolledPopover"
-        style={{ color: "white" }}
-        className="bright-on-hover cursor-pointer ml-0 ml-sm-2"
-      >
+      <span id="UncontrolledPopover" style={{ color: "white" }} className="bright-on-hover cursor-pointer ml-0 ml-sm-2">
         <FaNetworkWired className="fix-icon-is-down" />
-        <span className="ml-2 mr-4 text-sm font-weight-bold">
-          {getShortAppModeName(appMode)}
-        </span>
+        <span className="ml-2 mr-4 text-sm font-weight-bold">{getShortAppModeName(appMode)}</span>
       </span>
 
       <Popover
@@ -67,9 +61,7 @@ const AppModeSelector = () => {
                   >
                     {React.createElement(AppModesConfig[appMode].Icon)}
                   </span>
-                  <small className="white-color bright-on-hover">
-                    {AppModesConfig[appMode].shortName}
-                  </small>
+                  <small className="white-color bright-on-hover">{AppModesConfig[appMode].shortName}</small>
                 </span>
               );
             })}

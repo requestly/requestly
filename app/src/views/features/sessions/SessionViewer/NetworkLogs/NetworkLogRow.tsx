@@ -29,14 +29,8 @@ const NetworkLogRow: React.FC<Props> = ({
   isSelected,
   showResponseTime,
 }) => {
-  const responseTimeInSeconds = useMemo(
-    () => (responseTime / 1000).toFixed(3),
-    [responseTime]
-  );
-  const isFailedRequest = useMemo(
-    () => !status || (status >= 400 && status <= 599),
-    [status]
-  );
+  const responseTimeInSeconds = useMemo(() => (responseTime / 1000).toFixed(3), [responseTime]);
+  const isFailedRequest = useMemo(() => !status || (status >= 400 && status <= 599), [status]);
   const requestMethod = useMemo(() => method?.toUpperCase() ?? "GET", [method]);
 
   const networkUrl = useMemo(() => url || responseURL, [url, responseURL]);
@@ -54,17 +48,10 @@ const NetworkLogRow: React.FC<Props> = ({
       }
       onClick={onClick}
     >
-      <Tag
-        color={REQUEST_METHOD_COLOR_CODES[requestMethod]}
-        className="request-method-tag"
-      >
+      <Tag color={REQUEST_METHOD_COLOR_CODES[requestMethod]} className="request-method-tag">
         {requestMethod}
       </Tag>
-      <span
-        className={classNames("network-log-url", { failed: isFailedRequest })}
-      >
-        {networkUrl}
-      </span>
+      <span className={classNames("network-log-url", { failed: isFailedRequest })}>{networkUrl}</span>
     </SessionDetailsPanelRow>
   );
 };

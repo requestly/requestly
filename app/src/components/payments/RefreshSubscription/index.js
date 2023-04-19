@@ -55,20 +55,14 @@ const RefreshSubscription = () => {
             <CardBody>
               <Row>
                 <Col>
-                  <Jumbotron
-                    style={{ background: "transparent" }}
-                    className="text-center"
-                  >
-                    <h4>
-                      If you are facing any issue with your current
-                      subscription, a refresh might be helpful.
-                    </h4>
+                  <Jumbotron style={{ background: "transparent" }} className="text-center">
+                    <h4>If you are facing any issue with your current subscription, a refresh might be helpful.</h4>
                     {isProcessing ? (
                       <React.Fragment>
                         <br />
                         <h5>
-                          <FaExclamationCircle color="orange" /> This process
-                          may take a few seconds. Do not close this page.
+                          <FaExclamationCircle color="orange" /> This process may take a few seconds. Do not close this
+                          page.
                         </h5>
                       </React.Fragment>
                     ) : null}
@@ -83,22 +77,16 @@ const RefreshSubscription = () => {
                     >
                       <span className="btn-inner--icon">
                         <b>
-                          <FiRefreshCcw
-                            className={isProcessing ? "icon-spin" : ""}
-                          />
+                          <FiRefreshCcw className={isProcessing ? "icon-spin" : ""} />
                         </b>
                       </span>
-                      <span className="btn-inner--text">
-                        Refresh Subscription
-                      </span>
+                      <span className="btn-inner--text">Refresh Subscription</span>
                     </Button>
                     <br />
                     <hr />
                     <p>
                       Still facing issues? Reach our payment support team at{" "}
-                      <a
-                        href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}
-                      >
+                      <a href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}>
                         {GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
                       </a>
                       .

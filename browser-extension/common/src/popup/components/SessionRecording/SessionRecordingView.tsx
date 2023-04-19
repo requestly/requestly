@@ -8,17 +8,11 @@ import "./sessionRecordingView.css";
 const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
-  const [
-    isExplicitRecordingSession,
-    setIsExplicitRecordingSession,
-  ] = useState<boolean>();
+  const [isExplicitRecordingSession, setIsExplicitRecordingSession] = useState<boolean>();
 
   const startRecordingOnClick = () => {
-    chrome.tabs.sendMessage(
-      currentTabId,
-      { action: CLIENT_MESSAGES.START_RECORDING },
-      { frameId: 0 },
-      () => setIsRecordingSession(true)
+    chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.START_RECORDING }, { frameId: 0 }, () =>
+      setIsRecordingSession(true)
     );
   };
 
@@ -28,15 +22,10 @@ const SessionRecordingView: React.FC = () => {
 
   const stopRecordingOnClick = () => {
     if (isExplicitRecordingSession) {
-      chrome.tabs.sendMessage(
-        currentTabId,
-        { action: CLIENT_MESSAGES.STOP_RECORDING },
-        { frameId: 0 },
-        () => {
-          setIsRecordingSession(false);
-          viewRecordedSession();
-        }
-      );
+      chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
+        setIsRecordingSession(false);
+        viewRecordedSession();
+      });
     } else {
       viewRecordedSession();
     }
@@ -68,12 +57,7 @@ const SessionRecordingView: React.FC = () => {
   }, [isRecordingSession]);
 
   return (
-    <Row
-      wrap={false}
-      align="middle"
-      justify="space-between"
-      className="session-view-content"
-    >
+    <Row wrap={false} align="middle" justify="space-between" className="session-view-content">
       {isRecordingSession ? (
         <Row align="middle" justify="center">
           <div className="icon-wrapper">
@@ -81,9 +65,7 @@ const SessionRecordingView: React.FC = () => {
           </div>
           <i className="record-indicator" />
           <Divider type="vertical" />
-          <Typography.Text type="secondary">
-            Session is being recorded on this page.
-          </Typography.Text>
+          <Typography.Text type="secondary">Session is being recorded on this page.</Typography.Text>
         </Row>
       ) : (
         <>
@@ -95,12 +77,8 @@ const SessionRecordingView: React.FC = () => {
             </Col>
             <Col className="no-session-recording-message">
               <Typography.Text>No session recording</Typography.Text>
-              <Typography.Text
-                type="secondary"
-                className="session-recording-caption"
-              >
-                Record all network traffic, console logs & errors on current
-                domain.
+              <Typography.Text type="secondary" className="session-recording-caption">
+                Record all network traffic, console logs & errors on current domain.
               </Typography.Text>
             </Col>
           </Row>
@@ -109,15 +87,8 @@ const SessionRecordingView: React.FC = () => {
 
       <Col>
         {isRecordingSession ? (
-          <Button
-            type="link"
-            target="_blank"
-            className="session-view-link-button"
-            onClick={stopRecordingOnClick}
-          >
-            <span>
-              {isExplicitRecordingSession ? "Stop recording" : "View recording"}
-            </span>
+          <Button type="link" target="_blank" className="session-view-link-button" onClick={stopRecordingOnClick}>
+            <span>{isExplicitRecordingSession ? "Stop recording" : "View recording"}</span>
           </Button>
         ) : (
           <Typography.Link

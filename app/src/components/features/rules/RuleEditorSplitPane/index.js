@@ -9,17 +9,9 @@ import PremiumRequiredCTA from "../../../payments/PremiumRequiredCTA";
 import { trackRuleSimulatorTried } from "modules/analytics/events/common/rules";
 const { TabPane } = Tabs;
 
-const RuleEditorSplitPane = ({
-  mode,
-  showExecutionLogs,
-  expandRulePane,
-  collapseRulesPlane,
-  ruleType,
-}) => {
+const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapseRulesPlane, ruleType }) => {
   const activeKey = showExecutionLogs ? "executionLogs" : "ruleSimulator";
-  const isExecutionLogsCompatible = isExtensionVersionCompatible(
-    APP_CONSTANTS.EXECUTION_LOGS_COMPATIBILITY_VERSION
-  );
+  const isExecutionLogsCompatible = isExtensionVersionCompatible(APP_CONSTANTS.EXECUTION_LOGS_COMPATIBILITY_VERSION);
 
   const UpgradeExtensionCTA = () => {
     return (
@@ -27,10 +19,7 @@ const RuleEditorSplitPane = ({
         <Card className="primary-card github-like-border">
           <Row>
             <Col span={24} align="center">
-              <h1 className="display-3">
-                Please upgrade the extension to latest version to enable this
-                feature
-              </h1>
+              <h1 className="display-3">Please upgrade the extension to latest version to enable this feature</h1>
             </Col>
           </Row>
         </Card>
@@ -49,20 +38,11 @@ const RuleEditorSplitPane = ({
         onTabClick={(key) => {
           expandRulePane();
           if (key === "ruleSimulator") {
-            trackRuleSimulatorTried(
-              ruleType,
-              mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
-            );
+            trackRuleSimulatorTried(ruleType, mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT);
           }
         }}
         tabBarExtraContent={{
-          right: (
-            <Button
-              icon={<DownOutlined />}
-              onClick={collapseRulesPlane}
-              style={{ marginBottom: "8px" }}
-            />
-          ),
+          right: <Button icon={<DownOutlined />} onClick={collapseRulesPlane} style={{ marginBottom: "8px" }} />,
         }}
       >
         <TabPane tab={"Test this Rule"} key="ruleSimulator">
@@ -74,9 +54,7 @@ const RuleEditorSplitPane = ({
           tab={
             <span>
               {"Execution Logs "}
-              {!showExecutionLogs ? (
-                <CrownTwoTone twoToneColor={"limegreen"} />
-              ) : null}
+              {!showExecutionLogs ? <CrownTwoTone twoToneColor={"limegreen"} /> : null}
             </span>
           }
           key="executionLogs"
@@ -85,9 +63,7 @@ const RuleEditorSplitPane = ({
             showExecutionLogs ? (
               <ExecutionLogs />
             ) : (
-              <PremiumRequiredCTA
-                message={"Execution Logs is a premium feature"}
-              />
+              <PremiumRequiredCTA message={"Execution Logs is a premium feature"} />
             )
           ) : (
             <UpgradeExtensionCTA />

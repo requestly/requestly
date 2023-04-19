@@ -17,10 +17,7 @@ const firebaseApp = initializeApp({
 });
 
 if (isEnvEmulator()) {
-  if (
-    window.location.host.includes("localhost") ||
-    window.location.host.includes("127.0.0.1")
-  ) {
+  if (window.location.host.includes("localhost") || window.location.host.includes("127.0.0.1")) {
     const functions = getFunctions(firebaseApp);
     connectFunctionsEmulator(functions, "localhost", 5001);
     const storage = getStorage();

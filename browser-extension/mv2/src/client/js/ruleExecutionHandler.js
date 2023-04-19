@@ -14,10 +14,7 @@ RQ.RuleExecutionHandler.setup = () => {
         break;
 
       case RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES:
-        RQ.RuleExecutionHandler.syncCachedAppliedRules(
-          message.appliedRuleDetails,
-          message.isConsoleLoggerEnabled
-        );
+        RQ.RuleExecutionHandler.syncCachedAppliedRules(message.appliedRuleDetails, message.isConsoleLoggerEnabled);
         sendResponse();
         return true;
     }
@@ -25,10 +22,7 @@ RQ.RuleExecutionHandler.setup = () => {
   });
 };
 
-RQ.RuleExecutionHandler.syncCachedAppliedRules = (
-  appliedRuleDetails,
-  isConsoleLoggerEnabled
-) => {
+RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleLoggerEnabled) => {
   appliedRuleDetails.forEach((appliedRule) => {
     RQ.RuleExecutionHandler.appliedRuleIds.add(appliedRule.rule.id);
 

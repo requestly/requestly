@@ -48,9 +48,7 @@ export const defaultHtmlEditorMock: MockEditorDataSchema = {
 
 export const requestMethodDropdownOptions = [
   ...Object.keys(RequestMethod)
-    .filter(
-      (key: RequestMethod) => RequestMethod[key] !== RequestMethod.OPTIONS
-    )
+    .filter((key: RequestMethod) => RequestMethod[key] !== RequestMethod.OPTIONS)
     .map((key: RequestMethod) => {
       return { key: key, value: RequestMethod[key] };
     }),

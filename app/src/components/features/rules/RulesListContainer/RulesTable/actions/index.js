@@ -9,10 +9,7 @@ import Logger from "lib/logger";
 
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
-export const updateRulesListRefreshPendingStatus = (
-  dispatch,
-  isRulesListRefreshPending
-) => {
+export const updateRulesListRefreshPendingStatus = (dispatch, isRulesListRefreshPending) => {
   dispatch(
     actions.updateRefreshPendingStatus({
       type: "rules",
@@ -38,9 +35,7 @@ export const ungroupSelectedRules = (appMode, selectedRuleIds, user) => {
               groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
             };
             Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
-            allPromises.push(
-              StorageService(appMode).saveRuleOrGroup(updatedRule)
-            );
+            allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
           });
 
           Promise.all(allPromises).then(() => resolve());
@@ -49,12 +44,7 @@ export const ungroupSelectedRules = (appMode, selectedRuleIds, user) => {
   });
 };
 
-export const deleteGroup = (
-  appMode,
-  groupId,
-  groupwiseRulesToPopulate,
-  forceDelete
-) => {
+export const deleteGroup = (appMode, groupId, groupwiseRulesToPopulate, forceDelete) => {
   if (forceDelete) {
     Logger.log("Removing from storage in deleteGroup");
     return StorageService(appMode).removeRecord(groupId);

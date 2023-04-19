@@ -1,13 +1,7 @@
 import { Row, Col } from "antd";
 import { RQInput } from "lib/design-system/components";
 
-const DelayRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
 
   return (

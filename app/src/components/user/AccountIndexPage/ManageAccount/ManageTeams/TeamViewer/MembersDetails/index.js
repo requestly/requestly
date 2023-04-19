@@ -78,13 +78,8 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           </div>
         </Col>
         <Col>
-          <Button
-            disabled={!isTeamAdmin}
-            type="primary"
-            onClick={handleAddMemberClick}
-          >
-            <PlusOutlined />{" "}
-            <span className="text-bold caption">Invite People</span>
+          <Button disabled={!isTeamAdmin} type="primary" onClick={handleAddMemberClick}>
+            <PlusOutlined /> <span className="text-bold caption">Invite People</span>
           </Button>
         </Col>
       </Row>
@@ -101,13 +96,11 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           <>
             {accessCount === 1 ? (
               <p className="members-invite-message">
-                You are the only member in this workspace, add more members to
-                collaborate.
+                You are the only member in this workspace, add more members to collaborate.
               </p>
             ) : 1 < accessCount && accessCount <= 3 ? (
               <p className="members-invite-message">
-                There are only a few members in this workspace, add more members
-                to collaborate.
+                There are only a few members in this workspace, add more members to collaborate.
               </p>
             ) : null}
           </>
@@ -116,10 +109,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
 
       <Row align="middle" justify="center" className="members-quantity-info">
         {showSeatStatus ? (
-          <Typography.Text
-            strong
-            className="text-sm text-dark-gray text-center"
-          >
+          <Typography.Text strong className="text-sm text-dark-gray text-center">
             {`You currently have ${seats.actualBillQuantity} active users. Feel free to add more.`}
           </Typography.Text>
         ) : null}

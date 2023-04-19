@@ -71,18 +71,12 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
   };
 
   return (
-    <RQModal
-      centered
-      open={visible}
-      destroyOnClose={true}
-      onCancel={handleCancel}
-    >
+    <RQModal centered open={visible} destroyOnClose={true} onCancel={handleCancel}>
       <div className="rq-modal-content">
         <div className="header">Delete Mock</div>
         <div className="text-gray text-sm mt-1">
           <p>
-            Do you really want to delete{" "}
-            <span className="text-bold white-color">{mock?.name}</span> mock?
+            Do you really want to delete <span className="text-bold white-color">{mock?.name}</span> mock?
           </p>
         </div>
       </div>

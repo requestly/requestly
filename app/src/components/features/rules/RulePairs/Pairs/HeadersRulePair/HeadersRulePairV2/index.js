@@ -8,13 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
 
-const HeadersRulePairV2 = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-  ruleDetails,
-}) => {
+const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, ruleDetails }) => {
   //Utils
   const navigate = useNavigate();
   const navigateToTraffic = () => {
@@ -23,14 +17,9 @@ const HeadersRulePairV2 = ({
 
   const [activeTab, setActiveTab] = useState("Request");
 
-  const {
-    pushValueToArrayInPair,
-    deleteArrayValueByIndexInPair,
-  } = helperFunctions;
+  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
 
-  const getEmptyModification = (
-    type = GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD
-  ) => {
+  const getEmptyModification = (type = GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD) => {
     return {
       ...ruleDetails.EMPTY_MODIFICATION_FORMAT,
       id: generateObjectId(),
@@ -39,37 +28,17 @@ const HeadersRulePairV2 = ({
   };
 
   const addEmptyModification = (modificationType, type) => {
-    pushValueToArrayInPair(
-      null,
-      pairIndex,
-      ["modifications", modificationType],
-      stableGetEmptyModification(type)
-    );
+    pushValueToArrayInPair(null, pairIndex, ["modifications", modificationType], stableGetEmptyModification(type));
   };
 
-  const stableGetEmptyModification = useCallback(getEmptyModification, [
-    ruleDetails.EMPTY_MODIFICATION_FORMAT,
-  ]);
+  const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
 
-  const deleteModification = (
-    event,
-    pairIndex,
-    modificationIndex,
-    modificationType
-  ) => {
-    deleteArrayValueByIndexInPair(
-      event,
-      pairIndex,
-      ["modifications", modificationType],
-      modificationIndex
-    );
+  const deleteModification = (event, pairIndex, modificationIndex, modificationType) => {
+    deleteArrayValueByIndexInPair(event, pairIndex, ["modifications", modificationType], modificationIndex);
   };
 
   useEffect(() => {
-    if (
-      !pair.modifications.Request?.length &&
-      pair.modifications.Response?.length
-    ) {
+    if (!pair.modifications.Request?.length && pair.modifications.Response?.length) {
       setActiveTab("Response");
     }
   }, [pair.modifications]);
@@ -77,13 +46,7 @@ const HeadersRulePairV2 = ({
   return (
     <Col span={24}>
       <div className="card-container">
-        <Tabs
-          type="line"
-          tabBarGutter={16}
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          tabBarStyle={{ margin: 0 }}
-        >
+        <Tabs type="line" tabBarGutter={16} activeKey={activeTab} onChange={setActiveTab} tabBarStyle={{ margin: 0 }}>
           {["Request", "Response"].map((modificationType) => (
             <Tabs.TabPane
               tab={
@@ -99,34 +62,30 @@ const HeadersRulePairV2 = ({
               key={modificationType}
             >
               <Card bordered={false} className="headers-rule-pair-card">
-                {pair.modifications[modificationType]?.map(
-                  (modification, modificationIndex) => (
-                    <HeadersPairModificationRowV2
-                      modification={modification}
-                      modificationIndex={modificationIndex}
-                      pairIndex={pairIndex}
-                      isInputDisabled={isInputDisabled}
-                      helperFunctions={{
-                        ...helperFunctions,
-                        deleteModification,
-                      }}
-                      modificationType={modificationType}
-                      key={modificationIndex}
-                    />
-                  )
-                )}
+                {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
+                  <HeadersPairModificationRowV2
+                    modification={modification}
+                    modificationIndex={modificationIndex}
+                    pairIndex={pairIndex}
+                    isInputDisabled={isInputDisabled}
+                    helperFunctions={{
+                      ...helperFunctions,
+                      deleteModification,
+                    }}
+                    modificationType={modificationType}
+                    key={modificationIndex}
+                  />
+                ))}
                 <Row span={24} align="middle">
                   {pair.modifications[modificationType]?.length ? (
-                    <Col offset={3} span={24}>
+                    <Col offset={3} span={21}>
                       <Button
                         type="dashed"
                         onClick={() => addEmptyModification(activeTab)}
                         icon={<PlusOutlined />}
                         disabled={isInputDisabled}
                       >
-                        <span className="btn-inner--text">
-                          Add Modification
-                        </span>
+                        <span className="btn-inner--text">Add Modification</span>
                       </Button>
                     </Col>
                   ) : (
@@ -134,36 +93,21 @@ const HeadersRulePairV2 = ({
                       <Space>
                         <Button
                           type="dashed"
-                          onClick={() =>
-                            addEmptyModification(
-                              activeTab,
-                              GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD
-                            )
-                          }
+                          onClick={() => addEmptyModification(activeTab, GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD)}
                           icon={<PlusOutlined />}
                         >
                           <span className="btn-inner--text">{`Add ${modificationType} Header`}</span>
                         </Button>
                         <Button
                           type="dashed"
-                          onClick={() =>
-                            addEmptyModification(
-                              activeTab,
-                              GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE
-                            )
-                          }
+                          onClick={() => addEmptyModification(activeTab, GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE)}
                           icon={<MinusOutlined />}
                         >
                           <span className="btn-inner--text">{`Remove ${modificationType} Header`}</span>
                         </Button>
                         <Button
                           type="dashed"
-                          onClick={() =>
-                            addEmptyModification(
-                              activeTab,
-                              GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY
-                            )
-                          }
+                          onClick={() => addEmptyModification(activeTab, GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY)}
                           icon={<EditOutlined />}
                         >
                           <span className="btn-inner--text">{`Override ${modificationType} Header`}</span>
@@ -191,10 +135,9 @@ const HeadersRulePairV2 = ({
                       <Alert
                         message={
                           <span style={{ whiteSpace: "pre-wrap" }}>
-                            Request Headers modification done by Requestly are
-                            not visible in the Browsers devtool but they are
-                            actually modified. You can see the original headers
-                            in the Requestly Traffic logger.
+                            Request Headers modification done by Requestly are not visible in the Browsers devtool but
+                            they are actually modified. You can see the original headers in the Requestly Traffic
+                            logger.
                           </span>
                         }
                         type="info"

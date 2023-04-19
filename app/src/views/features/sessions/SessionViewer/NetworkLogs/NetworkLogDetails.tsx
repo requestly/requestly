@@ -31,10 +31,7 @@ const NetworkLogDetails: React.FC<Props> = ({
     [onClose]
   );
 
-  const responseTimeInSeconds = useMemo(
-    () => (responseTime / 1000).toFixed(3),
-    [responseTime]
-  );
+  const responseTimeInSeconds = useMemo(() => (responseTime / 1000).toFixed(3), [responseTime]);
 
   return (
     <div className="network-log-details">
@@ -42,14 +39,8 @@ const NetworkLogDetails: React.FC<Props> = ({
         <Tabs.TabPane tab="Request" key="request">
           <div className="network-log-details-tab-content">
             <NetworkLogProperty label="URL">{url}</NetworkLogProperty>
-            {responseURL !== url ? (
-              <NetworkLogProperty label="Redirected URL">
-                {responseURL}
-              </NetworkLogProperty>
-            ) : null}
-            <NetworkLogProperty label="Method">
-              {method?.toUpperCase() ?? "GET"}
-            </NetworkLogProperty>
+            {responseURL !== url ? <NetworkLogProperty label="Redirected URL">{responseURL}</NetworkLogProperty> : null}
+            <NetworkLogProperty label="Method">{method?.toUpperCase() ?? "GET"}</NetworkLogProperty>
             <NetworkPayload label="Payload" payload={requestData} />
           </div>
         </Tabs.TabPane>
@@ -58,12 +49,8 @@ const NetworkLogDetails: React.FC<Props> = ({
             <NetworkLogProperty label="Status">
               <NetworkStatusField status={status} statusText={statusText} />
             </NetworkLogProperty>
-            <NetworkLogProperty label="Response Time">
-              {responseTimeInSeconds} sec
-            </NetworkLogProperty>
-            <NetworkLogProperty label="Content Type">
-              {contentType}
-            </NetworkLogProperty>
+            <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
+            <NetworkLogProperty label="Content Type">{contentType}</NetworkLogProperty>
             <NetworkPayload label="Body" payload={response} />
           </div>
         </Tabs.TabPane>

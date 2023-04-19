@@ -49,9 +49,7 @@ export const updateHardRefreshPendingStatus = (prevState, action) => {
 export const toggleSelectedRule = (prevState, action) => {
   const currentValue = prevState.rules.selectedRules[action.payload.ruleId];
 
-  prevState.rules.selectedRules[action.payload.ruleId] = currentValue
-    ? false
-    : true;
+  prevState.rules.selectedRules[action.payload.ruleId] = currentValue ? false : true;
 };
 
 export const updateSelectedRules = (prevState, action) => {
@@ -62,9 +60,7 @@ export const updateSelectedRules = (prevState, action) => {
 export const updateSelectAllRulesOfAGroup = (prevState, action) => {
   const groupId = action.payload.groupId;
   const allRulesUnderThisGroup =
-    prevState["rules"]["groupwiseRulesToPopulate"][groupId][
-      RULES_LIST_TABLE_CONSTANTS.GROUP_RULES
-    ];
+    prevState["rules"]["groupwiseRulesToPopulate"][groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_RULES];
   const newSelectedRulesObject = {};
   allRulesUnderThisGroup.forEach((rule) => {
     newSelectedRulesObject[rule.id] = action.payload.newValue;
@@ -85,10 +81,7 @@ export const updateCurrentlySelectedRuleConfig = (prevState, action) => {
   prevState.rules.currentlySelectedRule.config = action.payload;
 };
 
-export const updateCurrentlySelectedRuleHasUnsavedChanges = (
-  prevState,
-  action
-) => {
+export const updateCurrentlySelectedRuleHasUnsavedChanges = (prevState, action) => {
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = action.payload;
 };
 
@@ -124,9 +117,7 @@ export const updateRecord = (prevState, action) => {
   };
   const recordType = ObjectTypeMap[action.payload.objectType];
 
-  const ruleIndex = prevState.rules.allRules[recordType].findIndex(
-    (record) => record.id === action.payload.id
-  );
+  const ruleIndex = prevState.rules.allRules[recordType].findIndex((record) => record.id === action.payload.id);
 
   prevState.rules.allRules[recordType][ruleIndex] = action.payload;
 };

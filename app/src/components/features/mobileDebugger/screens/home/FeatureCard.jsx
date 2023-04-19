@@ -5,9 +5,7 @@ const { Title } = Typography;
 
 const FeatureCard = ({ feature }) => {
   const renderSubtitle = (subtitle) => {
-    return (
-      <div style={{ textAlign: "center", paddingBottom: 8 }}>{subtitle}</div>
-    );
+    return <div style={{ textAlign: "center", paddingBottom: 8 }}>{subtitle}</div>;
   };
 
   const onClickHandler = () => {
@@ -27,8 +25,7 @@ const FeatureCard = ({ feature }) => {
   return (
     <ProCard className="github-like-border">
       <Title level={5}>
-        {feature.icon} {feature.title}{" "}
-        {feature.comingSoon ? <Badge count={"Coming Soon"} /> : null}
+        {feature.icon} {feature.title} {feature.comingSoon ? <Badge count={"Coming Soon"} /> : null}
       </Title>
       <Divider />
       {renderSubtitle(feature.subtitle)}

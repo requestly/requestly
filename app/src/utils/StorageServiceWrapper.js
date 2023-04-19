@@ -24,11 +24,7 @@ class StorageServiceWrapper {
   }
 
   hasPrimaryKey(record) {
-    if (
-      typeof record === "object" &&
-      !Array.isArray(record) &&
-      record !== null
-    ) {
+    if (typeof record === "object" && !Array.isArray(record) && record !== null) {
       for (let index = 0; index < this.primaryKeys.length; index++) {
         if (typeof record[this.primaryKeys[index]] !== "undefined") {
           return true;
@@ -81,17 +77,12 @@ class StorageServiceWrapper {
     const formattedObject = {
       [ruleOrGroup.id]: {
         ...ruleOrGroup,
-        modificationDate: options.silentUpdate
-          ? ruleOrGroup?.modificationDate
-          : new Date().getTime(),
+        modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
       },
     };
-    await doSyncRecords(
-      formattedObject,
-      SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-      this.appMode,
-      { workspaceId: options.workspaceId }
-    );
+    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+      workspaceId: options.workspaceId,
+    });
     return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
   }
 
@@ -100,11 +91,7 @@ class StorageServiceWrapper {
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
     });
-    await doSyncRecords(
-      formattedObject,
-      SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS,
-      this.appMode
-    );
+    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode);
     return this.saveRecord(formattedObject);
   }
 
@@ -114,11 +101,7 @@ class StorageServiceWrapper {
   }
 
   async saveSessionRecordingPageConfig(config) {
-    await doSyncRecords(
-      config,
-      SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG,
-      this.appMode
-    );
+    await doSyncRecords(config, SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG, this.appMode);
     return this.saveRecord({ sessionRecordingConfig: config });
   }
 
@@ -137,19 +120,11 @@ class StorageServiceWrapper {
 
   async removeRecord(key) {
     await this.StorageHelper.removeStorageObject(key);
-    await doSyncRecords(
-      [key],
-      SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS,
-      this.appMode
-    );
+    await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
   }
 
   async removeRecords(array) {
-    await doSyncRecords(
-      array,
-      SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS,
-      this.appMode
-    );
+    await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
     return this.StorageHelper.removeStorageObjects(array);
   }
 
@@ -165,8 +140,7 @@ class StorageServiceWrapper {
 
   async clearDB() {
     await this.StorageHelper.clearStorage();
-    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
-      await setStorageType("local");
+    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local");
   }
 
   saveConsoleLoggerState(state) {

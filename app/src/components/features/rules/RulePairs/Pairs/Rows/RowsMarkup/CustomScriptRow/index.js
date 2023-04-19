@@ -1,23 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  Tooltip,
-  Typography,
-  Menu,
-  Dropdown,
-  Popconfirm,
-  Button,
-} from "antd";
+import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
 //SUB COMPONENTS
 import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 //Icons
-import {
-  DeleteOutlined,
-  DownOutlined,
-  FolderOpenOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 //Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import CodeEditor from "components/misc/CodeEditor";
@@ -38,12 +24,8 @@ const CustomScriptRow = ({
 }) => {
   const { modifyPairAtGivenPath, deleteScript } = helperFunctions;
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
-  const [codeTypeSelection, setCodeTypeSelection] = useState(
-    GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
-  );
-  const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(
-    false
-  );
+  const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
+  const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const scriptEditorBoilerCode = useMemo(
@@ -62,12 +44,7 @@ const CustomScriptRow = ({
 
   const handleFilePickerAction = (url) => {
     setIsFilePickerModalActive(false);
-    modifyPairAtGivenPath(
-      undefined,
-      pairIndex,
-      `scripts[${scriptIndex}].value`,
-      url
-    );
+    modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, url);
   };
   /** Remove till here */
 
@@ -79,12 +56,7 @@ const CustomScriptRow = ({
 
   const handleMockPickerSelectionCallback = (url) => {
     setIsMockPickerVisible(false);
-    modifyPairAtGivenPath(
-      undefined,
-      pairIndex,
-      `scripts[${scriptIndex}].value`,
-      url
-    );
+    modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, url);
   };
 
   const renderURLInput = () => {
@@ -99,10 +71,7 @@ const CustomScriptRow = ({
               style={{ cursor: "pointer" }}
               addonAfter={
                 isInputDisabled ? null : (
-                  <Tooltip
-                    title="Import a existing Mock API"
-                    onClick={() => setIsMockPickerVisible(true)}
-                  >
+                  <Tooltip title="Import a existing Mock API" onClick={() => setIsMockPickerVisible(true)}>
                     <FolderOpenOutlined />
                     &nbsp; Pick from Mock Server
                   </Tooltip>
@@ -112,13 +81,7 @@ const CustomScriptRow = ({
               placeholder="Enter Source URL (relative or absolute)"
               type="text"
               disabled={isInputDisabled}
-              onChange={(event) =>
-                modifyPairAtGivenPath(
-                  event,
-                  pairIndex,
-                  `scripts[${scriptIndex}].value`
-                )
-              }
+              onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].value`)}
               value={script.value}
             />
           </Col>
@@ -156,18 +119,12 @@ const CustomScriptRow = ({
   };
 
   const onCodeTypeChange = (codeType) => {
-    modifyPairAtGivenPath(
-      null,
-      pairIndex,
-      `scripts[${scriptIndex}].codeType`,
-      codeType,
-      [
-        {
-          path: `scripts[${scriptIndex}].value`,
-          value: "",
-        },
-      ]
-    );
+    modifyPairAtGivenPath(null, pairIndex, `scripts[${scriptIndex}].codeType`, codeType, [
+      {
+        path: `scripts[${scriptIndex}].value`,
+        value: "",
+      },
+    ]);
   };
 
   const handleScriptDelete = (e) => {
@@ -176,14 +133,7 @@ const CustomScriptRow = ({
 
   const renderCodeEditor = () => {
     const scriptBodyChangeHandler = (value) => {
-      modifyPairAtGivenPath(
-        undefined,
-        pairIndex,
-        `scripts[${scriptIndex}].value`,
-        value,
-        null,
-        !isCodeFormatted
-      );
+      modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, value, null, !isCodeFormatted);
     };
 
     const handleCodeFormattedFlag = () => {
@@ -205,11 +155,7 @@ const CustomScriptRow = ({
         >
           <Col xl="12" span={24}>
             <CodeEditor
-              language={
-                script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
-                  ? "javascript"
-                  : "css"
-              }
+              language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={
                 script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS
                   ? scriptEditorBoilerCode.CSS
@@ -222,12 +168,7 @@ const CustomScriptRow = ({
             />
           </Col>
         </Row>
-        <Row
-          span={24}
-          align="middle"
-          justify="space-between"
-          className="code-editor-character-count-row "
-        >
+        <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
           <Col align="left">
             {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
               <Button type="link" onClick={handleCodeFormattedFlag}>
@@ -236,9 +177,7 @@ const CustomScriptRow = ({
             ) : null}
           </Col>
           <Col span={6} align="right">
-            <span className="codemirror-character-count text-gray">
-              {script.value.length} characters
-            </span>
+            <span className="codemirror-character-count text-gray">{script.value.length} characters</span>
           </Col>
         </Row>
       </React.Fragment>
@@ -246,18 +185,12 @@ const CustomScriptRow = ({
   };
 
   const scriptTypeChangeHandler = (event, newScriptType) => {
-    modifyPairAtGivenPath(
-      event,
-      pairIndex,
-      `scripts[${scriptIndex}].type`,
-      newScriptType,
-      [
-        {
-          path: `scripts[${scriptIndex}].value`,
-          value: "",
-        },
-      ]
-    );
+    modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].type`, newScriptType, [
+      {
+        path: `scripts[${scriptIndex}].value`,
+        value: "",
+      },
+    ]);
   };
 
   const loadTimeMenuItems = useMemo(
@@ -275,13 +208,7 @@ const CustomScriptRow = ({
   );
 
   const handleLoadTimeClick = useCallback(
-    (event, type) =>
-      modifyPairAtGivenPath(
-        event,
-        pairIndex,
-        `scripts[${scriptIndex}].loadTime`,
-        type
-      ),
+    (event, type) => modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].loadTime`, type),
     [pairIndex, scriptIndex, modifyPairAtGivenPath]
   );
 
@@ -312,10 +239,7 @@ const CustomScriptRow = ({
   const scriptTypeMenu = (
     <Menu>
       {scriptTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item
-          key={index}
-          onClick={(e) => scriptTypeChangeHandler(e, type)}
-        >
+        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(e, type)}>
           {title}
         </Menu.Item>
       ))}
@@ -339,10 +263,7 @@ const CustomScriptRow = ({
   const scriptCodeTypeMenu = (
     <Menu>
       {scriptCodeTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item
-          key={index}
-          onClick={() => showCodeTypeChangeConfirmation(type)}
-        >
+        <Menu.Item key={index} onClick={() => showCodeTypeChangeConfirmation(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -365,11 +286,7 @@ const CustomScriptRow = ({
         visible={isCodeTypePopupVisible}
       >
         <Dropdown overlay={scriptCodeTypeMenu}>
-          <Text
-            strong
-            className="cursor-pointer uppercase ant-dropdown-link"
-            onClick={(e) => e.preventDefault()}
-          >
+          <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
             {script.codeType} <DownOutlined />
           </Text>
         </Dropdown>
@@ -387,11 +304,7 @@ const CustomScriptRow = ({
         <Col span={6} align="left">
           <Text className="text-gray">Code Source: </Text>
           <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
-            <Text
-              strong
-              className="cursor-pointer uppercase ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-            >
+            <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               {script.type} <DownOutlined />
             </Text>
           </Dropdown>
@@ -406,8 +319,7 @@ const CustomScriptRow = ({
                 onClick={(e) => e.preventDefault()}
                 style={{ textTransform: "capitalize" }}
               >
-                {script.loadTime ===
-                GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
+                {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
                   ? "After Page Load"
                   : "Before Page Load"}{" "}
                 <DownOutlined />
@@ -439,9 +351,7 @@ const CustomScriptRow = ({
           </Popconfirm>
         </Col>
       </Row>
-      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL
-        ? renderURLInput()
-        : renderCodeEditor()}
+      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
     </div>
   );
 };

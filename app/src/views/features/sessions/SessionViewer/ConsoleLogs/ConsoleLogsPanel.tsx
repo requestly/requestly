@@ -14,20 +14,14 @@ interface Props {
   updateCount: (count: number) => void;
 }
 
-const ConsoleLogsPanel: React.FC<Props> = ({
-  consoleLogs,
-  playerTimeOffset,
-  updateCount,
-}) => {
+const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset, updateCount }) => {
   const visibleConsoleLogs = useMemo<ConsoleLog[]>(() => {
     return consoleLogs.filter((consoleLog: ConsoleLog) => {
       return consoleLog.timeOffset <= playerTimeOffset;
     });
   }, [consoleLogs, playerTimeOffset]);
 
-  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(
-    visibleConsoleLogs
-  );
+  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(visibleConsoleLogs);
 
   const includeConsoleLogs = useSelector(getIncludeConsoleLogs);
 
@@ -36,11 +30,7 @@ const ConsoleLogsPanel: React.FC<Props> = ({
   }, [visibleConsoleLogs, updateCount]);
 
   return (
-    <div
-      className="session-panel-content"
-      ref={containerRef}
-      onScroll={onScroll}
-    >
+    <div className="session-panel-content" ref={containerRef} onScroll={onScroll}>
       {visibleConsoleLogs.length ? (
         <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
           {visibleConsoleLogs.map((log, i) => (

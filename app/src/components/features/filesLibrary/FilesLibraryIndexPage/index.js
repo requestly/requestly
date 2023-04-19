@@ -6,12 +6,7 @@ import FilesLibraryTableContainer from "../FilesLibraryTableContainer";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import GetStartedWithFiles from "../GetStartedWithFiles";
 //ACTIONS
-import {
-  fetchUserMocks,
-  fetchFiles,
-  checkMigrationDone,
-  migrateAndUpdate,
-} from "./actions";
+import { fetchUserMocks, fetchFiles, checkMigrationDone, migrateAndUpdate } from "./actions";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 // import DataStoreUtils from "../../../../utils/DataStoreUtils";
@@ -71,10 +66,7 @@ const FilesLibraryIndexPage = () => {
     <SpinnerCard customLoadingMessage="Loading Mocks" />
   ) : !isEmpty(filesList) ? (
     <>
-      <FilesLibraryTableContainer
-        updateCollection={updateCollection}
-        filesList={filesList}
-      />
+      <FilesLibraryTableContainer updateCollection={updateCollection} filesList={filesList} />
     </>
   ) : (
     <GetStartedWithFiles updateCollection={updateCollection} />

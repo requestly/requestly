@@ -14,15 +14,12 @@ const CreateFirstTeam = () => {
 
   return (
     <>
-      <ProCard
-        className="primary-card github-like-border"
-        title="My Team Workspaces"
-      >
+      <ProCard className="primary-card github-like-border" title="My Team Workspaces">
         <Row>
           <Col span={24} align="center">
             <p>
-              You can create or join multiple teams. Each team is billed
-              separately and subscription is shared with all members.
+              You can create or join multiple teams. Each team is billed separately and subscription is shared with all
+              members.
             </p>
             <br />
             <Space>
@@ -35,14 +32,7 @@ const CreateFirstTeam = () => {
               >
                 Create your first team
               </Button>
-              <Button
-                onClick={(e) =>
-                  window.open(
-                    APP_CONSTANTS.LINKS.REQUESTLY_DOCS_TEAM_SUBSCRIPTION,
-                    "_blank"
-                  )
-                }
-              >
+              <Button onClick={(e) => window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOCS_TEAM_SUBSCRIPTION, "_blank")}>
                 Know More
               </Button>
             </Space>
@@ -50,10 +40,7 @@ const CreateFirstTeam = () => {
         </Row>
       </ProCard>
 
-      <CreateWorkspaceModal
-        isOpen={isCreateTeamModalOpen}
-        handleModalClose={handleCreateWorkspaceModalClose}
-      />
+      <CreateWorkspaceModal isOpen={isCreateTeamModalOpen} handleModalClose={handleCreateWorkspaceModalClose} />
     </>
   );
 };
