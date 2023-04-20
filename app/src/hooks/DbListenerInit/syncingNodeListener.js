@@ -10,11 +10,14 @@ import {
   syncToLocalFromFirebase,
   mergeRecords,
   getAllLocalRecords,
+  checkIfNoUpdateHasBeenPerformedSinceLastSync,
+  handleLocalConflicts,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
+import APP_CONSTANTS from "config/constants";
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
@@ -39,7 +42,7 @@ const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
   if (syncTarget === "sync") desiredValue = uid;
 
   await StorageService(appMode).saveRecord({
-    "last-sync-target": desiredValue,
+    [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
 };
 
@@ -55,13 +58,25 @@ export const mergeRecordsAndSaveToFirebase = async (appMode, recordsOnFirebase) 
   await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
   return mergedRecords;
 };
+const resolveLocalConflictsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
+  const localRecords = await getAllLocalRecords(appMode, false);
+  const resolvedRecords = handleLocalConflicts(recordsOnFirebase, localRecords);
+
+  // Write to firebase
+  const formattedObject = {};
+  resolvedRecords.forEach((object) => {
+    if (object && object.id) formattedObject[object.id] = object;
+  });
+  await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
+  return resolvedRecords;
+};
 
 export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
   // Consistency check. Merge records if inconsistent
-  const lastSyncTarget = await StorageService(appMode).getRecord("last-sync-target");
+  const lastSyncTarget = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
   let consistencyCheckPassed = false;
   if (syncTarget === "teamSync") {
     if (lastSyncTarget === team_id) consistencyCheckPassed = true;
@@ -75,7 +90,23 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
     allSyncedRecords = recordsOnFirebaseAfterMerge;
 
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
+  } else {
+    // At this stage we are sure that we want to sync with this target only, target is consistent
+    // Now let's check if there are any local update that we should prioritize
+    const tsResult = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
+    if (tsResult === false) {
+      // This means some updates have been performed locally and they have not been synced with firebase yet
+      // Handle conflicts
+      const recordsOnFirebaseAfterConflictResolution = await resolveLocalConflictsAndSaveToFirebase(
+        appMode,
+        allSyncedRecords
+      );
+      allSyncedRecords = recordsOnFirebaseAfterConflictResolution;
+
+      await setLastSyncTarget(appMode, syncTarget, uid, team_id);
+    }
   }
+
   // Write to local
   await syncToLocalFromFirebase(allSyncedRecords, appMode, uid);
   trackSyncCompleted(uid);
@@ -130,7 +161,6 @@ const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
         doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
       }
     };
-    invokeSyncingIfRequired();
 
     return onValue(syncNodeRef, async (snap) => {
       await invokeSyncingIfRequired(snap.val());

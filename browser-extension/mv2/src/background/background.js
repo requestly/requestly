@@ -1243,8 +1243,8 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
   const { tabId } = requestDetails;
 
   chrome.tabs.sendMessage(tabId, {
-    action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
-    ruleId: rule.id,
+    action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
+    rule,
   });
 
   // Cache execution details until content script loads
