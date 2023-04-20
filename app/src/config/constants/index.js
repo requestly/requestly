@@ -35,7 +35,9 @@ APP_CONSTANTS.PRICING = PRICING;
 APP_CONSTANTS.MIGRATED_TO_NEW_SOURCE_FILTER_FORMAT = "migrated-to-new-source-filter-format";
 APP_CONSTANTS.STORAGE_MIGRATED_TO_LOCAL = "storage-migrated-to-local";
 APP_CONSTANTS.LAST_BACKUP_TIMESTAMP = "last-backup-timestamp";
-APP_CONSTANTS.LAST_SYNC_TIMESTAMP = "last-synced-on";
+APP_CONSTANTS.LAST_SYNC_TARGET = "last-sync-target";
+APP_CONSTANTS.LAST_SYNCED_TS = "last-synced-ts";
+APP_CONSTANTS.LAST_UPDATED_TS = "last-updated-ts";
 
 APP_CONSTANTS.RQ_SETTINGS = "rq_settings";
 APP_CONSTANTS.MIGRATED_HEADER_RULES_TO_V2 = "migrated-header-rules-to-v2";

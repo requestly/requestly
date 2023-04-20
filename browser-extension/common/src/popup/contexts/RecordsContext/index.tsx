@@ -4,6 +4,7 @@ import { EXTENSION_MESSAGES } from "../../../constants";
 import { recordsInitialState, recordsReducer } from "./recordsReducer";
 import { RecordsAction, RecordsActionType, RecordsObject } from "./types";
 import { saveRecord } from "../../../storage";
+import { updateLastUpdatedTS } from "../../../utils";
 
 interface IRecordsContext extends Record<string, unknown> {
   rules: RecordsObject<Rule>;
@@ -42,6 +43,9 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
       type: RecordsActionType.UPDATE_RULE,
       payload: { rule: updatedRule, isUpdateFromPinnedRecords },
     });
+
+    updateLastUpdatedTS();
+    // todo notify app
   }, []);
 
   const updateGroup = useCallback((updatedGroup: Group) => {
@@ -53,6 +57,9 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
       type: RecordsActionType.UPDATE_GROUP,
       payload: updatedGroup,
     });
+
+    updateLastUpdatedTS();
+    // todo notify app
   }, []);
 
   const pinnedGroups = useMemo(

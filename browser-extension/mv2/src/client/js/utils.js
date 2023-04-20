@@ -66,3 +66,17 @@ RQ.ClientUtils.isHTMLDocument = function () {
   const docType = document.doctype;
   return docType && docType.name === "html";
 };
+
+RQ.ClientUtils.sendEventToBackground = (eventName, eventParams) => {
+  const eventTs = Date.now();
+  eventParams["log_source"] = "extension";
+
+  chrome.runtime.sendMessage({
+    action: RQ.CLIENT_MESSAGES.ADD_EVENT,
+    payload: {
+      eventName,
+      eventParams,
+      eventTs,
+    },
+  });
+};
