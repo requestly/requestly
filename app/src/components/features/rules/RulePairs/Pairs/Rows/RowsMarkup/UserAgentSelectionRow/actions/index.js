@@ -138,24 +138,21 @@ export const getAvailableUserAgents = (pair) => {
               label: "Firefox on Windows",
               value: {
                 env: "firefox.windows",
-                userAgent:
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
+                userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0",
               },
             },
             {
               label: "Firfox on Macintosh",
               value: {
                 env: "firefox.macintosh",
-                userAgent:
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 12.6; rv:104.0) Gecko/20100101 Firefox/104.0",
+                userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 12.6; rv:104.0) Gecko/20100101 Firefox/104.0",
               },
             },
             {
               label: "Firfox on Linux",
               value: {
                 env: "firefox.linux",
-                userAgent:
-                  "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0",
+                userAgent: "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0",
               },
             },
           ],
@@ -180,8 +177,7 @@ export const getAvailableUserAgents = (pair) => {
               label: "Internet Explorer 11",
               value: {
                 env: "msie.msie11",
-                userAgent:
-                  "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
+                userAgent: "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
               },
             },
           ],

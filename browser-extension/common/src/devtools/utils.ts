@@ -1,11 +1,7 @@
 import config from "../config";
 import { Rule } from "../types";
 import { ResourceTypeFilterValue } from "./components/ResourceTypeFilter";
-import {
-  RuleEditorUrlFragment,
-  ColorScheme,
-  NetworkResourceType,
-} from "./types";
+import { RuleEditorUrlFragment, ColorScheme, NetworkResourceType } from "./types";
 
 interface PostMessageData {
   author: string;
@@ -27,10 +23,7 @@ export const createRule = <T extends Rule>(
   const onMessageReceived = (event: MessageEvent<PostMessageData>) => {
     const { author, action, payload } = event.data;
     const { ruleData } = payload;
-    if (
-      author === REQUESTLY_POST_MESSAGE_AUTHOR &&
-      action === "ruleEditor:ready"
-    ) {
+    if (author === REQUESTLY_POST_MESSAGE_AUTHOR && action === "ruleEditor:ready") {
       initRuleData(ruleData as T); // in-place update on ruleData
       editorWindow?.postMessage(
         {
@@ -50,10 +43,7 @@ export const createRule = <T extends Rule>(
   editorWindow = window.open(editorUrl, "_blank");
 };
 
-export const getHostFromUrl = (
-  url: string,
-  includeScheme?: boolean
-): string => {
+export const getHostFromUrl = (url: string, includeScheme?: boolean): string => {
   const parsedUrl = new URL(url);
   return includeScheme ? parsedUrl.origin : parsedUrl.host;
 };
@@ -70,9 +60,7 @@ export const getPageOrigin = (): Promise<string> => {
 };
 
 export const getCurrentColorScheme = (): ColorScheme => {
-  return window.matchMedia("(prefers-color-scheme: dark)")?.matches
-    ? ColorScheme.DARK
-    : ColorScheme.LIGHT;
+  return window.matchMedia("(prefers-color-scheme: dark)")?.matches ? ColorScheme.DARK : ColorScheme.LIGHT;
 };
 
 export const generateRuleName = (modification: string) => {
@@ -80,14 +68,10 @@ export const generateRuleName = (modification: string) => {
   return [...words, Date.now()].join("-");
 };
 
-export const onColorSchemeChange = (
-  callback: (theme: ColorScheme) => void
-): void => {
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", function (e) {
-      callback(e.matches ? ColorScheme.DARK : ColorScheme.LIGHT);
-    });
+export const onColorSchemeChange = (callback: (theme: ColorScheme) => void): void => {
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+    callback(e.matches ? ColorScheme.DARK : ColorScheme.LIGHT);
+  });
 };
 
 export const isExtensionManifestV3 = (): boolean => {
@@ -102,9 +86,7 @@ export const matchResourceTypeFilter = (
     case ResourceTypeFilterValue.ALL:
       return true;
     case ResourceTypeFilterValue.AJAX:
-      return [NetworkResourceType.FETCH, NetworkResourceType.XHR].includes(
-        networkResourceType
-      );
+      return [NetworkResourceType.FETCH, NetworkResourceType.XHR].includes(networkResourceType);
     case ResourceTypeFilterValue.JS:
       return networkResourceType === NetworkResourceType.JS;
     case ResourceTypeFilterValue.CSS:

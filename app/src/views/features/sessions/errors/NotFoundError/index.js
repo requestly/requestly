@@ -12,10 +12,7 @@ const NotFoundError = () => {
 
   return (
     <React.Fragment>
-      <ProCard
-        className="primary-card github-like-border"
-        style={{ height: "100%" }}
-      >
+      <ProCard className="primary-card github-like-border" style={{ height: "100%" }}>
         <Row className="hp-text-center">
           <Col span={24}>
             <Row justify="center">
@@ -33,13 +30,8 @@ const NotFoundError = () => {
 
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
-            <Jumbotron
-              style={{ background: "transparent" }}
-              className="text-center"
-            >
-              <h1 className="display-3">
-                The session recording you were looking for does not exist.
-              </h1>
+            <Jumbotron style={{ background: "transparent" }} className="text-center">
+              <h1 className="display-3">The session recording you were looking for does not exist.</h1>
               <center>
                 <Button
                   type="primary"

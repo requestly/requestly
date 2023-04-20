@@ -20,9 +20,8 @@ const CertificateTrustInstructions = ({ device_id }) => {
                 title="a. Open Downloaded profile"
                 description={
                   <>
-                    Open settings. You should see a new{" "}
-                    <code>Profile Downloaded</code> option at the top. Select
-                    that to configure the profile
+                    Open settings. You should see a new <code>Profile Downloaded</code> option at the top. Select that
+                    to configure the profile
                   </>
                 }
               />
@@ -30,12 +29,7 @@ const CertificateTrustInstructions = ({ device_id }) => {
             <List.Item>
               <List.Item.Meta
                 title={<>b. Install Profile (Password Required)</>}
-                description={
-                  <>
-                    Press Install on the top right a few times and then click
-                    Done
-                  </>
-                }
+                description={<>Press Install on the top right a few times and then click Done</>}
               />
             </List.Item>
             <List.Item>
@@ -45,14 +39,11 @@ const CertificateTrustInstructions = ({ device_id }) => {
                   <>
                     Navigate to:{" "}
                     <b>
-                      <code>
-                        {`Settings -> General -> About -> Certificate Trust Settings`}
-                      </code>
+                      <code>{`Settings -> General -> About -> Certificate Trust Settings`}</code>
                     </b>
                     <br />
                     <code>
-                      Toggle the switch for <b>RQProxyCA</b> under{" "}
-                      <b>Enable Full Trust for Root Certificates</b>
+                      Toggle the switch for <b>RQProxyCA</b> under <b>Enable Full Trust for Root Certificates</b>
                     </code>
                   </>
                 }

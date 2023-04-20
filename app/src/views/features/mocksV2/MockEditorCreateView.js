@@ -7,11 +7,7 @@ import { MockType } from "components/features/mocksV2/types";
 const MockEditorCreateView = () => {
   return (
     <>
-      <ProtectedRoute
-        component={MockEditorIndex}
-        isNew={true}
-        mockType={MockType.API}
-      />
+      <ProtectedRoute component={MockEditorIndex} isNew={true} mockType={MockType.API} />
     </>
   );
 };

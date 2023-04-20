@@ -10,11 +10,7 @@ const MockEditorEditView = () => {
 
   return (
     <>
-      <ProtectedRoute
-        component={MockEditorIndex}
-        mockId={mockId}
-        mockType={MockType.API}
-      />
+      <ProtectedRoute component={MockEditorIndex} mockId={mockId} mockType={MockType.API} />
     </>
   );
 };

@@ -22,10 +22,9 @@ const ExportRulesModal = (props) => {
   //Component State
   const [dataToExport, setDataToExport] = useState(null);
 
-  const initDownload = useCallback(
-    () => initiateDownload(dataToExport.fileContent, dataToExport.rulesCount),
-    [dataToExport]
-  );
+  const initDownload = useCallback(() => initiateDownload(dataToExport.fileContent, dataToExport.rulesCount), [
+    dataToExport,
+  ]);
 
   useEffect(() => {
     if (isOpen && dataToExport?.rulesCount >= 1) {
@@ -33,9 +32,7 @@ const ExportRulesModal = (props) => {
     }
   }, [isOpen, dataToExport, initDownload]);
 
-  const renderLoader = () => (
-    <SpinnerColumn message="Preparing data to export" />
-  );
+  const renderLoader = () => <SpinnerColumn message="Preparing data to export" />;
 
   const renderDownloadSummary = () => {
     if (dataToExport.rulesCount === 0) {
@@ -49,10 +46,7 @@ const ExportRulesModal = (props) => {
           <br />
           <b>
             Your download will begin in a moment. If it doesn't,{" "}
-            <span
-              onClick={initDownload}
-              className="cursor-pointer text-primary"
-            >
+            <span onClick={initDownload} className="cursor-pointer text-primary">
               click here
             </span>
             .
@@ -82,22 +76,12 @@ const ExportRulesModal = (props) => {
 
   useEffect(() => {
     if (!dataToExport) {
-      prepareContentToExport(
-        appMode,
-        rulesToExport,
-        groupwiseRulesToPopulate
-      ).then((result) => {
+      prepareContentToExport(appMode, rulesToExport, groupwiseRulesToPopulate).then((result) => {
         setDataToExport(result);
         dispatch(actions.clearSelectedRules());
       });
     }
-  }, [
-    rulesToExport,
-    groupwiseRulesToPopulate,
-    dataToExport,
-    appMode,
-    dispatch,
-  ]);
+  }, [rulesToExport, groupwiseRulesToPopulate, dataToExport, appMode, dispatch]);
 
   return (
     <Modal
@@ -108,9 +92,7 @@ const ExportRulesModal = (props) => {
       style={{ textAlign: "center" }}
       title="Export Rules Wizard"
     >
-      <div className="modal-body ">
-        {dataToExport ? renderDownloadSummary() : renderLoader()}
-      </div>
+      <div className="modal-body ">{dataToExport ? renderDownloadSummary() : renderLoader()}</div>
     </Modal>
   );
 };

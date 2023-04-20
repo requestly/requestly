@@ -10,8 +10,7 @@ export const RQButton: React.FC<RQButtonProps> = (props) => {
   const filteredProps = useMemo(
     () =>
       Object.keys(props).reduce(
-        (result, key: keyof RQButtonProps) =>
-          key !== "iconOnly" ? { ...result, [key]: props[key] } : result,
+        (result, key: keyof RQButtonProps) => (key !== "iconOnly" ? { ...result, [key]: props[key] } : result),
         {}
       ),
     [props]
@@ -20,9 +19,9 @@ export const RQButton: React.FC<RQButtonProps> = (props) => {
   return (
     <Button
       {...filteredProps}
-      className={`rq-btn ${props.type === "default" ? "btn-default" : ""} ${
-        props.iconOnly ? "btn-icon-only" : ""
-      } ${props?.className ?? ""}`}
+      className={`rq-btn ${props.type === "default" ? "btn-default" : ""} ${props.iconOnly ? "btn-icon-only" : ""} ${
+        props?.className ?? ""
+      }`}
     />
   );
 };

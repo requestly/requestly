@@ -1,15 +1,5 @@
-import {
-  RRWebEventData,
-  NetworkEventData,
-  RQSessionEventType,
-} from "@requestly/web-sdk";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { RRWebEventData, NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Replayer from "rrweb-player";
 import { Badge, Input, Tabs } from "antd";
 import "rrweb-player/dist/style.css";
@@ -63,9 +53,7 @@ const SessionDetails: React.FC = () => {
   useEffect(() => {
     if (events?.rrweb?.length) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
-      const rrwebEvents = cloneDeep(
-        events[RQSessionEventType.RRWEB] as RRWebEventData[]
-      );
+      const rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
 
       setPlayer(
         new Replayer({
@@ -159,9 +147,7 @@ const SessionDetails: React.FC = () => {
             Environment
           </span>
         ),
-        children: (
-          <EnvironmentDetailsPanel environment={attributes.environment} />
-        ),
+        children: <EnvironmentDetailsPanel environment={attributes.environment} />,
       },
     ];
 
@@ -179,10 +165,7 @@ const SessionDetails: React.FC = () => {
     <>
       <Input readOnly addonBefore="Page URL" value={attributes.url} />
       <div className="session-recording-player-row">
-        <div
-          className="session-recording-player-container"
-          ref={playerContainer}
-        />
+        <div className="session-recording-player-container" ref={playerContainer} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
       </div>
       <ProCard className="primary-card session-panels-container">
@@ -190,10 +173,7 @@ const SessionDetails: React.FC = () => {
           defaultActiveKey="consoleLogs"
           items={getSessionPanelTabs}
           onTabClick={(key) => {
-            trackSessionRecordingPanelTabClicked(
-              key,
-              window.location.pathname.split("/")?.[2]
-            );
+            trackSessionRecordingPanelTabClicked(key, window.location.pathname.split("/")?.[2]);
           }}
         />
       </ProCard>

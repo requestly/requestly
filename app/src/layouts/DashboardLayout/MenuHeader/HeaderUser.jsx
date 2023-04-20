@@ -4,10 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
-import {
-  redirectToLicenseIndexPage,
-  redirectToAccountDetails,
-} from "utils/RedirectionUtils";
+import { redirectToLicenseIndexPage, redirectToAccountDetails } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -23,15 +20,10 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
-  const userName =
-    user.loggedIn && user?.details?.profile?.displayName
-      ? user.details.profile.displayName
-      : "User";
+  const userName = user.loggedIn && user?.details?.profile?.displayName ? user.details.profile.displayName : "User";
 
   const userPhoto =
-    user.loggedIn && user?.details?.profile?.photoURL
-      ? parseGravatarImage(user.details.profile.photoURL)
-      : null;
+    user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
 
   const userEmail = user?.details?.profile?.email;
 
@@ -54,37 +46,18 @@ export default function HeaderUser() {
 
   const menu = (
     <Menu className="profile-dropdown">
-      <Menu.Item
-        key={0}
-        className="profile-avatar-container"
-        onClick={() => redirectToAccountDetails(navigate)}
-      >
-        <Avatar
-          size={42}
-          src={userPhoto}
-          shape="square"
-          className="cursor-pointer"
-        />
+      <Menu.Item key={0} className="profile-avatar-container" onClick={() => redirectToAccountDetails(navigate)}>
+        <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer" />
         <div className="profile-details">
           <div className="profile-username">{userName}</div>
-          {userEmail ? (
-            <div className="text-gray text-sm">{userEmail}</div>
-          ) : null}
+          {userEmail ? <div className="text-gray text-sm">{userEmail}</div> : null}
         </div>
       </Menu.Item>
       <Divider className="profile-divider" />
-      <Menu.Item
-        key={1}
-        className="profile-menu-items"
-        onClick={() => redirectToAccountDetails(navigate)}
-      >
+      <Menu.Item key={1} className="profile-menu-items" onClick={() => redirectToAccountDetails(navigate)}>
         Profile
       </Menu.Item>
-      <Menu.Item
-        key={2}
-        className="profile-menu-items"
-        onClick={() => redirectToLicenseIndexPage(navigate)}
-      >
+      <Menu.Item key={2} className="profile-menu-items" onClick={() => redirectToLicenseIndexPage(navigate)}>
         Manage Workspaces
       </Menu.Item>
       <Divider className="profile-divider" />
@@ -138,12 +111,7 @@ export default function HeaderUser() {
               open && trackHeaderClicked("user_menu");
             }}
           >
-            <Avatar
-              size={28}
-              src={userPhoto}
-              shape="square"
-              className="cursor-pointer"
-            />
+            <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
         </Col>
       </>

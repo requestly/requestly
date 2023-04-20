@@ -13,10 +13,7 @@ const RulesSyncing = () => {
   const appMode = useSelector(getAppMode);
 
   const [syncStatus, setSyncStatus] = useState();
-  const [
-    isSyncStatusChangeProcessing,
-    setIsSyncStatusChangeProcessing,
-  ] = useState(false);
+  const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
 
   const handleSyncEnabled = (status) => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
@@ -37,16 +34,10 @@ const RulesSyncing = () => {
     setIsSyncStatusChangeProcessing(true);
     setSyncState(user.details.profile.uid, status, appMode)
       .then(() => {
-        toast.info(
-          `We ${
-            status ? "will" : "won't"
-          } be syncing your rules automatically hereon.`
-        );
+        toast.info(`We ${status ? "will" : "won't"} be syncing your rules automatically hereon.`);
       })
       .catch(() => {
-        toast.error(
-          `Sorry, we are experiencing issues updating the sync state.`
-        );
+        toast.error(`Sorry, we are experiencing issues updating the sync state.`);
       })
       .finally(() => setIsSyncStatusChangeProcessing(false));
   };

@@ -13,18 +13,12 @@ RQ.PreDefinedFunction = function (name, descriptors) {
     // multiple arguments
     argumentPattern = this.argument[0];
     for (var index = 1; index < this.argument.length; index++) {
-      argumentPattern +=
-        "(" +
-        RQ.PreDefinedFunction.patterns.COMMA +
-        this.argument[index] +
-        ")?";
+      argumentPattern += "(" + RQ.PreDefinedFunction.patterns.COMMA + this.argument[index] + ")?";
     }
   } else {
     argumentPattern = this.argument;
   }
-  this.pattern =
-    this.pattern ||
-    new RegExp(this.name + "\\(" + argumentPattern + "\\)", "ig");
+  this.pattern = this.pattern || new RegExp(this.name + "\\(" + argumentPattern + "\\)", "ig");
 };
 
 RQ.PreDefinedFunction.patterns = {

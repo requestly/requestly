@@ -7,10 +7,7 @@ const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
 
 export const initSessionRecording = () => {
-  chrome.runtime.sendMessage(
-    { action: CLIENT_MESSAGES.INIT_SESSION_RECORDING },
-    sendStartRecordingEvent
-  );
+  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }, sendStartRecordingEvent);
 
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
@@ -27,9 +24,7 @@ const isIframe = (): boolean => {
   return window.top !== window;
 };
 
-const sendStartRecordingEvent = (
-  sessionRecordingConfig: SessionRecordingConfig
-) => {
+const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig) => {
   if (sessionRecordingConfig) {
     const isIFrame = isIframe();
 
@@ -83,15 +78,8 @@ const sendResponseToRuntime = (action: string, payload: unknown) => {
   delete sendResponseCallbacks[action];
 };
 
-const sendMessageToClient = (
-  action: string,
-  payload: unknown,
-  sendResponseCallback?: SendResponseCallback
-) => {
-  window.postMessage(
-    { source: "requestly:extension", action, payload },
-    window.location.href
-  );
+const sendMessageToClient = (action: string, payload: unknown, sendResponseCallback?: SendResponseCallback) => {
+  window.postMessage({ source: "requestly:extension", action, payload }, window.location.href);
   if (sendResponseCallback) {
     sendResponseCallbacks[action] = sendResponseCallback;
   }

@@ -103,6 +103,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    connectedAppsModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */

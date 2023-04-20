@@ -7,10 +7,7 @@ import fuzzysort from "fuzzysort";
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
 import { getAllRules, getUserAuthDetails, getAppMode } from "store/selectors";
-import {
-  trackCommandBarToggled,
-  trackCommandBarActionSelected,
-} from "modules/analytics/events/misc/commandBar";
+import { trackCommandBarToggled, trackCommandBarActionSelected } from "modules/analytics/events/misc/commandBar";
 import "./index.css";
 import { config } from "./config";
 import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
@@ -85,9 +82,7 @@ export const CommandBar = () => {
   };
 
   const renderTitle = (item: CommandBarItem) =>
-    typeof item.title === "function"
-      ? item.title({ user, appMode, rules })
-      : item.title;
+    typeof item.title === "function" ? item.title({ user, appMode, rules }) : item.title;
 
   const renderGroupItem = (item: CommandBarItem): ReactNode | null => {
     if (typeof item.title === "function" && !item.title({ user, appMode })) {
@@ -106,10 +101,7 @@ export const CommandBar = () => {
 
   const renderDefaultItem = (item: CommandBarItem): ReactNode | null => {
     if (item) {
-      if (
-        typeof item.title === "function" &&
-        !item.title({ user, appMode, rules })
-      ) {
+      if (typeof item.title === "function" && !item.title({ user, appMode, rules })) {
         return null;
       }
       return (

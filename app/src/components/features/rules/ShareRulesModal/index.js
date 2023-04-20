@@ -27,9 +27,7 @@ const ShareRulesModal = (props) => {
   const [deleteRulesCompleted, setDeleteRulesCompleted] = useState(false);
 
   //To ignore rules that were earlier selected but then unselected
-  const rulesToShareArray = rulesArray.filter(
-    (selectedRule) => selectedRule.isSelected
-  );
+  const rulesToShareArray = rulesArray.filter((selectedRule) => selectedRule.isSelected);
 
   const renderLoader = () => <SpinnerColumn message="Deleting Rules" />;
 
@@ -46,21 +44,11 @@ const ShareRulesModal = (props) => {
         }}
       >
         {showConfirmationBtn ? (
-          <Button
-            color="primary"
-            data-dismiss="modal"
-            type="button"
-            onClick={() => setDeleteRulesConfirmed(true)}
-          >
+          <Button color="primary" data-dismiss="modal" type="button" onClick={() => setDeleteRulesConfirmed(true)}>
             Yes
           </Button>
         ) : null}
-        <Button
-          color="secondary"
-          data-dismiss="modal"
-          type="button"
-          onClick={toggle}
-        >
+        <Button color="secondary" data-dismiss="modal" type="button" onClick={toggle}>
           Close
         </Button>
       </div>
@@ -74,14 +62,7 @@ const ShareRulesModal = (props) => {
       return (
         <React.Fragment>
           <div className="modal-body ">
-            <Col
-              lg="12"
-              md="12"
-              xl="12"
-              sm="12"
-              xs="12"
-              className="text-center"
-            >
+            <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center">
               <h1 className="display-2">
                 <FaTrash />
               </h1>
@@ -146,53 +127,26 @@ const ShareRulesModal = (props) => {
     //Unselect all rules
     unselectAllRules(dispatch);
   };
-  const stablePostDeletionSteps = useCallback(postDeletionSteps, [
-    dispatch,
-    isRulesListRefreshPending,
-    toggle,
-  ]);
+  const stablePostDeletionSteps = useCallback(postDeletionSteps, [dispatch, isRulesListRefreshPending, toggle]);
 
   useEffect(() => {
     if (deleteRulesConfirmed && !deleteRulesCompleted) {
-      deleteRulesFromStorage(
-        rulesToShareArray,
-        stablePostDeletionSteps
-      ).then(() => {});
+      deleteRulesFromStorage(rulesToShareArray, stablePostDeletionSteps).then(() => {});
     }
-  }, [
-    deleteRulesConfirmed,
-    deleteRulesCompleted,
-    rulesToShareArray,
-    stablePostDeletionSteps,
-  ]);
+  }, [deleteRulesConfirmed, deleteRulesCompleted, rulesToShareArray, stablePostDeletionSteps]);
 
   return (
-    <Modal
-      className="modal-dialog-centered "
-      visible={isOpen}
-      onCancel={toggle}
-      footer={null}
-    >
+    <Modal className="modal-dialog-centered " visible={isOpen} onCancel={toggle} footer={null}>
       <div className="modal-header ">
         <h5 className="modal-title" id="exampleModalLabel">
           Delete Rules
         </h5>
-        <button
-          aria-label="Close"
-          className="close"
-          data-dismiss="modal"
-          type="button"
-          onClick={toggle}
-        >
+        <button aria-label="Close" className="close" data-dismiss="modal" type="button" onClick={toggle}>
           <span aria-hidden={true}>×</span>
         </button>
       </div>
 
-      {!deleteRulesConfirmed
-        ? renderConfirmation()
-        : deleteRulesCompleted
-        ? renderDeleteSummary()
-        : renderLoader()}
+      {!deleteRulesConfirmed ? renderConfirmation() : deleteRulesCompleted ? renderDeleteSummary() : renderLoader()}
     </Modal>
   );
 };

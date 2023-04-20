@@ -8,11 +8,7 @@ import CreateSharedListCTA from "../CreateSharedListCTA";
 //ACTIONS
 import { fetchSharedLists } from "./actions";
 //UTILS
-import {
-  getAppMode,
-  getIsRefreshSharesListsPending,
-  getUserAuthDetails,
-} from "../../../../store/selectors";
+import { getAppMode, getIsRefreshSharesListsPending, getUserAuthDetails } from "../../../../store/selectors";
 import { submitAttrUtil } from "../../../../utils/AnalyticsUtils";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -42,11 +38,7 @@ const SharedListsIndexPage = () => {
       setLoadingSharedLists(false);
 
       //ANALYTICS
-      if (result)
-        submitAttrUtil(
-          TRACKING.ATTR.NUM_SHARED_LISTS,
-          Object.keys(result).length
-        );
+      if (result) submitAttrUtil(TRACKING.ATTR.NUM_SHARED_LISTS, Object.keys(result).length);
       //TO SET NUM OF SHARED LIST TO ZERO IF USER HAVE NOT MADE ANY OR HAVE DELETED ALL
       if (!result) {
         submitAttrUtil(TRACKING.ATTR.NUM_SHARED_LISTS, 0);

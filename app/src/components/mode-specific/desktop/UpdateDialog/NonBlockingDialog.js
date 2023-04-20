@@ -27,11 +27,7 @@ const NonBlockingDialog = ({ updateDetails, quitAndInstall }) => {
     if (
       !window.updateDialogClosed &&
       (!window.updateDialogLastShown ||
-        getTimeDifferenceFromTimestamps(
-          Date.now(),
-          window.updateDialogLastShown
-        ) >
-          300 * 1000) // shown every 5 minute
+        getTimeDifferenceFromTimestamps(Date.now(), window.updateDialogLastShown) > 300 * 1000) // shown every 5 minute
     ) {
       notification.destroy();
       notification.info({

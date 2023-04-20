@@ -15,13 +15,8 @@ const RulesBackup = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
-  const [backupStatus, setBackupStatus] = useState(
-    user?.details?.isBackupEnabled ?? false
-  );
-  const [
-    isBackupStatusChangeProcessing,
-    setIsBackupStatusChangeProcessing,
-  ] = useState(false);
+  const [backupStatus, setBackupStatus] = useState(user?.details?.isBackupEnabled ?? false);
+  const [isBackupStatusChangeProcessing, setIsBackupStatusChangeProcessing] = useState(false);
 
   useEffect(() => {
     if (user?.loggedIn && user?.details?.isBackupEnabled) {

@@ -18,10 +18,7 @@ RuleMatcher.populateMatchesInString = function (finalString, matches) {
     matchValue = matchValue || "";
 
     // Replace all $index values in destinationUrl with the matched groups
-    finalString = finalString.replace(
-      new RegExp("[$]" + index, "g"),
-      matchValue
-    );
+    finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
   });
 
   return finalString;
@@ -53,11 +50,7 @@ RuleMatcher.checkRegexMatch = function (regexString, inputString, finalString) {
  * @param inputString
  * @param finalString
  */
-RuleMatcher.checkWildCardMatch = function (
-  wildCardString,
-  inputString,
-  finalString
-) {
+RuleMatcher.checkWildCardMatch = function (wildCardString, inputString, finalString) {
   var matches = [],
     wildCardSplits,
     index,
@@ -112,12 +105,7 @@ RuleMatcher.matchUrlWithRuleSource = function (sourceObject, url, destination) {
     }
   }
 
-  return RuleMatcher.matchUrlCriteria(
-    urlComponent,
-    operator,
-    value,
-    destination
-  );
+  return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
 };
 
 /**
@@ -137,12 +125,7 @@ RuleMatcher.matchUrlWithPageSource = function (sourceObject, url) {
   return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, null);
 };
 
-RuleMatcher.matchUrlCriteria = function (
-  urlComponent,
-  operator,
-  value,
-  destination
-) {
+RuleMatcher.matchUrlCriteria = function (urlComponent, operator, value, destination) {
   // urlComponent comes undefined sometimes
   // e.g. pageUrl comes undefined when request is for HTML and tabService returns undefined for -1 tabId
   if (!urlComponent) return;
@@ -190,24 +173,14 @@ RuleMatcher.matchUrlWithRulePairs = function (pairs, url, requestDetails) {
 
   for (pairIndex = 0; pairIndex < pairs.length; pairIndex++) {
     pair = pairs[pairIndex];
-    destination =
-      typeof pair.destination !== "undefined" ? pair.destination : null; // We pass destination as null in Cancel ruleType
+    destination = typeof pair.destination !== "undefined" ? pair.destination : null; // We pass destination as null in Cancel ruleType
 
     if (pair?.destination?.startsWith("file://")) {
       continue;
     }
 
-    if (
-      RuleMatcher.matchRequestWithRuleSourceFilters(
-        pair.source.filters,
-        requestDetails
-      )
-    ) {
-      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(
-        pair.source,
-        resultingUrl,
-        pair.destination
-      );
+    if (RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, requestDetails)) {
+      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, pair.destination);
       if (newResultingUrl !== null) {
         resultingUrl = newResultingUrl;
       }
@@ -217,10 +190,7 @@ RuleMatcher.matchUrlWithRulePairs = function (pairs, url, requestDetails) {
   return resultingUrl !== url ? resultingUrl : null;
 };
 
-RuleMatcher.matchRequestWithRuleSourceFilters = function (
-  sourceFilters,
-  requestDetails
-) {
+RuleMatcher.matchRequestWithRuleSourceFilters = function (sourceFilters, requestDetails) {
   if (!sourceFilters || !requestDetails) {
     return true;
   }
@@ -234,8 +204,7 @@ RuleMatcher.matchRequestWithRuleSourceFilters = function (
       let filterValues = sourceObject[filter] || [];
 
       // RQLY-61 Handle pageUrl value is object instead of array So wrap inside array
-      if (filterValues?.constructor?.name === "Object")
-        filterValues = [filterValues];
+      if (filterValues?.constructor?.name === "Object") filterValues = [filterValues];
 
       switch (filter) {
         case RQ.RULE_SOURCE_FILTER_TYPES.PAGE_URL:
@@ -248,22 +217,13 @@ RuleMatcher.matchRequestWithRuleSourceFilters = function (
           break;
 
         case RQ.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD:
-          if (
-            !filterValues.some(
-              (requestMethodFilter) =>
-                requestDetails.method === requestMethodFilter
-            )
-          ) {
+          if (!filterValues.some((requestMethodFilter) => requestDetails.method === requestMethodFilter)) {
             return false;
           }
           break;
 
         case RQ.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE:
-          if (
-            !filterValues.some(
-              (requestTypeFilter) => requestDetails.type === requestTypeFilter
-            )
-          ) {
+          if (!filterValues.some((requestTypeFilter) => requestDetails.type === requestTypeFilter)) {
             return false;
           }
           break;
@@ -276,13 +236,7 @@ RuleMatcher.matchRequestWithRuleSourceFilters = function (
 
 RuleMatcher.matchPageUrlFilter = function (pageUrlFilter, requestDetails) {
   const pageUrl = window.tabService.getTabUrl(requestDetails.tabId);
-  return (
-    RuleMatcher.matchUrlCriteria(
-      pageUrl,
-      pageUrlFilter.operator,
-      pageUrlFilter.value
-    ) !== null
-  );
+  return RuleMatcher.matchUrlCriteria(pageUrl, pageUrlFilter.operator, pageUrlFilter.value) !== null;
 };
 
 /**
@@ -291,10 +245,7 @@ RuleMatcher.matchPageUrlFilter = function (pageUrlFilter, requestDetails) {
  * @param value
  * @param preDefinedFunctionsMap
  */
-RuleMatcher.matchValueForPredefinedFunctions = function (
-  value,
-  preDefinedFunctionsMap
-) {
+RuleMatcher.matchValueForPredefinedFunctions = function (value, preDefinedFunctionsMap) {
   if (!value) return value;
 
   for (var preDefFuncName in preDefinedFunctionsMap) {

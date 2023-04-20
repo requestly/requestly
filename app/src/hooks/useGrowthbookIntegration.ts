@@ -4,10 +4,7 @@ import { useSelector } from "react-redux";
 import _ from "lodash";
 
 import { getUserAttributes } from "store/selectors";
-import {
-  initGrowthbook,
-  updateGrowthbookAttributes,
-} from "utils/feature-flag/growthbook";
+import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
 import firebaseApp from "firebase.js";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 

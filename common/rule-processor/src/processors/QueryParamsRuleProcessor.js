@@ -21,24 +21,16 @@ class QueryParamsRuleProcessor {
 
       // If Source does not match, proceed with next pair
       if (
-        !RuleHelper.matchRequestWithRuleSourceFilters(
-          pair.source.filters,
-          details
-        ) ||
+        !RuleHelper.matchRequestWithRuleSourceFilters(pair.source.filters, details) ||
         RuleHelper.matchUrlWithRuleSource(pair.source, url) === null
       ) {
         continue;
       }
 
-      resultingUrl = this.applyQueryParamModifications(
-        pair.modifications,
-        resultingUrl
-      );
+      resultingUrl = this.applyQueryParamModifications(pair.modifications, resultingUrl);
     }
 
-    return resultingUrl !== url
-      ? { action: "redirect", url: resultingUrl }
-      : null;
+    return resultingUrl !== url ? { action: "redirect", url: resultingUrl } : null;
   }
 
   /**
@@ -51,10 +43,7 @@ class QueryParamsRuleProcessor {
     let resultingUrl = url;
 
     modifications.forEach(function (modification) {
-      resultingUrl = QueryParamsRuleProcessor.applyQueryParamModification(
-        modification,
-        resultingUrl
-      );
+      resultingUrl = QueryParamsRuleProcessor.applyQueryParamModification(modification, resultingUrl);
     });
 
     return resultingUrl;
@@ -73,12 +62,7 @@ class QueryParamsRuleProcessor {
       case CONSTANTS.MODIFICATION_TYPES.ADD:
         // eslint-disable-next-line no-case-declarations
         const overwrite = modification.actionWhenParamExists === "Overwrite";
-        resultingUrl = addQueryParamToURL(
-          resultingUrl,
-          paramName,
-          paramValue,
-          overwrite
-        );
+        resultingUrl = addQueryParamToURL(resultingUrl, paramName, paramValue, overwrite);
 
         if (modification.actionWhenParamExists === "Ignore") {
           resultingUrl = url;
@@ -91,9 +75,7 @@ class QueryParamsRuleProcessor {
 
           queryString = convertQueryParamMapToString(queryParamsMap);
 
-          resultingUrl = queryString
-            ? urlWithoutQueryParams + "?" + queryString
-            : urlWithoutQueryParams;
+          resultingUrl = queryString ? urlWithoutQueryParams + "?" + queryString : urlWithoutQueryParams;
           resultingUrl += urlHash;
         }
         break;

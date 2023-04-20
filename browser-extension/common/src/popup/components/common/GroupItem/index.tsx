@@ -28,38 +28,26 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
   return (
     <li>
       <Row align="middle" className="record-item" wrap={false}>
-        <Col
-          span={18}
-          className="record-name-container"
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
+        <Col span={18} className="record-name-container" onClick={() => setIsExpanded((prev) => !prev)}>
           <Row wrap={false} align="middle">
             <>
               <Col>
                 <CaretRightOutlined
                   rotate={isExpanded ? 90 : 0}
-                  className={`group-expand-icon ${
-                    isExpanded ? "group-expanded" : ""
-                  }`}
+                  className={`group-expand-icon ${isExpanded ? "group-expanded" : ""}`}
                 />
               </Col>
               <Col>
                 <Row wrap={false} align="middle">
                   <>
                     <Tooltip title="Group">
-                      <span
-                        className={`icon-wrapper ${
-                          isExpanded ? "group-expanded" : ""
-                        }`}
-                      >
+                      <span className={`icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
                         <GroupIcon />
                       </span>
                     </Tooltip>
 
                     <RecordName name={group.name as string}>
-                      <span className="record-name">
-                        {group.name as string}
-                      </span>
+                      <span className="record-name">{group.name as string}</span>
                     </RecordName>
                   </>
                 </Row>
@@ -77,11 +65,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
         <Col span={4} className="record-switch-container">
           <Row align="middle" justify="center">
             <div>
-              <span
-                className={`record-status-text ${
-                  !isGroupActive ? "text-gray" : ""
-                }`}
-              >
+              <span className={`record-status-text ${!isGroupActive ? "text-gray" : ""}`}>
                 {isGroupActive ? "On" : "Off"}
               </span>
               <Switch onChange={handleToggleStatus} checked={isGroupActive} />
@@ -94,13 +78,9 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
         <Row>
           <Col span={24}>
             {group.children.length > 0 ? (
-              group.children.map((rule: Rule) => (
-                <RuleItem key={rule.id} rule={rule} isChildren={true} />
-              ))
+              group.children.map((rule: Rule) => <RuleItem key={rule.id} rule={rule} isChildren={true} />)
             ) : (
-              <div className="text-gray empty-group-message">
-                No rules present in this group!
-              </div>
+              <div className="text-gray empty-group-message">No rules present in this group!</div>
             )}
           </Col>
         </Row>

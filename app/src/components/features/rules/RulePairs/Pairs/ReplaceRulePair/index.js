@@ -3,13 +3,7 @@ import ReplacePartRow from "../Rows/RowsMarkup/ReplacePartRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import { Row, Col } from "antd";
 
-const ReplaceRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => (
+const ReplaceRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => (
   <React.Fragment>
     <Row align="middle">
       <Col span={24}>

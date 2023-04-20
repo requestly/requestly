@@ -7,13 +7,7 @@ import "./RemoveUserModal.css";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 
-const RemoveUserModal = ({
-  isOpen,
-  toggleModal,
-  userId,
-  teamId,
-  callbackOnSuccess,
-}) => {
+const RemoveUserModal = ({ isOpen, toggleModal, userId, teamId, callbackOnSuccess }) => {
   const [showLoader, setShowLoader] = useState(false);
   const user = useSelector(getUserAuthDetails);
 
@@ -53,23 +47,17 @@ const RemoveUserModal = ({
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <div className="rq-modal-content">
-        <div className="header">
-          {isUserRemovingHimself ? "Leave workspace" : "Remove user"}
-        </div>
+        <div className="header">{isUserRemovingHimself ? "Leave workspace" : "Remove user"}</div>
         <div className="text-gray text-sm remove-user-message">
           {isUserRemovingHimself ? (
             <>
               <p>Do you really want to leave this workspace?</p>
-              <p>
-                You would no longer be able to access shared workspace items.
-              </p>
+              <p>You would no longer be able to access shared workspace items.</p>
             </>
           ) : (
             <>
               <p>Do you really want to remove this user from the team?</p>
-              <p>
-                They would no longer be able to access shared workspace items.
-              </p>
+              <p>They would no longer be able to access shared workspace items.</p>
             </>
           )}
         </div>
@@ -88,13 +76,7 @@ const RemoveUserModal = ({
             onClick={removeUserFromTeam}
             className="remove-user-btn"
           >
-            {isUserRemovingHimself
-              ? showLoader
-                ? "Leaving..."
-                : "Leave"
-              : showLoader
-              ? "Removing user..."
-              : "Remove"}
+            {isUserRemovingHimself ? (showLoader ? "Leaving..." : "Leave") : showLoader ? "Removing user..." : "Remove"}
           </Button>
         </Col>
       </Row>

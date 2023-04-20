@@ -38,8 +38,8 @@ const SyncConsentModal = ({ isOpen, toggle, appMode }) => {
         <div className="py-3 text-center">
           <h4 className="heading mt-4">Update rules in your instance</h4>
           <p>
-            You have unsynced rules in your system. Do you wish your local rules
-            to be merged with your synced up rules ?
+            You have unsynced rules in your system. Do you wish your local rules to be merged with your synced up rules
+            ?
           </p>
           {/* <p>
             <span style={{ textTransform: "uppercase" }}>Warning!</span> Your
@@ -58,12 +58,7 @@ const SyncConsentModal = ({ isOpen, toggle, appMode }) => {
         >
           Disable Syncing
         </Button>
-        <Button
-          onClick={update}
-          className="btn-white ml-auto"
-          color="link"
-          type="button"
-        >
+        <Button onClick={update} className="btn-white ml-auto" color="link" type="button">
           Enable and Merge with Current Rules
         </Button>
       </div>

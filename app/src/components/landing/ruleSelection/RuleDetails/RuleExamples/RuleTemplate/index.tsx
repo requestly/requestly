@@ -3,12 +3,7 @@ import "./ruleTemplate.css";
 
 const RuleTemplate = () => {
   return (
-    <Row
-      wrap={false}
-      align="middle"
-      justify="space-between"
-      className="rule-template-container"
-    >
+    <Row wrap={false} align="middle" justify="space-between" className="rule-template-container">
       <Col span={12} className="caption line-clamp">
         Bypass CORS
       </Col>

@@ -1,9 +1,5 @@
 import { Button, Tabs, List, Tag, Image } from "antd";
-import {
-  LockOutlined,
-  DownloadOutlined,
-  CheckCircleTwoTone,
-} from "@ant-design/icons";
+import { LockOutlined, DownloadOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { saveRootCert } from "actions/DesktopActions";
 import importCertGif from "assets/img/screenshots/import_cert.gif";
@@ -21,10 +17,7 @@ const CertsInstructions = () => {
   });
 
   const fetchCertStatus = () => {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(
-      "system-wide-cert-status",
-      {}
-    )
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("system-wide-cert-status", {})
       .then((res) => {
         setCertStatus(res);
       })
@@ -149,12 +142,10 @@ const CertsInstructions = () => {
               <>
                 <ul>
                   <li>
-                    Open start menu and search for{" "}
-                    <b>Manage user certificates</b>
+                    Open start menu and search for <b>Manage user certificates</b>
                   </li>
                   <li>
-                    Open <b>Trusted Root Certification Authorities</b> from the
-                    left panel
+                    Open <b>Trusted Root Certification Authorities</b> from the left panel
                   </li>
                   <li>
                     Right click on <b>Certificates</b>
@@ -162,10 +153,7 @@ const CertsInstructions = () => {
                   <li>
                     Click on <b>Certificates &gt; import ...</b>
                   </li>
-                  <li>
-                    Import the certificate you downloaded in the previous step
-                    (RQProxyCA.pem)
-                  </li>
+                  <li>Import the certificate you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
                 <Image width={"100%"} src={installWinCert} />
               </>
@@ -195,17 +183,11 @@ const CertsInstructions = () => {
             description={
               <>
                 <ul>
-                  <li>
-                    Go to keychain access (Press cmd + enter and then type
-                    "keychain")
-                  </li>
+                  <li>Go to keychain access (Press cmd + enter and then type "keychain")</li>
                   <li>Select login keychain</li>
                   <li>Click on "File"</li>
                   <li>Click on "Import Items"</li>
-                  <li>
-                    Import the cert you downloaded in the previous step
-                    (RQProxyCA.pem)
-                  </li>
+                  <li>Import the cert you downloaded in the previous step (RQProxyCA.pem)</li>
                 </ul>
                 <Image width={"100%"} src={importCertGif} />
               </>
@@ -218,14 +200,8 @@ const CertsInstructions = () => {
             description={
               <>
                 <ul>
-                  <li>
-                    Double Click on the certificate(RQProxyCA) imported in
-                    previous step
-                  </li>
-                  <li>
-                    In Trust Section, Select "Always Trust" for "When using this
-                    certificate"{" "}
-                  </li>
+                  <li>Double Click on the certificate(RQProxyCA) imported in previous step</li>
+                  <li>In Trust Section, Select "Always Trust" for "When using this certificate" </li>
                   <li>Close the window (Admin permissions required)</li>
                 </ul>
                 <Image width={"100%"} src={trustCertGif} />

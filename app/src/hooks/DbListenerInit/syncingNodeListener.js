@@ -83,7 +83,6 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
   } else if (syncTarget === "sync") {
     if (lastSyncTarget === uid) consistencyCheckPassed = true;
   }
-
   let allSyncedRecords = await parseRemoteRecords(appMode, updatedFirebaseRecords);
   if (!consistencyCheckPassed) {
     // Merge records

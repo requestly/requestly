@@ -3,13 +3,7 @@ import { Row, Col } from "antd";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import RequestBodyRow from "../Rows/RowsMarkup/RequestBodyRow";
 
-const RequestRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => {
+const RequestRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   return (
     <React.Fragment>
       <Row>

@@ -6,7 +6,7 @@ import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
 import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals } from "store/selectors";
+import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
@@ -21,7 +21,7 @@ import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-t
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
-import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import { trackTrafficTableLogsCleared, trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import {
   trackSidebarFilterCollapsed,
   trackSidebarFilterExpanded,
@@ -29,6 +29,7 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
+import { getConnectedAppsCount } from "utils/Misc";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -43,6 +44,7 @@ const CurrentTrafficTable = ({
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
+  const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
@@ -199,6 +201,7 @@ const CurrentTrafficTable = ({
     // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
+    trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
 
     if (clearLogsCallback) clearLogsCallback();
   };

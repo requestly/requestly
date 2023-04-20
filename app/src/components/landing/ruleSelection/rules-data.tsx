@@ -17,8 +17,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
     subtitle: "Map Local or Redirect a matching pattern to another URL",
     icon: <RuleIcon ruleType={RuleType.REDIRECT} />,
     header: {
-      description:
-        "Redirect scripts, APIs, Stylesheets, or any other resource from one environment to another.",
+      description: "Redirect scripts, APIs, Stylesheets, or any other resource from one environment to another.",
     },
     description: `<p>
     Redirect a request URL (or a matching URL pattern) to another URL. Used
@@ -42,8 +41,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Create URL shortcuts for JIRA projects ?",
-          src:
-            "https://medium.com/requestly-docs/create-url-shortcuts-for-jira-projects-4fd49abdcae7",
+          src: "https://medium.com/requestly-docs/create-url-shortcuts-for-jira-projects-4fd49abdcae7",
           description:
             "Many a times we struggle with browser auto-completing URLs for us which may be different than desired URL we want to open.",
           logo: MEDIUM_LOGO,
@@ -52,8 +50,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
           title: "Overcome your Muscle memory to Stay Calm & Productive",
           description:
             "In this pandemic situation, almost entire tech industry is working from home. Staying focussed & productive is a constant challenge especially when you ...",
-          src:
-            "https://requestly.medium.com/overcome-your-muscle-memory-to-stay-calm-productive-fce5ffdf1f8f",
+          src: "https://requestly.medium.com/overcome-your-muscle-memory-to-stay-calm-productive-fce5ffdf1f8f",
           logo: MEDIUM_LOGO,
         },
       ],
@@ -74,21 +71,18 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       },
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Debugging minified JavaScript function with commas in Chrome",
+        question: "Debugging minified JavaScript function with commas in Chrome",
         link:
           "https://stackoverflow.com/questions/43261811/debugging-minified-javascript-function-with-commas-in-chrome/43268559#43268559",
       },
       {
         logo: STACKOVERFLOW_LOGO,
         question: "Debug cache-busted scripts in production",
-        link:
-          "https://stackoverflow.com/questions/35805579/debug-cache-busted-scripts-in-production/35848416#35848416",
+        link: "https://stackoverflow.com/questions/35805579/debug-cache-busted-scripts-in-production/35848416#35848416",
       },
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Change a setting on CDN-hosted JS file without touching file",
+        question: "Change a setting on CDN-hosted JS file without touching file",
         link:
           "https://stackoverflow.com/questions/43242429/change-a-setting-on-cdn-hosted-js-file-without-touching-file/43244557#43244557",
       },
@@ -121,8 +115,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Can third party resources affect your website",
-          src:
-            "https://medium.com/requestly-docs/stop-facebook-from-tracking-you-74debeb2cbe7",
+          src: "https://medium.com/requestly-docs/stop-facebook-from-tracking-you-74debeb2cbe7",
           description:
             "In this pandemic situation, almost entire tech industry is working from home. Staying focussed & productive is a constant challenge especially when you ...",
           logo: MEDIUM_LOGO,
@@ -131,8 +124,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
           title: "Stop facebook from tracking you.",
           description:
             "In this pandemic situation, almost entire tech industry is working from home. Staying focussed & productive is a constant challenge especially when you ...",
-          src:
-            "https://medium.com/webdevtools/can-third-party-resources-affect-your-website-b14e39c2f53d",
+          src: "https://medium.com/webdevtools/can-third-party-resources-affect-your-website-b14e39c2f53d",
           logo: MEDIUM_LOGO,
         },
       ],
@@ -226,8 +218,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
     faqs: [
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Can I run HTML files directly from GitHub, instead of just viewing their source?",
+        question: "Can I run HTML files directly from GitHub, instead of just viewing their source?",
         link:
           "https://stackoverflow.com/questions/6551446/can-i-run-html-files-directly-from-github-instead-of-just-viewing-their-source/37912931#37912931",
       },
@@ -267,16 +258,13 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Introducing Query Param rule",
-          src:
-            "https://medium.com/requestly-docs/introducing-query-param-rule-d152b28eec08",
-          description:
-            "QueryParam rule can be used to perform the modify on a given url's query parameters",
+          src: "https://medium.com/requestly-docs/introducing-query-param-rule-d152b28eec08",
+          description: "QueryParam rule can be used to perform the modify on a given url's query parameters",
           logo: MEDIUM_LOGO,
         },
         {
           title: "Disable caching of a particular CSS/JS file",
-          src:
-            "https://dev.to/requestlyio/disable-caching-of-particular-js-css-file-2k82",
+          src: "https://dev.to/requestlyio/disable-caching-of-particular-js-css-file-2k82",
           description:
             "Inject popular libraries or hosted scripts or execute custom code-snippet before or after page load using simple rule builder.",
           logo: DEV_TO_LOGO,
@@ -286,8 +274,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
     faqs: [
       {
         logo: MEDIUM_LOGO,
-        question:
-          "How to interrupt or pause http status code 301 request in browser?",
+        question: "How to interrupt or pause http status code 301 request in browser?",
         link:
           "https://stackoverflow.com/questions/57049805/how-to-intercept-or-pause-http-status-code-301-request-in-a-browser/57071689#57071689",
       },
@@ -315,16 +302,14 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Inserting scripts dynamically in a webpage",
-          src:
-            "https://medium.com/requestly-docs/inserting-scripts-dynamically-in-a-webpage-be4af90da20a",
+          src: "https://medium.com/requestly-docs/inserting-scripts-dynamically-in-a-webpage-be4af90da20a",
           description:
             "Inject popular libraries or hosted scripts or execute custom code-snippet before or after page load using simple rule builder.",
           logo: MEDIUM_LOGO,
         },
         {
           title: "How to inject javascript code?",
-          src:
-            "https://stackoverflow.com/questions/14273116/inject-javascript-code-into-a-web-page/71089059#71089059",
+          src: "https://stackoverflow.com/questions/14273116/inject-javascript-code-into-a-web-page/71089059#71089059",
           logo: STACKOVERFLOW_LOGO,
         },
       ],
@@ -345,8 +330,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       },
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Run my Javascript code on every page on my browser, similar to how a chrome extension would",
+        question: "Run my Javascript code on every page on my browser, similar to how a chrome extension would",
         link:
           "https://stackoverflow.com/questions/60292446/run-my-javascript-code-on-every-page-on-my-browser-similar-to-how-a-chrome-exte/60292782#60292782",
       },
@@ -358,8 +342,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       },
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Enter full screen automatically by inserting script in a webpage using requestly",
+        question: "Enter full screen automatically by inserting script in a webpage using requestly",
         link:
           "https://stackoverflow.com/questions/70965217/enter-full-screen-automatically-by-inserting-script-in-a-webpage-using-requestly",
       },
@@ -369,13 +352,10 @@ export const rulesData: Record<RuleType, RuleDetail> = {
     id: 7,
     type: RuleType.RESPONSE,
     name: isDesktopMode() ? "Modify Response" : "Modify API Response",
-    subtitle: isDesktopMode()
-      ? "Modify Response of any HTTP request"
-      : "Modify Response of any XHR/Fetch request",
+    subtitle: isDesktopMode() ? "Modify Response of any HTTP request" : "Modify Response of any XHR/Fetch request",
     icon: <RuleIcon ruleType={RuleType.RESPONSE} />,
     header: {
-      description:
-        "Override API responses with static data or programmatically.",
+      description: "Override API responses with static data or programmatically.",
     },
     description: `<p>
     Use Modify API Response rule to debug & modify API responses on the fly.
@@ -397,10 +377,8 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Introducing Modify AJAX Response Rule",
-          src:
-            "https://requestly.io/blog/2020/06/08/introducing-modify-ajax-response-rule/",
-          description:
-            "With Modify Response Rule, you`ll now be able to modify the response body of AJAX requests.",
+          src: "https://requestly.io/blog/2020/06/08/introducing-modify-ajax-response-rule/",
+          description: "With Modify Response Rule, you`ll now be able to modify the response body of AJAX requests.",
           logo: RQ_LOGO,
         },
         {
@@ -425,16 +403,14 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       },
       {
         logo: STACKOVERFLOW_LOGO,
-        question:
-          "Simulate fake 404,500 Status Code to check frontend app behaviour",
+        question: "Simulate fake 404,500 Status Code to check frontend app behaviour",
         link:
           "https://stackoverflow.com/questions/50923170/simulate-fake-404-500-status-code-to-check-frontend-app-behaviour/51098873#51098873",
       },
       {
         logo: STACKOVERFLOW_LOGO,
         question: "Changing a value of an index in a buffer array",
-        link:
-          "https://stackoverflow.com/questions/70764577/changing-a-value-of-an-index-in-a-buffer-array",
+        link: "https://stackoverflow.com/questions/70764577/changing-a-value-of-an-index-in-a-buffer-array",
       },
       {
         logo: STACKOVERFLOW_LOGO,
@@ -451,8 +427,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
     subtitle: "Modify Body of POST Requests",
     icon: <RuleIcon ruleType={RuleType.REQUEST} />,
     header: {
-      description:
-        "Override API request body with static data or programmatically modify existing request payload.",
+      description: "Override API request body with static data or programmatically modify existing request payload.",
     },
     description: `<p>
     Use Modify Request Body rule to change the payload sent in POST/PUT API
@@ -491,8 +466,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Adding Delay to Network Requests",
-          src:
-            "https://requestly.io/blog/2021/07/02/adding-delay-to-network-requests",
+          src: "https://requestly.io/blog/2021/07/02/adding-delay-to-network-requests",
           description:
             "It is important for a developer to test the website performance in poor network conditions. This article focuses on the different methods which could enable developers to simulate network conditions.",
           logo: RQ_LOGO,
@@ -521,8 +495,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
       useCases: [
         {
           title: "Switching User Agent in Browser",
-          src:
-            "https://medium.com/requestly-docs/switching-user-agent-in-browser-f57fcf42a4b5",
+          src: "https://medium.com/requestly-docs/switching-user-agent-in-browser-f57fcf42a4b5",
           description:
             "The User-Agent request header is commonly used by servers to identify its client's application type, operating system, etc. Based on this, server selects suitable content to be sent in response",
           logo: MEDIUM_LOGO,
