@@ -120,7 +120,9 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
 
   // Fetch Session Recording
   const sessionRecordingConfigOnFirebase = await getSyncedSessionRecordingPageConfig(uid);
-  saveSessionRecordingPageConfigLocallyWithoutSync(sessionRecordingConfigOnFirebase, appMode);
+  if (sessionRecordingConfigOnFirebase) {
+    saveSessionRecordingPageConfigLocallyWithoutSync(sessionRecordingConfigOnFirebase, appMode);
+  } else saveSessionRecordingPageConfigLocallyWithoutSync({}, appMode);
 
   // Refresh Session Recording Config
   dispatch(
