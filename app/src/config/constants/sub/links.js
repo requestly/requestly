@@ -75,10 +75,10 @@ const LINKS = {
     "https://microsoftedge.microsoft.com/addons/detail/requestly-redirect-url-/ehghoapnlpepjmfbgaomdiilchcjemak",
   /** GDPR */
   GDPR: {
-    GDPR_PAGE: "https://requestly.gdprpage.com/",
-    EXPORT_DATA: "https://requestly.gdprpage.com/subject",
-    DELETE_ACCOUNT: "https://requestly.gdprpage.com/subject",
-    SIGN_DPA: "https://requestly.gdprpage.com/dpa",
+    GDPR_PAGE: "https://privacy.requestly.io/",
+    EXPORT_DATA: "https://privacy.requestly.io/data_requests",
+    DELETE_ACCOUNT: "https://privacy.requestly.io/data_requests",
+    SIGN_DPA: "https://privacy.requestly.io/dpa",
   },
 
   /** MARKETTING */
