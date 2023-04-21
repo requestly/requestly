@@ -73,7 +73,7 @@ const APIClientView: React.FC<Props> = () => {
   }, []);
 
   const addUrlSchemeIfMissing = useCallback(() => {
-    if (!/^https?:\/\//.test(entry.request.url)) {
+    if (entry.request.url && !/^https?:\/\//.test(entry.request.url)) {
       setEntry((entry) => ({
         ...entry,
         request: {
@@ -99,16 +99,14 @@ const APIClientView: React.FC<Props> = () => {
     setIsFailed(false);
     setIsLoadingResponse(true);
 
-    makeRequest(sanitizedEntry.request)
-      .then((response) => {
+    makeRequest(sanitizedEntry.request).then((response) => {
+      if (response) {
         setEntry((entry) => ({ ...entry, response }));
-      })
-      .catch(() => {
+      } else {
         setIsFailed(true);
-      })
-      .finally(() => {
-        setIsLoadingResponse(false);
-      });
+      }
+      setIsLoadingResponse(false);
+    });
   }, [entry]);
 
   return (
