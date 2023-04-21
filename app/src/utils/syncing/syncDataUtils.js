@@ -388,7 +388,7 @@ export const handleLocalConflicts = (firebaseRecords, localRecords) => {
 
 // ** SESSION RECORDING SYNC UTILS ** //
 
-const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
+export const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
   Logger.log("Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync");
   await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
@@ -412,7 +412,7 @@ export const getLocalSessionRecordingPageConfig = (appMode) => {
   });
 };
 
-export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode, timestamp) => {
+export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode) => {
   const pageConfig = await getLocalSessionRecordingPageConfig(appMode);
 
   trackSyncTriggered(uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
