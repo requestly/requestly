@@ -1262,23 +1262,27 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     headers.append(name, value);
   });
 
-  const requestStartTime = performance.now();
-  const response = await fetch(url, { method, headers });
-  const responseText = await response.text();
-  const responseTime = performance.now() - requestStartTime;
+  try {
+    const requestStartTime = performance.now();
+    const response = await fetch(url, { method, headers });
+    const responseText = await response.text();
+    const responseTime = performance.now() - requestStartTime;
 
-  const responseHeaders = [];
-  response.headers.forEach((value, name) => {
-    responseHeaders.push({ name, value });
-  });
+    const responseHeaders = [];
+    response.headers.forEach((value, name) => {
+      responseHeaders.push({ name, value });
+    });
 
-  return {
-    body: responseText,
-    time: responseTime,
-    headers: responseHeaders,
-    status: response.status,
-    statusText: response.statusText,
-  };
+    return {
+      body: responseText,
+      time: responseTime,
+      headers: responseHeaders,
+      status: response.status,
+      statusText: response.statusText,
+    };
+  } catch (e) {
+    return null;
+  }
 };
 
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {

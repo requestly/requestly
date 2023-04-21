@@ -41,7 +41,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setRequestHeade
         children: <div></div>,
       },
     ],
-    [request, setQueryParams]
+    [request, setQueryParams, setRequestHeaders]
   );
 
   return <Tabs className="api-request-tabs" defaultActiveKey={Tab.QUERY_PARAMS} items={tabItems} size="small" />;
