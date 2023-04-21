@@ -1,0 +1,118 @@
+.apis-view {
+  height: 100%;
+
+  .api-client-view {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+
+    .api-client-header {
+      flex: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+
+      .api-client-url-container {
+        display: flex;
+        flex: auto;
+
+        .api-request-method-selector {
+          width: 120px;
+        }
+
+        .api-request-url {
+          padding: 4px 8px;
+        }
+      }
+    }
+
+    .api-client-body {
+      flex: auto;
+      height: 100%;
+      min-height: 0;
+
+      .gutter:hover {
+        background-color: #818cf8;
+      }
+    }
+
+    .api-request-tabs {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 0 10px;
+
+      .ant-tabs-content-holder {
+        overflow: auto;
+      }
+    }
+
+    .api-response-view {
+      height: 100%;
+      padding: 0 10px;
+
+      .api-response-empty-placeholder {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .api-response-tabs {
+        flex: auto;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .ant-tabs-content-holder {
+          overflow: auto;
+        }
+
+        .ant-tabs-content,
+        .ant-tabs-tabpane {
+          height: 100%;
+        }
+      }
+
+      .api-response-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .api-response-body-content {
+          flex: auto;
+          height: 100%;
+          overflow: auto;
+          font-size: 13px;
+        }
+      }
+    }
+
+    .query-params-table,
+    .request-headers-table {
+      td {
+        padding-right: 10px;
+      }
+
+      .key,
+      .name {
+        width: 200px;
+      }
+
+      .value {
+        width: 400px;
+      }
+
+      input {
+        width: 100%;
+        padding: 4px 8px;
+      }
+    }
+  }
+}

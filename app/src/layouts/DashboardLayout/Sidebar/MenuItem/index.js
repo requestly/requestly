@@ -6,7 +6,7 @@ import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
-import { MobileOutlined } from "@ant-design/icons";
+import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
@@ -36,6 +36,12 @@ const givenRoutes = [
     name: "Mock Server",
     icon: <Document set="curved" className="remix-icon" />,
     key: "my-mocks",
+  },
+  {
+    path: PATHS.APIS.ABSOLUTE,
+    name: "APIs",
+    icon: <ApiOutlined />,
+    key: "apis",
   },
   {
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
