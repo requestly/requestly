@@ -1,4 +1,4 @@
-import { Button, Input, Select, Space, Spin } from "antd";
+import { Button, Empty, Input, Select, Space, Spin } from "antd";
 import React, { useCallback, useState } from "react";
 import Split from "react-split";
 import { RQAPI, RequestMethod } from "./types";
@@ -158,7 +158,9 @@ const APIClientView: React.FC<Props> = () => {
                     Failed to send the request. Please check if the URL is valid.
                   </Space>
                 </div>
-              ) : null}
+              ) : (
+                <Empty description="No request sent." />
+              )}
             </div>
           )}
         </div>
