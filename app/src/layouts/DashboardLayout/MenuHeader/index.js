@@ -172,7 +172,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                     <RulesSyncToggle />
                   </div>
                   {/* info */}
-                  <Col className="hidden-on-small-screen">
+                  {/* <Col className="hidden-on-small-screen">
                     <Dropdown
                       trigger={["click"]}
                       menu={helpMenu}
@@ -183,7 +183,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                     >
                       <Button type="text" className="header-icon-btn" icon={<QuestionCircleOutlined />} />
                     </Dropdown>
-                  </Col>
+                  </Col> */}
 
                   {/* product updates */}
                   <Col className="hidden-on-small-screen">
