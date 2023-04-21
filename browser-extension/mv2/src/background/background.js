@@ -964,6 +964,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.getTabSession(message.tabId, sendResponse);
         return true;
 
+      case RQ.EXTENSION_MESSAGES.GET_API_RESPONSE:
+        BG.Methods.getAPIResponse(message.apiRequest).then(sendResponse);
+        return true;
+
       case RQ.EXTENSION_MESSAGES.GET_EXECUTED_RULES:
         BG.Methods.getExecutedRules(message.tabId, sendResponse);
         return true;
@@ -1237,6 +1241,44 @@ BG.Methods.saveExecutionCount = async function (rule) {
 
 BG.Methods.getTabSession = (tabId, callback) => {
   chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
+};
+
+BG.Methods.getAPIResponse = async (apiRequest) => {
+  const method = apiRequest.method;
+  const headers = new Headers();
+  let url = apiRequest.url;
+
+  if (apiRequest.queryParams.length) {
+    const urlObj = new URL(apiRequest.url);
+    const searchParams = new URLSearchParams(urlObj.search);
+    apiRequest.queryParams.forEach(({ key, value }) => {
+      searchParams.append(key, value);
+    });
+    urlObj.search = searchParams.toString();
+    url = urlObj.toString();
+  }
+
+  apiRequest.headers.forEach(({ name, value }) => {
+    headers.append(name, value);
+  });
+
+  const requestStartTime = performance.now();
+  const response = await fetch(url, { method, headers });
+  const responseText = await response.text();
+  const responseTime = performance.now() - requestStartTime;
+
+  const responseHeaders = [];
+  response.headers.forEach((value, name) => {
+    responseHeaders.push({ name, value });
+  });
+
+  return {
+    body: responseText,
+    time: responseTime,
+    headers: responseHeaders,
+    status: response.status,
+    statusText: response.statusText,
+  };
 };
 
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
