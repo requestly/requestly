@@ -12,6 +12,8 @@ import {
   getAllLocalRecords,
   checkIfNoUpdateHasBeenPerformedSinceLastSync,
   handleLocalConflicts,
+  getSyncedSessionRecordingPageConfig,
+  saveSessionRecordingPageConfigLocallyWithoutSync,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 import { StorageService } from "init";
@@ -114,13 +116,18 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
 
   // Refresh Rules
   dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+  dispatch(actions.updateIsRulesListLoading(false));
+
+  // Fetch Session Recording
+  const sessionRecordingConfigOnFirebase = await getSyncedSessionRecordingPageConfig(uid);
+  saveSessionRecordingPageConfigLocallyWithoutSync(sessionRecordingConfigOnFirebase, appMode);
+
   // Refresh Session Recording Config
   dispatch(
     actions.updateRefreshPendingStatus({
       type: "sessionRecordingConfig",
     })
   );
-  dispatch(actions.updateIsRulesListLoading(false));
 };
 export const doSyncDebounced = _.debounce(doSync, 5000);
 
