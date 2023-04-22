@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Row, Typography } from "antd";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import PlayIcon from "../../../../resources/icons/play.svg";
@@ -6,6 +6,9 @@ import PlayIcon from "../../../../resources/icons/play.svg";
 interface PopupFooterProps {
   isExtensionEnabled: boolean;
   handleToggleExtensionStatus: () => void;
+  checkingProxyStatus: boolean;
+  isProxyEnabled: boolean;
+  isProxyRunning: boolean;
 }
 
 const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
@@ -14,16 +17,17 @@ const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleTog
       {isExtensionEnabled ? (
         <SessionRecordingView />
       ) : (
-        <>
-          <Button danger className="popup-footer-resume-btn" onClick={handleToggleExtensionStatus}>
-            <PlayIcon />
-            <span className="popup-footer-resume-btn-text">Resume</span>
-          </Button>
+        // <>
+        //   <Button danger className="popup-footer-resume-btn" onClick={handleToggleExtensionStatus}>
+        //     <PlayIcon />
+        //     <span className="popup-footer-resume-btn-text">Resume</span>
+        //   </Button>
 
-          <Typography.Text type="secondary">
-            When paused, rules won't be applied and sessions won't be recorded.
-          </Typography.Text>
-        </>
+        //   <Typography.Text type="secondary">
+        //     When paused, rules won't be applied and sessions won't be recorded.
+        //   </Typography.Text>
+        // </>
+        <SessionRecordingView />
       )}
     </Row>
   );
