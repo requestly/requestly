@@ -1,7 +1,9 @@
 import { Tabs, TabsProps } from "antd";
 import React, { memo, useMemo } from "react";
 import ResponseBody from "./ResponseBody";
-import { RQAPI } from "../types";
+import { RQAPI } from "../../types";
+import ResponseHeaders from "./ResponseHeaders";
+import StatusLine from "./StatusLine";
 
 interface Props {
   response: RQAPI.Response;
@@ -13,20 +15,6 @@ enum Tab {
 }
 
 const ResponseTabs: React.FC<Props> = ({ response }) => {
-  const formattedTime = useMemo(() => {
-    if (response.time) {
-      const ms = Math.ceil(response.time);
-
-      if (ms < 1000) {
-        return `${ms} ms`;
-      }
-
-      return `${(ms / 1000).toFixed(3)} s`;
-    }
-
-    return "";
-  }, [response.time]);
-
   const tabItems: TabsProps["items"] = useMemo(
     () => [
       {
@@ -37,7 +25,7 @@ const ResponseTabs: React.FC<Props> = ({ response }) => {
       {
         key: Tab.HEADERS,
         label: "Headers",
-        children: <div>To be implemented...</div>,
+        children: <ResponseHeaders headers={response.headers} />,
       },
     ],
     [response]
@@ -49,7 +37,7 @@ const ResponseTabs: React.FC<Props> = ({ response }) => {
       defaultActiveKey={Tab.BODY}
       items={tabItems}
       size="small"
-      tabBarExtraContent={`Time: ${formattedTime}`}
+      tabBarExtraContent={<StatusLine response={response} />}
     />
   );
 };

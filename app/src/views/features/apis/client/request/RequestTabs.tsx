@@ -1,7 +1,7 @@
 import { Tabs, TabsProps } from "antd";
 import React, { memo, useMemo } from "react";
 import QueryParams from "./QueryParams";
-import { RQAPI } from "../types";
+import { RQAPI, RequestMethod } from "../../types";
 import RequestHeaders from "./RequestHeaders";
 
 interface Props {
@@ -29,6 +29,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setRequestHeade
         key: Tab.BODY,
         label: "Body",
         children: <div></div>,
+        disabled: [RequestMethod.GET, RequestMethod.HEAD].includes(request.method),
       },
       {
         key: Tab.HEADERS,

@@ -2,7 +2,7 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Button, Col, Input, InputNumber, Row, Select } from "antd";
+import { AutoComplete, Button, Col, Input, InputNumber, Modal, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CodeEditor from "components/misc/CodeEditor";
@@ -25,6 +25,8 @@ import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/ana
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import APIClientView from "views/features/apis/client/APIClientView";
+import { RQAPI } from "views/features/apis/types";
 
 interface Props {
   isNew?: boolean;
@@ -73,6 +75,28 @@ const MockEditor: React.FC<Props> = ({
   });
 
   const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+
+  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId), [
+    endpoint,
+    teamId,
+    user?.details?.profile?.uid,
+    username,
+  ]);
+
+  const apiEntry = useMemo<RQAPI.Entry>(() => {
+    const entry: RQAPI.Entry = { request: { url: finalUrl, method, headers: [], queryParams: [] }, response: null };
+    try {
+      entry.request.headers = Object.entries<string>(JSON.parse(headersString)).map(([name, value]) => ({
+        name,
+        value,
+        id: Math.random(),
+      }));
+    } catch (e) {
+      // do nothing
+    }
+    return entry;
+  }, [finalUrl, headersString, method]);
 
   //editor fields ref
   const endpointRef = useRef(null);
@@ -158,6 +182,10 @@ const MockEditor: React.FC<Props> = ({
       toast.error("Please fix the highlighted fields");
     }
   };
+
+  const handleTest = useCallback(() => {
+    setIsTestModalOpen(true);
+  }, []);
 
   const onNameChange = (name: string) => {
     setName(name);
@@ -285,11 +313,9 @@ const MockEditor: React.FC<Props> = ({
         </label>
         <Input
           id="url"
-          addonAfter={
-            <CopyButton title="" copyText={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)} />
-          }
+          addonAfter={<CopyButton title="" copyText={finalUrl} />}
           type="text"
-          value={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)}
+          value={finalUrl}
           name="url"
           disabled={true}
         />
@@ -414,6 +440,7 @@ const MockEditor: React.FC<Props> = ({
         savingInProgress={savingInProgress}
         handleClose={onClose}
         handleSave={handleOnSave}
+        handleTest={handleTest}
       />
       <RQEditorTitle
         name={name}
@@ -440,6 +467,17 @@ const MockEditor: React.FC<Props> = ({
           </Row>
         </Col>
       </Row>
+      <Modal
+        className="test-mock-modal"
+        centered
+        title="Test mock"
+        open={isTestModalOpen}
+        onCancel={() => setIsTestModalOpen(false)}
+        footer={null}
+        width="70%"
+      >
+        <APIClientView apiEntry={apiEntry} />
+      </Modal>
     </>
   );
 };

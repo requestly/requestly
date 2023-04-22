@@ -1,7 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
-import { RQAPI } from "../types";
+import { RQAPI } from "../../types";
 
 interface Props {
   headers: RQAPI.Header[];
