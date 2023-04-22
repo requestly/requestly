@@ -1,5 +1,5 @@
 import React from "react";
-import APIClientView from "./APIClientView";
+import APIClientView from "./client/APIClientView";
 import "./apis.scss";
 
 interface Props {}

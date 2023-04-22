@@ -1,13 +1,16 @@
 import { Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Split from "react-split";
-import { RQAPI, RequestMethod } from "./types";
+import { RQAPI, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
 import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { makeRequest } from "./apiUtils";
+import { makeRequest } from "../apiUtils";
+import "./apiClientView.scss";
 
-interface Props {}
+interface Props {
+  apiEntry?: RQAPI.Entry;
+}
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -17,7 +20,7 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 const getEmptyAPIEntry = (): RQAPI.Entry => {
   return {
     request: {
-      url: "",
+      url: "https://user36644.requestly.dev/test-mock-api",
       queryParams: [],
       method: RequestMethod.GET,
       headers: [],
@@ -27,10 +30,16 @@ const getEmptyAPIEntry = (): RQAPI.Entry => {
   };
 };
 
-const APIClientView: React.FC<Props> = () => {
+const APIClientView: React.FC<Props> = ({ apiEntry }) => {
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
+
+  useEffect(() => {
+    if (apiEntry) {
+      setEntry(apiEntry);
+    }
+  }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
     setEntry((entry) => ({
@@ -135,7 +144,7 @@ const APIClientView: React.FC<Props> = () => {
         className="api-client-body"
         direction="vertical"
         cursor="row-resize"
-        sizes={[50, 50]}
+        sizes={[40, 60]}
         minSize={200}
         gutterSize={6}
         gutterAlign="center"

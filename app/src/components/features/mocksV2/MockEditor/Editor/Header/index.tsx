@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Layout, Col, Tooltip } from "antd";
+import { ExperimentOutlined } from "@ant-design/icons";
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
 import { redirectToFileMocksList, redirectToMocksList } from "utils/RedirectionUtils";
@@ -13,6 +14,7 @@ interface HeaderProps {
   savingInProgress: boolean;
   handleClose: Function;
   handleSave: Function;
+  handleTest: () => void;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -21,6 +23,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   savingInProgress,
   handleClose,
   handleSave,
+  handleTest,
 }) => {
   const navigate = useNavigate();
 
@@ -48,10 +51,15 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           <RQBreadcrumb />
         </Col>
         <Col className="header-right-section">
+          {!isNewMock && (
+            <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
+              Test
+            </RQButton>
+          )}
           <RQButton type="default" onClick={() => handleClose()}>
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
+          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave}>
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
           </RQButton>
         </Col>
