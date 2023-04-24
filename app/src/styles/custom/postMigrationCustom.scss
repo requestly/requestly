@@ -1,5 +1,9 @@
 .network-table-wrapper-override {
   border-style: none !important;
+
+  .ant-pro-card-body {
+    padding-right: 0;
+  }
 }
 
 .network-table-override {
