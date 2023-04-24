@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - about: "Find detailed guides about common support issues in our forum"
-    name: "💬 GitHub Discussions"
-    url: "https://github.com/requestly/requestly/discussions"
+  - about: "Help us in creating Requestly's Roadmap by upvoting existing issues or feature requests"
+    name: "⬆️ Upvote features you want to see next in Requestly"
+    url: "https://github.com/requestly/requestly/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc"
   - about: "Ask a question on our forum"
     name: "❓ Question."
     url: "https://github.com/requestly/requestly/discussions"
