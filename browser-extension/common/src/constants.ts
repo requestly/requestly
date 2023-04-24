@@ -52,3 +52,7 @@ export const RULE_TITLES = {
   REQUEST: "Modify request body",
   DELAY: "Delay network requests",
 };
+
+export const STORAGE_KEYS = {
+  LAST_UPDATED_TS: "last-updated-ts",
+};
