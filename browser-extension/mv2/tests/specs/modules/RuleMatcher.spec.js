@@ -1,5 +1,11 @@
 describe("RuleMatcher: ", function () {
-  var redirectRule, cancelRule;
+  var redirectRule,
+    cancelRule,
+    requestDetails = {
+      tabId: 123,
+      method: "GET",
+      type: "xmlhttprequest",
+    };
 
   describe("#matchUrlWithRuleSource", function () {
     beforeEach(function () {
@@ -21,6 +27,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.GOOGLE,
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.YAHOO);
@@ -30,6 +37,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.GOOGLE,
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.FACEBOOK);
@@ -41,6 +49,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.GOOGLE,
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(pair["destination"]);
@@ -54,6 +63,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.GOOGLE_SEARCH_QUERY + "TGT-491",
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.REQUESTLY + "?query=TGT-491");
@@ -62,6 +72,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.GOOGLE_SEARCH_QUERY + "TGT-10419",
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.REQUESTLY + "?query=TGT-10419");
@@ -69,7 +80,8 @@ describe("RuleMatcher: ", function () {
       expect(
         RuleMatcher.matchUrlWithRulePairs(
           redirectRule.pairs,
-          "https://cricket.yahoo.com"
+          "https://cricket.yahoo.com",
+          requestDetails
         )
       ).toBe("https://cricket.yahoo.com?q1=https&q2=cricket");
     });
@@ -82,6 +94,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.DROPBOX,
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.FACEBOOK);
@@ -90,6 +103,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.EXAMPLE + "?ref=dropbox",
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(null);
@@ -100,6 +114,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.DROPBOX,
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(null);
@@ -108,6 +123,7 @@ describe("RuleMatcher: ", function () {
         RuleMatcher.matchUrlWithRuleSource(
           pair.source,
           URL_SOURCES.EXAMPLE + "/dropbox/home.html",
+          requestDetails.tabId,
           pair.destination
         )
       ).toBe(URL_SOURCES.FACEBOOK);
@@ -117,12 +133,17 @@ describe("RuleMatcher: ", function () {
       var pairs = cancelRule.pairs;
 
       expect(
-        RuleMatcher.matchUrlWithRuleSource(pairs[0].source, URL_SOURCES.GOOGLE)
+        RuleMatcher.matchUrlWithRuleSource(
+          pairs[0].source,
+          URL_SOURCES.GOOGLE,
+          requestDetails.tabId
+        )
       ).toBeNull();
       expect(
         RuleMatcher.matchUrlWithRuleSource(
           pairs[1].source,
-          URL_SOURCES.FACEBOOK
+          URL_SOURCES.FACEBOOK,
+          requestDetails.tabId
         )
       ).not.toBeNull();
     });
@@ -136,19 +157,22 @@ describe("RuleMatcher: ", function () {
       expect(
         RuleMatcher.matchUrlWithRuleSource(
           pairs[0].source,
-          "http://blog.requestly.in"
+          "http://blog.requestly.in",
+          requestDetails.tabId
         )
       ).toBeNull();
       expect(
         RuleMatcher.matchUrlWithRuleSource(
           pairs[0].source,
-          "http://web.requestly.in"
+          "http://web.requestly.in",
+          requestDetails.tabId
         )
       ).toBeNull();
       expect(
         RuleMatcher.matchUrlWithRuleSource(
           pairs[0].source,
           "http://quora.com?search=requestly",
+          requestDetails.tabId,
           URL_SOURCES.GOOGLE
         )
       ).toBe(URL_SOURCES.GOOGLE);
@@ -393,7 +417,11 @@ describe("RuleMatcher: ", function () {
       r.pairs = pairs;
 
       expect(
-        RuleMatcher.matchUrlWithRulePairs(r.pairs, URL_SOURCES.GOOGLE)
+        RuleMatcher.matchUrlWithRulePairs(
+          r.pairs,
+          URL_SOURCES.GOOGLE,
+          requestDetails
+        )
       ).toBe(URL_SOURCES.FACEBOOK);
     });
   });
