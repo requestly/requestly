@@ -50,7 +50,11 @@ BG.Methods.applyReplaceRule = function (rule, url, details) {
     if (
       pair.source &&
       pair.source.value &&
-      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null
+      RuleMatcher.matchUrlWithRuleSource(
+        pair.source,
+        resultingUrl,
+        details.tabId
+      ) === null
     ) {
       continue;
     }
@@ -155,7 +159,8 @@ BG.Methods.applyQueryParamRule = function (rule, url, details) {
         pair.source.filters,
         details
       ) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) ===
+        null
     ) {
       continue;
     }
@@ -191,7 +196,8 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
         pair.source.filters,
         details
       ) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) ===
+        null
     ) {
       continue;
     }
@@ -200,7 +206,11 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
     if (
       pair.source &&
       pair.source.value &&
-      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null
+      RuleMatcher.matchUrlWithRuleSource(
+        pair.source,
+        resultingUrl,
+        details.tabId
+      ) === null
     ) {
       continue;
     }
@@ -360,14 +370,19 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         // In UA Rule Type, we match Source Object with mainFrame as well
         if (
           rulePair.source &&
-          RuleMatcher.matchUrlWithRuleSource(rulePair.source, url) === null &&
+          RuleMatcher.matchUrlWithRuleSource(
+            rulePair.source,
+            url,
+            details.tabId
+          ) === null &&
           !(
             ruleType === RQ.RULE_TYPES.USERAGENT &&
             rulePair.source.requestType === RQ.REQUEST_TYPES.MAIN_FRAME &&
             mainFrameUrl &&
             RuleMatcher.matchUrlWithRuleSource(
               rulePair.source,
-              mainFrameUrl
+              mainFrameUrl,
+              details.tabId
             ) !== null
           )
         ) {
@@ -449,7 +464,11 @@ BG.Methods.getUserAgentHeaderModification = function (ruleModification) {
   };
 };
 
-BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRulePairs = function (
+  sourceUrl,
+  ruleType,
+  requestDetails
+) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules()
@@ -459,7 +478,11 @@ BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
     .reduce(function (matchedRulePairsSoFar, enabledRule) {
       var matchedRulePairs = enabledRule.pairs.filter(function (pair) {
         return (
-          RuleMatcher.matchUrlWithRuleSource(pair.source, sourceUrl) !== null
+          RuleMatcher.matchUrlWithRuleSource(
+            pair.source,
+            sourceUrl,
+            requestDetails.tabId
+          ) !== null
         );
       });
       return matchedRulePairsSoFar.concat(matchedRulePairs);
@@ -493,13 +516,13 @@ BG.Methods.getEnabledRules = function () {
   return enabledRules;
 };
 
-BG.Methods.getMatchingRules = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRules = function (sourceUrl, ruleType, details) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules().filter(function (rule) {
     return (
       (!ruleType || rule.ruleType === ruleType) &&
-      RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl) !== null
+      RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl, details) !== null
     );
   });
 };
@@ -690,7 +713,8 @@ BG.Methods.overrideResponse = function (details) {
 
   const responseRules = BG.Methods.getMatchingRules(
     details.url,
-    RQ.RULE_TYPES.RESPONSE
+    RQ.RULE_TYPES.RESPONSE,
+    details
   );
 
   if (responseRules.length > 0) {
@@ -1047,7 +1071,9 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
         if (message.url) {
           sendResponse(
-            BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT)
+            BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT, {
+              tabId: sender.tab.id,
+            })
           );
         }
         break;
@@ -1057,7 +1083,8 @@ BG.Methods.addListenerForExtensionMessages = function () {
           sendResponse(
             BG.Methods.getMatchingRulePairs(
               message.url,
-              RQ.RULE_TYPES.USERAGENT
+              RQ.RULE_TYPES.USERAGENT,
+              { tabId: sender.tab.id }
             )
           );
         }
