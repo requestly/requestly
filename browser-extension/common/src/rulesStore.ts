@@ -8,13 +8,14 @@ import {
 
 const isRule = (record: unknown): boolean => {
   return (
-    !!(record as Rule).ruleType ||
-    (record as Rule).objectType === ObjectType.RULE
+    record &&
+    (!!(record as Rule).ruleType ||
+      (record as Rule).objectType === ObjectType.RULE)
   );
 };
 
 const isGroup = (record: unknown): boolean => {
-  return (record as Group).objectType === ObjectType.GROUP;
+  return record && (record as Group).objectType === ObjectType.GROUP;
 };
 
 export const getRules = async (): Promise<Rule[]> => {
