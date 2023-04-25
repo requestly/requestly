@@ -1,6 +1,12 @@
 import React from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
-import { ClearOutlined, SafetyCertificateOutlined, SettingOutlined } from "@ant-design/icons";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Switch } from "antd";
+import {
+  CheckOutlined,
+  ClearOutlined,
+  CloseOutlined,
+  SafetyCertificateOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -12,6 +18,7 @@ const ActionHeader = ({
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
+  setIsInterceptingTraffic,
 }) => {
   return (
     <Row
@@ -57,6 +64,16 @@ const ActionHeader = ({
             </Col>
           </>
         ) : null}
+        <Tooltip title="Toggle traffic logging">
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            defaultChecked
+            onChange={(isChecked) => {
+              setIsInterceptingTraffic(isChecked);
+            }}
+          />
+        </Tooltip>
       </Space>
     </Row>
   );
