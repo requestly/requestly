@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaCheck, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserPersonaSurveyDetails, getUserAuthDetails } from "store/selectors";
+import { getUserPersonaSurveyDetails } from "store/selectors";
 import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 // Firebase
 // import firebase from "../../../firebase";
@@ -34,66 +34,68 @@ const DesktopSignIn = () => {
   //Component State
   const [allDone, setAllDone] = useState(false);
   const [isError, setIsError] = useState(false);
-  const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const dipatch = useDispatch();
+  const dispatch = useDispatch();
 
-  const handleDoneSignIn = async (firebaseUser, isNewUser = "false") => {
-    const params = new URLSearchParams(window.location.search);
-    const token = await firebaseUser?.getIdToken();
-    const code = params.get("ot-auth-code");
-    const source = params.get("source").replace(/ /g, "_");
-    const functions = getFunctions();
-    const createAuthToken = httpsCallable(functions, "createAuthToken");
+  const handleDoneSignIn = useCallback(
+    async (firebaseUser, isNewUser = "false") => {
+      const params = new URLSearchParams(window.location.search);
+      const token = await firebaseUser?.getIdToken();
+      const code = params.get("ot-auth-code");
+      const source = params.get("source").replace(/ /g, "_");
+      const functions = getFunctions();
+      const createAuthToken = httpsCallable(functions, "createAuthToken");
 
-    let uid = firebaseUser?.uid || null;
-    let email = firebaseUser?.email || null;
+      let uid = firebaseUser?.uid || null;
+      let email = firebaseUser?.email || null;
 
-    createAuthToken({
-      oneTimeCode: code,
-      idToken: token,
-    })
-      .then(() => {
-        setAllDone(true);
-        if (isNewUser) {
-          trackSignUpAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            source,
-          });
-          trackSignupSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-            email,
-            uid,
-            email_type: getEmailType(email),
-            domain: email.split("@")[1],
-            source,
-          });
-        } else {
-          trackLoginAttemptedEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-          trackLoginSuccessEvent({
-            auth_provider: AUTH_PROVIDERS.GMAIL,
-          });
-        }
-        // window.close();
+      createAuthToken({
+        oneTimeCode: code,
+        idToken: token,
       })
-      .catch((err) => {
-        setIsError(true);
-        trackSignUpFailedEvent({
-          auth_provider: AUTH_PROVIDERS.GMAIL,
-          error_message: err.message,
-          source,
+        .then(() => {
+          setAllDone(true);
+          syncUserPersona(uid, dispatch, userPersona);
+          if (isNewUser) {
+            trackSignUpAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              source,
+            });
+            trackSignupSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+              email,
+              uid,
+              email_type: getEmailType(email),
+              domain: email.split("@")[1],
+              source,
+            });
+          } else {
+            trackLoginAttemptedEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+            trackLoginSuccessEvent({
+              auth_provider: AUTH_PROVIDERS.GMAIL,
+            });
+          }
+          // window.close();
+        })
+        .catch((err) => {
+          setIsError(true);
+          trackSignUpFailedEvent({
+            auth_provider: AUTH_PROVIDERS.GMAIL,
+            error_message: err.message,
+            source,
+          });
+          // window.close();
         });
-        // window.close();
-      });
-  };
+    },
+    [dispatch, userPersona]
+  );
 
   const renderLoading = () => {
     if (isError) {
       return renderErrorMessage();
     } else if (allDone) {
-      syncUserPersona(user.details.profile.uid, dipatch, userPersona);
       return renderAllDone();
     }
     return (
@@ -147,7 +149,7 @@ const DesktopSignIn = () => {
         signInWithRedirect(auth, provider);
       }
     });
-  }, []);
+  }, [handleDoneSignIn]);
 
   return (
     <React.Fragment>
