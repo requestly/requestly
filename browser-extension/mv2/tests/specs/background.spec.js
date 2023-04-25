@@ -483,13 +483,18 @@ describe("Requestly Background Service - ", function () {
 
     it("should replace query parameters with ? in beginning (Issue: #86)", function () {
       expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=0")
+        BG.Methods.applyReplaceRule(
+          replaceRule,
+          URL_SOURCES.DROPBOX + "?dl=0",
+          requestDetails
+        )
       ).toBe(URL_SOURCES.DROPBOX + "?dl=1");
 
       expect(
         BG.Methods.applyReplaceRule(
           replaceRule,
-          URL_SOURCES.REQUESTLY + "?dl=0"
+          URL_SOURCES.REQUESTLY + "?dl=0",
+          requestDetails
         )
       ).toBeNull();
     });
@@ -497,19 +502,31 @@ describe("Requestly Background Service - ", function () {
     it("should match Url source before replacing matched string in Url", function () {
       // Case When source does not match with Url
       expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.YAHOO + "?q=1")
+        BG.Methods.applyReplaceRule(
+          replaceRule,
+          URL_SOURCES.YAHOO + "?q=1",
+          requestDetails
+        )
       ).toBeNull();
 
       // Source matches with Url
       expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.EXAMPLE + "?q=1")
+        BG.Methods.applyReplaceRule(
+          replaceRule,
+          URL_SOURCES.EXAMPLE + "?q=1",
+          requestDetails
+        )
       ).toBe(URL_SOURCES.EXAMPLE);
     });
 
     it('should replace when "pair.from" is valid regex', function () {
-      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.GOOGLE)).toBe(
-        URL_SOURCES.FACEBOOK
-      );
+      expect(
+        BG.Methods.applyReplaceRule(
+          replaceRule,
+          URL_SOURCES.GOOGLE,
+          requestDetails
+        )
+      ).toBe(URL_SOURCES.FACEBOOK);
     });
 
     it("should execute multiple pairs in same rule", function () {
@@ -548,7 +565,11 @@ describe("Requestly Background Service - ", function () {
       replaceRule.pairs = pairs;
 
       expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=1")
+        BG.Methods.applyReplaceRule(
+          replaceRule,
+          URL_SOURCES.DROPBOX + "?dl=1",
+          requestDetails
+        )
       ).toBe(URL_SOURCES.DROPBOX + "?dl=3");
     });
 
@@ -627,7 +648,11 @@ describe("Requestly Background Service - ", function () {
 
     it("should be able to add query param", function () {
       expect(
-        BG.Methods.applyQueryParamRule(queryParamsRule, URL_SOURCES.EXAMPLE)
+        BG.Methods.applyQueryParamRule(
+          queryParamsRule,
+          URL_SOURCES.EXAMPLE,
+          requestDetails
+        )
       ).toBe(URL_SOURCES.EXAMPLE + "?a=1&b=2");
     });
 
@@ -947,8 +972,11 @@ describe("Requestly Background Service - ", function () {
     it("should return empty rules when extension is deactivated", function () {
       BG.statusSettings.isExtensionEnabled = false;
       expect(
-        BG.Methods.getMatchingRulePairs("www.example.com", RQ.RULE_TYPES.SCRIPT)
-          .length
+        BG.Methods.getMatchingRulePairs(
+          "www.example.com",
+          RQ.RULE_TYPES.SCRIPT,
+          requestDetails
+        ).length
       ).toBe(0);
       BG.statusSettings.isExtensionEnabled = true;
     });
