@@ -96,9 +96,11 @@
     }
 
     hasPrimaryKey(record) {
-      for (let index = 0; index < this.primaryKeys.length; index++) {
-        if (typeof record[this.primaryKeys[index]] !== "undefined") {
-          return true;
+      if (record) {
+        for (let index = 0; index < this.primaryKeys.length; index++) {
+          if (typeof record[this.primaryKeys[index]] !== "undefined") {
+            return true;
+          }
         }
       }
 
