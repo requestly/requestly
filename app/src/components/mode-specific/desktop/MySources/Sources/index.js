@@ -301,7 +301,6 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           toggle();
           trackConnectAppsModalClosed(getAppCount());
         }}
-        destroyOnClose
       >
         <Col className="connected-apps-modal-content">
           {showInstructions ? (
