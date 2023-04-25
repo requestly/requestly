@@ -40,6 +40,9 @@
       });
 
       chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+        if (!that.map.hasOwnProperty(tabId)) {
+          return;
+        }
         that.map[tabId] = { ...tab, data: that.map[tabId].data || {} };
       });
 
