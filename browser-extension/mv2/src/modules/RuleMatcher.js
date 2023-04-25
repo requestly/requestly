@@ -93,14 +93,18 @@ RuleMatcher.checkWildCardMatch = function (wildCardString, inputString, finalStr
  * @returns Empty string ('') If rule should be applied and source object does not affect resulting url.
  * In some cases like wildcard match or regex match, resultingUrl will be destination+replaced group variables.
  */
-RuleMatcher.matchUrlWithRuleSource = function (sourceObject, url, destination) {
+RuleMatcher.matchUrlWithRuleSource = function (sourceObject, url, requestUrlTabId, destination) {
   var operator = sourceObject.operator,
     urlComponent = RQ.Utils.extractUrlComponent(url, sourceObject.key),
     value = sourceObject.value,
     blackListedDomains = RQ.BLACK_LIST_DOMAINS || [];
 
+  if (window.tabService.getTabUrl(requestUrlTabId)?.includes(RQ.configs.WEB_URL)) {
+    return null;
+  }
+
   for (var index = 0; index < blackListedDomains.length; index++) {
-    if (url.indexOf(blackListedDomains[index]) !== -1) {
+    if (url.includes(blackListedDomains[index])) {
       return null;
     }
   }
@@ -180,7 +184,12 @@ RuleMatcher.matchUrlWithRulePairs = function (pairs, url, requestDetails) {
     }
 
     if (RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, requestDetails)) {
-      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, pair.destination);
+      newResultingUrl = RuleMatcher.matchUrlWithRuleSource(
+        pair.source,
+        resultingUrl,
+        requestDetails.tabId,
+        pair.destination
+      );
       if (newResultingUrl !== null) {
         resultingUrl = newResultingUrl;
       }
