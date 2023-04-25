@@ -111,13 +111,14 @@ RuleMatcher.matchUrlWithRuleSource = function (
     value = sourceObject.value,
     blackListedDomains = RQ.BLACK_LIST_DOMAINS || [];
 
+  if (
+    window.tabService.getTabUrl(requestUrlTabId)?.includes(RQ.configs.WEB_URL)
+  ) {
+    return null;
+  }
+
   for (var index = 0; index < blackListedDomains.length; index++) {
-    if (
-      url.indexOf(blackListedDomains[index]) !== -1 ||
-      window.tabService
-        .getTabUrl(requestUrlTabId)
-        ?.indexOf(blackListedDomains[index]) !== -1
-    ) {
+    if (url.includes(blackListedDomains[index])) {
       return null;
     }
   }
