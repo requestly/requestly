@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaCheck, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserPersonaSurveyDetails, getUserAuthDetails } from "store/selectors";
+import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
 // Firebase
 // import firebase from "../../../firebase";
 import firebaseApp from "../../../firebase";
@@ -31,6 +34,9 @@ const DesktopSignIn = () => {
   //Component State
   const [allDone, setAllDone] = useState(false);
   const [isError, setIsError] = useState(false);
+  const user = useSelector(getUserAuthDetails);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const dipatch = useDispatch();
 
   const handleDoneSignIn = async (firebaseUser, isNewUser = "false") => {
     const params = new URLSearchParams(window.location.search);
@@ -87,6 +93,7 @@ const DesktopSignIn = () => {
     if (isError) {
       return renderErrorMessage();
     } else if (allDone) {
+      syncUserPersona(user.details.profile.uid, dipatch, userPersona);
       return renderAllDone();
     }
     return (
