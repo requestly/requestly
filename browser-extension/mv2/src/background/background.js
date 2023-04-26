@@ -41,7 +41,11 @@ BG.Methods.applyReplaceRule = function (rule, url, details) {
     }
 
     // If Source Value exists and does not match, proceed with next pair
-    if (pair.source && pair.source.value && RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null) {
+    if (
+      pair.source &&
+      pair.source.value &&
+      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, details.tabId) === null
+    ) {
       continue;
     }
 
@@ -132,7 +136,7 @@ BG.Methods.applyQueryParamRule = function (rule, url, details) {
     // If Source does not match, proceed with next pair
     if (
       !RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, details) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) === null
     ) {
       continue;
     }
@@ -162,13 +166,17 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
     // If Source does not match, proceed with next pair
     if (
       !RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, details) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) === null
     ) {
       continue;
     }
 
     // If Source Value exists and does not match, proceed with next pair
-    if (pair.source && pair.source.value && RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null) {
+    if (
+      pair.source &&
+      pair.source.value &&
+      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, details.tabId) === null
+    ) {
       continue;
     }
 
@@ -297,12 +305,12 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         // In UA Rule Type, we match Source Object with mainFrame as well
         if (
           rulePair.source &&
-          RuleMatcher.matchUrlWithRuleSource(rulePair.source, url) === null &&
+          RuleMatcher.matchUrlWithRuleSource(rulePair.source, url, details.tabId) === null &&
           !(
             ruleType === RQ.RULE_TYPES.USERAGENT &&
             rulePair.source.requestType === RQ.REQUEST_TYPES.MAIN_FRAME &&
             mainFrameUrl &&
-            RuleMatcher.matchUrlWithRuleSource(rulePair.source, mainFrameUrl) !== null
+            RuleMatcher.matchUrlWithRuleSource(rulePair.source, mainFrameUrl, details.tabId) !== null
           )
         ) {
           continue;
@@ -381,7 +389,7 @@ BG.Methods.getUserAgentHeaderModification = function (ruleModification) {
   };
 };
 
-BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType, requestDetails) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules()
@@ -390,7 +398,7 @@ BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
     })
     .reduce(function (matchedRulePairsSoFar, enabledRule) {
       var matchedRulePairs = enabledRule.pairs.filter(function (pair) {
-        return RuleMatcher.matchUrlWithRuleSource(pair.source, sourceUrl) !== null;
+        return RuleMatcher.matchUrlWithRuleSource(pair.source, sourceUrl, requestDetails.tabId) !== null;
       });
       return matchedRulePairsSoFar.concat(matchedRulePairs);
     }, []);
@@ -420,12 +428,13 @@ BG.Methods.getEnabledRules = function () {
   return enabledRules;
 };
 
-BG.Methods.getMatchingRules = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRules = function (sourceUrl, ruleType, details) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules().filter(function (rule) {
     return (
-      (!ruleType || rule.ruleType === ruleType) && RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl) !== null
+      (!ruleType || rule.ruleType === ruleType) &&
+      RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl, details) !== null
     );
   });
 };
@@ -572,7 +581,7 @@ BG.Methods.overrideResponse = function (details) {
     return false;
   }
 
-  const responseRules = BG.Methods.getMatchingRules(details.url, RQ.RULE_TYPES.RESPONSE);
+  const responseRules = BG.Methods.getMatchingRules(details.url, RQ.RULE_TYPES.RESPONSE, details);
 
   if (responseRules.length > 0) {
     const finalResponseRule = responseRules[responseRules.length - 1]; // last overridden response is final
@@ -877,13 +886,17 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
         if (message.url) {
-          sendResponse(BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT));
+          sendResponse(
+            BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT, {
+              tabId: sender.tab.id,
+            })
+          );
         }
         break;
 
       case RQ.CLIENT_MESSAGES.GET_USER_AGENT_RULE_PAIRS:
         if (message.url) {
-          sendResponse(BG.Methods.getMatchingRulePairs(message.url, RQ.RULE_TYPES.USERAGENT));
+          sendResponse(BG.Methods.getMatchingRulePairs(message.url, RQ.RULE_TYPES.USERAGENT, { tabId: sender.tab.id }));
         }
         break;
 
