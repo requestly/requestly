@@ -14,6 +14,7 @@ import {
 import { SYNC_CONSTANTS } from "./syncConstants";
 import { StorageService } from "init";
 import Logger from "lib/logger";
+import APP_CONSTANTS from "config/constants";
 
 /**
  * This functions triggers syncing process
@@ -51,7 +52,7 @@ export const setSyncState = async (uid, state, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
-        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing(["last-sync-target"]);
+        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
         trackSyncToggled(uid, state);
         resolve(true);
       })

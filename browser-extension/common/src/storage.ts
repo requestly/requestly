@@ -10,7 +10,7 @@ export const getSuperObject = async (): Promise<StoreObject> => {
 
 export const getAllRecords = async (): Promise<unknown[]> => {
   const superObject = await getSuperObject();
-  return Object.values(superObject);
+  return Object.values(superObject).filter((val) => !!val);
 };
 
 export const saveObject = async (object: StoreObject): Promise<void> => {

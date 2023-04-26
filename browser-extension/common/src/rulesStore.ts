@@ -2,11 +2,11 @@ import { Group, Rule, RuleType, ObjectType, Status } from "./types";
 import { ChangeType, getAllRecords, getRecord, onRecordChange } from "./storage";
 
 const isRule = (record: unknown): boolean => {
-  return !!(record as Rule).ruleType || (record as Rule).objectType === ObjectType.RULE;
+  return record && (!!(record as Rule).ruleType || (record as Rule).objectType === ObjectType.RULE);
 };
 
 const isGroup = (record: unknown): boolean => {
-  return (record as Group).objectType === ObjectType.GROUP;
+  return record && (record as Group).objectType === ObjectType.GROUP;
 };
 
 export const getRules = async (): Promise<Rule[]> => {

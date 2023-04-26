@@ -78,7 +78,7 @@ const PageScriptMessageHandler = {
 
       if (
         event.data.requestId &&
-        Object.hasOwn(this.eventCallbackMap, `${event.data.action}_${event.data.requestId}`)
+        this.eventCallbackMap.hasOwnProperty(`${event.data.action}_${event.data.requestId}`)
       ) {
         this.invokeCallback(event.data);
       } else {

@@ -6,9 +6,7 @@ describe("Requestly Background Service - ", function () {
     queryParamsRule,
     delayRequestRule,
     sourceFilters = {
-      [RQ.RULE_SOURCE_FILTER_TYPES.PAGE_URL]: [
-        { operator: RQ.RULE_OPERATORS.CONTAINS, value: KEYWORDS.EXAMPLE },
-      ],
+      [RQ.RULE_SOURCE_FILTER_TYPES.PAGE_URL]: [{ operator: RQ.RULE_OPERATORS.CONTAINS, value: KEYWORDS.EXAMPLE }],
       [RQ.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE]: ["xmlhttprequest"],
       [RQ.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD]: ["GET", "POST"],
     },
@@ -56,11 +54,7 @@ describe("Requestly Background Service - ", function () {
     it("should return modified Headers Array when header is added", function () {
       RQ.StorageService.records.push(headersRule);
 
-      var modifiedheaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
+      var modifiedheaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: URL_SOURCES.FACEBOOK });
       expect(modifiedheaders.length).toEqual(1);
     });
 
@@ -74,11 +68,9 @@ describe("Requestly Background Service - ", function () {
       headersRule.pairs[0]["type"] = RQ.MODIFICATION_TYPES.REMOVE;
 
       RQ.StorageService.records.push(headersRule);
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        originalHeaders,
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders(originalHeaders, RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+      });
       expect(modifiedHeaders.length).toEqual(2);
     });
 
@@ -88,11 +80,7 @@ describe("Requestly Background Service - ", function () {
       pair.value = "rq_rand(2)";
 
       RQ.StorageService.records.push(headersRule);
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: URL_SOURCES.FACEBOOK });
       expect(modifiedHeaders.length).toBe(1);
       expect(modifiedHeaders[0]["name"]).toBe("x-requestId");
       expect(/^[0-9]+$/gi.test(modifiedHeaders[0]["value"])).toBe(true);
@@ -108,11 +96,7 @@ describe("Requestly Background Service - ", function () {
       spyOn(BG.Methods, "getMainFrameUrl").andCallFake(function () {
         return sourceUrl;
       });
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: sourceUrl + "/request" }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: sourceUrl + "/request" });
       expect(modifiedHeaders).not.toBeNull();
       expect(modifiedHeaders.length).toBe(1);
       expect(modifiedHeaders[0]["name"]).toBe(RQ.HEADER_NAMES.USER_AGENT);
@@ -129,11 +113,7 @@ describe("Requestly Background Service - ", function () {
       spyOn(BG.Methods, "getMainFrameUrl").andCallFake(function () {
         return sourceUrl;
       });
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: sourceUrl + "/request" }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: sourceUrl + "/request" });
       expect(modifiedHeaders).toBeNull();
     });
 
@@ -143,15 +123,11 @@ describe("Requestly Background Service - ", function () {
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.EXAMPLE);
 
-      const modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        {
-          url: URL_SOURCES.FACEBOOK,
-          method: "GET",
-          type: "xmlhttprequest",
-        }
-      );
+      const modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+        method: "GET",
+        type: "xmlhttprequest",
+      });
       expect(modifiedHeaders.length).toEqual(1);
     });
 
@@ -161,11 +137,10 @@ describe("Requestly Background Service - ", function () {
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.GOOGLE);
 
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK, ...requestDetails }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+        ...requestDetails,
+      });
       expect(modifiedHeaders).toBeNull();
     });
 
@@ -174,13 +149,8 @@ describe("Requestly Background Service - ", function () {
       headersRule = getHeadersRuleV2();
       RQ.StorageService.records.push(headersRule);
 
-      var modifiedheaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
-      const expectedHeaderModification =
-        headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST];
+      var modifiedheaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: URL_SOURCES.FACEBOOK });
+      const expectedHeaderModification = headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST];
 
       expect(modifiedheaders.length).toEqual(1);
       expect(modifiedheaders).toEqual([
@@ -199,15 +169,12 @@ describe("Requestly Background Service - ", function () {
       ];
 
       headersRule = getHeadersRuleV2();
-      headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST][0]["type"] =
-        RQ.MODIFICATION_TYPES.REMOVE;
+      headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST][0]["type"] = RQ.MODIFICATION_TYPES.REMOVE;
 
       RQ.StorageService.records.push(headersRule);
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        originalHeaders,
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders(originalHeaders, RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+      });
 
       expect(modifiedHeaders.length).toEqual(2);
       expect(modifiedHeaders).toEqual(originalHeaders.slice(0, 2));
@@ -220,11 +187,7 @@ describe("Requestly Background Service - ", function () {
       pair.modifications[RQ.HEADERS_TARGET.REQUEST][0].value = "rq_rand(2)";
 
       RQ.StorageService.records.push(headersRule);
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, { url: URL_SOURCES.FACEBOOK });
 
       expect(modifiedHeaders.length).toBe(1);
       expect(modifiedHeaders[0]["name"]).toBe("x-requestId");
@@ -238,18 +201,13 @@ describe("Requestly Background Service - ", function () {
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.EXAMPLE);
 
-      const modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        {
-          url: URL_SOURCES.FACEBOOK,
-          method: "GET",
-          type: "xmlhttprequest",
-        }
-      );
+      const modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+        method: "GET",
+        type: "xmlhttprequest",
+      });
 
-      const expectedHeaderModification =
-        headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST];
+      const expectedHeaderModification = headersRule.pairs[0].modifications[RQ.HEADERS_TARGET.REQUEST];
 
       expect(modifiedHeaders.length).toEqual(1);
       expect(modifiedHeaders).toEqual([
@@ -267,11 +225,10 @@ describe("Requestly Background Service - ", function () {
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.GOOGLE);
 
-      var modifiedHeaders = BG.Methods.modifyHeaders(
-        [],
-        RQ.HEADERS_TARGET.REQUEST,
-        { url: URL_SOURCES.FACEBOOK, ...requestDetails }
-      );
+      var modifiedHeaders = BG.Methods.modifyHeaders([], RQ.HEADERS_TARGET.REQUEST, {
+        url: URL_SOURCES.FACEBOOK,
+        ...requestDetails,
+      });
 
       expect(modifiedHeaders).toBeNull();
     });
@@ -417,8 +374,7 @@ describe("Requestly Background Service - ", function () {
     describe("should update preDefinedFunction rq_encode value", function () {
       it("Redirect Rule", function () {
         var pair = redirectRule.pairs[0];
-        pair["destination"] =
-          "http://www.example.com/?password=rq_encode(P@$$W0rD)&val=123#rq_encode(my#string)";
+        pair["destination"] = "http://www.example.com/?password=rq_encode(P@$$W0rD)&val=123#rq_encode(my#string)";
         RQ.StorageService.records.push(redirectRule);
 
         expect(
@@ -426,9 +382,7 @@ describe("Requestly Background Service - ", function () {
             url: URL_SOURCES.GOOGLE,
             method: "GET",
           })["redirectUrl"]
-        ).toBe(
-          "http://www.example.com/?password=P%40%24%24W0rD&val=123#my%23string"
-        );
+        ).toBe("http://www.example.com/?password=P%40%24%24W0rD&val=123#my%23string");
       });
 
       it("Query parameters Rule", function () {
@@ -482,34 +436,25 @@ describe("Requestly Background Service - ", function () {
     });
 
     it("should replace query parameters with ? in beginning (Issue: #86)", function () {
-      expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=0")
-      ).toBe(URL_SOURCES.DROPBOX + "?dl=1");
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=0", requestDetails)).toBe(
+        URL_SOURCES.DROPBOX + "?dl=1"
+      );
 
-      expect(
-        BG.Methods.applyReplaceRule(
-          replaceRule,
-          URL_SOURCES.REQUESTLY + "?dl=0"
-        )
-      ).toBeNull();
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.REQUESTLY + "?dl=0", requestDetails)).toBeNull();
     });
 
     it("should match Url source before replacing matched string in Url", function () {
       // Case When source does not match with Url
-      expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.YAHOO + "?q=1")
-      ).toBeNull();
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.YAHOO + "?q=1", requestDetails)).toBeNull();
 
       // Source matches with Url
-      expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.EXAMPLE + "?q=1")
-      ).toBe(URL_SOURCES.EXAMPLE);
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.EXAMPLE + "?q=1", requestDetails)).toBe(
+        URL_SOURCES.EXAMPLE
+      );
     });
 
     it('should replace when "pair.from" is valid regex', function () {
-      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.GOOGLE)).toBe(
-        URL_SOURCES.FACEBOOK
-      );
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.GOOGLE, requestDetails)).toBe(URL_SOURCES.FACEBOOK);
     });
 
     it("should execute multiple pairs in same rule", function () {
@@ -547,35 +492,25 @@ describe("Requestly Background Service - ", function () {
 
       replaceRule.pairs = pairs;
 
-      expect(
-        BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=1")
-      ).toBe(URL_SOURCES.DROPBOX + "?dl=3");
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=1", requestDetails)).toBe(
+        URL_SOURCES.DROPBOX + "?dl=3"
+      );
     });
 
     it("should apply replace rule if source filters are satisfied", function () {
       replaceRule.pairs[1].source.filters = sourceFilters;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.EXAMPLE);
-      expect(
-        BG.Methods.applyReplaceRule(
-          replaceRule,
-          URL_SOURCES.DROPBOX + "?dl=0",
-          requestDetails
-        )
-      ).toBe(URL_SOURCES.DROPBOX + "?dl=1");
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=0", requestDetails)).toBe(
+        URL_SOURCES.DROPBOX + "?dl=1"
+      );
     });
 
     it("should not apply replace rule if source filters are not satisfied", function () {
       replaceRule.pairs[1].source.filters = sourceFilters;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.GOOGLE);
-      expect(
-        BG.Methods.applyReplaceRule(
-          replaceRule,
-          URL_SOURCES.DROPBOX + "?dl=0",
-          requestDetails
-        )
-      ).toBeNull();
+      expect(BG.Methods.applyReplaceRule(replaceRule, URL_SOURCES.DROPBOX + "?dl=0", requestDetails)).toBeNull();
     });
   });
 
@@ -626,35 +561,25 @@ describe("Requestly Background Service - ", function () {
     });
 
     it("should be able to add query param", function () {
-      expect(
-        BG.Methods.applyQueryParamRule(queryParamsRule, URL_SOURCES.EXAMPLE)
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1&b=2");
+      expect(BG.Methods.applyQueryParamRule(queryParamsRule, URL_SOURCES.EXAMPLE, requestDetails)).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1&b=2"
+      );
     });
 
     it("should apply query param rule if source filters are satisfied", function () {
       queryParamsRule.pairs[0].source.filters = sourceFilters;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.EXAMPLE);
-      expect(
-        BG.Methods.applyQueryParamRule(
-          queryParamsRule,
-          URL_SOURCES.EXAMPLE,
-          requestDetails
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1&b=2");
+      expect(BG.Methods.applyQueryParamRule(queryParamsRule, URL_SOURCES.EXAMPLE, requestDetails)).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1&b=2"
+      );
     });
 
     it("should not apply query param rule if source filters are not satisfied", function () {
       queryParamsRule.pairs[0].source.filters = sourceFilters;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.GOOGLE);
-      expect(
-        BG.Methods.applyQueryParamRule(
-          queryParamsRule,
-          URL_SOURCES.EXAMPLE,
-          requestDetails
-        )
-      ).toBeNull();
+      expect(BG.Methods.applyQueryParamRule(queryParamsRule, URL_SOURCES.EXAMPLE, requestDetails)).toBeNull();
     });
   });
 
@@ -664,42 +589,26 @@ describe("Requestly Background Service - ", function () {
     });
     const delayParam = `${RQ.DELAY_REQUEST_CONSTANTS.DELAY_PARAM_NAME}=${RQ.DELAY_REQUEST_CONSTANTS.DELAY_PARAM_VALUE}`;
     it("should be able to return the delay API URL using contains match", function () {
-      expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.EXAMPLE,
-          requestDetails
-        )
-      ).toBe(`${URL_SOURCES.EXAMPLE}?${delayParam}`);
+      expect(BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.EXAMPLE, requestDetails)).toBe(
+        `${URL_SOURCES.EXAMPLE}?${delayParam}`
+      );
     });
 
     it("should be able to return the delay API URL using equals match", function () {
-      expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.DROPBOX,
-          requestDetails
-        )
-      ).toBe(`${URL_SOURCES.DROPBOX}?${delayParam}`);
+      expect(BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.DROPBOX, requestDetails)).toBe(
+        `${URL_SOURCES.DROPBOX}?${delayParam}`
+      );
     });
 
     it("should be able to return the delay API URL using by decoding predefined rand func", function () {
       expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.EXAMPLE + "?r=rq_rand(0)#check",
-          requestDetails
-        )
+        BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.EXAMPLE + "?r=rq_rand(0)#check", requestDetails)
       ).toBe(`${URL_SOURCES.EXAMPLE}?r=1&${delayParam}#check`);
     });
 
     it("should be able to return the delay API URL using by decoding predefined increment func", function () {
       expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.EXAMPLE + "?r=rq_increment(5,2)",
-          requestDetails
-        )
+        BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.EXAMPLE + "?r=rq_increment(5,2)", requestDetails)
       ).toBe(`${URL_SOURCES.EXAMPLE}?r=7&${delayParam}`);
     });
 
@@ -710,36 +619,27 @@ describe("Requestly Background Service - ", function () {
           URL_SOURCES.EXAMPLE + "?a=2&b=3&c=check#some-testingstring",
           requestDetails
         )
-      ).toBe(
-        `${URL_SOURCES.EXAMPLE}?a=2&b=3&c=check&${delayParam}#some-testingstring`
-      );
+      ).toBe(`${URL_SOURCES.EXAMPLE}?a=2&b=3&c=check&${delayParam}#some-testingstring`);
     });
 
     it("should be able to return the server-side delay API URL containing hash string and delay=3000ms", function () {
       const delay = delayRequestRule.pairs[3].delay;
 
       expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.FACEBOOK + "?b=3&c=check#ServerSide",
-          { method: "GET", type: "image" }
-        )
-      ).toBe(
-        `${RQ.CONSTANTS.DELAY_API_URL}${delay}/${URL_SOURCES.FACEBOOK}?b=3&c=check#ServerSide`
-      );
+        BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.FACEBOOK + "?b=3&c=check#ServerSide", {
+          method: "GET",
+          type: "image",
+        })
+      ).toBe(`${RQ.CONSTANTS.DELAY_API_URL}${delay}/${URL_SOURCES.FACEBOOK}?b=3&c=check#ServerSide`);
     });
 
     it("should apply delay rule if source filters are satisfied", function () {
       delayRequestRule.pairs[0].source.filters = sourceFilters;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.EXAMPLE);
-      expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.EXAMPLE,
-          requestDetails
-        )
-      ).toBe(`${URL_SOURCES.EXAMPLE}?${delayParam}`);
+      expect(BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.EXAMPLE, requestDetails)).toBe(
+        `${URL_SOURCES.EXAMPLE}?${delayParam}`
+      );
     });
 
     it("should not apply query param rule if source filters are not satisfied", function () {
@@ -747,13 +647,7 @@ describe("Requestly Background Service - ", function () {
       const delay = delayRequestRule.pairs[0].delay;
 
       spyOn(window.tabService, "getTabUrl").andReturn(URL_SOURCES.GOOGLE);
-      expect(
-        BG.Methods.applyDelayRequestRule(
-          delayRequestRule,
-          URL_SOURCES.EXAMPLE,
-          requestDetails
-        )
-      ).toBeNull();
+      expect(BG.Methods.applyDelayRequestRule(delayRequestRule, URL_SOURCES.EXAMPLE, requestDetails)).toBeNull();
     });
   });
 
@@ -764,30 +658,20 @@ describe("Requestly Background Service - ", function () {
 
     it("should be able to add query param", function () {
       expect(
-        BG.Methods.applyQueryParamModifications(
-          queryParamsRule.pairs[0]["modifications"],
-          URL_SOURCES.EXAMPLE
-        )
+        BG.Methods.applyQueryParamModifications(queryParamsRule.pairs[0]["modifications"], URL_SOURCES.EXAMPLE)
       ).toBe(URL_SOURCES.EXAMPLE + "?a=1&b=2");
     });
 
     it("should overwrite the parameter is present", function () {
       expect(
-        BG.Methods.applyQueryParamModifications(
-          queryParamsRule.pairs[0]["modifications"],
-          URL_SOURCES.EXAMPLE + "?a=3"
-        )
+        BG.Methods.applyQueryParamModifications(queryParamsRule.pairs[0]["modifications"], URL_SOURCES.EXAMPLE + "?a=3")
       ).toBe(URL_SOURCES.EXAMPLE + "?a=1&b=2");
     });
 
     it("should be able to remove the param", function () {
-      queryParamsRule.pairs[0]["modifications"][0]["type"] =
-        RQ.MODIFICATION_TYPES.REMOVE;
+      queryParamsRule.pairs[0]["modifications"][0]["type"] = RQ.MODIFICATION_TYPES.REMOVE;
       expect(
-        BG.Methods.applyQueryParamModifications(
-          queryParamsRule.pairs[0]["modifications"],
-          URL_SOURCES.EXAMPLE + "?a=1"
-        )
+        BG.Methods.applyQueryParamModifications(queryParamsRule.pairs[0]["modifications"], URL_SOURCES.EXAMPLE + "?a=1")
       ).toBe(URL_SOURCES.EXAMPLE + "?b=2");
     });
 
@@ -800,24 +684,13 @@ describe("Requestly Background Service - ", function () {
       modifications[1]["type"] = RQ.MODIFICATION_TYPES.REMOVE;
       modifications[1]["param"] = "a";
 
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE);
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "?b=2"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?b=2");
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "#hash"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "#hash");
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(URL_SOURCES.EXAMPLE);
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "?b=2")).toBe(
+        URL_SOURCES.EXAMPLE + "?b=2"
+      );
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "#hash")).toBe(
+        URL_SOURCES.EXAMPLE + "#hash"
+      );
     });
 
     it("removeAll and add should add only one param", function () {
@@ -829,24 +702,15 @@ describe("Requestly Background Service - ", function () {
       modifications[1]["param"] = "a";
       modifications[1]["value"] = 1;
 
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1");
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "?b=2"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1");
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE + "#hash"
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?a=1#hash");
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1"
+      );
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "?b=2")).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1"
+      );
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE + "#hash")).toBe(
+        URL_SOURCES.EXAMPLE + "?a=1#hash"
+      );
     });
 
     it("adding multiple modifications with special characters in values", function () {
@@ -860,12 +724,9 @@ describe("Requestly Background Service - ", function () {
       modifications[1]["param"] = "a";
       modifications[1]["value"] = "1";
 
-      expect(
-        BG.Methods.applyQueryParamModifications(
-          modifications,
-          URL_SOURCES.EXAMPLE
-        )
-      ).toBe(URL_SOURCES.EXAMPLE + "?q=@&a=1");
+      expect(BG.Methods.applyQueryParamModifications(modifications, URL_SOURCES.EXAMPLE)).toBe(
+        URL_SOURCES.EXAMPLE + "?q=@&a=1"
+      );
     });
   });
 
@@ -877,21 +738,11 @@ describe("Requestly Background Service - ", function () {
         param: "utm_source",
       };
 
-      expect(BG.Methods.applyQueryParamModification(modification, url)).toBe(
-        url
+      expect(BG.Methods.applyQueryParamModification(modification, url)).toBe(url);
+      expect(BG.Methods.applyQueryParamModification(modification, url + "?utm_source=email")).toBe(url);
+      expect(BG.Methods.applyQueryParamModification(modification, url + "?utm_param=facebook")).toBe(
+        url + "?utm_param=facebook"
       );
-      expect(
-        BG.Methods.applyQueryParamModification(
-          modification,
-          url + "?utm_source=email"
-        )
-      ).toBe(url);
-      expect(
-        BG.Methods.applyQueryParamModification(
-          modification,
-          url + "?utm_param=facebook"
-        )
-      ).toBe(url + "?utm_param=facebook");
     });
   });
 
@@ -946,10 +797,7 @@ describe("Requestly Background Service - ", function () {
   describe("#BG.Methods.getMatchingRulePairs", function () {
     it("should return empty rules when extension is deactivated", function () {
       BG.statusSettings.isExtensionEnabled = false;
-      expect(
-        BG.Methods.getMatchingRulePairs("www.example.com", RQ.RULE_TYPES.SCRIPT)
-          .length
-      ).toBe(0);
+      expect(BG.Methods.getMatchingRulePairs("www.example.com", RQ.RULE_TYPES.SCRIPT, requestDetails).length).toBe(0);
       BG.statusSettings.isExtensionEnabled = true;
     });
 
@@ -957,8 +805,7 @@ describe("Requestly Background Service - ", function () {
   });
 
   describe("#appendExecutionLog", function () {
-    const originalNumberExecutionLogsLimit =
-      RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS;
+    const originalNumberExecutionLogsLimit = RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS;
     beforeEach(function () {
       RQ.StorageService.records = [];
     });
@@ -969,9 +816,7 @@ describe("Requestly Background Service - ", function () {
     it("should append new log directly into logs array when its size is not full", () => {
       RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS = 5;
 
-      const existingLogs = Array.apply(null, Array(3)).map(() =>
-        getExecutionLogObject()
-      );
+      const existingLogs = Array.apply(null, Array(3)).map(() => getExecutionLogObject());
 
       const lastExistingLog = existingLogs[existingLogs.length - 1];
 
@@ -986,10 +831,9 @@ describe("Requestly Background Service - ", function () {
     it("should append new log into array after removing 1st element when its size is full", () => {
       RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS = 3;
 
-      const existingLogs = Array.apply(
-        null,
-        Array(RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS)
-      ).map(() => getExecutionLogObject());
+      const existingLogs = Array.apply(null, Array(RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS)).map(() =>
+        getExecutionLogObject()
+      );
 
       const lastExistingLog = existingLogs[existingLogs.length - 1];
       const firstExistingLog = existingLogs[0];
@@ -999,9 +843,7 @@ describe("Requestly Background Service - ", function () {
       const firstNewLog = newLogs[0];
 
       expect(newLogs.length).toBe(RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS);
-      expect(existingLogs.length).toBe(
-        RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS
-      );
+      expect(existingLogs.length).toBe(RQ.CONSTANTS.LIMITS.NUMBER_EXECUTION_LOGS);
       expect(lastNewLog.id).not.toBe(lastExistingLog.id);
       expect(firstNewLog.id).not.toBe(firstExistingLog.id);
     });
@@ -1009,9 +851,7 @@ describe("Requestly Background Service - ", function () {
     it("should append new log into array when array size is 0", () => {
       const initialLogsSize = 0;
 
-      const existingLogs = Array.apply(null, Array(initialLogsSize)).map(() =>
-        getExecutionLogObject()
-      );
+      const existingLogs = Array.apply(null, Array(initialLogsSize)).map(() => getExecutionLogObject());
 
       const newLogs = appendExecutionLog(existingLogs, getExecutionLogObject());
       const lastNewLog = newLogs[newLogs.length - 1];
@@ -1067,14 +907,10 @@ describe("Requestly Background Service - ", function () {
 
   describe("#getSessionRecordingConfig", () => {
     it("should return null if config does not exist", async () => {
-      spyOn(RQ.StorageService, "getRecord").andReturn(
-        Promise.resolve(undefined)
-      );
+      spyOn(RQ.StorageService, "getRecord").andReturn(Promise.resolve(undefined));
 
       waits(100); // allow below async function to return
-      const config = await BG.Methods.getSessionRecordingConfig(
-        "https://example.com"
-      );
+      const config = await BG.Methods.getSessionRecordingConfig("https://example.com");
 
       runs(() => {
         expect(config).toBeNull();
@@ -1091,14 +927,10 @@ describe("Requestly Background Service - ", function () {
           },
         ],
       };
-      spyOn(RQ.StorageService, "getRecord").andReturn(
-        Promise.resolve(testConfig)
-      );
+      spyOn(RQ.StorageService, "getRecord").andReturn(Promise.resolve(testConfig));
 
       waits(100); // allow below async function to return
-      const config = await BG.Methods.getSessionRecordingConfig(
-        "https://example.com"
-      );
+      const config = await BG.Methods.getSessionRecordingConfig("https://example.com");
 
       runs(() => {
         expect(config).toEqual(testConfig);
@@ -1115,14 +947,10 @@ describe("Requestly Background Service - ", function () {
           },
         ],
       };
-      spyOn(RQ.StorageService, "getRecord").andReturn(
-        Promise.resolve(testConfig)
-      );
+      spyOn(RQ.StorageService, "getRecord").andReturn(Promise.resolve(testConfig));
 
       waits(100); // allow below async function to return
-      const config = await BG.Methods.getSessionRecordingConfig(
-        "https://example.com"
-      );
+      const config = await BG.Methods.getSessionRecordingConfig("https://example.com");
 
       runs(() => {
         expect(config).toBeNull();

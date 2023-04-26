@@ -8,6 +8,7 @@ import { isEqual, uniqWith } from "lodash";
 import { isEmpty } from "lodash";
 import Logger from "lib/logger";
 import { rulesFlatObjectToObjectIdArray } from "utils/FormattingHelper";
+import APP_CONSTANTS from "config/constants";
 const _ = require("lodash");
 
 const defaultSyncValue = "Inactive";
@@ -324,9 +325,27 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
   Logger.log("Writing storage in syncToLocalFromFirebase");
-  return StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
+  await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
+  return updateLastSyncedTS(appMode);
 };
 
+const updateLastSyncedTS = async (appMode) => {
+  return StorageService(appMode).saveRecord({
+    [APP_CONSTANTS.LAST_SYNCED_TS]: Date.now(),
+  });
+};
+
+// Checks if last-synced-ts is later than last-updated-ts - the ideal case
+// last updated-ts will be ahead only if updates are performed directly by extension popup
+export const checkIfNoUpdateHasBeenPerformedSinceLastSync = async (appMode) => {
+  const lastSyncedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNCED_TS);
+  const lastUpdatedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_UPDATED_TS);
+  if (!lastSyncedTS || !lastUpdatedTS) return true; // assumption
+  return lastSyncedTS > lastUpdatedTS;
+};
+
+// Merge them both
+// If same id, retain the one with newer modification date, delete the other one
 export const mergeRecords = (firebaseRecords, localRecords) => {
   const mergedRecords = [...localRecords];
 
@@ -347,9 +366,29 @@ export const mergeRecords = (firebaseRecords, localRecords) => {
   return mergedRecords;
 };
 
+// assumption: Only rule/group "status" and "isFavourite" can cause a conflict. Prioritize local status
+export const handleLocalConflicts = (firebaseRecords, localRecords) => {
+  const firebaseRecordsCopy = _.cloneDeep(firebaseRecords) || [];
+  const output = firebaseRecordsCopy.map((objectItem) => {
+    const localRecordIndex = localRecords.findIndex((record) => record.id === objectItem.id);
+    if (localRecordIndex !== -1) {
+      // record exists in local
+      if (localRecords[localRecordIndex].status !== undefined)
+        objectItem["status"] = localRecords[localRecordIndex].status;
+      if (localRecords[localRecordIndex].isFavourite !== undefined)
+        objectItem["isFavourite"] = localRecords[localRecordIndex].isFavourite;
+      return objectItem;
+    } else {
+      // record doesn't even exist in local
+      return objectItem;
+    }
+  });
+  return output;
+};
+
 // ** SESSION RECORDING SYNC UTILS ** //
 
-const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
+export const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
   Logger.log("Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync");
   await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
@@ -373,7 +412,7 @@ export const getLocalSessionRecordingPageConfig = (appMode) => {
   });
 };
 
-export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode, timestamp) => {
+export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode) => {
   const pageConfig = await getLocalSessionRecordingPageConfig(appMode);
 
   trackSyncTriggered(uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
