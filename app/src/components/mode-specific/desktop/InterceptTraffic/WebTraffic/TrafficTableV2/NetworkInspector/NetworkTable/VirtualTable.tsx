@@ -3,7 +3,7 @@
  */
 import { Table } from "@devtools-ds/table";
 import React from "react";
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { FixedSizeList, FixedSizeListProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { ContextMenu } from "../ContextMenu";
@@ -39,12 +39,19 @@ export const VirtualTable = ({
   const listRef = useRef<FixedSizeList | null>();
   const [top, setTop] = useState(0);
 
+  useEffect(() => {
+    setTimeout(() => {
+      listRef?.current?.scrollToItem(rest.itemCount, "end");
+    }, 50);
+  }, [rest.itemCount]);
+
   return (
     <VirtualTableContext.Provider value={{ top, setTop, header, footer, selectedRowData }}>
       <AutoSizer>
         {({ height, width }) => (
           <FixedSizeList
             {...rest}
+            itemCount={rest.itemCount}
             height={height}
             width={width}
             innerElementType={Inner}
