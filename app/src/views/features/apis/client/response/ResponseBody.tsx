@@ -22,7 +22,7 @@ const ResponseBody: React.FC<Props> = ({ responseText }) => {
         const json = JSON.parse(responseText);
         setResponseJSON(json);
       } catch (e) {
-        // do nothing
+        setResponseJSON(null);
       }
     }
   }, [responseText]);
