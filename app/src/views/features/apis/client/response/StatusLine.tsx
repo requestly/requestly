@@ -30,7 +30,7 @@ const StatusLine: React.FC<Props> = ({ response }) => {
   }, [response.status, response.statusText]);
 
   return (
-    <Space>
+    <Space className="api-response-status-line">
       <PropertyRow
         name="Status"
         value={<NetworkStatusField status={response.status} statusText={formattedStatusText} />}

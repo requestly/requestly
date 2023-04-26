@@ -1,3 +1,16 @@
 .apis-view {
   height: 100%;
+  display: flex;
+
+  .apis-view-sidebar {
+    width: 300px;
+    flex: 0 0 auto;
+    border-right: 1px solid var(--border-dark);
+  }
+
+  .api-client-view {
+    flex: auto;
+    width: 100%;
+    min-width: 0;
+  }
 }

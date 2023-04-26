@@ -526,7 +526,7 @@ var routes = [
   /** APIs */
   {
     path: PATHS.APIS.RELATIVE,
-    name: "APIs",
+    name: "API Client",
     icon: "ni ni-lock-circle-open text-red",
     component: APIsView,
   },
