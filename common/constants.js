@@ -141,6 +141,7 @@ CONSTANTS.EXTENSION_MESSAGES = {
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",
+  NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
 };
 
 CONSTANTS.HEADERS_TARGET = {

@@ -186,6 +186,10 @@ const AppModeInitializer = () => {
           received: true,
         };
       });
+
+      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (message) => {
+        console.log("!!!debug", "", message);
+      });
     }
   }, [appMode]);
 

@@ -973,6 +973,15 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.onSessionRecordingStoppedNotification(sender.tab.id);
         break;
 
+      case RQ.CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
+        BG.isAppOnline &&
+          BG.Methods.getAppTabs().then((tabs) => {
+            tabs.forEach((tab) => {
+              BG.Methods.sendMessageToApp({ action: RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED }, tab.id);
+            });
+          });
+        break;
+
       case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
         BG.Methods.getTabSession(message.tabId, sendResponse);
         return true;
