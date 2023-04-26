@@ -224,20 +224,16 @@ const CurrentTrafficTable = ({
     [stableDispatch]
   );
 
-  const unregisterLogListener = () => {
-    // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-    window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
-    window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
-  };
-
   useEffect(() => {
-    if (isInterceptingTraffic) {
-      // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-      window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
+    // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
+      if (isInterceptingTraffic) {
         // TODO: @sahil865gupta Fix this multiple time registering
         upsertNetworkLogMap(payload);
-      });
-      window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+      }
+    });
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+      if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
 
         printLogsToConsole(rqLog);
@@ -247,14 +243,14 @@ const CurrentTrafficTable = ({
         } else {
           upsertNetworkLogMap(rqLog);
         }
-      });
-    } else {
-      unregisterLogListener();
-    }
+      }
+    });
 
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
-        unregisterLogListener();
+        // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
   }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);

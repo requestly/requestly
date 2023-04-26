@@ -1,9 +1,9 @@
-import React from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip, Switch } from "antd";
+import React, { useState } from "react";
+import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
 import {
-  CheckOutlined,
+  CaretRightOutlined,
   ClearOutlined,
-  CloseOutlined,
+  PauseOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
@@ -64,19 +64,48 @@ const ActionHeader = ({
             </Col>
           </>
         ) : null}
-        <Tooltip title="Toggle traffic logging">
-          <Switch
-            checkedChildren={<CheckOutlined />}
-            unCheckedChildren={<CloseOutlined />}
-            defaultChecked
-            onChange={(isChecked) => {
-              setIsInterceptingTraffic(isChecked);
+        <Col>
+          <PauseAndPlayButton
+            defaultIsPaused={false}
+            onChange={(isPaused) => {
+              console.log("isPaused", isPaused);
+              setIsInterceptingTraffic(!isPaused);
             }}
           />
-        </Tooltip>
+        </Col>
       </Space>
     </Row>
   );
 };
 
 export default ActionHeader;
+
+function PauseAndPlayButton({ defaultIsPaused, onChange }) {
+  const [isPaused, setIsPaused] = useState(defaultIsPaused);
+  return (
+    <Tooltip title={isPaused ? "Start logging network requests" : "Stop Logging network requests"}>
+      {isPaused ? (
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<CaretRightOutlined />}
+          onClick={() => {
+            setIsPaused(false);
+            onChange(false); // isPaused
+          }}
+        />
+      ) : (
+        <Button
+          type="primary"
+          shape="circle"
+          danger
+          icon={<PauseOutlined />}
+          onClick={() => {
+            setIsPaused(true);
+            onChange(true); // isPaused
+          }}
+        />
+      )}
+    </Tooltip>
+  );
+}
