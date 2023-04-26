@@ -17,8 +17,6 @@ const ActionHeader = ({
     <Row
       align="middle"
       style={{
-        marginBottom: 6,
-        marginTop: 6,
         padding: 3,
         paddingLeft: "24px",
         paddingRight: "12px",
@@ -26,7 +24,12 @@ const ActionHeader = ({
     >
       <Space direction="horizontal">
         <Col>
-          <Input.Search placeholder="Input Search Keyword" onChange={handleOnSearchChange} style={{ width: 300 }} />
+          <Input.Search
+            className="action-header-input"
+            placeholder="Input Search Keyword"
+            onChange={handleOnSearchChange}
+            style={{ width: 300 }}
+          />
         </Col>
         <Col>
           <Tooltip placement="top" title="Clear Logs">
