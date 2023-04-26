@@ -181,6 +181,7 @@ const AppModeInitializer = () => {
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
+        console.log("!!!debug", "extension events", message);
         return {
           ackIds: batchIdsToAcknowledge,
           received: true,
@@ -189,6 +190,10 @@ const AppModeInitializer = () => {
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (message) => {
         console.log("!!!debug", "", message);
+        // TODO: handle app logic here for realtime toggle of rules
+        return {
+          received: true,
+        };
       });
     }
   }, [appMode]);

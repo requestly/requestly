@@ -15,8 +15,10 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
       return true;
 
     case RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED:
-      RQ.ContentScriptMessageHandler.sendMessage(message);
-      break;
+      RQ.ContentScriptMessageHandler.sendMessage(message, (response) => {
+        sendResponse(response);
+      });
+      return true;
   }
 });
 
