@@ -1,5 +1,5 @@
 import { Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { SyntheticEvent, useCallback, useEffect, useState } from "react";
 import Split from "react-split";
 import { RQAPI, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
@@ -10,6 +10,7 @@ import "./apiClientView.scss";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
+  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
 }
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -30,7 +31,7 @@ const getEmptyAPIEntry = (): RQAPI.Entry => {
   };
 };
 
-const APIClientView: React.FC<Props> = ({ apiEntry }) => {
+const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
@@ -94,6 +95,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry }) => {
   }, [entry]);
 
   const onSendButtonClick = useCallback(() => {
+    if (!entry.request.url) {
+      return;
+    }
+
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
@@ -109,14 +114,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry }) => {
     setIsLoadingResponse(true);
 
     makeRequest(sanitizedEntry.request).then((response) => {
+      const entryWithResponse = { ...entry, response };
       if (response) {
-        setEntry((entry) => ({ ...entry, response }));
+        setEntry(entryWithResponse);
       } else {
         setIsFailed(true);
       }
       setIsLoadingResponse(false);
+      notifyApiRequestFinished?.(entryWithResponse);
     });
-  }, [entry]);
+  }, [entry, notifyApiRequestFinished]);
+
+  const onUrlInputEnterPressed = useCallback((evt: SyntheticEvent<HTMLInputElement>) => {
+    (evt.target as HTMLInputElement).blur();
+  }, []);
 
   return (
     <div className="api-client-view">
@@ -133,6 +144,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry }) => {
             placeholder="https://example.com"
             value={entry.request.url}
             onChange={(evt) => setUrl(evt.target.value)}
+            onPressEnter={onUrlInputEnterPressed}
             onBlur={addUrlSchemeIfMissing}
           />
         </Space.Compact>

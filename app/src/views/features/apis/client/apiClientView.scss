@@ -75,6 +75,10 @@
       .ant-tabs-tabpane {
         height: 100%;
       }
+
+      .api-response-status-line {
+        font-size: 12px;
+      }
     }
 
     .api-response-body {
@@ -89,6 +93,12 @@
         font-size: 12px;
         background: #26272a;
         padding: 10px;
+
+        pre {
+          overflow: hidden;
+          word-wrap: break-word;
+          white-space: pre-wrap;
+        }
       }
     }
   }

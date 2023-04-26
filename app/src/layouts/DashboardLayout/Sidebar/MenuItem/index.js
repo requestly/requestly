@@ -39,7 +39,7 @@ const givenRoutes = [
   },
   {
     path: PATHS.APIS.ABSOLUTE,
-    name: "APIs",
+    name: "API Client",
     icon: <ApiOutlined />,
     key: "apis",
   },
