@@ -37,7 +37,7 @@ const APIsViewSidebar: React.FC<Props> = ({ history, clearHistory, onSelectionFr
     return history
       .map((entry: RQAPI.Entry, index) => ({
         key: String(index),
-        icon: <span>{entry.request.method.toUpperCase()}</span>,
+        icon: <span className="api-method">{entry.request.method.toUpperCase()}</span>,
         label: entry.request.url,
         entry,
       }))
