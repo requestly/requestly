@@ -1,3 +1,16 @@
+.request-log-main-wrapper {
+  position: relative;
+}
+
+.request-log-pane-header {
+  width: 100%;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--body-background);
+}
+
 .request-log-pane {
   font-size: 13px;
   background-color: transparent;

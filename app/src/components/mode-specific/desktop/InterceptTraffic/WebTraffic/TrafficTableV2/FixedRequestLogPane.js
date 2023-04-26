@@ -25,7 +25,7 @@ const CopyCurlButton = ({ requestShellCurl }) => {
 
 const Header = (props) => {
   return (
-    <Row align="middle" style={{ width: "100%", margin: "10px 0px" }}>
+    <Row className="request-log-pane-header" align="middle">
       <Space>
         <div style={{ display: "flex", marginLeft: "4px", cursor: "pointer" }}>
           <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
@@ -149,7 +149,7 @@ const LogPane = (props) => {
 const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleClosePane, visibility }) => {
   return (
     visibility && (
-      <>
+      <div className="request-log-main-wrapper">
         <Header
           url={selectedRequestData.url}
           requestShellCurl={selectedRequestData.requestShellCurl}
@@ -184,7 +184,7 @@ const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleCloseP
             />
           </div>
         </div>
-      </>
+      </div>
     )
   );
 };
