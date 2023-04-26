@@ -30,10 +30,19 @@
 
     &.ant-menu {
       background: transparent;
+
+      .ant-menu-item {
+        padding: 0 12px !important;
+        font-size: 13px;
+      }
     }
 
     .api-method {
       font-size: 11px;
+
+      .ant-tag {
+        margin-right: 0;
+      }
     }
   }
 }

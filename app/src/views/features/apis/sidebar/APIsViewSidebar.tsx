@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
-import { Button, Menu, Typography } from "antd";
-import { RQAPI } from "../types";
+import { Button, Menu, Tag, Typography } from "antd";
+import { RQAPI, RequestMethod } from "../types";
 import "./apisViewSidebar.scss";
 
 interface Props {
@@ -9,6 +9,18 @@ interface Props {
   clearHistory: () => void;
   onSelectionFromHistory: (entry: RQAPI.Entry) => void;
 }
+
+const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
+  [RequestMethod.GET]: "green",
+  [RequestMethod.POST]: "blue",
+  [RequestMethod.PUT]: "cyan",
+  [RequestMethod.PATCH]: "geekblue",
+  [RequestMethod.DELETE]: "red",
+  [RequestMethod.HEAD]: "magenta",
+  [RequestMethod.CONNECT]: "lime",
+  [RequestMethod.OPTIONS]: "gold",
+  [RequestMethod.TRACE]: "cyan",
+};
 
 const APIsViewSidebar: React.FC<Props> = ({ history, clearHistory, onSelectionFromHistory }) => {
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number>(-1);
@@ -35,12 +47,20 @@ const APIsViewSidebar: React.FC<Props> = ({ history, clearHistory, onSelectionFr
 
   const menuItems = useMemo(() => {
     return history
-      .map((entry: RQAPI.Entry, index) => ({
-        key: String(index),
-        icon: <span className="api-method">{entry.request.method.toUpperCase()}</span>,
-        label: entry.request.url,
-        entry,
-      }))
+      .map((entry: RQAPI.Entry, index) => {
+        const method = entry.request.method.toUpperCase();
+
+        return {
+          key: String(index),
+          icon: (
+            <span className="api-method">
+              <Tag color={REQUEST_METHOD_COLOR_CODES[method]}>{method}</Tag>
+            </span>
+          ),
+          label: entry.request.url,
+          entry,
+        };
+      })
       .reverse();
   }, [history]);
 
