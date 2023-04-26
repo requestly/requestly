@@ -51,7 +51,6 @@ export const VirtualTable = ({
         {({ height, width }) => (
           <FixedSizeList
             {...rest}
-            itemCount={rest.itemCount}
             height={height}
             width={width}
             innerElementType={Inner}
