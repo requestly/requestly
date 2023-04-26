@@ -14,7 +14,6 @@ interface DesktopTrafficTableState {
 
 export const logsAdapter = createEntityAdapter<any>({
   selectId: (log) => log.id,
-  sortComparer: (a, b) => (a?.data?.timestamp > b?.data?.timestamp ? 1 : -1),
 });
 
 const slice = createSlice({
