@@ -851,6 +851,7 @@ BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
   const lastTriedTabIds = [];
 
   while (BG.isAppOnline) {
+    /* Getting one app tab (that we haven't tried sending) */
     const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
       const filteredTab = tabs.find((tab) => !lastTriedTabIds.includes(tab.id));
       if (filteredTab) {
