@@ -87,8 +87,8 @@ const MockEditor: React.FC<Props> = ({
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     const entry: RQAPI.Entry = { request: { url: finalUrl, method, headers: [], queryParams: [] }, response: null };
     try {
-      entry.request.headers = Object.entries<string>(JSON.parse(headersString)).map(([name, value]) => ({
-        name,
+      entry.request.headers = Object.entries<string>(JSON.parse(headersString)).map(([key, value]) => ({
+        key,
         value,
         id: Math.random(),
       }));

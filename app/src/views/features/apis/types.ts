@@ -10,30 +10,31 @@ export enum RequestMethod {
   TRACE = "TRACE",
 }
 
+export enum RequestContentType {
+  RAW = "raw",
+  JSON = "json",
+  FORM = "form",
+}
+
+export interface KeyValuePair {
+  id?: number;
+  key: string;
+  value: string;
+}
+
 export namespace RQAPI {
-  export interface QueryParam {
-    id?: number;
-    key: string;
-    value: string;
-  }
-
-  export interface Header {
-    id?: number;
-    name: string;
-    value: string;
-  }
-
   export interface Request {
     url: string;
-    queryParams: QueryParam[];
+    queryParams: KeyValuePair[];
     method: RequestMethod;
-    headers: Header[];
+    headers: KeyValuePair[];
     body?: string;
+    contentType?: RequestContentType;
   }
 
   export interface Response {
     body: string;
-    headers: Header[];
+    headers: KeyValuePair[];
     status: number;
     statusText: string;
     time: number;
