@@ -20,12 +20,14 @@ import { desktopTrafficTableActions } from "store/features/desktop-traffic-table
 import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
+import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import { trackTrafficTableLogsCleared, trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import {
   trackSidebarFilterCollapsed,
   trackSidebarFilterExpanded,
   trackSidebarFilterSelected,
+  trackSidebarFilterClearAllClicked,
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
@@ -475,7 +477,10 @@ const CurrentTrafficTable = ({
             <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
           </span>
         ),
-        onClick: () => setFilterTypes({}),
+        onClick: () => {
+          setFilterTypes({});
+          trackSidebarFilterClearAllClicked(ANALYTIC_EVENT_SOURCE, Object.values(filterTypes).length);
+        },
       },
       {
         key: logType.APP,
@@ -490,7 +495,7 @@ const CurrentTrafficTable = ({
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ];
-  }, [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
+  }, [appList, domainList, filterTypes, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
 
   const handleSidebarMenuItemClick = useCallback((e) => {
     if (e.key === "clear_all") return;
