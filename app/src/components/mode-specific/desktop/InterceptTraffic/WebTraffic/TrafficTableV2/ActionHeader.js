@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
 import {
+  SaveOutlined,
   CaretRightOutlined,
   ClearOutlined,
   PauseOutlined,
@@ -18,7 +19,9 @@ const ActionHeader = ({
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
+  logsCount,
   setIsInterceptingTraffic,
+  exportLogsAsHar,
 }) => {
   return (
     <Row
@@ -37,7 +40,18 @@ const ActionHeader = ({
         </Col>
         <Col>
           <Tooltip placement="top" title="Clear Logs">
-            <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
+            <Button
+              type="primary"
+              disabled={!logsCount}
+              shape="circle"
+              icon={<ClearOutlined />}
+              onClick={clearLogs}
+            />
+          </Tooltip>
+        </Col>
+        <Col>
+          <Tooltip placement="top" title="Export Logs">
+            <Button type="primary" disabled={!logsCount} icon={<SaveOutlined />} onClick={exportLogsAsHar} />
           </Tooltip>
         </Col>
         {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (

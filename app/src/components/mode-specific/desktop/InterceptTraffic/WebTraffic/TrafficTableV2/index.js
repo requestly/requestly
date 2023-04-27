@@ -30,6 +30,7 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
+import { downloadLogs } from "../TrafficExporter/harLogs/utils";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -471,6 +472,11 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
+              logsCount={newLogs.length}
+              exportLogsAsHar={() => {
+                const logsToExport = getSearchedLogs(newLogs, searchKeyword);
+                downloadLogs(logsToExport);
+              }}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
