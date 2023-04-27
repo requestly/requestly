@@ -112,6 +112,8 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
         onSelected={(id) => {
           setSelected(id);
         }}
+        //@ts-ignore
+        onContextMenu={(e) => setSelected(e.target?.parentElement.id)}
       >
         {header}
         <ContextMenu log={selectedRowData}>
