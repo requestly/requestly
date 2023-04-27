@@ -467,7 +467,16 @@ const CurrentTrafficTable = ({
   const isFilterApplied = useMemo(() => Object.values(filterTypes).length > 0, [filterTypes]);
 
   const items = useMemo(() => {
-    const menuItems = [
+    return [
+      {
+        key: "clear_all",
+        label: (
+          <span>
+            <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
+          </span>
+        ),
+        onClick: () => setFilterTypes({}),
+      },
       {
         key: logType.APP,
         label: `Apps (${appList?.length ?? 0})`,
@@ -481,21 +490,7 @@ const CurrentTrafficTable = ({
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ];
-
-    const clearAllOption = [
-      {
-        key: "clear_all",
-        label: (
-          <span>
-            <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
-          </span>
-        ),
-        onClick: () => setFilterTypes({}),
-      },
-    ];
-
-    return isFilterApplied ? [...clearAllOption, ...menuItems] : menuItems;
-  }, [appList, domainList, isFilterApplied, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
+  }, [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
 
   const handleSidebarMenuItemClick = useCallback((e) => {
     if (e.key === "clear_all") return;
@@ -513,6 +508,7 @@ const CurrentTrafficTable = ({
             openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
             selectedKeys={Object.values(filterTypes)}
+            className={isFilterApplied ? "filter-applied" : ""}
           />
         </Col>
         <Col flex="auto">
