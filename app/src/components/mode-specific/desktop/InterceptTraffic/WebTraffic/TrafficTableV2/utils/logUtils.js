@@ -12,11 +12,11 @@ export const convertProxyLogToUILog = (log) => {
   finalLog.consoleLogs = log.consoleLogs || [];
   return finalLog;
 };
-
+// todo: shift to trafficExporter/harlogs/converter.ts
 const convertHarJsonToRQLog = (har) => {
   let entry = {};
   if (har?.log?.entries) {
-    entry = har?.log?.entries[0];
+    entry = har?.log?.entries[0]; // todo, change this to handle multiple entries
   } else {
     return null;
   }
