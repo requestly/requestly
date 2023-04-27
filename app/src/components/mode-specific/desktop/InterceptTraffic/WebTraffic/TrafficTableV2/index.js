@@ -67,7 +67,7 @@ const CurrentTrafficTable = ({
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
-  const [filterType, setFilterType] = useState(null);
+  const [filterTypes, setFilterTypes] = useState({});
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
 
   const handleRuleEditorModalClose = useCallback(() => {
@@ -110,11 +110,11 @@ const CurrentTrafficTable = ({
     setRulePaneSizes([100, 0]);
   };
 
-  const handleRowClick = (row) => {
+  const handleRowClick = useCallback((row) => {
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
     trackTrafficTableRequestClicked();
-  };
+  }, []);
 
   const handleClosePane = () => {
     handlePreviewVisibility(false);
@@ -331,32 +331,56 @@ const CurrentTrafficTable = ({
   const { appList, appLogs } = useMemo(() => getAppLogs(), [getAppLogs]);
   const { domainList, domainLogs } = useMemo(() => getDomainLogs(), [getDomainLogs]);
 
-  const getGroupLogs = () => {
-    const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
-    const searchedLogs = getSearchedLogs(logs, searchKeyword);
+  const getGroupLogs = useMemo(
+    () => () => {
+      const logs = Object.values(filterTypes).reduce((logs, filterType) => {
+        const [logType, filter] = filterType?.split(" ") ?? [];
+        return [...logs, ...(filter ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : [])];
+      }, []);
 
-    return (
-      <GroupByNone
-        requestsLog={searchedLogs}
-        handleRowClick={handleRowClick}
-        emptyCtaText={emptyCtaText}
-        emptyCtaAction={emptyCtaAction}
-        emptyDesc={emptyDesc}
-        searchKeyword={searchKeyword}
-      />
-    );
-  };
+      // remove logs with same id
+      const filteredLogs = logs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
+      const allLogs = Object.values(filteredLogs).length > 0 ? Object.values(filteredLogs) : requestLogs;
+      const searchedLogs = getSearchedLogs(allLogs, searchKeyword);
 
-  const handleClearFilter = useCallback((e) => {
-    e.stopPropagation();
-    setFilterType(null);
-  }, []);
+      return (
+        <GroupByNone
+          requestsLog={searchedLogs}
+          handleRowClick={handleRowClick}
+          emptyCtaText={emptyCtaText}
+          emptyCtaAction={emptyCtaAction}
+          emptyDesc={emptyDesc}
+        />
+      );
+    },
+    [
+      appLogs,
+      domainLogs,
+      emptyCtaAction,
+      emptyCtaText,
+      emptyDesc,
+      filterTypes,
+      getSearchedLogs,
+      handleRowClick,
+      requestLogs,
+      searchKeyword,
+    ]
+  );
+
+  const handleClearFilter = useCallback(
+    (e, key) => {
+      e.stopPropagation();
+
+      const updatedFilterTypes = JSON.parse(JSON.stringify(filterTypes));
+      delete updatedFilterTypes[key];
+      setFilterTypes(updatedFilterTypes);
+    },
+    [filterTypes]
+  );
 
   const getLogAvatar = useCallback(
-    (logName = "", avatarUrl) => {
-      const filter = filterType?.split(" ")?.[1] ?? [];
-      const isSelected = logName === filter;
+    (key, logName = "", avatarUrl) => {
+      const isSelected = key in filterTypes;
 
       return (
         <>
@@ -369,7 +393,7 @@ const CurrentTrafficTable = ({
                   size="small"
                   shape="circle"
                   icon={<CloseOutlined />}
-                  onClick={handleClearFilter}
+                  onClick={(e) => handleClearFilter(e, key)}
                   className="clear-log-filter-btn"
                 />
               </Tooltip>
@@ -378,25 +402,25 @@ const CurrentTrafficTable = ({
         </>
       );
     },
-    [filterType, handleClearFilter]
+    [filterTypes, handleClearFilter]
   );
 
   const getApplogAvatar = useCallback(
-    (logName) => {
+    (key, logName) => {
       const logNameURI = decodeURIComponent(logName.trim());
       const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
-      return getLogAvatar(logNameURI, avatarUrl);
+      return getLogAvatar(key, logNameURI, avatarUrl);
     },
     [getLogAvatar]
   );
 
   const getDomainLogAvatar = useCallback(
-    (logName) => {
+    (key, logName) => {
       const domainParts = logName.trim().split(".");
       const avatarDomain = domainParts.splice(domainParts.length - 2, 2).join(".");
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
-      return getLogAvatar(logName, avatarUrl);
+      return getLogAvatar(key, logName, avatarUrl);
     },
     [getLogAvatar]
   );
@@ -405,7 +429,7 @@ const CurrentTrafficTable = ({
     (apps) => {
       return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
         key: `${logType.APP} ${appName}`,
-        label: getApplogAvatar(appName),
+        label: getApplogAvatar(`${logType.APP} ${appName}`, appName),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
         },
@@ -418,7 +442,7 @@ const CurrentTrafficTable = ({
     (domains) => {
       return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
         key: `${logType.DOMAIN} ${domain}`,
-        label: getDomainLogAvatar(domain),
+        label: getDomainLogAvatar(`${logType.DOMAIN} ${domain}`, domain),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
         },
@@ -440,8 +464,10 @@ const CurrentTrafficTable = ({
     [expandedLogTypes]
   );
 
-  const items = useMemo(
-    () => [
+  const isFilterApplied = useMemo(() => Object.values(filterTypes).length > 0, [filterTypes]);
+
+  const items = useMemo(() => {
+    const menuItems = [
       {
         key: logType.APP,
         label: `Apps (${appList?.length ?? 0})`,
@@ -454,23 +480,39 @@ const CurrentTrafficTable = ({
         children: getDomainLogsMenuItem(domainList),
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
-    ],
-    [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]
-  );
+    ];
 
-  const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
+    const clearAllOption = [
+      {
+        key: "clear_all",
+        label: (
+          <span>
+            <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
+          </span>
+        ),
+        onClick: () => setFilterTypes({}),
+      },
+    ];
+
+    return isFilterApplied ? [...clearAllOption, ...menuItems] : menuItems;
+  }, [appList, domainList, isFilterApplied, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
+
+  const handleSidebarMenuItemClick = useCallback((e) => {
+    if (e.key === "clear_all") return;
+    setFilterTypes((prev) => ({ ...prev, [e.key]: e.key }));
+  }, []);
 
   return (
     <>
       <Row wrap={false}>
-        <Col flex="197px" className="traffic-table-sidebar">
+        <Col flex="197px" style={isFilterApplied ? { paddingTop: "8px" } : {}} className="traffic-table-sidebar">
           <Menu
             theme="dark"
             mode="inline"
             items={items}
             openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
-            selectedKeys={filterType ? [filterType] : []}
+            selectedKeys={Object.values(filterTypes)}
           />
         </Col>
         <Col flex="auto">
