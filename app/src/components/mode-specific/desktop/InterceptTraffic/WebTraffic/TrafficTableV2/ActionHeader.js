@@ -83,7 +83,7 @@ export default ActionHeader;
 function PauseAndPlayButton({ defaultIsPaused, onChange }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
   return (
-    <Tooltip title={isPaused ? "Start logging network requests" : "Stop Logging network requests"}>
+    <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
       {isPaused ? (
         <Button
           type="primary"
