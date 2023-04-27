@@ -23,12 +23,14 @@ export interface KeyValuePair {
 }
 
 export namespace RQAPI {
+  export type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
+
   export interface Request {
     url: string;
     queryParams: KeyValuePair[];
     method: RequestMethod;
     headers: KeyValuePair[];
-    body?: string;
+    body?: RequestBody;
     contentType?: RequestContentType;
   }
 

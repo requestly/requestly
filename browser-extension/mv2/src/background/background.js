@@ -1259,7 +1259,7 @@ BG.Methods.getTabSession = (tabId, callback) => {
 BG.Methods.getAPIResponse = async (apiRequest) => {
   const method = apiRequest.method;
   const headers = new Headers();
-  const body = apiRequest.body;
+  let body = apiRequest.body;
   let url = apiRequest.url;
 
   if (apiRequest.queryParams.length) {
@@ -1272,9 +1272,17 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     url = urlObj.toString();
   }
 
-  apiRequest.headers.forEach(({ name, value }) => {
-    headers.append(name, value);
+  apiRequest.headers.forEach(({ key, value }) => {
+    headers.append(key, value);
   });
+
+  if (apiRequest.contentType === "form") {
+    const formData = new FormData();
+    body.forEach(({ key, value }) => {
+      formData.append(key, value);
+    });
+    body = new URLSearchParams(formData);
+  }
 
   try {
     const requestStartTime = performance.now();
@@ -1283,8 +1291,8 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     const responseTime = performance.now() - requestStartTime;
 
     const responseHeaders = [];
-    response.headers.forEach((value, name) => {
-      responseHeaders.push({ name, value });
+    response.headers.forEach((value, key) => {
+      responseHeaders.push({ key, value });
     });
 
     return {

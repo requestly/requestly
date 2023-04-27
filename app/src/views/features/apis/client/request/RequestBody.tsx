@@ -2,12 +2,13 @@ import React, { useCallback, useMemo } from "react";
 import CodeEditor from "components/misc/CodeEditor";
 import { formatJSONString } from "utils/CodeEditorUtils";
 import { Button, Input, Radio } from "antd";
-import { RequestContentType } from "../../types";
+import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
+import KeyValueForm from "./KeyValueForm";
 
 interface Props {
-  body: string;
+  body: RQAPI.RequestBody;
   contentType: RequestContentType;
-  setBody: (body: string) => void;
+  setBody: (body: RQAPI.RequestBody) => void;
   setContentType: (contentType: RequestContentType) => void;
 }
 
@@ -31,14 +32,14 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
         );
 
       case RequestContentType.FORM:
-        return <div />;
+        return <KeyValueForm keyValuePairs={body as KeyValuePair[]} setKeyValuePairs={setBody} />;
 
       default:
         return (
           <Input.TextArea
             className="api-request-body-raw"
             placeholder="Enter text here..."
-            value={body}
+            value={body as string}
             onChange={(e) => setBody(e.target.value)}
           />
         );
