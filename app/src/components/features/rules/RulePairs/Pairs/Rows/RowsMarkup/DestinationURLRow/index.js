@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Radio, Tooltip, Popconfirm } from "antd";
+import { Row, Col, Input, Radio, Popconfirm } from "antd";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
@@ -20,6 +20,7 @@ import {
   trackSelectMock,
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
+import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
@@ -272,13 +273,12 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                   >
                     <Radio value={RedirectDestinationType.URL}>URL</Radio>
                   </MoreInfo>
-                  <Tooltip
-                    trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) ? ["hover", "focus"] : [null]}
-                    onOpenChange={(open) => {
-                      if (open) trackDesktopActionInterestCaptured("map_local");
-                    }}
-                    overlayInnerStyle={{ width: "442px" }}
-                    title={
+                  <MoreInfo
+                    trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+                    tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
+                    analyticsContext="map_local"
+                    source={currentlySelectedRuleConfig.TYPE}
+                    text={
                       <>
                         Map Local file option is available only in desktop app.{" "}
                         <a
@@ -286,6 +286,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                           target="_blank"
                           rel="noreferrer"
                           className="tooltip-link"
+                          onClick={() => trackMoreInfoClicked("map_local", currentlySelectedRuleConfig.TYPE)}
                         >
                           Download now
                         </a>
@@ -298,7 +299,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                     >
                       Local file
                     </Radio>
-                  </Tooltip>
+                  </MoreInfo>
                   <MoreInfo
                     text=" Redirect to endpoint from Requestly Mock Server or File Server"
                     analyticsContext="pick_mock_or_file_destination"
