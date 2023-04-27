@@ -13,7 +13,7 @@
   background-color: var(--body-background);
 }
 
-.traffic-table-sidebar .ant-menu.ant-menu-dark:not(.filter-applied) .ant-menu-item:first-child {
+.traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {
   display: none;
 }
 
