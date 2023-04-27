@@ -118,7 +118,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
         startWalkthrough={!isTrafficTableTourCompleted}
-        onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isTrafficTableTourCompleted" }))}
       />
       <VirtualTable
         height="100%"

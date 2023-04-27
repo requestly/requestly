@@ -42,7 +42,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     const { index, type, status } = data;
     if (status === STATUS.SKIPPED) {
       WalkthroughHelpers?.skip();
-      dispatch(actions.updateRedirectRuleTourCompleted({}));
+      dispatch(actions.updateProductTourCompleted({ tour: "isRedirectRuleTourCompleted" }));
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();

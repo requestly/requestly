@@ -125,7 +125,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
     if (open) {
       trackTrafficTableRequestRightClicked();
       if (!isTrafficTableTourCompleted) {
-        dispatch(actions.updateTrafficTableTourCompleted({}));
+        dispatch(actions.updateProductTourCompleted({ tour: "isTrafficTableTourCompleted" }));
       }
     }
   };

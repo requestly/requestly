@@ -281,7 +281,7 @@ const RuleBuilder = (props) => {
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         runTourWithABTest={isRedirectRuleTourEnabled}
-        onTourComplete={() => dispatch(actions.updateRedirectRuleTourCompleted({}))}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isRedirectRuleTourCompleted" }))}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header

@@ -149,7 +149,7 @@ export default function HeaderText() {
         <ProductWalkthrough
           tourFor={FEATURES.DESKTOP_APP_CONNECTED_APPS}
           startWalkthrough={startWalkthrough}
-          onTourComplete={() => dispatch(actions.updateConnectedAppsTourCompleted({}))}
+          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
         />
         <Col
           className="hidden-on-small-screen desktop-app-proxy-info-container"
