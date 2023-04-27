@@ -14,3 +14,10 @@
     min-width: 0;
   }
 }
+
+.import-modal {
+  textarea.curl-command-input {
+    height: 400px;
+    resize: none;
+  }
+}

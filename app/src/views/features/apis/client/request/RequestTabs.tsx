@@ -1,8 +1,9 @@
 import { Tabs, TabsProps } from "antd";
 import React, { memo, useMemo } from "react";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
+import { supportsRequestBody } from "../../apiUtils";
 
 interface Props {
   request: RQAPI.Request;
@@ -38,18 +39,18 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
             setContentType={setContentType}
           />
         ),
-        disabled: [RequestMethod.GET, RequestMethod.HEAD].includes(request.method),
+        disabled: !supportsRequestBody(request.method),
       },
       {
         key: Tab.HEADERS,
         label: "Headers",
         children: <KeyValueForm keyValuePairs={request.headers} setKeyValuePairs={setRequestHeaders} />,
       },
-      {
-        key: Tab.AUTHORIZATION,
-        label: "Authorization",
-        children: <div></div>,
-      },
+      // {
+      //   key: Tab.AUTHORIZATION,
+      //   label: "Authorization",
+      //   children: <div></div>,
+      // },
     ],
     [request, setQueryParams, setBody, setRequestHeaders, setContentType]
   );

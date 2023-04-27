@@ -1276,7 +1276,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     headers.append(key, value);
   });
 
-  if (apiRequest.contentType === "form") {
+  if (apiRequest.contentType === "application/x-www-form-urlencoded") {
     const formData = new FormData();
     body.forEach(({ key, value }) => {
       formData.append(key, value);

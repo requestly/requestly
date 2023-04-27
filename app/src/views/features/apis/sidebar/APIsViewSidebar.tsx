@@ -3,11 +3,14 @@ import placeholderImage from "../../../../assets/images/illustrations/empty-shee
 import { Button, Menu, Tag, Typography } from "antd";
 import { RQAPI, RequestMethod } from "../types";
 import "./apisViewSidebar.scss";
+import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
 interface Props {
   history: RQAPI.Entry[];
   clearHistory: () => void;
   onSelectionFromHistory: (entry: RQAPI.Entry) => void;
+  onNewClick: () => void;
+  onImportClick: () => void;
 }
 
 const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
@@ -22,7 +25,13 @@ const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
   [RequestMethod.TRACE]: "cyan",
 };
 
-const APIsViewSidebar: React.FC<Props> = ({ history, clearHistory, onSelectionFromHistory }) => {
+const APIsViewSidebar: React.FC<Props> = ({
+  history,
+  clearHistory,
+  onSelectionFromHistory,
+  onNewClick,
+  onImportClick,
+}) => {
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number>(-1);
 
   // using layout effect ensures that the updated list does not render with older selection
@@ -67,12 +76,21 @@ const APIsViewSidebar: React.FC<Props> = ({ history, clearHistory, onSelectionFr
   return (
     <div className="apis-view-sidebar">
       <div className="api-view-sidebar-header">
-        <Typography.Title level={5} style={{ margin: 0 }}>
-          History
-        </Typography.Title>
-        <Button type="text" onClick={clearHistory}>
-          Clear all
-        </Button>
+        <div>
+          <Button type="text" onClick={onNewClick} icon={<PlusCircleOutlined />}>
+            New
+          </Button>
+          <Button type="text" onClick={onImportClick} icon={<CodeOutlined />}>
+            Import
+          </Button>
+        </div>
+        <div>
+          {history?.length ? (
+            <Button type="text" onClick={clearHistory} icon={<ClearOutlined />}>
+              Clear history
+            </Button>
+          ) : null}
+        </div>
       </div>
       {history?.length ? (
         <Menu

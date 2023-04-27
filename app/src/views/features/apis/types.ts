@@ -11,9 +11,9 @@ export enum RequestMethod {
 }
 
 export enum RequestContentType {
-  RAW = "raw",
-  JSON = "json",
-  FORM = "form",
+  RAW = "text/plain",
+  JSON = "application/json",
+  FORM = "application/x-www-form-urlencoded",
 }
 
 export interface KeyValuePair {
