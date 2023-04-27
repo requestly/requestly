@@ -837,7 +837,7 @@ BG.Methods.getAppTabs = () => {
  * @param {Object} messageObject
  * @param {Number} tabId
  * @param {Number} timeout
- * @returns Promise resolving to the response from app or timeout error
+ * @returns Promise resolving to {wasMessageSent,payload} from app or timeout error
  */
 BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
   const sendMessageToTab = (messageObject, tabId) => {

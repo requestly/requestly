@@ -106,50 +106,6 @@ EventActions.sendExtensionEvents = async () => {
       });
     }
   }
-
-  // while (useEngine !== false && BG.isAppOnline) {
-  //   /* Getting one UI tab (that we haven't tried sending) */
-  //   const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
-  //     const filteredTab = tabs.find((tab) => !lastTriedTabIds.includes(tab.id));
-  //     if (filteredTab) {
-  //       lastTriedTabIds.push(filteredTab.id);
-  //       return filteredTab.id;
-  //     } else {
-  //       BG.isAppOnline = false;
-  //       return null;
-  //     }
-  //   });
-
-  //   if (!appTabId) break;
-
-  //   const eventBatchesPayload = await EventActions.getBatchesToSend();
-  //   if (eventBatchesPayload?.length === 0) break;
-
-  //   const extensionEventsMessage = {
-  //     action: RQ.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS,
-  //     eventBatches: eventBatchesPayload,
-  //   };
-  //   const response = await BG.Methods.sendMessageToApp(extensionEventsMessage, appTabId)
-  //     .then((payload) => {
-  //       if (payload) {
-  //         return { wasMessageSent: true, payload };
-  //       }
-  //       return { wasMessageSent: false };
-  //     })
-  //     .catch((err) => {
-  //       // todo: can add check if timeout based on err
-  //       return { wasMessageSent: false };
-  //     });
-
-  //   if (response.wasMessageSent) {
-  //     await EventActions.handleAcknowledgements(response.payload.ackIds);
-  //     break;
-  //   } else {
-  //     eventBatchesPayload.forEach((batch) => {
-  //       EventActions.stopWaitingForAcknowledgement(batch.id);
-  //     });
-  //   }
-  // }
 };
 
 EventActions.writeEventsToLocalStorage = async () => {
