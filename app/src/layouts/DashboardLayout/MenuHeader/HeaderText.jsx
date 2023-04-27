@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isPricingPage, isMobileInterceptorPage, isGoodbyePage } from "utils/PathUtils";
 import RQ_LOGO from "assets/img/brand/rq.png";
 import RQ_LOGO_LIGHT_BLUE from "assets/img/brand/rq-full-logo-light-blue.svg";
-import { getAppMode, getAppTheme, getUserAuthDetails, getIsConnectedAppsTourCompleted } from "store/selectors";
+import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FaStackOverflow } from "react-icons/fa";
@@ -14,10 +13,6 @@ import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
 import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
-import FEATURES from "config/constants/sub/features";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { actions } from "store";
-import { shouldShowConnectedAppsTour } from "./utils";
 
 const { PATHS } = APP_CONSTANTS;
 const SHOW_SESSION_RECORDING_BANNER = false;
@@ -27,24 +22,11 @@ const SHOW_MONTHLY_UPDATE_BANNER = false;
 export default function HeaderText() {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   // GLOBAL STATE
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const appTheme = useSelector(getAppTheme);
-  const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
-
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isConnectedAppsTourCompleted) {
-      shouldShowConnectedAppsTour(appMode).then((result) => {
-        if (result) {
-          setStartWalkthrough(true);
-        }
-      });
-    }
-  }, [appMode, isConnectedAppsTourCompleted, startWalkthrough]);
 
   const renderSessionRecordingPromo = () => {
     return (
@@ -146,15 +128,7 @@ export default function HeaderText() {
   const renderProxyInfo = () => {
     return (
       <>
-        <ProductWalkthrough
-          tourFor={FEATURES.CONNECTED_APPS}
-          startWalkthrough={startWalkthrough}
-          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
-        />
-        <Col
-          className="hidden-on-small-screen desktop-app-proxy-info-container"
-          data-tour-id="connected-apps-header-cta"
-        >
+        <Col className="hidden-on-small-screen desktop-app-proxy-info-container">
           <DesktopAppProxyInfo />
         </Col>
       </>
