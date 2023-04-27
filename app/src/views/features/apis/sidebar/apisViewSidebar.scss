@@ -17,10 +17,15 @@
   .api-view-sidebar-header {
     flex: 0 0 auto;
     border-bottom: 1px solid var(--border-dark);
-    padding: 5px 10px;
+    padding: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    button {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
   }
 
   .api-history-menu {
@@ -34,6 +39,10 @@
       .ant-menu-item {
         padding: 0 12px !important;
         font-size: 13px;
+
+        &.ant-menu-item-selected {
+          background-color: var(--component-background);
+        }
       }
     }
 

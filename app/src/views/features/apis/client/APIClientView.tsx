@@ -6,7 +6,7 @@ import RequestTabs from "./request/RequestTabs";
 import { getEmptyPair } from "./request/KeyValueForm";
 import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { makeRequest } from "../apiUtils";
+import { getEmptyAPIEntry, makeRequest, supportsRequestBody } from "../apiUtils";
 import "./apiClientView.scss";
 
 interface Props {
@@ -18,20 +18,6 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
   label: method,
 }));
-
-const getEmptyAPIEntry = (): RQAPI.Entry => {
-  return {
-    request: {
-      url: "https://user36644.requestly.dev/test-mock-api",
-      queryParams: [],
-      method: RequestMethod.GET,
-      headers: [],
-      body: "",
-      contentType: RequestContentType.RAW,
-    },
-    response: null,
-  };
-};
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
@@ -64,8 +50,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         },
       };
 
-      if ([RequestMethod.GET, RequestMethod.HEAD].includes(method)) {
-        newEntry.request.body = "";
+      if (!supportsRequestBody(method)) {
+        newEntry.request.body = null;
       }
       return newEntry;
     });
@@ -114,7 +100,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       const CONTENT_TYPE_HEADER = "Content-Type";
 
       const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
-      newEntry.request.headers = headers;
 
       let contentTypeHeader = headers.find((header) => !header.key && !header.value); // reuse empty header
       if (!contentTypeHeader) {
@@ -123,15 +108,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       }
 
       contentTypeHeader.key = CONTENT_TYPE_HEADER;
+      contentTypeHeader.value = contentType;
+      newEntry.request.headers = headers;
 
       if (contentType === RequestContentType.JSON) {
-        contentTypeHeader.value = "application/json";
         newEntry.request.body = "{}";
       } else if (contentType === RequestContentType.FORM) {
-        contentTypeHeader.value = "application/x-www-form-urlencoded";
         newEntry.request.body = [];
       } else {
-        contentTypeHeader.value = "text/plain";
         newEntry.request.body = "";
       }
 
@@ -170,7 +154,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       response: null,
     };
 
-    if (entry.request.contentType === RequestContentType.FORM) {
+    if (!supportsRequestBody(entry.request.method)) {
+      sanitizedEntry.request.body = null;
+    } else if (entry.request.contentType === RequestContentType.FORM) {
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
