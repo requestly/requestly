@@ -1259,6 +1259,7 @@ BG.Methods.getTabSession = (tabId, callback) => {
 BG.Methods.getAPIResponse = async (apiRequest) => {
   const method = apiRequest.method;
   const headers = new Headers();
+  const body = apiRequest.body;
   let url = apiRequest.url;
 
   if (apiRequest.queryParams.length) {
@@ -1277,7 +1278,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
 
   try {
     const requestStartTime = performance.now();
-    const response = await fetch(url, { method, headers });
+    const response = await fetch(url, { method, headers, body });
     const responseText = await response.text();
     const responseTime = performance.now() - requestStartTime;
 

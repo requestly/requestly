@@ -45,7 +45,12 @@ const ResponseBody: React.FC<Props> = ({ responseText }) => {
           <pre>{responseText}</pre>
         ) : (
           <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
-            <ObjectInspector data={responseJSON} includePrototypes={false} className="api-response-json" />
+            <ObjectInspector
+              data={responseJSON}
+              expandLevel={1}
+              includePrototypes={false}
+              className="api-response-json"
+            />
           </ThemeProvider>
         )}
       </div>

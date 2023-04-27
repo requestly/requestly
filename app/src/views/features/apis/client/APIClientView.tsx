@@ -1,8 +1,9 @@
 import { Button, Empty, Input, Select, Space, Spin } from "antd";
 import React, { SyntheticEvent, useCallback, useEffect, useState } from "react";
 import Split from "react-split";
-import { RQAPI, RequestMethod } from "../types";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
+import { getEmptyPair } from "./request/KeyValueForm";
 import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
 import { makeRequest } from "../apiUtils";
@@ -53,16 +54,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   }, []);
 
   const setMethod = useCallback((method: RequestMethod) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        method,
-      },
-    }));
+    setEntry((entry) => {
+      const newEntry: RQAPI.Entry = {
+        ...entry,
+        request: {
+          ...entry.request,
+          method,
+        },
+      };
+
+      if ([RequestMethod.GET, RequestMethod.HEAD].includes(method)) {
+        newEntry.request.body = "";
+      }
+      return newEntry;
+    });
   }, []);
 
-  const setQueryParams = useCallback((queryParams: RQAPI.QueryParam[]) => {
+  const setQueryParams = useCallback((queryParams: KeyValuePair[]) => {
     setEntry((entry) => ({
       ...entry,
       request: {
@@ -72,7 +80,17 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     }));
   }, []);
 
-  const setRequestHeaders = useCallback((headers: RQAPI.Header[]) => {
+  const setBody = useCallback((body: string) => {
+    setEntry((entry) => ({
+      ...entry,
+      request: {
+        ...entry.request,
+        body,
+      },
+    }));
+  }, []);
+
+  const setRequestHeaders = useCallback((headers: KeyValuePair[]) => {
     setEntry((entry) => ({
       ...entry,
       request: {
@@ -80,6 +98,37 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         headers,
       },
     }));
+  }, []);
+
+  const setContentType = useCallback((contentType: RequestContentType) => {
+    setEntry((entry) => {
+      const newEntry: RQAPI.Entry = {
+        ...entry,
+        request: {
+          ...entry.request,
+          contentType,
+        },
+      };
+
+      const CONTENT_TYPE_HEADER = "Content-Type";
+
+      if (contentType === RequestContentType.JSON) {
+        const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
+
+        let emptyHeader = headers.find((header) => !header.key && !header.value);
+        if (!emptyHeader) {
+          emptyHeader = getEmptyPair();
+          headers.push(emptyHeader);
+        }
+
+        emptyHeader.key = CONTENT_TYPE_HEADER;
+        emptyHeader.value = "application/json";
+
+        newEntry.request.headers = headers;
+      }
+
+      return newEntry;
+    });
   }, []);
 
   const addUrlSchemeIfMissing = useCallback(() => {
@@ -104,7 +153,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       request: {
         ...entry.request,
         queryParams: entry.request.queryParams.filter((param) => param.key.length),
-        headers: entry.request.headers.filter((param) => param.name.length),
+        headers: entry.request.headers.filter((param) => param.key.length),
       },
       response: null,
     };
@@ -114,7 +163,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     setIsLoadingResponse(true);
 
     makeRequest(sanitizedEntry.request).then((response) => {
-      const entryWithResponse = { ...entry, response };
+      const entryWithResponse = { ...sanitizedEntry, response };
       if (response) {
         setEntry(entryWithResponse);
       } else {
@@ -162,7 +211,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         gutterAlign="center"
         snapOffset={30}
       >
-        <RequestTabs request={entry.request} setQueryParams={setQueryParams} setRequestHeaders={setRequestHeaders} />
+        <RequestTabs
+          request={entry.request}
+          setQueryParams={setQueryParams}
+          setBody={setBody}
+          setRequestHeaders={setRequestHeaders}
+          setContentType={setContentType}
+        />
         <div className="api-response-view">
           {entry.response ? (
             <ResponseTabs response={entry.response} />

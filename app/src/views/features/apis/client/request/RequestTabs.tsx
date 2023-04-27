@@ -1,13 +1,15 @@
 import { Tabs, TabsProps } from "antd";
 import React, { memo, useMemo } from "react";
-import QueryParams from "./QueryParams";
-import { RQAPI, RequestMethod } from "../../types";
-import RequestHeaders from "./RequestHeaders";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import RequestBody from "./RequestBody";
+import KeyValueForm from "./KeyValueForm";
 
 interface Props {
   request: RQAPI.Request;
-  setQueryParams: (queryParams: RQAPI.QueryParam[]) => void;
-  setRequestHeaders: (headers: RQAPI.Header[]) => void;
+  setQueryParams: (queryParams: KeyValuePair[]) => void;
+  setBody: (body: string) => void;
+  setContentType: (contentType: RequestContentType) => void;
+  setRequestHeaders: (headers: KeyValuePair[]) => void;
 }
 
 enum Tab {
@@ -17,24 +19,31 @@ enum Tab {
   AUTHORIZATION = "authorization",
 }
 
-const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setRequestHeaders }) => {
+const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setRequestHeaders, setContentType }) => {
   const tabItems: TabsProps["items"] = useMemo(
     () => [
       {
         key: Tab.QUERY_PARAMS,
         label: "Query Params",
-        children: <QueryParams queryParams={request.queryParams} setQueryParams={setQueryParams} />,
+        children: <KeyValueForm keyValuePairs={request.queryParams} setKeyValuePairs={setQueryParams} />,
       },
       {
         key: Tab.BODY,
         label: "Body",
-        children: <div></div>,
+        children: (
+          <RequestBody
+            body={request.body}
+            contentType={request.contentType}
+            setBody={setBody}
+            setContentType={setContentType}
+          />
+        ),
         disabled: [RequestMethod.GET, RequestMethod.HEAD].includes(request.method),
       },
       {
         key: Tab.HEADERS,
         label: "Headers",
-        children: <RequestHeaders headers={request.headers} setRequestHeaders={setRequestHeaders} />,
+        children: <KeyValueForm keyValuePairs={request.headers} setKeyValuePairs={setRequestHeaders} />,
       },
       {
         key: Tab.AUTHORIZATION,
@@ -42,7 +51,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setRequestHeade
         children: <div></div>,
       },
     ],
-    [request, setQueryParams, setRequestHeaders]
+    [request, setQueryParams, setBody, setRequestHeaders, setContentType]
   );
 
   return <Tabs className="api-request-tabs" defaultActiveKey={Tab.QUERY_PARAMS} items={tabItems} size="small" />;

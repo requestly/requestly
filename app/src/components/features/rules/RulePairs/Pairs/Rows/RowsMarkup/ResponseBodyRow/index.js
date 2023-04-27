@@ -8,7 +8,7 @@ import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
+import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 
@@ -95,10 +95,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
       [
         {
           path: `response.value`,
-          value:
-            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-              ? processStaticDataBeforeSave(value)
-              : value,
+          value: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
         },
       ],
       triggerUnsavedChangesIndication

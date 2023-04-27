@@ -1,16 +1,16 @@
 import React from "react";
-import { RQAPI } from "../../types";
+import { KeyValuePair } from "../../types";
 import PropertyRow from "./PropertyRow/PropertyRow";
 
 interface Props {
-  headers: RQAPI.Header[];
+  headers: KeyValuePair[];
 }
 
 const ResponseHeaders: React.FC<Props> = ({ headers }) => {
   return (
     <>
       {headers.map((header, index) => (
-        <PropertyRow key={index} name={header.name} value={header.value} />
+        <PropertyRow key={index} name={header.key} value={header.value} />
       ))}
     </>
   );
