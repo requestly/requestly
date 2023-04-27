@@ -7,7 +7,7 @@ import KeyValueForm from "./KeyValueForm";
 interface Props {
   request: RQAPI.Request;
   setQueryParams: (queryParams: KeyValuePair[]) => void;
-  setBody: (body: string) => void;
+  setBody: (body: RQAPI.RequestBody) => void;
   setContentType: (contentType: RequestContentType) => void;
   setRequestHeaders: (headers: KeyValuePair[]) => void;
 }

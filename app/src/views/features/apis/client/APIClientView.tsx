@@ -27,6 +27,7 @@ const getEmptyAPIEntry = (): RQAPI.Entry => {
       method: RequestMethod.GET,
       headers: [],
       body: "",
+      contentType: RequestContentType.RAW,
     },
     response: null,
   };
@@ -112,19 +113,26 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
       const CONTENT_TYPE_HEADER = "Content-Type";
 
+      const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
+      newEntry.request.headers = headers;
+
+      let contentTypeHeader = headers.find((header) => !header.key && !header.value); // reuse empty header
+      if (!contentTypeHeader) {
+        contentTypeHeader = getEmptyPair();
+        headers.push(contentTypeHeader);
+      }
+
+      contentTypeHeader.key = CONTENT_TYPE_HEADER;
+
       if (contentType === RequestContentType.JSON) {
-        const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
-
-        let emptyHeader = headers.find((header) => !header.key && !header.value);
-        if (!emptyHeader) {
-          emptyHeader = getEmptyPair();
-          headers.push(emptyHeader);
-        }
-
-        emptyHeader.key = CONTENT_TYPE_HEADER;
-        emptyHeader.value = "application/json";
-
-        newEntry.request.headers = headers;
+        contentTypeHeader.value = "application/json";
+        newEntry.request.body = "{}";
+      } else if (contentType === RequestContentType.FORM) {
+        contentTypeHeader.value = "application/x-www-form-urlencoded";
+        newEntry.request.body = [];
+      } else {
+        contentTypeHeader.value = "text/plain";
+        newEntry.request.body = "";
       }
 
       return newEntry;
@@ -148,15 +156,23 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       return;
     }
 
+    const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
+      return keyValuePairs.filter((pair) => pair.key.length);
+    };
+
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
         ...entry.request,
-        queryParams: entry.request.queryParams.filter((param) => param.key.length),
-        headers: entry.request.headers.filter((param) => param.key.length),
+        queryParams: removeEmptyKeys(entry.request.queryParams),
+        headers: removeEmptyKeys(entry.request.headers),
       },
       response: null,
     };
+
+    if (entry.request.contentType === RequestContentType.FORM) {
+      sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
+    }
 
     setEntry(sanitizedEntry);
     setIsFailed(false);
