@@ -68,4 +68,15 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
     },
   ],
+  [FEATURES.DESKTOP_APP_CONNECTED_APPS]: [
+    {
+      target: tourTarget("connected-apps-header-cta"),
+      title: "Right-click to modify request, copy cURL and more. Try it now!",
+      content: null,
+      disableBeacon: true,
+      offset: 12,
+      pointerPlacement: "center",
+      placement: "bottom",
+    },
+  ],
 };
