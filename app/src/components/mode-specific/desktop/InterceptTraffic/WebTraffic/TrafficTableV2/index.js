@@ -59,6 +59,8 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
+  const [isInterceptingTraffic, setIsInterceptingTraffic] = useState(true);
+
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
@@ -225,18 +227,22 @@ const CurrentTrafficTable = ({
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
-      // TODO: @sahil865gupta Fix this multiple time registering
-      upsertNetworkLogMap(payload);
+      if (isInterceptingTraffic) {
+        // TODO: @sahil865gupta Fix this multiple time registering
+        upsertNetworkLogMap(payload);
+      }
     });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
-      const rqLog = convertProxyLogToUILog(payload);
+      if (isInterceptingTraffic) {
+        const rqLog = convertProxyLogToUILog(payload);
 
-      printLogsToConsole(rqLog);
+        printLogsToConsole(rqLog);
 
-      if (isTablePeristenceEnabled) {
-        saveLogInRedux(rqLog);
-      } else {
-        upsertNetworkLogMap(rqLog);
+        if (isTablePeristenceEnabled) {
+          saveLogInRedux(rqLog);
+        } else {
+          upsertNetworkLogMap(rqLog);
+        }
       }
     });
 
@@ -247,7 +253,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -464,6 +470,7 @@ const CurrentTrafficTable = ({
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
+              setIsInterceptingTraffic={setIsInterceptingTraffic}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
