@@ -147,7 +147,7 @@ export default function HeaderText() {
     return (
       <>
         <ProductWalkthrough
-          tourFor={FEATURES.DESKTOP_APP_CONNECTED_APPS}
+          tourFor={FEATURES.CONNECTED_APPS}
           startWalkthrough={startWalkthrough}
           onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
         />
