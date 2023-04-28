@@ -41,7 +41,6 @@ const APIsView: React.FC<Props> = () => {
     addToHistory(newApiEntry);
     setIsImportModalOpen(false);
     setCurlCommand("");
-    toast.success("Successfully imported request from cURL command");
   }, [addToHistory, curlCommand]);
 
   const onNewClick = useCallback(() => {

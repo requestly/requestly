@@ -15,12 +15,16 @@ enum Tab {
 }
 
 const ResponseTabs: React.FC<Props> = ({ response }) => {
+  const contentTypeHeader = useMemo(() => {
+    return response.headers.find((header) => header.key.toLowerCase() === "content-type")?.value;
+  }, [response.headers]);
+
   const tabItems: TabsProps["items"] = useMemo(
     () => [
       {
         key: Tab.BODY,
         label: "Response body",
-        children: <ResponseBody responseText={response.body} />,
+        children: <ResponseBody responseText={response.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
         key: Tab.HEADERS,
@@ -28,7 +32,7 @@ const ResponseTabs: React.FC<Props> = ({ response }) => {
         children: <ResponseHeaders headers={response.headers} />,
       },
     ],
-    [response]
+    [contentTypeHeader, response]
   );
 
   return (

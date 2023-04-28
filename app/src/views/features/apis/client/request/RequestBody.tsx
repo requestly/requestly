@@ -14,7 +14,7 @@ interface Props {
 
 const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentType }) => {
   const onClickBeautifyCode = useCallback(() => {
-    setBody(formatJSONString(body));
+    setBody(formatJSONString(body, 2));
   }, [body, setBody]);
 
   const bodyEditor = useMemo(() => {
