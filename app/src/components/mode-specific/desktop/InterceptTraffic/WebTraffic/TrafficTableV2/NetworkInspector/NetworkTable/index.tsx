@@ -9,6 +9,7 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
+import { FixedSizeList } from "react-window";
 
 export const ITEM_SIZE = 30;
 
@@ -17,67 +18,67 @@ interface Props {
   onRow: Function;
 }
 
+const columns = [
+  {
+    id: "time",
+    title: "Time",
+    dataIndex: "timestamp",
+    width: "7%",
+    render: (timestamp: any) => {
+      return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
+        hour12: false,
+      });
+    },
+  },
+  {
+    id: "url",
+    title: "URL",
+    dataIndex: "url",
+    width: "48%",
+  },
+  {
+    id: "method",
+    title: "Method",
+    dataIndex: ["request", "method"], // corresponds to request.method
+    width: "5%",
+  },
+  {
+    id: "contentType",
+    title: "Content-Type",
+    dataIndex: ["response", "contentType"],
+    width: "10%",
+  },
+  {
+    title: "Rules Applied",
+    dataIndex: ["actions"],
+    width: "10%",
+    responsive: ["xs", "sm"],
+    render: (actions: any) => {
+      if (!actions || actions === "-" || actions.length === 0) {
+        return "-";
+      }
+      return <AppliedRules actions={actions} />;
+    },
+  },
+  {
+    id: "status",
+    title: "Status",
+    dataIndex: ["response", "statusCode"],
+    width: "5%",
+  },
+];
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   const [selectedRowData, setSelectedRowData] = useState({});
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
-  const columns = [
-    {
-      id: "time",
-      title: "Time",
-      dataIndex: "timestamp",
-      width: "7%",
-      render: (timestamp: any) => {
-        return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
-          hour12: false,
-        });
-      },
-    },
-    {
-      id: "url",
-      title: "URL",
-      dataIndex: "url",
-      width: "48%",
-    },
-    {
-      id: "method",
-      title: "Method",
-      dataIndex: ["request", "method"], // corresponds to request.method
-      width: "5%",
-    },
-    {
-      id: "contentType",
-      title: "Content-Type",
-      dataIndex: ["response", "contentType"],
-      width: "10%",
-    },
-    {
-      title: "Rules Applied",
-      dataIndex: ["actions"],
-      width: "10%",
-      responsive: ["xs", "sm"],
-      render: (actions: any) => {
-        if (!actions || actions === "-" || actions.length === 0) {
-          return "-";
-        }
-        return <AppliedRules actions={actions} />;
-      },
-    },
-    {
-      id: "status",
-      title: "Status",
-      dataIndex: ["response", "statusCode"],
-      width: "5%",
-    },
-  ];
 
   const renderHeader = () => {
     return (
       <Table.Head style={{ zIndex: 1000 }}>
         <Table.Row>
           {columns.map((column: any) => (
-            <Table.HeadCell key={column.id} style={{ width: column.width }}>
+            <Table.HeadCell key={column.id} style={{ width: column.width, position: "sticky", top: 0 }}>
               {column.title}
             </Table.HeadCell>
           ))}
@@ -103,7 +104,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         {columns.map((column: any) => {
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
-          return <Table.Cell key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
+          return <Table.Cell style={{width: column?.width}} key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
         })}
       </Table.Row>
     );
@@ -120,7 +121,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         startWalkthrough={!isTrafficTableTourCompleted}
         onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
       />
-      <VirtualTable
+      {/* <VirtualTable
         height="100%"
         width="100%"
         itemCount={logs?.length ?? 0}
@@ -129,9 +130,52 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         row={Row}
         footer={null}
         selectedRowData={selectedRowData}
-      />
+      /> */}
+
+      <FixedSizeList
+        itemCount={1000}
+        itemSize={ITEM_SIZE}
+        overscanCount={15}
+        height={1000}
+        width={1000}
+        innerElementType={Inner}
+        outerElementType={Outer}
+      >
+        {Row}
+      </FixedSizeList>
     </>
   );
 };
+
+export const Outer = (props: any) => {
+  return (
+    <Table style={{
+      display: "block",
+    }}>
+      <Table.Head style={{ zIndex: 1000 }}>
+        <Table.Row>
+          {columns.map((column: any) => (
+            <Table.HeadCell key={column.id} style={{ width: column.width, position: "sticky", top: 0 }}>
+              {column.title}
+            </Table.HeadCell>
+          ))}
+        </Table.Row>
+      </Table.Head>
+      {props.children}
+    </Table>
+  );
+}
+
+export const Inner = (props: any) => {
+  return (
+    <Table.Body style={{
+        display: "block",
+        overflow: "auto",
+        width: "100%"
+    }}>
+      {props.children}
+    </Table.Body>
+  );
+}
 
 export default NetworkTable;
