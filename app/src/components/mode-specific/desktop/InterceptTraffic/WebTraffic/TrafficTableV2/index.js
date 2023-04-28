@@ -40,6 +40,7 @@ const CurrentTrafficTable = ({
   showDeviceSelector,
   deviceId,
   clearLogsCallback,
+  isStaticPreview = false,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -50,7 +51,7 @@ const CurrentTrafficTable = ({
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
   // Component State
-  const previousLogsRef = useRef(logs);
+  const previousLogsRef = useRef();
   const newLogs = useSelector(getAllLogs);
   // {id: log, ...}
   const [networkLogsMap, setNetworkLogsMap] = useState({});
@@ -477,6 +478,7 @@ const CurrentTrafficTable = ({
                 const logsToExport = getSearchedLogs(newLogs, searchKeyword);
                 downloadLogs(logsToExport);
               }}
+              isStaticPreview={isStaticPreview}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
