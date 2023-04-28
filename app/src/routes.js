@@ -256,6 +256,10 @@ var routes = [
     component: SavedSessionViewer,
   },
   {
+    path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    component: SavedSessionViewer, // TODO
+  },
+  {
     path: PATHS.GOODBYE.RELATIVE,
     name: "Goodbye",
     icon: "ni ni-lock-circle-open text-red",
