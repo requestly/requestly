@@ -1,5 +1,7 @@
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, Log } from "./types";
 
+import { v4 as uuidv4 } from "uuid";
+
 const createHarHeaders = (headersObject: HeaderMap) => {
   const headers: HarHeaderEntry[] = [];
   for (const key in headersObject) {
@@ -70,3 +72,57 @@ export function createLogsHar(logs: Log[]) {
 
   return result;
 }
+
+/**
+ * The optional chaining is so that this function is able
+ * to convert all sources of network har objects
+ * - Live from RQ proxy
+ * - importing har that was exported from RQ
+ * - importing any random (but valid) har file too!
+ */
+export const convertHarJsonToRQLogs = (har: Har): Log[] => {
+  const res: Log[] = har.log.entries.map((entry) => {
+    const requestHeaders: Record<string, string> = {};
+    entry.request.headers.forEach((headerObj) => {
+      requestHeaders[headerObj.name] = headerObj.value;
+    });
+
+    const responseHeaders: Record<string, string> = {};
+    entry.response.headers.forEach((headerObj) => {
+      responseHeaders[headerObj.name] = headerObj.value;
+    });
+
+    const url = new URL(entry.request.url);
+
+    const rqLog: Log = {
+      id: entry?.RQDetails?.id || uuidv4(),
+      timestamp: new Date(entry.startedDateTime).getTime() / 1000,
+      url: url.toString(),
+      request: {
+        method: entry.request.method,
+        path: url.pathname, //Change to path
+        host: url.hostname, //Change to host
+        port: url.port, //Change to port
+        headers: requestHeaders,
+        body: entry.request.postData?.text,
+      },
+      response: {
+        statusCode: entry.response.status,
+        headers: responseHeaders,
+        contentType: entry.response.content?.mimeType,
+        // Hack to fix dictionary coming into body
+        body:
+          typeof entry.response.content?.text == "string"
+            ? entry.response.content?.text
+            : JSON.stringify(entry.response.content?.text),
+      },
+      requestShellCurl: entry?.RQDetails?.requestShellCurl || "",
+      actions: entry?.RQDetails?.actions || [],
+      requestState: entry?.RQDetails?.requestState || "",
+      consoleLogs: entry?.RQDetails?.consoleLogs || [],
+    };
+    return rqLog;
+  });
+
+  return res;
+};
