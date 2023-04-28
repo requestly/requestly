@@ -1,9 +1,16 @@
 import { Tabs, TabsProps } from "antd";
-import React, { memo, useMemo } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
 import { supportsRequestBody } from "../../apiUtils";
+
+enum Tab {
+  QUERY_PARAMS = "query_params",
+  BODY = "body",
+  HEADERS = "headers",
+  AUTHORIZATION = "authorization",
+}
 
 interface Props {
   request: RQAPI.Request;
@@ -13,14 +20,15 @@ interface Props {
   setRequestHeaders: (headers: KeyValuePair[]) => void;
 }
 
-enum Tab {
-  QUERY_PARAMS = "query_params",
-  BODY = "body",
-  HEADERS = "headers",
-  AUTHORIZATION = "authorization",
-}
-
 const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setRequestHeaders, setContentType }) => {
+  const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
+
+  useEffect(() => {
+    if (selectedTab === Tab.BODY && !supportsRequestBody(request.method)) {
+      setSelectedTab(Tab.QUERY_PARAMS);
+    }
+  }, [request.method, selectedTab]);
+
   const tabItems: TabsProps["items"] = useMemo(
     () => [
       {
@@ -55,7 +63,15 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
     [request, setQueryParams, setBody, setRequestHeaders, setContentType]
   );
 
-  return <Tabs className="api-request-tabs" defaultActiveKey={Tab.QUERY_PARAMS} items={tabItems} size="small" />;
+  return (
+    <Tabs
+      className="api-request-tabs"
+      activeKey={selectedTab}
+      onChange={(tab: Tab) => setSelectedTab(tab)}
+      items={tabItems}
+      size="small"
+    />
+  );
 };
 
 export default memo(RequestTabs);

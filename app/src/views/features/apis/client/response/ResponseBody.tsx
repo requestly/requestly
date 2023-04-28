@@ -1,10 +1,11 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { ReactElement, memo, useEffect, useMemo, useState } from "react";
 import { ThemeProvider } from "@devtools-ds/themes";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Radio } from "antd";
 
 interface Props {
   responseText: string;
+  contentTypeHeader: string;
 }
 
 enum ResponseMode {
@@ -12,9 +13,8 @@ enum ResponseMode {
   PREVIEW,
 }
 
-const ResponseBody: React.FC<Props> = ({ responseText }) => {
+const JSONResponsePreview: React.FC<{ responseText: string }> = ({ responseText }) => {
   const [responseJSON, setResponseJSON] = useState(null);
-  const [responseMode, setResponseMode] = useState(ResponseMode.RAW);
 
   useEffect(() => {
     if (responseText) {
@@ -28,8 +28,34 @@ const ResponseBody: React.FC<Props> = ({ responseText }) => {
   }, [responseText]);
 
   return (
+    <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
+      <ObjectInspector data={responseJSON} expandLevel={1} includePrototypes={false} className="api-response-json" />
+    </ThemeProvider>
+  );
+};
+
+const HTMLResponsePreview: React.FC<{ responseText: string }> = ({ responseText }) => {
+  return <iframe title="HTML Response Preview" className="html-response-preview" sandbox="" srcDoc={responseText} />;
+};
+
+const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
+  const [responseMode, setResponseMode] = useState(ResponseMode.RAW);
+
+  const preview = useMemo<ReactElement>(() => {
+    if (contentTypeHeader?.includes("application/json")) {
+      return <JSONResponsePreview responseText={responseText} />;
+    }
+
+    if (contentTypeHeader?.includes("text/html")) {
+      return <HTMLResponsePreview responseText={responseText} />;
+    }
+
+    return null;
+  }, [contentTypeHeader, responseText]);
+
+  return (
     <div className="api-response-body">
-      {responseJSON ? (
+      {preview ? (
         <Radio.Group
           value={responseMode}
           onChange={(e) => setResponseMode(e.target.value)}
@@ -41,18 +67,7 @@ const ResponseBody: React.FC<Props> = ({ responseText }) => {
         </Radio.Group>
       ) : null}
       <div className="api-response-body-content">
-        {responseMode === ResponseMode.RAW ? (
-          <pre>{responseText}</pre>
-        ) : (
-          <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
-            <ObjectInspector
-              data={responseJSON}
-              expandLevel={1}
-              includePrototypes={false}
-              className="api-response-json"
-            />
-          </ThemeProvider>
-        )}
+        {responseMode === ResponseMode.PREVIEW ? preview : <pre>{responseText}</pre>}
       </div>
     </div>
   );
