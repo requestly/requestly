@@ -22,6 +22,7 @@ const ActionHeader = ({
   logsCount,
   setIsInterceptingTraffic,
   exportLogsAsHar,
+  isStaticPreview,
 }) => {
   return (
     <Row
@@ -38,55 +39,59 @@ const ActionHeader = ({
         <Col>
           <Input.Search placeholder="Input Search Keyword" onChange={handleOnSearchChange} style={{ width: 300 }} />
         </Col>
-        <Col>
-          <Tooltip placement="top" title="Clear Logs">
-            <Button
-              type="primary"
-              disabled={!logsCount}
-              shape="circle"
-              icon={<ClearOutlined />}
-              onClick={clearLogs}
-            />
-          </Tooltip>
-        </Col>
-        <Col>
-          <Tooltip placement="top" title="Export Logs">
-            <Button type="primary" disabled={!logsCount} icon={<SaveOutlined />} onClick={exportLogsAsHar} />
-          </Tooltip>
-        </Col>
-        {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
-          <Col>
-            <Tooltip title="SSL Proxying">
-              <Button
-                type="primary"
-                shape="circle"
-                icon={<SafetyCertificateOutlined />}
-                onClick={() => setIsSSLProxyingModalVisible(true)}
-              />
-            </Tooltip>
-          </Col>
-        ) : null}
-        {showDeviceSelector ? (
+        {isStaticPreview ? null : (
           <>
             <Col>
-              <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
-                <SettingOutlined />
-              </Button>
+              <Tooltip placement="top" title="Clear Logs">
+                <Button
+                  type="primary"
+                  disabled={!logsCount}
+                  shape="circle"
+                  icon={<ClearOutlined />}
+                  onClick={clearLogs}
+                />
+              </Tooltip>
             </Col>
             <Col>
-              <Text code>Device Id: {deviceId || "Null"}</Text>
+              <Tooltip placement="top" title="Export Logs">
+                <Button type="primary" disabled={!logsCount} icon={<SaveOutlined />} onClick={exportLogsAsHar} />
+              </Tooltip>
+            </Col>
+            {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
+              <Col>
+                <Tooltip title="SSL Proxying">
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    icon={<SafetyCertificateOutlined />}
+                    onClick={() => setIsSSLProxyingModalVisible(true)}
+                  />
+                </Tooltip>
+              </Col>
+            ) : null}
+            {showDeviceSelector ? (
+              <>
+                <Col>
+                  <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
+                    <SettingOutlined />
+                  </Button>
+                </Col>
+                <Col>
+                  <Text code>Device Id: {deviceId || "Null"}</Text>
+                </Col>
+              </>
+            ) : null}
+            <Col>
+              <PauseAndPlayButton
+                defaultIsPaused={false}
+                onChange={(isPaused) => {
+                  console.log("isPaused", isPaused);
+                  setIsInterceptingTraffic(!isPaused);
+                }}
+              />
             </Col>
           </>
-        ) : null}
-        <Col>
-          <PauseAndPlayButton
-            defaultIsPaused={false}
-            onChange={(isPaused) => {
-              console.log("isPaused", isPaused);
-              setIsInterceptingTraffic(!isPaused);
-            }}
-          />
-        </Col>
+        )}
       </Space>
     </Row>
   );
