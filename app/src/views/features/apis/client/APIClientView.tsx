@@ -124,7 +124,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   }, []);
 
   const addUrlSchemeIfMissing = useCallback(() => {
-    if (entry.request.url && !/^https?:\/\//.test(entry.request.url)) {
+    if (entry.request.url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(entry.request.url)) {
       setEntry((entry) => ({
         ...entry,
         request: {

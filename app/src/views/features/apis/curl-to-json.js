@@ -30,11 +30,13 @@ const convertToJson = (curl_request) => {
   const removeQuotes = (str) => str.replace(/['"]+/g, "");
 
   const stringIsUrl = (url) => {
-    return /^(ftp|http|https|ws):\/\/[^ "]+$/.test(url);
+    return /^([a-z][a-z0-9+\-.]*):\/\/[^ "]+$/.test(url);
   };
 
   const parseField = (string) => {
-    return string.split(/: (.+)/);
+    let [key, value] = string.split(/: (.+)/);
+    key = key.replaceAll(";", ""); // when header is empty, key contains semi-colon like Referer
+    return [key, value];
   };
 
   const parseHeader = (header) => {
@@ -111,13 +113,7 @@ const convertToJson = (curl_request) => {
           const _ = argvs[argv];
           _.forEach((item) => {
             item = removeQuotes(item);
-            if (
-              typeof item == "string" &&
-              item.includes(".com") &&
-              !item.match(/^((http|https|ftp|ftps|sftp|ssh|scp|smb|file|s3|ws):\/\/.*)$/)
-            ) {
-              item = "http://" + item;
-            }
+
             if (stringIsUrl(item)) {
               json.raw_url = item;
               const url = new URL(json.raw_url);

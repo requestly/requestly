@@ -1287,7 +1287,6 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
   try {
     const requestStartTime = performance.now();
     const response = await fetch(url, { method, headers, body });
-    const responseText = await response.text();
     const responseTime = performance.now() - requestStartTime;
 
     const responseHeaders = [];
@@ -1295,8 +1294,26 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
       responseHeaders.push({ key, value });
     });
 
+    let responseBody;
+    const responseBlob = await response.blob();
+    const contentType = response.headers.get("Content-Type");
+
+    if (contentType.includes("image/")) {
+      const getImageDataUri = (blob) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (evt) => resolve(evt.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(responseBlob);
+        });
+      };
+      responseBody = await getImageDataUri(responseBlob);
+    } else {
+      responseBody = await responseBlob.text();
+    }
+
     return {
-      body: responseText,
+      body: responseBody,
       time: responseTime,
       headers: responseHeaders,
       status: response.status,
