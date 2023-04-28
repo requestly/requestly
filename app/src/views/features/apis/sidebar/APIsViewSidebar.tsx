@@ -77,16 +77,16 @@ const APIsViewSidebar: React.FC<Props> = ({
     <div className="apis-view-sidebar">
       <div className="api-view-sidebar-header">
         <div>
-          <Button type="text" onClick={onNewClick} icon={<PlusCircleOutlined />}>
+          <Button type="text" size="small" onClick={onNewClick} icon={<PlusCircleOutlined />}>
             New
           </Button>
-          <Button type="text" onClick={onImportClick} icon={<CodeOutlined />}>
+          <Button type="text" size="small" onClick={onImportClick} icon={<CodeOutlined />}>
             Import
           </Button>
         </div>
         <div>
           {history?.length ? (
-            <Button type="text" onClick={clearHistory} icon={<ClearOutlined />}>
+            <Button type="text" size="small" onClick={clearHistory} icon={<ClearOutlined />}>
               Clear history
             </Button>
           ) : null}
