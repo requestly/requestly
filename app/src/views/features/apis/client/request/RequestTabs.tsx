@@ -4,6 +4,7 @@ import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
 import { removeEmptyKeys, supportsRequestBody } from "../../apiUtils";
+import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
 import "./requestTabs.scss";
 
 enum Tab {
@@ -68,7 +69,13 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       {
         key: Tab.HEADERS,
         label: <LabelWithCount label="Headers" count={removeEmptyKeys(request.headers).length} />,
-        children: <KeyValueForm keyValuePairs={request.headers} setKeyValuePairs={setRequestHeaders} />,
+        children: (
+          <KeyValueForm
+            keyValuePairs={request.headers}
+            setKeyValuePairs={setRequestHeaders}
+            keyOptions={HEADER_SUGGESTIONS.Request}
+          />
+        ),
       },
       // {
       //   key: Tab.AUTHORIZATION,
