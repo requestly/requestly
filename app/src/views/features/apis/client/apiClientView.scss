@@ -165,4 +165,34 @@
       padding: 4px 8px;
     }
   }
+
+  /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
+  .ant-tabs-ink-bar {
+    display: none;
+  }
+
+  .ant-tabs-tab {
+    border-bottom: 2px solid transparent;
+
+    &.ant-tabs-tab-active {
+      border-bottom-color: #1e69ff;
+    }
+
+    .ant-tabs-tab-btn {
+      display: flex;
+      align-items: center;
+
+      .dot {
+        margin-left: 5px;
+        margin-top: 5px;
+      }
+
+      .count {
+        font-size: 10px;
+        padding: 0 4px;
+        line-height: 14px;
+        margin-left: 5px;
+      }
+    }
+  }
 }

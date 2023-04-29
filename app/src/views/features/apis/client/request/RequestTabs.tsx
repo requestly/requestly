@@ -1,9 +1,9 @@
-import { Tabs, TabsProps } from "antd";
+import { Badge, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
-import { supportsRequestBody } from "../../apiUtils";
+import { removeEmptyKeys, supportsRequestBody } from "../../apiUtils";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
@@ -11,6 +11,21 @@ enum Tab {
   HEADERS = "headers",
   AUTHORIZATION = "authorization",
 }
+
+const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+  return (
+    <>
+      <span>{label}</span>
+      {count ? (
+        showDot ? (
+          <Badge className="dot" size="small" dot={true} />
+        ) : (
+          <Tag className="count">{count}</Tag>
+        )
+      ) : null}
+    </>
+  );
+};
 
 interface Props {
   request: RQAPI.Request;
@@ -33,12 +48,12 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
     () => [
       {
         key: Tab.QUERY_PARAMS,
-        label: "Query Params",
+        label: <LabelWithCount label="Query Params" count={removeEmptyKeys(request.queryParams).length} />,
         children: <KeyValueForm keyValuePairs={request.queryParams} setKeyValuePairs={setQueryParams} />,
       },
       {
         key: Tab.BODY,
-        label: "Body",
+        label: <LabelWithCount label="Body" count={request.body ? 1 : 0} showDot />,
         children: (
           <RequestBody
             body={request.body}
@@ -51,7 +66,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       },
       {
         key: Tab.HEADERS,
-        label: "Headers",
+        label: <LabelWithCount label="Headers" count={removeEmptyKeys(request.headers).length} />,
         children: <KeyValueForm keyValuePairs={request.headers} setKeyValuePairs={setRequestHeaders} />,
       },
       // {
