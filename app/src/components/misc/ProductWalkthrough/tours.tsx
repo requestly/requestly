@@ -75,9 +75,9 @@ export const productTours: Record<string, CustomSteps[]> = {
       content: "click here to launch your app and start intercepting network requests.",
       disableBeacon: true,
       offset: 16,
-      pointerPlacement: "right",
+      pointerPlacement: "center",
       placement: "bottom",
-      spotlightPadding: 14,
+      spotlightPadding: 7,
     },
   ],
 };

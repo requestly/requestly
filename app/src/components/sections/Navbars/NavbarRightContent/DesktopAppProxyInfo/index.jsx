@@ -26,16 +26,6 @@ const DesktopAppProxyInfo = () => {
   const [startWalkthrough, setStartWalkthrough] = useState(false);
 
   useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      shouldShowConnectedAppsTour(appMode).then((result) => {
-        if (result) {
-          setStartWalkthrough(true);
-        }
-      });
-    }
-  }, [appMode, isConnectedAppsTourCompleted, startWalkthrough]);
-
-  useEffect(() => {
     setNumberOfConnectedApps(getConnectedAppsCount(Object.values(appsList)));
   }, [appsList]);
 
@@ -59,7 +49,17 @@ const DesktopAppProxyInfo = () => {
     trackConnectAppsClicked("app_header");
   };
 
-  const renderProxyStatusText = () => {
+  const ProxyStatusText = () => {
+    useEffect(() => {
+      if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        shouldShowConnectedAppsTour(appMode).then((result) => {
+          if (result) {
+            setStartWalkthrough(true);
+          }
+        });
+      }
+    }, []);
+
     if (!isBackgroundProcessActive)
       return <span className="proxy-status-text">Waiting for proxy server to start...</span>;
 
@@ -67,8 +67,19 @@ const DesktopAppProxyInfo = () => {
 
     return (
       <>
+        <ProductWalkthrough
+          tourFor={FEATURES.CONNECTED_APPS}
+          startWalkthrough={startWalkthrough && !isConnectedAppsTourCompleted}
+          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
+        />
         <span className="proxy-status-text">Proxy server is listening at{` ${proxyIp}:${proxyPort}`}</span>
-        <RQButton type="default" size="small" className="connected-apps-btn" onClick={handleConnectAppsButtonClick}>
+        <RQButton
+          data-tour-id="connected-apps-header-cta"
+          type="default"
+          size="small"
+          className="connected-apps-btn"
+          onClick={handleConnectAppsButtonClick}
+        >
           Connect apps
           {numberOfConnectedApps > 0 ? <div className="rq-count-badge">{numberOfConnectedApps}</div> : null}
         </RQButton>
@@ -80,14 +91,9 @@ const DesktopAppProxyInfo = () => {
 
   return (
     <>
-      <ProductWalkthrough
-        tourFor={FEATURES.CONNECTED_APPS}
-        startWalkthrough={startWalkthrough && !isConnectedAppsTourCompleted}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
-      />
-      <div className="desktop-app-proxy-info" data-tour-id="connected-apps-header-cta">
+      <div className="desktop-app-proxy-info">
         <>{renderProxyBadgeStatus()}</>
-        <>{renderProxyStatusText()}</>
+        <ProxyStatusText />
       </div>
     </>
   );
