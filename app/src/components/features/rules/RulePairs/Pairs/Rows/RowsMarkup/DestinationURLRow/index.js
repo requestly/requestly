@@ -278,6 +278,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                     tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
                     analyticsContext="map_local"
                     source={currentlySelectedRuleConfig.TYPE}
+                    keepActive={true}
                     text={
                       <>
                         Map Local file option is available only in desktop app.{" "}

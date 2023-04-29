@@ -12,6 +12,7 @@ interface InfoProps {
   source: string;
   analyticsContext: string;
   trigger?: boolean;
+  keepActive?: boolean;
   tooltipOpenedCallback?: () => void;
 }
 
@@ -22,10 +23,11 @@ export const MoreInfo: React.FC<InfoProps> = ({
   source,
   analyticsContext,
   trigger = true,
+  keepActive = false, // flag for keeping a toolip/icon active even if experiment is not assigned
   tooltipOpenedCallback = () => {},
 }) => {
   const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
-  const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip";
+  const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip" || keepActive;
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
