@@ -1,0 +1,67 @@
+.api-request-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+
+  .ant-tabs-content-holder {
+    overflow: auto;
+    margin-bottom: 16px;
+  }
+
+  .ant-tabs-content,
+  .ant-tabs-tabpane,
+  .ant-tabs-tabpane {
+    height: 100%;
+  }
+
+  .api-request-body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .api-request-body-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .beautify-code {
+        height: 22px;
+        padding: 0;
+      }
+    }
+
+    .react-resizable {
+      min-height: 0 !important;
+      margin-bottom: 0 !important;
+      height: 100% !important;
+    }
+
+    .api-request-body-raw {
+      height: 100%;
+      width: 100%;
+      resize: none;
+    }
+  }
+
+  .key-value-pairs-table {
+    td {
+      padding-right: 5px;
+    }
+
+    .key,
+    .name {
+      width: 200px;
+    }
+
+    .value {
+      width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 4px 8px;
+    }
+  }
+}

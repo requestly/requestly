@@ -4,6 +4,7 @@ import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import RequestBody from "./RequestBody";
 import KeyValueForm from "./KeyValueForm";
 import { removeEmptyKeys, supportsRequestBody } from "../../apiUtils";
+import "./requestTabs.scss";
 
 enum Tab {
   QUERY_PARAMS = "query_params",
