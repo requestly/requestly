@@ -4,6 +4,7 @@ import ResponseBody from "./ResponseBody";
 import { RQAPI } from "../../types";
 import ResponseHeaders from "./ResponseHeaders";
 import StatusLine from "./StatusLine";
+import "./responseTabs.scss";
 
 interface Props {
   response: RQAPI.Response;
