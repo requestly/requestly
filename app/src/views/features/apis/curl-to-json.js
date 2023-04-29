@@ -103,6 +103,31 @@ const convertToJson = (curl_request) => {
     }
   };
 
+  const processUrl = (rawUrl) => {
+    json.raw_url = rawUrl;
+    const url = new URL(json.raw_url);
+    const cleanUrl = url.origin + url.pathname;
+    json.url = cleanUrl;
+
+    // Check if the raw URL has any queries
+    if (json.raw_url.includes("?")) {
+      // Extract the query string from the URL
+      const queryString = json.raw_url.split("?")[1];
+
+      // Split the query string into individual query parameters
+      const queryParams = queryString.split("&");
+
+      json.queries = {};
+      // Loop through each query parameter and add it to the queries object
+      for (let i = 0; i < queryParams.length; i++) {
+        const queryParam = queryParams[i].split("=");
+        const paramName = queryParam[0];
+        const paramValue = queryParam[1];
+        json.queries[paramName] = paramValue;
+      }
+    }
+  };
+
   let authTypeUsed = false;
   let httpMethodSpecified = false;
 
@@ -110,36 +135,14 @@ const convertToJson = (curl_request) => {
     switch (argv) {
       case "_":
         {
-          const _ = argvs[argv];
-          _.forEach((item) => {
-            item = removeQuotes(item);
-
-            if (stringIsUrl(item)) {
-              json.raw_url = item;
-              const url = new URL(json.raw_url);
-              const cleanUrl = url.origin + url.pathname;
-              json.url = cleanUrl;
-
-              // Check if the raw URL has any queries
-              if (json.raw_url.includes("?")) {
-                // Extract the query string from the URL
-                const queryString = json.raw_url.split("?")[1];
-
-                // Split the query string into individual query parameters
-                const queryParams = queryString.split("&");
-
-                json.queries = {};
-                // Loop through each query parameter and add it to the queries object
-                for (let i = 0; i < queryParams.length; i++) {
-                  const queryParam = queryParams[i].split("=");
-                  const paramName = queryParam[0];
-                  const paramValue = queryParam[1];
-                  json.queries[paramName] = paramValue;
-                }
-              }
-            }
-          });
+          const rawUrl = argvs[argv].map(removeQuotes).find(stringIsUrl);
+          if (rawUrl) {
+            processUrl(rawUrl);
+          }
         }
+        break;
+      case "url":
+        processUrl(argvs[argv]);
         break;
 
       case "H":

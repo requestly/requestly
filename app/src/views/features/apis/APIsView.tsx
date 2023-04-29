@@ -28,7 +28,7 @@ const APIsView: React.FC<Props> = () => {
 
   const onImportFromCurl = useCallback(() => {
     const requestFromCurl: RQAPI.Request = parseCurlRequest(curlCommand);
-    if (!requestFromCurl) {
+    if (!requestFromCurl || !requestFromCurl.url) {
       toast.error("Could not process the cURL command");
       return;
     }
