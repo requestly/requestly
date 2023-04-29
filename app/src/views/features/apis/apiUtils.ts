@@ -16,6 +16,10 @@ export const getEmptyAPIEntry = (): RQAPI.Entry => {
   };
 };
 
+export const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
+  return keyValuePairs.filter((pair) => pair.key.length);
+};
+
 export const makeRequest = async (request: RQAPI.Request): Promise<RQAPI.Response> => {
   // TODO: check if Extension or Desktop App is installed and has the support
   // TODO: add support in MV3 extension

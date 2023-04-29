@@ -6,7 +6,7 @@ import RequestTabs from "./request/RequestTabs";
 import { getEmptyPair } from "./request/KeyValueForm";
 import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { getEmptyAPIEntry, makeRequest, supportsRequestBody } from "../apiUtils";
+import { getEmptyAPIEntry, makeRequest, removeEmptyKeys, supportsRequestBody } from "../apiUtils";
 import "./apiClientView.scss";
 
 interface Props {
@@ -139,10 +139,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     if (!entry.request.url) {
       return;
     }
-
-    const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] => {
-      return keyValuePairs.filter((pair) => pair.key.length);
-    };
 
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
