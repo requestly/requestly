@@ -1,16 +1,17 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
+import { AutoComplete, Button, Input } from "antd";
 import React, { memo, useCallback, useEffect } from "react";
 import { KeyValuePair } from "../../types";
 
 interface Props {
   keyValuePairs: KeyValuePair[];
   setKeyValuePairs: (keyValuePairs: KeyValuePair[]) => void;
+  keyOptions?: { value: string }[];
 }
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "" });
 
-const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs }) => {
+const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOptions }) => {
   const addEmptyPair = useCallback(() => {
     setKeyValuePairs([...keyValuePairs, getEmptyPair()]);
   }, [keyValuePairs, setKeyValuePairs]);
@@ -54,7 +55,21 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs }) => {
         {keyValuePairs.map((param, index) => (
           <tr key={param.id}>
             <td className="key">
-              <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+              {keyOptions ? (
+                <AutoComplete
+                  options={keyOptions}
+                  value={param.key}
+                  onChange={(val) => onKeyChange(val, index)}
+                  filterOption={(inputValue, option: any) => {
+                    if (option.value) {
+                      return option.value.toLowerCase().includes(inputValue.toLowerCase());
+                    }
+                  }}
+                  placeholder="key"
+                />
+              ) : (
+                <Input placeholder="key" value={param.key} onChange={(evt) => onKeyChange(evt.target.value, index)} />
+              )}
             </td>
             <td className="value">
               <Input
