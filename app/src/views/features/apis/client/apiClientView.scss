@@ -174,6 +174,10 @@
   .ant-tabs-tab {
     border-bottom: 2px solid transparent;
 
+    + .ant-tabs-tab {
+      margin-left: 20px;
+    }
+
     &.ant-tabs-tab-active {
       border-bottom-color: #1e69ff;
     }
@@ -181,9 +185,10 @@
     .ant-tabs-tab-btn {
       display: flex;
       align-items: center;
+      padding: 0 5px;
 
       .dot {
-        margin-left: 5px;
+        margin-left: 2px;
         margin-top: 5px;
       }
 
@@ -192,6 +197,7 @@
         padding: 0 4px;
         line-height: 14px;
         margin-left: 5px;
+        margin-right: 0;
       }
     }
   }
