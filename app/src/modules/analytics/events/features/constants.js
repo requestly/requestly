@@ -19,6 +19,29 @@ export const SESSION_RECORDING = {
   session_recording_description_added: "session_recording_description_added",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
+
+  network: {
+    import: {
+      btn_clicked: "import_external_har_button_clicked",
+      completed: "import_external_har_completed",
+      canceled: "import_external_har_canceled",
+    },
+    delete: {
+      from_list: "delete_network_session_clicked_from_list",
+      from_preview: "delete_network_session_clicked_from_preview",
+      confirmed: "delete_network_session_confimed",
+      canceled: "delete_network_session_canceled",
+    },
+    save: {
+      btn_clicked: "save_network_session_button_clicked",
+      saved: "new_network_session_saved",
+      canceled: "new_network_session_canceled",
+    },
+    download: {
+      from_list: "download_network_session_clicked_from_list",
+      from_preview: "download_network_session_clicked_from_preview",
+    },
+  },
 };
 
 export const SHARED_LIST = {

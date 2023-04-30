@@ -4,6 +4,10 @@ import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffi
 import React, { useCallback, useState } from "react";
 import { toast } from "utils/Toast";
 import { saveRecording } from "./actions";
+import {
+  trackNetworkSessionSaveCanceled,
+  trackNetworkSessionSaved,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 interface Props {
   har: Har;
@@ -18,6 +22,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   const handleSaveRecording = async () => {
     const id = await saveRecording(name, har);
     toast.success("Network logs successfully saved!");
+    trackNetworkSessionSaved();
     onSave(id);
   };
 
@@ -26,7 +31,10 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   return (
     <Modal
       open={isVisible}
-      onCancel={closeModal}
+      onCancel={() => {
+        trackNetworkSessionSaveCanceled();
+        closeModal();
+      }}
       footer={[
         <Button key="cancel" onClick={closeModal}>
           Cancel

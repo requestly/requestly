@@ -6,6 +6,11 @@ import { FiUpload } from "react-icons/fi";
 // import { convertHarJsonToRQLogs } from "../harLogs/converter";
 import { Har } from "../harLogs/types";
 import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
+import {
+  trackHarImportButtonClicked,
+  trackHarImportCanceled,
+  trackHarImportCompleted,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 interface Props {
   onSaved: (sessionId: string) => void;
@@ -38,6 +43,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
     (data: Har) => {
       console.log("handling logs", data);
       setImportedHar(data);
+      trackHarImportCompleted();
       openSaveModal();
     },
     [openSaveModal]
@@ -98,6 +104,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
       <Button
         type="primary"
         onClick={() => {
+          trackHarImportButtonClicked();
           openDropZone();
         }}
         style={{ margin: "24px" }}
@@ -111,7 +118,10 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
         bodyStyle={{ padding: 12 }}
         maskClosable={false}
         footer={null}
-        onCancel={closeDropZone}
+        onCancel={() => {
+          trackHarImportCanceled();
+          closeDropZone();
+        }}
         title="Import Traffic Logs"
       >
         {processingDataToImport ? renderLoader() : <ImportRulesDropzone />}

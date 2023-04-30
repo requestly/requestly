@@ -12,6 +12,13 @@ import ImportandSaveNetworkHarModalButton from "components/mode-specific/desktop
 import { toast } from "utils/Toast";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useCallback } from "react";
+import {
+  ActionSource,
+  trackDeleteNetworkSessionCanceled,
+  trackDeleteNetworkSessionClicked,
+  trackDeleteNetworkSessionConfirmed,
+  trackDownloadNetworkSessionClicked,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 const { Text } = Typography;
 
@@ -26,8 +33,10 @@ export const confirmAndDeleteRecording = (id, callback) => {
     ),
     okText: "Delete",
     cancelText: "Cancel",
-    onOk: async () => {
+    onCancel: trackDeleteNetworkSessionCanceled,
+    onOk: () => {
       deleteRecording(id);
+      trackDeleteNetworkSessionConfirmed();
       callback();
     },
   });
@@ -42,16 +51,6 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
     },
     [navigate]
   );
-
-  // const [downloadName, setDownloadName] = useState(null)
-
-  // window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("get-network-session", (res) => {
-  //   if(downloadName) {
-  //     console.log('trying to download', res.har)
-  //     downloadHar(res.har, downloadName)
-  //     setDownloadName(null)
-  //   }
-  // })
 
   const columns = [
     {
@@ -92,9 +91,8 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                       }}
                       onClick={async () => {
                         const sessionRecord = await getRecording(id);
-                        // window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-network-session", {id})
-                        // setDownloadName(record.name)
                         downloadHar(sessionRecord.har || {}, record.name);
+                        trackDownloadNetworkSessionClicked(ActionSource.List);
                       }}
                     >
                       <Tooltip title="Download Recording">
@@ -107,11 +105,12 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
                       <Tooltip title="Delete">
                         <Tag
-                          onClick={() =>
+                          onClick={() => {
                             confirmAndDeleteRecording(id, () => {
                               console.log(`${id} deleted`);
-                            })
-                          }
+                            });
+                            trackDeleteNetworkSessionClicked(ActionSource.List);
+                          }}
                         >
                           <DeleteOutlined
                             style={{

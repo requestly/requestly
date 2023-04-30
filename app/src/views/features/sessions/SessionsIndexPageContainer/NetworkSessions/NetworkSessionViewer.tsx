@@ -16,6 +16,11 @@ import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "./NetworkSessionsList";
 import { getRecording } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
+import {
+  ActionSource,
+  trackDeleteNetworkSessionClicked,
+  trackDownloadNetworkSessionClicked,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 const NetworkSessionViewer: React.FC<{}> = () => {
   const { id } = useParams();
@@ -45,6 +50,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
             confirmAndDeleteRecording(id, () => {
               redirectToSessionRecordingHome(navigate);
             });
+            trackDeleteNetworkSessionClicked(ActionSource.Preview);
           }}
         >
           <DeleteOutlined className="more-action-icon" /> Delete Recording
@@ -55,6 +61,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
           disabled={!(!!recordedLogs && recordedLogs?.length !== 0)}
           onClick={() => {
             downloadHar(createLogsHar(recordedLogs), sessionName);
+            trackDownloadNetworkSessionClicked(ActionSource.Preview);
           }}
         >
           <DownloadOutlined className="more-action-icon" /> Save as Har

@@ -13,6 +13,7 @@ import FEATURES from "config/constants/sub/features";
 import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
 import { useNavigate } from "react-router-dom";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { trackNetworkSessionSaveClicked } from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 const { Text } = Typography;
 
@@ -74,7 +75,15 @@ const ActionHeader = ({
               </Col>
               <Col>
                 <Tooltip placement="top" title="Save Logs">
-                  <Button type="primary" disabled={!logsCount} icon={<SaveOutlined />} onClick={openSaveModal} />
+                  <Button
+                    type="primary"
+                    disabled={!logsCount}
+                    icon={<SaveOutlined />}
+                    onClick={() => {
+                      trackNetworkSessionSaveClicked();
+                      openSaveModal();
+                    }}
+                  />
                 </Tooltip>
               </Col>
               {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
