@@ -9,6 +9,8 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import VirtualTableV2 from "./VirtualTableV2";
 
 export const ITEM_SIZE = 30;
 
@@ -21,6 +23,8 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   const [selectedRowData, setSelectedRowData] = useState({});
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
+
+  const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
 
   const columns = [
     {
@@ -86,7 +90,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     );
   };
 
-  const renderLogRow = (log: any, index: number, style: any) => {
+  const renderLogRow = (log: any, index: number) => {
     if (!log) {
       return null;
     }
@@ -95,6 +99,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
 
     return (
       <Table.Row
+        key={index}
         id={log.id}
         onContextMenu={() => setSelectedRowData(log)}
         {...rowProps}
@@ -110,16 +115,21 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   };
 
   const Row = ({ index, style }: any) => {
-    return renderLogRow(logs[index], index, style);
+    return renderLogRow(logs[index], index);
   };
 
-  return (
-    <>
-      <ProductWalkthrough
-        tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
-        startWalkthrough={!isTrafficTableTourCompleted}
-        onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
-      />
+  const renderTable = () => {
+    if (isTrafficTableVirtualV2Enabled) {
+      return (
+        <VirtualTableV2
+          renderHeader={renderHeader}
+          renderLogRow={renderLogRow}
+          logs={logs}
+          selectedRowData={selectedRowData}
+        />
+      );
+    }
+    return (
       <VirtualTable
         height="100%"
         width="100%"
@@ -130,6 +140,17 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         footer={null}
         selectedRowData={selectedRowData}
       />
+    );
+  };
+
+  return (
+    <>
+      <ProductWalkthrough
+        tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
+        startWalkthrough={!isTrafficTableTourCompleted}
+        onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
+      />
+      {renderTable()}
     </>
   );
 };
