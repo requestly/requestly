@@ -7,14 +7,20 @@ import OnboardingView from "./SessionsIndexPageContainer/SessionsIndexPage/Onboa
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import NetworkSessionsIndexPage from "./SessionsIndexPageContainer/NetworkSessions";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import DesktopAppError from "./errors/DesktopAppError";
 
 const SessionsHomeView = () => {
   //Global State
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+  if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS)) {
     return <NetworkSessionsIndexPage />;
-    // return <OnboardingView type={OnboardingTypes.NETWORK} />;
+  }
+
+  if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    return <DesktopAppError />;
   }
 
   return isExtensionInstalled() || isWorkspaceMode ? <SessionsIndexPageContainer /> : <OnboardingView />;

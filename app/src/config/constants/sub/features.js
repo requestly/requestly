@@ -59,4 +59,5 @@ FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
 
+FEATURES.NETWORK_SESSIONS = "network-sessions";
 export default FEATURES;

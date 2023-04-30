@@ -73,19 +73,21 @@ const ActionHeader = ({
                   />
                 </Tooltip>
               </Col>
-              <Col>
-                <Tooltip placement="top" title="Save Logs">
-                  <Button
-                    type="primary"
-                    disabled={!logsCount}
-                    icon={<SaveOutlined />}
-                    onClick={() => {
-                      trackNetworkSessionSaveClicked();
-                      openSaveModal();
-                    }}
-                  />
-                </Tooltip>
-              </Col>
+              {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) ? (
+                <Col>
+                  <Tooltip placement="top" title="Save Logs">
+                    <Button
+                      type="primary"
+                      disabled={!logsCount}
+                      icon={<SaveOutlined />}
+                      onClick={() => {
+                        trackNetworkSessionSaveClicked();
+                        openSaveModal();
+                      }}
+                    />
+                  </Tooltip>
+                </Col>
+              ) : null}
               {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
                 <Col>
                   <Tooltip title="SSL Proxying">
