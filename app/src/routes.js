@@ -58,6 +58,7 @@ import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreat
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
+import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -257,7 +258,7 @@ var routes = [
   },
   {
     path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
-    component: SavedSessionViewer, // TODO
+    component: NetworkSessionViewer,
   },
   {
     path: PATHS.GOODBYE.RELATIVE,

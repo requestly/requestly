@@ -9,10 +9,8 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { getUserAuthDetails } from "store/selectors";
 import { AUTH } from "modules/analytics/events/common/constants.js";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
-import HarImportModalButton from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
-import { Log } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
-import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
-import { redirectToTraffic } from "utils/RedirectionUtils";
+import ImportandSaveNetworkHarModalButton from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   return (
@@ -35,24 +33,16 @@ interface OnboardingProps extends SessionOnboardProps {
   type?: OnboardingTypes;
 }
 
-// todo: move preview renderring outside of onboarding,
-// please ignore that part for now. this if for demo right now
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   const navigate = useNavigate();
-  const [logsToShow, setLogsToShow] = useState<Log[]>([]);
-
-  return logsToShow.length ? (
-    // will give error because traffic table props
-    // are all currently defined as required
-    // @ts-expect-error
-    <TrafficTable
-      logs={logsToShow}
-      isStaticPreview={true}
-      emptyCtaText="Capture Traffic in Network Inspector"
-      emptyDesc="The har file you imported does not contain any network logs."
-      emptyCtaAction={() => redirectToTraffic(navigate)}
-    />
-  ) : (
+  const stableNavigate = useCallback(
+    (sessionId: string) => {
+      console.log("navigating for sessionId: ", sessionId);
+      redirectToNetworkSession(navigate, sessionId);
+    },
+    [navigate]
+  );
+  return (
     <div
       style={{
         display: "flex",
@@ -67,12 +57,7 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
       </Typography.Text>
       <div>
-        <HarImportModalButton
-          onRulesImported={(logs) => {
-            // todo: redirect to viewer with logs
-            setLogsToShow(logs);
-          }}
-        />
+        <ImportandSaveNetworkHarModalButton onSaved={stableNavigate} />
       </div>
       <Divider />
       <Typography.Text type="secondary">

@@ -20,7 +20,7 @@ export interface HarEntry {
   serverIPAddress?: string;
   connection?: string;
 
-  RQDetails?: RQDetails; // not spec compliant
+  _RQDetails?: RQDetails;
 }
 
 export interface RQDetails {

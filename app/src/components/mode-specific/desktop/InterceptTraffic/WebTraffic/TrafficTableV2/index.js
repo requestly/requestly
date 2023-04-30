@@ -30,7 +30,7 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
-import { downloadLogs } from "../TrafficExporter/harLogs/utils";
+import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -258,17 +258,17 @@ const CurrentTrafficTable = ({
   }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
 
   useEffect(() => {
-    if (window.RQ && window.RQ.DESKTOP) {
+    if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
     }
 
     return () => {
-      if (window.RQ && window.RQ.DESKTOP) {
+      if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
         // Disable sending logs from bg window
         window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
-  }, []);
+  }, [isStaticPreview]);
 
   const getSearchedLogs = useCallback((logs, searchKeyword) => {
     if (searchKeyword) {
@@ -450,7 +450,10 @@ const CurrentTrafficTable = ({
   );
 
   const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
-
+  const stableGetLogsToExport = useMemo(() => {
+    const logsToExport = getSearchedLogs(newLogs, searchKeyword);
+    return createLogsHar(logsToExport);
+  }, [getSearchedLogs, newLogs, searchKeyword]);
   return (
     <>
       <Row wrap={false}>
@@ -474,13 +477,14 @@ const CurrentTrafficTable = ({
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
               logsCount={newLogs.length}
-              exportLogsAsHar={() => {
-                const logsToExport = getSearchedLogs(newLogs, searchKeyword);
-                downloadLogs(logsToExport);
-              }}
+              logsToSaveAsHar={stableGetLogsToExport}
               isStaticPreview={isStaticPreview}
             />
-            {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
+            {isStaticPreview ? (
+              <Tag>{logs.length} requests</Tag>
+            ) : newLogs.length ? (
+              <Tag>{newLogs.length} requests</Tag>
+            ) : null}
           </Row>
           <Split
             sizes={rulePaneSizes}

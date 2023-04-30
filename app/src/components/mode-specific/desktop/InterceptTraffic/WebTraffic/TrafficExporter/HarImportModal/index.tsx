@@ -1,19 +1,21 @@
 import { Button, Col, Modal, Row } from "antd";
 import SpinnerColumn from "components/misc/SpinnerColumn";
-import Logger from "lib/logger";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FiUpload } from "react-icons/fi";
-import { convertHarJsonToRQLogs } from "../harLogs/converter";
-import { Har, Log } from "../harLogs/types";
+// import { convertHarJsonToRQLogs } from "../harLogs/converter";
+import { Har } from "../harLogs/types";
+import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
 
 interface Props {
-  onRulesImported: (logs: Log[]) => void;
+  onSaved: (sessionId: string) => void;
   btnText?: string;
 }
 
-const HarImportModalButton: React.FC<Props> = ({ onRulesImported: onImportReady, btnText }) => {
+const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText }) => {
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);
+  const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+
   const closeDropZone = useCallback(() => {
     setIsDropZoneVisible(false);
   }, []);
@@ -21,15 +23,24 @@ const HarImportModalButton: React.FC<Props> = ({ onRulesImported: onImportReady,
     setIsDropZoneVisible(true);
   }, []);
 
+  const closeSaveModal = useCallback(() => {
+    setIsSaveModalVisible(false);
+    closeDropZone();
+  }, [closeDropZone]);
+  const openSaveModal = useCallback(() => {
+    setIsSaveModalVisible(true);
+  }, []);
+
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
+  const [importedHar, setImportedHar] = useState<Har>();
 
   const handleImportedData = useCallback(
-    (data: Log[]) => {
+    (data: Har) => {
       console.log("handling logs", data);
-      onImportReady(data);
-      closeDropZone();
+      setImportedHar(data);
+      openSaveModal();
     },
-    [onImportReady, closeDropZone]
+    [openSaveModal]
   );
 
   const ImportRulesDropzone = () => {
@@ -44,14 +55,15 @@ const HarImportModalButton: React.FC<Props> = ({ onRulesImported: onImportReady,
       reader.onload = () => {
         //Render the loader
         setProcessingDataToImport(true);
-        let UILogs = [];
         try {
+          console.log("read this", reader.result);
           const importedHar: Har = JSON.parse(reader.result as string);
-          UILogs = convertHarJsonToRQLogs(importedHar);
-          //Start processing data
-          handleImportedData(UILogs);
+          console.log("parsed");
+          handleImportedData(importedHar);
+          setProcessingDataToImport(false);
         } catch (error) {
-          Logger.log(error);
+          setProcessingDataToImport(false);
+          console.log(error);
           alert("Imported file doesn't match Requestly format. Please choose another file.");
           closeDropZone();
         }
@@ -104,8 +116,9 @@ const HarImportModalButton: React.FC<Props> = ({ onRulesImported: onImportReady,
       >
         {processingDataToImport ? renderLoader() : <ImportRulesDropzone />}
       </Modal>
+      <SessionSaveModal isVisible={isSaveModalVisible} closeModal={closeSaveModal} har={importedHar} onSave={onSaved} />
     </React.Fragment>
   );
 };
 
-export default HarImportModalButton;
+export default ImportandSaveNetworkHarModalButton;

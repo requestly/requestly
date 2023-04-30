@@ -44,7 +44,7 @@ const convertLogToHarEntry = (log: Log) => {
     cache: {},
     timings: {},
 
-    RQDetails: {
+    _RQDetails: {
       id: log.id,
       actions: log.actions,
       requestShellCurl: log.requestShellCurl,
@@ -95,7 +95,7 @@ export const convertHarJsonToRQLogs = (har: Har): Log[] => {
     const url = new URL(entry.request.url);
 
     const rqLog: Log = {
-      id: entry?.RQDetails?.id || uuidv4(),
+      id: entry?._RQDetails?.id || uuidv4(),
       timestamp: new Date(entry.startedDateTime).getTime() / 1000,
       url: url.toString(),
       request: {
@@ -116,10 +116,10 @@ export const convertHarJsonToRQLogs = (har: Har): Log[] => {
             ? entry.response.content?.text
             : JSON.stringify(entry.response.content?.text),
       },
-      requestShellCurl: entry?.RQDetails?.requestShellCurl || "",
-      actions: entry?.RQDetails?.actions || [],
-      requestState: entry?.RQDetails?.requestState || "",
-      consoleLogs: entry?.RQDetails?.consoleLogs || [],
+      requestShellCurl: entry?._RQDetails?.requestShellCurl || "",
+      actions: entry?._RQDetails?.actions || [],
+      requestState: entry?._RQDetails?.requestState || "",
+      consoleLogs: entry?._RQDetails?.consoleLogs || [],
     };
     return rqLog;
   });
