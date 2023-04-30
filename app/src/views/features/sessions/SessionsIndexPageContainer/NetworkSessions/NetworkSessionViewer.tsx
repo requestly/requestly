@@ -1,17 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 // import { NetworkSessionRecord } from "./types"
-import { convertHarJsonToRQLogs } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
+import {
+  convertHarJsonToRQLogs,
+  createLogsHar,
+} from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
 import { redirectToSessionRecordingHome, redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { Log } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
 import { Button, Dropdown, Menu, Space, Typography } from "antd";
-import { DeleteOutlined, MoreOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownloadOutlined, MoreOutlined } from "@ant-design/icons";
 
 import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "./NetworkSessionsList";
 import { getRecording } from "./actions";
+import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
 
 const NetworkSessionViewer: React.FC<{}> = () => {
   const { id } = useParams();
@@ -45,9 +49,19 @@ const NetworkSessionViewer: React.FC<{}> = () => {
         >
           <DeleteOutlined className="more-action-icon" /> Delete Recording
         </Menu.Item>
+        <Menu.Item
+          key="download"
+          className="more-action"
+          disabled={!(!!recordedLogs && recordedLogs?.length !== 0)}
+          onClick={() => {
+            downloadHar(createLogsHar(recordedLogs), sessionName);
+          }}
+        >
+          <DownloadOutlined className="more-action-icon" /> Save as Har
+        </Menu.Item>
       </Menu>
     ),
-    [navigate, id]
+    [navigate, id, recordedLogs, sessionName]
   );
 
   return recordedLogs ? (
