@@ -5,7 +5,7 @@ import { ContextMenu } from "../ContextMenu";
 import { ITEM_SIZE } from ".";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-import "./index.css";
+import "./virtualTableV2.css";
 
 interface Props {
   logs: any;
