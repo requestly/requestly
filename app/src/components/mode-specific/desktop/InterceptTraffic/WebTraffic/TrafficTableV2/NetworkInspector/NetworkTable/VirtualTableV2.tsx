@@ -23,7 +23,7 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData }: P
     count: logs.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
-    overscan: 5,
+    overscan: 15,
   });
 
   // https://github.com/bvaughn/react-window/issues/60#issuecomment-781540658
@@ -55,6 +55,7 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData }: P
               onSelected={(id: string) => {
                 setSelected(id);
               }}
+              onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
             >
               {renderHeader()}
               <ContextMenu log={selectedRowData}>
