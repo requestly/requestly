@@ -1,0 +1,17 @@
+/* https://github.com/bvaughn/react-window/issues/60#issuecomment-781540658 */
+#vtbody::before {
+  display: block;
+  padding-top: var(--virtualPaddingTop);
+  content: "";
+}
+
+#vtbody::after {
+  display: block;
+  padding-bottom: var(--virtualPaddingBottom);
+  content: "";
+}
+
+#vtable {
+  table-layout: fixed;
+  isolation: isolate;
+}

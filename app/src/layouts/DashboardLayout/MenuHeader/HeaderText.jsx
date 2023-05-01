@@ -13,8 +13,8 @@ import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
 import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
-const { PATHS } = APP_CONSTANTS;
 
+const { PATHS } = APP_CONSTANTS;
 const SHOW_SESSION_RECORDING_BANNER = false;
 const SHOW_STACK_OVERFLOW_BLOG_BANNER = false;
 const SHOW_MONTHLY_UPDATE_BANNER = false;
