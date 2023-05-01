@@ -72,7 +72,7 @@ export const productTours: Record<string, CustomSteps[]> = {
     {
       target: tourTarget("connected-apps-header-cta"),
       title: "Manage your connected apps here!",
-      content: "click here to launch your app and start intercepting network requests.",
+      content: null,
       disableBeacon: true,
       offset: 16,
       pointerPlacement: "center",
