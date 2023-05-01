@@ -323,7 +323,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
+    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
