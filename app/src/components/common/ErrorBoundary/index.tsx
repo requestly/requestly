@@ -3,7 +3,7 @@ import { trackErrorBoundaryShown } from "modules/analytics/events/common/error-b
 
 type Props = {
   fallback: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 type State = {
