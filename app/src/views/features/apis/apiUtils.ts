@@ -1,6 +1,20 @@
 import { getAPIResponse } from "actions/ExtensionActions";
 import parseCurlAsJson from "./curl-to-json";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
+import { CurlParserResponse, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
+
+export const makeRequest = async (request: RQAPI.Request): Promise<RQAPI.Response> => {
+  // TODO: check if Extension or Desktop App is installed and has the support
+  // TODO: add support in MV3 extension
+  return getAPIResponse(request);
+};
+
+export const addUrlSchemeIfMissing = (url: string): string => {
+  if (url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(url)) {
+    return "https://" + url;
+  }
+
+  return url;
+};
 
 export const getEmptyAPIEntry = (): RQAPI.Entry => {
   return {
@@ -20,24 +34,9 @@ export const removeEmptyKeys = (keyValuePairs: KeyValuePair[]): KeyValuePair[] =
   return keyValuePairs.filter((pair) => pair.key.length);
 };
 
-export const makeRequest = async (request: RQAPI.Request): Promise<RQAPI.Response> => {
-  // TODO: check if Extension or Desktop App is installed and has the support
-  // TODO: add support in MV3 extension
-  return getAPIResponse(request);
-};
-
 export const supportsRequestBody = (method: RequestMethod): boolean => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method);
 };
-
-interface CurlParserResponse {
-  queries?: Record<string, string>;
-  headers?: Record<string, string>;
-  method: RequestMethod;
-  url: string;
-  cookies?: Record<string, string>;
-  data?: Record<string, string>;
-}
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {

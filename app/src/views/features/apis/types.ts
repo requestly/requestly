@@ -47,3 +47,12 @@ export namespace RQAPI {
     response: Response;
   }
 }
+
+export interface CurlParserResponse {
+  queries?: Record<string, string>;
+  headers?: Record<string, string>;
+  method: RequestMethod;
+  url: string;
+  cookies?: Record<string, string>;
+  data?: Record<string, string>;
+}

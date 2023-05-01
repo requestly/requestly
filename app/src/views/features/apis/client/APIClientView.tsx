@@ -1,13 +1,20 @@
-import { Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { SyntheticEvent, useCallback, useEffect, useState } from "react";
+import { Avatar, Button, Empty, Input, Select, Space, Spin } from "antd";
+import React, { SyntheticEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
 import { getEmptyPair } from "./request/KeyValueForm";
 import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
-import { getEmptyAPIEntry, makeRequest, removeEmptyKeys, supportsRequestBody } from "../apiUtils";
+import {
+  addUrlSchemeIfMissing,
+  getEmptyAPIEntry,
+  makeRequest,
+  removeEmptyKeys,
+  supportsRequestBody,
+} from "../apiUtils";
 import "./apiClientView.scss";
+import { debounce } from "lodash";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -19,10 +26,15 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
+const EMPTY_FAVICON_URL =
+  "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16";
+
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
+  const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL);
+  const setFaviconUrlDebounced = useMemo(() => debounce(setFaviconUrl, 1000), [setFaviconUrl]);
 
   useEffect(() => {
     if (apiEntry) {
@@ -123,17 +135,14 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     });
   }, []);
 
-  const addUrlSchemeIfMissing = useCallback(() => {
-    if (entry.request.url && !/^([a-z][a-z0-9+\-.]*):\/\//.test(entry.request.url)) {
-      setEntry((entry) => ({
-        ...entry,
-        request: {
-          ...entry.request,
-          url: "https://" + entry.request.url,
-        },
-      }));
+  const onUrlInputBlur = useCallback(() => {
+    if (entry.request.url) {
+      const urlWithUrlScheme = addUrlSchemeIfMissing(entry.request.url);
+      if (urlWithUrlScheme !== entry.request.url) {
+        setUrl(urlWithUrlScheme);
+      }
     }
-  }, [entry]);
+  }, [entry.request.url, setUrl]);
 
   const onSendButtonClick = useCallback(() => {
     if (!entry.request.url) {
@@ -176,6 +185,35 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     (evt.target as HTMLInputElement).blur();
   }, []);
 
+  useEffect(() => {
+    let faviconUrl = EMPTY_FAVICON_URL;
+
+    try {
+      if (entry.request.url) {
+        const url = new URL(addUrlSchemeIfMissing(entry.request.url));
+        let domain = url.hostname;
+        const hostParts = domain.split(".");
+
+        if (hostParts.length > 2) {
+          if (hostParts[hostParts.length - 2].length === 2) {
+            domain = hostParts.slice(hostParts.length - 3).join(".");
+          } else {
+            domain = hostParts.slice(hostParts.length - 2).join(".");
+          }
+        }
+
+        const origin = `${url.protocol}//${domain}`;
+        faviconUrl =
+          "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16&url=" +
+          origin;
+      }
+    } catch (e) {
+      // skip
+    }
+
+    setFaviconUrlDebounced(faviconUrl);
+  }, [entry.request.url, setFaviconUrlDebounced]);
+
   return (
     <div className="api-client-view">
       <div className="api-client-header">
@@ -192,7 +230,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
             value={entry.request.url}
             onChange={(evt) => setUrl(evt.target.value)}
             onPressEnter={onUrlInputEnterPressed}
-            onBlur={addUrlSchemeIfMissing}
+            onBlur={onUrlInputBlur}
+            prefix={<Avatar size="small" style={{ marginRight: 2, height: 16, width: 16 }} src={faviconUrl} />}
           />
         </Space.Compact>
         <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
