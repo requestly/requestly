@@ -68,4 +68,22 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
     },
   ],
+  [FEATURES.CONNECTED_APPS]: [
+    {
+      target: tourTarget("connected-apps-header-cta"),
+      title: "Manage your connected apps here!",
+      content: null,
+      disableBeacon: true,
+      offset: 16,
+      pointerPlacement: "center",
+      placement: "bottom",
+      spotlightPadding: 7,
+      disableOverlayClose: false,
+      styles: {
+        options: {
+          overlayColor: "rgba(0, 0, 0, 0)",
+        },
+      },
+    },
+  ],
 };

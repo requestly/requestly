@@ -155,6 +155,7 @@ const INITIAL_STATE = {
   misc: {
     isRedirectRuleTourCompleted: false,
     isTrafficTableTourCompleted: false,
+    isConnectedAppsTourCompleted: false,
   },
 };
 
