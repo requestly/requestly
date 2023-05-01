@@ -323,7 +323,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
+    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -488,7 +488,7 @@ const CurrentTrafficTable = ({
                 className="primary-card github-like-border network-table-wrapper-override"
                 style={{
                   boxShadow: "none",
-                  borderBottom: "2px solid #f5f5f5",
+                  // borderBottom: "2px solid #f5f5f5",
                   borderRadius: "0",
                   paddingBottom: "0",
                 }}
@@ -503,7 +503,7 @@ const CurrentTrafficTable = ({
                 style={{
                   boxShadow: "none",
                   borderRadius: "0",
-                  borderTop: "2px solid #f5f5f5",
+                  // borderTop: "2px solid #f5f5f5",
                 }}
                 bodyStyle={{ padding: "0px 20px" }}
               >
