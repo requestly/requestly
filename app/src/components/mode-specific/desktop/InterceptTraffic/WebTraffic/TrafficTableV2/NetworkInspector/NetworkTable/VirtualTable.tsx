@@ -92,13 +92,17 @@ export const VirtualTable = ({
  * Other than that, render an optional header and footer.
  **/
 const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function Inner(
-  { children, ...rest },
+  { children, ...rest }: any,
   ref
 ) {
   // To higlight the row
   const [selected, setSelected] = useState(null);
 
   const { header, footer, top, selectedRowData } = useContext(VirtualTableContext);
+
+  // Prevent flickering due to alternating colors
+  const isFirstElementEvenIndex = children?.[0]?.props?.index % 2 === 0;
+
   return (
     <div {...rest} ref={ref}>
       <Table
@@ -117,7 +121,10 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
       >
         {header}
         <ContextMenu log={selectedRowData}>
-          <Table.Body>{children}</Table.Body>
+          <Table.Body>
+            {isFirstElementEvenIndex ? null : <tr style={{}}></tr>}
+            {children}
+          </Table.Body>
         </ContextMenu>
         {footer}
       </Table>

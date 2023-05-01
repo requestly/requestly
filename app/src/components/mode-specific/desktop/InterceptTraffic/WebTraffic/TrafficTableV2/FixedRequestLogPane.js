@@ -25,14 +25,14 @@ const CopyCurlButton = ({ requestShellCurl }) => {
 
 const Header = (props) => {
   return (
-    <Row align="middle" style={{ width: "100%", margin: "10px 0px" }}>
+    <Row className="request-log-pane-header" align="middle" wrap={false}>
       <Space>
         <div style={{ display: "flex", marginLeft: "4px", cursor: "pointer" }}>
           <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
         </div>
         <Badge count={props.method} style={{ backgroundColor: "grey" }} />
         <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
-        <Text ellipsis={{ tooltip: props.url }} style={{ fontSize: "0.9rem", width: 800 }}>
+        <Text ellipsis={{ tooltip: props.url }} className="request-log-pane-url">
           {props.url}
         </Text>
       </Space>
@@ -149,7 +149,7 @@ const LogPane = (props) => {
 const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleClosePane, visibility }) => {
   return (
     visibility && (
-      <>
+      <div className="request-log-main-wrapper">
         <Header
           url={selectedRequestData.url}
           requestShellCurl={selectedRequestData.requestShellCurl}
@@ -184,7 +184,7 @@ const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleCloseP
             />
           </div>
         </div>
-      </>
+      </div>
     )
   );
 };
