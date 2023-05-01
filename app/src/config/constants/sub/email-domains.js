@@ -22,5 +22,7 @@ EMAIL_DOMAINS.DESTROYABLE.push("mailinator.com");
 EMAIL_DOMAINS.DESTROYABLE.push("yopmail.com");
 EMAIL_DOMAINS.DESTROYABLE.push("eoopy.com");
 EMAIL_DOMAINS.DESTROYABLE.push("ttirv.com");
+EMAIL_DOMAINS.DESTROYABLE.push("freemail.hu");
+EMAIL_DOMAINS.DESTROYABLE.push("126.com");
 
 export default EMAIL_DOMAINS;
