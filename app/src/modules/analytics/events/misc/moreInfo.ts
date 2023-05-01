@@ -1,11 +1,6 @@
 import { MORE_INFO } from "./constants";
 import { trackEvent } from "modules/analytics";
 
-export const trackMoreInfoShown = (context: string, source: string) => {
-  const params = { context, source };
-  trackEvent(MORE_INFO.MORE_INFO_SHOWN, params);
-};
-
 export const trackMoreInfoViewed = (context: string, source: string) => {
   const params = { context, source };
   trackEvent(MORE_INFO.MORE_INFO_VIEWED, params);
