@@ -11,6 +11,7 @@ import {
   trackTrafficTableDropdownClicked,
   trackTrafficTableRequestRightClicked,
 } from "modules/analytics/events/desktopApp";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import "./index.css";
 
 interface ContextMenuProps {
@@ -125,7 +126,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
     if (open) {
       trackTrafficTableRequestRightClicked();
       if (!isTrafficTableTourCompleted) {
-        dispatch(actions.updateProductTourCompleted({ tour: "isTrafficTableTourCompleted" }));
+        dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }));
       }
     }
   };

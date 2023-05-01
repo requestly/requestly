@@ -10,6 +10,7 @@ import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { StorageService } from "../../../../init";
 import {
   cleanup,
@@ -281,7 +282,7 @@ const RuleBuilder = (props) => {
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         runTourWithABTest={isRedirectRuleTourEnabled}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isRedirectRuleTourCompleted" }))}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.REDIRECT_RULE }))}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header

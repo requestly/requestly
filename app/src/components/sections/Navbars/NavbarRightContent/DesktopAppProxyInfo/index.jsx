@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getDesktopSpecificDetails, getIsConnectedAppsTourCompleted } from "store/selectors";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { Badge } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
@@ -38,7 +39,7 @@ const DesktopAppProxyInfo = () => {
 
   const handleConnectAppsButtonClick = () => {
     if (!isConnectedAppsTourCompleted)
-      dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }));
+      dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.CONNECTED_APPS }));
     dispatch(
       actions.toggleActiveModal({
         modalName: "connectedAppsModal",
@@ -70,7 +71,7 @@ const DesktopAppProxyInfo = () => {
         <ProductWalkthrough
           tourFor={FEATURES.CONNECTED_APPS}
           startWalkthrough={startWalkthrough && !isConnectedAppsTourCompleted}
-          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: "isConnectedAppsTourCompleted" }))}
+          onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.CONNECTED_APPS }))}
         />
         <span className="proxy-status-text">Proxy server is listening at{` ${proxyIp}:${proxyPort}`}</span>
         <RQButton
