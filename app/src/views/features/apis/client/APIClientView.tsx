@@ -1,5 +1,5 @@
 import { Avatar, Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useState } from "react";
+import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
@@ -33,8 +33,10 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
+  const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL);
   const setFaviconUrlDebounced = useMemo(() => debounce(setFaviconUrl, 1000), [setFaviconUrl]);
+  const abortControllerRef = useRef<AbortController>(null);
 
   useEffect(() => {
     if (apiEntry) {
@@ -165,21 +167,37 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       sanitizedEntry.request.body = removeEmptyKeys(sanitizedEntry.request.body as KeyValuePair[]);
     }
 
+    abortControllerRef.current = new AbortController();
+
     setEntry(sanitizedEntry);
     setIsFailed(false);
     setIsLoadingResponse(true);
+    setIsRequestCancelled(false);
 
-    makeRequest(sanitizedEntry.request).then((response) => {
-      const entryWithResponse = { ...sanitizedEntry, response };
-      if (response) {
-        setEntry(entryWithResponse);
-      } else {
-        setIsFailed(true);
-      }
-      setIsLoadingResponse(false);
-      notifyApiRequestFinished?.(entryWithResponse);
-    });
+    makeRequest(sanitizedEntry.request, abortControllerRef.current.signal)
+      .then((response) => {
+        const entryWithResponse = { ...sanitizedEntry, response };
+        if (response) {
+          setEntry(entryWithResponse);
+        } else {
+          setIsFailed(true);
+        }
+        notifyApiRequestFinished?.(entryWithResponse);
+      })
+      .catch(() => {
+        if (abortControllerRef.current?.signal.aborted) {
+          setIsRequestCancelled(true);
+        }
+      })
+      .finally(() => {
+        abortControllerRef.current = null;
+        setIsLoadingResponse(false);
+      });
   }, [entry, notifyApiRequestFinished]);
+
+  const cancelRequest = useCallback(() => {
+    abortControllerRef.current?.abort();
+  }, []);
 
   const onUrlInputEnterPressed = useCallback((evt: SyntheticEvent<HTMLInputElement>) => {
     (evt.target as HTMLInputElement).blur();
@@ -261,14 +279,22 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
           ) : (
             <div className="api-response-empty-placeholder">
               {isLoadingResponse ? (
-                <Spin size="large" tip="Request in progress..." />
+                <>
+                  <Spin size="large" tip="Request in progress..." />
+                  <Button onClick={cancelRequest} style={{ marginTop: 10 }}>
+                    Cancel request
+                  </Button>
+                </>
               ) : isFailed ? (
-                <div className="api-response-empty-placeholder">
-                  <Space>
-                    <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-                    Failed to send the request. Please check if the URL is valid.
-                  </Space>
-                </div>
+                <Space>
+                  <CloseCircleFilled style={{ color: "#ff4d4f" }} />
+                  Failed to send the request. Please check if the URL is valid.
+                </Space>
+              ) : isRequestCancelled ? (
+                <Space>
+                  <CloseCircleFilled style={{ color: "#ff4d4f" }} />
+                  You have cancelled the request.
+                </Space>
               ) : (
                 <Empty description="No request sent." />
               )}
