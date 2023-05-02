@@ -19,13 +19,13 @@ export interface APIClientRequest {
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
-  isModal?: boolean;
+  openInModal?: boolean;
   isModalOpen?: boolean;
   onModalClose?: () => void;
   modalTitle?: string;
 }
 
-const APIClient: React.FC<Props> = ({ request, isModal, isModalOpen, onModalClose, modalTitle }) => {
+const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
       return null;
@@ -72,7 +72,7 @@ const APIClient: React.FC<Props> = ({ request, isModal, isModalOpen, onModalClos
     return null;
   }
 
-  return isModal ? (
+  return openInModal ? (
     <Modal
       className="api-client-modal"
       centered
@@ -81,6 +81,7 @@ const APIClient: React.FC<Props> = ({ request, isModal, isModalOpen, onModalClos
       onCancel={onModalClose}
       footer={null}
       width="70%"
+      destroyOnClose
     >
       <APIClientView apiEntry={apiEntry} />
     </Modal>
