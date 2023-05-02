@@ -240,7 +240,7 @@ const DraftSessionViewer: React.FC = () => {
   return isLoading ? (
     <PageLoader message="Loading session details..." />
   ) : loadingError ? (
-    <PageError message="Something went wrong. Please contact the support." />
+    <PageError />
   ) : (
     <div className="session-viewer-page">
       <div className="session-viewer-header">
