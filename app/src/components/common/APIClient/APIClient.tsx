@@ -8,14 +8,8 @@ import {
 } from "views/features/apis/apiUtils";
 import APIClientView from "views/features/apis/client/APIClientView";
 import { RQAPI, RequestContentType, RequestMethod } from "views/features/apis/types";
+import { APIClientRequest } from "./types";
 import "./apiClient.scss";
-
-export interface APIClientRequest {
-  url: string;
-  headers?: Record<string, string>;
-  method?: RequestMethod;
-  body?: string | FormData;
-}
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
