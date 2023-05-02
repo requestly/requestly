@@ -333,6 +333,7 @@ const CurrentTrafficTable = ({
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}
         emptyDesc={emptyDesc}
+        searchKeyword={searchKeyword}
       />
     );
   };
