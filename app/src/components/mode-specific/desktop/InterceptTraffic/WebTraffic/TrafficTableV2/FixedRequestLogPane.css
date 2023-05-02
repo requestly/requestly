@@ -83,5 +83,14 @@
 }
 
 .action-header-input .ant-input-group-addon .ant-btn .anticon {
-  margin: 8px 0;
+  margin: 11px 0;
+}
+.action-header-input .traffic-table-regex-btn-inactive {
+  /* background: var(--component-background); */
+  background: transparent;
+}
+.action-header-input .traffic-table-regex-btn:hover,
+.action-header-input .traffic-table-regex-btn-active {
+  background: var(--border-dark);
+  color: var(--white);
 }

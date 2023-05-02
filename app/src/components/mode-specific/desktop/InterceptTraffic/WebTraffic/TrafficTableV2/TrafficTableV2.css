@@ -90,8 +90,3 @@
 .traffic-table-split-container .ant-row.request-log-pane-container {
   margin-left: 1.25rem;
 }
-
-.traffic-table-regex-active {
-  background: var(--component-background) !important;
-  color: var(--white) !important;
-}
