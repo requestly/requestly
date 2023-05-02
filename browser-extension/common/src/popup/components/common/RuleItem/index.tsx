@@ -8,6 +8,7 @@ import { useRecords } from "../../../contexts/RecordsContext";
 import { icons } from "../../../ruleTypeIcons";
 import RecordName from "../RecordName";
 import "./ruleItem.css";
+import { EVENT, sendEvent } from "../../../events";
 
 interface RuleItemProps {
   rule: Rule;
@@ -42,10 +43,15 @@ const RuleItem: React.FC<RuleItemProps> = ({
     };
 
     handleUpdateRule(updatedRule);
+    sendEvent(EVENT.RULE_TOGGLED, {
+      type: rule.ruleType,
+      status: isRuleActive ? Status.INACTIVE : Status.ACTIVE,
+    });
   }, [rule, isRuleActive, handleUpdateRule]);
 
   const handleGroupActiveClick = useCallback(() => {
     updateGroup({ ...group, status: Status.ACTIVE });
+    sendEvent(EVENT.GROUP_TOGGLED, { status: Status.ACTIVE });
   }, [group, updateGroup]);
 
   return (
