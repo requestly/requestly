@@ -978,7 +978,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.GET_API_RESPONSE:
-        BG.Methods.getAPIResponse(message.apiRequest).then(sendResponse);
+        BG.Methods.getAPIResponse(message.apiRequest, message.fetchOptions).then(sendResponse);
         return true;
 
       case RQ.EXTENSION_MESSAGES.GET_EXECUTED_RULES:
@@ -1256,7 +1256,7 @@ BG.Methods.getTabSession = (tabId, callback) => {
   chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
 };
 
-BG.Methods.getAPIResponse = async (apiRequest) => {
+BG.Methods.getAPIResponse = async (apiRequest, fetchOptions = {}) => {
   const method = apiRequest.method;
   const headers = new Headers();
   let body = apiRequest.body;
@@ -1286,7 +1286,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
 
   try {
     const requestStartTime = performance.now();
-    const response = await fetch(url, { method, headers, body });
+    const response = await fetch(url, { method, headers, body, ...fetchOptions });
     const responseTime = performance.now() - requestStartTime;
 
     const responseHeaders = [];
@@ -1304,7 +1304,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
           const reader = new FileReader();
           reader.onload = (evt) => resolve(evt.target.result);
           reader.onerror = reject;
-          reader.readAsDataURL(responseBlob);
+          reader.readAsDataURL(blob);
         });
       };
       responseBody = await getImageDataUri(responseBlob);
