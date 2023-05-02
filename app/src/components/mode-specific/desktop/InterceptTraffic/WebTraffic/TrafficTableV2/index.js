@@ -30,6 +30,7 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
+import { isRegexFormat } from "utils/rules/misc";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -56,6 +57,7 @@ const CurrentTrafficTable = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isRegexSearchActive, setIsRegexSearchActive] = useState(false);
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
@@ -268,19 +270,29 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
-  const getSearchedLogs = useCallback((logs, searchKeyword) => {
-    if (searchKeyword) {
-      try {
-        // TODO: @wrongsahil fix this. Special Characters are breaking the UI
-        const reg = new RegExp(searchKeyword, "i");
-        return logs.filter((log) => log.url.match(reg));
-      } catch (err) {
-        Logger.log(err);
+  const getSearchedLogs = useCallback(
+    (logs, searchKeyword) => {
+      if (searchKeyword) {
+        try {
+          // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+          let reg = null;
+          if (isRegexSearchActive) {
+            const isRegexValid = isRegexFormat(searchKeyword);
+            if (isRegexValid) reg = new RegExp(searchKeyword.slice(1, -1));
+            else return [];
+          } else {
+            reg = new RegExp(searchKeyword, "i");
+          }
+          return logs.filter((log) => log.url.match(reg));
+        } catch (err) {
+          Logger.log(err);
+        }
       }
-    }
 
-    return logs;
-  }, []);
+      return logs;
+    },
+    [isRegexSearchActive]
+  );
 
   const getRequestLogs = useCallback(
     (desc = true) => {
@@ -472,6 +484,8 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
+              setIsRegexSearchActive={setIsRegexSearchActive}
+              isRegexSearchActive={isRegexSearchActive}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>

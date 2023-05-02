@@ -9,6 +9,8 @@ import {
 } from "@ant-design/icons";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RQButton } from "lib/design-system/components";
+import { VscRegex } from "react-icons/vsc";
 
 const { Text } = Typography;
 
@@ -19,6 +21,8 @@ const ActionHeader = ({
   showDeviceSelector,
   deviceId,
   setIsInterceptingTraffic,
+  isRegexSearchActive,
+  setIsRegexSearchActive,
 }) => {
   return (
     <Row
@@ -35,6 +39,14 @@ const ActionHeader = ({
             className="action-header-input"
             placeholder="Input Search Keyword"
             onChange={handleOnSearchChange}
+            suffix={
+              <RQButton
+                className={isRegexSearchActive && "traffic-table-regex-active"}
+                onClick={() => setIsRegexSearchActive((prev) => !prev)}
+                iconOnly
+                icon={<VscRegex />}
+              />
+            }
             style={{ width: 300 }}
           />
         </Col>
