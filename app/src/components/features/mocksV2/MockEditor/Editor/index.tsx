@@ -25,7 +25,7 @@ import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/ana
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import APIClient, { APIClientRequest } from "components/common/APIClient";
+import { APIClient, APIClientRequest } from "components/common/APIClient";
 
 interface Props {
   isNew?: boolean;
