@@ -84,16 +84,11 @@ const MockEditor: React.FC<Props> = ({
   ]);
 
   const apiRequest = useMemo<APIClientRequest>(() => {
-    try {
-      return {
-        url: finalUrl,
-        method,
-        headers: JSON.parse(headersString),
-      };
-    } catch (e) {
-      return null;
-    }
-  }, [finalUrl, headersString, method]);
+    return {
+      url: finalUrl,
+      method,
+    };
+  }, [finalUrl, method]);
 
   //editor fields ref
   const endpointRef = useRef(null);
@@ -181,13 +176,8 @@ const MockEditor: React.FC<Props> = ({
   };
 
   const handleTest = useCallback(() => {
-    if (!apiRequest) {
-      toast.error("Invalid API definition");
-      return;
-    }
-
     setIsTestModalOpen(true);
-  }, [apiRequest]);
+  }, []);
 
   const onNameChange = (name: string) => {
     setName(name);
@@ -469,10 +459,10 @@ const MockEditor: React.FC<Props> = ({
           </Row>
         </Col>
       </Row>
-      {!isNew && apiRequest ? (
+      {!isNew ? (
         <APIClient
           request={apiRequest}
-          isModal
+          openInModal
           modalTitle="Test mock endpoint"
           isModalOpen={isTestModalOpen}
           onModalClose={() => setIsTestModalOpen(false)}

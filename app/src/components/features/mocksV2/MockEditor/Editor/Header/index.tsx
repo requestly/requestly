@@ -59,7 +59,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           <RQButton type="default" onClick={() => handleClose()}>
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave}>
+          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
           </RQButton>
         </Col>
