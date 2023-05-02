@@ -17,8 +17,7 @@ export const makeRequest = async (request: RQAPI.Request, signal?: AbortSignal):
       };
       signal.addEventListener("abort", abortListener);
     }
-
-    getAPIResponse(request).then(resolve);
+    getAPIResponse(request, { credentials: "omit" }).then(resolve);
   });
 };
 

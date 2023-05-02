@@ -50,7 +50,7 @@ const CodeEditor = ({
   const handleEditordidMount = (editor) => {
     editorRef.current = editor;
 
-    if (!value.length) {
+    if (!value?.length) {
       handleChange(defaultValue ? defaultValue : ""); //trigger handleChange for defaultValue in code editor
     }
   };
