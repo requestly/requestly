@@ -51,45 +51,42 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method);
 };
 
+export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
+  return Object.entries(json || {}).map(([key, value]) => {
+    return {
+      key,
+      value,
+      id: Math.random(),
+    };
+  });
+};
+
+export const getContentTypeFromHeaders = (headers: KeyValuePair[]): RequestContentType => {
+  const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
+  const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
+  const contentType: RequestContentType =
+    contentTypeHeaderValue && Object.values(RequestContentType).includes(contentTypeHeaderValue)
+      ? contentTypeHeaderValue
+      : RequestContentType.RAW;
+
+  return contentType;
+};
+
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {
     // @ts-ignore
     const json: CurlParserResponse = parseCurlAsJson(curl);
-    const queryParams: KeyValuePair[] = Object.entries(json.queries || {}).map(([key, value]) => {
-      return {
-        key,
-        value,
-        id: Math.random(),
-      };
-    });
-    const headers: KeyValuePair[] = Object.entries(json.headers || {}).map(([key, value]) => {
-      return {
-        key,
-        value,
-        id: Math.random(),
-      };
-    });
-
-    const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
-    const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
-    const contentType: RequestContentType =
-      contentTypeHeaderValue && Object.values(RequestContentType).includes(contentTypeHeaderValue)
-        ? contentTypeHeaderValue
-        : RequestContentType.RAW;
+    const queryParams = generateKeyValuePairsFromJson(json.queries);
+    const headers = generateKeyValuePairsFromJson(json.headers);
+    const contentType = getContentTypeFromHeaders(headers);
 
     let body: RQAPI.RequestBody;
     if (contentType === RequestContentType.JSON) {
       body = JSON.stringify(json.data);
     } else if (contentType === RequestContentType.FORM) {
-      body = Object.entries(json.data || {}).map(([key, value]) => {
-        return {
-          key,
-          value,
-          id: Math.random(),
-        };
-      }) as KeyValuePair[];
+      body = generateKeyValuePairsFromJson(json.data);
     } else {
-      body = Object.entries(json.data || {})[0]?.[0] ?? "";
+      body = Object.entries(json.data || {})[0]?.[0] ?? ""; // when body is string, json.data = { "string": "" }
     }
 
     const request: RQAPI.Request = {

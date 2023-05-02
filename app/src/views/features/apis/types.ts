@@ -17,7 +17,7 @@ export enum RequestContentType {
 }
 
 export interface KeyValuePair {
-  id?: number;
+  id: number;
   key: string;
   value: string;
 }

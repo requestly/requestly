@@ -67,7 +67,3 @@
 .generate-ai-response-button {
   margin-top: 0.5rem;
 }
-
-.test-mock-modal .ant-modal-body {
-  height: calc(100vh - 140px);
-}
