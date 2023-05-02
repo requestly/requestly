@@ -2,10 +2,24 @@ import { getAPIResponse } from "actions/ExtensionActions";
 import parseCurlAsJson from "./curl-to-json";
 import { CurlParserResponse, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
 
-export const makeRequest = async (request: RQAPI.Request): Promise<RQAPI.Response> => {
+export const makeRequest = async (request: RQAPI.Request, signal?: AbortSignal): Promise<RQAPI.Response> => {
   // TODO: check if Extension or Desktop App is installed and has the support
   // TODO: add support in MV3 extension
-  return getAPIResponse(request);
+  return new Promise((resolve, reject) => {
+    if (signal) {
+      if (signal.aborted) {
+        reject();
+      }
+
+      const abortListener = () => {
+        signal.removeEventListener("abort", abortListener);
+        reject();
+      };
+      signal.addEventListener("abort", abortListener);
+    }
+
+    getAPIResponse(request).then(resolve);
+  });
 };
 
 export const addUrlSchemeIfMissing = (url: string): string => {
