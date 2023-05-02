@@ -1,9 +1,9 @@
-import React from "react";
+import React, { ErrorInfo } from "react";
 import { trackErrorBoundaryShown } from "modules/analytics/events/common/error-boundaries";
 
-type Props = {
-  fallback: React.ReactNode;
-  children?: React.ReactNode;
+type Props<T = React.ReactNode> = {
+  fallback: T;
+  children?: T;
 };
 
 type State = {
@@ -16,12 +16,15 @@ export class ErrorBoundary extends React.Component<Props, State> {
     this.state = { isError: false };
   }
 
-  static getDerivedStateFromError(error: unknown) {
+  static getDerivedStateFromError(error: Error) {
     return { isError: true };
   }
 
-  componentDidCatch(error: unknown, errorInfo: unknown) {
-    trackErrorBoundaryShown(error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    const { message } = error;
+    const { componentStack } = errorInfo;
+
+    trackErrorBoundaryShown(message, componentStack?.slice(0, 200));
   }
 
   render(): React.ReactNode {
