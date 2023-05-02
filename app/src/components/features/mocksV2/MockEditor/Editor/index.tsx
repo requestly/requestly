@@ -2,7 +2,7 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Button, Col, Input, InputNumber, Modal, Row, Select } from "antd";
+import { AutoComplete, Button, Col, Input, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CodeEditor from "components/misc/CodeEditor";
@@ -25,8 +25,7 @@ import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/ana
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import APIClientView from "views/features/apis/client/APIClientView";
-import { RQAPI } from "views/features/apis/types";
+import APIClient, { APIClientRequest } from "components/common/APIClient";
 
 interface Props {
   isNew?: boolean;
@@ -84,18 +83,16 @@ const MockEditor: React.FC<Props> = ({
     username,
   ]);
 
-  const apiEntry = useMemo<RQAPI.Entry>(() => {
-    const entry: RQAPI.Entry = { request: { url: finalUrl, method, headers: [], queryParams: [] }, response: null };
+  const apiRequest = useMemo<APIClientRequest>(() => {
     try {
-      entry.request.headers = Object.entries<string>(JSON.parse(headersString)).map(([key, value]) => ({
-        key,
-        value,
-        id: Math.random(),
-      }));
+      return {
+        url: finalUrl,
+        method,
+        headers: JSON.parse(headersString),
+      };
     } catch (e) {
-      // do nothing
+      return null;
     }
-    return entry;
   }, [finalUrl, headersString, method]);
 
   //editor fields ref
@@ -184,8 +181,13 @@ const MockEditor: React.FC<Props> = ({
   };
 
   const handleTest = useCallback(() => {
+    if (!apiRequest) {
+      toast.error("Invalid API definition");
+      return;
+    }
+
     setIsTestModalOpen(true);
-  }, []);
+  }, [apiRequest]);
 
   const onNameChange = (name: string) => {
     setName(name);
@@ -467,17 +469,15 @@ const MockEditor: React.FC<Props> = ({
           </Row>
         </Col>
       </Row>
-      <Modal
-        className="test-mock-modal"
-        centered
-        title="Test mock"
-        open={isTestModalOpen}
-        onCancel={() => setIsTestModalOpen(false)}
-        footer={null}
-        width="70%"
-      >
-        <APIClientView apiEntry={apiEntry} />
-      </Modal>
+      {!isNew && apiRequest ? (
+        <APIClient
+          request={apiRequest}
+          isModal
+          modalTitle="Test mock endpoint"
+          isModalOpen={isTestModalOpen}
+          onModalClose={() => setIsTestModalOpen(false)}
+        />
+      ) : null}
     </>
   );
 };
