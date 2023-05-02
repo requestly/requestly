@@ -7,10 +7,10 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { VscRegex } from "react-icons/vsc";
+import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { RQButton } from "lib/design-system/components";
-import { VscRegex } from "react-icons/vsc";
 
 const { Text } = Typography;
 

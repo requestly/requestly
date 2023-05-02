@@ -86,7 +86,6 @@
   margin: 11px 0;
 }
 .action-header-input .traffic-table-regex-btn-inactive {
-  /* background: var(--component-background); */
   background: transparent;
 }
 .action-header-input .traffic-table-regex-btn:hover,
