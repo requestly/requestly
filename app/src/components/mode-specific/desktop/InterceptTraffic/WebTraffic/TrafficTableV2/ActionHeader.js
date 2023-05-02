@@ -40,14 +40,16 @@ const ActionHeader = ({
             placeholder="Input Search Keyword"
             onChange={handleOnSearchChange}
             suffix={
-              <RQButton
-                className={`traffic-table-regex-btn ${
-                  isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
-                }`}
-                onClick={() => setIsRegexSearchActive((prev) => !prev)}
-                iconOnly
-                icon={<VscRegex />}
-              />
+              <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
+                <RQButton
+                  className={`traffic-table-regex-btn ${
+                    isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
+                  }`}
+                  onClick={() => setIsRegexSearchActive((prev) => !prev)}
+                  iconOnly
+                  icon={<VscRegex />}
+                />
+              </Tooltip>
             }
             style={{ width: 300 }}
           />
