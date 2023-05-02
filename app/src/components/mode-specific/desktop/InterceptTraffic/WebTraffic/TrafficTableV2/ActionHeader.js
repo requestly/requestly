@@ -41,7 +41,9 @@ const ActionHeader = ({
             onChange={handleOnSearchChange}
             suffix={
               <RQButton
-                className={isRegexSearchActive && "traffic-table-regex-active"}
+                className={`traffic-table-regex-btn ${
+                  isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
+                }`}
                 onClick={() => setIsRegexSearchActive((prev) => !prev)}
                 iconOnly
                 icon={<VscRegex />}
