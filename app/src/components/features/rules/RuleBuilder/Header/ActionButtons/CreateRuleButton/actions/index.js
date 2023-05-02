@@ -251,7 +251,7 @@ export const validateRule = (rule, dispatch) => {
           error: "missing source",
         };
       }
-      //file should be selected
+      //file selection shouldn't be empty
       else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE && isEmpty(pair.response.value)) {
         output = {
           result: false,
