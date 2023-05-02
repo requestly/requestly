@@ -34,13 +34,14 @@ export const BUSINESS = {
   },
 
   TRIAL_MODE_EXPIRED_MODAL_SHOWN: "trial_mode_expired_modal_shown",
-  TRIAL_MODE_EXPIRED_UPGRADE_BUTTON_CLICKED:
-    "trial_mode_expired_upgrade_button_clicked",
+  TRIAL_MODE_EXPIRED_UPGRADE_BUTTON_CLICKED: "trial_mode_expired_upgrade_button_clicked",
   UPGRADE_CLICKED: "upgrade_clicked",
   VIEW_GITHUB_CLICKED: "view_github_clicked",
 };
 
 export const INTEREST_CAPTURED = "interest_captured";
+
+export const DESKTOP_ACTION_INTEREST_CAPTURED = "desktop_action_interest_captured";
 
 export const COUPON = {
   COUPON_APPLIED_SUCCESS: "coupon_applied_success",
@@ -80,4 +81,17 @@ export const PERSONA_SURVEY = {
   PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
   PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
   PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
+  VIEW_ALL_PERSONA_RECOMMENDATION: "view_all_persona_recommendation",
+};
+
+export const PRODUCT_WALKTHROUGH = {
+  WALKTHROUGH_VIEWED: "walkthrough_viewed",
+  WALKTHROUGH_STEP_DONE: "walkthrough_step_done",
+  WALKTHROUGH_COMPLETED: "walkthrough_completed",
+};
+
+export const MORE_INFO = {
+  MORE_INFO_SHOWN: "more_info_shown",
+  MORE_INFO_VIEWED: "more_info_viewed",
+  MORE_INFO_CLICKED: "more_info_clicked",
 };

@@ -1,11 +1,6 @@
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { query } from "firebase/database";
-import {
-  collection,
-  getFirestore,
-  onSnapshot,
-  where,
-} from "firebase/firestore";
+import { collection, getFirestore, onSnapshot, where } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { teamsActions } from "store/features/teams/slice";
@@ -14,12 +9,7 @@ import firebaseApp from "../../firebase";
 
 const db = getFirestore(firebaseApp);
 
-const availableTeamsListener = (
-  dispatch,
-  uid,
-  currentlyActiveWorkspace,
-  appMode
-) => {
+const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode) => {
   if (!uid) {
     // Rare edge case
     if (currentlyActiveWorkspace.id) {
@@ -28,35 +18,33 @@ const availableTeamsListener = (
     return null;
   }
   try {
-    const q = query(
-      collection(db, "teams"),
-      where("access", "array-contains", uid)
-    );
+    const q = query(collection(db, "teams"), where("access", "array-contains", uid));
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = [];
-        querySnapshot.forEach((team) => {
+        const records = querySnapshot.docs.map((team) => {
           const teamData = team.data();
-          records.push({
+
+          return {
             id: team.id,
             name: teamData.name,
+            owner: teamData.owner,
+            archived: teamData.archived,
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
-          });
+          };
         });
+
         dispatch(teamsActions.setAvailableTeams(records));
 
         if (!currentlyActiveWorkspace?.id) return;
 
-        const found = records.find(
-          (team) => team.id === currentlyActiveWorkspace.id
-        );
+        const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
+
         if (!found) {
-          alert(
-            "You no longer have access to this workspace. Please contact your team admin."
-          );
+          if (!window.hasUserRemovedHimselfRecently)
+            alert("You no longer have access to this workspace. Please contact your team admin.");
           clearCurrentlyActiveWorkspace(dispatch, appMode);
           toast.info("Verifying storage checksum");
           setTimeout(() => {
@@ -86,9 +74,7 @@ const availableTeamsListener = (
                 response.users.forEach((user, index) => {
                   users[user.id] = response.users[index];
                 });
-                dispatch(
-                  teamsActions.setCurrentlyActiveWorkspaceMembers(users)
-                );
+                dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers(users));
               } else {
                 throw new Error(response.message);
               }

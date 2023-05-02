@@ -5,17 +5,10 @@ import { initClientHandler } from "./clientHandler";
 import { isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
-import {
-  getTabSession,
-  initSessionRecording,
-  onSessionRecordingStartedNotification,
-} from "./sessionRecording";
+import { getTabSession, initSessionRecording, onSessionRecordingStartedNotification } from "./sessionRecording";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
-export const sendMessageToApp = (
-  messageObject: unknown,
-  callback?: () => void
-) => {
+export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
   chrome.tabs.query({ url: config.WEB_URL + "/*" }, (tabs) => {
     tabs.forEach(({ id }) => {
       chrome.tabs.sendMessage(id, messageObject, callback);
@@ -36,20 +29,11 @@ export const initMessageHandler = () => {
         break;
 
       case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
-        initSessionRecording(
-          sender.tab?.id,
-          sender.frameId,
-          sender.tab.url
-        ).then(sendResponse);
+        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG:
-        initSessionRecording(
-          sender.tab?.id,
-          sender.frameId,
-          sender.tab.url,
-          true
-        ).then(sendResponse);
+        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url, true).then(sendResponse);
         return true;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:

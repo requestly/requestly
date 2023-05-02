@@ -19,13 +19,7 @@ const RuleSimulatorModal = ({ isOpen, toggle, body, mode, title }) => {
         }}
         width="700px"
       >
-        <CodeEditor
-          height={300}
-          language={mode}
-          defaultValue={body}
-          value={body}
-          readOnly={true}
-        />
+        <CodeEditor height={300} language={mode} defaultValue={body} value={body} readOnly={true} />
       </Modal>
     </>
   );

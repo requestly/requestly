@@ -15,11 +15,7 @@ const userSubscriptionNodeListener = (dispatch) => {
 
   if (user) {
     try {
-      const userSubscriptionNodeRef = getNodeRef([
-        "userSubscriptions",
-        user.uid,
-        "planDetails",
-      ]);
+      const userSubscriptionNodeRef = getNodeRef(["userSubscriptions", user.uid, "planDetails"]);
       onValue(userSubscriptionNodeRef, async (snapshot) => {
         const planDetails = snapshot.val();
         const isUserPremium = isPremiumUser(planDetails);
@@ -28,33 +24,19 @@ const userSubscriptionNodeListener = (dispatch) => {
           actions.updateUserPlanDetails({
             userPlanDetails: {
               ...planDetails,
-              planName: isUserPremium
-                ? getPlanName(planDetails)
-                : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
+              planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
             },
             isUserPremium,
           })
         );
         submitAttrUtil(TRACKING.ATTR.IS_PREMIUM, isUserPremium);
         if (planDetails) {
-          submitAttrUtil(
-            TRACKING.ATTR.PAYMENT_MODE,
-            planDetails.type || "Missing Value"
-          );
-          submitAttrUtil(
-            TRACKING.ATTR.PLAN_ID,
-            planDetails.planId || "Missing Value"
-          );
+          submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
+          submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
 
           if (planDetails.subscription) {
-            submitAttrUtil(
-              TRACKING.ATTR.PLAN_START_DATE,
-              planDetails.subscription.startDate || "Missing Value"
-            );
-            submitAttrUtil(
-              TRACKING.ATTR.PLAN_END_DATE,
-              planDetails.subscription.endDate || "Missing Value"
-            );
+            submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate || "Missing Value");
           }
         }
       });

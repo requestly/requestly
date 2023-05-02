@@ -21,35 +21,17 @@ const FreeAndEnterprisePlanTable = () => {
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
 
-  const useRQwith = [
-    "Web browsers & desktop apps",
-    "Android & iOS",
-    "Selenium & Cypress",
-  ];
+  const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
   return (
     <>
       <div className="pricing-table-wrapper">
         <Row className="pricing-table-row" gutter={[16, 16]}>
-          <Col
-            className="pricing-table-col"
-            xs={24}
-            sm={11}
-            md={11}
-            lg={11}
-            xl={11}
-          >
+          <Col className="pricing-table-col" xs={24} sm={11} md={11} lg={11} xl={11}>
             <div className="pricing-col-header">
               <p className="text-gray plan-for">For individuals</p>
               <div className="header text-left">
-                <span>
-                  {
-                    APP_CONSTANTS.PRICING.PLAN_HEADERS[
-                      APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC
-                    ]
-                  }
-                </span>{" "}
-                plan
+                <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]}</span> plan
               </div>
               <div className="price text-left price-container">$0</div>
               {isExtensionInstalled() ? (
@@ -62,17 +44,11 @@ const FreeAndEnterprisePlanTable = () => {
             </div>
             <div>
               {Plans.basic.map((feature, index) => (
-                <FeatureRepresentation
-                  key={index}
-                  title={feature.title}
-                  enabled={feature.enabled}
-                />
+                <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
               ))}
             </div>
             <div>
-              <div className="basic-use-with-text text-left">
-                Use Requestly with
-              </div>
+              <div className="basic-use-with-text text-left">Use Requestly with</div>
               <div>
                 {useRQwith.map((title, index) => (
                   <div className="rq-use-with" key={index}>
@@ -83,35 +59,16 @@ const FreeAndEnterprisePlanTable = () => {
               </div>
             </div>
           </Col>
-          <Col
-            className="pricing-table-col"
-            xs={24}
-            sm={11}
-            md={11}
-            lg={11}
-            xl={11}
-          >
+          <Col className="pricing-table-col" xs={24} sm={11} md={11} lg={11} xl={11}>
             <div className="pricing-col-header">
-              <p className="text-gray plan-for">
-                For collaboration in QA & developer teams
-              </p>
+              <p className="text-gray plan-for">For collaboration in QA & developer teams</p>
               <div className="header text-left">
-                <span>
-                  {
-                    APP_CONSTANTS.PRICING.PLAN_HEADERS[
-                      APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
-                    ]
-                  }
-                </span>{" "}
-                plan
+                <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE]}</span> plan
               </div>
               <div className="text-gray text-left price-container">
                 <span className="price">$25</span> per member, per month
               </div>
-              <RQButton
-                type="primary"
-                onClick={() => setIsContactUsModalOpen(true)}
-              >
+              <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
                 Contact us
               </RQButton>
             </div>
@@ -123,29 +80,16 @@ const FreeAndEnterprisePlanTable = () => {
             </div>
             <div>
               {Plans.team.map((feature, index) => (
-                <FeatureRepresentation
-                  key={index}
-                  title={feature.title}
-                  enabled={feature.enabled}
-                />
+                <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
               ))}
             </div>
           </Col>
         </Row>
         <div className="note-container text-gray text-center">
           <span>
-            <img
-              alt="StripeClimateBadge"
-              src={StripeClimateBadge}
-              style={{ height: "1em" }}
-            />{" "}
-            At Requestly, we contribute 1% of our revenue to carbon
-            removal.&nbsp;
-            <a
-              href="https://climate.stripe.com/Ve5kOs"
-              target={"_blank"}
-              rel="noreferrer"
-            >
+            <img alt="StripeClimateBadge" src={StripeClimateBadge} style={{ height: "1em" }} /> At Requestly, we
+            contribute 1% of our revenue to carbon removal.&nbsp;
+            <a href="https://climate.stripe.com/Ve5kOs" target={"_blank"} rel="noreferrer">
               See how
             </a>
           </span>

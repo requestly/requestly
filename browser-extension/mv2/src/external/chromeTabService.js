@@ -40,6 +40,9 @@
       });
 
       chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+        if (!that.map.hasOwnProperty(tabId)) {
+          return;
+        }
         that.map[tabId] = { ...tab, data: that.map[tabId].data || {} };
       });
 
@@ -94,10 +97,7 @@
 
     addOnClosedListener: function (listener) {
       if (typeof listener !== "function") {
-        console.error(
-          "Chrome Tab Service: Invalid listener passed as onClosedListener ",
-          listener
-        );
+        console.error("Chrome Tab Service: Invalid listener passed as onClosedListener ", listener);
       }
 
       chrome.tabs.onRemoved.addListener(listener);

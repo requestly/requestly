@@ -1,28 +1,22 @@
 import React, { useMemo } from "react";
-import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlySelectedRuleConfig } from "store/selectors";
+import { Row, Col, Input, Badge, Menu, Typography } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown } from "lib/design-system/components";
+import { MoreInfo } from "components/misc/MoreInfo";
+import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
-const RequestSourceRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => {
-  const {
-    modifyPairAtGivenPath,
-    openFilterModal,
-    getFilterCount,
-    generatePlaceholderText,
-  } = helperFunctions;
+const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+  const { modifyPairAtGivenPath, openFilterModal, getFilterCount, generatePlaceholderText } = helperFunctions;
+
+  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
   const sourceKeys = useMemo(
     () => [
@@ -78,12 +72,7 @@ const RequestSourceRow = ({
           <Menu.Item
             key={id}
             onClick={(event) => {
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-                ruleKey
-              );
+              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS, ruleKey);
             }}
           >
             {title}
@@ -100,12 +89,7 @@ const RequestSourceRow = ({
           <Menu.Item
             key={id}
             onClick={(event) => {
-              modifyPairAtGivenPath(
-                event,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-                ruleOperator
-              );
+              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS, ruleOperator);
             }}
           >
             {title}
@@ -120,17 +104,14 @@ const RequestSourceRow = ({
       gutter={6}
       key={rowIndex}
       align="middle"
+      data-tour-id="rule-editor-source"
       className="rules-pair-content-header"
       style={{ marginLeft: 0, marginRight: 0 }}
       wrap={false}
     >
       <Col className="shrink-0">
         <RQDropdown overlay={renderSourceKeys} disabled={isInputDisabled}>
-          <Text
-            strong
-            className="ant-dropdown-link cursor-pointer uppercase"
-            onClick={(e) => e.preventDefault()}
-          >
+          <Text strong className="ant-dropdown-link cursor-pointer uppercase" onClick={(e) => e.preventDefault()}>
             {pair.source.key} {!isInputDisabled && <DownOutlined />}
           </Text>
         </RQDropdown>
@@ -143,8 +124,7 @@ const RequestSourceRow = ({
             onClick={(e) => e.preventDefault()}
             style={{ textTransform: "capitalize" }}
           >
-            {pair.source.operator ===
-            GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
+            {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
               ? "Wildcard"
               : pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
               ? "RegEx"
@@ -163,38 +143,48 @@ const RequestSourceRow = ({
           placeholder={
             ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
               ? "Enter url here or leave this field empty to apply rule to all url’s..."
-              : generatePlaceholderText(
-                  pair.source.operator,
-                  "source-value",
-                  pair.source.key
-                )
+              : generatePlaceholderText(pair.source.operator, "source-value", pair.source.key)
           }
           type="text"
-          onChange={(event) =>
-            modifyPairAtGivenPath(event, pairIndex, "source.value")
-          }
+          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "source.value")}
           className="rules-pair-input"
           value={pair.source.value}
           disabled={isInputDisabled}
+          data-selectionid="source-value"
         />
       </Col>
 
       {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
         <Col span={1} align="right" className="source-filter-col">
           &nbsp;&nbsp;
-          <Tooltip title="Filters">
+          <MoreInfo
+            text={
+              <>
+                Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
+                <a
+                  className="tooltip-link"
+                  href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackMoreInfoClicked("redirect_source_filter", currentlySelectedRuleConfig.TYPE)}
+                >
+                  Learn More
+                </a>
+              </>
+            }
+            analyticsContext="redirect_source_filter"
+            source={currentlySelectedRuleConfig.TYPE}
+          >
             <span
               onClick={() => openFilterModal(pairIndex)}
               className="cursor-pointer text-gray source-filter-icon-container"
             >
               <FaFilter />{" "}
               {getFilterCount(pairIndex) !== 0 ? (
-                <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>
-                  {getFilterCount(pairIndex)}
-                </Badge>
+                <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
               ) : null}
             </span>
-          </Tooltip>
+          </MoreInfo>
         </Col>
       ) : null}
     </Row>

@@ -55,14 +55,8 @@ const filterRulesAndGroups = (incomingArray) => {
 };
 
 const isObjectValid = (object) => {
-  const objectType = [
-    GLOBAL_CONSTANTS.OBJECT_TYPES.RULE,
-    GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP,
-  ];
-  const objectStatus = [
-    GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
-    GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
-  ];
+  const objectType = [GLOBAL_CONSTANTS.OBJECT_TYPES.RULE, GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP];
+  const objectStatus = [GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE, GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE];
 
   return objectType.includes(object.objectType) &&
     objectStatus.includes(object.objectStatus) &&
@@ -96,19 +90,12 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
   return rulesArray.map((rule) => {
     return {
       ...rule,
-      groupId: groupsIdObject[rule.groupId]
-        ? rule.groupId
-        : RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
+      groupId: groupsIdObject[rule.groupId] ? rule.groupId : RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
     };
   });
 };
 
-export const processDataToImport = (
-  incomingArray,
-  user,
-  allRules,
-  overwrite = true
-) => {
+export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
   //Filter valid rules
   const rules = data.rules.filter((object) => isObjectValid(object));

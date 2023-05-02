@@ -43,10 +43,7 @@ import MobileDebuggerHomeView from "views/features/mobileDebugger/home";
 import MobileDebuggerDashboardView from "views/features/mobileDebugger";
 import MobileDebuggerInterceptorView from "views/features/mobileDebugger/features/interceptor";
 import MobileDebuggerUnauthorized from "components/features/mobileDebugger/screens/unauthorized";
-import {
-  DraftSessionViewer,
-  SavedSessionViewer,
-} from "views/features/sessions/SessionViewer";
+import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import SessionsHomeView from "./views/features/sessions";
 import Updates from "views/features/Updates";
 import DesktopPreference from "views/user/Settings/DesktopPreferences";
@@ -60,6 +57,7 @@ import FileMockListView from "views/features/mocksV2/FileMockListView";
 import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
+import InviteView from "views/misc/Invite";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -111,11 +109,7 @@ var routes = [
     path: PATHS.RULES.RELATIVE,
     name: "Rules",
     icon: "fas fa-exchange-alt",
-    component: () => (
-      <Navigate
-        to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`}
-      />
-    ),
+    component: () => <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`} />,
   },
   {
     path: PATHS.INSTALL_EXTENSION.RELATIVE,
@@ -268,10 +262,16 @@ var routes = [
     component: Goodbye,
   },
   {
-    path: PATHS.ACCOUNT.TEAM.RELATIVE + "/:teamId",
+    path: PATHS.ACCOUNT.TEAMS.RELATIVE + "/:teamId",
     name: "Manage Team",
     icon: "ni ni-lock-circle-open text-red",
     component: TeamViewerIndex,
+  },
+  {
+    path: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
+    name: "Manage Team",
+    icon: "ni ni-lock-circle-open text-red",
+    component: () => <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
   },
   {
     path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
@@ -552,6 +552,11 @@ var routes = [
     path: PATHS.GETTING_STARTED,
     name: "Getting started",
     component: GettingStarted,
+  },
+  {
+    path: PATHS.INVITE.RELATIVE,
+    name: "Accept Invite",
+    component: InviteView,
   },
 ];
 export default routes;

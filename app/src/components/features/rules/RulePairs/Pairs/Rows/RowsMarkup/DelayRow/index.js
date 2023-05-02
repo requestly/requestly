@@ -1,13 +1,7 @@
 import { Row, Col } from "antd";
 import { RQInput } from "lib/design-system/components";
 
-const DelayRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
 
   return (
@@ -21,6 +15,7 @@ const DelayRow = ({
           className="display-inline-block"
           addonBefore={<span className="text-gray">DELAY (ms):</span>}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "delay")}
+          data-selectionid="delay-value"
         />
       </Col>
     </Row>

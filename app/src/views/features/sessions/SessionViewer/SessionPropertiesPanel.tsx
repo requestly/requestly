@@ -12,19 +12,13 @@ import {
 } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateStartTimeOffset, updateDescription } from "../api";
-import {
-  epochToDateAndTimeString,
-  msToHoursMinutesAndSeconds,
-} from "utils/DateTimeUtils";
+import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import debounce from "lodash/debounce";
 import { AimOutlined } from "@ant-design/icons";
 import InfoIcon from "components/misc/InfoIcon";
 import { getUserAuthDetails } from "store/selectors";
 
-const SessionProperty: React.FC<{ label: string; children: ReactNode }> = ({
-  label,
-  children,
-}) => {
+const SessionProperty: React.FC<{ label: string; children: ReactNode }> = ({ label, children }) => {
   return children ? (
     <div
       style={{
@@ -55,20 +49,13 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const isReadOnly = useSelector(getIsReadOnly);
   const sessionDescription = useSelector(getSessionRecordingDescription);
 
-  const recordingLengthInSeconds = useMemo(
-    () => Math.floor(attributes.duration / 1000),
-    [attributes]
-  );
+  const recordingLengthInSeconds = useMemo(() => Math.floor(attributes.duration / 1000), [attributes]);
 
   const saveStartTimeOffset = useMemo(
     () =>
       debounce((value: number) => {
         if (recordingId) {
-          updateStartTimeOffset(
-            user?.details?.profile?.uid,
-            recordingId,
-            value
-          );
+          updateStartTimeOffset(user?.details?.profile?.uid, recordingId, value);
         }
       }, 1000),
     [recordingId, user]
@@ -101,14 +88,10 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   return (
     <ProCard className="session-recording-properties primary-card">
       {attributes.startTime && (
-        <SessionProperty label="Recorded at">
-          {epochToDateAndTimeString(attributes.startTime)}
-        </SessionProperty>
+        <SessionProperty label="Recorded at">{epochToDateAndTimeString(attributes.startTime)}</SessionProperty>
       )}
       {events.rrweb.length && (
-        <SessionProperty label="Duration">
-          {msToHoursMinutesAndSeconds(attributes.duration)}
-        </SessionProperty>
+        <SessionProperty label="Duration">{msToHoursMinutesAndSeconds(attributes.duration)}</SessionProperty>
       )}
       {!isReadOnly && (
         <SessionProperty label="Start time offset">
@@ -122,16 +105,10 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
               style={{ marginTop: 5, width: 200 }}
               size="small"
             />
-            <InfoIcon
-              text={`By default, video will start playing at this time.`}
-            />
+            <InfoIcon text={`By default, video will start playing at this time.`} />
           </div>
           <div>
-            <Button
-              type="link"
-              icon={<AimOutlined />}
-              onClick={() => onStartTimeOffsetChange(getCurrentTimeOffset())}
-            >
+            <Button type="link" icon={<AimOutlined />} onClick={() => onStartTimeOffsetChange(getCurrentTimeOffset())}>
               Select current player time
             </Button>
           </div>
@@ -148,9 +125,9 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
             style={{ wordBreak: "break-word", resize: "none" }}
           />
         ) : (
-          <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-            {sessionDescription}
-          </span>
+          sessionDescription && (
+            <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{sessionDescription}</span>
+          )
         )}
       </SessionProperty>
     </ProCard>

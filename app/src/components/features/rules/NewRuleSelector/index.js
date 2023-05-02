@@ -20,7 +20,7 @@ const NewRuleSelector = (props) => {
   const appMode = useSelector(getAppMode);
 
   const handleCreateClick = (ruleConfigType) => {
-    trackRuleCreationWorkflowStartedEvent(ruleConfigType);
+    trackRuleCreationWorkflowStartedEvent(ruleConfigType, "screen");
   };
 
   return (
@@ -40,14 +40,8 @@ const NewRuleSelector = (props) => {
               appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
               RULE_CONFIG.TYPE === GLOBAL_CONSTANTS.RULE_TYPES.DELAY
             ) {
-              if (
-                !isExtensionVersionCompatible(
-                  APP_CONSTANTS.DELAY_COMPATIBILITY_VERSION
-                )
-              ) {
-                console.log(
-                  "Delay Rule is not compatible with your extension version"
-                );
+              if (!isExtensionVersionCompatible(APP_CONSTANTS.DELAY_COMPATIBILITY_VERSION)) {
+                console.log("Delay Rule is not compatible with your extension version");
                 return null;
               }
             }
@@ -56,10 +50,7 @@ const NewRuleSelector = (props) => {
               return null;
             }
 
-            if (
-              appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-              RULE_CONFIG.HIDE_IN_EXTENSION
-            ) {
+            if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && RULE_CONFIG.HIDE_IN_EXTENSION) {
               return null;
             }
 
@@ -77,9 +68,7 @@ const NewRuleSelector = (props) => {
                   size="small"
                   bodyStyle={{ flexGrow: "1" }}
                   actions={[
-                    <NavLink
-                      to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_CONFIG.TYPE}`}
-                    >
+                    <NavLink to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_CONFIG.TYPE}`}>
                       <Button
                         type="primary"
                         icon={<RightOutlined />}

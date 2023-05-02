@@ -22,23 +22,20 @@ const NetworkLogRow: React.FC<Props> = ({
   timeOffset,
   method,
   url,
+  responseURL,
   status,
   responseTime = 0,
   onClick,
   isSelected,
   showResponseTime,
 }) => {
-  const responseTimeInSeconds = useMemo(
-    () => (responseTime / 1000).toFixed(3),
-    [responseTime]
-  );
-  const isFailedRequest = useMemo(
-    () => !status || (status >= 400 && status <= 599),
-    [status]
-  );
-  const requestMethod = useMemo(() => method.toUpperCase(), [method]);
+  const responseTimeInSeconds = useMemo(() => (responseTime / 1000).toFixed(3), [responseTime]);
+  const isFailedRequest = useMemo(() => !status || (status >= 400 && status <= 599), [status]);
+  const requestMethod = useMemo(() => method?.toUpperCase() ?? "GET", [method]);
 
-  return (
+  const networkUrl = useMemo(() => url || responseURL, [url, responseURL]);
+
+  return !networkUrl ? null : (
     <SessionDetailsPanelRow
       className={`network-log-row ${isSelected ? "selected" : ""}`}
       timeOffset={timeOffset}
@@ -51,17 +48,10 @@ const NetworkLogRow: React.FC<Props> = ({
       }
       onClick={onClick}
     >
-      <Tag
-        color={REQUEST_METHOD_COLOR_CODES[requestMethod]}
-        className="request-method-tag"
-      >
+      <Tag color={REQUEST_METHOD_COLOR_CODES[requestMethod]} className="request-method-tag">
         {requestMethod}
       </Tag>
-      <span
-        className={classNames("network-log-url", { failed: isFailedRequest })}
-      >
-        {url}
-      </span>
+      <span className={classNames("network-log-url", { failed: isFailedRequest })}>{networkUrl}</span>
     </SessionDetailsPanelRow>
   );
 };

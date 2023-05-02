@@ -3,12 +3,7 @@ import { AndroidFilled } from "@ant-design/icons";
 import React from "react";
 import { PopupButton } from "@typeform/embed-react";
 
-const CaptureInterest = ({
-  setIsModalVisible,
-  isModalVisible,
-  isSorryModalVisible,
-  setIsSorryModalVisible,
-}) => {
+const CaptureInterest = ({ setIsModalVisible, isModalVisible, isSorryModalVisible, setIsSorryModalVisible }) => {
   // LOCAL
   const feedbackTaken = false;
 
@@ -22,12 +17,7 @@ const CaptureInterest = ({
   };
   return (
     <Row>
-      <Col
-        span={24}
-        xs={{ offset: 0 }}
-        sm={{ offset: 0 }}
-        md={{ span: 10, offset: 7 }}
-      >
+      <Col span={24} xs={{ offset: 0 }} sm={{ offset: 0 }} md={{ span: 10, offset: 7 }}>
         <Modal
           title="Thank you for showing your interest"
           visible={isModalVisible}
@@ -37,13 +27,12 @@ const CaptureInterest = ({
           cancelButtonProps={{ style: { display: "none" } }}
         >
           <p>
-            Thank you for showing your interest in Requestly's Android
-            Interceptor. We have recorded your response and forwarded it to our
-            team. We'll let you know when we have something ready for you.
+            Thank you for showing your interest in Requestly's Android Interceptor. We have recorded your response and
+            forwarded it to our team. We'll let you know when we have something ready for you.
           </p>
           <p>
-            If you have any questions, please check out the Android Interceptor
-            Docs or drop us a message, we'll be there to help you :)
+            If you have any questions, please check out the Android Interceptor Docs or drop us a message, we'll be
+            there to help you :)
           </p>
         </Modal>
         <Modal
@@ -80,11 +69,7 @@ const CaptureInterest = ({
                   Yes, sounds great!
                 </Button>{" "} */}
 
-                <PopupButton
-                  id="BUsaN1l2"
-                  style={{ fontSize: 15 }}
-                  className="typeform-btn"
-                >
+                <PopupButton id="BUsaN1l2" style={{ fontSize: 15 }} className="typeform-btn">
                   Get Early Access
                 </PopupButton>
               </>

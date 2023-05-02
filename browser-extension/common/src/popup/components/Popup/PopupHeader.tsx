@@ -2,18 +2,17 @@ import React, { useCallback } from "react";
 import { Button, Dropdown, Menu, Row, Typography } from "antd";
 import config from "../../../config";
 import ArrowDown from "../../../../resources/icons/arrowDown.svg";
+import { EVENT, sendEvent } from "../../events";
 
 interface PopupHeaderProps {
   isExtensionEnabled: boolean;
   handleToggleExtensionStatus: () => void;
 }
 
-const PopupHeader: React.FC<PopupHeaderProps> = ({
-  isExtensionEnabled,
-  handleToggleExtensionStatus,
-}) => {
+const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
   const onOpenAppButtonClick = useCallback(() => {
     window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
+    sendEvent(EVENT.OPEN_APP_CLICKED);
   }, []);
 
   const items = (
@@ -23,14 +22,8 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({
           <Typography.Text type="secondary">
             When paused, rules won't be applied and sessions won't be recorded.
           </Typography.Text>
-          <Button
-            type="text"
-            danger={!isExtensionEnabled}
-            onClick={handleToggleExtensionStatus}
-          >
-            <span>{`${
-              isExtensionEnabled ? "Pause" : "Resume"
-            } requestly`}</span>
+          <Button type="text" danger={!isExtensionEnabled} onClick={handleToggleExtensionStatus}>
+            <span>{`${isExtensionEnabled ? "Pause" : "Resume"} requestly`}</span>
           </Button>
         </div>
       </Menu.Item>
@@ -40,10 +33,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({
   return (
     <div className="popup-header">
       <div className="popup-header-workspace-section">
-        <img
-          className="product-logo"
-          src="/resources/images/extended_logo.png"
-        />
+        <img className="product-logo" src="/resources/images/extended_logo.png" />
         {/* <Avatar shape="square" icon={<UserOutlined />} /> */}
 
         {/* <div className="popup-header-workspace-details">
@@ -63,9 +53,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({
         <Dropdown overlay={items} placement="bottomRight">
           <Typography.Text type="secondary">
             <span className="popup-header-dropdown-text">
-              <Typography.Text
-                type={isExtensionEnabled ? "secondary" : "danger"}
-              >
+              <Typography.Text type={isExtensionEnabled ? "secondary" : "danger"}>
                 {`Requestly ${isExtensionEnabled ? "running" : "paused"}`}
               </Typography.Text>
               <ArrowDown />
@@ -73,11 +61,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({
           </Typography.Text>
         </Dropdown>
 
-        <Button
-          type="primary"
-          className="open-app-btn"
-          onClick={onOpenAppButtonClick}
-        >
+        <Button type="primary" className="open-app-btn" onClick={onOpenAppButtonClick}>
           Open app
         </Button>
       </Row>

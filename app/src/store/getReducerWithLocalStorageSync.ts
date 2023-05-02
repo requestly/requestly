@@ -3,11 +3,7 @@ import { persistReducer } from "redux-persist";
 import { getPersistConfig } from "redux-deep-persist";
 import storage from "redux-persist/lib/storage";
 
-const getReducerWithLocalStorageSync = (
-  key: string,
-  reducer: Reducer,
-  whitelist: string[]
-): Reducer => {
+const getReducerWithLocalStorageSync = (key: string, reducer: Reducer, whitelist: string[]): Reducer => {
   const persistConfig = getPersistConfig({
     storage, // default localstorage
     key,

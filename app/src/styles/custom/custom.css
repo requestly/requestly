@@ -110,8 +110,7 @@ button.ant-input-search-button {
   margin: 1rem auto !important;
   border-radius: 4px;
   background: #22272d;
-  box-shadow: rgba(50, 50, 93, 0.11) 0px 4px 6px,
-    rgba(0, 0, 0, 0.08) 0px 1px 3px;
+  box-shadow: rgba(50, 50, 93, 0.11) 0px 4px 6px, rgba(0, 0, 0, 0.08) 0px 1px 3px;
   color: #0a48b3;
   font-weight: 600;
   cursor: pointer;
@@ -292,8 +291,7 @@ button.ant-input-search-button {
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 0.25rem;
-  box-shadow: rgba(50, 50, 93, 0.15) 0px 1px 3px,
-    rgba(0, 0, 0, 0.02) 0px 1px 0px;
+  box-shadow: rgba(50, 50, 93, 0.15) 0px 1px 3px, rgba(0, 0, 0, 0.02) 0px 1px 0px;
   color: #8898aa;
   display: block;
   font-family: inherit;
@@ -308,8 +306,7 @@ button.ant-input-search-button {
 
 .profile-card-form-field input:focus {
   border-color: rgb(10, 72, 179);
-  box-shadow: rgba(50, 50, 93, 0.11) 0px 4px 6px,
-    rgba(0, 0, 0, 0.08) 0px 1px 3px;
+  box-shadow: rgba(50, 50, 93, 0.11) 0px 4px 6px, rgba(0, 0, 0, 0.08) 0px 1px 3px;
   outline: 0px;
 }
 
@@ -415,9 +412,6 @@ button.ant-input-search-button {
   margin-left: 2%;
 }
 
-.mr-8 {
-  margin-right: 8%;
-}
 .ml-8 {
   margin-left: 8%;
 }
@@ -510,8 +504,7 @@ button.ant-input-search-button {
 }
 
 @media screen and (min-width: 64em) {
-  .ant-table-ping-right:not(.ant-table-has-fix-right)
-    .ant-table-container::after {
+  .ant-table-ping-right:not(.ant-table-has-fix-right) .ant-table-container::after {
     box-shadow: none;
   }
 }
@@ -562,8 +555,7 @@ button.ant-input-search-button {
   flex-shrink: 0;
 }
 
-.icon-wrapper,
-.sidebar-collapsed-container .icon-wrapper.ant-menu-item-icon {
+.icon-wrapper {
   width: 1.75rem;
   height: 1.75rem;
   display: flex;
@@ -587,8 +579,7 @@ button.ant-input-search-button {
   color: var(--text-gray);
 }
 
-.ant-dropdown-menu.ant-dropdown-menu-root
-  .ant-dropdown-menu-item.ant-dropdown-menu-item-active {
+.ant-dropdown-menu.ant-dropdown-menu-root .ant-dropdown-menu-item.ant-dropdown-menu-item-active {
   color: var(--white);
 }
 

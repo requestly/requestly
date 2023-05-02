@@ -1,28 +1,18 @@
 import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
-import { UserRecommendations } from "./Recommendations";
-import {
-  handleUseCaseActiveOption,
-  setPersonaReferralChannel,
-  setPersonaUseCase,
-  setUserPersona,
-} from "./actions";
+import { handleUseCaseActiveOption, setPersonaUseCase, setUserPersona } from "./actions";
 
-//@ts-ignore
-import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
-//@ts-ignore
-import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
-//@ts-ignore
-import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
-//@ts-ignore
-import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+// import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
+// import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
+// import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
+// import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
 
 export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   1: {
     key: "persona",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear),
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "persona"),
     options: [
       {
         title: PersonaType.FRONTEND,
@@ -45,18 +35,20 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         icon: "📊",
       },
       {
-        title: PersonaType.FOUNDER,
-        icon: "👑",
+        title: PersonaType.FULLSTACK,
+        icon: "👨🏽‍💻",
+      },
+      {
+        title: PersonaType.SALES,
+        icon: "💵",
       },
     ],
   },
   2: {
     key: "useCases",
     questionType: "multiple",
-    isActive: ({ key, title, optionType }) =>
-      handleUseCaseActiveOption(key, title, optionType),
-    action: (dispatch, value, clear, optionType) =>
-      setPersonaUseCase(dispatch, value, clear, optionType),
+    isActive: ({ key, title, optionType }) => handleUseCaseActiveOption(key, title, optionType),
+    action: (dispatch, value, clear, optionType) => setPersonaUseCase(dispatch, value, clear, optionType),
     conditional: [
       {
         condition: (answer: string) => answer === PersonaType.BACKEND,
@@ -80,8 +72,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         condition: (answer: string) => answer === PersonaType.QUALITY,
         options: [
           {
-            title:
-              "Testing newly developed features on different hosts/environments",
+            title: "Testing newly developed features on different hosts/environments",
           },
           {
             title: "Testing new features on client websites",
@@ -102,8 +93,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) =>
-          answer === PersonaType.FOUNDER || answer === PersonaType.PRODUCT,
+        condition: (answer: string) => answer === PersonaType.PRODUCT,
         options: [
           {
             title: "Testing new features on client websites",
@@ -121,7 +111,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) => answer === PersonaType.MARKETER,
+        condition: (answer: string) => answer === PersonaType.MARKETER || answer === PersonaType.SALES,
         options: [
           {
             title: "Replace production script with development script",
@@ -142,7 +132,7 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
         ],
       },
       {
-        condition: (answer: string) => answer === PersonaType.FRONTEND,
+        condition: (answer: string) => answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
         options: [
           {
             title: "Local development before the backend is ready",
@@ -181,58 +171,89 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     ],
   },
   3: {
-    key: "referralChannel",
+    key: "numberOfEmployees",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) =>
-      setPersonaReferralChannel(dispatch, value, clear),
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "numberOfEmployees"),
     options: [
       {
-        title: "Google search",
-        icon: <img src={chromeIcon} alt="google chrome" />,
+        title: "Just me",
       },
       {
-        title: "Friend/Colleague",
-        icon: "🙂",
+        title: "1-10",
       },
       {
-        title: "Online ads",
-        icon: "📢",
+        title: "11-50",
       },
       {
-        title: "Chrome webstore",
-        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+        title: "51-100",
       },
       {
-        title: "Social media",
-        icon: "🌐",
+        title: "100-500",
       },
       {
-        title: "Read an article",
-        icon: "📄",
-      },
-      {
-        title: "Reddit",
-        icon: <img src={redditIcon} alt="reddit" />,
-      },
-      {
-        title: "HackerNews",
-        icon: <img src={hackerNewsIcon} alt="hacker news" />,
-      },
-      {
-        title: "Company documentation",
-        icon: "📋",
+        title: "500+",
       },
     ],
   },
+
+  /* Referral channel questionaire*/
+  // 3: {
+  //   key: "referralChannel",
+  //   questionType: "single",
+  //   isActive: ({ key, title }) => key === title,
+  //   action: (dispatch, value, clear) =>
+  //     setPersonaReferralChannel(dispatch, value, clear),
+  //   options: [
+  //     {
+  //       title: "Google search",
+  //       icon: <img src={chromeIcon} alt="google chrome" />,
+  //     },
+  //     {
+  //       title: "Friend/Colleague",
+  //       icon: "🙂",
+  //     },
+  //     {
+  //       title: "Online ads",
+  //       icon: "📢",
+  //     },
+  //     {
+  //       title: "Chrome webstore",
+  //       icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+  //     },
+  //     {
+  //       title: "Social media",
+  //       icon: "🌐",
+  //     },
+  //     {
+  //       title: "Read an article",
+  //       icon: "📄",
+  //     },
+  //     {
+  //       title: "Reddit",
+  //       icon: <img src={redditIcon} alt="reddit" />,
+  //     },
+  //     {
+  //       title: "HackerNews",
+  //       icon: <img src={hackerNewsIcon} alt="hacker news" />,
+  //     },
+  //     {
+  //       title: "Company documentation",
+  //       icon: "📋",
+  //     },
+  //     {
+  //       title: "ChatGPT",
+  //       icon: "🤖",
+  //     },
+  //   ],
+  // },
 };
 
 export const SurveyConfig: PageConfig[] = [
   {
     pageId: 0,
     title: "Welcome to Requestly!",
-    subTitle:
-      "Help us personalise your experience by answering the following questionnaire",
+    subTitle: "Help us personalise your experience by answering the following questionnaire",
     render: () => <GettingStartedWithSurvey />,
   },
   {
@@ -243,23 +264,16 @@ export const SurveyConfig: PageConfig[] = [
   },
   {
     pageId: 2,
+    skip: true,
     title: "What is your primary goal for using Requestly?",
     subTitle: "Select as many as you like",
     render: 2,
   },
   {
     pageId: 3,
-    title: "How did you hear about Requestly?",
+    skip: true,
+    title: "How many employees do you have in your organisation?",
     subTitle: "Select one",
     render: 3,
-  },
-  {
-    pageId: 4,
-    title: "✨ Where would you like to start?",
-    subTitle:
-      "Choose a use case you want to work on and we will help you get started",
-    render: ({ toggleImportRulesModal }) => (
-      <UserRecommendations toggleImportRulesModal={toggleImportRulesModal} />
-    ),
   },
 ];

@@ -32,13 +32,7 @@ CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
  * We are calling them as BLACK_LIST_DOMAINS
  * however the usage is code is as the URL containing these substrings, We don't touch those requests
  */
-CONSTANTS.BLACK_LIST_DOMAINS = [
-  "requestly.in",
-  "requestly.io",
-  "rq.in",
-  "rq.io",
-  "__rq",
-];
+CONSTANTS.BLACK_LIST_DOMAINS = ["requestly.in", "requestly.io", "rq.in", "rq.io", "__rq"];
 
 CONSTANTS.OBJECT_TYPES = {
   GROUP: "group",
@@ -145,6 +139,8 @@ CONSTANTS.EXTENSION_MESSAGES = {
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
+  SEND_EXTENSION_EVENTS: "sendExtensionEvents",
+  NOTIFY_APP_LOADED: "notifyAppLoaded",
 };
 
 CONSTANTS.HEADERS_TARGET = {
@@ -176,8 +172,7 @@ CONSTANTS.SCRIPT_LIBRARIES = {
   JQUERY: { name: "jQuery", src: "https://code.jquery.com/jquery-2.2.4.js" },
   UNDERSCORE: {
     name: "Underscore",
-    src:
-      "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js",
+    src: "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js",
   },
 };
 
@@ -197,6 +192,7 @@ CONSTANTS.STORAGE_KEYS = {
   USER_INFO: "user_info",
   LATEST_NOTIFICATION_READ_BY_USER: "latestNotificationReadId",
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
+  USE_EVENTS_ENGINE: "useEventsEngine",
 };
 
 CONSTANTS.REQUEST_STATE = {

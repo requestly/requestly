@@ -1,34 +1,82 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Button, Input, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { Row, Button, Input, message, Col, Tooltip } from "antd";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
+import { redirectToRules, redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
-import SwitchWorkspaceButton from "../SwitchWorkspaceButton";
+import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
+import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
+import LoadingModal from "../../../../../../../layouts/DashboardLayout/Sidebar/WorkspaceSelector/LoadingModal";
 import { toast } from "utils/Toast";
+import { trackWorkspaceDeleted, trackWorkspaceDeleteClicked } from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";
 
-const TeamSettings = ({ teamId, isTeamAdmin }) => {
+const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const mountedRef = useRef(true);
-  // const inputRef = useRef(null);
+  const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
+  const userId = user?.details?.profile?.uid;
+  const isLoggedInUserOwner = userId === teamOwnerId;
 
   if (!teamId) redirectToMyTeams(navigate);
+
   // Component State
   const [name, setName] = useState("");
   const [originalTeamName, setOriginalTeamName] = useState("");
-  // const [creationTime, setCreationTime] = useState("");
-  // const [subscriptionStatus, setSubscriptionStatus] = useState("");
-  const [membersCount, setMembersCount] = useState(0);
-  // const [subscriptionCurrentPeriodEnd, setSubscriptionCurrentPeriodEnd] =
-  //   useState("");
-  // const [subscriptionCurrentPeriodStart, setSubscriptionCurrentPeriodStart] =
-  //   useState("");
   const [isTeamInfoLoading, setIsTeamInfoLoading] = useState(false);
   const [renameInProgress, setRenameInProgress] = useState(false);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
+  const [isDeleteModalActive, setIsDeleteModalActive] = useState(false);
+  const [isTeamSwitchModalActive, setIsTeamSwitchModalActive] = useState(false);
+
+  const handleDeleteModalOpen = () => {
+    setIsDeleteModalActive(true);
+    trackWorkspaceDeleteClicked();
+  };
+
+  const handleDeleteModalClose = () => {
+    setIsDeleteModalActive(false);
+  };
+
+  const handleSwitchToPrivateWorkspace = async () => {
+    setIsTeamSwitchModalActive(true);
+    await clearCurrentlyActiveWorkspace(dispatch, appMode);
+    setTimeout(() => {
+      setIsTeamSwitchModalActive(false);
+      showSwitchWorkspaceSuccessToast();
+    }, 2 * 1000);
+  };
+
+  const deleteTeam = async () => {
+    if (!isLoggedInUserOwner) {
+      toast.error("Only owner can delete the workspace!");
+      return;
+    }
+
+    const functions = getFunctions();
+    const archiveTeam = httpsCallable(functions, "teams-archiveTeam");
+
+    try {
+      setDeleteInProgress(true);
+      await archiveTeam({ teamId });
+      trackWorkspaceDeleted();
+      toast.info("Workspace deletion scheduled");
+      redirectToRules(navigate);
+      handleSwitchToPrivateWorkspace();
+    } catch (err) {
+      toast.error("Only owner can delete the workspace!");
+    } finally {
+      setDeleteInProgress(false);
+      handleDeleteModalClose();
+    }
+  };
 
   const fetchTeamInfo = () => {
     setIsTeamInfoLoading(true);
@@ -43,19 +91,6 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
         const teamInfo = response.data;
         setName(teamInfo.name);
         setOriginalTeamName(teamInfo.name);
-        setMembersCount(teamInfo.accessCount);
-        // setCreationTime(
-        //   new Date(teamInfo.creationTime._seconds * 1000).toDateString()
-        // );
-        // setSubscriptionStatus(teamInfo.subscriptionStatus);
-        // setSubscriptionCurrentPeriodStart(
-        //   new Date(
-        //     teamInfo.subscriptionCurrentPeriodStart * 1000
-        //   ).toDateString()
-        // );
-        // setSubscriptionCurrentPeriodEnd(
-        //   new Date(teamInfo.subscriptionCurrentPeriodEnd * 1000).toDateString()
-        // );
       })
       .catch(() => redirectToMyTeams(navigate))
       .finally(() => setIsTeamInfoLoading(false));
@@ -91,58 +126,6 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
       .finally(() => setRenameInProgress(false));
   };
 
-  // const renderCardBody = () => {
-  //   return (
-  //     <div style={{ marginTop: "1%" }}>
-  //       <Descriptions title={null} bordered column={2}>
-  //         <Descriptions.Item
-  //           label={
-  //             <>
-  //               <span>
-  //                 {"Team Name "}
-  //                 <Button
-  //                   type="link"
-  //                   style={{ padding: 0 }}
-  //                   onClick={handleRenameOnClick}
-  //                 >
-  //                   {renderTeamNameLinkText()}
-  //                 </Button>
-  //               </span>
-  //             </>
-  //           }
-  //         >
-  //           <Input
-  //             value={name}
-  //             bordered={false}
-  //             disabled={!renameInProgress}
-  //             ref={inputRef}
-  //             onChange={(e) => setName(e.target.value)}
-  //             onPressEnter={handleRenameOnClick}
-  //           />
-  //         </Descriptions.Item>
-  //         <Descriptions.Item label="Created on">
-  //           {creationTime}
-  //         </Descriptions.Item>
-
-  //         {!subscriptionStatus || isEmpty(subscriptionStatus) ? null : (
-  //           <>
-  //             <Descriptions.Item
-  //               className=" github-like-border"
-  //               label="Current Period"
-  //             >{`${subscriptionCurrentPeriodStart} ~ ${subscriptionCurrentPeriodEnd}`}</Descriptions.Item>
-  //             <Descriptions.Item
-  //               className=" github-like-border"
-  //               label="Subscription Status"
-  //             >
-  //               {beautifySubscriptionStatus(subscriptionStatus)}
-  //             </Descriptions.Item>
-  //           </>
-  //         )}
-  //       </Descriptions>
-  //     </div>
-  //   );
-  // };
-
   useEffect(() => {
     stableFetchTeamInfo();
 
@@ -158,30 +141,24 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
         {isTeamInfoLoading ? (
           <SpinnerColumn message="Fetching workspace settings" />
         ) : !isTeamAdmin ? (
-          <div>Only admins can view the workspace settings.</div>
+          <>
+            <WorkspaceStatusSyncing />
+            <div>Only admins can view rest of the workspace settings.</div>
+          </>
         ) : (
           <>
             <Row align="middle" justify="space-between">
               <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
-              <SwitchWorkspaceButton
-                teamName={name}
-                selectedTeamId={teamId}
-                teamMembersCount={membersCount}
-              />
             </Row>
 
             <div className="title team-settings-title">Workspace settings</div>
             <form onSubmit={handleTeamRename} className="team-settings-form">
               <div className="team-settings-form-item">
-                <label
-                  htmlFor="name"
-                  className="team-settings-name-input-label"
-                >
+                <label htmlFor="name" className="team-settings-name-input-label">
                   Workspace name
                 </label>
                 <Input
                   id="name"
-                  autoFocus
                   autoComplete="off"
                   value={name}
                   disabled={renameInProgress || isTeamInfoLoading}
@@ -191,14 +168,8 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
                 />
               </div>
 
-              <div
-                style={{ display: "none" }}
-                className="team-settings-form-item"
-              >
-                <label
-                  htmlFor="description"
-                  className="team-settings-description-label"
-                >
+              <div style={{ display: "none" }} className="team-settings-form-item">
+                <label htmlFor="description" className="team-settings-description-label">
                   Description
                 </label>
                 <Input.TextArea
@@ -223,54 +194,51 @@ const TeamSettings = ({ teamId, isTeamAdmin }) => {
             </form>
 
             <WorkspaceStatusSyncing />
+
+            <Row className="w-full">
+              <Col span={24}>
+                <div className="title team-delete-title">Delete workspace</div>
+
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "270px" }}
+                  title={
+                    isTeamArchived
+                      ? "Team is already archived"
+                      : isLoggedInUserOwner
+                      ? ""
+                      : "Only owner can delete the workspace. Please contact owner of this workspace."
+                  }
+                >
+                  <Button
+                    danger
+                    className="delete-team-btn"
+                    loading={deleteInProgress}
+                    onClick={handleDeleteModalOpen}
+                    disabled={!isLoggedInUserOwner || !!isTeamArchived}
+                  >
+                    Delete entire workspace
+                  </Button>
+                </Tooltip>
+              </Col>
+            </Row>
           </>
         )}
       </div>
 
-      {/* <div className="team-settings-container"> */}
-      {/* <div>
-          <Row>
-            <Col span={12}>
-              <span>Team Details</span>
-            </Col>
-            <Col align="right" span={12}>
-            {subscriptionStatus === "active" ? (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    redirectToUpdateSubscription({
-                      mode: "team",
-                      planType: "enterprise",
-                      teamId: teamId,
-                    });
-                  }}
-                  icon={<CalendarOutlined />}
-                >
-                  Change Plan
-                </Button>
-              ) : null}
-            {subscriptionStatus === "canceled" ||
-              subscriptionStatus === "incomplete_expired" ? (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    redirectToUpdateSubscription({
-                      mode: "team",
-                      planType: "enterprise",
-                      teamId: teamId,
-                      isRenewal: true,
-                    });
-                  }}
-                  icon={<SyncOutlined />}
-                >
-                  Renew Subscription
-                </Button>
-              ) : null}
-            </Col>
-          </Row>
-        </div> */}
-      {/* {isTeamInfoLoading ? renderLoader() : renderCardBody()} */}
-      {/* </div> */}
+      {isDeleteModalActive ? (
+        <DeleteWorkspaceModal
+          name={name}
+          isOpen={isDeleteModalActive}
+          deleteInProgress={deleteInProgress}
+          handleDeleteTeam={deleteTeam}
+          handleModalClose={handleDeleteModalClose}
+        />
+      ) : null}
+
+      {isTeamSwitchModalActive ? (
+        <LoadingModal isModalOpen={isTeamSwitchModalActive} closeModal={() => setIsTeamSwitchModalActive(false)} />
+      ) : null}
     </>
   );
 };

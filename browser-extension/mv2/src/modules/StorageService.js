@@ -32,9 +32,7 @@
     }
 
     constructor(options) {
-      this.DB = options.DB
-        ? chrome.storage[options.DB]
-        : chrome.storage[RQ.configs.storageType];
+      this.DB = options.DB ? chrome.storage[options.DB] : chrome.storage[RQ.configs.storageType];
       this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
       this.records = [];
       this.isRecordsFetched = false;
@@ -53,20 +51,15 @@
 
     static getStorageType() {
       return new Promise((resolve) => {
-        StorageService.getRecordFromStorage("storageType", "sync").then(
-          (storageType) => {
-            // If there is no storageType stored, fallback to default setting
-            resolve(storageType || RQ.configs.storageType);
-          }
-        );
+        StorageService.getRecordFromStorage("storageType", "sync").then((storageType) => {
+          // If there is no storageType stored, fallback to default setting
+          resolve(storageType || RQ.configs.storageType);
+        });
       });
     }
 
     static setStorageType(newStorageType) {
-      return StorageService.saveRecordInStorage(
-        { storageType: newStorageType },
-        "sync"
-      );
+      return StorageService.saveRecordInStorage({ storageType: newStorageType }, "sync");
     }
 
     fetchRecords(objectType, forceFetch) {
@@ -96,9 +89,11 @@
     }
 
     hasPrimaryKey(record) {
-      for (let index = 0; index < this.primaryKeys.length; index++) {
-        if (typeof record[this.primaryKeys[index]] !== "undefined") {
-          return true;
+      if (record) {
+        for (let index = 0; index < this.primaryKeys.length; index++) {
+          if (typeof record[this.primaryKeys[index]] !== "undefined") {
+            return true;
+          }
         }
       }
 
@@ -134,29 +129,21 @@
     }
 
     static saveRecordInStorage(object, storageType) {
-      return new Promise((resolve) =>
-        chrome.storage[storageType].set(object, resolve)
-      );
+      return new Promise((resolve) => chrome.storage[storageType].set(object, resolve));
     }
 
     static getRecordFromStorage(key, storageType) {
-      return new Promise((resolve) =>
-        chrome.storage[storageType].get(key, (obj) => resolve(obj[key]))
-      );
+      return new Promise((resolve) => chrome.storage[storageType].get(key, (obj) => resolve(obj[key])));
     }
 
     getRecord(key) {
       const self = this;
-      return new Promise((resolve) =>
-        self.DB.get(key, (obj) => resolve(obj[key]))
-      );
+      return new Promise((resolve) => self.DB.get(key, (obj) => resolve(obj[key])));
     }
 
     getRecords(keys) {
       const self = this;
-      return new Promise((resolve) =>
-        self.DB.get(keys, (obj) => resolve(Object.values(obj)))
-      );
+      return new Promise((resolve) => self.DB.get(keys, (obj) => resolve(Object.values(obj))));
     }
 
     removeRecord(key) {
@@ -170,11 +157,7 @@
     }
 
     getCachedRecordIndex(keyToFind) {
-      for (
-        let recordIndex = 0;
-        recordIndex < this.records.length;
-        recordIndex++
-      ) {
+      for (let recordIndex = 0; recordIndex < this.records.length; recordIndex++) {
         const recordKey = this.records[recordIndex].id;
 
         if (recordKey === keyToFind) {
@@ -195,11 +178,7 @@
       var changedObject, changedObjectIndex, objectExists, changedObjectKey;
 
       // If storageType is changed then source the data in new storage
-      if (
-        namespace === "sync" &&
-        changes.hasOwnProperty("storageType") &&
-        changes["storageType"].newValue
-      ) {
+      if (namespace === "sync" && changes.hasOwnProperty("storageType") && changes["storageType"].newValue) {
         this.switchStorageType(changes["storageType"].newValue);
         return;
       }
@@ -222,11 +201,8 @@
             }
 
             objectExists
-              ? (this.records[changedObjectIndex] =
-                  changedObject.newValue) /* Update existing object (Edit) */
-              : this.records.push(
-                  changedObject.newValue
-                ); /* Create New Object */
+              ? (this.records[changedObjectIndex] = changedObject.newValue) /* Update existing object (Edit) */
+              : this.records.push(changedObject.newValue); /* Create New Object */
           }
 
           // Delete Rule Operation
@@ -270,10 +246,7 @@
       existingStorage.get(null, (superObject) => {
         const keysToRemove = [];
         for (let key in superObject) {
-          if (
-            superObject.hasOwnProperty(key) &&
-            self.hasPrimaryKey(superObject[key])
-          ) {
+          if (superObject.hasOwnProperty(key) && self.hasPrimaryKey(superObject[key])) {
             // Save data in the new Storage
             chrome.storage[newStorageType].set({ [key]: superObject[key] });
             keysToRemove.push(key);

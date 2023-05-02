@@ -1,10 +1,17 @@
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
+import { getIsTrafficTableTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
-import React from "react";
 import _ from "lodash";
-
 import { getColumnKey } from "../utils";
 import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import FEATURES from "config/constants/sub/features";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import VirtualTableV2 from "./VirtualTableV2";
 
 export const ITEM_SIZE = 30;
 
@@ -14,12 +21,18 @@ interface Props {
 }
 
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
+  const [selectedRowData, setSelectedRowData] = useState({});
+  const dispatch = useDispatch();
+  const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
+
+  const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
+
   const columns = [
     {
       id: "time",
       title: "Time",
       dataIndex: "timestamp",
-      width: "5%",
+      width: "7%",
       render: (timestamp: any) => {
         return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
           hour12: false,
@@ -30,7 +43,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       id: "url",
       title: "URL",
       dataIndex: "url",
-      width: "50%",
+      width: "48%",
     },
     {
       id: "method",
@@ -78,7 +91,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     );
   };
 
-  const renderLogRow = (log: any, style: any) => {
+  const renderLogRow = (log: any, index: number) => {
     if (!log) {
       return null;
     }
@@ -86,35 +99,59 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     const rowProps = onRow(log);
 
     return (
-      <Table.Row id={log.id} {...rowProps}>
+      <Table.Row
+        key={index}
+        id={log.id}
+        onContextMenu={() => setSelectedRowData(log)}
+        {...rowProps}
+        data-tour-id={index === 0 ? "traffic-table-row" : null}
+      >
         {columns.map((column: any) => {
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
-          return (
-            <Table.Cell key={column.id}>
-              {column?.render ? column.render(columnData) : columnData}
-            </Table.Cell>
-          );
+          return <Table.Cell key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
         })}
       </Table.Row>
     );
   };
 
   const Row = ({ index, style }: any) => {
-    return renderLogRow(logs[index], style);
+    return renderLogRow(logs[index], index);
   };
 
-  return (
-    <>
+  const renderTable = () => {
+    if (isTrafficTableVirtualV2Enabled) {
+      return (
+        <VirtualTableV2
+          renderHeader={renderHeader}
+          renderLogRow={renderLogRow}
+          logs={logs}
+          selectedRowData={selectedRowData}
+        />
+      );
+    }
+    return (
       <VirtualTable
         height="100%"
         width="100%"
-        itemCount={logs.length}
+        itemCount={logs?.length ?? 0}
         itemSize={ITEM_SIZE}
         header={renderHeader()}
         row={Row}
         footer={null}
+        selectedRowData={selectedRowData}
       />
+    );
+  };
+
+  return (
+    <>
+      <ProductWalkthrough
+        tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
+        startWalkthrough={!isTrafficTableTourCompleted}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
+      />
+      {renderTable()}
     </>
   );
 };

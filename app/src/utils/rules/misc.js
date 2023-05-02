@@ -3,17 +3,14 @@ import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
-//CONSTANTS
-const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
+import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+
+const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
 
-const processRules = (
-  rule,
-  groupIdsArr,
-  isGroupIdAlreadyAdded,
-  _sanitizeRules = true
-) => {
+const processRules = (rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules = true) => {
   if (rule.groupId !== RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID) {
     if (!isGroupIdAlreadyAdded[rule.groupId]) {
       groupIdsArr.push(rule.groupId);
@@ -30,11 +27,17 @@ const sanitizeRule = (rule) => {
   return sanitizedRule;
 };
 
-export const getRulesAndGroupsFromRuleIds = (
-  appMode,
-  selectedRuleIds,
-  groupwiseRules
-) => {
+export const getRuleConfigInEditMode = (rule) => {
+  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
+    if (!rule.version) {
+      return RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS_V1];
+    }
+  }
+
+  return RULE_TYPES_CONFIG[rule.ruleType];
+};
+
+export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds, groupwiseRules) => {
   return new Promise((resolve) => {
     const groupIdsArr = [];
     const isGroupIdAlreadyAdded = {};
@@ -45,20 +48,13 @@ export const getRulesAndGroupsFromRuleIds = (
       .then((allRecords) => {
         //Fetch Required Rules
         const rules = selectedRuleIds.map((ruleId) =>
-          processRules(
-            allRecords[ruleId],
-            groupIdsArr,
-            isGroupIdAlreadyAdded,
-            true
-          )
+          processRules(allRecords[ruleId], groupIdsArr, isGroupIdAlreadyAdded, true)
         );
 
         const groups = [];
         //Fetch Required Groups
         groupIdsArr.forEach((groupId) => {
-          groups.push(
-            groupwiseRules[groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS]
-          );
+          groups.push(groupwiseRules[groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS]);
         });
 
         resolve({
@@ -97,12 +93,7 @@ export const getAllRulesAndGroups = (appMode, _sanitizeRules = true) => {
         }
 
         const rules = allRules.map((rule) => {
-          return processRules(
-            rule,
-            groupIdsArr,
-            isGroupIdAlreadyAdded,
-            _sanitizeRules
-          );
+          return processRules(rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules);
         });
 
         const groups = [];
@@ -131,12 +122,8 @@ export const getAllRulesAndGroupsIds = (appMode) => {
 };
 
 export const compareRuleByModificationDate = (object1, object2) => {
-  const comparisonKeyForObject1 = object1.modificationDate
-    ? object1.modificationDate
-    : object1.creationDate;
-  const comparisonKeyForObject2 = object2.modificationDate
-    ? object2.modificationDate
-    : object2.creationDate;
+  const comparisonKeyForObject1 = object1.modificationDate ? object1.modificationDate : object1.creationDate;
+  const comparisonKeyForObject2 = object2.modificationDate ? object2.modificationDate : object2.creationDate;
 
   if (comparisonKeyForObject1 < comparisonKeyForObject2) {
     return 1;
@@ -169,27 +156,66 @@ export const getExecutionLogsId = (ruleId) => {
   return `execution_${ruleId}`;
 };
 
-// TODO: remove it- commenting it for now as no header found to be unmodifiable from this list
-// export const canBrowserModifyHeader = (header = "") => {
-//   if (isDesktopMode()) return true;
-//   const UNMODIFIABLE_HEADERS = [
-//     "Authorization",
-//     "Cache-Control",
-//     "Connection",
-//     "Content-Length",
-//     "Host",
-//     "If-Modified-Since",
-//     "If-None-Match",
-//     "If-Range",
-//     "Partial-Data",
-//     "Pragma",
-//     "Proxy-Authorization",
-//     "Proxy-Connection",
-//     "Transfer-Encoding",
-//   ];
+export const isDesktopOnlyRule = (rule) => {
+  if (rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+    const pairs = rule?.pairs;
+    return pairs.some(
+      ({ destinationType, destination }) =>
+        destinationType === RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
+    );
+  }
+};
 
-//   return !UNMODIFIABLE_HEADERS.find(
-//     (unmodifiableHeader) =>
-//       unmodifiableHeader.toLowerCase() === header.toLowerCase()
-//   );
-// };
+export const getAllRedirectDestinationTypes = (rule) => {
+  const destinationTypes = rule.pairs.map((pair) => pair.destinationType);
+  return destinationTypes;
+};
+
+/**
+ * Check if the regex string contains the forward and backward slashes or not
+ * @param {string} regexStr
+ * @returns {boolean}
+ */
+export const isRegexFormat = (regexStr) => {
+  const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
+  return regexFormat.test(regexStr);
+};
+
+/**
+ * Formats regex string by adding forward and trailing slashes
+ * @param {string} regexStr
+ * @returns {string}
+ */
+export const formatRegexSource = (regexStr) => {
+  try {
+    return regexStr.replace(/^\/?([^/]+(?:\/[^/]+)*)\/?$/, "/$1/");
+  } catch {
+    return regexStr;
+  }
+};
+
+export const fixRuleRegexSourceFormat = (dispatch, rule) => {
+  const rulePairs = rule.pairs.map((pair) => {
+    if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+      if (!isRegexFormat(pair.source.value)) {
+        return {
+          ...pair,
+          source: {
+            ...pair.source,
+            value: formatRegexSource(pair.source.value),
+          },
+        };
+      }
+    }
+    return pair;
+  });
+
+  const fixedRule = {
+    ...rule,
+    pairs: rulePairs,
+  };
+
+  setCurrentlySelectedRule(dispatch, fixedRule);
+
+  return fixedRule;
+};

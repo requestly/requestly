@@ -15,6 +15,7 @@ const INITIAL_STATE = {
     persona: "",
     useCases: [],
     referralChannel: "",
+    numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 
@@ -98,6 +99,14 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    ruleEditorModal: {
+      isActive: false,
+      props: {},
+    },
+    connectedAppsModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -137,6 +146,16 @@ const INITIAL_STATE = {
 
   userPreferences: {
     isRedirectRuleTutorialModalShown: false,
+  },
+
+  userAttributes: {
+    deviceId: null,
+  },
+
+  misc: {
+    isRedirectRuleTourCompleted: false,
+    isTrafficTableTourCompleted: false,
+    isConnectedAppsTourCompleted: false,
   },
 };
 

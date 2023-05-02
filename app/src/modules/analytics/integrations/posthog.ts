@@ -24,7 +24,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
 
     // @ts-ignore
     if (!window.POSTHOG_INTEGRATION_DONE) {
-      posthog.init("phc_7D52fDZhcwbC2BRlC3Py7jSEGPWFoFStHk00xnx7zSg", {
+      posthog.init("phc_uNIYhy7rJ7GZF0H7aYtHvCOHIaCjB6wKICG9dkNUEDy", {
         api_host: "https://app.posthog.com",
         persistence: "memory",
         disable_session_recording: true,
@@ -50,18 +50,22 @@ class PosthogIntegration implements IAnalyticsIntegration {
       return;
     }
 
+    // Disabling events Tracking for posthog.
+    // TODO: Move to new account
+    /*
+    if (true) return;
+
     if (this.isIntegrationDone) {
       posthog.capture(eventName, eventParams);
     } else {
       if (Date.now() - this.startTime > maxRetryDuration) return;
 
-      Logger.log(
-        `Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`
-      );
+      Logger.log(`Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`);
       setTimeout(() => {
         this.trackEvent(eventName, eventParams, retry + 1);
       }, retryDuration);
     }
+    */
   };
 
   trackAttr = (name: string, value: string, retry: number = 0) => {
@@ -70,8 +74,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
         // @ts-ignore
         window.rq_posthog = window.rq_posthog || {};
         // @ts-ignore
-        window.rq_posthog.attributesToSync =
-          window.rq_posthog.attributesToSync || {};
+        window.rq_posthog.attributesToSync = window.rq_posthog.attributesToSync || {};
         // @ts-ignore
         window.rq_posthog.attributesToSync[name] = value;
       } catch (_e) {
@@ -80,9 +83,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
     } else {
       if (Date.now() - this.startTime > maxRetryDuration) return;
 
-      Logger.log(
-        `Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`
-      );
+      Logger.log(`Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`);
       setTimeout(() => {
         this.trackAttr(name, value, retry + 1);
       }, retryDuration);
@@ -95,10 +96,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
       if (window.rq_posthog && window.rq_posthog.attributesToSync) {
         try {
           // @ts-ignore
-          Logger.log(
-            `[Analytics] Batch Syncing Posthog Attributes`,
-            window.rq_posthog.attributesToSync
-          );
+          Logger.log(`[Analytics] Batch Syncing Posthog Attributes`, window.rq_posthog.attributesToSync);
           // @ts-ignore
           posthog.people.set(window.rq_posthog.attributesToSync);
           // @ts-ignore

@@ -25,11 +25,14 @@ export enum RuleType {
 
 export interface Rule extends Record<string, unknown> {
   id: string;
+  name: string;
+  description?: string;
   objectType?: ObjectType.RULE;
   ruleType: RuleType;
   status: Status;
   groupId?: string;
   extensionRules?: ExtensionRule[];
+  pairs: Record<string, any>[];
 }
 
 export enum SourceKey {
@@ -69,6 +72,11 @@ export enum ResponseRuleResourceType {
   STATIC = "static", //  HTML / JS / CSS
 }
 
+export enum RequestRuleBodyType {
+  CODE = "code",
+  STATIC = "static",
+}
+
 export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
@@ -91,6 +99,12 @@ export interface ResponseRulePair {
     type: ResponseRuleBodyType;
     resourceType?: ResponseRuleResourceType;
   };
+}
+
+export enum RedirectDestinationType {
+  URL = "url",
+  MAP_LOCAL = "map_local",
+  MOCK_OR_FILE_PICKER = "mock_or_file_picker",
 }
 
 export interface RedirectRulePair {
@@ -182,6 +196,16 @@ export interface ScriptRule extends Rule {
 
 export interface ResponseRule extends Rule {
   pairs: ResponseRulePair[];
+}
+
+export interface RequestRulePair {
+  id: string;
+  source: RulePairSource;
+  request: { value: string; statusCode: string; type: RequestRuleBodyType };
+}
+
+export interface RequestRule extends Rule {
+  pairs: RequestRulePair[];
 }
 
 // Group

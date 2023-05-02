@@ -13,6 +13,7 @@ BG = window.BG = {
     planName: "",
     isLoggedIn: "",
   },
+  isAppOnline: false,
   extensionStatusContextMenuId: -1,
   modifiedRequestsPool: new Queue(1000),
 };
@@ -35,13 +36,7 @@ BG.Methods.applyReplaceRule = function (rule, url, details) {
     pair = pairs[i];
     pair.from = pair.from || "";
 
-    if (
-      pair.source &&
-      !RuleMatcher.matchRequestWithRuleSourceFilters(
-        pair.source.filters,
-        details
-      )
-    ) {
+    if (pair.source && !RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, details)) {
       continue;
     }
 
@@ -49,7 +44,7 @@ BG.Methods.applyReplaceRule = function (rule, url, details) {
     if (
       pair.source &&
       pair.source.value &&
-      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, details.tabId) === null
     ) {
       continue;
     }
@@ -62,10 +57,7 @@ BG.Methods.applyReplaceRule = function (rule, url, details) {
 
     // Use String.match method when from is Regex otherwise use indexOf
     // Issue-86: String.match("?a=1") fails with an error
-    if (
-      (isFromPartRegex && resultingUrl.match(from)) ||
-      resultingUrl.indexOf(from) !== -1
-    ) {
+    if ((isFromPartRegex && resultingUrl.match(from)) || resultingUrl.indexOf(from) !== -1) {
       resultingUrl = resultingUrl.replace(from, pair.to);
     }
   }
@@ -89,9 +81,7 @@ BG.Methods.applyQueryParamModification = function (modification, url) {
         queryParamsMap[paramName].push(paramValue);
 
         queryString = RQ.Utils.convertQueryParamMapToString(queryParamsMap);
-        resultingUrl = queryString
-          ? urlWithoutQueryParams + "?" + queryString
-          : urlWithoutQueryParams;
+        resultingUrl = queryString ? urlWithoutQueryParams + "?" + queryString : urlWithoutQueryParams;
         resultingUrl += urlHash;
       }
 
@@ -106,9 +96,7 @@ BG.Methods.applyQueryParamModification = function (modification, url) {
 
         queryString = RQ.Utils.convertQueryParamMapToString(queryParamsMap);
 
-        resultingUrl = queryString
-          ? urlWithoutQueryParams + "?" + queryString
-          : urlWithoutQueryParams;
+        resultingUrl = queryString ? urlWithoutQueryParams + "?" + queryString : urlWithoutQueryParams;
         resultingUrl += urlHash;
       }
       break;
@@ -131,10 +119,7 @@ BG.Methods.applyQueryParamModifications = function (modifications, url) {
   var resultingUrl = url;
 
   modifications.forEach(function (modification) {
-    resultingUrl = BG.Methods.applyQueryParamModification(
-      modification,
-      resultingUrl
-    );
+    resultingUrl = BG.Methods.applyQueryParamModification(modification, resultingUrl);
   });
 
   return resultingUrl;
@@ -150,19 +135,13 @@ BG.Methods.applyQueryParamRule = function (rule, url, details) {
 
     // If Source does not match, proceed with next pair
     if (
-      !RuleMatcher.matchRequestWithRuleSourceFilters(
-        pair.source.filters,
-        details
-      ) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      !RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, details) ||
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) === null
     ) {
       continue;
     }
 
-    resultingUrl = BG.Methods.applyQueryParamModifications(
-      pair.modifications,
-      resultingUrl
-    );
+    resultingUrl = BG.Methods.applyQueryParamModifications(pair.modifications, resultingUrl);
   }
 
   return resultingUrl !== url ? resultingUrl : null;
@@ -186,11 +165,8 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
 
     // If Source does not match, proceed with next pair
     if (
-      !RuleMatcher.matchRequestWithRuleSourceFilters(
-        pair.source.filters,
-        details
-      ) ||
-      RuleMatcher.matchUrlWithRuleSource(pair.source, url) === null
+      !RuleMatcher.matchRequestWithRuleSourceFilters(pair.source.filters, details) ||
+      RuleMatcher.matchUrlWithRuleSource(pair.source, url, details.tabId) === null
     ) {
       continue;
     }
@@ -199,15 +175,12 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
     if (
       pair.source &&
       pair.source.value &&
-      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl) === null
+      RuleMatcher.matchUrlWithRuleSource(pair.source, resultingUrl, details.tabId) === null
     ) {
       continue;
     }
 
-    resultingUrl = RuleMatcher.matchValueForPredefinedFunctions(
-      resultingUrl,
-      RQ.PreDefinedFunctions
-    );
+    resultingUrl = RuleMatcher.matchValueForPredefinedFunctions(resultingUrl, RQ.PreDefinedFunctions);
 
     delay = pair.delay;
 
@@ -219,10 +192,7 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
       delay = pair.delay;
     } else {
       delayType = RQ.DELAY_REQUEST_CONSTANTS.DELAY_TYPE.CLIENT_SIDE;
-      delay = Math.min(
-        pair.delay,
-        RQ.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_XHR
-      );
+      delay = Math.min(pair.delay, RQ.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_XHR);
     }
 
     if (delayType === "serverSideDelay") {
@@ -262,10 +232,7 @@ BG.Methods.removeHeader = function (headers, name) {
 BG.Methods.modifyHeaderIfExists = function (headers, newHeader) {
   for (var i = headers.length - 1; i >= 0; i--) {
     var header = headers[i];
-    if (
-      header.name &&
-      header.name.toLowerCase() === newHeader.name.toLowerCase()
-    ) {
+    if (header.name && header.name.toLowerCase() === newHeader.name.toLowerCase()) {
       header.value = newHeader.value;
       break;
     }
@@ -300,9 +267,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     rule = enabledRules[i];
     ruleType = rule.ruleType;
 
-    if (
-      [RQ.RULE_TYPES.HEADERS, RQ.RULE_TYPES.USERAGENT].indexOf(ruleType) === -1
-    ) {
+    if ([RQ.RULE_TYPES.HEADERS, RQ.RULE_TYPES.USERAGENT].indexOf(ruleType) === -1) {
       continue;
     }
 
@@ -312,12 +277,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
       rulePair = rulePairs[index];
 
       if (rule.version > 1) {
-        if (
-          !RuleMatcher.matchRequestWithRuleSourceFilters(
-            rulePair.source.filters,
-            details
-          )
-        ) {
+        if (!RuleMatcher.matchRequestWithRuleSourceFilters(rulePair.source.filters, details)) {
           continue;
         }
         modifications = rulePair.modifications?.[headersTarget] || [];
@@ -325,33 +285,19 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         modifications = [rulePair];
       }
 
-      for (
-        var modificationIndex = 0;
-        modificationIndex < modifications.length;
-        ++modificationIndex
-      ) {
+      for (var modificationIndex = 0; modificationIndex < modifications.length; ++modificationIndex) {
         modification = modifications[modificationIndex];
 
         // We generate modificationType, target etc for UA rule in this method. These fields are not persisted
         if (ruleType === RQ.RULE_TYPES.USERAGENT) {
-          modification = BG.Methods.getUserAgentHeaderModification(
-            modification
-          );
+          modification = BG.Methods.getUserAgentHeaderModification(modification);
         }
 
-        if (
-          (!(rule.version > 1) && modification.target !== headersTarget) ||
-          !modification.header
-        ) {
+        if ((!(rule.version > 1) && modification.target !== headersTarget) || !modification.header) {
           continue;
         }
 
-        if (
-          !RuleMatcher.matchRequestWithRuleSourceFilters(
-            rulePair.source.filters,
-            details
-          )
-        ) {
+        if (!RuleMatcher.matchRequestWithRuleSourceFilters(rulePair.source.filters, details)) {
           continue;
         }
 
@@ -359,15 +305,12 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         // In UA Rule Type, we match Source Object with mainFrame as well
         if (
           rulePair.source &&
-          RuleMatcher.matchUrlWithRuleSource(rulePair.source, url) === null &&
+          RuleMatcher.matchUrlWithRuleSource(rulePair.source, url, details.tabId) === null &&
           !(
             ruleType === RQ.RULE_TYPES.USERAGENT &&
             rulePair.source.requestType === RQ.REQUEST_TYPES.MAIN_FRAME &&
             mainFrameUrl &&
-            RuleMatcher.matchUrlWithRuleSource(
-              rulePair.source,
-              mainFrameUrl
-            ) !== null
+            RuleMatcher.matchUrlWithRuleSource(rulePair.source, mainFrameUrl, details.tabId) !== null
           )
         ) {
           continue;
@@ -413,9 +356,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         BG.Methods.logRuleApplied(
           rule,
           details,
-          `modified ${
-            headersTarget === RQ.HEADERS_TARGET.REQUEST ? "request" : "response"
-          } headers`
+          `modified ${headersTarget === RQ.HEADERS_TARGET.REQUEST ? "request" : "response"} headers`
         );
       }
     }
@@ -448,7 +389,7 @@ BG.Methods.getUserAgentHeaderModification = function (ruleModification) {
   };
 };
 
-BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType, requestDetails) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules()
@@ -457,9 +398,7 @@ BG.Methods.getMatchingRulePairs = function (sourceUrl, ruleType) {
     })
     .reduce(function (matchedRulePairsSoFar, enabledRule) {
       var matchedRulePairs = enabledRule.pairs.filter(function (pair) {
-        return (
-          RuleMatcher.matchUrlWithRuleSource(pair.source, sourceUrl) !== null
-        );
+        return RuleMatcher.matchUrlWithRuleSource(pair.source, sourceUrl, requestDetails.tabId) !== null;
       });
       return matchedRulePairsSoFar.concat(matchedRulePairs);
     }, []);
@@ -481,10 +420,7 @@ BG.Methods.getEnabledRules = function () {
   allRules.forEach(function (rule) {
     var group = rule.groupId && groups[rule.groupId];
 
-    if (
-      rule.status === RQ.RULE_STATUS.ACTIVE &&
-      (!group || group.status === RQ.GROUP_STATUS.ACTIVE)
-    ) {
+    if (rule.status === RQ.RULE_STATUS.ACTIVE && (!group || group.status === RQ.GROUP_STATUS.ACTIVE)) {
       enabledRules.push(rule);
     }
   });
@@ -492,13 +428,13 @@ BG.Methods.getEnabledRules = function () {
   return enabledRules;
 };
 
-BG.Methods.getMatchingRules = function (sourceUrl, ruleType) {
+BG.Methods.getMatchingRules = function (sourceUrl, ruleType, details) {
   if (!BG.statusSettings.isExtensionEnabled) return [];
 
   return BG.Methods.getEnabledRules().filter(function (rule) {
     return (
       (!ruleType || rule.ruleType === ruleType) &&
-      RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl) !== null
+      RuleMatcher.matchUrlWithRulePairs(rule.pairs, sourceUrl, details) !== null
     );
   });
 };
@@ -514,10 +450,7 @@ BG.Methods.modifyUrl = function (details) {
   }
 
   // Do not modify URL again if it has been already processed earlier
-  if (
-    details.requestId &&
-    BG.modifiedRequestsPool.getElementIndex(details.requestId) > -1
-  ) {
+  if (details.requestId && BG.modifiedRequestsPool.getElementIndex(details.requestId) > -1) {
     return;
   }
 
@@ -530,10 +463,7 @@ BG.Methods.modifyUrl = function (details) {
     switch (rule.ruleType) {
       case RQ.RULE_TYPES.REDIRECT:
         // Introduce Pairs: Transform the Redirect Rule Model to new Model to support multiple entries (pairs)
-        if (
-          typeof rule.source !== "undefined" &&
-          typeof rule.destination !== "undefined"
-        ) {
+        if (typeof rule.source !== "undefined" && typeof rule.destination !== "undefined") {
           rule.pairs = [
             {
               source: {
@@ -549,15 +479,8 @@ BG.Methods.modifyUrl = function (details) {
           delete rule.destination;
         }
 
-        processedUrl = RuleMatcher.matchUrlWithRulePairs(
-          rule.pairs,
-          requestUrl,
-          details
-        );
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(
-          processedUrl,
-          RQ.PreDefinedFunctions
-        );
+        processedUrl = RuleMatcher.matchUrlWithRulePairs(rule.pairs, requestUrl, details);
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
 
         break;
 
@@ -578,11 +501,7 @@ BG.Methods.modifyUrl = function (details) {
           delete rule.source;
         }
 
-        processedUrl = RuleMatcher.matchUrlWithRulePairs(
-          rule.pairs,
-          requestUrl,
-          details
-        );
+        processedUrl = RuleMatcher.matchUrlWithRulePairs(rule.pairs, requestUrl, details);
         if (processedUrl !== null) {
           processedUrl = "javascript:";
         }
@@ -590,32 +509,18 @@ BG.Methods.modifyUrl = function (details) {
 
       case RQ.RULE_TYPES.REPLACE:
         processedUrl = BG.Methods.applyReplaceRule(rule, requestUrl, details);
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(
-          processedUrl,
-          RQ.PreDefinedFunctions
-        );
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
 
         break;
 
       case RQ.RULE_TYPES.QUERYPARAM:
-        processedUrl = BG.Methods.applyQueryParamRule(
-          rule,
-          requestUrl,
-          details
-        );
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(
-          processedUrl,
-          RQ.PreDefinedFunctions
-        );
+        processedUrl = BG.Methods.applyQueryParamRule(rule, requestUrl, details);
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
 
         break;
 
       case RQ.RULE_TYPES.DELAY:
-        processedUrl = BG.Methods.applyDelayRequestRule(
-          rule,
-          requestUrl,
-          details
-        );
+        processedUrl = BG.Methods.applyDelayRequestRule(rule, requestUrl, details);
 
         break;
     }
@@ -638,7 +543,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     // Requests which are fired from non-tab pages like background, chrome-extension page
     return;
   }
-
   BG.Methods.setExtensionIconActive(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
@@ -657,11 +561,7 @@ BG.Methods.onBeforeRequest = (details) => {
 };
 
 BG.Methods.modifyRequestHeadersListener = function (details) {
-  var modifiedHeaders = BG.Methods.modifyHeaders(
-    details.requestHeaders,
-    RQ.HEADERS_TARGET.REQUEST,
-    details
-  );
+  var modifiedHeaders = BG.Methods.modifyHeaders(details.requestHeaders, RQ.HEADERS_TARGET.REQUEST, details);
 
   if (modifiedHeaders !== null) {
     return { requestHeaders: modifiedHeaders };
@@ -669,11 +569,7 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 };
 
 BG.Methods.onHeadersReceived = function (details) {
-  var modifiedHeaders = BG.Methods.modifyHeaders(
-    details.responseHeaders,
-    RQ.HEADERS_TARGET.RESPONSE,
-    details
-  );
+  var modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
 
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
@@ -681,17 +577,11 @@ BG.Methods.onHeadersReceived = function (details) {
 };
 
 BG.Methods.overrideResponse = function (details) {
-  if (
-    BG.Methods.isNonBrowserTab(details.tabId) ||
-    details.type !== "xmlhttprequest"
-  ) {
+  if (BG.Methods.isNonBrowserTab(details.tabId) || details.type !== "xmlhttprequest") {
     return false;
   }
 
-  const responseRules = BG.Methods.getMatchingRules(
-    details.url,
-    RQ.RULE_TYPES.RESPONSE
-  );
+  const responseRules = BG.Methods.getMatchingRules(details.url, RQ.RULE_TYPES.RESPONSE, details);
 
   if (responseRules.length > 0) {
     const finalResponseRule = responseRules[responseRules.length - 1]; // last overridden response is final
@@ -701,7 +591,7 @@ BG.Methods.overrideResponse = function (details) {
       {
         action: RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE,
         url: details.url,
-        ruleId: finalResponseRule.id,
+        rule: finalResponseRule,
       },
       { frameId: details.frameId }
     );
@@ -766,26 +656,14 @@ BG.Methods.checkIfNoRulesPresent = function () {
 };
 
 BG.Methods.registerListeners = function () {
-  if (
-    !chrome.webRequest.onBeforeRequest.hasListener(BG.Methods.onBeforeRequest)
-  ) {
-    chrome.webRequest.onBeforeRequest.addListener(
-      BG.Methods.onBeforeRequest,
-      { urls: ["<all_urls>"] },
-      ["blocking"]
-    );
+  if (!chrome.webRequest.onBeforeRequest.hasListener(BG.Methods.onBeforeRequest)) {
+    chrome.webRequest.onBeforeRequest.addListener(BG.Methods.onBeforeRequest, { urls: ["<all_urls>"] }, ["blocking"]);
   }
 
-  if (
-    !chrome.webRequest.onBeforeSendHeaders.hasListener(
-      BG.Methods.modifyRequestHeadersListener
-    )
-  ) {
+  if (!chrome.webRequest.onBeforeSendHeaders.hasListener(BG.Methods.modifyRequestHeadersListener)) {
     var onBeforeSendHeadersOptions = ["blocking", "requestHeaders"];
     if (chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS) {
-      onBeforeSendHeadersOptions.push(
-        chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS
-      );
+      onBeforeSendHeadersOptions.push(chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS);
     }
 
     chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -795,16 +673,10 @@ BG.Methods.registerListeners = function () {
     );
   }
 
-  if (
-    !chrome.webRequest.onHeadersReceived.hasListener(
-      BG.Methods.onHeadersReceived
-    )
-  ) {
+  if (!chrome.webRequest.onHeadersReceived.hasListener(BG.Methods.onHeadersReceived)) {
     var onHeadersReceivedOptions = ["blocking", "responseHeaders"];
     if (chrome.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS) {
-      onHeadersReceivedOptions.push(
-        chrome.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS
-      );
+      onHeadersReceivedOptions.push(chrome.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS);
     }
 
     chrome.webRequest.onHeadersReceived.addListener(
@@ -819,26 +691,18 @@ BG.Methods.registerListeners = function () {
 // Documentation: https://developer.chrome.com/extensions/events
 BG.Methods.unregisterListeners = function () {
   chrome.webRequest.onBeforeRequest.removeListener(BG.Methods.onBeforeRequest);
-  chrome.webRequest.onBeforeSendHeaders.removeListener(
-    BG.Methods.modifyRequestHeadersListener
-  );
-  chrome.webRequest.onHeadersReceived.removeListener(
-    BG.Methods.onHeadersReceived
-  );
+  chrome.webRequest.onBeforeSendHeaders.removeListener(BG.Methods.modifyRequestHeadersListener);
+  chrome.webRequest.onHeadersReceived.removeListener(BG.Methods.onHeadersReceived);
 };
 
 BG.Methods.disableExtension = function () {
   BG.statusSettings["isExtensionEnabled"] = false;
-  RQ.StorageService.saveRecord({ rq_settings: BG.statusSettings }).then(
-    BG.Methods.handleExtensionDisabled
-  );
+  RQ.StorageService.saveRecord({ rq_settings: BG.statusSettings }).then(BG.Methods.handleExtensionDisabled);
 };
 
 BG.Methods.enableExtension = function () {
   BG.statusSettings["isExtensionEnabled"] = true;
-  RQ.StorageService.saveRecord({ rq_settings: BG.statusSettings }).then(
-    BG.Methods.handleExtensionEnabled
-  );
+  RQ.StorageService.saveRecord({ rq_settings: BG.statusSettings }).then(BG.Methods.handleExtensionEnabled);
 };
 
 BG.Methods.handleExtensionDisabled = function () {
@@ -853,11 +717,7 @@ BG.Methods.handleExtensionDisabled = function () {
       if (BG.Methods.isNonBrowserTab(tab.id)) {
         return;
       }
-      chrome.tabs.sendMessage(
-        tab.id,
-        { action: RQ.CLIENT_MESSAGES.STOP_RECORDING },
-        { frameId: 0 }
-      );
+      chrome.tabs.sendMessage(tab.id, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 });
     });
   });
   BG.Methods.sendMessage({ isExtensionEnabled: false });
@@ -878,26 +738,20 @@ BG.Methods.handleExtensionEnabled = function () {
 };
 
 BG.Methods.checkIfExtensionEnabled = async function () {
-  const alreadyStoredSettings = await RQ.StorageService.getRecord(
-    RQ.STORAGE_KEYS.REQUESTLY_SETTINGS
-  );
+  const alreadyStoredSettings = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.REQUESTLY_SETTINGS);
   BG.statusSettings = alreadyStoredSettings || BG.statusSettings;
   return BG.statusSettings["isExtensionEnabled"];
 };
 
 BG.Methods.toggleExtensionStatus = async function () {
-  const alreadyStoredSettings = await RQ.StorageService.getRecord(
-    RQ.STORAGE_KEYS.REQUESTLY_SETTINGS
-  );
+  const alreadyStoredSettings = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.REQUESTLY_SETTINGS);
   BG.statusSettings = alreadyStoredSettings || BG.statusSettings;
   const extensionEnabledStatus = BG.statusSettings["isExtensionEnabled"];
   const updatedStatus = !extensionEnabledStatus;
 
   BG.statusSettings["isExtensionEnabled"] = updatedStatus;
   RQ.StorageService.saveRecord({ rq_settings: BG.statusSettings }).then(
-    updatedStatus
-      ? BG.Methods.handleExtensionEnabled()
-      : BG.Methods.handleExtensionDisabled()
+    updatedStatus ? BG.Methods.handleExtensionEnabled() : BG.Methods.handleExtensionDisabled()
   );
 
   return updatedStatus;
@@ -930,14 +784,12 @@ BG.Methods.setExtensionIconActive = function (tabId) {
 };
 
 BG.Methods.readExtensionStatus = function () {
-  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.REQUESTLY_SETTINGS).then(
-    (alreadyStoredSettings) => {
-      BG.statusSettings = alreadyStoredSettings || BG.statusSettings;
-      BG.statusSettings["isExtensionEnabled"]
-        ? BG.Methods.handleExtensionEnabled()
-        : BG.Methods.handleExtensionDisabled();
-    }
-  );
+  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.REQUESTLY_SETTINGS).then((alreadyStoredSettings) => {
+    BG.statusSettings = alreadyStoredSettings || BG.statusSettings;
+    BG.statusSettings["isExtensionEnabled"]
+      ? BG.Methods.handleExtensionEnabled()
+      : BG.Methods.handleExtensionDisabled();
+  });
 };
 
 BG.Methods.createContextMenu = function (title, contexts, handler) {
@@ -957,21 +809,49 @@ BG.Methods.sendMessage = function (messageObject, callback) {
   callback =
     callback ||
     function () {
-      console.log(
-        "DefaultHandler: Sending Message to Runtime: ",
-        messageObject
-      );
+      console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
     };
 
-  chrome.tabs.query(
-    { url: RQ.CONSTANTS.RULES_PAGE_URL_PATTERN },
-    function (tabs) {
-      // Send message to each opened tab which matches the url
-      for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
-        chrome.tabs.sendMessage(tabs[tabIndex].id, messageObject, callback);
-      }
+  chrome.tabs.query({ url: RQ.CONSTANTS.RULES_PAGE_URL_PATTERN }, function (tabs) {
+    // Send message to each opened tab which matches the url
+    for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
+      chrome.tabs.sendMessage(tabs[tabIndex].id, messageObject, callback);
     }
-  );
+  });
+};
+
+BG.Methods.getAppTabs = () => {
+  return new Promise((resolve) => {
+    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
+      if (tabs.length === 0) {
+        BG.isAppOnline = false;
+      }
+      resolve(tabs);
+    });
+  });
+};
+
+/**
+ * Sends the message to requestly app. It takes tabId as an argument because if the app is open or not is uncertain. So there is another
+ * utility, getAppTabs() which checks if app is open and returns its tabId. After being sure that the app is open, this function is called.
+ * @param {Object} messageObject
+ * @param {Number} tabId
+ * @param {Number} timeout
+ * @returns Promise resolving to the response from app or timeout error
+ */
+BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
+  const sendMessageToTab = (messageObject, tabId) => {
+    return new Promise((resolve) => {
+      chrome.tabs.sendMessage(tabId, messageObject, (response) => {
+        resolve(response);
+      });
+    });
+  };
+
+  return Promise.race([
+    sendMessageToTab(messageObject, tabId),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), timeout)),
+  ]);
 };
 
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
@@ -998,28 +878,25 @@ BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
 };
 
 BG.Methods.addListenerForExtensionMessages = function () {
-  chrome.runtime.onMessage.addListener(function (
-    message,
-    sender,
-    sendResponse
-  ) {
+  chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     switch (message.action) {
+      case RQ.CLIENT_MESSAGES.ADD_EVENT:
+        EventActions.queueEventToWrite(message.payload);
+        break;
+
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
         if (message.url) {
           sendResponse(
-            BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT)
+            BG.Methods.getMatchingRules(message.url, RQ.RULE_TYPES.SCRIPT, {
+              tabId: sender.tab.id,
+            })
           );
         }
         break;
 
       case RQ.CLIENT_MESSAGES.GET_USER_AGENT_RULE_PAIRS:
         if (message.url) {
-          sendResponse(
-            BG.Methods.getMatchingRulePairs(
-              message.url,
-              RQ.RULE_TYPES.USERAGENT
-            )
-          );
+          sendResponse(BG.Methods.getMatchingRulePairs(message.url, RQ.RULE_TYPES.USERAGENT, { tabId: sender.tab.id }));
         }
         break;
 
@@ -1115,21 +992,20 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
         BG.Methods.toggleExtensionStatus().then(sendResponse);
         return true;
+
+      case RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED:
+        BG.Methods.onAppLoadedNotification();
+        break;
     }
   });
 };
 
 BG.Methods.getSessionRecordingConfig = async (url) => {
-  const sessionRecordingConfig = await RQ.StorageService.getRecord(
-    RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-  );
+  const sessionRecordingConfig = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG);
   const pageSources = sessionRecordingConfig?.pageSources || [];
   const shouldRecord =
     BG.statusSettings.isExtensionEnabled &&
-    pageSources.some(
-      (pageSource) =>
-        RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null
-    );
+    pageSources.some((pageSource) => RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null);
 
   return shouldRecord ? sessionRecordingConfig : null;
 };
@@ -1143,18 +1019,32 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
 };
 
+BG.Methods.onAppLoadedNotification = () => {
+  BG.isAppOnline = true;
+  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE).then((useEngine) => {
+    if (useEngine === false) {
+      EventActions.stopPeriodicEventWriter();
+    } else {
+      EventActions.startPeriodicEventWriter();
+    }
+  });
+  EventActions.sendExtensionEvents();
+};
+
 BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
-  chrome.tabs.sendMessage(
-    tabId,
-    {
-      action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
-      appliedRuleDetails: BG.Methods.getCachedAppliedRuleDetails(tabId),
-      isConsoleLoggerEnabled: await RQ.StorageService.getRecord(
-        RQ.CONSOLE_LOGGER_ENABLED
-      ),
-    },
-    () => window.tabService.removeData(tabId, "appliedRuleDetails")
-  );
+  const cachedAppliesRules = BG.Methods.getCachedAppliedRuleDetails(tabId);
+
+  if (cachedAppliesRules?.length > 0) {
+    chrome.tabs.sendMessage(
+      tabId,
+      {
+        action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
+        appliedRuleDetails: cachedAppliesRules,
+        isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
+      },
+      () => window.tabService.removeData(tabId, "appliedRuleDetails")
+    );
+  }
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {
@@ -1164,7 +1054,7 @@ BG.Methods.getExecutedRules = async (tabId, callback) => {
       action: RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS,
     },
     async (appliedRuleIds) => {
-      if (appliedRuleIds.length > 0) {
+      if (appliedRuleIds?.length > 0) {
         callback(await RQ.StorageService.getRecords(appliedRuleIds));
       } else {
         callback([]);
@@ -1174,11 +1064,7 @@ BG.Methods.getExecutedRules = async (tabId, callback) => {
 };
 
 BG.Methods.getCachedAppliedRuleDetails = (tabId) => {
-  const appliedRuleDetails = window.tabService.getData(
-    tabId,
-    "appliedRuleDetails",
-    []
-  );
+  const appliedRuleDetails = window.tabService.getData(tabId, "appliedRuleDetails", []);
 
   return appliedRuleDetails;
 };
@@ -1198,9 +1084,7 @@ BG.Methods.listenDevtools = function () {
 
     // Remove port when destroyed (eg when devtools instance is closed)
     port.onDisconnect.addListener(function () {
-      const tabId = Object.keys(BG.devtools).find(
-        (tabId) => BG.devtools[tabId] === port
-      );
+      const tabId = Object.keys(BG.devtools).find((tabId) => BG.devtools[tabId] === port);
       delete BG.devtools[tabId];
     });
   });
@@ -1251,9 +1135,7 @@ function buildExecutionLogObject({ ruleName, requestDetails, modification }) {
   };
 
   if (requestDetails.type !== "main_frame") {
-    executionLogObject.pageSourceUrl = window.tabService.getTabUrl(
-      requestDetails.tabId
-    );
+    executionLogObject.pageSourceUrl = window.tabService.getTabUrl(requestDetails.tabId);
   }
 
   return executionLogObject;
@@ -1284,11 +1166,7 @@ function appendExecutionLog(existingLogs, newLogObject) {
  * @param {Object} requestDetails all request details
  * @param {String} modification the modifications applied by the rule
  */
-BG.Methods.saveExecutionLog = async function (
-  rule,
-  requestDetails,
-  modification
-) {
+BG.Methods.saveExecutionLog = async function (rule, requestDetails, modification) {
   const storageKey = `execution_${rule.id}`;
   const existingExecutionLogs = await RQ.StorageService.getRecord(storageKey);
   const logObject = buildExecutionLogObject({
@@ -1309,11 +1187,7 @@ BG.Methods.isNonBrowserTab = (tabId) => {
   return tabId === chrome.tabs.TAB_ID_NONE;
 };
 
-BG.Methods.sendLogToConsoleLogger = async function (
-  rule,
-  requestDetails,
-  modification
-) {
+BG.Methods.sendLogToConsoleLogger = async function (rule, requestDetails, modification) {
   if (BG.Methods.isNonBrowserTab(requestDetails.tabId)) {
     // content script will not be available for console logging
     return;
@@ -1351,15 +1225,10 @@ function buildExecutionCountObject({ existingExecutionCount, ruleType }) {
 
   if (existingExecutionCount?.[yyyy]?.[mm]?.[ruleType]) {
     // Increment if already exists
-    existingExecutionCount[yyyy][mm][ruleType] =
-      existingExecutionCount[yyyy][mm][ruleType] + 1;
+    existingExecutionCount[yyyy][mm][ruleType] = existingExecutionCount[yyyy][mm][ruleType] + 1;
   } else {
     // Set 1 if doesn't already exist
-    RQ.Utils.setObjectValueAtPath(
-      existingExecutionCount,
-      `${yyyy}.${mm}.${ruleType}`,
-      1
-    );
+    RQ.Utils.setObjectValueAtPath(existingExecutionCount, `${yyyy}.${mm}.${ruleType}`, 1);
   }
 
   return existingExecutionCount;
@@ -1380,29 +1249,20 @@ BG.Methods.saveExecutionCount = async function (rule) {
 };
 
 BG.Methods.getTabSession = (tabId, callback) => {
-  chrome.tabs.sendMessage(
-    tabId,
-    { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION },
-    { frameId: 0 },
-    callback
-  );
+  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
 };
 
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
   const { tabId } = requestDetails;
 
   chrome.tabs.sendMessage(tabId, {
-    action: RQ.CLIENT_MESSAGES.UPDATE_APPLIED_RULE_ID,
-    ruleId: rule.id,
+    action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
+    rule,
   });
 
   // Cache execution details until content script loads
   if (BG.Methods.isTopDocumentRequest(requestDetails)) {
-    const appliedRuleDetails = window.tabService.getData(
-      tabId,
-      "appliedRuleDetails",
-      []
-    );
+    const appliedRuleDetails = window.tabService.getData(tabId, "appliedRuleDetails", []);
     appliedRuleDetails?.push({
       rule,
       requestDetails,
@@ -1421,9 +1281,7 @@ BG.Methods.init = function () {
   );
 
   // Handle extension install/update - https://developer.chrome.com/extensions/runtime#event-onStartup
-  chrome.runtime.onInstalled.addListener(
-    BG.Methods.handleExtensionInstalledOrUpdated
-  );
+  chrome.runtime.onInstalled.addListener(BG.Methods.handleExtensionInstalledOrUpdated);
 
   chrome.runtime.setUninstallURL(RQ.CONSTANTS.GOODBYE_PAGE_URL);
 
@@ -1440,6 +1298,8 @@ BG.Methods.init = function () {
   BG.Methods.listenDevtools();
 
   BG.Methods.listenCommands();
+
+  EventActions.startPeriodicEventWriter();
 };
 
 // Background Initialization Code

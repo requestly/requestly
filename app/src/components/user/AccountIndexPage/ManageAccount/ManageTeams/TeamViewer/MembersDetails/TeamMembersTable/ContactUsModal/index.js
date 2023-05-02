@@ -4,12 +4,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const ContactUsModal = ({ isOpen, toggleModal }) => {
   return (
-    <Modal
-      style={{ marginTop: "200px" }}
-      visible={isOpen}
-      onCancel={toggleModal}
-      footer={null}
-    >
+    <Modal style={{ marginTop: "200px" }} visible={isOpen} onCancel={toggleModal} footer={null}>
       <div>
         <h2>To Remove Team Member</h2>
       </div>

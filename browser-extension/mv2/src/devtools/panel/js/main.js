@@ -5,6 +5,7 @@ class RQDevToolsPanel {
     this.addBackgroundMessageListener();
     this.render();
     this.addEvents();
+    this.sendEventFromDevtool("devtool_opened");
   }
 
   initState() {
@@ -54,9 +55,7 @@ class RQDevToolsPanel {
       return;
     }
 
-    this.getTableRows()
-      .removeClass("rq-empty-table")
-      .append(RQ.Templates.Row(log));
+    this.getTableRows().removeClass("rq-empty-table").append(RQ.Templates.Row(log));
   }
 
   renderLogs() {
@@ -110,6 +109,22 @@ class RQDevToolsPanel {
 
   getTableRows() {
     return $("#rows");
+  }
+
+  sendEventFromDevtool(eventName) {
+    const eventTs = Date.now();
+
+    chrome.runtime.sendMessage({
+      action: "addEvent",
+      payload: {
+        eventName,
+        eventParams: {
+          source: "devtool",
+          log_source: "extension",
+        },
+        eventTs,
+      },
+    });
   }
 }
 

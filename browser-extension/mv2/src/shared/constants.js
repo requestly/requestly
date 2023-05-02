@@ -32,6 +32,7 @@ RQ.RESOURCES = {
 };
 
 RQ.CLIENT_MESSAGES = {
+  ADD_EVENT: "addEvent",
   GET_SCRIPT_RULES: "getScriptRules",
   GET_USER_AGENT_RULE_PAIRS: "getUserAgentRulePairs",
   OVERRIDE_RESPONSE: "overrideResponse",
@@ -42,7 +43,7 @@ RQ.CLIENT_MESSAGES = {
   NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
-  UPDATE_APPLIED_RULE_ID: "updateAppliedRuleId",
+  NOTIFY_RULE_APPLIED: "notifyRuleApplied",
   GET_APPLIED_RULE_IDS: "getAppliedRuleIds",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",

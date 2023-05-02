@@ -1,6 +1,7 @@
-import React, { createElement } from "react";
+import React, { useCallback } from "react";
 import { Button, Col, Row } from "antd";
-import { RiMenuFoldLine, RiMenuUnfoldLine } from "react-icons/ri";
+import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
+import { ReactComponent as LeftChevron } from "assets/icons/chevron-left.svg";
 import WorkspaceSelector from "../WorkspaceSelector";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 
@@ -13,8 +14,8 @@ interface SideBarHeaderProps {
 
 const SideBarHeader: React.FC<SideBarHeaderProps> = ({
   collapsed,
-  setCollapsed,
   isMobileMenu = false,
+  setCollapsed = () => {},
   handleMobileSidebarClose = () => {},
 }) => {
   const toggle = () => {
@@ -23,33 +24,33 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
     trackSidebarClicked("collapse_button");
   };
 
-  const trigger = createElement(collapsed ? RiMenuUnfoldLine : RiMenuFoldLine, {
-    className: "trigger",
-  });
+  const handleSidebarCollapsed = useCallback(
+    (collapsed: boolean) => {
+      localStorage.setItem("collapsed-sidebar", `${collapsed}`);
+      setCollapsed(collapsed);
+    },
+    [setCollapsed]
+  );
 
   return (
-    <Row
-      align="middle"
-      className={`siderbar-header ${
-        collapsed ? "sidebar-header-collapsed" : ""
-      }`}
-    >
+    <Row align="middle" className={`siderbar-header ${collapsed ? "sidebar-header-collapsed" : ""}`}>
       <Col>
         <WorkspaceSelector
           isCollapsed={collapsed}
+          handleSidebarCollapsed={handleSidebarCollapsed}
           handleMobileSidebarClose={handleMobileSidebarClose}
         />
       </Col>
 
       {!isMobileMenu && (
-        <Col className="ml-auto">
+        <div className="ml-auto sidebar-collapse-btn-container">
           <Button
             type="text"
-            icon={trigger}
+            icon={collapsed ? <RightChevron className="trigger" /> : <LeftChevron className="trigger" />}
             onClick={toggle}
             className="siderbar-collapse-btn"
           />
-        </Col>
+        </div>
       )}
     </Row>
   );

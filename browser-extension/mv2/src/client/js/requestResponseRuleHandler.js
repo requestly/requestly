@@ -3,11 +3,25 @@ RQ.RequestResponseRuleHandler.isInitialized = false;
 RQ.RequestResponseRuleHandler.cachedResponseRuleIds = new Set();
 
 RQ.RequestResponseRuleHandler.setup = () => {
+  // TODO: store the extension status in background and watch for changes here
+  chrome.runtime.sendMessage(
+    {
+      action: RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED,
+    },
+    (isExtensionEnabled) => {
+      RQ.ClientUtils.executeJS(
+        `
+        window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+        window.${RQ.PUBLIC_NAMESPACE}.isExtensionEnabled = ${isExtensionEnabled};
+      `,
+        true
+      );
+    }
+  );
+
   RQ.RulesStore.getRules().then((rules) => {
     const doRequestResponseRulesExist = rules.some((rule) => {
-      return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(
-        rule.ruleType
-      );
+      return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(rule.ruleType);
     });
 
     if (doRequestResponseRulesExist) {
@@ -25,18 +39,13 @@ RQ.RequestResponseRuleHandler.setup = () => {
 
 RQ.RequestResponseRuleHandler.init = function () {
   // we match request rules on client-side whereas response rules are still matched in background
-  RQ.ClientUtils.executeJS(
-    `(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`
-  );
+  RQ.ClientUtils.executeJS(`(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
 
   RQ.RequestResponseRuleHandler.cacheRequestRules();
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE) {
-      RQ.RequestResponseRuleHandler.cacheResponseRule(
-        message.url,
-        message.ruleId
-      );
+      RQ.RequestResponseRuleHandler.cacheResponseRule(message.url, message.rule);
     }
   });
 
@@ -63,9 +72,7 @@ RQ.RequestResponseRuleHandler.init = function () {
     }
   });
 
-  RQ.ClientUtils.executeJS(
-    `(${this.interceptAJAXRequests.toString()})('${RQ.PUBLIC_NAMESPACE}')`
-  );
+  RQ.ClientUtils.executeJS(`(${this.interceptAJAXRequests.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
 
   RQ.RequestResponseRuleHandler.isInitialized = true;
 };
@@ -73,24 +80,21 @@ RQ.RequestResponseRuleHandler.init = function () {
 RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
   RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
     RQ.ClientUtils.executeJS(
-      `window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(
-        requestRules
-      )};`,
+      `
+      window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+      window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
+    `,
       true
     );
   });
 };
 
-RQ.RequestResponseRuleHandler.cacheResponseRule = (url, ruleId) => {
-  RQ.RulesStore.getRule(ruleId).then((responseRule) => {
-    RQ.ClientUtils.executeJS(
-      `window.${
-        RQ.PUBLIC_NAMESPACE
-      }.responseRulesByUrl['${url}'] = ${JSON.stringify(responseRule)};`,
-      true
-    );
-    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.add(ruleId);
-  });
+RQ.RequestResponseRuleHandler.cacheResponseRule = (url, responseRule) => {
+  RQ.ClientUtils.executeJS(
+    `window.${RQ.PUBLIC_NAMESPACE}.responseRulesByUrl['${url}'] = ${JSON.stringify(responseRule)};`,
+    true
+  );
+  RQ.RequestResponseRuleHandler.cachedResponseRuleIds.add(responseRule.id);
 };
 
 RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
@@ -108,16 +112,14 @@ RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
 RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
   RQ.RequestResponseRuleHandler.cacheRequestRules();
 
-  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then(
-    (responseRules) => {
-      const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
-      RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
-        if (!enabledResponseRuleIds.includes(ruleId)) {
-          RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
-        }
-      });
-    }
-  );
+  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then((responseRules) => {
+    const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
+    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
+      if (!enabledResponseRuleIds.includes(ruleId)) {
+        RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
+      }
+    });
+  });
 };
 
 /**
@@ -137,6 +139,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     isDebugMode = window && window.localStorage && localStorage.isDebugMode;
   } catch (e) {}
 
+  const isExtensionEnabled = () => {
+    return window[namespace].isExtensionEnabled ?? true;
+  };
+
   const getAbsoluteUrl = (url) => {
     const dummyLink = document.createElement("a");
     dummyLink.href = url;
@@ -155,9 +161,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const isResponseRuleApplicableOnUrl = (url) => {
-    return window[namespace].responseRulesByUrl.hasOwnProperty(
-      getAbsoluteUrl(url)
-    );
+    return window[namespace].responseRulesByUrl.hasOwnProperty(getAbsoluteUrl(url));
   };
 
   /**
@@ -182,32 +186,20 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     }
   };
 
-  const isRequestPayloadFilterApplicable = (
-    { requestData, method },
-    sourceFilters
-  ) => {
-    const sourceFiltersArray = Array.isArray(sourceFilters)
-      ? sourceFilters
-      : [sourceFilters];
+  const isRequestPayloadFilterApplicable = ({ requestData, method }, sourceFilters) => {
+    const sourceFiltersArray = Array.isArray(sourceFilters) ? sourceFilters : [sourceFilters];
 
     return (
       !sourceFiltersArray.length ||
       sourceFiltersArray.some((sourceFilter) => {
-        if (
-          sourceFilter?.requestMethod?.length &&
-          !sourceFilter.requestMethod.includes(method)
-        ) {
+        if (sourceFilter?.requestMethod?.length && !sourceFilter.requestMethod.includes(method)) {
           return false;
         }
 
         let requestPayloadFilter = sourceFilter?.requestPayload;
 
         if (!requestPayloadFilter) return true;
-        if (
-          typeof requestPayloadFilter === "object" &&
-          Object.keys(requestPayloadFilter).length === 0
-        )
-          return true;
+        if (typeof requestPayloadFilter === "object" && Object.keys(requestPayloadFilter).length === 0) return true;
 
         // We only allow request payload targeting when requestData is JSON
         if (!requestData || typeof requestData !== "object") return false;
@@ -218,10 +210,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
         // tagettedKey is the json path e.g. a.b.0.c
         if (targettedKey) {
-          const valueInRequestData = traverseJsonByPath(
-            requestData,
-            targettedKey
-          );
+          const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
           return valueInRequestData == requestPayloadFilter?.value;
         }
 
@@ -231,6 +220,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const getRequestRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
     const absoluteUrl = getAbsoluteUrl(url);
 
     return window[namespace].requestRules.findLast((rule) =>
@@ -258,6 +251,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const getResponseRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
     return window[namespace].responseRulesByUrl[getAbsoluteUrl(url)];
   };
 
@@ -295,9 +291,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     // https://stackoverflow.com/a/50147341/816213
     // (URL decoding is already handled in URLSearchParams)
     const searchParamsString = url.split("?")[1];
-    const paramsObject = Object.fromEntries(
-      new URLSearchParams(searchParamsString)
-    );
+    const paramsObject = Object.fromEntries(new URLSearchParams(searchParamsString));
 
     // Traverse paramsObject to convert JSON strings into JSON object
     for (paramName in paramsObject) {
@@ -333,19 +327,13 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   };
 
   const isPromise = (obj) =>
-    !!obj &&
-    (typeof obj === "object" || typeof obj === "function") &&
-    typeof obj.then === "function";
+    !!obj && (typeof obj === "object" || typeof obj === "function") && typeof obj.then === "function";
 
-  const isContentTypeJSON = (contentType) =>
-    !!contentType?.includes("application/json");
+  const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
   // Intercept XMLHttpRequest
   const onReadyStateChange = async function () {
-    if (
-      this.readyState === this.HEADERS_RECEIVED ||
-      this.readyState === this.DONE
-    ) {
+    if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
       let url;
 
       if (isResponseRuleApplicableOnUrl(this.responseURL)) {
@@ -382,10 +370,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus =
-          responseModification.statusCode || this.status || 200;
-        const responseStatusText =
-          responseModification.statusText || this.statusText;
+        const responseStatus = responseModification.statusCode || this.status || 200;
+        const responseStatusText = responseModification.statusText || this.statusText;
 
         Object.defineProperty(this, "status", {
           get: () => responseStatus,
@@ -416,14 +402,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
           customResponse = await customResponse;
         }
 
-        const isUnsupportedResponseType =
-          responseType && !["json", "text"].includes(responseType);
+        const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
         // We do not support statically modifying responses of type - blob, arraybuffer, document etc.
-        if (
-          responseModification.type === "static" &&
-          isUnsupportedResponseType
-        ) {
+        if (responseModification.type === "static" && isUnsupportedResponseType) {
           customResponse = this.response;
         }
 
@@ -438,10 +420,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
         Object.defineProperty(this, "response", {
           get: function () {
-            if (
-              responseModification.type === "static" &&
-              responseType === "json"
-            ) {
+            if (responseModification.type === "static" && responseType === "json") {
               if (typeof customResponse === "object") {
                 return customResponse;
               }
@@ -479,11 +458,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   const XHR = XMLHttpRequest;
   XMLHttpRequest = function () {
     const xhr = new XHR();
-    xhr.addEventListener(
-      "readystatechange",
-      onReadyStateChange.bind(xhr),
-      false
-    );
+    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
     return xhr;
   };
   XMLHttpRequest.prototype = XHR.prototype;
@@ -639,12 +614,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       requestData = convertSearchParamsToJSON(url);
     }
 
-    if (
-      !isRequestPayloadFilterApplicable(
-        { requestData, method },
-        source?.filters
-      )
-    ) {
+    if (!isRequestPayloadFilterApplicable({ requestData, method }, source?.filters)) {
       return fetchedResponse;
     }
 
@@ -668,10 +638,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       if (fetchedResponse) {
         const fetchedResponseData = await fetchedResponse.text();
         const responseType = fetchedResponse.headers.get("content-type");
-        const fetchedResponseDataAsJson = jsonifyValidJSONString(
-          fetchedResponseData,
-          true
-        );
+        const fetchedResponseDataAsJson = jsonifyValidJSONString(fetchedResponseData, true);
 
         evaluatorArgs = {
           ...evaluatorArgs,
@@ -681,9 +648,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         };
       }
 
-      customResponse = getFunctionFromCode(responseModification.value)(
-        evaluatorArgs
-      );
+      customResponse = getFunctionFromCode(responseModification.value)(evaluatorArgs);
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object
@@ -691,10 +656,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         customResponse = await customResponse;
       }
 
-      if (
-        typeof customResponse === "object" &&
-        isContentTypeJSON(evaluatorArgs?.responseType)
-      ) {
+      if (typeof customResponse === "object" && isContentTypeJSON(evaluatorArgs?.responseType)) {
         customResponse = JSON.stringify(customResponse);
       }
     } else {
@@ -716,8 +678,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     return new Response(new Blob([customResponse]), {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
       status: responseModification.statusCode || fetchedResponse?.status || 200,
-      statusText:
-        responseModification.statusText || fetchedResponse?.statusText,
+      statusText: responseModification.statusText || fetchedResponse?.statusText,
       headers: fetchedResponse?.headers,
     });
   };

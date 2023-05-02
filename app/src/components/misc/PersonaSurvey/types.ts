@@ -1,5 +1,14 @@
 import { ReactNode } from "react";
 
+export interface UserPersona {
+  page: number;
+  isSurveyCompleted: boolean;
+  persona: string;
+  referralChannel?: string;
+  useCases: multipleChoiceOption[];
+  numberOfEmployees?: string;
+}
+
 export interface Option {
   type?: string;
   title: string;
@@ -18,6 +27,10 @@ export interface PageConfig {
   pageId: number;
   title: string;
   subTitle: string;
+  /**
+   * If skip true then don't show the question in survey
+   */
+  skip?: boolean;
   render?: number | ((props: renderProps) => ReactNode);
 }
 
@@ -25,12 +38,7 @@ export interface SurveyOptionsConfig {
   key: string;
   questionType: "single" | "multiple";
   isActive?: (props: ActiveProps) => boolean;
-  action?: (
-    dispatch: any,
-    value: string,
-    clear: boolean,
-    optionType?: string
-  ) => void;
+  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
   conditional?: any;
   options?: Option[];
 }
@@ -56,8 +64,9 @@ export interface Feature {
 export enum PersonaType {
   FRONTEND = "Front-end developer",
   BACKEND = "Back-end developer",
+  FULLSTACK = "Full-stack developer",
   MARKETER = "Digital Marketer",
-  FOUNDER = "Founder",
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
+  SALES = "Sales",
 }

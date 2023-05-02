@@ -10,11 +10,7 @@ const FileMockEditorEditView = () => {
 
   return (
     <>
-      <ProtectedRoute
-        component={MockEditorIndex}
-        mockId={mockId}
-        mockType={MockType.FILE}
-      />
+      <ProtectedRoute component={MockEditorIndex} mockId={mockId} mockType={MockType.FILE} />
     </>
   );
 };

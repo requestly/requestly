@@ -20,7 +20,7 @@ const JsonPreview = ({ data, updateAllowed, setModifiedData, setIsValid }) => {
         jsonEditorRef.current.update(_dataObj);
         setDataObj(_dataObj);
       } catch (err) {
-        return <h3>Not a valid json</h3>;
+        // console.log("Not a valid json");
       }
     }
   }, [jsonEditorRef, data]);

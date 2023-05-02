@@ -25,8 +25,7 @@ THE SOFTWARE.
 
 */
 (function webpackUniversalModuleDefinition(root, factory) {
-  if (typeof exports === "object" && typeof module === "object")
-    module.exports = factory();
+  if (typeof exports === "object" && typeof module === "object") module.exports = factory();
   else if (typeof define === "function" && define.amd) define([], factory);
   else if (typeof exports === "object") exports["Handlebars"] = factory();
   else root["Handlebars"] = factory();
@@ -38,8 +37,7 @@ THE SOFTWARE.
 
     /******/ /******/ function __webpack_require__(moduleId) {
       /******/ // Check if module is in cache
-      /******/ if (installedModules[moduleId])
-        /******/ return installedModules[moduleId].exports; // Create a new module (and put it into the cache)
+      /******/ if (installedModules[moduleId]) /******/ return installedModules[moduleId].exports; // Create a new module (and put it into the cache)
 
       /******/ /******/ var module = (installedModules[moduleId] = {
         /******/ exports: {},
@@ -48,12 +46,7 @@ THE SOFTWARE.
         /******/
       }); // Execute the module function
 
-      /******/ /******/ modules[moduleId].call(
-        module.exports,
-        module,
-        module.exports,
-        __webpack_require__
-      ); // Flag the module as loaded
+      /******/ /******/ modules[moduleId].call(module.exports, module, module.exports, __webpack_require__); // Flag the module as loaded
 
       /******/ /******/ module.loaded = true; // Return the exports of the module
 
@@ -91,15 +84,11 @@ THE SOFTWARE.
 
         var _handlebarsSafeString = __webpack_require__(36);
 
-        var _handlebarsSafeString2 = _interopRequireDefault(
-          _handlebarsSafeString
-        );
+        var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
         var _handlebarsException = __webpack_require__(5);
 
-        var _handlebarsException2 = _interopRequireDefault(
-          _handlebarsException
-        );
+        var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
         var _handlebarsUtils = __webpack_require__(4);
 
@@ -111,9 +100,7 @@ THE SOFTWARE.
 
         var _handlebarsNoConflict = __webpack_require__(43);
 
-        var _handlebarsNoConflict2 = _interopRequireDefault(
-          _handlebarsNoConflict
-        );
+        var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
         // For compatibility and usage outside of module systems, make the Handlebars object a namespace
         function create() {
@@ -157,8 +144,7 @@ THE SOFTWARE.
 
             if (obj != null) {
               for (var key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key))
-                  newObj[key] = obj[key];
+                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
               }
             }
 
@@ -251,9 +237,7 @@ THE SOFTWARE.
           registerHelper: function registerHelper(name, fn) {
             if (_utils.toString.call(name) === objectType) {
               if (fn) {
-                throw new _exception2["default"](
-                  "Arg not supported with multiple helpers"
-                );
+                throw new _exception2["default"]("Arg not supported with multiple helpers");
               }
               _utils.extend(this.helpers, name);
             } else {
@@ -269,11 +253,7 @@ THE SOFTWARE.
               _utils.extend(this.partials, name);
             } else {
               if (typeof partial === "undefined") {
-                throw new _exception2["default"](
-                  'Attempting to register a partial called "' +
-                    name +
-                    '" as undefined'
-                );
+                throw new _exception2["default"]('Attempting to register a partial called "' + name + '" as undefined');
               }
               this.partials[name] = partial;
             }
@@ -285,9 +265,7 @@ THE SOFTWARE.
           registerDecorator: function registerDecorator(name, fn) {
             if (_utils.toString.call(name) === objectType) {
               if (fn) {
-                throw new _exception2["default"](
-                  "Arg not supported with multiple decorators"
-                );
+                throw new _exception2["default"]("Arg not supported with multiple decorators");
               }
               _utils.extend(this.decorators, name);
             } else {
@@ -368,10 +346,7 @@ THE SOFTWARE.
         /* istanbul ignore next */
         if (isFunction(/x/)) {
           exports.isFunction = isFunction = function (value) {
-            return (
-              typeof value === "function" &&
-              toString.call(value) === "[object Function]"
-            );
+            return typeof value === "function" && toString.call(value) === "[object Function]";
           };
         }
         exports.isFunction = isFunction;
@@ -382,9 +357,7 @@ THE SOFTWARE.
         var isArray =
           Array.isArray ||
           function (value) {
-            return value && typeof value === "object"
-              ? toString.call(value) === "[object Array]"
-              : false;
+            return value && typeof value === "object" ? toString.call(value) === "[object Array]" : false;
           };
 
         exports.isArray = isArray;
@@ -573,9 +546,7 @@ THE SOFTWARE.
 
         var _helpersBlockHelperMissing = __webpack_require__(10);
 
-        var _helpersBlockHelperMissing2 = _interopRequireDefault(
-          _helpersBlockHelperMissing
-        );
+        var _helpersBlockHelperMissing2 = _interopRequireDefault(_helpersBlockHelperMissing);
 
         var _helpersEach = __webpack_require__(11);
 
@@ -583,9 +554,7 @@ THE SOFTWARE.
 
         var _helpersHelperMissing = __webpack_require__(24);
 
-        var _helpersHelperMissing2 = _interopRequireDefault(
-          _helpersHelperMissing
-        );
+        var _helpersHelperMissing2 = _interopRequireDefault(_helpersHelperMissing);
 
         var _helpersIf = __webpack_require__(25);
 
@@ -633,40 +602,34 @@ THE SOFTWARE.
         var _utils = __webpack_require__(4);
 
         exports["default"] = function (instance) {
-          instance.registerHelper(
-            "blockHelperMissing",
-            function (context, options) {
-              var inverse = options.inverse,
-                fn = options.fn;
+          instance.registerHelper("blockHelperMissing", function (context, options) {
+            var inverse = options.inverse,
+              fn = options.fn;
 
-              if (context === true) {
-                return fn(this);
-              } else if (context === false || context == null) {
-                return inverse(this);
-              } else if (_utils.isArray(context)) {
-                if (context.length > 0) {
-                  if (options.ids) {
-                    options.ids = [options.name];
-                  }
-
-                  return instance.helpers.each(context, options);
-                } else {
-                  return inverse(this);
+            if (context === true) {
+              return fn(this);
+            } else if (context === false || context == null) {
+              return inverse(this);
+            } else if (_utils.isArray(context)) {
+              if (context.length > 0) {
+                if (options.ids) {
+                  options.ids = [options.name];
                 }
+
+                return instance.helpers.each(context, options);
               } else {
-                if (options.data && options.ids) {
-                  var data = _utils.createFrame(options.data);
-                  data.contextPath = _utils.appendContextPath(
-                    options.data.contextPath,
-                    options.name
-                  );
-                  options = { data: data };
-                }
-
-                return fn(context, options);
+                return inverse(this);
               }
+            } else {
+              if (options.data && options.ids) {
+                var data = _utils.createFrame(options.data);
+                data.contextPath = _utils.appendContextPath(options.data.contextPath, options.name);
+                options = { data: data };
+              }
+
+              return fn(context, options);
             }
-          );
+          });
         };
 
         module.exports = exports["default"];
@@ -704,11 +667,7 @@ THE SOFTWARE.
                 contextPath = undefined;
 
               if (options.data && options.ids) {
-                contextPath =
-                  _utils.appendContextPath(
-                    options.data.contextPath,
-                    options.ids[0]
-                  ) + ".";
+                contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]) + ".";
               }
 
               if (_utils.isFunction(context)) {
@@ -735,10 +694,7 @@ THE SOFTWARE.
                   ret +
                   fn(context[field], {
                     data: data,
-                    blockParams: _utils.blockParams(
-                      [context[field], field],
-                      [contextPath + field, null]
-                    ),
+                    blockParams: _utils.blockParams([context[field], field], [contextPath + field, null]),
                   });
               }
 
@@ -752,11 +708,7 @@ THE SOFTWARE.
                 } else if (global.Symbol && context[global.Symbol.iterator]) {
                   var newContext = [];
                   var iterator = context[global.Symbol.iterator]();
-                  for (
-                    var it = iterator.next();
-                    !it.done;
-                    it = iterator.next()
-                  ) {
+                  for (var it = iterator.next(); !it.done; it = iterator.next()) {
                     newContext.push(it.value);
                   }
                   context = newContext;
@@ -887,11 +839,7 @@ THE SOFTWARE.
             IS_BIND = type & $export.B,
             IS_WRAP = type & $export.W,
             exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
-            target = IS_GLOBAL
-              ? global
-              : IS_STATIC
-              ? global[name]
-              : (global[name] || {})[PROTOTYPE],
+            target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
             key,
             own,
             out;
@@ -922,8 +870,7 @@ THE SOFTWARE.
                 : IS_PROTO && typeof out == "function"
                 ? ctx(Function.call, out)
                 : out;
-            if (IS_PROTO)
-              (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+            if (IS_PROTO) (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
           }
         };
         // type bitmap
@@ -988,8 +935,7 @@ THE SOFTWARE.
       /* 22 */
       /***/ function (module, exports) {
         module.exports = function (it) {
-          if (typeof it != "function")
-            throw TypeError(it + " is not a function!");
+          if (typeof it != "function") throw TypeError(it + " is not a function!");
           return it;
         };
 
@@ -1020,22 +966,15 @@ THE SOFTWARE.
         var _exception2 = _interopRequireDefault(_exception);
 
         exports["default"] = function (instance) {
-          instance.registerHelper(
-            "helperMissing",
-            function () /* [args, ]options */ {
-              if (arguments.length === 1) {
-                // A missing field in a {{foo}} construct.
-                return undefined;
-              } else {
-                // Someone is actually trying to call something, blow up.
-                throw new _exception2["default"](
-                  'Missing helper: "' +
-                    arguments[arguments.length - 1].name +
-                    '"'
-                );
-              }
+          instance.registerHelper("helperMissing", function () /* [args, ]options */ {
+            if (arguments.length === 1) {
+              // A missing field in a {{foo}} construct.
+              return undefined;
+            } else {
+              // Someone is actually trying to call something, blow up.
+              throw new _exception2["default"]('Missing helper: "' + arguments[arguments.length - 1].name + '"');
             }
-          );
+          });
         };
 
         module.exports = exports["default"];
@@ -1059,9 +998,7 @@ THE SOFTWARE.
         exports["default"] = function (instance) {
           instance.registerHelper("if", function (conditional, options) {
             if (arguments.length != 2) {
-              throw new _exception2["default"](
-                "#if requires exactly one argument"
-              );
+              throw new _exception2["default"]("#if requires exactly one argument");
             }
             if (_utils.isFunction(conditional)) {
               conditional = conditional.call(this);
@@ -1070,10 +1007,7 @@ THE SOFTWARE.
             // Default behavior is to render the positive path if the value is truthy and not empty.
             // The `includeZero` option may be set to treat the condtional as purely not empty based on the
             // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
-            if (
-              (!options.hash.includeZero && !conditional) ||
-              _utils.isEmpty(conditional)
-            ) {
+            if ((!options.hash.includeZero && !conditional) || _utils.isEmpty(conditional)) {
               return options.inverse(this);
             } else {
               return options.fn(this);
@@ -1082,9 +1016,7 @@ THE SOFTWARE.
 
           instance.registerHelper("unless", function (conditional, options) {
             if (arguments.length != 2) {
-              throw new _exception2["default"](
-                "#unless requires exactly one argument"
-              );
+              throw new _exception2["default"]("#unless requires exactly one argument");
             }
             return instance.helpers["if"].call(this, conditional, {
               fn: options.inverse,
@@ -1165,9 +1097,7 @@ THE SOFTWARE.
         exports["default"] = function (instance) {
           instance.registerHelper("with", function (context, options) {
             if (arguments.length != 2) {
-              throw new _exception2["default"](
-                "#with requires exactly one argument"
-              );
+              throw new _exception2["default"]("#with requires exactly one argument");
             }
             if (_utils.isFunction(context)) {
               context = context.call(this);
@@ -1179,18 +1109,12 @@ THE SOFTWARE.
               var data = options.data;
               if (options.data && options.ids) {
                 data = _utils.createFrame(options.data);
-                data.contextPath = _utils.appendContextPath(
-                  options.data.contextPath,
-                  options.ids[0]
-                );
+                data.contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]);
               }
 
               return fn(context, {
                 data: data,
-                blockParams: _utils.blockParams(
-                  [context],
-                  [data && data.contextPath]
-                ),
+                blockParams: _utils.blockParams([context], [data && data.contextPath]),
               });
             } else {
               return options.inverse(this);
@@ -1230,31 +1154,24 @@ THE SOFTWARE.
         var _utils = __webpack_require__(4);
 
         exports["default"] = function (instance) {
-          instance.registerDecorator(
-            "inline",
-            function (fn, props, container, options) {
-              var ret = fn;
-              if (!props.partials) {
-                props.partials = {};
-                ret = function (context, options) {
-                  // Create a new partials stack frame prior to exec.
-                  var original = container.partials;
-                  container.partials = _utils.extend(
-                    {},
-                    original,
-                    props.partials
-                  );
-                  var ret = fn(context, options);
-                  container.partials = original;
-                  return ret;
-                };
-              }
-
-              props.partials[options.args[0]] = options.fn;
-
-              return ret;
+          instance.registerDecorator("inline", function (fn, props, container, options) {
+            var ret = fn;
+            if (!props.partials) {
+              props.partials = {};
+              ret = function (context, options) {
+                // Create a new partials stack frame prior to exec.
+                var original = container.partials;
+                container.partials = _utils.extend({}, original, props.partials);
+                var ret = fn(context, options);
+                container.partials = original;
+                return ret;
+              };
             }
-          );
+
+            props.partials[options.args[0]] = options.fn;
+
+            return ret;
+          });
         };
 
         module.exports = exports["default"];
@@ -1276,10 +1193,7 @@ THE SOFTWARE.
           // Maps a given level value to the `methodMap` indexes above.
           lookupLevel: function lookupLevel(level) {
             if (typeof level === "string") {
-              var levelMap = _utils.indexOf(
-                logger.methodMap,
-                level.toLowerCase()
-              );
+              var levelMap = _utils.indexOf(logger.methodMap, level.toLowerCase());
               if (levelMap >= 0) {
                 level = levelMap;
               } else {
@@ -1294,10 +1208,7 @@ THE SOFTWARE.
           log: function log(level) {
             level = logger.lookupLevel(level);
 
-            if (
-              typeof console !== "undefined" &&
-              logger.lookupLevel(logger.level) <= level
-            ) {
+            if (typeof console !== "undefined" && logger.lookupLevel(logger.level) <= level) {
               var method = logger.methodMap[level];
               // eslint-disable-next-line no-console
               if (!console[method]) {
@@ -1305,9 +1216,7 @@ THE SOFTWARE.
               }
 
               for (
-                var _len = arguments.length,
-                  message = Array(_len > 1 ? _len - 1 : 0),
-                  _key = 1;
+                var _len = arguments.length, message = Array(_len > 1 ? _len - 1 : 0), _key = 1;
                 _key < _len;
                 _key++
               ) {
@@ -1451,18 +1360,11 @@ THE SOFTWARE.
          */
 
         function createNewLookupObject() {
-          for (
-            var _len = arguments.length, sources = Array(_len), _key = 0;
-            _key < _len;
-            _key++
-          ) {
+          for (var _len = arguments.length, sources = Array(_len), _key = 0; _key < _len; _key++) {
             sources[_key] = arguments[_key];
           }
 
-          return _utils.extend.apply(
-            undefined,
-            [_Object$create(null)].concat(sources)
-          );
+          return _utils.extend.apply(undefined, [_Object$create(null)].concat(sources));
         }
 
         /***/
@@ -1558,14 +1460,10 @@ THE SOFTWARE.
         function template(templateSpec, env) {
           /* istanbul ignore next */
           if (!env) {
-            throw new _exception2["default"](
-              "No environment passed to template"
-            );
+            throw new _exception2["default"]("No environment passed to template");
           }
           if (!templateSpec || !templateSpec.main) {
-            throw new _exception2["default"](
-              "Unknown template object: " + typeof templateSpec
-            );
+            throw new _exception2["default"]("Unknown template object: " + typeof templateSpec);
           }
 
           templateSpec.main.decorator = templateSpec.main_d;
@@ -1575,8 +1473,7 @@ THE SOFTWARE.
           env.VM.checkRevision(templateSpec.compiler);
 
           // backwards compatibility for precompiled templates with compiler-version 7 (<4.3.0)
-          var templateWasPrecompiledWithCompilerV7 =
-            templateSpec.compiler && templateSpec.compiler[0] === 7;
+          var templateWasPrecompiledWithCompilerV7 = templateSpec.compiler && templateSpec.compiler[0] === 7;
 
           function invokePartialWrapper(partial, context, options) {
             if (options.hash) {
@@ -1585,31 +1482,17 @@ THE SOFTWARE.
                 options.ids[0] = true;
               }
             }
-            partial = env.VM.resolvePartial.call(
-              this,
-              partial,
-              context,
-              options
-            );
+            partial = env.VM.resolvePartial.call(this, partial, context, options);
 
             var extendedOptions = Utils.extend({}, options, {
               hooks: this.hooks,
               protoAccessControl: this.protoAccessControl,
             });
 
-            var result = env.VM.invokePartial.call(
-              this,
-              partial,
-              context,
-              extendedOptions
-            );
+            var result = env.VM.invokePartial.call(this, partial, context, extendedOptions);
 
             if (result == null && env.compile) {
-              options.partials[options.name] = env.compile(
-                partial,
-                templateSpec.compilerOptions,
-                env
-              );
+              options.partials[options.name] = env.compile(partial, templateSpec.compilerOptions, env);
               result = options.partials[options.name](context, extendedOptions);
             }
             if (result != null) {
@@ -1627,9 +1510,7 @@ THE SOFTWARE.
               return result;
             } else {
               throw new _exception2["default"](
-                "The partial " +
-                  options.name +
-                  " could not be compiled when running in runtime-only mode"
+                "The partial " + options.name + " could not be compiled when running in runtime-only mode"
               );
             }
           }
@@ -1638,12 +1519,9 @@ THE SOFTWARE.
           var container = {
             strict: function strict(obj, name, loc) {
               if (!obj || !(name in obj)) {
-                throw new _exception2["default"](
-                  '"' + name + '" not defined in ' + obj,
-                  {
-                    loc: loc,
-                  }
-                );
+                throw new _exception2["default"]('"' + name + '" not defined in ' + obj, {
+                  loc: loc,
+                });
               }
               return container.lookupProperty(obj, name);
             },
@@ -1656,13 +1534,7 @@ THE SOFTWARE.
                 return result;
               }
 
-              if (
-                _internalProtoAccess.resultIsAllowed(
-                  result,
-                  container.protoAccessControl,
-                  propertyName
-                )
-              ) {
+              if (_internalProtoAccess.resultIsAllowed(result, container.protoAccessControl, propertyName)) {
                 return result;
               }
               return undefined;
@@ -1670,17 +1542,14 @@ THE SOFTWARE.
             lookup: function lookup(depths, name) {
               var len = depths.length;
               for (var i = 0; i < len; i++) {
-                var result =
-                  depths[i] && container.lookupProperty(depths[i], name);
+                var result = depths[i] && container.lookupProperty(depths[i], name);
                 if (result != null) {
                   return depths[i][name];
                 }
               }
             },
             lambda: function lambda(current, context) {
-              return typeof current === "function"
-                ? current.call(context)
-                : current;
+              return typeof current === "function" ? current.call(context) : current;
             },
 
             escapeExpression: Utils.escapeExpression,
@@ -1693,25 +1562,11 @@ THE SOFTWARE.
             },
 
             programs: [],
-            program: function program(
-              i,
-              data,
-              declaredBlockParams,
-              blockParams,
-              depths
-            ) {
+            program: function program(i, data, declaredBlockParams, blockParams, depths) {
               var programWrapper = this.programs[i],
                 fn = this.fn(i);
               if (data || depths || blockParams || declaredBlockParams) {
-                programWrapper = wrapProgram(
-                  this,
-                  i,
-                  fn,
-                  data,
-                  declaredBlockParams,
-                  blockParams,
-                  depths
-                );
+                programWrapper = wrapProgram(this, i, fn, data, declaredBlockParams, blockParams, depths);
               } else if (!programWrapper) {
                 programWrapper = this.programs[i] = wrapProgram(this, i, fn);
               }
@@ -1741,10 +1596,7 @@ THE SOFTWARE.
           };
 
           function ret(context) {
-            var options =
-              arguments.length <= 1 || arguments[1] === undefined
-                ? {}
-                : arguments[1];
+            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
             var data = options.data;
 
@@ -1756,10 +1608,7 @@ THE SOFTWARE.
               blockParams = templateSpec.useBlockParams ? [] : undefined;
             if (templateSpec.useDepths) {
               if (options.depths) {
-                depths =
-                  context != options.depths[0]
-                    ? [context].concat(options.depths)
-                    : options.depths;
+                depths = context != options.depths[0] ? [context].concat(options.depths) : options.depths;
               } else {
                 depths = [context];
               }
@@ -1768,26 +1617,11 @@ THE SOFTWARE.
             function main(context /*, options*/) {
               return (
                 "" +
-                templateSpec.main(
-                  container,
-                  context,
-                  container.helpers,
-                  container.partials,
-                  data,
-                  blockParams,
-                  depths
-                )
+                templateSpec.main(container, context, container.helpers, container.partials, data, blockParams, depths)
               );
             }
 
-            main = executeDecorators(
-              templateSpec.main,
-              main,
-              container,
-              options.depths || [],
-              data,
-              blockParams
-            );
+            main = executeDecorators(templateSpec.main, main, container, options.depths || [], data, blockParams);
             return main(context, options);
           }
 
@@ -1795,47 +1629,24 @@ THE SOFTWARE.
 
           ret._setup = function (options) {
             if (!options.partial) {
-              var mergedHelpers = Utils.extend(
-                {},
-                env.helpers,
-                options.helpers
-              );
+              var mergedHelpers = Utils.extend({}, env.helpers, options.helpers);
               wrapHelpersToPassLookupProperty(mergedHelpers, container);
               container.helpers = mergedHelpers;
 
               if (templateSpec.usePartial) {
                 // Use mergeIfNeeded here to prevent compiling global partials multiple times
-                container.partials = container.mergeIfNeeded(
-                  options.partials,
-                  env.partials
-                );
+                container.partials = container.mergeIfNeeded(options.partials, env.partials);
               }
               if (templateSpec.usePartial || templateSpec.useDecorators) {
-                container.decorators = Utils.extend(
-                  {},
-                  env.decorators,
-                  options.decorators
-                );
+                container.decorators = Utils.extend({}, env.decorators, options.decorators);
               }
 
               container.hooks = {};
-              container.protoAccessControl = _internalProtoAccess.createProtoAccessControl(
-                options
-              );
+              container.protoAccessControl = _internalProtoAccess.createProtoAccessControl(options);
 
-              var keepHelperInHelpers =
-                options.allowCallsToHelperMissing ||
-                templateWasPrecompiledWithCompilerV7;
-              _helpers.moveHelperToHooks(
-                container,
-                "helperMissing",
-                keepHelperInHelpers
-              );
-              _helpers.moveHelperToHooks(
-                container,
-                "blockHelperMissing",
-                keepHelperInHelpers
-              );
+              var keepHelperInHelpers = options.allowCallsToHelperMissing || templateWasPrecompiledWithCompilerV7;
+              _helpers.moveHelperToHooks(container, "helperMissing", keepHelperInHelpers);
+              _helpers.moveHelperToHooks(container, "blockHelperMissing", keepHelperInHelpers);
             } else {
               container.protoAccessControl = options.protoAccessControl; // internal option
               container.helpers = options.helpers;
@@ -1853,40 +1664,17 @@ THE SOFTWARE.
               throw new _exception2["default"]("must pass parent depths");
             }
 
-            return wrapProgram(
-              container,
-              i,
-              templateSpec[i],
-              data,
-              0,
-              blockParams,
-              depths
-            );
+            return wrapProgram(container, i, templateSpec[i], data, 0, blockParams, depths);
           };
           return ret;
         }
 
-        function wrapProgram(
-          container,
-          i,
-          fn,
-          data,
-          declaredBlockParams,
-          blockParams,
-          depths
-        ) {
+        function wrapProgram(container, i, fn, data, declaredBlockParams, blockParams, depths) {
           function prog(context) {
-            var options =
-              arguments.length <= 1 || arguments[1] === undefined
-                ? {}
-                : arguments[1];
+            var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
             var currentDepths = depths;
-            if (
-              depths &&
-              context != depths[0] &&
-              !(context === container.nullContext && depths[0] === null)
-            ) {
+            if (depths && context != depths[0] && !(context === container.nullContext && depths[0] === null)) {
               currentDepths = [context].concat(depths);
             }
 
@@ -1901,14 +1689,7 @@ THE SOFTWARE.
             );
           }
 
-          prog = executeDecorators(
-            fn,
-            prog,
-            container,
-            depths,
-            data,
-            blockParams
-          );
+          prog = executeDecorators(fn, prog, container, depths, data, blockParams);
 
           prog.program = i;
           prog.depth = depths ? depths.length : 0;
@@ -1937,12 +1718,10 @@ THE SOFTWARE.
 
         function invokePartial(partial, context, options) {
           // Use the current closure context to save the partial-block if this partial
-          var currentPartialBlock =
-            options.data && options.data["partial-block"];
+          var currentPartialBlock = options.data && options.data["partial-block"];
           options.partial = true;
           if (options.ids) {
-            options.data.contextPath =
-              options.ids[0] || options.data.contextPath;
+            options.data.contextPath = options.ids[0] || options.data.contextPath;
           }
 
           var partialBlock = undefined;
@@ -1951,13 +1730,8 @@ THE SOFTWARE.
               options.data = _base.createFrame(options.data);
               // Wrapper function to get access to currentPartialBlock from the closure
               var fn = options.fn;
-              partialBlock = options.data[
-                "partial-block"
-              ] = function partialBlockWrapper(context) {
-                var options =
-                  arguments.length <= 1 || arguments[1] === undefined
-                    ? {}
-                    : arguments[1];
+              partialBlock = options.data["partial-block"] = function partialBlockWrapper(context) {
+                var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
                 // Restore the partial-block from the closure for the execution of the block
                 // i.e. the part inside the block of the partial call.
@@ -1966,11 +1740,7 @@ THE SOFTWARE.
                 return fn(context, options);
               };
               if (fn.partials) {
-                options.partials = Utils.extend(
-                  {},
-                  options.partials,
-                  fn.partials
-                );
+                options.partials = Utils.extend({}, options.partials, fn.partials);
               }
             })();
           }
@@ -1980,9 +1750,7 @@ THE SOFTWARE.
           }
 
           if (partial === undefined) {
-            throw new _exception2["default"](
-              "The partial " + options.name + " could not be found"
-            );
+            throw new _exception2["default"]("The partial " + options.name + " could not be found");
           } else if (partial instanceof Function) {
             return partial(context, options);
           }
@@ -2000,25 +1768,10 @@ THE SOFTWARE.
           return data;
         }
 
-        function executeDecorators(
-          fn,
-          prog,
-          container,
-          depths,
-          data,
-          blockParams
-        ) {
+        function executeDecorators(fn, prog, container, depths, data, blockParams) {
           if (fn.decorator) {
             var props = {};
-            prog = fn.decorator(
-              prog,
-              props,
-              container,
-              depths && depths[0],
-              data,
-              blockParams,
-              depths
-            );
+            prog = fn.decorator(prog, props, container, depths && depths[0], data, blockParams, depths);
             Utils.extend(prog, props);
           }
           return prog;
@@ -2027,10 +1780,7 @@ THE SOFTWARE.
         function wrapHelpersToPassLookupProperty(mergedHelpers, container) {
           _Object$keys(mergedHelpers).forEach(function (helperName) {
             var helper = mergedHelpers[helperName];
-            mergedHelpers[helperName] = passLookupPropertyOption(
-              helper,
-              container
-            );
+            mergedHelpers[helperName] = passLookupPropertyOption(helper, container);
           });
         }
 
@@ -2072,9 +1822,7 @@ THE SOFTWARE.
       /* 41 */
       /***/ function (module, exports) {
         module.exports = function (it) {
-          return typeof it === "object"
-            ? it !== null
-            : typeof it === "function";
+          return typeof it === "object" ? it !== null : typeof it === "function";
         };
 
         /***/

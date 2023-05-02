@@ -2,31 +2,46 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.4.25",
+    logs: [
+      {
+        title: "Bug fix: Rule status toggled from extension popup gets reverted on opening app",
+        link: "https://github.com/requestly/requestly/issues/540",
+      },
+      {
+        title: "Bug fix: UI app breaks due to some rules matching requests originated from app",
+        link: "https://github.com/requestly/requestly/issues/551",
+      },
+    ],
+  },
+  {
+    version: "23.4.5",
+    logs: [
+      {
+        title: "Bug fixes in Modify Response rule execution.",
+      },
+    ],
+  },
+  {
     version: "23.3.3",
     logs: [
       {
-        title:
-          "Show modifications on top URL in extension popup and browser console.",
+        title: "Show modifications on top URL in extension popup and browser console.",
       },
       {
-        title:
-          "No need to refresh website after modifying or toggling Modify Request/Response rules.",
+        title: "No need to refresh website after modifying or toggling Modify Request/Response rules.",
       },
       {
-        title:
-          "Added support for capturing cross-origin iframes in Session Recording.",
+        title: "Added support for capturing cross-origin iframes in Session Recording.",
       },
       {
-        title:
-          'Bug fix: Clicking on View Recording showed "Something went wrong" error.',
+        title: 'Bug fix: Clicking on View Recording showed "Something went wrong" error.',
       },
       {
-        title:
-          "Bug fix: Early console logs were not captured in Session Recording.",
+        title: "Bug fix: Early console logs were not captured in Session Recording.",
       },
       {
-        title:
-          "Bug fix: Rules with bad regex conditions impacted execution of other rules.",
+        title: "Bug fix: Rules with bad regex conditions impacted execution of other rules.",
       },
     ],
   },
@@ -37,12 +52,10 @@ const changeLogs: VersionedChangeLogs[] = [
         title: "UI Redesign of extension popup",
       },
       {
-        title:
-          "Ability to stop session recording from extension popup, if started manually.",
+        title: "Ability to stop session recording from extension popup, if started manually.",
       },
       {
-        title:
-          'In "Modify API Response" rule, the response status will override as soon as headers are received.',
+        title: 'In "Modify API Response" rule, the response status will override as soon as headers are received.',
       },
     ],
   },
@@ -53,8 +66,7 @@ const changeLogs: VersionedChangeLogs[] = [
         title: "Start session recording directly from extension popup.",
       },
       {
-        title:
-          'Access rules applied in current page from extension popup "Executed Rules" tab.',
+        title: 'Access rules applied in current page from extension popup "Executed Rules" tab.',
       },
       {
         title:
@@ -66,8 +78,7 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "23.1.9",
     logs: [
       {
-        title:
-          "Recently modified rules may now be accessed from extension popup",
+        title: "Recently modified rules may now be accessed from extension popup",
       },
       {
         title: "Design changes in extension popup along with Dark mode support",
@@ -81,8 +92,7 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "22.12.27",
     logs: [
       {
-        title:
-          '"Modify Request Body" rule is now supported in Browser Extensions',
+        title: '"Modify Request Body" rule is now supported in Browser Extensions',
       },
       {
         title:
@@ -90,8 +100,7 @@ const changeLogs: VersionedChangeLogs[] = [
         link: "https://github.com/requestly/requestly/issues/252",
       },
       {
-        title:
-          "Bug fix in Session Recording where view recording failed when network requests contain Form Data",
+        title: "Bug fix in Session Recording where view recording failed when network requests contain Form Data",
       },
     ],
   },
@@ -99,20 +108,17 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "22.12.6",
     logs: [
       {
-        title:
-          "Fixed bug in Session Recording where view recording action was stuck on loading screen",
+        title: "Fixed bug in Session Recording where view recording action was stuck on loading screen",
       },
       {
-        title:
-          "Blob API responses are now being captured in Session Recording network logs",
+        title: "Blob API responses are now being captured in Session Recording network logs",
       },
       {
         title:
           "Fixed bug where Modify API Response rule did not work when blob JSON API responses were intercepted in programmatic mode",
       },
       {
-        title:
-          "Fixed bug where filters on request method did not work in Modify API Response rule",
+        title: "Fixed bug where filters on request method did not work in Modify API Response rule",
         link: "https://github.com/requestly/requestly/issues/247",
       },
     ],
@@ -121,8 +127,7 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "22.11.25",
     logs: [
       {
-        title:
-          "Added support for Web Socket requests - Modify Headers and more.",
+        title: "Added support for Web Socket requests - Modify Headers and more.",
         link: "https://github.com/requestly/requestly/issues/238",
       },
       {
@@ -139,8 +144,7 @@ const changeLogs: VersionedChangeLogs[] = [
         link: "https://requestly.io/debug-android-apps/",
       },
       {
-        title:
-          "Added support for description and start time offset for session recording.",
+        title: "Added support for description and start time offset for session recording.",
         link:
           "https://www.linkedin.com/posts/vaibhavnigam15_bug-bugreporting-session-activity-6984132832373706752-gmuR?utm_source=share&utm_medium=member_desktop",
       },
@@ -153,8 +157,7 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "22.9.24",
     logs: [
       {
-        title:
-          "Report bugs with video, console logs, API logs and environment details.",
+        title: "Report bugs with video, console logs, API logs and environment details.",
         link: "https://requestly.io/feature/session-recording/",
       },
       {
@@ -171,8 +174,7 @@ const changeLogs: VersionedChangeLogs[] = [
     version: "22.8.27",
     logs: [
       {
-        title:
-          "Added support to modify response programmatically using javascript.",
+        title: "Added support to modify response programmatically using javascript.",
       },
       {
         title: "Modify graphql query response using the modify response rule.",
@@ -195,10 +197,8 @@ const changeLogs: VersionedChangeLogs[] = [
         title: "Added support for fetch in Modify response rule.",
       },
       {
-        title:
-          "Improved Advanced Request targeting based on HTTP Methods, Resource Types, Tab URL etc.",
-        link:
-          "https://docs.requestly.io/getting-started/features/source-filters",
+        title: "Improved Advanced Request targeting based on HTTP Methods, Resource Types, Tab URL etc.",
+        link: "https://docs.requestly.io/getting-started/features/source-filters",
       },
     ],
   },

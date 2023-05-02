@@ -1,7 +1,6 @@
 /**
  *  @References
  * [0] http://gruntjs.com/getting-started to install grunt-cli
- * [2]: https://github.com/gruntjs/grunt-contrib-handlebars
  * [3]: http://gruntjs.com/configuring-tasks#files
  **/
 
@@ -22,9 +21,7 @@ const processManifest = (content) => {
   contentScripts[1].exclude_matches = [webUrlPattern];
 
   if (env !== "prod") {
-    manifestJson.description = `[${env.toUpperCase()}] ${
-      manifestJson.description
-    }`;
+    manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
   }
 
   if (!isProductionBuildMode) {
@@ -54,8 +51,7 @@ module.exports = function (grunt) {
           "dist/generated/pages/main.js": jsList["pages"],
           "dist/generated/client/client.js": jsList["client"],
           "dist/generated/devtools/panel/panel.js": jsList["devtools-panel"],
-          "dist/generated/background/background-bundled.js":
-            jsList["background"],
+          "dist/generated/background/background-bundled.js": jsList["background"],
         },
       },
     },
@@ -69,13 +65,9 @@ module.exports = function (grunt) {
       dist: {
         files: {
           "dist/generated/shared.js": ["dist/generated/shared.js"],
-          "dist/generated/background/background-bundled.js": [
-            "dist/generated/background/background-bundled.js",
-          ],
+          "dist/generated/background/background-bundled.js": ["dist/generated/background/background-bundled.js"],
           "dist/generated/pages/main.js": ["dist/generated/pages/main.js"],
-          "dist/generated/client/client.js": [
-            "dist/generated/client/client.js",
-          ],
+          "dist/generated/client/client.js": ["dist/generated/client/client.js"],
         },
       },
     },
@@ -96,9 +88,7 @@ module.exports = function (grunt) {
           },
         },
         files: {
-          "dist/generated/devtools/panel/templates.hbs.js": [
-            "src/devtools/panel/templates/**/*.hbs",
-          ],
+          "dist/generated/devtools/panel/templates.hbs.js": ["src/devtools/panel/templates/**/*.hbs"],
         },
       },
     },
@@ -173,7 +163,7 @@ module.exports = function (grunt) {
           {
             cwd: "../common/dist/popup",
             src: "**/*",
-            dest: "dist/generated/popup",
+            dest: "dist/popup",
             expand: true,
           },
         ],
@@ -197,10 +187,16 @@ module.exports = function (grunt) {
             dest: "dist/generated/devtools/panel/panel.css",
           },
           // {
-          //   cwd: "../common/dist/devtools/network-panel",
-          //   src: "**/*",
-          //   dest: "dist/generated/devtools/network-panel",
-          //   expand: true,
+          //   src: "../common/dist/devtools/index.html",
+          //   dest: "dist/generated/devtools/network-panel/index.html",
+          // },
+          // {
+          //   src: "../common/dist/devtools/index.js",
+          //   dest: "dist/generated/devtools/network-panel/index.js",
+          // },
+          // {
+          //   src: "../common/dist/devtools/index.css",
+          //   dest: "dist/generated/devtools/network-panel/index.css",
           // },
         ],
       },
@@ -214,13 +210,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-uglify");
 
-  grunt.registerTask("dist", [
-    "handlebars",
-    "concat",
-    "copy:popup",
-    "copy:devtools",
-    "copy:static_content",
-  ]);
+  grunt.registerTask("dist", ["handlebars", "concat", "copy:popup", "copy:devtools", "copy:static_content"]);
 
   grunt.registerTask("build", ["dist", `copy:manifest_${browser}`]);
 

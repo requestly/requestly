@@ -1,42 +1,28 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Layout,
-  Button,
-  Row,
-  Col,
-  Tooltip,
-  Dropdown,
-  Menu,
-  Divider,
-} from "antd";
+import { Layout, Button, Row, Col, Tooltip, Dropdown, Menu, Divider } from "antd";
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
-import { isPricingPage, isGoodbyePage } from "utils/PathUtils";
+import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import {
   GithubOutlined,
   NotificationOutlined,
   PhoneOutlined,
   QuestionCircleOutlined,
   ReadOutlined,
+  SlackOutlined,
   SnippetsOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
-import {
-  redirectToSettings,
-  redirectToProductUpdates,
-} from "utils/RedirectionUtils";
+import { redirectToSettings, redirectToProductUpdates } from "utils/RedirectionUtils";
 import { RQBreadcrumb } from "lib/design-system/components";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
-import {
-  trackHeaderClicked,
-  trackHelpdeskClicked,
-} from "modules/analytics/events/common/onboarding/header";
+import { trackHeaderClicked, trackHelpdeskClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -46,13 +32,14 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isMyRulesPage = pathname.includes("my-rules");
-  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage();
+  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const editorPaths = [
     "/rules/editor",
     "/mocks/editor",
     "/filesv2/editor",
     "/mock-server/viewer",
     "/pricing",
+    "/invite",
   ];
 
   const showMenuHeader = () => {
@@ -70,16 +57,9 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   };
 
   const helpMenu = (
-    <Menu
-      className="header-help-menu-container"
-      onClick={({ key }) => trackHelpdeskClicked(key)}
-    >
+    <Menu className="header-help-menu-container" onClick={({ key }) => trackHelpdeskClicked(key)}>
       <Menu.Item key="github">
-        <a
-          href={LINKS.REQUESTLY_GITHUB_ISSUES}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={LINKS.REQUESTLY_GITHUB_ISSUES} target="_blank" rel="noreferrer">
           <GithubOutlined /> <span>Github</span>
         </a>
       </Menu.Item>
@@ -112,6 +92,8 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     </Menu>
   );
 
+  const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
+
   return showMenuHeader() ? (
     <Header className="layout-header">
       <Row justify="center" className="w-full" wrap={false}>
@@ -131,19 +113,12 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
             {!isPricingOrGoodbyePage ? (
               <Col span={4} flex="1 1">
-                <div className="header-left-section">
+                <div className="header-left-section hidden-on-small-screen">
                   {!isMyRulesPage && (
                     <Button
                       type="text"
                       className="header-icon-btn"
-                      icon={
-                        <img
-                          alt="back"
-                          width="14px"
-                          height="12px"
-                          src="/assets/icons/leftArrow.svg"
-                        />
-                      }
+                      icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
                       onClick={() => navigate(-1)}
                     />
                   )}
@@ -153,70 +128,66 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               </Col>
             ) : null}
 
-            <Col
-              xs={0}
-              sm={0}
-              md={0}
-              lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 12) : 16}
-            >
-              <div className="header-middle-section">
+            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 14) : 16}>
+              <div className="header-middle-section hidden-on-small-screen">
                 <HeaderText />
               </div>
             </Col>
 
-            <Col className="ml-auto" sm={14} md={14} lg={8} span={8}>
+            <Col className="ml-auto">
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
-                  <Col>
-                    <span
-                      className="github-star-button"
-                      onClick={() => trackHeaderClicked("github_star_button")}
-                    >
-                      <GitHubButton
-                        style={{ display: "flex" }}
-                        className="github-star-button"
-                        href="https://github.com/requestly/requestly"
-                        data-color-scheme="dark_dimmed"
-                        data-text="Star"
-                        data-show-count="true"
-                        aria-label="Star Requestly on GitHub"
-                      />
-                    </span>
-                  </Col>
-                  <Divider
-                    type="vertical"
-                    className="header-vertival-divider"
-                  />
-                  <div onClick={() => trackHeaderClicked("syncing")}>
+                  {randomNumberBetween1And2 === 1 ? (
+                    <Col className="hidden-on-small-screen">
+                      <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                        <GitHubButton
+                          style={{ display: "flex" }}
+                          className="github-star-button"
+                          href="https://github.com/requestly/requestly"
+                          data-color-scheme="dark_dimmed"
+                          data-text="Star"
+                          data-show-count="true"
+                          aria-label="Star Requestly on GitHub"
+                        />
+                      </span>
+                    </Col>
+                  ) : (
+                    <Col className="hidden-on-small-screen">
+                      <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
+                        <Button
+                          style={{ display: "flex" }}
+                          type="default"
+                          size="small"
+                          icon={<SlackOutlined />}
+                          onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
+                        >
+                          Join Slack Community
+                        </Button>
+                      </span>
+                    </Col>
+                  )}
+
+                  <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
+                  <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
                     <RulesSyncToggle />
                   </div>
                   {/* info */}
-                  <Col>
+                  {/* <Col className="hidden-on-small-screen">
                     <Dropdown
                       trigger={["click"]}
-                      overlay={helpMenu}
+                      menu={helpMenu}
                       placement="bottomRight"
                       onOpenChange={(open) => {
                         open && trackHeaderClicked("helpdesk");
                       }}
                     >
-                      <Button
-                        type="text"
-                        className="header-icon-btn"
-                        icon={<QuestionCircleOutlined />}
-                      />
+                      <Button type="text" className="header-icon-btn" icon={<QuestionCircleOutlined />} />
                     </Dropdown>
-                  </Col>
+                  </Col> */}
 
                   {/* product updates */}
-                  <Col>
-                    <Tooltip
-                      title={
-                        <span className="text-gray text-sm">
-                          Product updates
-                        </span>
-                      }
-                    >
+                  <Col className="hidden-on-small-screen">
+                    <Tooltip title={<span className="text-gray text-sm">Product updates</span>}>
                       <Button
                         type="text"
                         className="header-icon-btn"
@@ -231,11 +202,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
                   {/* settings */}
                   <Col>
-                    <Tooltip
-                      title={
-                        <span className="text-gray text-sm">Settings</span>
-                      }
-                    >
+                    <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
                       <Button
                         type="text"
                         className="header-icon-btn"

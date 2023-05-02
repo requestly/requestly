@@ -11,10 +11,7 @@ interface DemoVideosProps {
 }
 
 const DemoVideos: React.FC<DemoVideosProps> = ({ selectedRuleType }) => {
-  const { name, image, demoVideos } = useMemo(
-    () => getRuleDetails(selectedRuleType),
-    [selectedRuleType]
-  );
+  const { name, image, demoVideos } = useMemo(() => getRuleDetails(selectedRuleType), [selectedRuleType]);
 
   return (
     <div className="demo-videos-container">
@@ -23,11 +20,7 @@ const DemoVideos: React.FC<DemoVideosProps> = ({ selectedRuleType }) => {
           <div className="title text-bold demo-videos-title">Demo Video</div>
           <Row gutter={[20, 8]} align="middle">
             {demoVideos.map((demoVideo: RuleDemoVideo, index: number) => (
-              <DemoVideoCard
-                key={index}
-                demoVideo={demoVideo}
-                ruleType={selectedRuleType}
-              />
+              <DemoVideoCard key={index} demoVideo={demoVideo} ruleType={selectedRuleType} />
             ))}
           </Row>
         </>

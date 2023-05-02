@@ -4,35 +4,38 @@ import { toast } from "utils/Toast.js";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import "./RemoveUserModal.css";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 
-const RemoveUserModal = ({
-  isOpen,
-  toggleModal,
-  userId,
-  teamId,
-  callbackOnSuccess,
-  isLeaveRequested = false,
-}) => {
+const RemoveUserModal = ({ isOpen, toggleModal, userId, teamId, callbackOnSuccess }) => {
   const [showLoader, setShowLoader] = useState(false);
+  const user = useSelector(getUserAuthDetails);
+
+  const isUserRemovingHimself = user?.details?.profile?.uid === userId;
 
   const removeUserFromTeam = () => {
     setShowLoader(true);
     const functions = getFunctions();
     const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
 
+    if (isUserRemovingHimself) window.hasUserRemovedHimselfRecently = true;
+
     updateTeamUserRole({
       teamId: teamId,
       userId: userId,
       role: "remove",
-      isLeaveRequested,
     })
       .then((res) => {
-        if (!isLeaveRequested) {
-          toast.info("Member removed");
+        if (isUserRemovingHimself) {
+          window.hasUserRemovedHimselfRecently = true;
+        } else {
+          toast.info("User removed");
         }
+
         callbackOnSuccess?.();
       })
       .catch((err) => {
+        window.hasUserRemovedHimselfRecently = false;
         toast.error(err.message);
       })
       .finally(() => {
@@ -44,23 +47,17 @@ const RemoveUserModal = ({
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <div className="rq-modal-content">
-        <div className="header">
-          {isLeaveRequested ? "Leave workspace" : "Remove Member"}
-        </div>
+        <div className="header">{isUserRemovingHimself ? "Leave workspace" : "Remove user"}</div>
         <div className="text-gray text-sm remove-user-message">
-          {isLeaveRequested ? (
+          {isUserRemovingHimself ? (
             <>
               <p>Do you really want to leave this workspace?</p>
-              <p>
-                You would no longer be able to access shared workspace items.
-              </p>
+              <p>You would no longer be able to access shared workspace items.</p>
             </>
           ) : (
             <>
               <p>Do you really want to remove this user from the team?</p>
-              <p>
-                They would no longer be able to access shared workspace items.
-              </p>
+              <p>They would no longer be able to access shared workspace items.</p>
             </>
           )}
         </div>
@@ -79,13 +76,7 @@ const RemoveUserModal = ({
             onClick={removeUserFromTeam}
             className="remove-user-btn"
           >
-            {isLeaveRequested
-              ? showLoader
-                ? "Leaving..."
-                : "Leave"
-              : showLoader
-              ? "Removing user..."
-              : "Remove"}
+            {isUserRemovingHimself ? (showLoader ? "Leaving..." : "Leave") : showLoader ? "Removing user..." : "Remove"}
           </Button>
         </Col>
       </Row>

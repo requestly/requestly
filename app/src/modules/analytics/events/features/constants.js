@@ -2,10 +2,8 @@ export const SESSION_RECORDING = {
   session_recording_demo_video_opened: "session_recording_demo_video_opened",
   session_recordings_config_opened: "session_recordings_config_opened",
   session_recordings_config_saved: "session_recordings_config_saved",
-  session_recordings_install_extension_dialog_shown:
-    "session_recordings_extension_dialog_opened",
-  session_recordings_installation_button_clicked:
-    "session_recordings_installation_button_clicked",
+  session_recordings_install_extension_dialog_shown: "session_recordings_extension_dialog_opened",
+  session_recordings_installation_button_clicked: "session_recordings_installation_button_clicked",
   session_recording_failed: "session_recording_failed",
   draft_session_recording_viewed: "draft_session_recording_viewed",
   draft_session_discarded: "draft_session_discarded",
@@ -16,13 +14,11 @@ export const SESSION_RECORDING = {
   session_recording_share_clicked: "session_recording_share_clicked",
   session_recording_share_link_copied: "session_recording_share_link_copied",
   session_recording_visibility_updated: "session_recording_visibility_updated",
-  session_recording_start_time_offset_updated:
-    "session_recording_start_time_offset_updated",
+  session_recording_start_time_offset_updated: "session_recording_start_time_offset_updated",
   session_recording_deleted: "session_recording_deleted",
   session_recording_description_added: "session_recording_description_added",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
-  session_recording_panel_sample_session_clicked:
-    "session_recording_panel_sample_session_clicked",
+  session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
 };
 
 export const SHARED_LIST = {
@@ -72,6 +68,12 @@ export const MOCKSV2 = {
   MOCK_UPLOAD_WORKFLOW_STARTED: "mock_upload_workflow_started",
   MOCK_UPLOADED: "mock_uploaded",
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
+
+  AI_MOCK_RESPONSE_BUTTON_CLICKED: "ai_mock_response_button_clicked",
+  AI_MOCK_RESPONSE_GENERATE_CLICKED: "ai_mock_response_generate_clicked",
+  AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
+  AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
+  AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
@@ -106,6 +108,12 @@ export const TEAMS = {
   NEW_TEAM_CREATE_FAILURE: "new_team_create_failure",
   ADD_TEAM_MEMBER_SUCCESS: "add_team_member_success",
   ADD_TEAM_MEMBER_FAILURE: "add_team_member_failure",
+  WORKSPACE_INVITE_LINK_GENERATED: "workspace_invite_link_generated",
+  WORKSPACE_INVITE_LINK_REVOKED: "workspace_invite_link_revoked",
+  WORKSPACE_INVITE_ACCEPTED: "workspace_invite_accepted",
+  WORKSPACE_INVITE_SCREEN_ERROR: "workspace_invite_screen_error",
+  WORKSPACE_JOINING_MODAL_OPENED: "workspace_joining_modal_opened",
+  WORKSPACE_JOIN_CLICKED: "workspace_join_clicked",
 };
 
 export const TRASH = {

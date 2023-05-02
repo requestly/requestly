@@ -37,7 +37,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 22rem;
+  max-width: 30rem;
 }
 
 .header-right-section {
@@ -123,29 +123,23 @@
   color: var(--text-gray);
 }
 
-.header-help-menu-container.ant-dropdown-menu
-  .ant-dropdown-menu-item
-  .ant-dropdown-menu-title-content
-  a {
+.header-help-menu-container.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content a {
   display: flex;
   align-items: center;
 }
 
-.header-help-menu-container.ant-dropdown-menu
-  .ant-dropdown-menu-item
-  .ant-dropdown-menu-title-content
-  .anticon {
+.header-help-menu-container.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content .anticon {
   font-size: 1.1rem;
   margin-right: 9px;
 }
 
-.header-vertival-divider.ant-divider-vertical {
+.header-vertical-divider.ant-divider-vertical {
   height: 60px;
   margin-right: 12px;
   margin-left: 16px;
 }
 
-.github-star-button > span {
+.github-star-button span {
   display: flex;
   align-items: center;
 }

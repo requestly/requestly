@@ -23,9 +23,7 @@ const MyTeams = () => {
         <center>
           <div id="MyTeams-teamAnimation" style={{ height: 100 }} />
         </center>
-        <h1 style={{ textAlign: "center" }}>
-          Requestly for QA & Development Teams
-        </h1>
+        <h1 style={{ textAlign: "center" }}>Requestly for QA & Development Teams</h1>
 
         <ManageTeams />
       </Card>

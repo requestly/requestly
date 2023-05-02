@@ -2,6 +2,7 @@ import { getAppDetails } from "utils/AppUtils";
 import { SYNCING } from "./events/features/constants";
 import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
+import localIntegration from "./integrations/local";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
@@ -11,12 +12,9 @@ const BLACKLISTED_EVENTS = [
   SYNCING.BACKUP.CREATED,
 ];
 
-export const trackEvent = (name, params) => {
+export const trackEvent = (name, params, config) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
   const { app_mode, app_version } = getAppDetails();
@@ -26,43 +24,31 @@ export const trackEvent = (name, params) => {
   newParams.rq_app_mode = app_mode;
   newParams.rq_app_version = app_version;
   newParams.automation_enabled = window.navigator.webdriver === true;
-  newParams.workspace = window.currentlyActiveWorkspaceTeamId
-    ? "team"
-    : "personal";
-  newParams.workspaceId = window.currentlyActiveWorkspaceTeamId
-    ? window.currentlyActiveWorkspaceTeamId
-    : null;
+  newParams.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
+  newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
 
-  Logger.log(`[analytics.trackEvent] name=${name} params=`, params);
+  Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });
   posthogIntegration.trackEvent(name, newParams);
 };
 
 export const trackAttr = (name, value) => {
   if (!name || !value) return;
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
-
-  setTimeout(() => {
-    trackAttr(name, value);
-  }, 5000);
 
   name = name?.toLowerCase();
   Logger.log(`[analytics.trackAttr] name=${name} params=${value}`);
 
   posthogIntegration.trackAttr(name, value);
+  localIntegration.trackAttr(name, value);
 };
 
-export const initIntegrations = (user) => {
-  if (
-    localStorage.getItem("dataCollectionStatus") &&
-    localStorage.getItem("dataCollectionStatus") === "disabled"
-  )
+export const initIntegrations = (user, dispatch) => {
+  if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
   if (window.top === window.self) {
     posthogIntegration.init(user);
+    localIntegration.init(null, dispatch);
   }
 };

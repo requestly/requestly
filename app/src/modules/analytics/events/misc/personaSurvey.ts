@@ -15,8 +15,8 @@ export const trackPersonaQ2Completed = (option: string[]) => {
   trackEvent(PERSONA_SURVEY.PERSONA_Q2_COMPLETED, params);
 };
 
-export const trackPersonaQ3Completed = (options: string) => {
-  const params = { options };
+export const trackPersonaQ3Completed = (option: string) => {
+  const params = { option };
   trackEvent(PERSONA_SURVEY.PERSONA_Q3_COMPLETED, params);
 };
 
@@ -35,4 +35,8 @@ export const trackPersonaQuestionnaireStarted = () => {
 
 export const trackPersonaSurveySignInClicked = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_SIGN_IN_CLICKED);
+};
+
+export const trackPersonaSurveyViewAllOptionsClicked = () => {
+  trackEvent(PERSONA_SURVEY.VIEW_ALL_PERSONA_RECOMMENDATION);
 };

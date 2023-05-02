@@ -20,17 +20,13 @@ const EmailAction = () => {
     if (params["mode"]) {
       switch (params["mode"]) {
         case "resetPassword":
-          setRedirectPath(
-            PATHS.AUTH.RESET_PASSWORD.RELATIVE + queryParamString
-          );
+          setRedirectPath(PATHS.AUTH.RESET_PASSWORD.RELATIVE + queryParamString);
           break;
         case "verifyEmail":
           setRedirectPath(PATHS.AUTH.VERIFY_EMAIL.RELATIVE + queryParamString);
           break;
         case "signIn":
-          setRedirectPath(
-            PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE + queryParamString
-          );
+          setRedirectPath(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE + queryParamString);
           break;
         default:
           setRedirectPath(PATHS.RULES.RELATIVE);

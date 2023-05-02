@@ -1,6 +1,5 @@
 *.iml
 *.idea
-*.hbs
 node_modules/
 *.log
 *.sublime-workspace

@@ -65,6 +65,7 @@ export const AUTH = {
     WORKSPACE_SIDEBAR: "workspace_sidebar",
     RULES_LIST: "rules_list",
     PERSONA_SURVEY: "persona-survey",
+    PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
@@ -104,6 +105,15 @@ export const RULES = {
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
+  DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
+
+  // rule editor docs
+  DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",
+  DOCS_SIDEBAR_CLOSED: "docs_sidebar_closed",
+  DOCS_SIDEBAR_PRIMARY_CATEGORY_CLICKED: "docs_sidebar_primary_category_clicked",
+  DOCS_SIDEBAR_SECONDARY_CATEGORY_CLICKED: "docs_sidebar_secondary_category_clicked",
+  DOCS_SIDEBAR_CONTACT_US_CLICKED: "docs_sidebar_contact_us_clicked",
+  DOCS_SIDEBAR_DEMOVIDEO_WATCHED: "docs_sidebar_demovideo_watched",
 };
 
 export const GROUPS = {
@@ -125,8 +135,11 @@ export const TEAMS = {
   INVITE_TEAMMATES_CLICKED: "invite_teammates_clicked",
   INVITE_TEAMMATES_BANNER_CLICKED: "invite_teammates_banner_clicked",
   INVITE_MORE_TEAMMATES_BUTTON_CLICKED: "invite_more_teammates_button_clicked",
-  CREATE_NEW_WORKSPACE_CLICKED: "create_new_worskpace_clicked",
+  CREATE_NEW_WORKSPACE_CLICKED: "create_new_workspace_clicked",
+  CREATE_NEW_TEAM_CLICKED: "create_new_team_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
+  WORKSPACE_DELETE_CLICKED: "workspace_delete_clicked",
+  WORKSPACE_DELETED: "workspace_deleted",
   ADD_MEMBER_CLICKED: "add_member_clicked",
   REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
@@ -135,6 +148,11 @@ export const TEAMS = {
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
   UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
-  ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED:
-    "add_members_in_worskpace_modal_viewed",
+  ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
+};
+
+export const TRAFFIC_TABLE = {
+  SIDEBAR_FILTER_SELECTED: "sidebar_filter_selected",
+  SIDEBAR_FILTER_EXPANDED: "sidebar_filter_expanded",
+  SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
 };

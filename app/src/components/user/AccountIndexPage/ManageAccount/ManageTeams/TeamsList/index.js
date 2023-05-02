@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Badge } from "antd";
+import { Button, Badge, Tag } from "antd";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
 import CreateWorkspaceModal from "../CreateWorkspaceModal";
 import { trackCreateNewWorkspaceClicked } from "modules/analytics/events/common/teams";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const TeamsList = ({ teams = [] }) => {
   const navigate = useNavigate();
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
 
@@ -21,10 +24,7 @@ const TeamsList = ({ teams = [] }) => {
     switch (subscriptionStatus) {
       case "active":
         return (
-          <span
-            style={{ width: "300px" }}
-            onClick={() => redirectToTeam(navigate, teamId)}
-          >
+          <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
             <Badge status="success" /> Active
           </span>
         );
@@ -32,12 +32,7 @@ const TeamsList = ({ teams = [] }) => {
       case "incomplete":
       case "canceled":
         return (
-          <Button
-            color="primary"
-            size="sm"
-            type="button"
-            onClick={() => redirectToTeam(navigate, teamId)}
-          >
+          <Button color="primary" size="sm" type="button" onClick={() => redirectToTeam(navigate, teamId)}>
             <span>Pay now</span>
           </Button>
         );
@@ -56,18 +51,26 @@ const TeamsList = ({ teams = [] }) => {
       title: "Workspace",
       dataIndex: "name",
       render: (_, record) => (
-        <span
-          onClick={() => {
-            redirectToTeam(navigate, record.id, {
-              redirectBackToMyTeams: true,
-            });
-          }}
-          style={{
-            cursor: "pointer",
-          }}
-        >
-          {_}
-        </span>
+        <>
+          <span
+            onClick={() => {
+              redirectToTeam(navigate, record.id, {
+                redirectBackToMyTeams: true,
+              });
+            }}
+            style={{
+              cursor: "pointer",
+            }}
+          >
+            {_}
+          </span>
+
+          {currentlyActiveWorkspace.id === record.id ? (
+            <Tag style={{ marginLeft: "1em" }} color="green">
+              Current
+            </Tag>
+          ) : null}
+        </>
       ),
     },
     {
@@ -138,10 +141,7 @@ const TeamsList = ({ teams = [] }) => {
         ]}
       />
 
-      <CreateWorkspaceModal
-        isOpen={isCreateTeamModalOpen}
-        handleModalClose={toggleCreateTeamModal}
-      />
+      <CreateWorkspaceModal isOpen={isCreateTeamModalOpen} handleModalClose={toggleCreateTeamModal} />
     </>
   );
 };

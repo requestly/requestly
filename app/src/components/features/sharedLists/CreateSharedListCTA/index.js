@@ -19,18 +19,12 @@ const CreateSharedListCTA = () => {
   const appMode = useSelector(getAppMode);
 
   // Component State
-  const [
-    isImportSharedListFromURLModalVisible,
-    setIsImportSharedListFromURLModalVisible,
-  ] = useState(false);
+  const [isImportSharedListFromURLModalVisible, setIsImportSharedListFromURLModalVisible] = useState(false);
 
   const renderEmptyListDescription = () => {
     return (
       <>
-        <p>
-          To create a Shared List, go to Rules page, select the required rules &
-          click Share Rules button
-        </p>
+        <p>To create a Shared List, go to Rules page, select the required rules & click Share Rules button</p>
         <Row justify="center" gutter={[8, 0]}>
           <Col>
             {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
@@ -46,11 +40,7 @@ const CreateSharedListCTA = () => {
           </Col>
           <Col>
             <RQButton
-              type={
-                appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-                  ? "default"
-                  : "primary"
-              }
+              type={appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "default" : "primary"}
               onClick={() => redirectToRules(navigate)}
             >
               Go to Rules
@@ -72,11 +62,7 @@ const CreateSharedListCTA = () => {
       {isImportSharedListFromURLModalVisible ? (
         <ImportSharedListFromURLModal
           isOpen={isImportSharedListFromURLModalVisible}
-          toggle={() =>
-            setIsImportSharedListFromURLModalVisible(
-              !isImportSharedListFromURLModalVisible
-            )
-          }
+          toggle={() => setIsImportSharedListFromURLModalVisible(!isImportSharedListFromURLModalVisible)}
         />
       ) : null}
     </>

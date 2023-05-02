@@ -1,0 +1,9 @@
+.icon-button {
+  font-size: var(--font-size-normal);
+  display: inline-block;
+  color: var(--color-secondary);
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}

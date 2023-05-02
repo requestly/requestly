@@ -1,0 +1,23 @@
+.property-row {
+  .property-name {
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
+  .property-value {
+    color: var(--color-secondary);
+  }
+
+  .property-name,
+  .property-value {
+    font-size: var(--font-size-normal);
+  }
+
+  .property-actions {
+    display: inline-block;
+  }
+
+  &:not(:hover) .property-actions {
+    display: none;
+  }
+}

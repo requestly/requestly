@@ -31,7 +31,7 @@
   "browser_action": {
     "default_icon": "resources/images/128x128.png",
     "default_title": "__MSG_extIconTitle__",
-    "default_popup": "generated/popup/popup.html"
+    "default_popup": "popup/popup.html"
   },
 
   "web_accessible_resources": ["libs/requestly-web-sdk.js"],

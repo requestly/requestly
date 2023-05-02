@@ -3,13 +3,7 @@ import ModifyHeaderRow from "../Rows/RowsMarkup/ModifyHeaderRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import { Row, Col } from "antd";
 
-const HeadersRulePair = ({
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => (
+const HeadersRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => (
   <React.Fragment>
     <Row>
       <Col span={24}>

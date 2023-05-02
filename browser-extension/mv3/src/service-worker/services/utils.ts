@@ -1,10 +1,5 @@
 import { ScriptCodeType, ScriptObject, ScriptType } from "common/types";
-import {
-  getVariable,
-  onVariableChange,
-  setVariable,
-  Variable,
-} from "../variable";
+import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { updateActivationStatus } from "./contextMenu";
 
 /* Do not refer any external variable in below function other than arguments */
@@ -61,10 +56,7 @@ const addRemoteCSS = function (url: string): void {
   parent.appendChild(link);
 };
 
-export const injectScript = (
-  script: ScriptObject,
-  target: chrome.scripting.InjectionTarget
-): Promise<unknown> => {
+export const injectScript = (script: ScriptObject, target: chrome.scripting.InjectionTarget): Promise<unknown> => {
   return new Promise((resolve) => {
     let func: (val: string) => void;
     if (script.codeType === ScriptCodeType.JS) {
@@ -105,10 +97,7 @@ export const injectWebAccessibleScript = (
   });
 };
 
-export const injectJSAtRequestSource = (
-  code: string,
-  requestDetails: chrome.webRequest.WebRequestDetails
-) => {
+export const injectJSAtRequestSource = (code: string, requestDetails: chrome.webRequest.WebRequestDetails) => {
   injectScript(
     {
       codeType: ScriptCodeType.JS,
@@ -129,18 +118,12 @@ export const isExtensionEnabled = async (): Promise<boolean> => {
 };
 
 export const toggleExtensionStatus = async () => {
-  const extensionEnabledStatus = await getVariable<boolean>(
-    Variable.IS_EXTENSION_ENABLED,
-    true
-  );
+  const extensionEnabledStatus = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
 
   const updatedStatus = !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
-  onVariableChange<boolean>(
-    Variable.IS_EXTENSION_ENABLED,
-    updateActivationStatus
-  );
+  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
 
   return updatedStatus;
 };

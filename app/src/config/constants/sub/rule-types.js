@@ -93,6 +93,7 @@ const RULE_TYPES_CONFIG = {
     },
     EMPTY_PAIR_FORMAT: {
       destination: "",
+      destinationType: "url",
       source: getSourceFormat(),
     },
     ALLOW_ADD_PAIR: true,
@@ -228,9 +229,7 @@ const RULE_TYPES_CONFIG = {
     ID: 7,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE,
     NAME: isDesktopMode() ? "Modify Response" : "Modify API Response",
-    DESCRIPTION: isDesktopMode()
-      ? "Modify Response of any HTTP request"
-      : "Modify Response of any XHR/Fetch request",
+    DESCRIPTION: isDesktopMode() ? "Modify Response of any HTTP request" : "Modify Response of any XHR/Fetch request",
     ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE} />,
     PRIMARY_COLOR: "#880e4f",
     SECONDARY_COLOR: "#710C42",

@@ -33,20 +33,12 @@ const QueryParamModificationRow = ({
   );
 
   const handleModificationTypeClick = (event, type) =>
-    modifyPairAtGivenPath(
-      event,
-      pairIndex,
-      `modifications[${modificationIndex}].type`,
-      type
-    );
+    modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].type`, type);
 
   const modificationTypeMenu = (
     <Menu>
       {modificationTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item
-          key={index}
-          onClick={(e) => handleModificationTypeClick(e, type)}
-        >
+        <Menu.Item key={index} onClick={(e) => handleModificationTypeClick(e, type)}>
           {title}
         </Menu.Item>
       ))}
@@ -57,11 +49,7 @@ const QueryParamModificationRow = ({
     <Row gutter={16} key={rowIndex} align="middle" className="margin-top-one">
       <Col span={3} align="right" className="min-dropdown-tile-width-lg">
         <Dropdown overlay={modificationTypeMenu}>
-          <Text
-            strong
-            className="uppercase ant-dropdown-link cursor-pointer"
-            onClick={(e) => e.preventDefault()}
-          >
+          <Text strong className="uppercase ant-dropdown-link cursor-pointer" onClick={(e) => e.preventDefault()}>
             {modification.type} <DownOutlined />
           </Text>
         </Dropdown>
@@ -72,21 +60,10 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Name"
           type="text"
-          onChange={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationIndex}].param`
-            )
-          }
+          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].param`)}
           value={modification.param}
-          disabled={
-            isInputDisabled
-              ? true
-              : modification.type === "Remove All"
-              ? true
-              : false
-          }
+          disabled={isInputDisabled ? true : modification.type === "Remove All" ? true : false}
+          data-selectionid="query-param-name"
         />
       </Col>
       <Col span={9} align="right">
@@ -95,17 +72,10 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Value"
           type="text"
-          onChange={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              `modifications[${modificationIndex}].value`
-            )
-          }
+          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].value`)}
           value={modification.value}
-          disabled={
-            isInputDisabled ? true : modification.type === "Add" ? false : true
-          }
+          disabled={isInputDisabled ? true : modification.type === "Add" ? false : true}
+          data-selectionid="query-param-value"
         />
       </Col>
       <Col span={1} align="right">

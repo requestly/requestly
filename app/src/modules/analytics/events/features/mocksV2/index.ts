@@ -1,12 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
 
-export const trackCreateMockEvent = (
-  id: string,
-  type: string,
-  file_type: string,
-  source?: string
-) => {
+export const trackCreateMockEvent = (id: string, type: string, file_type: string, source?: string) => {
   const params = {
     version: 2,
     id,
@@ -17,11 +12,7 @@ export const trackCreateMockEvent = (
   trackEvent(MOCKSV2.CREATED, params);
 };
 
-export const trackUpdateMockEvent = (
-  id: string,
-  type: string,
-  file_type: string
-) => {
+export const trackUpdateMockEvent = (id: string, type: string, file_type: string) => {
   const params = {
     version: 2,
     id,
@@ -31,11 +22,7 @@ export const trackUpdateMockEvent = (
   trackEvent(MOCKSV2.UPDATED, params);
 };
 
-export const trackDeleteMockEvent = (
-  id: string,
-  type: string,
-  file_type: string
-) => {
+export const trackDeleteMockEvent = (id: string, type: string, file_type: string) => {
   const params = {
     version: 2,
     id,
@@ -73,4 +60,29 @@ export const trackMockUploaded = (type: string) => {
 export const trackMockUploadFailed = (type: string, cause: string) => {
   const params = { type, cause };
   trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
+};
+
+export const trackAiResponseButtonClicked = () => {
+  const params = {};
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_BUTTON_CLICKED, params);
+};
+
+export const trackAiResponseGenerateClicked = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATE_CLICKED, params);
+};
+
+export const trackAiResponseUseClicked = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_USE_CLICKED, params);
+};
+
+export const trackAiResponseGenerated = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATED, params);
+};
+
+export const trackAiResponseGenerateFailed = (prompt: string) => {
+  const params = { prompt };
+  trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATE_FAILED, params);
 };

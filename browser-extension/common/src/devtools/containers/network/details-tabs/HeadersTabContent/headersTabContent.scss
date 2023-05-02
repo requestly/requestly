@@ -1,0 +1,27 @@
+.headers-section {
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding: 6px;
+    align-items: center;
+
+    .ant-collapse-expand-icon,
+    .ant-collapse-header-text,
+    .header-action-button {
+      font-size: var(--font-size-normal);
+      font-weight: bold;
+      line-height: 20px;
+      height: 20px;
+    }
+
+    .ant-collapse-expand-icon {
+      padding-inline-end: 6px;
+    }
+  }
+
+  &.ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+    padding-top: 0;
+  }
+
+  .header-action-button {
+    margin-left: 8px;
+  }
+}

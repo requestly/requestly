@@ -58,19 +58,10 @@ export const redirectToSharedList = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - SHARED LIST - View a Shared List */
-export const redirectToSharedListViewer = (
-  navigate,
-  shareId,
-  sharedListName,
-  template = false
-) => {
-  const formattedSharedListName = sharedListName
-    .replace(new RegExp(" +|/+", "g"), "-")
-    .replace(/-+/g, "-");
+export const redirectToSharedListViewer = (navigate, shareId, sharedListName, template = false) => {
+  const formattedSharedListName = sharedListName.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
 
-  navigate(
-    `${PATHS.SHARED_LISTS.VIEWER.ABSOLUTE}/${shareId}-${formattedSharedListName}?template=${template}`
-  );
+  navigate(`${PATHS.SHARED_LISTS.VIEWER.ABSOLUTE}/${shareId}-${formattedSharedListName}?template=${template}`);
 };
 
 // FEATURE - API MOCKS
@@ -150,9 +141,7 @@ export const redirectToForgotPassword = (navigate) => {
 
 export const redirectToVerifyEmail = (navigate, options) => {
   const { redirectURL } = options || {};
-  const baseURL = new URL(
-    window.location.origin + PATHS.AUTH.VERIFY_EMAIL.ABSOLUTE
-  );
+  const baseURL = new URL(window.location.origin + PATHS.AUTH.VERIFY_EMAIL.ABSOLUTE);
   baseURL.searchParams.set("mode", MODES.NEW);
   if (redirectURL) {
     baseURL.searchParams.set("callbackURL", redirectURL);
@@ -294,7 +283,7 @@ export const redirectToBackups = (navigate, hardRedirect) => {
 export const redirectToTeam = (navigate, teamId, options = {}) => {
   const { hardRedirect, autoRefresh, redirectBackToMyTeams, state } = options;
   const url = new URL(window.location.href);
-  url.pathname = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
+  url.pathname = PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`;
   if (autoRefresh) {
     url.searchParams.set("autoRefresh", "true");
   }
@@ -302,7 +291,7 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
     url.searchParams.set("redirectBackToMyTeams", "true");
   }
   if (hardRedirect) {
-    window.location = PATHS.ACCOUNT.TEAM.ABSOLUTE + `/${teamId}`;
+    window.location = PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`;
   } else if (state) {
     navigate(url.pathname + url.search, { state });
   } else {
@@ -326,11 +315,7 @@ export const redirectToCreateNewTeamWorkspace = (navigate, hardRedirect) => {
 };
 
 /* ACCOUNT - PERSONAL SUBSCRIPTION */
-export const redirectToPersonalSubscription = (
-  navigate,
-  hardRedirect,
-  autoRefresh
-) => {
+export const redirectToPersonalSubscription = (navigate, hardRedirect, autoRefresh) => {
   const url = new URL(window.location.href);
   url.pathname = PATHS.ACCOUNT.PERSONAL_SUBSCRIPTION.ABSOLUTE;
   if (autoRefresh) {
@@ -344,13 +329,7 @@ export const redirectToPersonalSubscription = (
 };
 
 /* ACCOUNT - CHECKOUT */
-export const redirectToCheckout = ({
-  mode,
-  teamId,
-  planType: planName,
-  days,
-  quantity,
-}) => {
+export const redirectToCheckout = ({ mode, teamId, planType: planName, days, quantity }) => {
   const url = new URL(window.location.href);
   url.pathname = PATHS.CHECKOUT.ABSOLUTE;
   url.searchParams.set("m", mode);
@@ -379,12 +358,7 @@ export const redirectToMarketplace = (navigate, hardRedirect) => {
 };
 
 /* ACCOUNT - UPDATE SUBSCRIPTION */
-export const redirectToUpdateSubscription = ({
-  mode,
-  teamId,
-  planType,
-  isRenewal,
-}) => {
+export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal }) => {
   const url = new URL(window.location.href);
   url.pathname = PATHS.ACCOUNT.UPDATE_SUBSCRIPTION.ABSOLUTE;
   url.searchParams.set("m", mode);
@@ -411,8 +385,7 @@ export const redirectToUpdatePaymentMethod = () => {
 /* ACCOUNT - PAYMENT FAILED */
 export const redirectToPaymentFailed = (errorCode) => {
   let qp = "?ref=stripe&paymentId=5357551a-e2d7";
-  if (errorCode && typeof errorCode === "string")
-    qp = qp.concat("err=" + errorCode);
+  if (errorCode && typeof errorCode === "string") qp = qp.concat("err=" + errorCode);
   window.location.href = PATHS.PAYMENT_FAIL.ABSOLUTE + qp;
 };
 
@@ -490,10 +463,6 @@ export const redirectToTraffic = (navigate) => {
   navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
-export const redirectToApps = (navigate) => {
-  navigate(PATHS.DESKTOP.MY_APPS.ABSOLUTE);
-};
-
 export const redirectToCreateNewApp = (navigate) => {
   navigate(PATHS.MOBILE_DEBUGGER.NEW.ABSOLUTE);
 };
@@ -515,18 +484,12 @@ export const redirectToDownloadPage = () => {
 };
 
 export const redirectToMockEditorEditMock = (navigate, mockId) => {
-  const mockEditUrl = `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}`.replace(
-    ":mockId",
-    mockId
-  );
+  const mockEditUrl = `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
   navigate(mockEditUrl);
 };
 
 export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
-  const mockEditUrl = `${PATHS.FILE_SERVER_V2.EDIT.ABSOLUTE}`.replace(
-    ":mockId",
-    mockId
-  );
+  const mockEditUrl = `${PATHS.FILE_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
   navigate(mockEditUrl);
 };
 

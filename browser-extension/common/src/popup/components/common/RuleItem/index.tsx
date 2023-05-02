@@ -8,6 +8,7 @@ import { useRecords } from "../../../contexts/RecordsContext";
 import { icons } from "../../../ruleTypeIcons";
 import RecordName from "../RecordName";
 import "./ruleItem.css";
+import { EVENT, sendEvent } from "../../../events";
 
 interface RuleItemProps {
   rule: Rule;
@@ -42,36 +43,28 @@ const RuleItem: React.FC<RuleItemProps> = ({
     };
 
     handleUpdateRule(updatedRule);
+    sendEvent(EVENT.RULE_TOGGLED, {
+      type: rule.ruleType,
+      status: isRuleActive ? Status.INACTIVE : Status.ACTIVE,
+    });
   }, [rule, isRuleActive, handleUpdateRule]);
 
   const handleGroupActiveClick = useCallback(() => {
     updateGroup({ ...group, status: Status.ACTIVE });
+    sendEvent(EVENT.GROUP_TOGGLED, { status: Status.ACTIVE });
   }, [group, updateGroup]);
 
   return (
     <li>
       <Row align="middle" className="record-item" wrap={false}>
         <Col span={isChildren ? 20 : 18} className="record-name-container">
-          <Row
-            wrap={false}
-            align="middle"
-            className={`rule-name-container ${isChildren ? "child-rule" : ""}`}
-          >
-            <Tooltip
-              placement="topRight"
-              title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}
-            >
-              <span className="icon-wrapper rule-type-icons">
-                {icons[rule.ruleType]}
-              </span>
+          <Row wrap={false} align="middle" className={`rule-name-container ${isChildren ? "child-rule" : ""}`}>
+            <Tooltip placement="topRight" title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}>
+              <span className="icon-wrapper rule-type-icons">{icons[rule.ruleType]}</span>
             </Tooltip>
 
             <RecordName name={rule.name}>
-              <a
-                target="_blank"
-                className="record-name link"
-                href={`${config.WEB_URL}/rules/editor/edit/${rule.id}`}
-              >
+              <a target="_blank" className="record-name link" href={`${config.WEB_URL}/rules/editor/edit/${rule.id}`}>
                 {rule.name}
               </a>
             </RecordName>
@@ -93,8 +86,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
             disabled={!isGroupInactive}
             title={
               <span>
-                Please enable <b>{group?.name as string}</b> group to make the
-                rule work.
+                Please enable <b>{group?.name as string}</b> group to make the rule work.
               </span>
             }
             okText="Enable"
@@ -104,11 +96,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
           >
             <Row wrap={false} align="middle" justify="center">
               <div>
-                <span
-                  className={`record-status-text ${
-                    !isRuleActive ? "text-gray" : ""
-                  }`}
-                >
+                <span className={`record-status-text ${!isRuleActive ? "text-gray" : ""}`}>
                   {isRuleActive ? "On" : "Off"}
                 </span>
                 <Switch

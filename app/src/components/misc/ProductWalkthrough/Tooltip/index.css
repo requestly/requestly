@@ -1,0 +1,52 @@
+.tour-tooltip-container {
+  max-width: 400px;
+  padding: 20px;
+  background: var(--body-background);
+  border-radius: var(--border-radius-md);
+  position: relative;
+  box-shadow: 0px 3px 27px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ff6905;
+}
+.tour-tooltip-container .tour-tooltip-content {
+  margin-top: 4px;
+  max-width: 400px;
+}
+
+.tour-tooltip-container button.tour-tooltip-next-btn {
+  background: transparent;
+  font-weight: 500;
+  padding: 11px;
+  display: flex;
+  gap: 4px;
+}
+.tour-tooltip-container button.tour-tooltip-next-btn img {
+  transform: rotate(180deg);
+}
+.tour-tooltip-container .tour-tooltip-buttons-container {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 12px;
+}
+.tour-tooltip-container .title {
+  margin-top: 8px;
+}
+.tour-close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.tour-tooltip-pointer {
+  position: absolute;
+  top: -27px;
+}
+.tour-tooltip-pointer-center {
+  left: 50%;
+}
+.tour-tooltip-pointer-left {
+  left: 10%;
+}
+.tour-tooltip-pointer-right {
+  left: 85%;
+}

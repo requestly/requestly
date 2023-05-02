@@ -7,13 +7,7 @@ import { DownOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 const { Option, OptGroup } = Select;
 
-const UserAgentSelectionRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  isInputDisabled,
-}) => {
+const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
 
   const userAgentSelectorOnChangeHandler = (itemSet) => {
@@ -41,22 +35,14 @@ const UserAgentSelectionRow = ({
         });
       }
 
-      modifyPairAtGivenPath(
-        event,
-        pairIndex,
-        "envType",
-        newValue,
-        extraModifications
-      );
+      modifyPairAtGivenPath(event, pairIndex, "envType", newValue, extraModifications);
     },
     [modifyPairAtGivenPath, pairIndex]
   );
 
   const getCurrentUserAgentValue = () => {
     return {
-      label: pair.env
-        .replace("msie.msie", "Internet Explorer ")
-        .replace(/[.|_]/, " "),
+      label: pair.env.replace("msie.msie", "Internet Explorer ").replace(/[.|_]/, " "),
     };
   };
 
@@ -103,28 +89,16 @@ const UserAgentSelectionRow = ({
     userAgentSelectorOnChangeHandler(JSON.parse(newSelectedItemSet));
   };
 
-  const availableUserAgents = useMemo(() => getAvailableUserAgents(pair), [
-    pair,
-  ]);
+  const availableUserAgents = useMemo(() => getAvailableUserAgents(pair), [pair]);
 
   return (
-    <Row
-      key={rowIndex}
-      span={24}
-      align="middle"
-      gutter={16}
-      className="margin-top-one"
-    >
+    <Row key={rowIndex} span={24} align="middle" gutter={16} className="margin-top-one">
       <Col className="my-auto">
         <span>UserAgent</span>
       </Col>
       <Col className="my-auto" align="right">
         <Dropdown overlay={renderEnvOptions} disabled={isInputDisabled}>
-          <Text
-            strong
-            onClick={(e) => e.preventDefault()}
-            className="uppercase cursor-pointer ant-dropdown-link"
-          >
+          <Text strong onClick={(e) => e.preventDefault()} className="uppercase cursor-pointer ant-dropdown-link">
             {pair.envType === "" ? "Select" : pair.envType} <DownOutlined />
           </Text>
         </Dropdown>
@@ -135,9 +109,7 @@ const UserAgentSelectionRow = ({
             placeholder="Enter custom UserAgent string"
             type="text"
             disabled={isInputDisabled}
-            onChange={(event) =>
-              modifyPairAtGivenPath(event, pairIndex, "userAgent")
-            }
+            onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "userAgent")}
             className="display-inline-block"
             value={pair.userAgent}
           />
@@ -148,13 +120,10 @@ const UserAgentSelectionRow = ({
             style={{ width: "100%" }}
             disabled={isInputDisabled || pair.envType === ""}
             onChange={handleSelectChange}
-            placeholder={
-              pair.envType === ""
-                ? "Please select device type first"
-                : "Type to search"
-            }
+            placeholder={pair.envType === "" ? "Please select device type first" : "Type to search"}
             filterOption={true}
             value={getCurrentUserAgentValue().label || undefined}
+            data-selectionid="device-selector"
           >
             {availableUserAgents?.length > 0 &&
               availableUserAgents.map(({ label, options }) => (

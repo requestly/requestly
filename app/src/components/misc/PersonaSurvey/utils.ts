@@ -1,7 +1,13 @@
+import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { multipleChoiceOption, Option } from "./types";
+import { multipleChoiceOption, Option, UserPersona } from "./types";
+import { getValueAsPromise, setValue } from "actions/FirebaseActions";
+import PATHS from "config/constants/sub/paths";
 
 export const shouldShowPersonaSurvey = async (appMode: string) => {
+  // Don't show persona survey on Browser if user is authenticating from desktop app
+  if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE)) return false;
+
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
   if (new Date(installDate) >= new Date("2023-03-06")) return true;
   else return false;
@@ -21,4 +27,13 @@ export const shuffleOptions = (options: Option[]) => {
     [options[i], options[j]] = [options[j], options[i]];
   }
   return options;
+};
+
+export const syncUserPersona = async (uid: string, dispatch: any, userPersona: UserPersona) => {
+  const persona: any = await getValueAsPromise(["users", uid, "persona"]);
+  if (!persona) {
+    setValue(["users", uid, "persona"], { ...userPersona });
+  } else {
+    dispatch(actions.setUserPersonaData({ ...persona }));
+  }
 };

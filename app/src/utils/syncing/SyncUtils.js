@@ -1,7 +1,4 @@
-import {
-  removeValueAsPromise,
-  updateValueAsPromise,
-} from "../../actions/FirebaseActions";
+import { removeValueAsPromise, updateValueAsPromise } from "../../actions/FirebaseActions";
 import {
   updateUserSyncRecords,
   removeUserSyncRecords,
@@ -16,6 +13,8 @@ import {
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
 import { StorageService } from "init";
+import Logger from "lib/logger";
+import APP_CONSTANTS from "config/constants";
 
 /**
  * This functions triggers syncing process
@@ -25,20 +24,15 @@ import { StorageService } from "init";
  *
  * syncing is disabled when storage is remote
  */
-export const doSyncRecords = async (records, syncType, appMode, forceSync) => {
+export const doSyncRecords = async (records, syncType, appMode, options = {}) => {
   if (!window.uid) return; // If user is not logged in
-  if (
-    !forceSync &&
-    !window.isSyncEnabled &&
-    !window.currentlyActiveWorkspaceTeamId
-  )
-    return; // If personal syncing is disabled and user has no active workspace
+  if (!options.forceSync && !window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return; // If personal syncing is disabled and user has no active workspace
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
-      await updateUserSyncRecords(window.uid, records).catch((e) =>
-        console.error(e)
-      );
+      await updateUserSyncRecords(window.uid, records, appMode, {
+        workspaceId: options.workspaceId,
+      }).catch(Logger.error);
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
@@ -58,10 +52,7 @@ export const setSyncState = async (uid, state, appMode) => {
   return new Promise((resolve, reject) => {
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
-        if (!state)
-          await StorageService(appMode).removeRecordsWithoutSyncing([
-            "last-sync-target",
-          ]);
+        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
         trackSyncToggled(uid, state);
         resolve(true);
       })
@@ -78,11 +69,7 @@ export const setSyncState = async (uid, state, appMode) => {
  * @param {String} appMode
  */
 export const syncRecordsRemoval = async (recordIds, appMode) => {
-  trackSyncTriggered(
-    window.uid,
-    recordIds.length,
-    SYNC_CONSTANTS.SYNC_REMOVE_RECORDS
-  );
+  trackSyncTriggered(window.uid, recordIds.length, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS);
 
   try {
     window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
@@ -96,11 +83,7 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
 
     trackSyncCompleted(window.uid);
   } catch (e) {
-    trackSyncFailed(
-      window.uid,
-      SYNC_CONSTANTS.SYNC_REMOVE_RECORDS,
-      JSON.stringify(e)
-    );
+    trackSyncFailed(window.uid, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS, JSON.stringify(e));
   }
 };
 
@@ -110,11 +93,5 @@ const syncSessionRecordingPageConfig = async (object, appMode) => {
     .then(() => {
       trackSyncCompleted(window.uid);
     })
-    .catch((e) =>
-      trackSyncFailed(
-        window.uid,
-        SYNC_CONSTANTS.SESSION_PAGE_CONFIG,
-        JSON.stringify(e)
-      )
-    );
+    .catch((e) => trackSyncFailed(window.uid, SYNC_CONSTANTS.SESSION_PAGE_CONFIG, JSON.stringify(e)));
 };

@@ -26,8 +26,7 @@ export const getMarketplaceRules = (state) => {
 export const getUniqueMarketplaceRuleID = (state) => {
   const onlyMarketplaceRules = getMarketplaceRules(state);
   const uniqueMarketplaceRuleIDs = onlyMarketplaceRules.filter(
-    (rule, index, self) =>
-      self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
+    (rule, index, self) => self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
   );
   return uniqueMarketplaceRuleIDs;
 };
@@ -208,4 +207,19 @@ export const getUserPreferences = (state) => {
 
 export const getUserPersonaSurveyDetails = (state) => {
   return getGlobalState(state)["userPersona"];
+};
+
+export const getUserAttributes = (state) => {
+  return getGlobalState(state)["userAttributes"];
+};
+
+export const getIsRedirectRuleTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isRedirectRuleTourCompleted"];
+};
+export const getIsTrafficTableTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isTrafficTableTourCompleted"];
+};
+
+export const getIsConnectedAppsTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isConnectedAppsTourCompleted"];
 };

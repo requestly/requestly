@@ -15,11 +15,9 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
   const TestimonialSection = () => {
     const testimonials = [
       {
-        body:
-          "Requestly is a game-changer. It started with one person and now the entire team uses Requestly.",
+        body: "Requestly is a game-changer. It started with one person and now the entire team uses Requestly.",
         name: "Piers Carrigan",
-        author:
-          "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/63809401540ef733d3ce9506_piers.jpeg",
+        author: "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/63809401540ef733d3ce9506_piers.jpeg",
         role: "QA Lead",
         company: "15Gifts",
       },
@@ -27,17 +25,14 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
         body:
           "Requestly made it easier for us to develop, test & debug our code. We more confidently ship product updates now.",
         name: "Michael Levinson",
-        author:
-          "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/638094ec2d13f972194ee214_michael.jpeg",
+        author: "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/638094ec2d13f972194ee214_michael.jpeg",
         role: "CPO & Co-Founder",
         company: "Joyned",
       },
       {
-        body:
-          "Requestly is one-stop solution for all our needs at Wingify. Collaboration feature works like a Charm.",
+        body: "Requestly is one-stop solution for all our needs at Wingify. Collaboration feature works like a Charm.",
         name: "Nitish Mittal",
-        author:
-          "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/638c981c0787c782c9e26282_nitish.jpeg",
+        author: "https://uploads-ssl.webflow.com/6348fffb6541341630d50640/638c981c0787c782c9e26282_nitish.jpeg",
         role: "Director of Engineering",
         company: "Wingify",
       },
@@ -47,19 +42,12 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
       <Col className="signup-modal-testimonial-wrapper">
         <img src={quoteIcon} alt="quote" />
         <Row>
-          <Typography.Text type="primary">
-            {testimonials[currentTestimonialIndex].body}
-          </Typography.Text>
+          <Typography.Text type="primary">{testimonials[currentTestimonialIndex].body}</Typography.Text>
         </Row>
         <Row align={"middle"} className="signup-modal-testimonial">
-          <img
-            src={testimonials[currentTestimonialIndex].author}
-            alt="user"
-            width={28}
-          />
+          <img src={testimonials[currentTestimonialIndex].author} alt="user" width={28} />
           <Typography.Text type="secondary">
-            - {testimonials[currentTestimonialIndex].name},{" "}
-            {testimonials[currentTestimonialIndex].role} at{" "}
+            - {testimonials[currentTestimonialIndex].name}, {testimonials[currentTestimonialIndex].role} at{" "}
             {testimonials[currentTestimonialIndex].company}
           </Typography.Text>
         </Row>
@@ -69,10 +57,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
 
   return (
     <Col span={13} className="signup-modal-section-wrapper signup-modal-hero">
-      <Typography.Text
-        type="primary"
-        className="signup-modal-hero-title text-bold w-full"
-      >
+      <Typography.Text type="primary" className="signup-modal-hero-title text-bold w-full">
         Speed up your web development, testing & debugging process 🚀
       </Typography.Text>
       <div className="work-email-wrapper">
@@ -87,9 +72,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
         {workEmailsBenefits.map((benefit, index) => (
           <div className="work-email-benefit-item" key={index}>
             <HiArrowRight className="signup-modal-secondary-text" />
-            <Typography.Text className="signup-modal-secondary-text">
-              {benefit}
-            </Typography.Text>
+            <Typography.Text className="signup-modal-secondary-text">{benefit}</Typography.Text>
           </div>
         ))}
       </div>

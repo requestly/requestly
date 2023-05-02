@@ -25,9 +25,7 @@ const AuthModal = ({
   const user = useSelector(getUserAuthDetails);
   // Component State
   const [authMode, setAuthMode] = useState(
-    authModeFromProps
-      ? authModeFromProps
-      : APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+    authModeFromProps ? authModeFromProps : APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
   );
   const [popoverVisible, setPopoverVisible] = useState(
     authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? true : true
@@ -40,21 +38,10 @@ const AuthModal = ({
 
   return (
     <>
-      <img
-        src={closeIcon}
-        width={15}
-        className="modal-close-icon"
-        onClick={() => toggle()}
-        alt="close-icon"
-      />
+      <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggle()} alt="close-icon" />
       <Modal
         size="small"
-        visible={
-          window.location.href.includes("/signin") ||
-          window.location.href.includes("/signup")
-            ? false
-            : isOpen
-        }
+        visible={window.location.href.includes("/signin") || window.location.href.includes("/signup") ? false : isOpen}
         onCancel={closable ? () => toggle() : null}
         footer={null}
         centered={true}
@@ -65,8 +52,7 @@ const AuthModal = ({
         closable={false}
         width={
           authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ||
-          authMode ===
-            APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD ||
+          authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD ||
           authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.DO_RESET_PASSWORD
             ? "500px"
             : "auto"

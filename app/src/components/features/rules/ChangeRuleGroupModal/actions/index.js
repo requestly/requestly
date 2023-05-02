@@ -30,12 +30,7 @@ export const createNewGroup = (appMode, newGroupName, callback, user) => {
     });
 };
 
-export const updateGroupOfSelectedRules = (
-  appMode,
-  rulesSelection,
-  newGroupId,
-  user
-) => {
+export const updateGroupOfSelectedRules = (appMode, rulesSelection, newGroupId, user) => {
   return new Promise((resolve, reject) => {
     // Filter only Selected Rules
 

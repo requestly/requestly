@@ -2,10 +2,7 @@
 import APP_CONSTANTS from "../../../../../config/constants";
 //UTILS
 import DataStoreUtils from "../../../../../utils/DataStoreUtils";
-import {
-  getPublicSharedListPath,
-  getUserSpecificFilePath,
-} from "../../../../../utils/db/UserModel";
+import { getPublicSharedListPath, getUserSpecificFilePath } from "../../../../../utils/db/UserModel";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 //CONSTANTS
@@ -19,8 +16,7 @@ export const getFileIdFromURL = (url) => {
   const urlArray = url.split("/");
 
   // Use path varible to determine which index of this array would contain shared list id
-  const numberOfSlashesInKnownPath = PATHS.FILES.VIEWER.ABSOLUTE.split("/")
-    .length;
+  const numberOfSlashesInKnownPath = PATHS.FILES.VIEWER.ABSOLUTE.split("/").length;
   const requiredIndex = numberOfSlashesInKnownPath + 1 - 1; // +1 to Count the HOST part, -1 to convert arr length to arr index
 
   return urlArray[requiredIndex];

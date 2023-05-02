@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Radio, Tooltip } from "antd";
-import {
-  getCurrentlySelectedRuleData,
-  getResponseRuleResourceType,
-} from "store/selectors";
+import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store/selectors";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
@@ -32,24 +29,14 @@ const ResponseRuleResourceTypes: React.FC = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
 
-  const requestPayloadFilter =
-    currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
+  const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
   const updateResourceType = useCallback(
-    (
-      resourceType: ResponseRuleResourceType,
-      clearGraphqlRequestPayload = false
-    ) => {
+    (resourceType: ResponseRuleResourceType, clearGraphqlRequestPayload = false) => {
       const pairIndex = 0; // response rule will only have one pair
-      const copyOfCurrentlySelectedRule = JSON.parse(
-        JSON.stringify(currentlySelectedRuleData)
-      );
+      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
 
-      let updatedPair = set(
-        copyOfCurrentlySelectedRule.pairs[pairIndex],
-        "response.resourceType",
-        resourceType
-      );
+      let updatedPair = set(copyOfCurrentlySelectedRule?.pairs?.[pairIndex], "response.resourceType", resourceType);
 
       if (clearGraphqlRequestPayload) {
         // clear graphql request payload on resource type change
@@ -61,17 +48,12 @@ const ResponseRuleResourceTypes: React.FC = () => {
         pairs: [{ ...updatedPair }],
       };
 
-      setCurrentlySelectedRule(
-        dispatch,
-        updatedRule,
-        resourceType !== ResponseRuleResourceType.UNKNOWN
-      );
+      setCurrentlySelectedRule(dispatch, updatedRule, resourceType !== ResponseRuleResourceType.UNKNOWN);
     },
     [dispatch, currentlySelectedRuleData]
   );
 
-  const isNewResponseRule =
-    "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
+  const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
 
   useEffect(() => {
     if (isNewResponseRule) return;
@@ -81,43 +63,31 @@ const ResponseRuleResourceTypes: React.FC = () => {
   }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
   const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
-    const clearGraphqlRequestPayload =
-      type !== ResponseRuleResourceType.GRAPHQL_API;
+    const clearGraphqlRequestPayload = type !== ResponseRuleResourceType.GRAPHQL_API;
 
     updateResourceType(type, clearGraphqlRequestPayload);
   };
 
-  return isNewResponseRule &&
-    responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
+  return isNewResponseRule && responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
     <div className="resource-types-container">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
-        <Radio.Group
-          value={responseRuleResourceType}
-          onChange={(e) => handleResourceTypeChange(e.target.value)}
-        >
-          <Radio value={ResponseRuleResourceType.REST_API}>Rest API</Radio>
-          <Radio value={ResponseRuleResourceType.GRAPHQL_API}>
-            GraphQL API
-          </Radio>
+        <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
+          <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
+          <Radio value={ResponseRuleResourceType.GRAPHQL_API}>GraphQL API</Radio>
           {isDesktop ? (
-            <Radio value={ResponseRuleResourceType.STATIC}>
-              HTML / JS / CSS
-            </Radio>
+            <Radio value={ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
           ) : (
             <Tooltip
               overlayClassName="response-rule-resource-type-tooltip"
               title={
                 <span>
-                  This option is available only in desktop app due to technical
-                  constraints of chrome extension. <DownloadDesktopAppLink />
+                  This option is available only in desktop app due to technical constraints of chrome extension.{" "}
+                  <DownloadDesktopAppLink />
                 </span>
               }
             >
-              <Radio
-                disabled={!isDesktop}
-                value={ResponseRuleResourceType.STATIC}
-              >
+              <Radio disabled={!isDesktop} value={ResponseRuleResourceType.STATIC}>
                 HTML / JS / CSS
                 <QuestionCircleOutlined className="resource-disable-option-info-icon" />
               </Radio>

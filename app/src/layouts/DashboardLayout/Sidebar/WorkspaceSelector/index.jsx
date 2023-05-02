@@ -10,37 +10,35 @@ import {
   SettingOutlined,
   UserOutlined,
   ExclamationCircleFilled,
+  RightOutlined,
 } from "@ant-design/icons";
 import {
   clearCurrentlyActiveWorkspace,
   showSwitchWorkspaceSuccessToast,
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
-import { Avatar, Divider, Dropdown, Menu, Modal, Row, Spin } from "antd";
+import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Row, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackCreateNewWorkspaceClicked,
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
-import {
-  getCurrentlyActiveWorkspace,
-  getAvailableTeams,
-  getIsWorkspaceMode,
-} from "store/features/teams/selectors";
-import {
-  getAppMode,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getUserAuthDetails,
-} from "store/selectors";
+import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
+import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getUserAuthDetails } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import Logger from "lib/logger";
+import { getTeamInvites } from "backend/teams";
+import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import "./WorkSpaceSelector.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -51,17 +49,17 @@ export const isWorkspacesFeatureEnabled = (email) => {
 };
 
 const prettifyWorkspaceName = (workspaceName) => {
-  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
-    return "Private";
+  // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
+  //   return "Private";
   return workspaceName;
 };
+
 const getWorkspaceIcon = (workspaceName) => {
-  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
-    return <LockOutlined />;
+  if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
   return workspaceName[0].toUpperCase();
 };
 
-const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
+const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, menu }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -73,12 +71,20 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
+  const handleWorkspaceDropdownClick = (open) => {
+    if (open) {
+      handleSidebarCollapsed(false);
+      trackSidebarClicked("workspace");
+    }
+  };
+
   return (
     <Row align="middle" justify="center">
       <Dropdown
         overlay={menu}
         trigger={["click"]}
         className="workspace-dropdown"
+        onOpenChange={handleWorkspaceDropdownClick}
       >
         <div className="cursor-pointer items-center">
           <Avatar
@@ -88,29 +94,34 @@ const WorkSpaceDropDown = ({ isCollapsed, menu }) => {
             className="workspace-avatar"
             style={{
               backgroundColor: user.loggedIn
-                ? activeWorkspaceName ===
-                  APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
                   ? "#1E69FF"
-                  : getUniqueColorForWorkspace(
-                      currentlyActiveWorkspace?.id,
-                      activeWorkspaceName
-                    )
+                  : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
                 : "#ffffff4d",
             }}
           />
-          <span className={isCollapsed ? "hidden" : "items-center"}>
-            <span className="active-workspace-name">
-              {prettifyWorkspaceName(activeWorkspaceName)}
+          <Tooltip
+            overlayClassName="workspace-selector-tooltip"
+            style={{
+              top: "35px",
+            }}
+            title={prettifyWorkspaceName(activeWorkspaceName)}
+            placement={"bottomRight"}
+            showArrow={false}
+            mouseEnterDelay={1}
+          >
+            <span className={isCollapsed ? "hidden" : "items-center"}>
+              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+              <DownOutlined className="active-workspace-name-down-icon" />
             </span>
-            <DownOutlined className="active-workspace-name-down-icon" />
-          </span>
+          </Tooltip>
         </div>
       </Dropdown>
     </Row>
   );
 };
 
-const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
+const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSidebarClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -118,26 +129,35 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
+  const _availableTeams = availableTeams || [];
+  const sortedAvailableTeams = [
+    ..._availableTeams.filter((team) => !team?.archived),
+    ..._availableTeams.filter((team) => team?.archived),
+  ];
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(
-    getIsCurrentlySelectedRuleHasUnsavedChanges
-  );
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(
-    false
-  );
+  const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(false);
+  const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [teamInvites, setTeamInvites] = useState([]);
+  const loggedInUserEmail = user?.details?.profile?.email;
+
+  useEffect(() => {
+    if (!user.loggedIn) return;
+
+    getTeamInvites(loggedInUserEmail)
+      .then(setTeamInvites)
+      .catch((e) => Logger.log("Not able to fetch team invites!"));
+  }, [user.loggedIn, loggedInUserEmail]);
 
   useEffect(() => {
     if (availableTeams?.length > 0) {
-      submitAttrUtil(
-        APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES,
-        availableTeams.length
-      );
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableTeams.length);
     }
   }, [availableTeams?.length]);
 
@@ -153,6 +173,10 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleJoinWorkspaceModalClose = () => {
+    setIsJoinWorkspaceModalOpen(false);
   };
 
   const handleCreateWorkspaceModalClose = () => {
@@ -179,11 +203,27 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     );
   };
 
+  const handleJoinWorkspaceMenuItemClick = () => {
+    if (user.loggedIn) {
+      setIsJoinWorkspaceModalOpen(true);
+      trackWorkspaceJoiningModalOpened(teamInvites.length);
+    } else {
+      promptUserSignupModal(() => {
+        setIsJoinWorkspaceModalOpen(true);
+        trackWorkspaceJoiningModalOpened(teamInvites.length);
+      }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+    }
+  };
+
+  const handleCreateWorkspaceFromJoinModal = () => {
+    handleJoinWorkspaceModalClose();
+    handleCreateNewWorkspaceRedirect();
+  };
+
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
       setIsCreateWorkspaceModalOpen(true);
       handleMobileSidebarClose?.();
-      trackCreateNewWorkspaceClicked("workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -201,10 +241,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         redirectToMyTeams(navigate, false);
       }
     } else {
-      promptUserSignupModal(
-        () => redirectToMyTeams(navigate, false),
-        AUTH.SOURCE.WORKSPACE_SIDEBAR
-      );
+      promptUserSignupModal(() => redirectToMyTeams(navigate, false), AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
@@ -214,6 +251,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       files: PATHS.FILE_SERVER_V2.ABSOLUTE,
       sessions: PATHS.SESSIONS.ABSOLUTE,
+      teams: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
     }),
     []
   );
@@ -225,7 +263,8 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
           pathname.includes(path) &&
           (pathname.includes("editor") ||
             pathname.includes("viewer") ||
-            pathname.includes("saved"))
+            pathname.includes("saved") ||
+            pathname.includes("/teams/"))
       ),
     [redirects, pathname]
   );
@@ -239,7 +278,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
       }
     };
 
-    if (!isCurrentlySelectedRuleHasUnsavedChanges) {
+    if (!isCurrentlySelectedRuleHasUnsavedChanges || pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)) {
       handleCallback();
       return;
     }
@@ -294,6 +333,7 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         onClick={() => {
           handleCreateNewWorkspaceRedirect();
           trackWorkspaceDropdownClicked("create_new_workspace");
+          trackCreateNewWorkspaceClicked("workspaces_dropdown");
         }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
@@ -324,6 +364,39 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     </Menu>
   );
 
+  const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
+  const TeamsInviteCountBadge = (
+    <Badge color="#0361FF" count={teamInvites.length} className="join-workspace-invite-count-badge" />
+  );
+
+  const joinWorkspaceDropdownItems = [
+    {
+      key: "0",
+      label: (
+        <span className="join-existing-workspace-menu-item">
+          <span>Join an existing workspace</span>
+          {teamInvites.length > 0 && TeamsInviteCountBadge}
+        </span>
+      ),
+      onClick: () => {
+        handleJoinWorkspaceMenuItemClick();
+      },
+    },
+    {
+      key: "1",
+      label: "Create a new workspace",
+      onClick: () => {
+        handleCreateNewWorkspaceRedirect();
+        trackWorkspaceDropdownClicked("create_new_workspace");
+        trackCreateNewWorkspaceClicked("workspaces_dropdown");
+      },
+    },
+  ];
+
+  const handleJoinWorkspaceDropdownClick = ({ key }) => {
+    joinWorkspaceDropdownItems[key]?.onClick?.();
+  };
+
   const menu = (
     <Menu className="workspaces-menu">
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
@@ -333,17 +406,16 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
             <Avatar
               size={28}
               shape="square"
-              icon={getWorkspaceIcon(
-                APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-              )}
+              icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
               className="workspace-avatar"
               style={{ backgroundColor: "#1E69FF" }}
             />
           }
-          className={`workspace-menu-item ${
-            !currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
-          }`}
-          onClick={() => confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace)}
+          className={`workspace-menu-item ${!currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""}`}
+          onClick={() => {
+            confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
+            trackWorkspaceDropdownClicked("switch_workspace");
+          }}
         >
           <div className="workspace-name-container">
             {APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE} (Default)
@@ -351,11 +423,12 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
         </Menu.Item>
         {availableTeams === null ? renderLoader() : null}
 
-        {availableTeams &&
-          availableTeams.map((team) => {
+        {sortedAvailableTeams &&
+          sortedAvailableTeams.map((team) => {
             return (
               <Menu.Item
                 key={team.id}
+                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
                 icon={
                   <Avatar
                     size={28}
@@ -363,54 +436,72 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
                     icon={team.name?.[0]?.toUpperCase() ?? "P"}
                     className="workspace-avatar"
                     style={{
-                      backgroundColor: `${getUniqueColorForWorkspace(
-                        team.id,
-                        team.name
-                      )}`,
+                      backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
                     }}
                   />
                 }
                 className={`workspace-menu-item ${
-                  team.id === currentlyActiveWorkspace.id
-                    ? "active-workspace-dropdownItem"
-                    : ""
+                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={() => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
                   trackWorkspaceDropdownClicked("switch_workspace");
                 }}
               >
-                <div className="workspace-name-container">
-                  <div className="workspace-name">{team.name}</div>
-                  <div className="text-gray wrokspace-details">
-                    {team.subscriptionStatus
-                      ? `${team.subscriptionStatus} • `
-                      : null}
-                    {team.accessCount}{" "}
-                    {team.accessCount > 1 ? "members" : "member"}
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "178px" }}
+                  title={team.archived ? "This workspace has been scheduled for deletion in next 48 hours." : ""}
+                >
+                  <div className="workspace-item-wrapper">
+                    <div
+                      className={`workspace-name-container ${
+                        team.archived || isTeamCurrentlyActive(team.id) ? "archived-workspace-item" : ""
+                      }`}
+                    >
+                      <div className="workspace-name">{team.name}</div>
+                      <div className="text-gray workspace-details">
+                        {team.subscriptionStatus ? `${team.subscriptionStatus} • ` : null}
+                        {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
+                      </div>
+                    </div>
+                    {team.archived ? (
+                      <Tag color="gold">archived</Tag>
+                    ) : isTeamCurrentlyActive(team.id) ? (
+                      <Tag color="green">current</Tag>
+                    ) : null}
                   </div>
-                </div>
+                </Tooltip>
               </Menu.Item>
             );
           })}
       </Menu.ItemGroup>
 
       <Divider className="ant-divider-margin workspace-divider" />
+      <Menu.Item key="3" className="workspace-menu-item">
+        <Dropdown
+          placement="right"
+          trigger={["hover"]}
+          menu={{
+            items: joinWorkspaceDropdownItems,
+            onClick: handleJoinWorkspaceDropdownClick,
+          }}
+          overlayClassName="join-workspace-menu-dropdown-container"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="join-workspace-menu-dropdown-trigger">
+            <span>Join or create workspace</span>
 
-      <Menu.Item
-        key="3"
-        className="workspace-menu-item"
-        onClick={() => {
-          handleCreateNewWorkspaceRedirect();
-          trackWorkspaceDropdownClicked("create_new_workspace");
-        }}
-        icon={<PlusOutlined className="icon-wrapper" />}
-      >
-        Create New Workspace
+            <div>
+              {teamInvites.length > 0 && TeamsInviteCountBadge}
+              <RightOutlined />
+            </div>
+          </div>
+        </Dropdown>
       </Menu.Item>
 
       {isWorkspaceMode ? (
         <>
+          <Divider className="ant-divider-margin workspace-divider" />
           <Menu.Item
             key="4"
             className="workspace-menu-item"
@@ -447,25 +538,22 @@ const WorkspaceSelector = ({ isCollapsed, handleMobileSidebarClose }) => {
     <>
       <WorkSpaceDropDown
         isCollapsed={isCollapsed}
+        handleSidebarCollapsed={handleSidebarCollapsed}
         menu={user.loggedIn ? menu : unauthenticatedUserMenu}
       />
 
-      {isModalOpen ? (
-        <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} />
-      ) : null}
+      {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 
-      <CreateWorkspaceModal
-        isOpen={isCreateWorkspaceModalOpen}
-        handleModalClose={handleCreateWorkspaceModalClose}
+      <JoinWorkspaceModal
+        teamInvites={teamInvites}
+        isOpen={isJoinWorkspaceModalOpen}
+        handleModalClose={handleJoinWorkspaceModalClose}
+        handleCreateNewWorkspaceClick={handleCreateWorkspaceFromJoinModal}
       />
 
-      {/* TODO: change "invite" terminology to "add" */}
-      {isWorkspaceMode ? (
-        <AddMemberModal
-          isOpen={isInviteModalOpen}
-          handleModalClose={handleInviteModalClose}
-        />
-      ) : null}
+      <CreateWorkspaceModal isOpen={isCreateWorkspaceModalOpen} handleModalClose={handleCreateWorkspaceModalClose} />
+
+      {isWorkspaceMode ? <AddMemberModal isOpen={isInviteModalOpen} handleModalClose={handleInviteModalClose} /> : null}
     </>
   );
 };

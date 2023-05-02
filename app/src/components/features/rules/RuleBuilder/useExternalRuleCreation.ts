@@ -27,10 +27,7 @@ const useExternalRuleCreation = (mode: string): void => {
   useEffect(() => {
     const onMessageReceived = (event: MessageEvent<PostMessageData>) => {
       const { author, action, payload } = event.data;
-      if (
-        author === REQUESTLY_POST_MESSAGE_AUTHOR &&
-        action === "ruleEditor:loadData"
-      ) {
+      if (author === REQUESTLY_POST_MESSAGE_AUTHOR && action === "ruleEditor:loadData") {
         const { ruleData, inputSelectorToFocus } = payload;
         setCurrentlySelectedRule(dispatch, ruleData);
         if (inputSelectorToFocus) {
@@ -69,10 +66,14 @@ const useExternalRuleCreation = (mode: string): void => {
 
   useEffect(() => {
     if (loaded && inputSelectorRefToFocus.current) {
-      const input = document.querySelector(
-        inputSelectorRefToFocus.current
-      ) as HTMLInputElement;
-      input?.focus();
+      setTimeout(() => {
+        const input = document.querySelector(inputSelectorRefToFocus.current) as HTMLInputElement;
+
+        if (input) {
+          input.focus();
+          input.selectionStart = input.value?.length;
+        }
+      }, 500); // sometimes app takes time to render the selected input
     }
   }, [loaded]);
 };

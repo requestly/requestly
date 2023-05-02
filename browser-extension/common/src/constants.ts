@@ -33,6 +33,7 @@ export const CLIENT_MESSAGES = {
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
+  ADD_EVENT: "addEvent",
 };
 
 export const STORAGE_TYPE = "local";
@@ -50,4 +51,9 @@ export const RULE_TITLES = {
   RESPONSE: "Modify API response",
   REQUEST: "Modify request body",
   DELAY: "Delay network requests",
+};
+
+export const STORAGE_KEYS = {
+  LAST_SYNCED_TS: "last-synced-ts",
+  LAST_UPDATED_TS: "last-updated-ts",
 };

@@ -1,6 +1,6 @@
 import React from "react";
 // COMPONENTS
-import ManualSetup from "../../../../components/mode-specific/desktop/ManualSetup";
+import ManualSetup from "../../../../components/mode-specific/desktop/ManualProxySetup";
 
 const ManualSetupView = () => {
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -8,41 +8,30 @@ import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode } from "utils/CodeEditorUtils";
+import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 
 const { Text } = Typography;
 
-const ResponseBodyRow = ({
-  rowIndex,
-  pair,
-  pairIndex,
-  helperFunctions,
-  ruleDetails,
-  isInputDisabled,
-}) => {
+const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const appMode = useSelector(getAppMode);
 
-  const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(
-    false
-  );
+  const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(false);
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
     pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
   );
   const [editorStaticValue, setEditorStaticValue] = useState(
-    pair.response.value
+    pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC && pair.response.value
   );
   const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
+  const codeFormattedFlag = useRef(null);
+
   const onChangeResponseType = (responseBodyType) => {
-    if (
-      Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(
-        responseBodyType
-      )
-    ) {
+    if (Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(responseBodyType)) {
       let value = "{}";
       if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
         value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
@@ -51,34 +40,22 @@ const ResponseBodyRow = ({
         setEditorStaticValue(value);
       }
 
-      modifyPairAtGivenPath(
-        null,
-        pairIndex,
-        `response.type`,
-        responseBodyType,
-        [
-          {
-            path: `response.value`,
-            value: value,
-          },
-        ]
-      );
+      modifyPairAtGivenPath(null, pairIndex, `response.type`, responseBodyType, [
+        {
+          path: `response.value`,
+          value: value,
+        },
+      ]);
     }
   };
 
   const handleFileSelectCallback = (selectedFile) => {
-    modifyPairAtGivenPath(
-      null,
-      pairIndex,
-      `response.type`,
-      GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
-      [
-        {
-          path: `response.value`,
-          value: selectedFile,
-        },
-      ]
-    );
+    modifyPairAtGivenPath(null, pairIndex, `response.type`, GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE, [
+      {
+        path: `response.value`,
+        value: selectedFile,
+      },
+    ]);
   };
 
   const showPopup = (e) => {
@@ -89,9 +66,7 @@ const ResponseBodyRow = ({
   };
 
   const renderFileSelector = () => {
-    if (
-      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE
-    ) {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
       return (
         <Row span={24} className="margin-top-one">
           <Col span={24} align="right">
@@ -108,7 +83,7 @@ const ResponseBodyRow = ({
   };
 
   const responseBodyChangeHandler = (value) => {
-    let triggerUnsavedChangesIndication = !isCodeFormatted;
+    let triggerUnsavedChangesIndication = !codeFormattedFlag.current;
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
@@ -122,7 +97,7 @@ const ResponseBodyRow = ({
           path: `response.value`,
           value:
             pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-              ? minifyCode(value)
+              ? processStaticDataBeforeSave(value)
               : value,
         },
       ],
@@ -131,19 +106,19 @@ const ResponseBodyRow = ({
   };
 
   const handleCodePrettifyToggle = () => {
-    if (isCodeMinified) {
-      setIsCodeMinified(false);
-    } else {
-      setIsCodeMinified(true);
+    if (!isCodeMinified) {
       setEditorStaticValue(minifyCode(editorStaticValue));
     }
+    setIsCodeMinified((isMinified) => !isMinified);
     handleCodeFormattedFlag();
   };
 
   const handleCodeFormattedFlag = () => {
     setIsCodeFormatted(true);
+    codeFormattedFlag.current = true;
     setTimeout(() => {
       setIsCodeFormatted(false);
+      codeFormattedFlag.current = false;
     }, 2000);
   };
 
@@ -156,12 +131,7 @@ const ResponseBodyRow = ({
   return (
     <React.Fragment key={rowIndex}>
       <div className="subtitle response-body-row-header">Response Body</div>
-      <Row
-        key={rowIndex}
-        span={24}
-        align="middle"
-        className="code-editor-header-row"
-      >
+      <Row key={rowIndex} span={24} align="middle" className="code-editor-header-row">
         <Col span={24}>
           <Popconfirm
             title="This will clear the existing body content"
@@ -180,31 +150,14 @@ const ResponseBodyRow = ({
               disabled={isInputDisabled}
               className="response-body-type-radio-group"
             >
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>
-                Static Data
-              </Radio>
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-                Dynamic (JavaScript)
-              </Radio>
-              {getAppDetails().app_mode ===
-              GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
+              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>Dynamic (JavaScript)</Radio>
+              {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
                 isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
-                  <Radio
-                    value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}
-                  >
-                    Local File
-                  </Radio>
+                  <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>
                 ) : (
-                  <Popover
-                    placement="left"
-                    content={
-                      "Update to latest version of app to enjoy this feature"
-                    }
-                  >
-                    <Radio
-                      value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}
-                      disabled={true}
-                    >
+                  <Popover placement="left" content={"Update to latest version of app to enjoy this feature"}>
+                    <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE} disabled={true}>
                       Local File
                     </Radio>
                   </Popover>
@@ -215,8 +168,7 @@ const ResponseBodyRow = ({
         </Col>
       </Row>
       {renderFileSelector()}
-      {pair.response.type !==
-      GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
+      {pair.response.type !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
         <>
           <Row
             span={24}
@@ -228,54 +180,33 @@ const ResponseBodyRow = ({
             <Col xl="12" span={24}>
               <CodeEditor
                 key={pair.response.type}
-                language={
-                  pair.response.type ===
-                  GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
-                    ? "javascript"
-                    : "json"
-                }
+                language={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json"}
                 value={
-                  pair.response.type ===
-                  GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
                     ? editorStaticValue
                     : pair.response.value
                 }
                 defaultValue={
-                  pair.response.type ===
-                    GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC &&
+                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC &&
                   appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION
                     ? "{}"
                     : null
                 }
                 handleChange={responseBodyChangeHandler}
                 readOnly={isInputDisabled}
-                validation={
-                  pair.response.type ===
-                  GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-                    ? "off"
-                    : "editable"
-                }
+                validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
                 unlockJsonPrettify={true}
                 isCodeMinified={isCodeMinified}
                 isCodeFormatted={isCodeFormatted}
               />
             </Col>
           </Row>
-          <Row
-            align="middle"
-            justify="space-between"
-            className="code-editor-character-count-row "
-          >
+          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
             <Col align="left">
-              {pair.response.type ===
-              GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
+              {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
                 <>
                   <Button type="link" onClick={handleCodePrettifyToggle}>
-                    {isCodeMinified ? (
-                      <span>Pretty Print {"{ }"}</span>
-                    ) : (
-                      <span>View Raw</span>
-                    )}
+                    {isCodeMinified ? <span>Pretty Print {"{ }"}</span> : <span>View Raw</span>}
                   </Button>
                 </>
               ) : (

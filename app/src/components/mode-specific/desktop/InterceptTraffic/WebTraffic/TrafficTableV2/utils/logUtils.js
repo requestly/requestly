@@ -56,9 +56,7 @@ const convertHarJsonToRQLog = (har) => {
       contentType: response?.content?.mimeType,
       // Hack to fix dictionary coming into body
       body:
-        typeof response?.content?.text == "string"
-          ? response?.content?.text
-          : JSON.stringify(response?.content?.text),
+        typeof response?.content?.text == "string" ? response?.content?.text : JSON.stringify(response?.content?.text),
     },
     requestShellCurl: "",
     actions: [],
@@ -66,4 +64,8 @@ const convertHarJsonToRQLog = (har) => {
   };
 
   return rqLog;
+};
+
+export const getSortedMenuItems = (items, key) => {
+  return [...(items ?? [])].sort((a, b) => (a[key].trim() < b[key].trim() ? -1 : 1));
 };

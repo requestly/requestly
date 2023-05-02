@@ -8,21 +8,14 @@ interface PopupFooterProps {
   handleToggleExtensionStatus: () => void;
 }
 
-const PopupFooter: React.FC<PopupFooterProps> = ({
-  isExtensionEnabled,
-  handleToggleExtensionStatus,
-}) => {
+const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
   return (
     <Row align="middle" className="popup-footer">
       {isExtensionEnabled ? (
         <SessionRecordingView />
       ) : (
         <>
-          <Button
-            danger
-            className="popup-footer-resume-btn"
-            onClick={handleToggleExtensionStatus}
-          >
+          <Button danger className="popup-footer-resume-btn" onClick={handleToggleExtensionStatus}>
             <PlayIcon />
             <span className="popup-footer-resume-btn-text">Resume</span>
           </Button>

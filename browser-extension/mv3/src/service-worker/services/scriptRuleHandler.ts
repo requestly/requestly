@@ -5,19 +5,13 @@ import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";
 
-export const applyScriptRules = async (
-  tabId: number,
-  frameId: number,
-  url: string
-) => {
+export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
     return;
   }
 
   const enabledRules = await getEnabledRules();
-  const scriptRules = enabledRules.filter(
-    (rule) => rule.ruleType === RuleType.SCRIPT
-  );
+  const scriptRules = enabledRules.filter((rule) => rule.ruleType === RuleType.SCRIPT);
   const scripts: ScriptObject[] = [];
 
   const appliedScriptRuleIds = new Set<string>();

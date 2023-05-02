@@ -12,22 +12,12 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
-export const setIsCurrentlySelectedRuleHasUnsavedChanges = (
-  dispatch,
-  hasUnsavedChanges
-) => {
-  dispatch(
-    actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges)
-  );
+export const setIsCurrentlySelectedRuleHasUnsavedChanges = (dispatch, hasUnsavedChanges) => {
+  dispatch(actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
 };
 
-export const setCurrentlySelectedRule = (
-  dispatch,
-  newRule,
-  warnForUnsavedChanges = false
-) => {
-  const { MODE } = getModeData(new URL(window.location.href));
-  if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT && warnForUnsavedChanges) {
+export const setCurrentlySelectedRule = (dispatch, newRule, warnForUnsavedChanges = false) => {
+  if (warnForUnsavedChanges) {
     setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
   }
 
@@ -74,16 +64,14 @@ export const initiateBlankCurrentlySelectedRule = (
       blankRuleFormat.version = currentlySelectedRuleConfig.VERSION;
     }
 
-    if (
-      isExtensionManifestVersion3() &&
-      "REMOVE_CSP_HEADER" in currentlySelectedRuleConfig
-    ) {
-      blankRuleFormat.removeCSPHeader =
-        currentlySelectedRuleConfig.REMOVE_CSP_HEADER;
+    if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in currentlySelectedRuleConfig) {
+      blankRuleFormat.removeCSPHeader = currentlySelectedRuleConfig.REMOVE_CSP_HEADER;
     }
 
     blankRuleFormat.pairs.push(getEmptyPairUsingRuleType(RULE_TYPE_TO_CREATE));
     setCurrentlySelectedRule(dispatch, blankRuleFormat);
+
+    return blankRuleFormat;
   }
 };
 

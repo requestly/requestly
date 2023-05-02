@@ -17,18 +17,12 @@ const WorkspaceStatusSyncing = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // Component State
-  const [syncRuleStatus, setSyncRuleStatus] = useState(
-    localStorage.getItem("syncRuleStatus") === "true" || false
-  );
+  const [syncRuleStatus, setSyncRuleStatus] = useState(localStorage.getItem("syncRuleStatus") === "true" || false);
 
   const handleToggleStatusSyncing = async () => {
     const triggerSync = async () => {
       const syncNodeRef = getNodeRef(
-        getRecordsSyncPath(
-          "teamSync",
-          user.details.profile.uid,
-          currentlyActiveWorkspace.id
-        )
+        getRecordsSyncPath("teamSync", user.details.profile.uid, currentlyActiveWorkspace.id)
       );
 
       const syncNodeRefNode = await get(syncNodeRef);

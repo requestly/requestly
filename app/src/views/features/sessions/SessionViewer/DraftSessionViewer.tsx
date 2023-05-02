@@ -1,35 +1,16 @@
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import {
-  Button,
-  Checkbox,
-  Col,
-  Input,
-  Modal,
-  Row,
-  Space,
-  Tooltip,
-  Typography,
-} from "antd";
+import { Button, Checkbox, Col, Input, Modal, Row, Space, Tooltip, Typography } from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
-import {
-  RQSession,
-  RQSessionEvents,
-  RQSessionEventType,
-  RRWebEventData,
-} from "@requestly/web-sdk";
+import { RQSession, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
-import {
-  compressEvents,
-  filterOutConsoleLogs,
-  filterOutLargeNetworkResponses,
-} from "./sessionEventsUtils";
+import { compressEvents, filterOutConsoleLogs, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionNamed,
@@ -59,10 +40,7 @@ import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.s
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
-const defaultDebugInfo: CheckboxValueType[] = [
-  "includeNetworkLogs",
-  "includeConsoleLogs",
-];
+const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -80,9 +58,7 @@ const DraftSessionViewer: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
-  const [includedDebugInfo, setIncludedDebugInfo] = useState<
-    CheckboxValueType[]
-  >(defaultDebugInfo);
+  const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -147,9 +123,7 @@ const DraftSessionViewer: React.FC = () => {
       }
 
       if (options.includeConsoleLogs === false) {
-        const filteredRRWebEvent = filterOutConsoleLogs(
-          sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]
-        );
+        const filteredRRWebEvent = filterOutConsoleLogs(sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]);
         filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
       }
 
@@ -210,10 +184,7 @@ const DraftSessionViewer: React.FC = () => {
       if (response?.success) {
         setIsSaveModalVisible(false);
         toast.success("Recording saved successfully");
-        trackDraftSessionSaved(
-          sessionAttributes.duration,
-          recordingOptionsToSave
-        );
+        trackDraftSessionSaved(sessionAttributes.duration, recordingOptionsToSave);
         navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
           replace: true,
           state: { fromApp: true, viewAfterSave: true },
@@ -269,7 +240,7 @@ const DraftSessionViewer: React.FC = () => {
   return isLoading ? (
     <PageLoader message="Loading session details..." />
   ) : loadingError ? (
-    <PageError message="Something went wrong. Please contact the support." />
+    <PageError />
   ) : (
     <div className="session-viewer-page">
       <div className="session-viewer-header">
@@ -278,11 +249,7 @@ const DraftSessionViewer: React.FC = () => {
         </Typography.Title>
         <div className="session-viewer-actions">
           <Button onClick={confirmDiscard}>Discard</Button>
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            onClick={() => setIsSaveModalVisible(true)}
-          >
+          <Button type="primary" icon={<SaveOutlined />} onClick={() => setIsSaveModalVisible(true)}>
             Save Session
           </Button>
           <Modal
@@ -311,12 +278,7 @@ const DraftSessionViewer: React.FC = () => {
                   <p>Information to include in session:</p>
                 </Col>
                 <Col className="session-metadata-tooltip-icon">
-                  <Tooltip
-                    title={
-                      "This setting cannot be updated once the session is saved."
-                    }
-                    placement="right"
-                  >
+                  <Tooltip title={"This setting cannot be updated once the session is saved."} placement="right">
                     <QuestionMarkIcon />
                   </Tooltip>
                 </Col>

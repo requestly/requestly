@@ -10,10 +10,7 @@ const ShareButton = ({ appDetails }) => {
 
   return (
     <>
-      <Tooltip
-        title="Share app with teammates and debug together"
-        placement="right"
-      >
+      <Tooltip title="Share app with teammates and debug together" placement="right">
         <Button
           type="primary"
           icon={<ShareAltOutlined />}

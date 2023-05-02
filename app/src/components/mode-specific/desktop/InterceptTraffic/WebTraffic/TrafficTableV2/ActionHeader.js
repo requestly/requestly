@@ -1,16 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
 import {
-  Row,
-  Col,
-  Input,
-  Radio,
-  Typography,
-  Space,
-  Button,
-  Tooltip,
-} from "antd";
-import {
+  CaretRightOutlined,
   ClearOutlined,
+  PauseOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
@@ -21,40 +14,25 @@ const { Text } = Typography;
 
 const ActionHeader = ({
   handleOnSearchChange,
-  groupByParameter,
-  handleOnGroupParameterChange,
   clearLogs,
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
+  setIsInterceptingTraffic,
 }) => {
   return (
     <Row
       align="middle"
       style={{
-        marginBottom: 6,
-        marginTop: 6,
         padding: 3,
         paddingLeft: "24px",
-        paddingRight: "24px",
+        paddingRight: "12px",
       }}
     >
       <Space direction="horizontal">
         <Col>
-          <Typography.Text strong>Group by:</Typography.Text>
-        </Col>
-        <Col>
-          <Radio.Group
-            onChange={handleOnGroupParameterChange}
-            value={groupByParameter}
-          >
-            <Radio value={"app"}>App Name</Radio>
-            <Radio value={"domain"}>Domain</Radio>
-            <Radio value={"none"}>None</Radio>
-          </Radio.Group>
-        </Col>
-        <Col>
           <Input.Search
+            className="action-header-input"
             placeholder="Input Search Keyword"
             onChange={handleOnSearchChange}
             style={{ width: 300 }}
@@ -62,12 +40,7 @@ const ActionHeader = ({
         </Col>
         <Col>
           <Tooltip placement="top" title="Clear Logs">
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<ClearOutlined />}
-              onClick={() => clearLogs()}
-            />
+            <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
           </Tooltip>
         </Col>
         {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
@@ -85,12 +58,7 @@ const ActionHeader = ({
         {showDeviceSelector ? (
           <>
             <Col>
-              <Button
-                onClick={showDeviceSelector}
-                shape="circle"
-                danger
-                type="primary"
-              >
+              <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
                 <SettingOutlined />
               </Button>
             </Col>
@@ -99,9 +67,48 @@ const ActionHeader = ({
             </Col>
           </>
         ) : null}
+        <Col>
+          <PauseAndPlayButton
+            defaultIsPaused={false}
+            onChange={(isPaused) => {
+              console.log("isPaused", isPaused);
+              setIsInterceptingTraffic(!isPaused);
+            }}
+          />
+        </Col>
       </Space>
     </Row>
   );
 };
 
 export default ActionHeader;
+
+function PauseAndPlayButton({ defaultIsPaused, onChange }) {
+  const [isPaused, setIsPaused] = useState(defaultIsPaused);
+  return (
+    <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
+      {isPaused ? (
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<CaretRightOutlined />}
+          onClick={() => {
+            setIsPaused(false);
+            onChange(false); // isPaused
+          }}
+        />
+      ) : (
+        <Button
+          type="primary"
+          shape="circle"
+          danger
+          icon={<PauseOutlined />}
+          onClick={() => {
+            setIsPaused(true);
+            onChange(true); // isPaused
+          }}
+        />
+      )}
+    </Tooltip>
+  );
+}
