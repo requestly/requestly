@@ -9,6 +9,7 @@ import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 
@@ -148,7 +149,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
         startWalkthrough={!isTrafficTableTourCompleted}
-        onTourComplete={() => dispatch(actions.updateTrafficTableTourCompleted({}))}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
       {renderTable()}
     </>
