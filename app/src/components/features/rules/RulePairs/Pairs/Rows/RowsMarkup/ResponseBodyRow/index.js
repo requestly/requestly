@@ -9,11 +9,14 @@ import FEATURES from "config/constants/sub/features";
 import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
+import { getModeData } from "components/features/rules/RuleBuilder/actions";
+import APP_CONSTANTS from "config/constants";
 
 const { Text } = Typography;
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
+  const { MODE } = getModeData(window.location);
 
   const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(false);
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
@@ -127,10 +130,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+        return "{}";
+      }
       return pair.response.value ?? "{}";
     }
     return null;
-  }, [pair.response.type, pair.response.value]);
+  }, [MODE, pair.response.type, pair.response.value]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
