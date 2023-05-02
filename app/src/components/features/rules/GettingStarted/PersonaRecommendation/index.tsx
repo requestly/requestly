@@ -33,7 +33,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
   ]);
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
-    trackPersonaRecommendationSkipped("screen");
+    trackPersonaRecommendationSkipped();
 
     navigate(
       //@ts-ignore

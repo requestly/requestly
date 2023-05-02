@@ -2,6 +2,19 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.4.25",
+    logs: [
+      {
+        title: "Bug fix: Rule status toggled from extension popup gets reverted on opening app",
+        link: "https://github.com/requestly/requestly/issues/540",
+      },
+      {
+        title: "Bug fix: UI app breaks due to some rules matching requests originated from app",
+        link: "https://github.com/requestly/requestly/issues/551",
+      },
+    ],
+  },
+  {
     version: "23.4.5",
     logs: [
       {

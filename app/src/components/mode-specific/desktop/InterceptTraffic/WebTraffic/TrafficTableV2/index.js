@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
+import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { isEqual, sortBy } from "lodash";
 import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals } from "store/selectors";
+import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
@@ -21,7 +21,7 @@ import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-t
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
-import { trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import { trackTrafficTableLogsCleared, trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import {
   trackSidebarFilterCollapsed,
   trackSidebarFilterExpanded,
@@ -29,6 +29,7 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
+import { getConnectedAppsCount } from "utils/Misc";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -43,6 +44,7 @@ const CurrentTrafficTable = ({
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
+  const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
@@ -56,6 +58,8 @@ const CurrentTrafficTable = ({
   const [searchKeyword, setSearchKeyword] = useState("");
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
+
+  const [isInterceptingTraffic, setIsInterceptingTraffic] = useState(true);
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
@@ -199,6 +203,7 @@ const CurrentTrafficTable = ({
     // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
+    trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
 
     if (clearLogsCallback) clearLogsCallback();
   };
@@ -222,18 +227,22 @@ const CurrentTrafficTable = ({
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
-      // TODO: @sahil865gupta Fix this multiple time registering
-      upsertNetworkLogMap(payload);
+      if (isInterceptingTraffic) {
+        // TODO: @sahil865gupta Fix this multiple time registering
+        upsertNetworkLogMap(payload);
+      }
     });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
-      const rqLog = convertProxyLogToUILog(payload);
+      if (isInterceptingTraffic) {
+        const rqLog = convertProxyLogToUILog(payload);
 
-      printLogsToConsole(rqLog);
+        printLogsToConsole(rqLog);
 
-      if (isTablePeristenceEnabled) {
-        saveLogInRedux(rqLog);
-      } else {
-        upsertNetworkLogMap(rqLog);
+        if (isTablePeristenceEnabled) {
+          saveLogInRedux(rqLog);
+        } else {
+          upsertNetworkLogMap(rqLog);
+        }
       }
     });
 
@@ -244,7 +253,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -314,7 +323,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
+    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -324,6 +333,7 @@ const CurrentTrafficTable = ({
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}
         emptyDesc={emptyDesc}
+        searchKeyword={searchKeyword}
       />
     );
   };
@@ -461,6 +471,7 @@ const CurrentTrafficTable = ({
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
+              setIsInterceptingTraffic={setIsInterceptingTraffic}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
@@ -471,7 +482,6 @@ const CurrentTrafficTable = ({
             dragInterval={20}
             direction="vertical"
             cursor="row-resize"
-            style={{ height: "75vh" }}
             className="traffic-table-split-container"
           >
             <Row className="gap-case-1" style={{ overflow: "hidden" }}>
@@ -479,7 +489,7 @@ const CurrentTrafficTable = ({
                 className="primary-card github-like-border network-table-wrapper-override"
                 style={{
                   boxShadow: "none",
-                  borderBottom: "2px solid #f5f5f5",
+                  // borderBottom: "2px solid #f5f5f5",
                   borderRadius: "0",
                   paddingBottom: "0",
                 }}
@@ -494,7 +504,7 @@ const CurrentTrafficTable = ({
                 style={{
                   boxShadow: "none",
                   borderRadius: "0",
-                  borderTop: "2px solid #f5f5f5",
+                  // borderTop: "2px solid #f5f5f5",
                 }}
                 bodyStyle={{ padding: "0px 20px" }}
               >
@@ -510,14 +520,6 @@ const CurrentTrafficTable = ({
               </ProCard>
             </Row>
           </Split>
-
-          <Alert
-            closable
-            showIcon
-            type="info"
-            message="Network logger works only when you are on this page."
-            style={{ paddingLeft: "24px", paddingRight: "24px", margin: "1rem 0 1rem 1.25rem" }}
-          />
 
           {/* ssl proxying is currently hidden */}
           <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />

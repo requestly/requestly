@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
@@ -15,6 +14,7 @@ import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modul
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
 
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const { PATHS } = APP_CONSTANTS;
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
@@ -24,13 +24,12 @@ const GettingStarted = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-
+  const appMode = useSelector(getAppMode);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const isFeatureflagOn = useFeatureIsOn("persona_recommendation");
-  const isPersonaRecommendationFlagOn = isFeatureflagOn && state?.src === "persona_survey_modal";
+  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -93,7 +92,7 @@ const GettingStarted = () => {
 
   return (
     <>
-      {isPersonaRecommendationFlagOn ? (
+      {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
         <Row className="getting-started-container">

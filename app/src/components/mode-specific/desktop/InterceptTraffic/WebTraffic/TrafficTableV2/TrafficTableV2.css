@@ -82,6 +82,10 @@
   font-size: 12px;
 }
 
+.traffic-table-split-container {
+  height: calc(100vh - 122px);
+}
+
 .traffic-table-split-container .gutter-vertical,
 .traffic-table-split-container .ant-row.request-log-pane-container {
   margin-left: 1.25rem;
