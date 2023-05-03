@@ -7,6 +7,8 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { VscRegex } from "react-icons/vsc";
+import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -19,7 +21,60 @@ const ActionHeader = ({
   showDeviceSelector,
   deviceId,
   setIsInterceptingTraffic,
+  isRegexSearchActive,
+  setIsRegexSearchActive,
 }) => {
+  const renderSearchInput = () => {
+    if (isRegexSearchActive) {
+      return (
+        <Input.Search
+          className="action-header-input"
+          placeholder="Input RegEx"
+          onChange={handleOnSearchChange}
+          prefix={<span className="text-gray">{"/"}</span>}
+          suffix={
+            <>
+              <span className="text-gray">{"/"}</span>
+              &nbsp;
+              <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
+                <RQButton
+                  className={`traffic-table-regex-btn ${
+                    isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
+                  }`}
+                  onClick={() => setIsRegexSearchActive((prev) => !prev)}
+                  iconOnly
+                  icon={<VscRegex />}
+                />
+              </Tooltip>
+            </>
+          }
+          style={{ width: 300 }}
+        />
+      );
+    }
+
+    return (
+      <Input.Search
+        className="action-header-input"
+        placeholder="Input Search Keyword"
+        onChange={handleOnSearchChange}
+        suffix={
+          <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
+            <RQButton
+              className={`traffic-table-regex-btn ${
+                isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
+              }`}
+              onClick={() => setIsRegexSearchActive((prev) => !prev)}
+              iconOnly
+              icon={<VscRegex />}
+            />
+          </Tooltip>
+        }
+        style={{ width: 300 }}
+      />
+    );
+  };
+
   return (
     <Row
       align="middle"
@@ -30,14 +85,7 @@ const ActionHeader = ({
       }}
     >
       <Space direction="horizontal">
-        <Col>
-          <Input.Search
-            className="action-header-input"
-            placeholder="Input Search Keyword"
-            onChange={handleOnSearchChange}
-            style={{ width: 300 }}
-          />
-        </Col>
+        <Col>{renderSearchInput()}</Col>
         <Col>
           <Tooltip placement="top" title="Clear Logs">
             <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />

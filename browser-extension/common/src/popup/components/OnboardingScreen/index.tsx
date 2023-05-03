@@ -3,6 +3,7 @@ import { Button, Col, Row, Typography } from "antd";
 import config from "../../../config";
 import { icons } from "../../ruleTypeIcons";
 import "./onboardingScreen.css";
+import { EVENT, sendEvent } from "../../events";
 
 interface RuleSelectorProps {
   editorLink: string;
@@ -80,6 +81,7 @@ const OnboardingScreen: React.FC = () => {
           className="watch-demo-link"
           type="text"
           onClick={() => {
+            sendEvent(EVENT.WATCH_DEMO_VIDEO_CLICKED);
             window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
           }}
         >

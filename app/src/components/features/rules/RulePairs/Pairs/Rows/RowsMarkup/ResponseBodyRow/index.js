@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getAppMode } from "../../../../../../../../store/selectors";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
 import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
@@ -11,12 +9,14 @@ import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
+import { getModeData } from "components/features/rules/RuleBuilder/actions";
+import APP_CONSTANTS from "config/constants";
 
 const { Text } = Typography;
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
-  const appMode = useSelector(getAppMode);
+  const { MODE } = getModeData(window.location);
 
   const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(false);
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
@@ -119,6 +119,22 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
     }, 2000);
   };
 
+  const getEditorDefaultValue = useCallback(() => {
+    // handle unsaved changes trigger
+    codeFormattedFlag.current = true;
+    setTimeout(() => {
+      codeFormattedFlag.current = false;
+    }, 2000);
+
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+        return "{}";
+      }
+      return pair.response.value ?? "{}";
+    }
+    return null;
+  }, [MODE, pair.response.type, pair.response.value]);
+
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
@@ -183,12 +199,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
                     ? editorStaticValue
                     : pair.response.value
                 }
-                defaultValue={
-                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC &&
-                  appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION
-                    ? "{}"
-                    : null
-                }
+                defaultValue={getEditorDefaultValue()}
                 handleChange={responseBodyChangeHandler}
                 readOnly={isInputDisabled}
                 validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
