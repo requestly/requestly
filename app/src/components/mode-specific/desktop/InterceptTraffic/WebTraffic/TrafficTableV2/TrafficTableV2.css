@@ -94,3 +94,8 @@
 .traffic-table-split-container .ant-row.request-log-pane-container {
   margin-left: 1.25rem;
 }
+
+/* table */
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"] {
+  background-color: #1e69ffdb;
+}
