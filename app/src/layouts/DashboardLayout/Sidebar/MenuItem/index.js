@@ -38,7 +38,7 @@ const givenRoutes = [
     key: "my-mocks",
   },
   {
-    path: PATHS.APIS.ABSOLUTE,
+    path: PATHS.API_CLIENT.ABSOLUTE,
     name: "API Client",
     icon: <ApiOutlined />,
     key: "apis",

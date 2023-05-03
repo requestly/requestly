@@ -58,7 +58,7 @@ import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreat
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
-import APIsView from "views/features/apis/APIsView";
+import APIClientContainer from "views/features/apis/APIClientContainer";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -523,12 +523,12 @@ var routes = [
     icon: "ni ni-lock-circle-open text-red",
     component: MockListView,
   },
-  /** APIs */
+  /** API Client */
   {
-    path: PATHS.APIS.RELATIVE,
+    path: PATHS.API_CLIENT.RELATIVE,
     name: "API Client",
     icon: "ni ni-lock-circle-open text-red",
-    component: APIsView,
+    component: APIClientContainer,
   },
   /*******/
   {

@@ -1,10 +1,10 @@
-.apis-view-sidebar {
+.api-client-sidebar {
   flex: 0 0 auto;
   border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
 
-  .apis-view-sidebar-placeholder {
+  .api-client-sidebar-placeholder {
     height: 100%;
     width: 100%;
     display: flex;
@@ -14,7 +14,7 @@
     align-items: center;
   }
 
-  .api-view-sidebar-header {
+  .api-client-sidebar-header {
     flex: 0 0 auto;
     border-bottom: 1px solid var(--border-dark);
     padding: 8px 5px;

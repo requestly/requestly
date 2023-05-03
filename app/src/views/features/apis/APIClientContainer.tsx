@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from "react";
-import APIsViewSidebar from "./sidebar/APIsViewSidebar";
+import APIClientSidebar from "./sidebar/APIClientSidebar";
 import APIClientView from "./client/APIClientView";
 import { RQAPI } from "./types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
-import "./apis.scss";
 import { Input, Modal } from "antd";
 import { getEmptyAPIEntry, parseCurlRequest } from "./apiUtils";
 import { toast } from "utils/Toast";
+import "./apiClientContainer.scss";
 
 interface Props {}
 
-const APIsView: React.FC<Props> = () => {
+const APIClientContainer: React.FC<Props> = () => {
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -48,8 +48,8 @@ const APIsView: React.FC<Props> = () => {
   }, [addToHistory]);
 
   return (
-    <div className="apis-view">
-      <APIsViewSidebar
+    <div className="api-client-container">
+      <APIClientSidebar
         history={history}
         clearHistory={clearHistory}
         onSelectionFromHistory={setSelectedEntry}
@@ -78,4 +78,4 @@ const APIsView: React.FC<Props> = () => {
   );
 };
 
-export default APIsView;
+export default APIClientContainer;
