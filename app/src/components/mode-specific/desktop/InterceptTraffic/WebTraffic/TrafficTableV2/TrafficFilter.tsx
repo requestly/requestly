@@ -3,20 +3,29 @@ import { Select, Space } from "antd";
 
 interface FilterProps {
   filterId: string;
+  filterLabel: string;
   filterPlaceholder: string;
   options: [];
   handleFilterChange?: (options: []) => void;
 }
 
-export const TrafficFilter: React.FC<FilterProps> = ({ filterId, filterPlaceholder, options, handleFilterChange }) => {
+export const TrafficFilter: React.FC<FilterProps> = ({
+  filterId,
+  filterLabel,
+  filterPlaceholder,
+  options,
+  handleFilterChange,
+}) => {
   return (
     <Space direction="vertical">
-      <label htmlFor={filterId} style={{ marginLeft: 25 }}>
-        Status code:
+      <label htmlFor={filterId} className="traffic-table-filter-label" style={{ marginLeft: 25 }}>
+        {filterLabel}
       </label>
       <Select
+        allowClear
+        maxTagCount="responsive"
         id={filterId}
-        style={{ width: 220, marginLeft: 25 }}
+        className="traffic-table-filter-select"
         mode="multiple"
         placeholder={filterPlaceholder}
         options={options}

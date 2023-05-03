@@ -11,6 +11,7 @@ import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
+import { TrafficFilter } from "./TrafficFilter";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
@@ -31,6 +32,9 @@ import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
 import { isRegexFormat } from "utils/rules/misc";
+import { STATUS_CODE_OPTIONS } from "config/constants/sub/statusCode";
+import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -513,9 +517,31 @@ const CurrentTrafficTable = ({
               setIsInterceptingTraffic={setIsInterceptingTraffic}
               setIsRegexSearchActive={setIsRegexSearchActive}
               isRegexSearchActive={isRegexSearchActive}
-              setLogFilters={setLogFilters}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
+          </Row>
+          <Row className="traffic-table-filters-container">
+            <TrafficFilter
+              filterId="filter-status-code"
+              filterLabel="Status code"
+              filterPlaceholder="filter by status code"
+              options={STATUS_CODE_OPTIONS}
+              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+            />
+            <TrafficFilter
+              filterId="filter-method"
+              filterLabel="Method"
+              filterPlaceholder="filter by method"
+              options={METHOD_TYPE_OPTIONS}
+              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
+            />
+            <TrafficFilter
+              filterId="filter-resource-type"
+              filterLabel="Resource type"
+              filterPlaceholder="filter by resource type"
+              options={CONTENT_TYPE_OPTIONS}
+              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+            />
           </Row>
           <Split
             sizes={rulePaneSizes}

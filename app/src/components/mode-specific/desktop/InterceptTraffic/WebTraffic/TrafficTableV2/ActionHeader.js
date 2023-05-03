@@ -11,8 +11,6 @@ import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { TrafficFilter } from "./TrafficFilter";
-import { STATUS_CODE_OPTIONS } from "config/constants/sub/statusCode";
 
 const { Text } = Typography;
 
@@ -25,7 +23,6 @@ const ActionHeader = ({
   setIsInterceptingTraffic,
   isRegexSearchActive,
   setIsRegexSearchActive,
-  setLogFilters,
 }) => {
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -130,14 +127,6 @@ const ActionHeader = ({
           </Col>
         </Space>
       </Row>
-      <Col span={24}>
-        <TrafficFilter
-          filterId="filter-status-code"
-          filterPlaceholder="filter status code"
-          options={STATUS_CODE_OPTIONS}
-          handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
-        />
-      </Col>
     </>
   );
 };
