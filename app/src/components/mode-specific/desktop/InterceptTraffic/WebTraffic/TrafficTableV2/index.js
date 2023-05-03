@@ -31,8 +31,6 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
-import { getConnectedAppsCount } from "utils/Misc";
-import { isRegexFormat } from "utils/rules/misc";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -352,6 +350,7 @@ const CurrentTrafficTable = ({
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
+          searchKeyword={searchKeyword}
         />
       );
     },
