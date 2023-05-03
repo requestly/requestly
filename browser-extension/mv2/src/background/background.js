@@ -1276,9 +1276,9 @@ BG.Methods.getAPIResponse = async (apiRequest, fetchOptions = {}) => {
     headers.append(key, value);
   });
 
-  if (apiRequest.contentType === "application/x-www-form-urlencoded") {
+  if (!["GET", "HEAD"].includes(method) && apiRequest.contentType === "application/x-www-form-urlencoded") {
     const formData = new FormData();
-    body.forEach(({ key, value }) => {
+    body?.forEach(({ key, value }) => {
       formData.append(key, value);
     });
     body = new URLSearchParams(formData);
