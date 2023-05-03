@@ -1,7 +1,7 @@
 import React, { ReactNode, useCallback } from "react";
 import { Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { trackMoreInfoShown, trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
+import { trackMoreInfoViewed } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 
@@ -11,23 +11,36 @@ interface InfoProps {
   showIcon: boolean;
   source: string;
   analyticsContext: string;
+  trigger?: boolean;
+  keepActive?: boolean;
+  tooltipOpenedCallback?: () => void;
 }
 
-export const MoreInfo: React.FC<InfoProps> = ({ children, text, showIcon, source, analyticsContext }) => {
+export const MoreInfo: React.FC<InfoProps> = ({
+  children,
+  text,
+  showIcon,
+  source,
+  analyticsContext,
+  trigger = true,
+  keepActive = false, // flag for keeping a toolip/icon active even if experiment is not assigned
+  tooltipOpenedCallback = () => {},
+}) => {
   const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
-  const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip";
+  const isMoreInfoActive = redirectRuleOnboardingExp === "tooltip" || keepActive;
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
-      if (isOpen) trackMoreInfoViewed(analyticsContext, source);
+      if (isOpen) {
+        trackMoreInfoViewed(analyticsContext, source);
+        tooltipOpenedCallback();
+      }
     },
-    [analyticsContext, source]
+    [analyticsContext, source, tooltipOpenedCallback]
   );
 
   if (!isMoreInfoActive) {
     return <>{children}</>;
-  } else {
-    trackMoreInfoShown(analyticsContext, source);
   }
 
   return showIcon ? (
@@ -35,7 +48,7 @@ export const MoreInfo: React.FC<InfoProps> = ({ children, text, showIcon, source
       {children}
       <Tooltip
         title={text}
-        trigger={isMoreInfoActive ? ["hover", "focus"] : [null]}
+        trigger={trigger && isMoreInfoActive ? ["hover", "focus"] : [null]}
         onOpenChange={handleOpenChange}
         showArrow={false}
         overlayInnerStyle={{ width: "300px" }}
@@ -46,7 +59,7 @@ export const MoreInfo: React.FC<InfoProps> = ({ children, text, showIcon, source
   ) : (
     <Tooltip
       title={text}
-      trigger={isMoreInfoActive ? ["hover", "focus"] : [null]}
+      trigger={trigger && isMoreInfoActive ? ["hover", "focus"] : [null]}
       onOpenChange={handleOpenChange}
       showArrow={false}
       overlayInnerStyle={{ width: "300px" }}
