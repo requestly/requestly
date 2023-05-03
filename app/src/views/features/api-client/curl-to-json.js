@@ -162,12 +162,14 @@ const convertToJson = (curl_request) => {
 
       case "u":
       case "user":
-        // json.headers["Authorization"] = argvs[argv];
-        const [username, password] = argvs[argv].split(":");
-        json.auth = { user: username, pass: password };
-        // var authTypeUsed = false;
-        if (!authTypeUsed) {
-          json.auth_type = "basic";
+        {
+          // json.headers["Authorization"] = argvs[argv];
+          const [username, password] = argvs[argv].split(":");
+          json.auth = { user: username, pass: password };
+          // var authTypeUsed = false;
+          if (!authTypeUsed) {
+            json.auth_type = "basic";
+          }
         }
 
         break;

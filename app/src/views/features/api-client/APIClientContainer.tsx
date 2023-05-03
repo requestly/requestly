@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import APIClientSidebar from "./sidebar/APIClientSidebar";
-import APIClientView from "./client/APIClientView";
+import APIClientView from "./client-view/APIClientView";
 import { RQAPI } from "./types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
 import { Input, Modal } from "antd";

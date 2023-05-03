@@ -102,7 +102,7 @@ const APIClientSidebar: React.FC<Props> = ({
           items={menuItems}
         />
       ) : (
-        <div className="apis-view-sidebar-placeholder">
+        <div className="api-client-sidebar-placeholder">
           <img src={placeholderImage} alt="empty" />
           <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
         </div>

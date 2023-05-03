@@ -32,7 +32,7 @@ export const addUrlSchemeIfMissing = (url: string): string => {
 export const getEmptyAPIEntry = (): RQAPI.Entry => {
   return {
     request: {
-      url: "https://user36644.requestly.dev/test-mock-api",
+      url: "https://app.requestly.io/echo",
       queryParams: [],
       method: RequestMethod.GET,
       headers: [],

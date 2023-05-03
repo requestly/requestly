@@ -1,4 +1,4 @@
-import { RequestMethod } from "views/features/apis/types";
+import { RequestMethod } from "views/features/api-client/types";
 
 export interface APIClientRequest {
   url: string;
