@@ -26,6 +26,8 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   label: method,
 }));
 
+const CONTENT_TYPE_HEADER = "Content-Type";
+
 const EMPTY_FAVICON_URL =
   "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16";
 
@@ -66,6 +68,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
       if (!supportsRequestBody(method)) {
         newEntry.request.body = null;
+        newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
+        newEntry.request.contentType = RequestContentType.RAW;
       }
       return newEntry;
     });
@@ -110,8 +114,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
           contentType,
         },
       };
-
-      const CONTENT_TYPE_HEADER = "Content-Type";
 
       const headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
 

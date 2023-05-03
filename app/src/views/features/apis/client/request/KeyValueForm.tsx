@@ -52,7 +52,7 @@ const KeyValueForm: React.FC<Props> = ({ keyValuePairs, setKeyValuePairs, keyOpt
   return (
     <table className="key-value-pairs-table">
       <tbody>
-        {keyValuePairs.map((param, index) => (
+        {keyValuePairs?.map((param, index) => (
           <tr key={param.id}>
             <td className="key">
               {keyOptions ? (
