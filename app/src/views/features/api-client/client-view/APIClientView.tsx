@@ -8,6 +8,7 @@ import ResponseTabs from "./response/ResponseTabs";
 import { CloseCircleFilled } from "@ant-design/icons";
 import {
   addUrlSchemeIfMissing,
+  getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   makeRequest,
   removeEmptyKeys,
@@ -15,6 +16,12 @@ import {
 } from "../apiUtils";
 import "./apiClientView.scss";
 import { debounce } from "lodash";
+import {
+  trackAPIRequestCancelled,
+  trackAPIRequestSent,
+  trackRequestFailed,
+  trackResponseLoaded,
+} from "modules/analytics/events/features/apiClient";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -181,8 +188,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
           setEntry(entryWithResponse);
+          trackResponseLoaded({
+            type: getContentTypeFromResponseHeaders(response.headers),
+            time: Math.round(response.time / 1000),
+          });
         } else {
           setIsFailed(true);
+          trackRequestFailed();
         }
         notifyApiRequestFinished?.(entryWithResponse);
       })
@@ -195,10 +207,18 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         abortControllerRef.current = null;
         setIsLoadingResponse(false);
       });
+
+    trackAPIRequestSent({
+      method: sanitizedEntry.request.method,
+      queryParamsCount: sanitizedEntry.request.queryParams.length,
+      headersCount: sanitizedEntry.request.headers.length,
+      requestContentType: sanitizedEntry.request.contentType,
+    });
   }, [entry, notifyApiRequestFinished]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
+    trackAPIRequestCancelled();
   }, []);
 
   const onUrlInputEnterPressed = useCallback((evt: SyntheticEvent<HTMLInputElement>) => {

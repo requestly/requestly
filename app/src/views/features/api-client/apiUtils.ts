@@ -61,7 +61,7 @@ export const generateKeyValuePairsFromJson = (json: Record<string, string> = {})
   });
 };
 
-export const getContentTypeFromHeaders = (headers: KeyValuePair[]): RequestContentType => {
+export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
   const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
   const contentType: RequestContentType =
@@ -72,13 +72,17 @@ export const getContentTypeFromHeaders = (headers: KeyValuePair[]): RequestConte
   return contentType;
 };
 
+export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
+  return headers.find((header) => header.key.toLowerCase() === "content-type")?.value;
+};
+
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   try {
     // @ts-ignore
     const json: CurlParserResponse = parseCurlAsJson(curl);
     const queryParams = generateKeyValuePairsFromJson(json.queries);
     const headers = generateKeyValuePairsFromJson(json.headers);
-    const contentType = getContentTypeFromHeaders(headers);
+    const contentType = getContentTypeFromRequestHeaders(headers);
 
     let body: RQAPI.RequestBody;
     if (contentType === RequestContentType.JSON) {

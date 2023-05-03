@@ -3,6 +3,7 @@ import placeholderImage from "../../../../assets/images/illustrations/empty-shee
 import { Button, Menu, Tag, Typography } from "antd";
 import { RQAPI, RequestMethod } from "../types";
 import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import "./apiClientSidebar.scss";
 
 interface Props {
@@ -52,6 +53,7 @@ const APIClientSidebar: React.FC<Props> = ({
   const onMenuItemClick = useCallback(({ key }: { key: string }) => {
     const historyIndex = parseInt(key);
     setSelectedHistoryIndex(historyIndex);
+    trackRequestSelectedFromHistory();
   }, []);
 
   const menuItems = useMemo(() => {

@@ -4,6 +4,7 @@ import { formatJSONString } from "utils/CodeEditorUtils";
 import { Button, Input, Radio } from "antd";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import KeyValueForm from "./KeyValueForm";
+import { trackBeautifyRequestJSONClicked } from "modules/analytics/events/features/apiClient";
 
 interface Props {
   body: RQAPI.RequestBody;
@@ -15,6 +16,7 @@ interface Props {
 const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentType }) => {
   const onClickBeautifyCode = useCallback(() => {
     setBody(formatJSONString(body, 2));
+    trackBeautifyRequestJSONClicked();
   }, [body, setBody]);
 
   const bodyEditor = useMemo(() => {

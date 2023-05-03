@@ -21,7 +21,11 @@ import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
 import { getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
 import "./index.css";
-import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
+import {
+  trackAiResponseButtonClicked,
+  trackMockEditorOpened,
+  trackTestMockClicked,
+} from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -177,6 +181,7 @@ const MockEditor: React.FC<Props> = ({
 
   const handleTest = useCallback(() => {
     setIsTestModalOpen(true);
+    trackTestMockClicked();
   }, []);
 
   const onNameChange = (name: string) => {
