@@ -277,13 +277,11 @@ const CurrentTrafficTable = ({
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (isRegexSearchActive) {
-            const isRegexValid = isRegexFormat(searchKeyword);
-            if (isRegexValid) reg = new RegExp(searchKeyword.slice(1, -1));
-            else return [];
+            reg = new RegExp(searchKeyword);
+            return logs.filter((log) => log.url.match(reg));
           } else {
-            reg = new RegExp(searchKeyword, "i");
+            return logs.filter((log) => log.url.includes(searchKeyword));
           }
-          return logs.filter((log) => log.url.match(reg));
         } catch (err) {
           Logger.log(err);
         }
