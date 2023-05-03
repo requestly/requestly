@@ -2,7 +2,7 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import {
   generateKeyValuePairsFromJson,
-  getContentTypeFromHeaders,
+  getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
 } from "views/features/api-client/apiUtils";
@@ -38,7 +38,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     entry.request.queryParams = generateKeyValuePairsFromJson(searchParams);
     entry.request.headers = generateKeyValuePairsFromJson(request.headers);
     entry.request.method = request.method || RequestMethod.GET;
-    entry.request.contentType = getContentTypeFromHeaders(entry.request.headers);
+    entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
 
     if (typeof request.body === "string") {
       entry.request.body = request.body;

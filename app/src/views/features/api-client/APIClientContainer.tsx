@@ -6,6 +6,13 @@ import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from 
 import { Input, Modal } from "antd";
 import { getEmptyAPIEntry, parseCurlRequest } from "./apiUtils";
 import { toast } from "utils/Toast";
+import {
+  trackCurlImportFailed,
+  trackCurlImported,
+  trackHistoryCleared,
+  trackImportCurlClicked,
+  trackNewRequestClicked,
+} from "modules/analytics/events/features/apiClient";
 import "./apiClientContainer.scss";
 
 interface Props {}
@@ -24,12 +31,14 @@ const APIClientContainer: React.FC<Props> = () => {
   const clearHistory = useCallback(() => {
     setHistory([]);
     clearHistoryFromStore();
+    trackHistoryCleared();
   }, [setHistory]);
 
   const onImportFromCurl = useCallback(() => {
     const requestFromCurl: RQAPI.Request = parseCurlRequest(curlCommand);
     if (!requestFromCurl || !requestFromCurl.url) {
       toast.error("Could not process the cURL command");
+      trackCurlImportFailed();
       return;
     }
 
@@ -41,10 +50,17 @@ const APIClientContainer: React.FC<Props> = () => {
     addToHistory(newApiEntry);
     setIsImportModalOpen(false);
     setCurlCommand("");
+    trackCurlImported();
   }, [addToHistory, curlCommand]);
+
+  const onImportClick = useCallback(() => {
+    setIsImportModalOpen(true);
+    trackImportCurlClicked();
+  }, []);
 
   const onNewClick = useCallback(() => {
     addToHistory(getEmptyAPIEntry());
+    trackNewRequestClicked();
   }, [addToHistory]);
 
   return (
@@ -54,7 +70,7 @@ const APIClientContainer: React.FC<Props> = () => {
         clearHistory={clearHistory}
         onSelectionFromHistory={setSelectedEntry}
         onNewClick={onNewClick}
-        onImportClick={() => setIsImportModalOpen(true)}
+        onImportClick={onImportClick}
       />
       <APIClientView apiEntry={selectedEntry} notifyApiRequestFinished={addToHistory} />
       <Modal

@@ -1,10 +1,12 @@
 import { Tabs, TabsProps } from "antd";
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import ResponseBody from "./ResponseBody";
 import { RQAPI } from "../../types";
 import ResponseHeaders from "./ResponseHeaders";
 import StatusLine from "./StatusLine";
 import "./responseTabs.scss";
+import { trackResponseHeadersViewed } from "modules/analytics/events/features/apiClient";
+import { getContentTypeFromResponseHeaders } from "../../apiUtils";
 
 interface Props {
   response: RQAPI.Response;
@@ -17,7 +19,7 @@ enum Tab {
 
 const ResponseTabs: React.FC<Props> = ({ response }) => {
   const contentTypeHeader = useMemo(() => {
-    return response.headers.find((header) => header.key.toLowerCase() === "content-type")?.value;
+    return getContentTypeFromResponseHeaders(response.headers);
   }, [response.headers]);
 
   const tabItems: TabsProps["items"] = useMemo(
@@ -36,6 +38,12 @@ const ResponseTabs: React.FC<Props> = ({ response }) => {
     [contentTypeHeader, response]
   );
 
+  const onTabChange = useCallback((tab: Tab) => {
+    if (tab === Tab.HEADERS) {
+      trackResponseHeadersViewed();
+    }
+  }, []);
+
   return (
     <Tabs
       className="api-response-tabs"
@@ -43,6 +51,7 @@ const ResponseTabs: React.FC<Props> = ({ response }) => {
       items={tabItems}
       size="small"
       tabBarExtraContent={<StatusLine response={response} />}
+      onChange={onTabChange}
     />
   );
 };
