@@ -7,6 +7,8 @@ import { MockType } from "components/features/mocksV2/types";
 import { redirectToFileMocksList, redirectToMocksList } from "utils/RedirectionUtils";
 import "./index.css";
 import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -51,7 +53,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           <RQBreadcrumb />
         </Col>
         <Col className="header-right-section">
-          {!isNewMock && (
+          {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
             <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
               Test
             </RQButton>
