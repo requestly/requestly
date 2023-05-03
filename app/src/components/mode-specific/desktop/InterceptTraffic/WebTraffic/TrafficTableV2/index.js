@@ -69,6 +69,11 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
+  const [logFilters, setLogFilters] = useState({
+    statusCode: [],
+    resourceType: [],
+    method: [],
+  });
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -270,26 +275,50 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
+  const getFilteredLogs = useCallback(
+    (logs) => {
+      const isLogFilterApplied = Object.values(logFilters).some((prop) => prop.length > 0);
+      if (isLogFilterApplied) {
+        return logs.filter((log) => {
+          if (logFilters.statusCode.length && !logFilters.statusCode.includes(log?.response?.statusCode?.toString())) {
+            return false;
+          }
+          if (logFilters.resourceType.length && !logFilters.resourceType.includes(log?.response?.contentType)) {
+            return false;
+          }
+          if (logFilters.method.length && !logFilters.method.includes(log?.request?.method)) {
+            return false;
+          }
+
+          return true;
+        });
+      }
+      return null;
+    },
+    [logFilters]
+  );
+
   const getSearchedLogs = useCallback(
     (logs, searchKeyword) => {
+      let networkLogs = getFilteredLogs(logs) || logs;
       if (searchKeyword) {
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (isRegexSearchActive) {
             reg = new RegExp(searchKeyword);
-            return logs.filter((log) => log.url.match(reg));
+            return networkLogs.filter((log) => log.url.match(reg));
           } else {
-            return logs.filter((log) => log.url.includes(searchKeyword));
+            return networkLogs.filter((log) => log.url.includes(searchKeyword));
           }
         } catch (err) {
           Logger.log(err);
         }
       }
 
-      return logs;
+      return networkLogs;
     },
-    [isRegexSearchActive]
+    [isRegexSearchActive, getFilteredLogs]
   );
 
   const getRequestLogs = useCallback(
@@ -484,6 +513,7 @@ const CurrentTrafficTable = ({
               setIsInterceptingTraffic={setIsInterceptingTraffic}
               setIsRegexSearchActive={setIsRegexSearchActive}
               isRegexSearchActive={isRegexSearchActive}
+              setLogFilters={setLogFilters}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>

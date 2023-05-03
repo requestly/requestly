@@ -11,6 +11,8 @@ import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { TrafficFilter } from "./TrafficFilter";
+import { STATUS_CODE_OPTIONS } from "config/constants/sub/statusCode";
 
 const { Text } = Typography;
 
@@ -23,6 +25,7 @@ const ActionHeader = ({
   setIsInterceptingTraffic,
   isRegexSearchActive,
   setIsRegexSearchActive,
+  setLogFilters,
 }) => {
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -76,56 +79,66 @@ const ActionHeader = ({
   };
 
   return (
-    <Row
-      align="middle"
-      style={{
-        padding: 3,
-        paddingLeft: "24px",
-        paddingRight: "12px",
-      }}
-    >
-      <Space direction="horizontal">
-        <Col>{renderSearchInput()}</Col>
-        <Col>
-          <Tooltip placement="top" title="Clear Logs">
-            <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
-          </Tooltip>
-        </Col>
-        {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
+    <>
+      <Row
+        align="middle"
+        style={{
+          padding: 3,
+          paddingLeft: "24px",
+          paddingRight: "12px",
+        }}
+      >
+        <Space direction="horizontal">
+          <Col>{renderSearchInput()}</Col>
           <Col>
-            <Tooltip title="SSL Proxying">
-              <Button
-                type="primary"
-                shape="circle"
-                icon={<SafetyCertificateOutlined />}
-                onClick={() => setIsSSLProxyingModalVisible(true)}
-              />
+            <Tooltip placement="top" title="Clear Logs">
+              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
             </Tooltip>
           </Col>
-        ) : null}
-        {showDeviceSelector ? (
-          <>
+          {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
             <Col>
-              <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
-                <SettingOutlined />
-              </Button>
+              <Tooltip title="SSL Proxying">
+                <Button
+                  type="primary"
+                  shape="circle"
+                  icon={<SafetyCertificateOutlined />}
+                  onClick={() => setIsSSLProxyingModalVisible(true)}
+                />
+              </Tooltip>
             </Col>
-            <Col>
-              <Text code>Device Id: {deviceId || "Null"}</Text>
-            </Col>
-          </>
-        ) : null}
-        <Col>
-          <PauseAndPlayButton
-            defaultIsPaused={false}
-            onChange={(isPaused) => {
-              console.log("isPaused", isPaused);
-              setIsInterceptingTraffic(!isPaused);
-            }}
-          />
-        </Col>
-      </Space>
-    </Row>
+          ) : null}
+          {showDeviceSelector ? (
+            <>
+              <Col>
+                <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
+                  <SettingOutlined />
+                </Button>
+              </Col>
+              <Col>
+                <Text code>Device Id: {deviceId || "Null"}</Text>
+              </Col>
+            </>
+          ) : null}
+          <Col>
+            <PauseAndPlayButton
+              defaultIsPaused={false}
+              onChange={(isPaused) => {
+                console.log("isPaused", isPaused);
+                setIsInterceptingTraffic(!isPaused);
+              }}
+            />
+          </Col>
+        </Space>
+      </Row>
+      <Col span={24}>
+        <TrafficFilter
+          filterId="filter-status-code"
+          filterPlaceholder="filter status code"
+          options={STATUS_CODE_OPTIONS}
+          handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+        />
+      </Col>
+    </>
   );
 };
 
