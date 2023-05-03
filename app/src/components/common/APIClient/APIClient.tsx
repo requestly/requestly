@@ -5,9 +5,9 @@ import {
   getContentTypeFromHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-} from "views/features/apis/apiUtils";
-import APIClientView from "views/features/apis/client/APIClientView";
-import { RQAPI, RequestContentType, RequestMethod } from "views/features/apis/types";
+} from "views/features/api-client/apiUtils";
+import APIClientView from "views/features/api-client/client-view/APIClientView";
+import { RQAPI, RequestContentType, RequestMethod } from "views/features/api-client/types";
 import { APIClientRequest } from "./types";
 import "./apiClient.scss";
 

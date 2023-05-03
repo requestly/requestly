@@ -58,7 +58,7 @@ import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreat
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
-import APIClientContainer from "views/features/apis/APIClientContainer";
+import APIClientContainer from "views/features/api-client/APIClientContainer";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;

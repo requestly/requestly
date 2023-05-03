@@ -37,7 +37,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL);
-  const setFaviconUrlDebounced = useMemo(() => debounce(setFaviconUrl, 1000), [setFaviconUrl]);
+  const setFaviconUrlDebounced = useMemo(() => debounce(setFaviconUrl, 500), [setFaviconUrl]);
   const abortControllerRef = useRef<AbortController>(null);
 
   useEffect(() => {
