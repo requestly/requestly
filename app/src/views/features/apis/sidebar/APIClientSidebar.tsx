@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { Button, Menu, Tag, Typography } from "antd";
 import { RQAPI, RequestMethod } from "../types";
-import "./apisViewSidebar.scss";
 import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import "./apiClientSidebar.scss";
 
 interface Props {
   history: RQAPI.Entry[];
@@ -25,7 +25,7 @@ const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
   [RequestMethod.TRACE]: "cyan",
 };
 
-const APIsViewSidebar: React.FC<Props> = ({
+const APIClientSidebar: React.FC<Props> = ({
   history,
   clearHistory,
   onSelectionFromHistory,
@@ -74,8 +74,8 @@ const APIsViewSidebar: React.FC<Props> = ({
   }, [history]);
 
   return (
-    <div className="apis-view-sidebar">
-      <div className="api-view-sidebar-header">
+    <div className="api-client-sidebar">
+      <div className="api-client-sidebar-header">
         <div>
           <Button type="text" size="small" onClick={onNewClick} icon={<PlusCircleOutlined />}>
             New
@@ -111,4 +111,4 @@ const APIsViewSidebar: React.FC<Props> = ({
   );
 };
 
-export default APIsViewSidebar;
+export default APIClientSidebar;
