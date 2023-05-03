@@ -24,22 +24,18 @@ const ActionHeader = ({
   isRegexSearchActive,
   setIsRegexSearchActive,
 }) => {
-  return (
-    <Row
-      align="middle"
-      style={{
-        padding: 3,
-        paddingLeft: "24px",
-        paddingRight: "12px",
-      }}
-    >
-      <Space direction="horizontal">
-        <Col>
-          <Input.Search
-            className="action-header-input"
-            placeholder="Input Search Keyword"
-            onChange={handleOnSearchChange}
-            suffix={
+  const renderSearchInput = () => {
+    if (isRegexSearchActive) {
+      return (
+        <Input.Search
+          className="action-header-input"
+          placeholder="Input RegEx"
+          onChange={handleOnSearchChange}
+          prefix={<span className="text-gray">{"/"}</span>}
+          suffix={
+            <>
+              <span className="text-gray">{"/"}</span>
+              &nbsp;
               <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
                 <RQButton
                   className={`traffic-table-regex-btn ${
@@ -50,10 +46,46 @@ const ActionHeader = ({
                   icon={<VscRegex />}
                 />
               </Tooltip>
-            }
-            style={{ width: 300 }}
-          />
-        </Col>
+            </>
+          }
+          style={{ width: 300 }}
+        />
+      );
+    }
+
+    return (
+      <Input.Search
+        className="action-header-input"
+        placeholder="Input Search Keyword"
+        onChange={handleOnSearchChange}
+        suffix={
+          <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
+            <RQButton
+              className={`traffic-table-regex-btn ${
+                isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
+              }`}
+              onClick={() => setIsRegexSearchActive((prev) => !prev)}
+              iconOnly
+              icon={<VscRegex />}
+            />
+          </Tooltip>
+        }
+        style={{ width: 300 }}
+      />
+    );
+  };
+
+  return (
+    <Row
+      align="middle"
+      style={{
+        padding: 3,
+        paddingLeft: "24px",
+        paddingRight: "12px",
+      }}
+    >
+      <Space direction="horizontal">
+        <Col>{renderSearchInput()}</Col>
         <Col>
           <Tooltip placement="top" title="Clear Logs">
             <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
