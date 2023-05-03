@@ -251,18 +251,12 @@ export const validateRule = (rule, dispatch) => {
           error: "missing source",
         };
       }
-      //Response body shouldn't be empty
-      else if (isEmpty(pair.response.value)) {
-        let message = `Please specify response body`;
-        let error = "missing response body";
-        if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
-          message = "Please select a file first";
-          error = "file not selected";
-        }
+      //file selection shouldn't be empty
+      else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE && isEmpty(pair.response.value)) {
         output = {
           result: false,
-          message: message,
-          error,
+          message: "Please select a file first",
+          error: "file not selected",
         };
       }
     });

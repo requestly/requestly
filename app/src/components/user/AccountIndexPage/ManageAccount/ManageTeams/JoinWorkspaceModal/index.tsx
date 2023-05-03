@@ -25,8 +25,9 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   const navigate = useNavigate();
 
   const handleJoinClick = (teamId: string, inviteId: string) => {
-    trackWorkspaceJoinClicked(teamId, "workspace_joining_modal");
+    handleModalClose();
     navigate(`/invite/${inviteId}`);
+    trackWorkspaceJoinClicked(teamId, "workspace_joining_modal");
   };
 
   return (
