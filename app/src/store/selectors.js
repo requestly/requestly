@@ -219,3 +219,7 @@ export const getIsRedirectRuleTourCompleted = (state) => {
 export const getIsTrafficTableTourCompleted = (state) => {
   return getGlobalState(state)?.["misc"]?.["isTrafficTableTourCompleted"];
 };
+
+export const getIsConnectedAppsTourCompleted = (state) => {
+  return getGlobalState(state)?.["misc"]?.["isConnectedAppsTourCompleted"];
+};
