@@ -11,7 +11,6 @@ import DashboardContent from "./DashboardContent";
 import Sidebar from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { Content } from "antd/lib/layout/layout";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./dashboardLayout.scss";
 
 const DashboardLayout = () => {
@@ -20,9 +19,7 @@ const DashboardLayout = () => {
 
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isPersonaRecommendationFeatureflagOn = useFeatureIsOn("persona_recommendation");
-  const isPersonaRecommendationScreen =
-    userPersona.page === 4 && !userPersona.isSurveyCompleted && isPersonaRecommendationFeatureflagOn;
+  const isPersonaRecommendationScreen = userPersona.page === 4 && !userPersona.isSurveyCompleted;
 
   // Component State
   const [visible, setVisible] = useState(false);
