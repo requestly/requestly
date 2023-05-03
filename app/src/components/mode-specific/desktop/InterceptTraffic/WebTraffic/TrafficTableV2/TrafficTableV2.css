@@ -90,3 +90,18 @@
 .traffic-table-split-container .ant-row.request-log-pane-container {
   margin-left: 1.25rem;
 }
+
+.traffic-table-filters-container {
+  margin-top: 1rem;
+}
+.traffic-table-filters-container-collapsed {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  max-height: 0;
+  display: none;
+}
+
+.traffic-table-filter-select .ant-select-selector {
+  width: 240px;
+  margin-left: 25px;
+}
