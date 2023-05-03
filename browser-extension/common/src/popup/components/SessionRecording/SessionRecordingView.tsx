@@ -4,6 +4,7 @@ import config from "../../../config";
 import { CLIENT_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
 import "./sessionRecordingView.css";
+import { EVENT, sendEvent } from "../../events";
 
 const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
@@ -11,6 +12,7 @@ const SessionRecordingView: React.FC = () => {
   const [isExplicitRecordingSession, setIsExplicitRecordingSession] = useState<boolean>();
 
   const startRecordingOnClick = () => {
+    sendEvent(EVENT.START_RECORDING_CLICKED);
     chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.START_RECORDING }, { frameId: 0 }, () =>
       setIsRecordingSession(true)
     );
@@ -22,11 +24,13 @@ const SessionRecordingView: React.FC = () => {
 
   const stopRecordingOnClick = () => {
     if (isExplicitRecordingSession) {
+      sendEvent(EVENT.STOP_RECORDING_CLICKED);
       chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
         setIsRecordingSession(false);
         viewRecordedSession();
       });
     } else {
+      sendEvent(EVENT.VIEW_RECORDING_CLICKED);
       viewRecordedSession();
     }
   };
