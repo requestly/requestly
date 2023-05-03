@@ -474,7 +474,7 @@ const CurrentTrafficTable = ({
         key: "clear_all",
         label: (
           <span className="clear-all-filter-option">
-            <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
+            Clear all <CloseOutlined style={{ marginLeft: "8px" }} />
           </span>
         ),
         onClick: () => {
