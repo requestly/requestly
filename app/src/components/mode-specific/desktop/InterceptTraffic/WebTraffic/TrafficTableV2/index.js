@@ -335,7 +335,8 @@ const CurrentTrafficTable = ({
     () => () => {
       const logs = Object.values(filterTypes).reduce((logs, filterType) => {
         const [logType, filter] = filterType?.split(" ") ?? [];
-        return [...logs, ...(filter ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : [])];
+        const filteredLogs = filter ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : [];
+        return [...logs, ...(filteredLogs ?? [])];
       }, []);
 
       // remove logs with same id
@@ -472,7 +473,7 @@ const CurrentTrafficTable = ({
       {
         key: "clear_all",
         label: (
-          <span>
+          <span className="clear-all-filter-option">
             <CloseOutlined style={{ marginRight: "8px" }} /> Clear all
           </span>
         ),
