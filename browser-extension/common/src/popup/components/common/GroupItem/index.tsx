@@ -8,6 +8,7 @@ import { useRecords } from "../../../contexts/RecordsContext";
 import GroupIcon from "../../../../../resources/icons/groupIcon.svg";
 import RecordName from "../RecordName";
 import "./groupItem.css";
+import { EVENT, sendEvent } from "../../../events";
 
 interface GroupItemProps {
   group: Group;
@@ -21,6 +22,9 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
   const handleToggleStatus = useCallback(() => {
     updateGroup({
       ...group,
+      status: isGroupActive ? Status.INACTIVE : Status.ACTIVE,
+    });
+    sendEvent(EVENT.GROUP_TOGGLED, {
       status: isGroupActive ? Status.INACTIVE : Status.ACTIVE,
     });
   }, [group, isGroupActive, updateGroup]);
