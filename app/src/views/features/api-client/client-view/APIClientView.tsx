@@ -14,7 +14,6 @@ import {
   removeEmptyKeys,
   supportsRequestBody,
 } from "../apiUtils";
-import "./apiClientView.scss";
 import { debounce } from "lodash";
 import {
   trackAPIRequestCancelled,
@@ -22,6 +21,9 @@ import {
   trackRequestFailed,
   trackResponseLoaded,
 } from "modules/analytics/events/features/apiClient";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import "./apiClientView.scss";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -39,6 +41,7 @@ const EMPTY_FAVICON_URL =
   "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16";
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
+  const appMode = useSelector(getAppMode);
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
@@ -183,7 +186,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
 
-    makeRequest(sanitizedEntry.request, abortControllerRef.current.signal)
+    makeRequest(appMode, sanitizedEntry.request, abortControllerRef.current.signal)
       .then((response) => {
         const entryWithResponse = { ...sanitizedEntry, response };
         if (response) {
@@ -214,7 +217,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       headersCount: sanitizedEntry.request.headers.length,
       requestContentType: sanitizedEntry.request.contentType,
     });
-  }, [entry, notifyApiRequestFinished]);
+  }, [appMode, entry, notifyApiRequestFinished]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
