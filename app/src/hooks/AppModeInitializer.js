@@ -23,6 +23,7 @@ import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/event
 import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { toast } from "utils/Toast";
 
 let hasAppModeBeenSet = false;
 
@@ -198,6 +199,7 @@ const AppModeInitializer = () => {
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
         window.skipSyncListenerForNextOneTime = false;
+        toast.loading("Just a sec, fetching updated rules..", null, true);
         invokeSyncingIfRequired({
           dispatch,
           uid: user?.details?.profile?.uid,
