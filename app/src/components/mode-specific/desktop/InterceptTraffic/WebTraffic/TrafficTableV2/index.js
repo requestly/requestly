@@ -32,7 +32,7 @@ import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
 import { isRegexFormat } from "utils/rules/misc";
-import { STATUS_CODE_OPTIONS } from "config/constants/sub/statusCode";
+import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { RQButton } from "lib/design-system/components";
@@ -545,7 +545,7 @@ const CurrentTrafficTable = ({
                   filterId="filter-status-code"
                   filterLabel="Status code"
                   filterPlaceholder="Filter by status code"
-                  options={STATUS_CODE_OPTIONS}
+                  options={STATUS_CODE_ONLY_OPTIONS}
                   value={logFilters.statusCode}
                   handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
                 />
