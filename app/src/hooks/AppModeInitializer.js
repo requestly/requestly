@@ -21,6 +21,8 @@ import {
 import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
+import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 let hasAppModeBeenSet = false;
 
@@ -40,9 +42,11 @@ const AppModeInitializer = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { appsList, isBackgroundProcessActive } = useSelector(getDesktopSpecificDetails);
 
   const appsListRef = useRef(null);
+  const hasMessageHandlersBeenSet = useRef(false);
   const hasAuthChanged = useHasChanged(user.loggedIn);
 
   useEffect(() => {
@@ -174,6 +178,10 @@ const AppModeInitializer = () => {
   }, [appMode]);
 
   useEffect(() => {
+    // This useEffect should not get invoked multiple times
+    if (hasMessageHandlersBeenSet.current) return;
+    hasMessageHandlersBeenSet.current = true;
+
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       StorageService(appMode)
         .saveRecord(getEventsEngineFlag)
@@ -188,15 +196,22 @@ const AppModeInitializer = () => {
         };
       });
 
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (message) => {
-        console.log("!!!debug", "", message);
-        // TODO: handle app logic here for realtime toggle of rules
+      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
+        window.skipSyncListenerForNextOneTime = false;
+        invokeSyncingIfRequired({
+          dispatch,
+          uid: user?.details?.profile?.uid,
+          team_id: currentlyActiveWorkspace?.id,
+          appMode,
+          isSyncEnabled: user?.details?.isSyncEnabled,
+        });
+
         return {
           received: true,
         };
       });
     }
-  }, [appMode]);
+  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 
   return null;
 };
