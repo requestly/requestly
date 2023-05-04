@@ -140,6 +140,7 @@ export interface QueryParamRule extends Rule {
 }
 
 export interface HeadersRuleModificationData {
+  id?: string;
   header: string;
   type: HeaderRuleActionType;
   value: string;
