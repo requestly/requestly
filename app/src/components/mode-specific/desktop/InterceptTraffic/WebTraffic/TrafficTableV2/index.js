@@ -73,6 +73,7 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterType, setFilterType] = useState(null);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
   const [logFilters, setLogFilters] = useState({
     statusCode: [],
     resourceType: [],
@@ -515,34 +516,39 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
-              setIsRegexSearchActive={setIsRegexSearchActive}
               isRegexSearchActive={isRegexSearchActive}
+              isFiltersCollapsed={isFiltersCollapsed}
+              setIsFiltersCollapsed={setIsFiltersCollapsed}
+              setIsRegexSearchActive={setIsRegexSearchActive}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
-          <Row className="traffic-table-filters-container">
-            <TrafficFilter
-              filterId="filter-status-code"
-              filterLabel="Status code"
-              filterPlaceholder="filter by status code"
-              options={STATUS_CODE_OPTIONS}
-              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
-            />
-            <TrafficFilter
-              filterId="filter-method"
-              filterLabel="Method"
-              filterPlaceholder="filter by method"
-              options={METHOD_TYPE_OPTIONS}
-              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
-            />
-            <TrafficFilter
-              filterId="filter-resource-type"
-              filterLabel="Resource type"
-              filterPlaceholder="filter by resource type"
-              options={CONTENT_TYPE_OPTIONS}
-              handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
-            />
-          </Row>
+          {!isFiltersCollapsed && (
+            <Row className="traffic-table-filters-container">
+              <TrafficFilter
+                filterId="filter-status-code"
+                filterLabel="Status code"
+                filterPlaceholder="Filter by status code"
+                options={STATUS_CODE_OPTIONS}
+                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+              />
+              <TrafficFilter
+                filterId="filter-method"
+                filterLabel="Method"
+                filterPlaceholder="Filter by method"
+                options={METHOD_TYPE_OPTIONS}
+                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
+              />
+              <TrafficFilter
+                filterId="filter-resource-type"
+                filterLabel="Content type"
+                filterPlaceholder="Filter by content type"
+                options={CONTENT_TYPE_OPTIONS}
+                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+              />
+            </Row>
+          )}
+
           <Split
             sizes={rulePaneSizes}
             minSize={[75, 0]}

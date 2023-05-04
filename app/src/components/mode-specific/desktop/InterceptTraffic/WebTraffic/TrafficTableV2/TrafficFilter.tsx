@@ -23,7 +23,6 @@ export const TrafficFilter: React.FC<FilterProps> = ({
       </label>
       <Select
         allowClear
-        maxTagCount="responsive"
         id={filterId}
         className="traffic-table-filter-select"
         mode="multiple"

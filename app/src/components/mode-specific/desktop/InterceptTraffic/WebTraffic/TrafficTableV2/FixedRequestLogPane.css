@@ -89,7 +89,21 @@
   background: transparent;
 }
 .action-header-input .traffic-table-regex-btn:hover,
-.action-header-input .traffic-table-regex-btn-active {
+.action-header-input .traffic-table-regex-btn-active,
+.traffic-table-filter-btn-active.ant-btn {
   background: var(--border-dark);
   color: var(--white);
+}
+.traffic-table-filters-container {
+  margin-top: 1rem;
+}
+.traffic-table-filter-label {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.traffic-table-filter-select .ant-select-selector {
+  width: 240px;
+  margin-left: 25px;
+  margin-top: -10px;
 }
