@@ -1294,11 +1294,11 @@ BG.Methods.getAPIResponse = async (apiRequest, fetchOptions = {}) => {
       responseHeaders.push({ key, value });
     });
 
-    let responseBody;
     const responseBlob = await response.blob();
-    const contentType = response.headers.get("Content-Type");
+    const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
 
-    if (contentType.includes("image/")) {
+    let responseBody;
+    if (contentType?.includes("image/")) {
       const getImageDataUri = (blob) => {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -1318,6 +1318,7 @@ BG.Methods.getAPIResponse = async (apiRequest, fetchOptions = {}) => {
       headers: responseHeaders,
       status: response.status,
       statusText: response.statusText,
+      redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
     return null;
