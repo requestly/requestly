@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
 import {
   CaretRightOutlined,
   ClearOutlined,
@@ -26,6 +26,7 @@ const ActionHeader = ({
   isFiltersCollapsed,
   setIsRegexSearchActive,
   setIsFiltersCollapsed,
+  activeFiltersCount = 0,
 }) => {
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -91,13 +92,15 @@ const ActionHeader = ({
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <RQButton
-              type="default"
-              iconOnly
-              icon={<FaFilter />}
-              onClick={() => setIsFiltersCollapsed((prev) => !prev)}
-              className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
-            />
+            <Badge count={activeFiltersCount} size="small">
+              <RQButton
+                type="default"
+                iconOnly
+                icon={<FaFilter />}
+                onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+                className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
+              />
+            </Badge>
           </Col>
           <Col>
             <Tooltip placement="top" title="Clear Logs">

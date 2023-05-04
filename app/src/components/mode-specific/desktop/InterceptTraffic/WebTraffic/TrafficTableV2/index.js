@@ -281,6 +281,11 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
+  const activeFiltersCount = useMemo(
+    () => Object.values(logFilters).reduce((current, filter) => current + filter.length, 0),
+    [logFilters]
+  );
+
   const getFilteredLogs = useCallback(
     (logs) => {
       const isLogFilterApplied = Object.values(logFilters).some((prop) => prop.length > 0);
@@ -521,6 +526,7 @@ const CurrentTrafficTable = ({
               isFiltersCollapsed={isFiltersCollapsed}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsRegexSearchActive={setIsRegexSearchActive}
+              activeFiltersCount={activeFiltersCount}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
