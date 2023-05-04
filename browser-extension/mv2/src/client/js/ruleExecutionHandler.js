@@ -3,16 +3,19 @@ RQ.RuleExecutionHandler = {
 };
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
-  //disable rule execution event
-  return;
+  chrome.storage.local.get(RQ.STORAGE_KEYS.ENABLE_RULE_EXECUTION_EVENT, (obj) => {
+    const isEventEnabled = obj[RQ.STORAGE_KEYS.ENABLE_RULE_EXECUTION_EVENT];
 
-  const eventName = "rule_executed";
-  const eventParams = {
-    rule_type: rule.ruleType,
-    rule_id: rule.id,
-    platform: "extension",
-  };
-  RQ.ClientUtils.sendEventToBackground(eventName, eventParams);
+    if (isEventEnabled === true) {
+      const eventName = "rule_executed";
+      const eventParams = {
+        rule_type: rule.ruleType,
+        rule_id: rule.id,
+        platform: "extension",
+      };
+      RQ.ClientUtils.sendEventToBackground(eventName, eventParams);
+    }
+  });
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
