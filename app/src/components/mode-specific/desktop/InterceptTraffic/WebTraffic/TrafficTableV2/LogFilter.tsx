@@ -24,7 +24,7 @@ export const LogFilter: React.FC<FilterProps> = ({
         {filterLabel}
       </label>
       <Select
-        allowClear
+        // allowClear
         id={filterId}
         className="traffic-table-filter-select"
         mode="multiple"
