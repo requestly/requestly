@@ -25,12 +25,10 @@ export const makeRequest = async (
       signal.addEventListener("abort", abortListener);
     }
 
-    const fetchOptions = { credentials: "omit" };
-
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request, fetchOptions).then(resolve);
+      getAPIResponseViaExtension(request).then(resolve);
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request, fetchOptions).then(resolve);
+      getAPIResponseViaProxy(request).then(resolve);
     } else {
       resolve(null);
     }

@@ -108,6 +108,6 @@ export const invokeAppDetectionInBackground = (arrayOfApps) => {
   return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("detect-available-apps", arrayOfAppIds);
 };
 
-export const getAPIResponse = (apiRequest, fetchOptions) => {
-  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-api-response", { apiRequest, fetchOptions });
+export const getAPIResponse = (apiRequest) => {
+  return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-api-response", { apiRequest });
 };
