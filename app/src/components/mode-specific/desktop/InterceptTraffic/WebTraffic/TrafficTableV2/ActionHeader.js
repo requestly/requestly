@@ -7,6 +7,7 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -22,7 +23,9 @@ const ActionHeader = ({
   deviceId,
   setIsInterceptingTraffic,
   isRegexSearchActive,
+  isFiltersCollapsed,
   setIsRegexSearchActive,
+  setIsFiltersCollapsed,
 }) => {
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -87,6 +90,15 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
+          <Col>
+            <RQButton
+              type="default"
+              iconOnly
+              icon={<FaFilter />}
+              onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+              className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
+            />
+          </Col>
           <Col>
             <Tooltip placement="top" title="Clear Logs">
               <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
