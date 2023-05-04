@@ -11,7 +11,7 @@ import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
-import { TrafficFilter } from "./TrafficFilter";
+import { LogFilter } from "./LogFilter";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
@@ -35,6 +35,7 @@ import { isRegexFormat } from "utils/rules/misc";
 import { STATUS_CODE_OPTIONS } from "config/constants/sub/statusCode";
 import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -525,27 +526,41 @@ const CurrentTrafficTable = ({
           </Row>
           {!isFiltersCollapsed && (
             <Row className="traffic-table-filters-container">
-              <TrafficFilter
-                filterId="filter-status-code"
-                filterLabel="Status code"
-                filterPlaceholder="Filter by status code"
-                options={STATUS_CODE_OPTIONS}
-                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
-              />
-              <TrafficFilter
-                filterId="filter-method"
-                filterLabel="Method"
-                filterPlaceholder="Filter by method"
-                options={METHOD_TYPE_OPTIONS}
-                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
-              />
-              <TrafficFilter
-                filterId="filter-resource-type"
-                filterLabel="Content type"
-                filterPlaceholder="Filter by content type"
-                options={CONTENT_TYPE_OPTIONS}
-                handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
-              />
+              <section>
+                <LogFilter
+                  filterId="filter-method"
+                  filterLabel="Method"
+                  filterPlaceholder="Filter by method"
+                  options={METHOD_TYPE_OPTIONS}
+                  value={logFilters.method}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
+                />
+                <LogFilter
+                  filterId="filter-status-code"
+                  filterLabel="Status code"
+                  filterPlaceholder="Filter by status code"
+                  options={STATUS_CODE_OPTIONS}
+                  value={logFilters.statusCode}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+                />
+                <LogFilter
+                  filterId="filter-resource-type"
+                  filterLabel="Content type"
+                  filterPlaceholder="Filter by content type"
+                  options={CONTENT_TYPE_OPTIONS}
+                  value={logFilters.resourceType}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+                />
+              </section>
+              <RQButton
+                type="primary"
+                className="clear-logs-filter-btn"
+                onClick={() => {
+                  setLogFilters({ statusCode: [], resourceType: [], method: [] });
+                }}
+              >
+                Clear
+              </RQButton>
             </Row>
           )}
 
