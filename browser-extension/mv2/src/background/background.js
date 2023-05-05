@@ -1257,12 +1257,12 @@ BG.Methods.getTabSession = (tabId, callback) => {
 };
 
 BG.Methods.getAPIResponse = async (apiRequest) => {
-  const method = apiRequest.method;
+  const method = apiRequest.method || "GET";
   const headers = new Headers();
   let body = apiRequest.body;
   let url = apiRequest.url;
 
-  if (apiRequest.queryParams.length) {
+  if (apiRequest?.queryParams.length) {
     const urlObj = new URL(apiRequest.url);
     const searchParams = new URLSearchParams(urlObj.search);
     apiRequest.queryParams.forEach(({ key, value }) => {
@@ -1272,7 +1272,7 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
     url = urlObj.toString();
   }
 
-  apiRequest.headers.forEach(({ key, value }) => {
+  apiRequest?.headers.forEach(({ key, value }) => {
     headers.append(key, value);
   });
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { Button, Menu, Tag, Typography } from "antd";
 import { RQAPI, RequestMethod } from "../types";
@@ -6,8 +6,12 @@ import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/ico
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import "./apiClientSidebar.scss";
 
+export const NO_HISTORY_INDEX = -1;
+
 interface Props {
   history: RQAPI.Entry[];
+  selectedHistoryIndex: number;
+  setSelectedHistoryIndex: (index: number) => void;
   clearHistory: () => void;
   onSelectionFromHistory: (entry: RQAPI.Entry) => void;
   onNewClick: () => void;
@@ -28,24 +32,24 @@ const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
 
 const APIClientSidebar: React.FC<Props> = ({
   history,
+  selectedHistoryIndex,
+  setSelectedHistoryIndex,
   clearHistory,
   onSelectionFromHistory,
   onNewClick,
   onImportClick,
 }) => {
-  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number>(-1);
-
   // using layout effect ensures that the updated list does not render with older selection
   useLayoutEffect(() => {
     if (history?.length) {
       setSelectedHistoryIndex(history.length - 1);
     } else {
-      setSelectedHistoryIndex(-1);
+      setSelectedHistoryIndex(NO_HISTORY_INDEX);
     }
-  }, [history]);
+  }, [history, setSelectedHistoryIndex]);
 
   useEffect(() => {
-    if (selectedHistoryIndex !== -1) {
+    if (selectedHistoryIndex !== NO_HISTORY_INDEX) {
       onSelectionFromHistory(history[selectedHistoryIndex]);
     }
   }, [history, onSelectionFromHistory, selectedHistoryIndex]);
@@ -99,7 +103,7 @@ const APIClientSidebar: React.FC<Props> = ({
           className="api-history-menu"
           theme={"dark"}
           onClick={onMenuItemClick}
-          selectedKeys={[String(selectedHistoryIndex)]}
+          selectedKeys={selectedHistoryIndex !== NO_HISTORY_INDEX ? [String(selectedHistoryIndex)] : []}
           mode="inline"
           items={menuItems}
         />
