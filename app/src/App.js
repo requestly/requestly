@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import APP_CONSTANTS from "./config/constants";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
-import { ConfigProvider } from "antd";
+import { Button, ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
 import useGeoLocation from "hooks/useGeoLocation";
 import DashboardLayout from "layouts/DashboardLayout";
@@ -21,36 +21,15 @@ import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
+
 import { getXmlToJs } from "utils/charles-rule-adapters/getXmlToJs";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
+import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
-// const singleRuleExportedData = `<?charles serialisation-version='2.0' ?>
-// <selectedHostsTool>
-// <locations>
-// <locationPatterns>
-// <locationMatch>
-// <location>
-// <protocol>https</protocol>
-// <host>www.flipkart.com</host>
-// </location>
-// <enabled>true</enabled>
-// </locationMatch>
-// <locationMatch>
-// <location>
-// <protocol>https</protocol>
-// <host>github.com</host>
-// <port>443</port>
-// </location>
-// <enabled>true</enabled>
-// </locationMatch>
-// </locationPatterns>
-// </locations>
-// <toolEnabled>true</toolEnabled>
-// <useSelectedLocations>true</useSelectedLocations>
-// </selectedHostsTool>`;
-
-const oneTimeExportedData = `<?charles serialisation-version='2.0' ?>
+const exportedData = `<?charles serialisation-version='2.0' ?>
 <charles-export>
 <toolConfiguration>
 <configs>
@@ -648,8 +627,30 @@ const oneTimeExportedData = `<?charles serialisation-version='2.0' ?>
 
 const App = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const [isLoading, setIsLoading] = useState(false);
 
-  getXmlToJs(oneTimeExportedData).catch((err) => console.log(`from effect::`, err));
+  // TODO: will remove it, its just for testing
+  const handleImport = () => {
+    console.clear();
+
+    setIsLoading(true);
+    getXmlToJs(exportedData, appMode)
+      .then(() => {
+        console.log("----- updating rules & groups ------");
+
+        dispatch(
+          actions.updateRefreshPendingStatus({
+            type: "rules",
+            newValue: !isRulesListRefreshPending,
+          })
+        );
+      })
+      .catch((err) => console.log(`----- from import handler -----`, err))
+      .finally(() => setIsLoading(false));
+  };
 
   useEffect(() => {
     // Load features asynchronously when the app renders
@@ -700,6 +701,9 @@ const App = () => {
             }}
           >
             <CommandBar />
+            <Button loading={isLoading} type="primary" onClick={handleImport}>
+              Import rules from Charles
+            </Button>
             {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
               <FullScreenLayout />
             ) : (
