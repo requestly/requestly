@@ -83,7 +83,7 @@
 }
 
 .traffic-table-split-container {
-  height: calc(100vh - 143px);
+  height: calc(100vh - 122px);
 }
 
 .traffic-table-split-container .gutter-vertical,

@@ -58,6 +58,7 @@ const CurrentTrafficTable = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isRegexSearchActive, setIsRegexSearchActive] = useState(false);
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
@@ -270,19 +271,27 @@ const CurrentTrafficTable = ({
     };
   }, [isStaticPreview]);
 
-  const getSearchedLogs = useCallback((logs, searchKeyword) => {
-    if (searchKeyword) {
-      try {
-        // TODO: @wrongsahil fix this. Special Characters are breaking the UI
-        const reg = new RegExp(searchKeyword, "i");
-        return logs.filter((log) => log.url.match(reg));
-      } catch (err) {
-        Logger.log(err);
+  const getSearchedLogs = useCallback(
+    (logs, searchKeyword) => {
+      if (searchKeyword) {
+        try {
+          // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+          let reg = null;
+          if (isRegexSearchActive) {
+            reg = new RegExp(searchKeyword);
+            return logs.filter((log) => log.url.match(reg));
+          } else {
+            return logs.filter((log) => log.url.includes(searchKeyword));
+          }
+        } catch (err) {
+          Logger.log(err);
+        }
       }
-    }
 
-    return logs;
-  }, []);
+      return logs;
+    },
+    [isRegexSearchActive]
+  );
 
   const getRequestLogs = useCallback(
     (desc = true) => {
@@ -325,7 +334,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
+    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -335,6 +344,7 @@ const CurrentTrafficTable = ({
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}
         emptyDesc={emptyDesc}
+        searchKeyword={searchKeyword}
       />
     );
   };
@@ -479,6 +489,8 @@ const CurrentTrafficTable = ({
               logsCount={newLogs.length}
               logsToSaveAsHar={stableGetLogsToExport}
               isStaticPreview={isStaticPreview}
+              setIsRegexSearchActive={setIsRegexSearchActive}
+              isRegexSearchActive={isRegexSearchActive}
             />
             {isStaticPreview ? (
               <Tag>{logs.length} requests</Tag>
@@ -500,7 +512,7 @@ const CurrentTrafficTable = ({
                 className="primary-card github-like-border network-table-wrapper-override"
                 style={{
                   boxShadow: "none",
-                  borderBottom: "2px solid #f5f5f5",
+                  // borderBottom: "2px solid #f5f5f5",
                   borderRadius: "0",
                   paddingBottom: "0",
                 }}
@@ -515,7 +527,7 @@ const CurrentTrafficTable = ({
                 style={{
                   boxShadow: "none",
                   borderRadius: "0",
-                  borderTop: "2px solid #f5f5f5",
+                  // borderTop: "2px solid #f5f5f5",
                 }}
                 bodyStyle={{ padding: "0px 20px" }}
               >

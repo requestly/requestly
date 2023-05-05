@@ -27,7 +27,7 @@
     }
   ],
 
-  "devtools_page": "devtools/devtools.html",
+  "devtools_page": "generated/devtools/devtools.html",
 
   "background": {
     "scripts": ["generated/background/background-bundled.js"]
