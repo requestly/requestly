@@ -1,5 +1,14 @@
 import { HeaderRuleActionType } from "types";
 
+export enum CharlesRuleType {
+  NO_CACHING = "No Caching",
+  BLOCK_COOKIES = "Block Cookies",
+  BLOCK_LIST = "Block List",
+  MAP_LOCAL = "Map Local",
+  MAP_REMOTE = "Map Remote",
+  REWRITE = "Rewrite",
+}
+
 export type HeadersConfig<
   T = {
     value: string;
