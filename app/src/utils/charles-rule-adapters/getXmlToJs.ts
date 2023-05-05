@@ -1,6 +1,7 @@
 import xml2js from "xml2js";
 import { get } from "lodash";
 import { noCachingRuleAdapter } from "./no-caching";
+import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
 
 export enum CharlesRule {
   NO_CACHING = "No Caching",
@@ -15,38 +16,7 @@ export type CharlesExport = {
   "charles-export": Record<string, unknown>;
 };
 
-export type ConfigEntry = {
-  string: CharlesRule | unknown;
-} & Record<string, unknown>;
-
-// {
-//   string: "No Caching",
-//   selectedHostsTool: {
-//     locations: {
-//       locationPatterns: {
-//         locationMatch: [
-//           {
-//             location: {
-//               protocol: "https",
-//               host: "www.flipkart.com",
-//             },
-//             enabled: "true",
-//           },
-//           {
-//             location: {
-//               protocol: "https",
-//               host: "github.com",
-//               port: "443",
-//             },
-//             enabled: "true",
-//           },
-//         ],
-//       },
-//     },
-//     toolEnabled: "false",
-//     useSelectedLocations: "true",
-//   },
-// },
+export type ConfigEntry = { string: CharlesRule | unknown } & Record<string, unknown>;
 
 //@ts-ignore
 // const result = {
@@ -502,10 +472,13 @@ export type ConfigEntry = {
 //                     locationMatch: [
 //                       {
 //                         location: {
-//                           protocol: "https",
+//                           protocol: "*",
 //                           host: "www.flipkart.com",
+//                           port: "*",
+//                           path: "/mobile*",
+//                           query: "fm=n?o",
 //                         },
-//                         enabled: "true",
+//                         enabled: true,
 //                       },
 //                       {
 //                         location: {
@@ -513,14 +486,14 @@ export type ConfigEntry = {
 //                           host: "developer.mozilla.org",
 //                           path: "/en-US/",
 //                         },
-//                         enabled: "true",
+//                         enabled: false,
 //                       },
 //                     ],
 //                   },
 //                 },
-//                 toolEnabled: "false",
-//                 useSelectedLocations: "false",
-//                 action: "0",
+//                 toolEnabled: true,
+//                 useSelectedLocations: false,
+//                 action: 0,
 //               },
 //             },
 //             {
@@ -618,6 +591,16 @@ export type ConfigEntry = {
 //                     locationMatch: [
 //                       {
 //                         location: {
+//                           protocol: "*",
+//                           host: "www.flipkart.com",
+//                           port: "*",
+//                           path: "/mobile*",
+//                           query: "fm=n?o",
+//                         },
+//                         enabled: true,
+//                       },
+//                       {
+//                         location: {
 //                           protocol: "https",
 //                           host: "www.flipkart.com",
 //                         },
@@ -675,14 +658,12 @@ export type ConfigEntry = {
  * -----------------------
  *  [] Rewrite
  *
- *  - Create a rough version of the from coverter to rule creation
- *  - Check the individual rule scehma and according to that make the output of converter
- *
  */
 
 export const getXmlToJs = (xml: string, appMode: string): Promise<any> => {
   const options = {
     explicitArray: false,
+    valueProcessors: [parseNumbers, parseBooleans],
   };
 
   return xml2js
