@@ -34,7 +34,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
         trackNetworkSessionSaveCanceled();
         closeModal();
       }}
-      wrapClassName="network-sessions-modal"
+      wrapClassName="network-session-modal"
       footer={[
         <Button key="cancel" onClick={closeModal}>
           Cancel
@@ -44,16 +44,16 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
         </Button>,
       ]}
     >
-      <div className="network-sessions-modal-content">
+      <div className="network-session-modal-content">
         <Row>
           <Input
-            placeholder="Enter a name for the session"
+            placeholder="Enter a name for this session"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </Row>
-        <Row className="network-sessions-modal-footer">
+        <Row className="network-session-modal-footer">
           <Space>
             <Button key="cancel" onClick={closeModal}>
               Cancel

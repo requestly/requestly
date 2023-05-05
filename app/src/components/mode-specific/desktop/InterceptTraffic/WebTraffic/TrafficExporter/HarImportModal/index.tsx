@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row } from "antd";
+import { Col, Modal, Row } from "antd";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -11,6 +11,7 @@ import {
   trackHarImportCanceled,
   trackHarImportCompleted,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { RQButton } from "lib/design-system/components";
 
 interface Props {
   onSaved: (sessionId: string) => void;
@@ -99,16 +100,15 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
 
   return (
     <React.Fragment>
-      <Button
+      <RQButton
         type="primary"
         onClick={() => {
           trackHarImportButtonClicked();
           openDropZone();
         }}
-        style={{ margin: "24px" }}
       >
         {btnText ? btnText : "Import Har File"}
-      </Button>
+      </RQButton>
       <Modal
         className="modal-dialog-centered "
         open={isDropZoneVisible}

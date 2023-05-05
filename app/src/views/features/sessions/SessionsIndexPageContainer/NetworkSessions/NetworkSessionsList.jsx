@@ -133,7 +133,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
   ];
 
   return (
-    <ProCard className="primary-card github-like-border rules-table-container" title={null}>
+    <ProCard className="primary-card github-like-border network-session-table-container" title={null}>
       <ProTable
         dataSource={networkSessionsMetadata}
         scroll={{ x: 700 }}
@@ -143,8 +143,10 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
         options={false}
         search={false}
         headerTitle={
-          <Space align="center" className="session-list-header">
-            <Typography.Title level={4}>Network Session Recordings</Typography.Title>
+          <Space align="center" className="network-session-list-header">
+            <Typography.Title level={4} className="network-session-list-heading">
+              Network Session Recordings
+            </Typography.Title>
             <ImportandSaveNetworkHarModalButton onSaved={stableOnSuccessfulHarImport} btnText="Import External Har" />
           </Space>
         }

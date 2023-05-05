@@ -1,125 +1,51 @@
-// selectively copied from sessionViewer.scss
-
-.session-viewer-page {
+.network-session-viewer-page {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 24px;
+}
 
-  .session-recording-player-row {
-    display: flex;
-    width: 100%;
-    gap: 12px;
-    margin: 12px 0;
+.network-session-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  margin-left: 197px;
 
-    .session-recording-player-container {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      overflow-x: auto;
-
-      iframe {
-        background: white;
-      }
-    }
-
-    .session-recording-properties {
-      width: 300px;
-      overflow: auto;
-      min-height: 100%;
-
-      > div {
-        height: auto;
-      }
-
-      .session-property-label {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .session-viewer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
-
-    .session-recording-name {
-      line-height: 40px;
-      margin: 0;
-    }
-
-    .session-viewer-actions {
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: row;
-      column-gap: 10px;
-
-      button {
-        height: 40px;
-      }
-    }
+  .network-session-recording-name {
+    line-height: 40px;
+    margin: 0;
   }
 }
 
-.session-viewer-more-actions {
+.network-session-viewer-more-actions {
   .more-action {
     padding: 5px 10px;
 
     .more-action-icon {
       width: initial;
-      padding: 5px !important;
-    }
-  }
-}
-
-body.dark {
-  .session-viewer-page {
-    .session-recording-name {
-      color: rgba(255, 255, 255, 0.85) !important;
-    }
-
-    .ant-input-number-group-addon {
-      color: #ffffff;
-      border-color: #313a46;
-      background-color: #313a46;
-    }
-
-    .ant-btn-link {
       padding: 5px;
-      min-height: 0;
-
-      &:hover,
-      &:focus {
-        border-color: transparent !important;
-        background: transparent;
-      }
     }
   }
 }
 
-.session-metadata-tooltip-icon {
-  margin: 4.8px 0 0 4px;
-  svg {
-    display: block;
-    height: 13px;
-    width: 13px;
-    cursor: pointer;
+.network-session-table-container {
+  .ant-pro-table-list-toolbar-left,
+  .ant-pro-table-list-toolbar-title {
+    width: 100%;
   }
-}
 
-.ant-pro-table-list-toolbar-left,
-.ant-pro-table-list-toolbar-title {
-  width: 100% !important;
-}
-
-.session-list-header {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  .network-session-list-header {
+    width: 100%;
+    justify-content: space-between;
+    .rq-btn {
+      margin: 0;
+    }
+    .network-session-list-heading {
+      margin-bottom: 0;
+    }
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -130,14 +56,14 @@ body.dark {
   }
 }
 
-.network-sessions-modal {
-  .network-sessions-modal-content {
+.network-session-modal {
+  .network-session-modal-content {
     padding: 20px;
     background: var(--body-background);
     overflow: auto;
     border-radius: var(--border-radius-md);
 
-    .network-sessions-modal-footer {
+    .network-session-modal-footer {
       justify-content: end;
       margin-top: 16px;
     }

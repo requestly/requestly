@@ -42,7 +42,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
   const renderLoader = () => <PageLoader message="Fetching session details..." />;
   const sessionActionsDropdownMenu = useMemo(
     () => (
-      <Menu className="session-viewer-more-actions">
+      <Menu className="network-session-viewer-more-actions">
         <Menu.Item
           key="delete"
           className="more-action"
@@ -73,15 +73,15 @@ const NetworkSessionViewer: React.FC<{}> = () => {
 
   return recordedLogs ? (
     <>
-      <div className="session-viewer-page">
-        <div className="session-viewer-header">
+      <div className="network-session-viewer-page">
+        <div className="network-session-viewer-header">
           <div
             style={{
               display: "flex",
               columnGap: "10px",
             }}
           >
-            <Typography.Title level={3} className="session-recording-name">
+            <Typography.Title level={3} className="network-session-recording-name">
               {sessionName}
             </Typography.Title>
           </div>
