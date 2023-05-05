@@ -19,14 +19,12 @@ interface Props {
 const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave }) => {
   const [name, setName] = useState<string>("");
 
-  const handleSaveRecording = async () => {
+  const handleSaveRecording = useCallback(async () => {
     const id = await saveRecording(name, har);
     toast.success("Network logs successfully saved!");
     trackNetworkSessionSaved();
     onSave(id);
-  };
-
-  const stableSaveRecording = useCallback(handleSaveRecording, [onSave, name, har]);
+  }, [onSave, name, har]);
 
   return (
     <Modal
@@ -39,7 +37,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
         <Button key="cancel" onClick={closeModal}>
           Cancel
         </Button>,
-        <Button key="save" type="primary" disabled={!name} onClick={stableSaveRecording}>
+        <Button key="save" type="primary" disabled={!name} onClick={handleSaveRecording}>
           Save
         </Button>,
       ]}

@@ -13,8 +13,6 @@ import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
-import { useNavigate } from "react-router-dom";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { trackNetworkSessionSaveClicked } from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 const { Text } = Typography;
@@ -32,7 +30,6 @@ const ActionHeader = ({
   isRegexSearchActive,
   setIsRegexSearchActive,
 }) => {
-  const navigate = useNavigate();
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
   const closeSaveModal = useCallback(() => {
@@ -41,13 +38,6 @@ const ActionHeader = ({
   const openSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(true);
   }, []);
-
-  const stableRedirectToSavedLogPreview = useCallback(
-    (id) => {
-      redirectToNetworkSession(navigate, id);
-    },
-    [navigate]
-  );
 
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -112,11 +102,6 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
-          <Col>
-            <Tooltip placement="top" title="Clear Logs">
-              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
-            </Tooltip>
-          </Col>
           {isStaticPreview ? null : (
             <>
               <Col>
@@ -175,6 +160,7 @@ const ActionHeader = ({
                   onChange={(isPaused) => {
                     setIsInterceptingTraffic(!isPaused);
                   }}
+                  disabled={!logsCount}
                 />
               </Col>
             </>
@@ -185,7 +171,7 @@ const ActionHeader = ({
         har={logsToSaveAsHar}
         isVisible={isSessionSaveModalOpen}
         closeModal={closeSaveModal}
-        onSave={stableRedirectToSavedLogPreview}
+        onSave={closeSaveModal}
       />
     </>
   );
@@ -193,7 +179,7 @@ const ActionHeader = ({
 
 export default ActionHeader;
 
-function PauseAndPlayButton({ defaultIsPaused, onChange }) {
+function PauseAndPlayButton({ defaultIsPaused, onChange, disabled }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
   return (
     <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
@@ -217,6 +203,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
             setIsPaused(true);
             onChange(true); // isPaused
           }}
+          disabled={disabled}
         />
       )}
     </Tooltip>
