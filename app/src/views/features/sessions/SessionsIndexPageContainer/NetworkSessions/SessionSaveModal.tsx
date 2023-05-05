@@ -1,4 +1,5 @@
-import { Modal, Input, Button } from "antd";
+import { Input, Button, Row, Space } from "antd";
+import { RQModal } from "lib/design-system/components";
 import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 // import { saveRecording } from "./actions"; // takes har and name
 import React, { useCallback, useState } from "react";
@@ -27,12 +28,13 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   }, [onSave, name, har]);
 
   return (
-    <Modal
+    <RQModal
       open={isVisible}
       onCancel={() => {
         trackNetworkSessionSaveCanceled();
         closeModal();
       }}
+      wrapClassName="network-sessions-modal"
       footer={[
         <Button key="cancel" onClick={closeModal}>
           Cancel
@@ -42,14 +44,27 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
         </Button>,
       ]}
     >
-      {/* todo: add label before input */}
-      <Input
-        placeholder="Enter a name for the recording"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-    </Modal>
+      <div className="network-sessions-modal-content">
+        <Row>
+          <Input
+            placeholder="Enter a name for the session"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </Row>
+        <Row className="network-sessions-modal-footer">
+          <Space>
+            <Button key="cancel" onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button key="save" type="primary" disabled={!name} onClick={handleSaveRecording}>
+              Save
+            </Button>
+          </Space>
+        </Row>
+      </div>
+    </RQModal>
   );
 };
 

@@ -62,15 +62,13 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
         //Render the loader
         setProcessingDataToImport(true);
         try {
-          console.log("read this", reader.result);
           const importedHar: Har = JSON.parse(reader.result as string);
-          console.log("parsed");
           handleImportedData(importedHar);
           setProcessingDataToImport(false);
         } catch (error) {
           setProcessingDataToImport(false);
           console.log(error);
-          alert("Imported file doesn't match Requestly format. Please choose another file.");
+          alert("Imported file doesn't match the HAR format. Please choose another file.");
           closeDropZone();
         }
       };
@@ -89,7 +87,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
               </h1>
             </Row>
             <Row justify="center">
-              <p>Drag and drop requestly export file, or click to select</p>
+              <p>Drag and drop your exported sessions file, or click to select</p>
             </Row>
           </Col>
         </Row>

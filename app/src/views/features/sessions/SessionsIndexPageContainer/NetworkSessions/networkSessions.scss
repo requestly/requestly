@@ -129,3 +129,17 @@ body.dark {
     }
   }
 }
+
+.network-sessions-modal {
+  .network-sessions-modal-content {
+    padding: 20px;
+    background: var(--body-background);
+    overflow: auto;
+    border-radius: var(--border-radius-md);
+
+    .network-sessions-modal-footer {
+      justify-content: end;
+      margin-top: 16px;
+    }
+  }
+}
