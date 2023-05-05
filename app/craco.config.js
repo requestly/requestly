@@ -22,9 +22,7 @@ module.exports = {
           // relativeUrls: false,
         },
         modifyLessRule: (lessRule, context) => {
-          lessRule.use = lessRule.use.filter(
-            (i) => !i.loader.includes("resolve-url-loader")
-          );
+          lessRule.use = lessRule.use.filter((i) => !i.loader.includes("resolve-url-loader"));
           return lessRule;
         },
       },
@@ -35,6 +33,9 @@ module.exports = {
       resolve: {
         extensions: [".d.ts", ".ts", ".tsx", ".js", ".jsx"],
         fallback: {
+          buffer: require.resolve("buffer/"),
+          timers: require.resolve("timers-browserify"),
+          stream: require.resolve("stream-browserify"),
           "process/browser": require.resolve("process/browser"),
         },
       },
@@ -70,8 +71,7 @@ module.exports = {
         process: "process/browser",
       }),
       ...when(
-        (process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true") &&
-          process.env.NODE_ENV === "production",
+        (process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true") && process.env.NODE_ENV === "production",
         () => [
           new SentryWebpackPlugin({
             org: "requestly",
