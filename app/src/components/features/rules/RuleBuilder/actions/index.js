@@ -75,6 +75,43 @@ export const initiateBlankCurrentlySelectedRule = (
   }
 };
 
+export const getNewRule = (ruleType, isExportedFromCharles = false) => {
+  const ruleConfig = RULE_TYPES_CONFIG[ruleType];
+
+  if (!ruleConfig) return;
+
+  const extraRuleConfig = getRuleLevelInitialConfigs(ruleType);
+  const newRule = {
+    creationDate: generateObjectCreationDate(),
+    description: "",
+    groupId: "",
+    id: `${ruleType}_${generateObjectId()}`,
+    isSample: false,
+    name: "",
+    objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.RULE,
+    pairs: [],
+    ruleType: ruleType,
+    status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
+    ...extraRuleConfig,
+  };
+
+  if (ruleConfig.VERSION) {
+    newRule.version = ruleConfig.VERSION;
+  }
+
+  if (isExportedFromCharles) {
+    newRule._isCharlesExport = true;
+  }
+
+  if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in ruleConfig) {
+    newRule.removeCSPHeader = ruleConfig.REMOVE_CSP_HEADER;
+  }
+
+  newRule.pairs.push(getEmptyPairUsingRuleType(ruleType));
+
+  return newRule;
+};
+
 export const setCurrentlySelectedRuleConfig = (dispatch, config, navigate) => {
   if (config === undefined) {
     redirectToRoot(navigate);
