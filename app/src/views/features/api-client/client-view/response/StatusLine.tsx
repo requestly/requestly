@@ -34,7 +34,7 @@ const StatusLine: React.FC<Props> = ({ response }) => {
     <Space className="api-response-status-line">
       {response.redirectedUrl && (
         <Popover content={response.redirectedUrl}>
-          <Button type="text" icon={<NodeIndexOutlined />}>
+          <Button type="link" icon={<NodeIndexOutlined />}>
             Redirected
           </Button>
         </Popover>
