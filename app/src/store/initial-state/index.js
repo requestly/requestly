@@ -121,6 +121,7 @@ const INITIAL_STATE = {
     appsList: appListJson,
     availableAppsScanned: false, // @nsr remove completely, as it is now async
     proxyIp: "127.0.0.1",
+    isSavingNetworkSession: false,
   },
 
   // country of current user

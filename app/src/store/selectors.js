@@ -223,3 +223,7 @@ export const getIsTrafficTableTourCompleted = (state) => {
 export const getIsConnectedAppsTourCompleted = (state) => {
   return getGlobalState(state)?.["misc"]?.["isConnectedAppsTourCompleted"];
 };
+
+export const getIsSavingNetworkSession = (state) => {
+  return getGlobalState(state)?.["desktopSpecificDetails"]?.["isSavingNetworkSession"];
+};

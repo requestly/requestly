@@ -9,6 +9,8 @@ import {
   trackNetworkSessionSaveCanceled,
   trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 
 interface Props {
   har: Har;
@@ -17,15 +19,22 @@ interface Props {
   onSave: (id: string) => void;
 }
 
-const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave }) => {
+const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal }) => {
+  const dispatch = useDispatch();
+
   const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
-    const id = await saveRecording(name, har);
+    await saveRecording(name, har);
     toast.success("Network logs successfully saved!");
+    setName("");
+    dispatch(actions.updateIsSavingNetworkSession(true));
+    setTimeout(() => {
+      dispatch(actions.updateIsSavingNetworkSession(false));
+    }, 3000);
     trackNetworkSessionSaved();
-    onSave(id);
-  }, [onSave, name, har]);
+    closeModal();
+  }, [name, har, dispatch, closeModal]);
 
   return (
     <RQModal
@@ -35,14 +44,6 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
         closeModal();
       }}
       wrapClassName="network-session-modal"
-      footer={[
-        <Button key="cancel" onClick={closeModal}>
-          Cancel
-        </Button>,
-        <Button key="save" type="primary" disabled={!name} onClick={handleSaveRecording}>
-          Save
-        </Button>,
-      ]}
     >
       <div className="network-session-modal-content">
         <Row>

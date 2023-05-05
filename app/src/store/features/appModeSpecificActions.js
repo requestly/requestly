@@ -28,3 +28,7 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
 
   prevState.desktopSpecificDetails.appsList[appId][property] = value;
 };
+
+export const updateIsSavingNetworkSession = (prevState, action) => {
+  prevState.desktopSpecificDetails.isSavingNetworkSession = action.payload;
+};

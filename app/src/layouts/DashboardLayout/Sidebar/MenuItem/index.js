@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
-import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu } from "antd";
+import { getAppMode, getAppTheme, getIsSavingNetworkSession, getUserAuthDetails } from "store/selectors";
+import { Menu, Tooltip } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
@@ -13,80 +13,6 @@ import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/
 import { snakeCase } from "lodash";
 
 const { PATHS, LINKS } = APP_CONSTANTS;
-
-const givenRoutes = [
-  {
-    header: "Product",
-    key: "header-product",
-  },
-  {
-    path: PATHS.RULES.MY_RULES.ABSOLUTE,
-    name: "HTTP Rules",
-    icon: <Filter set="curved" className="remix-icon" />,
-    key: "my-http-rules",
-  },
-  {
-    path: PATHS.SESSIONS.RELATIVE,
-    name: "Sessions",
-    icon: <Video set="curved" className="remix-icon" />,
-    key: "sessions",
-  },
-  {
-    path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-    name: "Mock Server",
-    icon: <Document set="curved" className="remix-icon" />,
-    key: "my-mocks",
-  },
-  {
-    path: PATHS.FILE_SERVER_V2.ABSOLUTE,
-    name: "File Server",
-    icon: <PaperUpload set="curved" className="remix-icon" />,
-    key: "my-mock-files",
-  },
-  {
-    header: "Collaboration",
-    collapsedHeader: "Collab",
-    key: "header-collaboration",
-  },
-  {
-    path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
-    name: "Shared Lists",
-    icon: <AddUser set="curved" className="remix-icon" />,
-    key: "shared-lists",
-  },
-  {
-    path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
-    name: "Workspaces",
-    icon: <People set="curved" className="remix-icon" />,
-    key: "workspaces",
-  },
-  {
-    header: "divider",
-    key: "divider",
-  },
-  {
-    header: "Others",
-    key: "others",
-  },
-  {
-    path: PATHS.RULES.TEMPLATES.ABSOLUTE,
-    name: "Templates",
-    icon: <Bag2 set="curved" className="remix-icon" />,
-    key: "template-rules",
-  },
-  {
-    path: PATHS.TRASH.ABSOLUTE,
-    name: "Trash",
-    icon: <Delete set="curved" className="remix-icon" />,
-    key: "rules-trash",
-  },
-  {
-    path: LINKS.YOUTUBE_TUTORIALS,
-    name: <span>Tutorials</span>,
-    icon: <Play set="curved" className="remix-icon" />,
-    key: "tutorials",
-  },
-];
 
 const MenuItem = (props) => {
   const { onClose, collapsed } = props;
@@ -99,31 +25,110 @@ const MenuItem = (props) => {
   const appMode = useSelector(getAppMode);
   const appTheme = useSelector(getAppTheme);
   const user = useSelector(getUserAuthDetails);
+  const isSavingNetworkSession = useSelector(getIsSavingNetworkSession);
+
+  const givenRoutes = useCallback(() => {
+    const routes = [
+      {
+        header: "Product",
+        key: "header-product",
+      },
+      {
+        path: PATHS.RULES.MY_RULES.ABSOLUTE,
+        name: "HTTP Rules",
+        icon: <Filter set="curved" className="remix-icon" />,
+        key: "my-http-rules",
+      },
+      {
+        path: PATHS.SESSIONS.RELATIVE,
+        name: "Sessions",
+        icon: (
+          <Tooltip title={"View and manage your saved sessions here"} placement="right" open={isSavingNetworkSession}>
+            <Video set="curved" className="remix-icon" />
+          </Tooltip>
+        ),
+        key: "sessions",
+      },
+      {
+        path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
+        name: "Mock Server",
+        icon: <Document set="curved" className="remix-icon" />,
+        key: "my-mocks",
+      },
+      {
+        path: PATHS.FILE_SERVER_V2.ABSOLUTE,
+        name: "File Server",
+        icon: <PaperUpload set="curved" className="remix-icon" />,
+        key: "my-mock-files",
+      },
+      {
+        header: "Collaboration",
+        collapsedHeader: "Collab",
+        key: "header-collaboration",
+      },
+      {
+        path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
+        name: "Shared Lists",
+        icon: <AddUser set="curved" className="remix-icon" />,
+        key: "shared-lists",
+      },
+      {
+        path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
+        name: "Workspaces",
+        icon: <People set="curved" className="remix-icon" />,
+        key: "workspaces",
+      },
+      {
+        header: "divider",
+        key: "divider",
+      },
+      {
+        header: "Others",
+        key: "others",
+      },
+      {
+        path: PATHS.RULES.TEMPLATES.ABSOLUTE,
+        name: "Templates",
+        icon: <Bag2 set="curved" className="remix-icon" />,
+        key: "template-rules",
+      },
+      {
+        path: PATHS.TRASH.ABSOLUTE,
+        name: "Trash",
+        icon: <Delete set="curved" className="remix-icon" />,
+        key: "rules-trash",
+      },
+      {
+        path: LINKS.YOUTUBE_TUTORIALS,
+        name: <span>Tutorials</span>,
+        icon: <Play set="curved" className="remix-icon" />,
+        key: "tutorials",
+      },
+    ];
+
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      if (routes.some((route) => route.key === "network-traffic")) return;
+      routes.unshift({
+        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
+        key: "network-traffic",
+        name: "Network Traffic",
+        icon: <Swap set="curved" className="remix-icon" />,
+      });
+    }
+    return routes;
+  }, [appMode, isSavingNetworkSession]);
 
   // Component State
-  const [myRoutes, setMyRoutes] = useState(givenRoutes);
+  const [myRoutes, setMyRoutes] = useState(givenRoutes());
 
   const splitLocation = pathname.split("/");
 
   // Menu
   const locationURL = pathname;
 
-  // Set desktop app routes
   useEffect(() => {
-    // For Desktop App - Show Sources menu in Navbar only in  Desktop App
-    if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      const allRoutes = [...myRoutes];
-      // Check if doesn't exist already!
-      if (allRoutes.some((route) => route.key === "network-traffic")) return;
-      allRoutes.unshift({
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
-        key: "network-traffic",
-        name: "Network Traffic",
-        icon: <Swap set="curved" className="remix-icon" />,
-      });
-      setMyRoutes(allRoutes);
-    }
-  }, [appMode, myRoutes]);
+    setMyRoutes(givenRoutes());
+  }, [givenRoutes]);
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {

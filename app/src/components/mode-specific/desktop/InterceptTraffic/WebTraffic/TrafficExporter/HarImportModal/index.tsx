@@ -106,11 +106,12 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
           trackHarImportButtonClicked();
           openDropZone();
         }}
+        className="mt-8"
       >
         {btnText ? btnText : "Import Har File"}
       </RQButton>
       <Modal
-        className="modal-dialog-centered "
+        className="modal-dialog-centered"
         open={isDropZoneVisible}
         width="60%"
         bodyStyle={{ padding: 12 }}

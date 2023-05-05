@@ -35,6 +35,7 @@ const ActionHeader = ({
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
   }, []);
+
   const openSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(true);
   }, []);
@@ -167,12 +168,7 @@ const ActionHeader = ({
           )}
         </Space>
       </Row>
-      <SessionSaveModal
-        har={logsToSaveAsHar}
-        isVisible={isSessionSaveModalOpen}
-        closeModal={closeSaveModal}
-        onSave={closeSaveModal}
-      />
+      <SessionSaveModal har={logsToSaveAsHar} isVisible={isSessionSaveModalOpen} closeModal={closeSaveModal} />
     </>
   );
 };
