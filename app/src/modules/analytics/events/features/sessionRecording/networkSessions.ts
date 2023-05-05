@@ -17,14 +17,8 @@ export function trackHarImportCompleted() {
 }
 
 export function trackDeleteNetworkSessionClicked(source: ActionSource) {
-  switch (source) {
-    case ActionSource.Preview:
-      trackEvent(SESSION_RECORDING.network.delete.from_preview);
-      break;
-    case ActionSource.List:
-      trackEvent(SESSION_RECORDING.network.delete.from_list);
-      break;
-  }
+  const params = { source };
+  trackEvent(SESSION_RECORDING.network.delete.btn_clicked, params);
 }
 export function trackDeleteNetworkSessionCanceled() {
   trackEvent(SESSION_RECORDING.network.delete.canceled);
@@ -34,14 +28,8 @@ export function trackDeleteNetworkSessionConfirmed() {
 }
 
 export function trackDownloadNetworkSessionClicked(source: ActionSource) {
-  switch (source) {
-    case ActionSource.Preview:
-      trackEvent(SESSION_RECORDING.network.download.from_preview);
-      break;
-    case ActionSource.List:
-      trackEvent(SESSION_RECORDING.network.download.from_list);
-      break;
-  }
+  const params = { source };
+  trackEvent(SESSION_RECORDING.network.download, params);
 }
 
 export function trackNetworkSessionSaveClicked() {

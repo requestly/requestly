@@ -27,8 +27,7 @@ export const SESSION_RECORDING = {
       canceled: "import_external_har_canceled",
     },
     delete: {
-      from_list: "delete_network_session_clicked_from_list",
-      from_preview: "delete_network_session_clicked_from_preview",
+      btn_clicked: "delete_network_session_clicked_from_list",
       confirmed: "delete_network_session_confimed",
       canceled: "delete_network_session_canceled",
     },
@@ -37,10 +36,7 @@ export const SESSION_RECORDING = {
       saved: "new_network_session_saved",
       canceled: "new_network_session_canceled",
     },
-    download: {
-      from_list: "download_network_session_clicked_from_list",
-      from_preview: "download_network_session_clicked_from_preview",
-    },
+    download: "download_network_session_clicked",
   },
 };
 
