@@ -75,7 +75,7 @@ export const initiateBlankCurrentlySelectedRule = (
   }
 };
 
-export const getNewRule = (ruleType, isExportedFromCharles = false) => {
+export const getNewRule = (ruleType) => {
   const ruleConfig = RULE_TYPES_CONFIG[ruleType];
 
   if (!ruleConfig) return;
@@ -97,10 +97,6 @@ export const getNewRule = (ruleType, isExportedFromCharles = false) => {
 
   if (ruleConfig.VERSION) {
     newRule.version = ruleConfig.VERSION;
-  }
-
-  if (isExportedFromCharles) {
-    newRule._isCharlesExport = true;
   }
 
   if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in ruleConfig) {
