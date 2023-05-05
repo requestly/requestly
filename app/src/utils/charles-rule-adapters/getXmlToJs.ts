@@ -666,7 +666,7 @@ export type ConfigEntry = {
 
 /**
  *
- *  [] No Caching
+ *  [x] No Caching
  *  [] Block Cookies
  *  [] Block List
  * -----------------------
@@ -680,7 +680,7 @@ export type ConfigEntry = {
  *
  */
 
-export const getXmlToJs = (xml: string): Promise<any> => {
+export const getXmlToJs = (xml: string, appMode: string): Promise<any> => {
   const options = {
     explicitArray: false,
   };
@@ -697,17 +697,25 @@ export const getXmlToJs = (xml: string): Promise<any> => {
 
       const rules = get(records, "charles-export.toolConfiguration.configs.entry");
       return rules as ConfigEntry[];
-    })
+    }) // @ts-ignore
     .then((records) => {
-      // console.log("----->", records);
-      //@ts-ignore
-      // const recordsObject = records.reduce((result, record) => ({ ...result, [record.string]: record }), {});
+      // @ts-ignore
+      const recordsObject: Record<Partial<CharlesRule>, ConfigEntry> = records.reduce(
+        (result, record) => ({ ...result, [record.string as CharlesRule]: record }),
+        {}
+      );
+
+      console.log("------- rules import started ---------");
+      console.log({ recordsObject });
 
       // according to rule type call the adapters
+      return noCachingRuleAdapter(recordsObject[CharlesRule.NO_CACHING], appMode);
+
+      // eslint-disable-next-line
       records.forEach((record) => {
         switch (record.string) {
           case CharlesRule.NO_CACHING:
-            return noCachingRuleAdapter(record);
+            return noCachingRuleAdapter(record, appMode);
 
           // TODO
           case CharlesRule.BLOCK_COOKIES:
@@ -721,7 +729,5 @@ export const getXmlToJs = (xml: string): Promise<any> => {
             console.error("No adapter found!");
         }
       });
-
-      return records;
     });
 };

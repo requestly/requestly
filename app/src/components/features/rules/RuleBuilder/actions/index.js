@@ -75,7 +75,7 @@ export const initiateBlankCurrentlySelectedRule = (
   }
 };
 
-export const getNewRule = (ruleType, isExportedFromCharles = false) => {
+export const getNewRule = (ruleType) => {
   const ruleConfig = RULE_TYPES_CONFIG[ruleType];
 
   if (!ruleConfig) return;
@@ -99,16 +99,11 @@ export const getNewRule = (ruleType, isExportedFromCharles = false) => {
     newRule.version = ruleConfig.VERSION;
   }
 
-  if (isExportedFromCharles) {
-    newRule._isCharlesExport = true;
-  }
-
   if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in ruleConfig) {
     newRule.removeCSPHeader = ruleConfig.REMOVE_CSP_HEADER;
   }
 
   newRule.pairs.push(getEmptyPairUsingRuleType(ruleType));
-
   return newRule;
 };
 
