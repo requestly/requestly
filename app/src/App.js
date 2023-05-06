@@ -648,8 +648,8 @@ const App = () => {
 
     setIsLoading(true);
     getXmlToJs(exportedData, appMode)
-      .then(() => {
-        console.log("----- updating rules & groups ------");
+      .then((result) => {
+        console.log("----- updating rules & groups ------", result);
 
         dispatch(
           actions.updateRefreshPendingStatus({
@@ -660,8 +660,7 @@ const App = () => {
 
         setIsLoading(false);
       })
-      .catch((err) => console.log(`----- from import handler -----`, err))
-      .finally(() => {});
+      .catch((error) => console.log(`----- from import handler -----`, error));
   };
 
   useEffect(() => {
