@@ -17,8 +17,9 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
 
   useEffect(() => {
     if (isOpen) {
-      setCurlCommand("");
       inputRef.current?.focus();
+    } else {
+      setCurlCommand("");
     }
   }, [isOpen]);
 
