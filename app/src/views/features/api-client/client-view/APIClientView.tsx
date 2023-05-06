@@ -1,5 +1,5 @@
-import { Avatar, Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button, Empty, Input, Select, Space, Spin } from "antd";
+import React, { SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
@@ -14,7 +14,6 @@ import {
   removeEmptyKeys,
   supportsRequestBody,
 } from "../apiUtils";
-import { debounce } from "lodash";
 import {
   trackAPIRequestCancelled,
   trackAPIRequestSent,
@@ -23,6 +22,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
+import Favicon from "components/misc/Favicon";
 import "./apiClientView.scss";
 
 interface Props {
@@ -37,17 +37,12 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const CONTENT_TYPE_HEADER = "Content-Type";
 
-const EMPTY_FAVICON_URL =
-  "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16";
-
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const appMode = useSelector(getAppMode);
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
-  const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL);
-  const setFaviconUrlDebounced = useMemo(() => debounce(setFaviconUrl, 500), [setFaviconUrl]);
   const abortControllerRef = useRef<AbortController>(null);
 
   useEffect(() => {
@@ -228,35 +223,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  useEffect(() => {
-    let faviconUrl = EMPTY_FAVICON_URL;
-
-    try {
-      if (entry.request.url) {
-        const url = new URL(addUrlSchemeIfMissing(entry.request.url));
-        let domain = url.hostname;
-        const hostParts = domain.split(".");
-
-        if (hostParts.length > 2) {
-          if (hostParts[hostParts.length - 2].length === 2) {
-            domain = hostParts.slice(hostParts.length - 3).join(".");
-          } else {
-            domain = hostParts.slice(hostParts.length - 2).join(".");
-          }
-        }
-
-        const origin = `${url.protocol}//${domain}`;
-        faviconUrl =
-          "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16&url=" +
-          origin;
-      }
-    } catch (e) {
-      // skip
-    }
-
-    setFaviconUrlDebounced(faviconUrl);
-  }, [entry.request.url, setFaviconUrlDebounced]);
-
   return (
     <div className="api-client-view">
       <div className="api-client-header">
@@ -274,7 +240,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
             onChange={(evt) => setUrl(evt.target.value)}
             onPressEnter={onUrlInputEnterPressed}
             onBlur={onUrlInputBlur}
-            prefix={<Avatar size="small" style={{ marginRight: 2, height: 16, width: 16 }} src={faviconUrl} />}
+            prefix={<Favicon url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
           />
         </Space.Compact>
         <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
