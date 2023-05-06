@@ -55,10 +55,11 @@ const convertToJson = (curl_request) => {
   };
 
   const parseData = (data) => {
-    let jsonObj = {};
     // json.headers["Content-Type"] = "application/json";
 
     if (Array.isArray(data)) {
+      let jsonObj = {};
+
       if (isJson(data[0])) {
         data.forEach((item) => {
           const parsedItem = JSON.parse(item);
@@ -81,8 +82,8 @@ const convertToJson = (curl_request) => {
       if (data.includes("=")) {
         return parseDataUrlEncode(data);
       }
-      return data;
     }
+    return data;
   };
 
   const parseDataUrlEncode = (data) => {
