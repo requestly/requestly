@@ -78,9 +78,9 @@ export const generateKeyValuePairsFromJson = (json: Record<string, string> = {})
 export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
   const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
-  const contentType: RequestContentType = Object.values(RequestContentType).find((type) =>
-    contentTypeHeaderValue.includes(type)
-  );
+
+  const contentType: RequestContentType =
+    contentTypeHeaderValue && Object.values(RequestContentType).find((type) => contentTypeHeaderValue.includes(type));
 
   return contentType || RequestContentType.RAW;
 };
