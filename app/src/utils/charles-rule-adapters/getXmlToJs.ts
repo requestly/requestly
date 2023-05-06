@@ -23,7 +23,7 @@ type ConfigEntry = { string: CharlesRuleType | unknown } & Record<string, unknow
  *
  */
 
-export const getXmlToJs = (xml: string, appMode: string): Promise<any> => {
+export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
   const options = {
     explicitArray: false,
     valueProcessors: [parseNumbers, parseBooleans],
@@ -35,43 +35,25 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<any> => {
       // "charles-export" indicates its a valid export
       // ie multiple rule types exported together from Charles
       if (!("charles-export" in records)) {
-        console.error("Not a valid export!");
-        return;
+        throw new Error("Not a valid export!");
       }
 
       const rules = get(records, "charles-export.toolConfiguration.configs.entry");
       return rules as ConfigEntry[];
-    }) // @ts-ignore
+    })
     .then((records) => {
-      // @ts-ignore
-      const recordsObject: Record<Partial<CharlesRuleType>, ConfigEntry> = records.reduce(
+      if (!records) {
+        throw new Error("No rules found!");
+      }
+
+      const recordsObject = records.reduce(
         (result, record) => ({ ...result, [record.string as CharlesRuleType]: record }),
-        {}
+        {} as Record<CharlesRuleType, ConfigEntry>
       );
 
       console.log("------- rules import started ---------");
       console.log({ recordsObject });
 
-      // according to rule type call the adapters
-      return noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING], appMode);
-
-      // eslint-disable-next-line
-      records.forEach((record) => {
-        switch (record.string) {
-          case CharlesRuleType.NO_CACHING:
-            return noCachingRuleAdapter(record, appMode);
-
-          // TODO
-          case CharlesRuleType.BLOCK_COOKIES:
-          case CharlesRuleType.BLOCK_LIST:
-          case CharlesRuleType.MAP_LOCAL:
-          case CharlesRuleType.MAP_REMOTE:
-          case CharlesRuleType.REWRITE:
-            return;
-
-          default:
-            console.error("No adapter found!");
-        }
-      });
+      return Promise.allSettled([noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING], appMode)]);
     });
 };
