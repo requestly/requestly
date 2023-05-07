@@ -30,6 +30,7 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { getConnectedAppsCount } from "utils/Misc";
+import { isRegexFormat } from "utils/rules/misc";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -56,8 +57,11 @@ const CurrentTrafficTable = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isRegexSearchActive, setIsRegexSearchActive] = useState(false);
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
+
+  const [isInterceptingTraffic, setIsInterceptingTraffic] = useState(true);
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
@@ -225,18 +229,22 @@ const CurrentTrafficTable = ({
   useEffect(() => {
     // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
-      // TODO: @sahil865gupta Fix this multiple time registering
-      upsertNetworkLogMap(payload);
+      if (isInterceptingTraffic) {
+        // TODO: @sahil865gupta Fix this multiple time registering
+        upsertNetworkLogMap(payload);
+      }
     });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
-      const rqLog = convertProxyLogToUILog(payload);
+      if (isInterceptingTraffic) {
+        const rqLog = convertProxyLogToUILog(payload);
 
-      printLogsToConsole(rqLog);
+        printLogsToConsole(rqLog);
 
-      if (isTablePeristenceEnabled) {
-        saveLogInRedux(rqLog);
-      } else {
-        upsertNetworkLogMap(rqLog);
+        if (isTablePeristenceEnabled) {
+          saveLogInRedux(rqLog);
+        } else {
+          upsertNetworkLogMap(rqLog);
+        }
       }
     });
 
@@ -247,7 +255,7 @@ const CurrentTrafficTable = ({
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled]);
+  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP) {
@@ -262,19 +270,27 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
-  const getSearchedLogs = useCallback((logs, searchKeyword) => {
-    if (searchKeyword) {
-      try {
-        // TODO: @wrongsahil fix this. Special Characters are breaking the UI
-        const reg = new RegExp(searchKeyword, "i");
-        return logs.filter((log) => log.url.match(reg));
-      } catch (err) {
-        Logger.log(err);
+  const getSearchedLogs = useCallback(
+    (logs, searchKeyword) => {
+      if (searchKeyword) {
+        try {
+          // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+          let reg = null;
+          if (isRegexSearchActive) {
+            reg = new RegExp(searchKeyword);
+            return logs.filter((log) => log.url.match(reg));
+          } else {
+            return logs.filter((log) => log.url.includes(searchKeyword));
+          }
+        } catch (err) {
+          Logger.log(err);
+        }
       }
-    }
 
-    return logs;
-  }, []);
+      return logs;
+    },
+    [isRegexSearchActive]
+  );
 
   const getRequestLogs = useCallback(
     (desc = true) => {
@@ -317,7 +333,7 @@ const CurrentTrafficTable = ({
 
   const getGroupLogs = () => {
     const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs;
+    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
     const searchedLogs = getSearchedLogs(logs, searchKeyword);
 
     return (
@@ -327,6 +343,7 @@ const CurrentTrafficTable = ({
         emptyCtaText={emptyCtaText}
         emptyCtaAction={emptyCtaAction}
         emptyDesc={emptyDesc}
+        searchKeyword={searchKeyword}
       />
     );
   };
@@ -464,6 +481,9 @@ const CurrentTrafficTable = ({
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
+              setIsInterceptingTraffic={setIsInterceptingTraffic}
+              setIsRegexSearchActive={setIsRegexSearchActive}
+              isRegexSearchActive={isRegexSearchActive}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
@@ -481,7 +501,7 @@ const CurrentTrafficTable = ({
                 className="primary-card github-like-border network-table-wrapper-override"
                 style={{
                   boxShadow: "none",
-                  borderBottom: "2px solid #f5f5f5",
+                  // borderBottom: "2px solid #f5f5f5",
                   borderRadius: "0",
                   paddingBottom: "0",
                 }}
@@ -496,7 +516,7 @@ const CurrentTrafficTable = ({
                 style={{
                   boxShadow: "none",
                   borderRadius: "0",
-                  borderTop: "2px solid #f5f5f5",
+                  // borderTop: "2px solid #f5f5f5",
                 }}
                 bodyStyle={{ padding: "0px 20px" }}
               >
