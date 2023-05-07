@@ -185,7 +185,7 @@ const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args) => {
   const now = new Date().getTime();
   const timeSinceLastCalled = now - (lastCalled || 0);
 
-  if (timeSinceLastCalled > 5000 || !lastCalled) {
+  if (timeSinceLastCalled > 2000 || !lastCalled) {
     lastCalled = now;
     await invokeSyncingIfRequired(args);
   }

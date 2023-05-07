@@ -199,7 +199,7 @@ const AppModeInitializer = () => {
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
         window.skipSyncListenerForNextOneTime = false;
-        toast.loading("Just a sec, fetching updated rules..", null, true);
+        toast.loading("Just a sec, fetching updated rules..", 2, true);
         invokeSyncingIfRequired({
           dispatch,
           uid: user?.details?.profile?.uid,
