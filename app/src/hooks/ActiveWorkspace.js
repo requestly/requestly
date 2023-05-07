@@ -3,8 +3,9 @@ import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import {
-  getAllTeamUserRulesConfigPath,
+  getTeamUserRuleAllConfigsPath,
   getTeamUserRuleConfigPath,
   getRecordsSyncPath,
 } from "utils/syncing/syncDataUtils";
@@ -18,6 +19,7 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
 
 const ActiveWorkspace = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const user = useSelector(getUserAuthDetails);
 
   const performCleanup = async () => {
     if (window.workspaceCleanupDone) return;
@@ -26,8 +28,14 @@ const ActiveWorkspace = () => {
 
     if (currentlyActiveWorkspace.id) {
       // Fetch fresh rule configs from Firebase
-      const allRulesConfig = await getValueAsPromise(getAllTeamUserRulesConfigPath());
-      if (!allRulesConfig) return; // It's already empty - No cleanup required bitch
+      const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath(
+        currentlyActiveWorkspace.id,
+        user?.details?.profile?.uid
+      );
+      if (!teamUserRuleAllConfigsPath) return;
+
+      const allRulesConfig = await getValueAsPromise(teamUserRuleAllConfigsPath);
+      if (!allRulesConfig) return; // It's already empty - No cleanup required
       const allRulesConfigIds = Object.keys(allRulesConfig);
 
       // Fetch fresh rule definitions from Firebase
@@ -43,7 +51,9 @@ const ActiveWorkspace = () => {
       const extraConfigIds = allRulesConfigIds.filter((x) => !allRuleIds.includes(x));
 
       for (const recordId of extraConfigIds) {
-        await removeValueAsPromise(getTeamUserRuleConfigPath(recordId));
+        const teamUserRuleConfigPath = getTeamUserRuleConfigPath(recordId);
+        if (!teamUserRuleConfigPath) return;
+        await removeValueAsPromise(teamUserRuleConfigPath);
       }
     }
   };

@@ -14,6 +14,7 @@ import {
   handleLocalConflicts,
   getSyncedSessionRecordingPageConfig,
   saveSessionRecordingPageConfigLocallyWithoutSync,
+  getTeamUserRuleAllConfigsPath,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 import { StorageService } from "init";
@@ -179,6 +180,17 @@ export const invokeSyncingIfRequired = async ({
   }
 };
 
+let lastCalled = null;
+const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args) => {
+  const now = new Date().getTime();
+  const timeSinceLastCalled = now - (lastCalled || 0);
+
+  if (timeSinceLastCalled > 5000 || !lastCalled) {
+    lastCalled = now;
+    await invokeSyncingIfRequired(args);
+  }
+};
+
 export const getSyncTarget = (currentlyActiveWorkspaceId) => {
   if (currentlyActiveWorkspaceId) return "teamSync";
   return "sync";
@@ -188,16 +200,52 @@ const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => 
   const syncTarget = getSyncTarget(team_id);
   const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
   try {
-    return onValue(syncNodeRef, async (snap) => {
-      await invokeSyncingIfRequired({
-        dispatch,
-        latestFirebaseRecords: snap.val(),
-        uid,
-        team_id,
-        appMode,
-        isSyncEnabled,
-      });
-    });
+    if (syncTarget === "sync") {
+      // This is individual sync
+      // Listen to only records only
+      return [
+        onValue(syncNodeRef, async (snap) => {
+          await invokeSyncingIfRequired({
+            dispatch,
+            latestFirebaseRecords: snap.val(),
+            uid,
+            team_id,
+            appMode,
+            isSyncEnabled,
+          });
+        }),
+      ];
+    } else if (syncTarget === "teamSync") {
+      // This is team sync
+      // Listen to records node & rulesConfig node
+
+      return [
+        onValue(syncNodeRef, async (snap) => {
+          await callInvokeSyncingIfRequiredIfNotCalledRecently({
+            dispatch,
+            latestFirebaseRecords: snap.val(),
+            uid,
+            team_id,
+            appMode,
+            isSyncEnabled,
+          });
+        }),
+        (() => {
+          const rulesConfigPath = getTeamUserRuleAllConfigsPath(team_id, uid);
+          if (!rulesConfigPath) return;
+          const rulesConfigRef = getNodeRef(rulesConfigPath);
+          return onValue(rulesConfigRef, async () => {
+            await callInvokeSyncingIfRequiredIfNotCalledRecently({
+              dispatch,
+              uid,
+              team_id,
+              appMode,
+              isSyncEnabled,
+            });
+          });
+        })(),
+      ];
+    }
   } catch (e) {
     Logger.log(e);
     return null;
