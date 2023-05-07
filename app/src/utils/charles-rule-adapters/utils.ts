@@ -1,8 +1,11 @@
 import { SourceOperator } from "types";
-import { SourceUrl } from "./types";
+import { HeadersConfig, SourceUrl } from "./types";
+import { generateObjectId } from "utils/FormattingHelper";
 
-export const getSourceUrls = (locations: SourceUrl[]) => {
-  return locations.map((source: SourceUrl) => {
+export const getSourceUrls = (locations: SourceUrl | SourceUrl[]) => {
+  const sources = Array.isArray(locations) ? locations : [locations];
+
+  return sources.map((source: SourceUrl) => {
     const { enabled, location } = source;
     const { host = "", port = 443, protocol = "https", path = "", query = "" } = location;
 
@@ -20,4 +23,10 @@ export const getSourceUrls = (locations: SourceUrl[]) => {
       operator: isWildCardPresent ? SourceOperator.WILDCARD_MATCHES : SourceOperator.CONTAINS,
     };
   });
+};
+
+export const getHeaders = (headersConfig: HeadersConfig) => {
+  const requestHeaders = headersConfig.requestHeaders.map((config) => ({ ...config, id: generateObjectId() }));
+  const responseHeaders = headersConfig.responseHeaders.map((config) => ({ ...config, id: generateObjectId() }));
+  return { requestHeaders, responseHeaders };
 };

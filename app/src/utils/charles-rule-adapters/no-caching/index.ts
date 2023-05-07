@@ -1,18 +1,11 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { generateObjectId } from "utils/FormattingHelper";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
-import { getSourceUrls } from "../utils";
-import { HeadersConfig, NoCachingRule, SourceUrl } from "../types";
+import { getSourceUrls, getHeaders } from "../utils";
+import { NoCachingRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
-
-const getHeaders = (headersConfig: HeadersConfig) => {
-  const requestHeaders = headersConfig.requestHeaders.map((config) => ({ ...config, id: generateObjectId() }));
-  const responseHeaders = headersConfig.responseHeaders.map((config) => ({ ...config, id: generateObjectId() }));
-  return { requestHeaders, responseHeaders };
-};
 
 // TODO: write test for the same
 export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: string): Promise<void> => {
