@@ -238,7 +238,8 @@ const CurrentTrafficTable = ({
       if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
 
-        printLogsToConsole(rqLog);
+        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+        // printLogsToConsole(rqLog);
 
         if (isTablePeristenceEnabled) {
           saveLogInRedux(rqLog);
