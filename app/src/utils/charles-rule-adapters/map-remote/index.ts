@@ -3,11 +3,11 @@ import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
 import { createNewGroupAndSave, getLocation } from "../utils";
-import { CharlesRuleType, MapRemoteRule, RemoteRuleMappings } from "../types";
+import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings } from "../types";
 
 export const mapRemoteAdapter = <T = MapRemoteRule>(rules: T, appMode: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const mappings = get(rules, "map.mappings.mapMapping") as RemoteRuleMappings;
+    const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
     if (!mappings) {
