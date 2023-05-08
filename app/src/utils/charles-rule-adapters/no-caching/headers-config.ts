@@ -1,59 +1,50 @@
 import { HeaderRuleActionType } from "types";
-
-// enum Headers {
-//   PRAGMA = "Pragma",
-//   CACHE_CONTROL = "Cache-Control",
-//   IF_MODIFIED_SINCE = "If-Modified-Since",
-//   IF_NONE_MATCH = "If-None-Match",
-//   EXPIRES = "Expires",
-//   LAST_MODIFIED = "Last-Modified",
-//   ETAG = "ETag",
-// }
+import { Header, HeaderValue } from "../types";
 
 export const headersConfig = {
   requestHeaders: [
     {
-      header: "Pragma",
-      value: "no-cache",
+      header: Header.PRAGMA,
       type: HeaderRuleActionType.ADD,
+      value: HeaderValue.NO_CACHE,
     },
     {
-      header: "Cache-Control",
-      value: "no-cache",
+      header: Header.CACHE_CONTROL,
       type: HeaderRuleActionType.ADD,
+      value: HeaderValue.NO_CACHE,
     },
     {
-      header: "If-Modified-Since",
+      header: Header.IF_MODIFIED_SINCE,
       type: HeaderRuleActionType.REMOVE,
-      value: "",
+      value: HeaderValue.UNKNOWN,
     },
     {
-      header: "If-None-Match",
+      header: Header.IF_NONE_MATCH,
       type: HeaderRuleActionType.REMOVE,
-      value: "",
+      value: HeaderValue.UNKNOWN,
     },
   ],
 
   responseHeaders: [
     {
-      header: "Cache-Control",
-      value: "no-cache",
+      header: Header.CACHE_CONTROL,
+      value: HeaderValue.NO_CACHE,
       type: HeaderRuleActionType.ADD,
     },
     {
-      header: "Expires",
+      header: Header.EXPIRES,
       type: HeaderRuleActionType.REMOVE,
-      value: "",
+      value: HeaderValue.UNKNOWN,
     },
     {
-      header: "Last-Modified",
+      header: Header.LAST_MODIFIED,
       type: HeaderRuleActionType.REMOVE,
-      value: "",
+      value: HeaderValue.UNKNOWN,
     },
     {
-      header: "ETag",
+      header: Header.ETAG,
       type: HeaderRuleActionType.REMOVE,
-      value: "",
+      value: HeaderValue.UNKNOWN,
     },
   ],
 };
