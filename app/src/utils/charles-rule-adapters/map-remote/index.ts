@@ -10,7 +10,7 @@ export const mapRemoteAdapter = (appMode: string, rules: MapRemoteRule): Promise
     const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
-    if (!mappings) {
+    if (!rules || !mappings) {
       reject();
       return;
     }

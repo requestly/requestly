@@ -10,7 +10,7 @@ export const noCachingRuleAdapter = (appMode: string, rules: NoCachingRule): Pro
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch") as SourceUrl[];
 
-    if (!locations) {
+    if (!rules || !locations) {
       reject();
       return;
     }
