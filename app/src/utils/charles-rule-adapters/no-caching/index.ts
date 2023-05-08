@@ -1,9 +1,7 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { StorageService } from "init";
-import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
-import { getSourceUrls, getHeaders } from "../utils";
+import { getSourceUrls, getHeaders, createNewGroupAndSave } from "../utils";
 import { CharlesRuleType, NoCachingRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
@@ -19,13 +17,13 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
 
     const sourcesUrls = getSourceUrls(locations);
     const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-    const exportedRules = sourcesUrls.map(({ value, status, operator }, index) => {
+    const exportedRules = sourcesUrls.map(({ value, status, operator }) => {
       const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
 
       return {
         ...rule,
-        isCharlesExport: true,
         name: `${value}`,
+        isCharlesExported: true,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -41,12 +39,14 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
       };
     });
 
-    createNewGroup(appMode, CharlesRuleType.NO_CACHING, (groupId: string) => {
-      const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => resolve())
-        .catch(() => reject());
+    const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
+    createNewGroupAndSave({
+      appMode,
+      rules: exportedRules,
+      status: isToolEnabled,
+      onError: reject,
+      onSuccess: resolve,
+      groupName: CharlesRuleType.NO_CACHING,
     });
   });
 };
