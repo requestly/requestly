@@ -67,6 +67,22 @@ export type BlockCookiesRule = {
   } & Record<string, unknown>;
 };
 
+export type BlockListRule = {
+  string: string;
+  blacklist: {
+    action: 0 | 1;
+    toolEnabled: boolean;
+    locations: {
+      locationPatterns: {
+        locationMatch: {
+          enabled: boolean;
+          location: Location;
+        };
+      };
+    };
+  };
+};
+
 export type MapRemoteRuleMapping<T = Location> = {
   sourceLocation: T;
   destLocation: T;
