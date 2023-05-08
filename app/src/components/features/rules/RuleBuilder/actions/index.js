@@ -82,15 +82,15 @@ export const getNewRule = (ruleType) => {
 
   const extraRuleConfig = getRuleLevelInitialConfigs(ruleType);
   const newRule = {
-    creationDate: generateObjectCreationDate(),
-    description: "",
-    groupId: "",
-    id: `${ruleType}_${generateObjectId()}`,
-    isSample: false,
     name: "",
-    objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.RULE,
+    groupId: "",
+    description: "",
+    isSample: false,
     pairs: [],
     ruleType: ruleType,
+    id: `${ruleType}_${generateObjectId()}`,
+    creationDate: generateObjectCreationDate(),
+    objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.RULE,
     status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
     ...extraRuleConfig,
   };
