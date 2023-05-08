@@ -1,27 +1,29 @@
 import { get } from "lodash";
 import { StorageService } from "init";
-import { BlockCookiesRule } from "../types";
+import { BlockCookiesRule, CharlesRuleType } from "../types";
 import { getHeaders, getSourceUrls } from "../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
-import { RuleType, Status } from "types";
+import { HeadersRule, RuleType, Status } from "types";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
 
 export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch");
+
     if (!locations) {
       reject();
       return;
     }
+
     const sourceUrls = getSourceUrls(locations);
     const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
     const exportedRules = sourceUrls.map(({ value, status, operator }, index) => {
-      const rule = getNewRule(RuleType.HEADERS);
+      const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
       return {
         ...rule,
         isCharlesExport: true,
-        name: `block cookies_${value}`,
+        name: `${value}`,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -37,7 +39,7 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
       };
     });
 
-    createNewGroup(appMode, "Block Cookies", (groupId: string) => {
+    createNewGroup(appMode, CharlesRuleType.BLOCK_COOKIES, (groupId: string) => {
       const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
       StorageService(appMode)
         .saveMultipleRulesOrGroups(updatedRules)
