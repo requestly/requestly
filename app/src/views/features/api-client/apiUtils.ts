@@ -1,8 +1,15 @@
-import { getAPIResponse } from "actions/ExtensionActions";
+import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
+import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import parseCurlAsJson from "./curl-to-json";
 import { CurlParserResponse, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
+// @ts-ignore
+import { CONSTANTS } from "@requestly/requestly-core";
 
-export const makeRequest = async (request: RQAPI.Request, signal?: AbortSignal): Promise<RQAPI.Response> => {
+export const makeRequest = async (
+  appMode: string,
+  request: RQAPI.Request,
+  signal?: AbortSignal
+): Promise<RQAPI.Response> => {
   // TODO: check if Extension or Desktop App is installed and has the support
   // TODO: add support in MV3 extension
   return new Promise((resolve, reject) => {
@@ -17,7 +24,14 @@ export const makeRequest = async (request: RQAPI.Request, signal?: AbortSignal):
       };
       signal.addEventListener("abort", abortListener);
     }
-    getAPIResponse(request, { credentials: "omit" }).then(resolve);
+
+    if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
+      getAPIResponseViaExtension(request).then(resolve);
+    } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
+      getAPIResponseViaProxy(request).then(resolve);
+    } else {
+      resolve(null);
+    }
   });
 };
 
@@ -64,12 +78,11 @@ export const generateKeyValuePairsFromJson = (json: Record<string, string> = {})
 export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
   const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
-  const contentType: RequestContentType =
-    contentTypeHeaderValue && Object.values(RequestContentType).includes(contentTypeHeaderValue)
-      ? contentTypeHeaderValue
-      : RequestContentType.RAW;
 
-  return contentType;
+  const contentType: RequestContentType =
+    contentTypeHeaderValue && Object.values(RequestContentType).find((type) => contentTypeHeaderValue.includes(type));
+
+  return contentType || RequestContentType.RAW;
 };
 
 export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {

@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { RQAPI } from "../../types";
-import { Space } from "antd";
+import { Button, Popover, Space } from "antd";
 import PropertyRow from "./PropertyRow/PropertyRow";
 import { statusCodes } from "config/constants/sub/statusCode";
 import NetworkStatusField from "components/misc/NetworkStatusField";
+import { NodeIndexOutlined } from "@ant-design/icons";
 
 interface Props {
   response: RQAPI.Response;
@@ -31,6 +32,13 @@ const StatusLine: React.FC<Props> = ({ response }) => {
 
   return (
     <Space className="api-response-status-line">
+      {response.redirectedUrl && (
+        <Popover content={response.redirectedUrl}>
+          <Button type="link" icon={<NodeIndexOutlined />}>
+            Redirected
+          </Button>
+        </Popover>
+      )}
       <PropertyRow
         name="Status"
         value={<NetworkStatusField status={response.status} statusText={formattedStatusText} />}
