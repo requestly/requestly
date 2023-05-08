@@ -87,8 +87,6 @@ const RuleBuilder = (props) => {
     return enableDocs && showDocs;
   }, [enableDocs, showDocs]);
 
-  console.log({ currentlySelectedRuleData });
-
   useExternalRuleCreation(MODE);
 
   const useHasChanged = (val) => {
