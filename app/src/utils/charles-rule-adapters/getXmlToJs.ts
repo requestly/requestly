@@ -1,6 +1,7 @@
 import xml2js from "xml2js";
 import { get } from "lodash";
 import { noCachingRuleAdapter } from "./no-caching";
+import { blockCookiesAdapter } from "./block-cookies";
 import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
 import { CharlesRuleType } from "./types";
 
@@ -54,6 +55,9 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
       console.log("------- rules import started ---------");
       console.log({ recordsObject });
 
-      return Promise.allSettled([noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING], appMode)]);
+      return Promise.allSettled([
+        noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING], appMode),
+        blockCookiesAdapter(recordsObject[CharlesRuleType.BLOCK_COOKIES], appMode),
+      ]);
     });
 };
