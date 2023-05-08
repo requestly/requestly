@@ -86,12 +86,21 @@ export type MapRemoteRule = {
   };
 };
 
-// export type MapLocalRule = {
-//   string: string;
-//   mapLocal:{
-//     toolEnabled: boolean,
-//     mappings:{
-//       mapLocalMapping:
-//     }
-//   }
-// }
+export type MapLocalRuleMapping = {
+  dest: string;
+  sourceLocation: Location;
+  enabled: boolean;
+  caseSensitive: boolean;
+};
+
+export type MapLocalRuleMappings = MapLocalRuleMapping | MapLocalRuleMapping[];
+
+export type MapLocalRule = {
+  string: string;
+  mapLocal: {
+    toolEnabled: boolean;
+    mappings: {
+      mapLocalMapping: MapLocalRuleMappings;
+    };
+  };
+};
