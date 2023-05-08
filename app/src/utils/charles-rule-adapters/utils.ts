@@ -12,6 +12,7 @@ export const getSourceUrls = (locations: SourceUrl | SourceUrl[]) => {
     // TODO @rohanmathur91: update logic to convert wildcard to regex match
     // 1. check wildcard, replace "*" with ".*" and "?" with "."
     // 2. handle escape for existing "." in source URL
+    // 3. if ports in [80, 443] then dont concat in URL
     const isWildCardPresent = Object.values(location).some(
       (value) => String(value).includes("*") || String(value).includes("?")
     );
