@@ -6,7 +6,7 @@ import { CharlesRuleType, NoCachingRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
 // TODO: write test for the same
-export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: string): Promise<void> => {
+export const noCachingRuleAdapter = (appMode: string, rules: NoCachingRule): Promise<void> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch") as SourceUrl[];
 
