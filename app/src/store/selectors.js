@@ -214,16 +214,20 @@ export const getUserAttributes = (state) => {
 };
 
 export const getIsRedirectRuleTourCompleted = (state) => {
-  return getGlobalState(state)?.["misc"]?.["isRedirectRuleTourCompleted"];
+  return getGlobalState(state).misc?.persist?.isRedirectRuleTourCompleted;
 };
 export const getIsTrafficTableTourCompleted = (state) => {
-  return getGlobalState(state)?.["misc"]?.["isTrafficTableTourCompleted"];
+  return getGlobalState(state).misc.persist?.isTrafficTableTourCompleted;
 };
 
 export const getIsConnectedAppsTourCompleted = (state) => {
-  return getGlobalState(state)?.["misc"]?.["isConnectedAppsTourCompleted"];
+  return getGlobalState(state).misc.persist?.isConnectedAppsTourCompleted;
 };
 
-export const getIsSavingNetworkSession = (state) => {
-  return getGlobalState(state)?.["desktopSpecificDetails"]?.["isSavingNetworkSession"];
+export const getNetworkSessionSaveInProgress = (state) => {
+  return getGlobalState(state).misc.nonPersist?.networkSessionSaveInProgress;
+};
+
+export const getIsNetworkTooptipShown = (state) => {
+  return getGlobalState(state).misc.persist?.isNetworkSessionTooltipShown;
 };

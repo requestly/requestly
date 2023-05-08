@@ -2,16 +2,16 @@ import { Input, Button, Row, Space } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 // import { saveRecording } from "./actions"; // takes har and name
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { toast } from "utils/Toast";
 import { saveRecording } from "./actions";
 import {
   trackNetworkSessionSaveCanceled,
   trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { NetworkSessionRecord } from "./types";
+import { getIsNetworkTooptipShown } from "store/selectors";
 
 interface Props {
   har: Har;
@@ -23,28 +23,24 @@ interface Props {
 const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal }) => {
   const dispatch = useDispatch();
 
-  const [name, setName] = useState<string>("");
-  const [numberOfSessions, setNumberOfSessions] = useState<number>(0);
+  const networkSessionTooptipShown = useSelector(getIsNetworkTooptipShown);
 
-  useEffect(() => {
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("all-network-sessions", (payload: NetworkSessionRecord[]) => {
-      setNumberOfSessions(payload?.length || 0);
-    });
-  }, []);
+  const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
     await saveRecording(name, har);
     toast.success("Network logs successfully saved!");
     setName("");
-    if (numberOfSessions === 0) {
-      dispatch(actions.updateIsSavingNetworkSession(true));
+    if (!networkSessionTooptipShown) {
+      dispatch(actions.updateNetworkSessionSaveInProgress(true));
+      dispatch(actions.updateNetworkSessionTooltipShown());
       setTimeout(() => {
-        dispatch(actions.updateIsSavingNetworkSession(false));
-      }, 3000);
+        dispatch(actions.updateNetworkSessionSaveInProgress(false));
+      }, 2500);
     }
     trackNetworkSessionSaved();
     closeModal();
-  }, [name, har, numberOfSessions, closeModal, dispatch]);
+  }, [closeModal, dispatch, har, name, networkSessionTooptipShown]);
 
   return (
     <RQModal

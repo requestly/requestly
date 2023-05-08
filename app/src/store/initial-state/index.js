@@ -154,9 +154,15 @@ const INITIAL_STATE = {
   },
 
   misc: {
-    isRedirectRuleTourCompleted: false,
-    isTrafficTableTourCompleted: false,
-    isConnectedAppsTourCompleted: false,
+    persist: {
+      isRedirectRuleTourCompleted: false,
+      isTrafficTableTourCompleted: false,
+      isConnectedAppsTourCompleted: false,
+      isNetworkSessionTooltipShown: false,
+    },
+    nonPersist: {
+      networkSessionSaveInProgress: false,
+    },
   },
 };
 

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
-import { getAppMode, getAppTheme, getIsSavingNetworkSession, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getAppTheme, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
 import { Menu, Tooltip } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { MobileOutlined } from "@ant-design/icons";
@@ -25,7 +25,7 @@ const MenuItem = (props) => {
   const appMode = useSelector(getAppMode);
   const appTheme = useSelector(getAppTheme);
   const user = useSelector(getUserAuthDetails);
-  const isSavingNetworkSession = useSelector(getIsSavingNetworkSession);
+  const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
 
   const givenRoutes = useCallback(() => {
     const routes = [
