@@ -111,6 +111,10 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
   font-size: 12px;
 }
+.hide-traffic-table-split-gutter .traffic-table-split-container .gutter.gutter-vertical {
+  height: 0 !important;
+  transition: none;
+}
 
 .traffic-table-split-container {
   height: calc(100vh - 122px);
