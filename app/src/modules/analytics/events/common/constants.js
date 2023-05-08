@@ -155,4 +155,5 @@ export const TRAFFIC_TABLE = {
   SIDEBAR_FILTER_SELECTED: "sidebar_filter_selected",
   SIDEBAR_FILTER_EXPANDED: "sidebar_filter_expanded",
   SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
+  SIDEBAR_FILTER_CLEAR_ALL_CLICKED: "sidebar_filter_clear_all_clicked",
 };
