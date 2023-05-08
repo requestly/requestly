@@ -24,7 +24,7 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
 
       return {
         ...rule,
-        isCharlesExport: true,
+        isCharlesExported: true,
         name: `${value}`,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [

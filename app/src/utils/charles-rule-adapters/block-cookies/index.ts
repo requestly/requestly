@@ -22,7 +22,7 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
       const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
       return {
         ...rule,
-        isCharlesExport: true,
+        isCharlesExported: true,
         name: `${value}`,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
