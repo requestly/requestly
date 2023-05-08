@@ -11,19 +11,6 @@ type CharlesExport = {
 
 type ConfigEntry = { string: CharlesRuleType | unknown } & Record<string, unknown>;
 
-/**
- *
- *  [x] No Caching
- *  [] Block Cookies
- *  [] Block List
- * -----------------------
- *  [] Map Remote
- *  [] Map Local
- * -----------------------
- *  [] Rewrite
- *
- */
-
 export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
   const options = {
     explicitArray: false,
