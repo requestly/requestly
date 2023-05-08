@@ -10,7 +10,7 @@ export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promi
     const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
-    if (!mappings) {
+    if (!rules || !mappings) {
       reject();
       return;
     }
