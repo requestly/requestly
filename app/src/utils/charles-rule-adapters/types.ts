@@ -67,21 +67,40 @@ export type BlockCookiesRule = {
   } & Record<string, unknown>;
 };
 
-export type RemoteRuleMapping<T = Location> = {
+export type MapRemoteRuleMapping<T = Location> = {
   sourceLocation: T;
   destLocation: T;
   enabled: boolean;
   preserveHostHeader: boolean;
 };
 
-export type RemoteRuleMappings = RemoteRuleMapping | RemoteRuleMapping[];
+export type MapRemoteRuleMappings = MapRemoteRuleMapping | MapRemoteRuleMapping[];
 
 export type MapRemoteRule = {
   string: string;
   map: {
     toolEnabled: boolean;
     mappings: {
-      mapMapping: RemoteRuleMappings;
+      mapMapping: MapRemoteRuleMappings;
+    };
+  };
+};
+
+export type MapLocalRuleMapping = {
+  dest: string;
+  sourceLocation: Location;
+  enabled: boolean;
+  caseSensitive: boolean;
+};
+
+export type MapLocalRuleMappings = MapLocalRuleMapping | MapLocalRuleMapping[];
+
+export type MapLocalRule = {
+  string: string;
+  mapLocal: {
+    toolEnabled: boolean;
+    mappings: {
+      mapLocalMapping: MapLocalRuleMappings;
     };
   };
 };
