@@ -5,6 +5,7 @@ import { blockCookiesAdapter } from "./block-cookies";
 import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
 import { CharlesRuleType } from "./types";
 import { mapRemoteAdapter } from "./map-remote";
+import { mapLocalRuleAdapter } from "./map-local";
 
 type CharlesExport = {
   "charles-export": Record<string, unknown>;
@@ -47,6 +48,7 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
         noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING], appMode),
         blockCookiesAdapter(recordsObject[CharlesRuleType.BLOCK_COOKIES], appMode),
         mapRemoteAdapter(recordsObject[CharlesRuleType.MAP_REMOTE], appMode),
+        mapLocalRuleAdapter(recordsObject[CharlesRuleType.MAP_LOCAL], appMode),
       ]);
     });
 };
