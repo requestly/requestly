@@ -50,13 +50,34 @@ export type SourceUrl = {
 
 // rules
 export type NoCachingRule = {
-  selectedHostsTool: Record<string, unknown>;
-  toolEnabled: boolean;
-  useSelectedLocations: boolean;
+  string: string;
+  selectedHostsTool: {
+    toolEnabled: boolean;
+    useSelectedLocations: boolean;
+  } & Record<string, unknown>;
 };
 
 export type BlockCookiesRule = {
-  selectedHostsTool: Record<string, unknown>;
-  toolEnabled: boolean;
-  useSelectedLocations: boolean;
+  string: string;
+  selectedHostsTool: {
+    toolEnabled: boolean;
+    useSelectedLocations: boolean;
+  } & Record<string, unknown>;
+};
+
+type RemoteRuleMapping<T = SourceUrl> = {
+  sourceLocation: T;
+  destLocation: T;
+  enabled: boolean;
+  preserveHostHeader: boolean;
+};
+
+export type MapRemoteRule = {
+  string: string;
+  map: {
+    toolEnabled: boolean;
+    mappings: {
+      mapMapping: RemoteRuleMapping | RemoteRuleMapping[];
+    };
+  };
 };
