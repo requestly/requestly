@@ -2,6 +2,7 @@ import xml2js from "xml2js";
 import { get } from "lodash";
 import { noCachingRuleAdapter } from "./no-caching";
 import { blockCookiesAdapter } from "./block-cookies";
+import { blocklistAdapter } from "./block-list";
 import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
 import { CharlesRuleType } from "./types";
 import { mapRemoteAdapter } from "./map-remote";
@@ -49,6 +50,7 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
         blockCookiesAdapter(recordsObject[CharlesRuleType.BLOCK_COOKIES], appMode),
         mapRemoteAdapter(recordsObject[CharlesRuleType.MAP_REMOTE], appMode),
         mapLocalRuleAdapter(recordsObject[CharlesRuleType.MAP_LOCAL], appMode),
+        blocklistAdapter(recordsObject[CharlesRuleType.BLOCK_LIST], appMode),
       ]);
     });
 };

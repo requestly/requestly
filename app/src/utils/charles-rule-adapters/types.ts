@@ -104,3 +104,10 @@ export type MapLocalRule = {
     };
   };
 };
+
+export type BlocklistRule = {
+  blacklist: Record<string, unknown>;
+  toolEnabled: boolean;
+  useSelectedLocations: boolean;
+  action: number;
+};
