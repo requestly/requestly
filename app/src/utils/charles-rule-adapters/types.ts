@@ -37,3 +37,9 @@ export type NoCachingRule = {
   toolEnabled: boolean;
   useSelectedLocations: boolean;
 };
+
+export type BlockCookiesRule = {
+  selectedHostsTool: Record<string, unknown>;
+  toolEnabled: boolean;
+  useSelectedLocations: boolean;
+};
