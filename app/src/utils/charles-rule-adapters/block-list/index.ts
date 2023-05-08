@@ -31,7 +31,7 @@ const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: s
   };
 };
 
-export const blockListRuleAdapter = (rules: BlockListRule, appMode: string): Promise<void> => {
+export const blockListRuleAdapter = (appMode: string, rules: BlockListRule): Promise<void> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "blacklist.locations.locationPatterns.locationMatch");
 

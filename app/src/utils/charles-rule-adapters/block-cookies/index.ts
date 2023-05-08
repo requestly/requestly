@@ -5,7 +5,7 @@ import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { HeadersRule, RuleType, Status } from "types";
 
-export const blockCookiesRuleAdapter = <T = BlockCookiesRule>(rules: T, appMode: string): Promise<void> => {
+export const blockCookiesRuleAdapter = (appMode: string, rules: BlockCookiesRule): Promise<void> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch");
 
