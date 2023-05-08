@@ -4,7 +4,7 @@ import { RuleType, HeadersRule, Status } from "types";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { getSourceUrls, getHeaders } from "../utils";
-import { NoCachingRule, SourceUrl } from "../types";
+import { CharlesRuleType, NoCachingRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
 // TODO: write test for the same
@@ -25,7 +25,7 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
       return {
         ...rule,
         isCharlesExport: true,
-        name: `untitled_${index}`,
+        name: `${value}`,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -41,7 +41,7 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
       };
     });
 
-    createNewGroup(appMode, "No Caching", (groupId: string) => {
+    createNewGroup(appMode, CharlesRuleType.NO_CACHING, (groupId: string) => {
       const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
       StorageService(appMode)
         .saveMultipleRulesOrGroups(updatedRules)
