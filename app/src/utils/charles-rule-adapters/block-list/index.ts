@@ -1,20 +1,18 @@
 import { get } from "lodash";
-import { BlocklistRule, CharlesRuleType } from "../types";
-import { getSourceUrls } from "../utils";
-import { Rule, CancelRule, RuleType, Status, ResponseRuleResourceType } from "types";
+import { BlockListRule, CharlesRuleType } from "../types";
+import { createNewGroupAndSave, getSourceUrls } from "../utils";
+import { CancelRule, RuleType, Status, ResponseRuleResourceType, ResponseRule } from "types";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
-import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
-import { StorageService } from "init";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: string) => {
-  const rule = getNewRule(RuleType.RESPONSE);
+  const rule = getNewRule(RuleType.RESPONSE) as ResponseRule;
   return {
     ...rule,
     isCharlesExport: true,
-    name: `return 403_${sourceUrl}`,
+    name: `${sourceUrl}`,
     status: status ? Status.ACTIVE : Status.INACTIVE,
     pairs: [
       {
@@ -33,32 +31,28 @@ const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: s
   };
 };
 
-export const blocklistAdapter = <T = BlocklistRule>(rules: T, appMode: string): Promise<void> => {
+export const blockListRuleAdapter = (rules: BlockListRule, appMode: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "blacklist.locations.locationPatterns.locationMatch");
-    if (!locations) {
+
+    if (!rules || !locations) {
       reject();
       return;
     }
 
-    let exportedRules: Rule[] = [];
-
-    const blockingAction = get(rules, "blacklist.action");
-    /* 
-        if blockingAction is 0, default behaviour (Drop connection)
-        if blocing Action is 1, return 403 response
-    */
-
+    // If blockingAction is 0, default behaviour (Drop connection)
+    // If blockingAction is 1, return 403 response
+    const blockingAction = rules?.blacklist.action;
     const sourceUrls = getSourceUrls(locations);
-    sourceUrls.forEach(({ value, status, operator }) => {
+    const exportedRules = sourceUrls.map(({ value, status, operator }) => {
       if (blockingAction === 1) {
-        const responseRule = generate403ResponseRule(value, status, operator);
-        exportedRules.push(responseRule);
+        return generate403ResponseRule(value, status, operator);
       }
+
       const rule = getNewRule(RuleType.CANCEL) as CancelRule;
-      exportedRules.push({
+      return {
         ...rule,
-        isCharlesExport: true,
+        isCharlesExported: true,
         name: `block_${value}`,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
@@ -67,15 +61,17 @@ export const blocklistAdapter = <T = BlocklistRule>(rules: T, appMode: string): 
             source: { ...rule.pairs[0].source, value, operator },
           },
         ],
-      });
+      };
     });
 
-    createNewGroup(appMode, CharlesRuleType.BLOCK_LIST, (groupId: string) => {
-      const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => resolve())
-        .catch(() => reject());
+    const isToolEnabled = rules?.blacklist.toolEnabled;
+    createNewGroupAndSave({
+      appMode,
+      rules: exportedRules,
+      status: isToolEnabled,
+      onError: reject,
+      onSuccess: resolve,
+      groupName: CharlesRuleType.BLOCK_LIST,
     });
   });
 };
