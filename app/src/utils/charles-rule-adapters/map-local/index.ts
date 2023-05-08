@@ -3,11 +3,11 @@ import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
 import { createNewGroupAndSave, getLocation } from "../utils";
-import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings } from "../types";
+import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings } from "../types";
 
-export const mapRemoteAdapter = <T = MapRemoteRule>(rules: T, appMode: string): Promise<void> => {
+export const mapLocalRuleAdapter = <T = MapLocalRule>(rules: T, appMode: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
+    const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
     if (!mappings) {
@@ -15,35 +15,34 @@ export const mapRemoteAdapter = <T = MapRemoteRule>(rules: T, appMode: string): 
       return;
     }
 
-    const exportedRules = updatedMappings.map(({ sourceLocation, destLocation, enabled }) => {
+    const exportedRules = updatedMappings.map(({ dest, sourceLocation, enabled }) => {
       const source = getLocation(sourceLocation);
-      const destination = getLocation(destLocation);
       const rule = getNewRule(RuleType.REDIRECT) as RedirectRule;
       return {
         ...rule,
         isCharlesExported: true,
-        name: `${source.value} to ${destination.value}`,
+        name: `${source.value} to ${dest}`,
         status: enabled ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
             ...rule.pairs[0],
             id: generateObjectId(),
-            destination: destination.value,
-            destinationType: RedirectDestinationType.URL,
+            destination: `file://${dest}`,
+            destinationType: RedirectDestinationType.MAP_LOCAL,
             source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
           },
         ],
       };
     });
 
-    const isToolEnabled = get(rules, "map.toolEnabled");
+    const isToolEnabled = get(rules, "mapLocal.toolEnabled");
     createNewGroupAndSave({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
       onError: reject,
       onSuccess: resolve,
-      groupName: CharlesRuleType.MAP_REMOTE,
+      groupName: CharlesRuleType.MAP_LOCAL,
     });
   });
 };
