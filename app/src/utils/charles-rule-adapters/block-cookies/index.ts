@@ -9,7 +9,7 @@ export const blockCookiesRuleAdapter = (appMode: string, rules: BlockCookiesRule
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch");
 
-    if (!locations) {
+    if (!rules || !locations) {
       reject();
       return;
     }
