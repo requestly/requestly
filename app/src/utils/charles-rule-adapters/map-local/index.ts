@@ -5,7 +5,7 @@ import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
 import { createNewGroupAndSave, getLocation } from "../utils";
 import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings } from "../types";
 
-export const mapLocalRuleAdapter = <T = MapLocalRule>(rules: T, appMode: string): Promise<void> => {
+export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promise<void> => {
   return new Promise((resolve, reject) => {
     const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
