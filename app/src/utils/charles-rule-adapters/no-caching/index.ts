@@ -19,13 +19,13 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
 
     const sourcesUrls = getSourceUrls(locations);
     const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-    const exportedRules = sourcesUrls.map(({ value, status, operator }, index) => {
+    const exportedRules = sourcesUrls.map(({ value, status, operator }) => {
       const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
 
       return {
         ...rule,
-        isCharlesExported: true,
         name: `${value}`,
+        isCharlesExported: true,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -41,12 +41,19 @@ export const noCachingRuleAdapter = <T = NoCachingRule>(rules: T, appMode: strin
       };
     });
 
-    createNewGroup(appMode, CharlesRuleType.NO_CACHING, (groupId: string) => {
-      const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => resolve())
-        .catch(() => reject());
-    });
+    const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
+    createNewGroup(
+      appMode,
+      CharlesRuleType.NO_CACHING,
+      (groupId: string) => {
+        const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups(updatedRules)
+          .then(() => resolve())
+          .catch(() => reject());
+      },
+      null,
+      isToolEnabled
+    );
   });
 };

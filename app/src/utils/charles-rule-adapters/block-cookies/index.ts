@@ -18,12 +18,12 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
 
     const sourceUrls = getSourceUrls(locations);
     const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-    const exportedRules = sourceUrls.map(({ value, status, operator }, index) => {
+    const exportedRules = sourceUrls.map(({ value, status, operator }) => {
       const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
       return {
         ...rule,
-        isCharlesExported: true,
         name: `${value}`,
+        isCharlesExported: true,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -39,12 +39,19 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
       };
     });
 
-    createNewGroup(appMode, CharlesRuleType.BLOCK_COOKIES, (groupId: string) => {
-      const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => resolve())
-        .catch(() => reject());
-    });
+    const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
+    createNewGroup(
+      appMode,
+      CharlesRuleType.BLOCK_COOKIES,
+      (groupId: string) => {
+        const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups(updatedRules)
+          .then(() => resolve())
+          .catch(() => reject());
+      },
+      null,
+      isToolEnabled
+    );
   });
 };
