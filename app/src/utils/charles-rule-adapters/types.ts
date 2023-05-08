@@ -37,26 +37,51 @@ export type HeadersConfig<
   responseHeaders: T[];
 };
 
+export type Location = {
+  host: string;
+  port?: number;
+  protocol?: string;
+  path?: string;
+  query?: string;
+};
+
 export type SourceUrl = {
+  location: Location;
   enabled: boolean;
-  location: {
-    host: string;
-    port?: number;
-    protocol?: string;
-    path?: string;
-    query?: string;
-  };
 };
 
 // rules
 export type NoCachingRule = {
-  selectedHostsTool: Record<string, unknown>;
-  toolEnabled: boolean;
-  useSelectedLocations: boolean;
+  string: string;
+  selectedHostsTool: {
+    toolEnabled: boolean;
+    useSelectedLocations: boolean;
+  } & Record<string, unknown>;
 };
 
 export type BlockCookiesRule = {
-  selectedHostsTool: Record<string, unknown>;
-  toolEnabled: boolean;
-  useSelectedLocations: boolean;
+  string: string;
+  selectedHostsTool: {
+    toolEnabled: boolean;
+    useSelectedLocations: boolean;
+  } & Record<string, unknown>;
+};
+
+export type RemoteRuleMapping<T = Location> = {
+  sourceLocation: T;
+  destLocation: T;
+  enabled: boolean;
+  preserveHostHeader: boolean;
+};
+
+export type RemoteRuleMappings = RemoteRuleMapping | RemoteRuleMapping[];
+
+export type MapRemoteRule = {
+  string: string;
+  map: {
+    toolEnabled: boolean;
+    mappings: {
+      mapMapping: RemoteRuleMappings;
+    };
+  };
 };

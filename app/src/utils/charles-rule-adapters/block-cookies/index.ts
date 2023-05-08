@@ -1,11 +1,9 @@
 import { get } from "lodash";
-import { StorageService } from "init";
 import { BlockCookiesRule, CharlesRuleType } from "../types";
-import { getHeaders, getSourceUrls } from "../utils";
+import { createNewGroupAndSave, getHeaders, getSourceUrls } from "../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { HeadersRule, RuleType, Status } from "types";
-import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
 
 export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -18,12 +16,12 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
 
     const sourceUrls = getSourceUrls(locations);
     const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-    const exportedRules = sourceUrls.map(({ value, status, operator }, index) => {
+    const exportedRules = sourceUrls.map(({ value, status, operator }) => {
       const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
       return {
         ...rule,
-        isCharlesExport: true,
         name: `${value}`,
+        isCharlesExported: true,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
@@ -39,12 +37,14 @@ export const blockCookiesAdapter = <T = BlockCookiesRule>(rules: T, appMode: str
       };
     });
 
-    createNewGroup(appMode, CharlesRuleType.BLOCK_COOKIES, (groupId: string) => {
-      const updatedRules = exportedRules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => resolve())
-        .catch(() => reject());
+    const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
+    createNewGroupAndSave({
+      appMode,
+      rules: exportedRules,
+      status: isToolEnabled,
+      onError: reject,
+      onSuccess: resolve,
+      groupName: CharlesRuleType.BLOCK_COOKIES,
     });
   });
 };
