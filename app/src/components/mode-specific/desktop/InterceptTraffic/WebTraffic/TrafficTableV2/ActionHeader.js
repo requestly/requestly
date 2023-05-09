@@ -135,7 +135,6 @@ const ActionHeader = ({
             <PauseAndPlayButton
               defaultIsPaused={false}
               onChange={(isPaused) => {
-                console.log("isPaused", isPaused);
                 setIsInterceptingTraffic(!isPaused);
               }}
             />

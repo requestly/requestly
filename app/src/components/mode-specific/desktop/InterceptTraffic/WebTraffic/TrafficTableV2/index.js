@@ -393,6 +393,7 @@ const CurrentTrafficTable = ({
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
           searchKeyword={searchKeyword}
+          logFilters={logFilters}
         />
       );
     },
@@ -405,6 +406,7 @@ const CurrentTrafficTable = ({
       filterTypes,
       getSearchedLogs,
       handleRowClick,
+      logFilters,
       requestLogs,
       searchKeyword,
     ]
