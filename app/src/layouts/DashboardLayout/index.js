@@ -53,7 +53,7 @@ const DashboardLayout = () => {
 
           <Content className="hp-content-main">
             <Row justify="center" style={{ height: "100%" }}>
-              <Col span={24}>
+              <Col span={24} style={{ height: "100%" }}>
                 <React.Fragment>
                   <Routes>
                     <Route path={PATHS.DASHBOARD + PATHS.ANY} element={<DashboardContent />} />

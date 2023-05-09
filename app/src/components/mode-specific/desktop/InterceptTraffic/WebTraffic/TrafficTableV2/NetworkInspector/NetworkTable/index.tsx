@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getIsTrafficTableTourCompleted } from "store/selectors";
@@ -12,6 +12,7 @@ import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
+import { APIClient } from "components/common/APIClient";
 
 export const ITEM_SIZE = 30;
 
@@ -20,12 +21,21 @@ interface Props {
   onRow: Function;
 }
 
+interface RowData {
+  requestShellCurl?: string;
+}
+
 const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
-  const [selectedRowData, setSelectedRowData] = useState({});
+  const [selectedRowData, setSelectedRowData] = useState<RowData>({});
+  const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
   const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
+
+  const onReplayRequest = useCallback(() => {
+    setIsReplayRequestModalOpen(true);
+  }, []);
 
   const columns = [
     {
@@ -127,6 +137,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
           renderLogRow={renderLogRow}
           logs={logs}
           selectedRowData={selectedRowData}
+          onReplayRequest={onReplayRequest}
         />
       );
     }
@@ -140,6 +151,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         row={Row}
         footer={null}
         selectedRowData={selectedRowData}
+        onReplayRequest={onReplayRequest}
       />
     );
   };
@@ -152,6 +164,15 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
       {renderTable()}
+      {isReplayRequestModalOpen ? (
+        <APIClient
+          request={selectedRowData.requestShellCurl}
+          openInModal
+          modalTitle="Replay request"
+          isModalOpen
+          onModalClose={() => setIsReplayRequestModalOpen(false)}
+        />
+      ) : null}
     </>
   );
 };
