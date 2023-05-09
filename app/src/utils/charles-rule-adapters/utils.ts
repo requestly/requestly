@@ -3,21 +3,45 @@ import { HeadersConfig, SourceUrl, Location, CharlesRuleType } from "./types";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
+import { trim } from "lodash";
+
+const checkIfWildCardPresent = (value: string | number): boolean => {
+  // e.g: for port if it contains wildcard then its a string else number
+  return String(value).includes("*") || String(value).includes("?");
+};
+
+const getRegex = (value: string | number) => {
+  return String(value).replaceAll("*", ".*").replaceAll("?", ".");
+};
 
 export const getLocation = (location: Location) => {
-  const { host = "", port = 443, protocol = "https", path = "", query = "" } = location;
+  const isWildCardPresent = Object.values(location).some(checkIfWildCardPresent);
+  const updatedLocation = Object.entries(location).reduce((updatedLocation, [key, value]) => {
+    const trimmedValue = trim(String(value), "/");
 
-  // TODO @rohanmathur91: update logic to convert wildcard to regex match
-  // 1. check wildcard, replace "*" with ".*" and "?" with "."
-  // 2. handle escape for existing "." in source URL
-  // 3. if ports in [80, 443] then dont concat in URL
-  const isWildCardPresent = Object.values(location).some(
-    (value) => String(value).includes("*") || String(value).includes("?")
-  );
+    // if wildcard present in URL then escape all the literal dots "."
+    const updatedValue = isWildCardPresent ? trimmedValue.replaceAll(".", `\\.`) : trimmedValue;
 
-  const url = `${protocol}://${host}:${port}/${path}` + (query ? `?${query}` : ``);
+    return {
+      ...updatedLocation,
+
+      // If wildcard ("*" & "?") present in the source url then converting that
+      // in regex for requestly rules since we dont support "?" wildcard.
+      [key]: checkIfWildCardPresent(updatedValue) ? getRegex(updatedValue) : updatedValue,
+    };
+  }, {} as SourceUrl["location"]);
+
+  const { host = "", port = 443, protocol = "https", path = "", query = "" } = updatedLocation;
+
+  const updatedPort = port ? (["80", "443", ".*"].includes(String(port)) ? `` : `:${port}`) : ``;
+  const updatedPath = path ? `/${path}` : ``;
+  const updatedQuery = query ? (isWildCardPresent ? `\\?${query}` : `?${query}`) : ``;
+
+  const url = `${protocol}://${host}${updatedPort}${updatedPath}${updatedQuery}`;
+  const updatedUrl = isWildCardPresent ? `/^${url.replaceAll("/", "\\/")}$/` : url;
+
   return {
-    value: url,
+    value: updatedUrl,
     operator: isWildCardPresent ? SourceOperator.WILDCARD_MATCHES : SourceOperator.CONTAINS,
   };
 };
