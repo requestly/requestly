@@ -53,7 +53,7 @@ export const blockListRuleAdapter = (appMode: string, rules: BlockListRule): Pro
       return {
         ...rule,
         isCharlesExported: true,
-        name: `block_${value}`,
+        name: value,
         status: status ? Status.ACTIVE : Status.INACTIVE,
         pairs: [
           {
