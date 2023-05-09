@@ -12,9 +12,10 @@ interface Props {
   renderHeader: any;
   renderLogRow: any;
   selectedRowData: any;
+  onReplayRequest: () => void;
 }
 
-const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData }: Props) => {
+const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onReplayRequest }: Props) => {
   const [selected, setSelected] = useState(null);
 
   const parentRef = useRef(null);
@@ -58,7 +59,7 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData }: P
               onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
             >
               {renderHeader()}
-              <ContextMenu log={selectedRowData}>
+              <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
                 <Table.Body id="vtbody" style={{}}>
                   {/* Hack to fix alternate colors flickering due to virtualization*/}
                   {rowVirtualizer.getVirtualItems()?.[0]?.index % 2 === 0 ? null : <tr></tr>}

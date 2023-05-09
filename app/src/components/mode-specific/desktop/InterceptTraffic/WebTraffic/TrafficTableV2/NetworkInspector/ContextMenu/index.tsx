@@ -17,9 +17,10 @@ import "./index.css";
 interface ContextMenuProps {
   log: any;
   children: ReactNode;
+  onReplayRequest: () => void;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
@@ -57,6 +58,14 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_url");
+        },
+      },
+      {
+        key: "replace_request",
+        label: "Replay request",
+        onClick: () => {
+          trackTrafficTableDropdownClicked("replay_request");
+          onReplayRequest();
         },
       },
       {
