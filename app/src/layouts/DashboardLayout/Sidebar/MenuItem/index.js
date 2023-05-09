@@ -6,11 +6,13 @@ import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
-import { MobileOutlined } from "@ant-design/icons";
+import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { snakeCase } from "lodash";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 const { PATHS, LINKS } = APP_CONSTANTS;
 
@@ -36,6 +38,13 @@ const givenRoutes = [
     name: "Mock Server",
     icon: <Document set="curved" className="remix-icon" />,
     key: "my-mocks",
+  },
+  {
+    path: PATHS.API_CLIENT.ABSOLUTE,
+    name: "API Client",
+    icon: <ApiOutlined />,
+    key: "api-client",
+    feature: FEATURES.API_CLIENT,
   },
   {
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
@@ -110,39 +119,46 @@ const MenuItem = (props) => {
 
   // Set desktop app routes
   useEffect(() => {
-    // For Desktop App - Show Sources menu in Navbar only in  Desktop App
-    if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      const allRoutes = [...myRoutes];
-      // Check if doesn't exist already!
-      if (allRoutes.some((route) => route.key === "network-traffic")) return;
-      allRoutes.unshift({
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
-        key: "network-traffic",
-        name: "Network Traffic",
-        icon: <Swap set="curved" className="remix-icon" />,
+    setMyRoutes((myRoutes) => {
+      const routes = myRoutes.filter((route) => {
+        return !route.feature || isFeatureCompatible(route.feature);
       });
-      setMyRoutes(allRoutes);
-    }
-  }, [appMode, myRoutes]);
+
+      // For Desktop App - Show Sources menu in Navbar only in  Desktop App
+      if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        // Check if doesn't exist already!
+        if (routes.some((route) => route.key === "network-traffic")) return;
+        routes.unshift({
+          path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
+          key: "network-traffic",
+          name: "Network Traffic",
+          icon: <Swap set="curved" className="remix-icon" />,
+        });
+      }
+
+      return routes;
+    });
+  }, [appMode]);
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
-      if (result) {
-        const allRoutes = [...myRoutes];
-        const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
-        allRoutes.splice(index, 0, {
-          path: PATHS.MOBILE_DEBUGGER.RELATIVE,
-          name: "Android Debugger",
-          icon: <MobileOutlined />,
-          key: "android-debugger",
-        });
-        setMyRoutes(allRoutes);
-      } else {
-        setMyRoutes((prev) => prev.filter((route) => route.key !== "android-debugger"));
-      }
+      setMyRoutes((myRoutes) => {
+        if (result) {
+          const allRoutes = [...myRoutes];
+          const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
+          allRoutes.splice(index, 0, {
+            path: PATHS.MOBILE_DEBUGGER.RELATIVE,
+            name: "Android Debugger",
+            icon: <MobileOutlined />,
+            key: "android-debugger",
+          });
+          return allRoutes;
+        }
+
+        return myRoutes.filter((route) => route.key !== "android-debugger");
+      });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [user?.details?.profile?.uid, user.loggedIn]);
 
   const menuItems = myRoutes.map((item) => {
     if (item.header) {

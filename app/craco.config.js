@@ -22,9 +22,7 @@ module.exports = {
           // relativeUrls: false,
         },
         modifyLessRule: (lessRule, context) => {
-          lessRule.use = lessRule.use.filter(
-            (i) => !i.loader.includes("resolve-url-loader")
-          );
+          lessRule.use = lessRule.use.filter((i) => !i.loader.includes("resolve-url-loader"));
           return lessRule;
         },
       },
@@ -36,6 +34,9 @@ module.exports = {
         extensions: [".d.ts", ".ts", ".tsx", ".js", ".jsx"],
         fallback: {
           "process/browser": require.resolve("process/browser"),
+          util: require.resolve("util"),
+          path: false,
+          fs: false,
         },
       },
       externals: "worker_threads", // a transitive dependency in @requestly/web-sdk depends on worker_threads in Node environment
@@ -70,8 +71,7 @@ module.exports = {
         process: "process/browser",
       }),
       ...when(
-        (process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true") &&
-          process.env.NODE_ENV === "production",
+        (process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true") && process.env.NODE_ENV === "production",
         () => [
           new SentryWebpackPlugin({
             org: "requestly",

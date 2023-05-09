@@ -21,10 +21,15 @@ import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
 import { getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
 import "./index.css";
-import { trackAiResponseButtonClicked, trackMockEditorOpened } from "modules/analytics/events/features/mocksV2";
+import {
+  trackAiResponseButtonClicked,
+  trackMockEditorOpened,
+  trackTestMockClicked,
+} from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { APIClient, APIClientRequest } from "components/common/APIClient";
 
 interface Props {
   isNew?: boolean;
@@ -73,6 +78,21 @@ const MockEditor: React.FC<Props> = ({
   });
 
   const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+
+  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId), [
+    endpoint,
+    teamId,
+    user?.details?.profile?.uid,
+    username,
+  ]);
+
+  const apiRequest = useMemo<APIClientRequest>(() => {
+    return {
+      url: finalUrl,
+      method,
+    };
+  }, [finalUrl, method]);
 
   //editor fields ref
   const endpointRef = useRef(null);
@@ -158,6 +178,11 @@ const MockEditor: React.FC<Props> = ({
       toast.error("Please fix the highlighted fields");
     }
   };
+
+  const handleTest = useCallback(() => {
+    setIsTestModalOpen(true);
+    trackTestMockClicked();
+  }, []);
 
   const onNameChange = (name: string) => {
     setName(name);
@@ -285,11 +310,9 @@ const MockEditor: React.FC<Props> = ({
         </label>
         <Input
           id="url"
-          addonAfter={
-            <CopyButton title="" copyText={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)} />
-          }
+          addonAfter={<CopyButton title="" copyText={finalUrl} />}
           type="text"
-          value={generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId)}
+          value={finalUrl}
           name="url"
           disabled={true}
         />
@@ -414,6 +437,7 @@ const MockEditor: React.FC<Props> = ({
         savingInProgress={savingInProgress}
         handleClose={onClose}
         handleSave={handleOnSave}
+        handleTest={handleTest}
       />
       <RQEditorTitle
         name={name}
@@ -440,6 +464,15 @@ const MockEditor: React.FC<Props> = ({
           </Row>
         </Col>
       </Row>
+      {!isNew ? (
+        <APIClient
+          request={apiRequest}
+          openInModal
+          modalTitle="Test mock endpoint"
+          isModalOpen={isTestModalOpen}
+          onModalClose={() => setIsTestModalOpen(false)}
+        />
+      ) : null}
     </>
   );
 };

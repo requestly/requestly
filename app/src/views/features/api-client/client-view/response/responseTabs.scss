@@ -1,0 +1,53 @@
+.api-response-tabs {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .ant-tabs-content-holder {
+    overflow: auto;
+  }
+
+  .ant-tabs-content,
+  .ant-tabs-tabpane {
+    height: 100%;
+  }
+
+  .api-response-status-line {
+    font-size: 12px;
+
+    button {
+      font-size: 12px;
+    }
+  }
+
+  .api-response-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .api-response-body-content {
+      flex: auto;
+      height: 100%;
+      overflow: auto;
+      font-size: 12px;
+      background: #26272a;
+      padding: 10px;
+      border: 1px solid var(--border-dark);
+      border-radius: 4px;
+
+      pre {
+        overflow: hidden;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+      }
+
+      .html-response-preview {
+        height: 100%;
+        width: 100%;
+        background-color: #fff;
+        pointer-events: none;
+      }
+    }
+  }
+}

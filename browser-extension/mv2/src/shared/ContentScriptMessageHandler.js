@@ -149,6 +149,7 @@ RQ.ContentScriptMessageHandler = {
           RQ.EXTENSION_MESSAGES.CLEAR_LOGS_FOR_DOMAIN,
           RQ.EXTENSION_MESSAGES.GET_FLAGS,
           RQ.EXTENSION_MESSAGES.GET_TAB_SESSION,
+          RQ.EXTENSION_MESSAGES.GET_API_RESPONSE,
           RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED,
         ].includes(event.data.action)
       ) {
