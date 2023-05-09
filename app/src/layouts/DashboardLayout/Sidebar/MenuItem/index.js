@@ -4,7 +4,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu } from "antd";
+import { Menu, Space, Tag } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
@@ -143,19 +143,20 @@ const MenuItem = (props) => {
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
       setMyRoutes((myRoutes) => {
+        const ANDROID_DEBUGGER_KEY = "android-debugger";
+        const allRoutes = myRoutes.filter((route) => route.key !== ANDROID_DEBUGGER_KEY);
+
         if (result) {
-          const allRoutes = [...myRoutes];
           const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
           allRoutes.splice(index, 0, {
             path: PATHS.MOBILE_DEBUGGER.RELATIVE,
             name: "Android Debugger",
             icon: <MobileOutlined />,
-            key: "android-debugger",
+            key: ANDROID_DEBUGGER_KEY,
           });
-          return allRoutes;
         }
 
-        return myRoutes.filter((route) => route.key !== "android-debugger");
+        return allRoutes;
       });
     });
   }, [user?.details?.profile?.uid, user.loggedIn]);
