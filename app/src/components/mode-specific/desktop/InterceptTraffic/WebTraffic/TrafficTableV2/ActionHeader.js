@@ -91,7 +91,7 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
-          <Col>
+          {/* <Col>
             <Badge count={activeFiltersCount} size="small">
               <RQButton
                 type="default"
@@ -101,7 +101,7 @@ const ActionHeader = ({
                 className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
               />
             </Badge>
-          </Col>
+          </Col> */}
           <Col>
             <Tooltip placement="top" title="Clear Logs">
               <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
