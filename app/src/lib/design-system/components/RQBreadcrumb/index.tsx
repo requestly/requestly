@@ -12,6 +12,9 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
     if (pathname.includes("filesv2")) {
       return pathname.replace("filesv2", "files");
     }
+    if (pathname.includes("apis")) {
+      return pathname.replace("apis", "API Client");
+    }
     return pathname;
   }, []);
 

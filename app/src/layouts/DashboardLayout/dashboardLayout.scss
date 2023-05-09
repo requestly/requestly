@@ -3,6 +3,11 @@
 }
 
 #requestly-dashboard-layout {
+  > .ant-layout {
+    height: 100%;
+    flex-direction: row;
+  }
+
   .hp-content-main {
     overflow: auto;
   }

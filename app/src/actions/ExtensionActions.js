@@ -99,3 +99,10 @@ export function notifyAppLoadedToExtension() {
     action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_APP_LOADED,
   });
 }
+
+export function getAPIResponse(apiRequest) {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.GET_API_RESPONSE,
+    apiRequest,
+  });
+}
