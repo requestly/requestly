@@ -1,11 +1,11 @@
 import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
-import { handleUseCaseActiveOption, setPersonaUseCase, setUserPersona } from "./actions";
+import { setUserPersona } from "./actions";
 
-// import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
-// import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
-// import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
-// import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
+import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
+import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
+import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
 
 export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   1: {
@@ -44,209 +44,208 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
       },
     ],
   },
-  2: {
-    key: "useCases",
-    questionType: "multiple",
-    isActive: ({ key, title, optionType }) => handleUseCaseActiveOption(key, title, optionType),
-    action: (dispatch, value, clear, optionType) => setPersonaUseCase(dispatch, value, clear, optionType),
-    conditional: [
-      {
-        condition: (answer: string) => answer === PersonaType.BACKEND,
-        options: [
-          {
-            title: "Test local API changes against production app/website",
-          },
-          {
-            title: "Debug backend microservices",
-          },
-          {
-            title: "Modify GraphQL Query & Server Response",
-          },
-          {
-            type: "text",
-            title: "other",
-          },
-        ],
-      },
-      {
-        condition: (answer: string) => answer === PersonaType.QUALITY,
-        options: [
-          {
-            title: "Testing newly developed features on different hosts/environments",
-          },
-          {
-            title: "Testing new features on client websites",
-          },
-          {
-            title: "Simulate network conditions",
-          },
-          {
-            title: "UI automation testing",
-          },
-          {
-            title: "Recording issues & sharing with developers",
-          },
-          {
-            type: "text",
-            title: "other",
-          },
-        ],
-      },
-      {
-        condition: (answer: string) => answer === PersonaType.PRODUCT,
-        options: [
-          {
-            title: "Testing new features on client websites",
-          },
-          {
-            title: "Showing new feature demos to clients",
-          },
-          {
-            title: "Recording issues & sharing with developers ",
-          },
-          {
-            type: "text",
-            title: "other",
-          },
-        ],
-      },
-      {
-        condition: (answer: string) => answer === PersonaType.MARKETER || answer === PersonaType.SALES,
-        options: [
-          {
-            title: "Replace production script with development script",
-          },
-          {
-            title: "Debug analytics tags",
-          },
-          {
-            title: "Showing new feature demos to clients",
-          },
-          {
-            title: "Adding Query Params to URLs",
-          },
-          {
-            type: "text",
-            title: "other",
-          },
-        ],
-      },
-      {
-        condition: (answer: string) => answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
-        options: [
-          {
-            title: "Local development before the backend is ready",
-          },
-          {
-            title: "Redirect APIs/scripts from one environment to another",
-          },
-          {
-            title: "Load scripts from local/dev environment (Map Local)",
-          },
+  // 2: {
+  //   key: "useCases",
+  //   questionType: "multiple",
+  //   isActive: ({ key, title, optionType }) => handleUseCaseActiveOption(key, title, optionType),
+  //   action: (dispatch, value, clear, optionType) => setPersonaUseCase(dispatch, value, clear, optionType),
+  //   conditional: [
+  //     {
+  //       condition: (answer: string) => answer === PersonaType.BACKEND,
+  //       options: [
+  //         {
+  //           title: "Test local API changes against production app/website",
+  //         },
+  //         {
+  //           title: "Debug backend microservices",
+  //         },
+  //         {
+  //           title: "Modify GraphQL Query & Server Response",
+  //         },
+  //         {
+  //           type: "text",
+  //           title: "other",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       condition: (answer: string) => answer === PersonaType.QUALITY,
+  //       options: [
+  //         {
+  //           title: "Testing newly developed features on different hosts/environments",
+  //         },
+  //         {
+  //           title: "Testing new features on client websites",
+  //         },
+  //         {
+  //           title: "Simulate network conditions",
+  //         },
+  //         {
+  //           title: "UI automation testing",
+  //         },
+  //         {
+  //           title: "Recording issues & sharing with developers",
+  //         },
+  //         {
+  //           type: "text",
+  //           title: "other",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       condition: (answer: string) => answer === PersonaType.PRODUCT,
+  //       options: [
+  //         {
+  //           title: "Testing new features on client websites",
+  //         },
+  //         {
+  //           title: "Showing new feature demos to clients",
+  //         },
+  //         {
+  //           title: "Recording issues & sharing with developers ",
+  //         },
+  //         {
+  //           type: "text",
+  //           title: "other",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       condition: (answer: string) => answer === PersonaType.MARKETER || answer === PersonaType.SALES,
+  //       options: [
+  //         {
+  //           title: "Replace production script with development script",
+  //         },
+  //         {
+  //           title: "Debug analytics tags",
+  //         },
+  //         {
+  //           title: "Showing new feature demos to clients",
+  //         },
+  //         {
+  //           title: "Adding Query Params to URLs",
+  //         },
+  //         {
+  //           type: "text",
+  //           title: "other",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       condition: (answer: string) => answer === PersonaType.FULLSTACK || answer === PersonaType.FRONTEND,
+  //       options: [
+  //         {
+  //           title: "Local development before the backend is ready",
+  //         },
+  //         {
+  //           title: "Redirect APIs/scripts from one environment to another",
+  //         },
+  //         {
+  //           title: "Load scripts from local/dev environment (Map Local)",
+  //         },
 
-          {
-            title: "Modify existing network responses",
-          },
-          {
-            title: "Inject custom scripts",
-          },
-          {
-            title: "Modify headers on a website",
-          },
-          {
-            title: "Modify request payload ",
-          },
-          {
-            title: "Simulate status codes",
-          },
-          {
-            title: "Recording issues & sharing with team members",
-          },
-          {
-            type: "text",
-            title: "other",
-          },
-        ],
-      },
-    ],
-  },
-  3: {
-    key: "numberOfEmployees",
-    questionType: "single",
-    isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "numberOfEmployees"),
-    options: [
-      {
-        title: "Just me",
-      },
-      {
-        title: "1-10",
-      },
-      {
-        title: "11-50",
-      },
-      {
-        title: "51-100",
-      },
-      {
-        title: "100-500",
-      },
-      {
-        title: "500+",
-      },
-    ],
-  },
-
-  /* Referral channel questionaire*/
-  // 3: {
-  //   key: "referralChannel",
-  //   questionType: "single",
-  //   isActive: ({ key, title }) => key === title,
-  //   action: (dispatch, value, clear) =>
-  //     setPersonaReferralChannel(dispatch, value, clear),
-  //   options: [
-  //     {
-  //       title: "Google search",
-  //       icon: <img src={chromeIcon} alt="google chrome" />,
-  //     },
-  //     {
-  //       title: "Friend/Colleague",
-  //       icon: "🙂",
-  //     },
-  //     {
-  //       title: "Online ads",
-  //       icon: "📢",
-  //     },
-  //     {
-  //       title: "Chrome webstore",
-  //       icon: <img src={chromeStoreIcon} alt="chrome web store" />,
-  //     },
-  //     {
-  //       title: "Social media",
-  //       icon: "🌐",
-  //     },
-  //     {
-  //       title: "Read an article",
-  //       icon: "📄",
-  //     },
-  //     {
-  //       title: "Reddit",
-  //       icon: <img src={redditIcon} alt="reddit" />,
-  //     },
-  //     {
-  //       title: "HackerNews",
-  //       icon: <img src={hackerNewsIcon} alt="hacker news" />,
-  //     },
-  //     {
-  //       title: "Company documentation",
-  //       icon: "📋",
-  //     },
-  //     {
-  //       title: "ChatGPT",
-  //       icon: "🤖",
+  //         {
+  //           title: "Modify existing network responses",
+  //         },
+  //         {
+  //           title: "Inject custom scripts",
+  //         },
+  //         {
+  //           title: "Modify headers on a website",
+  //         },
+  //         {
+  //           title: "Modify request payload ",
+  //         },
+  //         {
+  //           title: "Simulate status codes",
+  //         },
+  //         {
+  //           title: "Recording issues & sharing with team members",
+  //         },
+  //         {
+  //           type: "text",
+  //           title: "other",
+  //         },
+  //       ],
   //     },
   //   ],
   // },
+  // 3: {
+  //   key: "numberOfEmployees",
+  //   questionType: "single",
+  //   isActive: ({ key, title }) => key === title,
+  //   action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "numberOfEmployees"),
+  //   options: [
+  //     {
+  //       title: "Just me",
+  //     },
+  //     {
+  //       title: "1-10",
+  //     },
+  //     {
+  //       title: "11-50",
+  //     },
+  //     {
+  //       title: "51-100",
+  //     },
+  //     {
+  //       title: "100-500",
+  //     },
+  //     {
+  //       title: "500+",
+  //     },
+  //   ],
+  // },
+
+  /* Referral channel questionaire*/
+  3: {
+    key: "referralChannel",
+    questionType: "single",
+    isActive: ({ key, title }) => key === title,
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "referralChannel"),
+    options: [
+      {
+        title: "Google search",
+        icon: <img src={chromeIcon} alt="google chrome" />,
+      },
+      {
+        title: "Friend/Colleague",
+        icon: "🙂",
+      },
+      {
+        title: "Online ads",
+        icon: "📢",
+      },
+      {
+        title: "Chrome webstore",
+        icon: <img src={chromeStoreIcon} alt="chrome web store" />,
+      },
+      {
+        title: "Social media",
+        icon: "🌐",
+      },
+      {
+        title: "Read an article",
+        icon: "📄",
+      },
+      {
+        title: "Reddit",
+        icon: <img src={redditIcon} alt="reddit" />,
+      },
+      {
+        title: "HackerNews",
+        icon: <img src={hackerNewsIcon} alt="hacker news" />,
+      },
+      {
+        title: "Company documentation",
+        icon: "📋",
+      },
+      {
+        title: "ChatGPT",
+        icon: "🤖",
+      },
+    ],
+  },
 };
 
 export const SurveyConfig: PageConfig[] = [
@@ -271,7 +270,6 @@ export const SurveyConfig: PageConfig[] = [
   },
   {
     pageId: 3,
-    skip: true,
     title: "How many employees do you have in your organisation?",
     subTitle: "Select one",
     render: 3,
