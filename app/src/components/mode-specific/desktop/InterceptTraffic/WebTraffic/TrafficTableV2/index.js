@@ -11,6 +11,7 @@ import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
+import { LogFilter } from "./LogFilter";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
@@ -31,6 +32,10 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
+import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -69,6 +74,12 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [filterTypes, setFilterTypes] = useState({});
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
+  const [logFilters, setLogFilters] = useState({
+    statusCode: [],
+    resourceType: [],
+    method: [],
+  });
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -271,26 +282,55 @@ const CurrentTrafficTable = ({
     };
   }, []);
 
+  const activeFiltersCount = useMemo(
+    () => Object.values(logFilters).reduce((current, filter) => current + filter.length, 0),
+    [logFilters]
+  );
+
+  const getFilteredLogs = useCallback(
+    (logs) => {
+      const isLogFilterApplied = Object.values(logFilters).some((prop) => prop.length > 0);
+      if (isLogFilterApplied) {
+        return logs.filter((log) => {
+          if (logFilters.statusCode.length && !logFilters.statusCode.includes(log?.response?.statusCode?.toString())) {
+            return false;
+          }
+          if (logFilters.resourceType.length && !logFilters.resourceType.includes(log?.response?.contentType)) {
+            return false;
+          }
+          if (logFilters.method.length && !logFilters.method.includes(log?.request?.method)) {
+            return false;
+          }
+
+          return true;
+        });
+      }
+      return null;
+    },
+    [logFilters]
+  );
+
   const getSearchedLogs = useCallback(
     (logs, searchKeyword) => {
+      let networkLogs = getFilteredLogs(logs) || logs;
       if (searchKeyword) {
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (isRegexSearchActive) {
             reg = new RegExp(searchKeyword);
-            return logs.filter((log) => log.url.match(reg));
+            return networkLogs.filter((log) => log.url.match(reg));
           } else {
-            return logs.filter((log) => log.url.includes(searchKeyword));
+            return networkLogs.filter((log) => log.url.includes(searchKeyword));
           }
         } catch (err) {
           Logger.log(err);
         }
       }
 
-      return logs;
+      return networkLogs;
     },
-    [isRegexSearchActive]
+    [isRegexSearchActive, getFilteredLogs]
   );
 
   const getRequestLogs = useCallback(
@@ -526,11 +566,54 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
-              setIsRegexSearchActive={setIsRegexSearchActive}
               isRegexSearchActive={isRegexSearchActive}
+              isFiltersCollapsed={isFiltersCollapsed}
+              setIsFiltersCollapsed={setIsFiltersCollapsed}
+              setIsRegexSearchActive={setIsRegexSearchActive}
+              activeFiltersCount={activeFiltersCount}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
           </Row>
+          {!isFiltersCollapsed && (
+            <Row className="traffic-table-filters-container">
+              <section>
+                <LogFilter
+                  filterId="filter-method"
+                  filterLabel="Method"
+                  filterPlaceholder="Filter by method"
+                  options={METHOD_TYPE_OPTIONS}
+                  value={logFilters.method}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
+                />
+                <LogFilter
+                  filterId="filter-status-code"
+                  filterLabel="Status code"
+                  filterPlaceholder="Filter by status code"
+                  options={STATUS_CODE_ONLY_OPTIONS}
+                  value={logFilters.statusCode}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+                />
+                <LogFilter
+                  filterId="filter-resource-type"
+                  filterLabel="Content type"
+                  filterPlaceholder="Filter by content type"
+                  options={CONTENT_TYPE_OPTIONS}
+                  value={logFilters.resourceType}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+                />
+              </section>
+              <RQButton
+                type="primary"
+                className="clear-logs-filter-btn"
+                onClick={() => {
+                  setLogFilters({ statusCode: [], resourceType: [], method: [] });
+                }}
+              >
+                Clear
+              </RQButton>
+            </Row>
+          )}
+
           <Split
             sizes={rulePaneSizes}
             minSize={[75, 0]}
