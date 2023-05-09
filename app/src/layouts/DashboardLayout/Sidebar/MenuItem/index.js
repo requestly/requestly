@@ -4,7 +4,7 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu, Space, Tag } from "antd";
+import { Menu } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";

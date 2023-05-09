@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip } from "antd";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
 import {
   CaretRightOutlined,
   ClearOutlined,
@@ -7,6 +7,7 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -22,7 +23,10 @@ const ActionHeader = ({
   deviceId,
   setIsInterceptingTraffic,
   isRegexSearchActive,
+  isFiltersCollapsed,
   setIsRegexSearchActive,
+  setIsFiltersCollapsed,
+  activeFiltersCount = 0,
 }) => {
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
@@ -76,56 +80,69 @@ const ActionHeader = ({
   };
 
   return (
-    <Row
-      align="middle"
-      style={{
-        padding: 3,
-        paddingLeft: "24px",
-        paddingRight: "12px",
-      }}
-    >
-      <Space direction="horizontal">
-        <Col>{renderSearchInput()}</Col>
-        <Col>
-          <Tooltip placement="top" title="Clear Logs">
-            <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
-          </Tooltip>
-        </Col>
-        {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
-          <Col>
-            <Tooltip title="SSL Proxying">
-              <Button
-                type="primary"
-                shape="circle"
-                icon={<SafetyCertificateOutlined />}
-                onClick={() => setIsSSLProxyingModalVisible(true)}
+    <>
+      <Row
+        align="middle"
+        style={{
+          padding: 3,
+          paddingLeft: "24px",
+          paddingRight: "12px",
+        }}
+      >
+        <Space direction="horizontal">
+          <Col>{renderSearchInput()}</Col>
+          {/* <Col>
+            <Badge count={activeFiltersCount} size="small">
+              <RQButton
+                type="default"
+                iconOnly
+                icon={<FaFilter />}
+                onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+                className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
               />
+            </Badge>
+          </Col> */}
+          <Col>
+            <Tooltip placement="top" title="Clear Logs">
+              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
             </Tooltip>
           </Col>
-        ) : null}
-        {showDeviceSelector ? (
-          <>
+          {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
             <Col>
-              <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
-                <SettingOutlined />
-              </Button>
+              <Tooltip title="SSL Proxying">
+                <Button
+                  type="primary"
+                  shape="circle"
+                  icon={<SafetyCertificateOutlined />}
+                  onClick={() => setIsSSLProxyingModalVisible(true)}
+                />
+              </Tooltip>
             </Col>
-            <Col>
-              <Text code>Device Id: {deviceId || "Null"}</Text>
-            </Col>
-          </>
-        ) : null}
-        <Col>
-          <PauseAndPlayButton
-            defaultIsPaused={false}
-            onChange={(isPaused) => {
-              console.log("isPaused", isPaused);
-              setIsInterceptingTraffic(!isPaused);
-            }}
-          />
-        </Col>
-      </Space>
-    </Row>
+          ) : null}
+          {showDeviceSelector ? (
+            <>
+              <Col>
+                <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
+                  <SettingOutlined />
+                </Button>
+              </Col>
+              <Col>
+                <Text code>Device Id: {deviceId || "Null"}</Text>
+              </Col>
+            </>
+          ) : null}
+          <Col>
+            <PauseAndPlayButton
+              defaultIsPaused={false}
+              onChange={(isPaused) => {
+                console.log("isPaused", isPaused);
+                setIsInterceptingTraffic(!isPaused);
+              }}
+            />
+          </Col>
+        </Space>
+      </Row>
+    </>
   );
 };
 
