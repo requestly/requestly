@@ -9,9 +9,9 @@ export const minifyCode = (value) => {
   }
 };
 
-export const processStaticDataBeforeSave = (value) => {
+export const formatJSONString = (value, tabSize = 0) => {
   try {
-    return JSON.stringify(JSON.parse(value)); //convert string to JSON if in correct JSON format
+    return JSON.stringify(JSON.parse(value), null, tabSize); //convert string to JSON if in correct JSON format
   } catch (e) {
     try {
       const formattedCode = prettier.format(value, {
@@ -19,7 +19,7 @@ export const processStaticDataBeforeSave = (value) => {
         parser: "json",
         plugins: [parserBabel],
       });
-      return JSON.stringify(JSON.parse(formattedCode));
+      return JSON.stringify(JSON.parse(formattedCode), null, tabSize);
     } catch {
       return value; // value can also be string
     }

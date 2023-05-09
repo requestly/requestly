@@ -6,7 +6,7 @@ import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 
 import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
-import { minifyCode, processStaticDataBeforeSave } from "utils/CodeEditorUtils";
+import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
@@ -62,10 +62,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
       [
         {
           path: `request.value`,
-          value:
-            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
-              ? processStaticDataBeforeSave(value)
-              : value,
+          value: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
         },
       ],
       !codeFormattedFlag.current

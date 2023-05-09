@@ -977,6 +977,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.getTabSession(message.tabId, sendResponse);
         return true;
 
+      case RQ.EXTENSION_MESSAGES.GET_API_RESPONSE:
+        BG.Methods.getAPIResponse(message.apiRequest).then(sendResponse);
+        return true;
+
       case RQ.EXTENSION_MESSAGES.GET_EXECUTED_RULES:
         BG.Methods.getExecutedRules(message.tabId, sendResponse);
         return true;
@@ -1250,6 +1254,75 @@ BG.Methods.saveExecutionCount = async function (rule) {
 
 BG.Methods.getTabSession = (tabId, callback) => {
   chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
+};
+
+BG.Methods.getAPIResponse = async (apiRequest) => {
+  const method = apiRequest.method || "GET";
+  const headers = new Headers();
+  let body = apiRequest.body;
+  let url = apiRequest.url;
+
+  if (apiRequest?.queryParams.length) {
+    const urlObj = new URL(apiRequest.url);
+    const searchParams = new URLSearchParams(urlObj.search);
+    apiRequest.queryParams.forEach(({ key, value }) => {
+      searchParams.append(key, value);
+    });
+    urlObj.search = searchParams.toString();
+    url = urlObj.toString();
+  }
+
+  apiRequest?.headers.forEach(({ key, value }) => {
+    headers.append(key, value);
+  });
+
+  if (!["GET", "HEAD"].includes(method) && apiRequest.contentType === "application/x-www-form-urlencoded") {
+    const formData = new FormData();
+    body?.forEach(({ key, value }) => {
+      formData.append(key, value);
+    });
+    body = new URLSearchParams(formData);
+  }
+
+  try {
+    const requestStartTime = performance.now();
+    const response = await fetch(url, { method, headers, body, credentials: "omit" });
+    const responseTime = performance.now() - requestStartTime;
+
+    const responseHeaders = [];
+    response.headers.forEach((value, key) => {
+      responseHeaders.push({ key, value });
+    });
+
+    const responseBlob = await response.blob();
+    const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
+
+    let responseBody;
+    if (contentType?.includes("image/")) {
+      const getImageDataUri = (blob) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (evt) => resolve(evt.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+      responseBody = await getImageDataUri(responseBlob);
+    } else {
+      responseBody = await responseBlob.text();
+    }
+
+    return {
+      body: responseBody,
+      time: responseTime,
+      headers: responseHeaders,
+      status: response.status,
+      statusText: response.statusText,
+      redirectedUrl: response.url !== url ? response.url : "",
+    };
+  } catch (e) {
+    return null;
+  }
 };
 
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {

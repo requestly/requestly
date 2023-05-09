@@ -1,4 +1,4 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { autoBatchEnhancer, configureStore, createSlice } from "@reduxjs/toolkit";
 import getReducerWithLocalStorageSync from "./getReducerWithLocalStorageSync";
 
 //FEATURES
@@ -62,5 +62,17 @@ export const reduxStore = configureStore({
     // in our case we have functions in payload,
     // so avoiding this check.
     return getDefaultMiddleware({ serializableCheck: false });
+  },
+  enhancers: (existingEnhancers) => {
+    // Add the autobatch enhancer to the store setup
+    return existingEnhancers.concat(
+      autoBatchEnhancer(
+        { type: "timer", timeout: 100 }
+        // Timer seems to be these amongst other for now. Lets keep on iterating on this to improve the table performance
+        // {type: 'raf'}
+        // {type: 'tick'}
+        // {type: "callback", queueNotification: (notify) => { console.log('queuing'); setTimeout(() => { console.log("notifying");notify()}, 5000)}}
+      )
+    );
   },
 });

@@ -13,6 +13,36 @@
   background-color: var(--body-background);
 }
 
+.traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {
+  display: none;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-root.filter-applied > .ant-menu-item:first-child {
+  height: 32px;
+  padding: 4px 0;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-root.filter-applied > .ant-menu-item:first-child:hover,
+.traffic-table-sidebar .ant-menu.ant-menu-root.filter-applied > .ant-menu-item:first-child:focus {
+  background-color: transparent;
+}
+
+.traffic-table-sidebar .ant-menu.ant-menu-root.filter-applied > .ant-menu-item:first-child .clear-all-filter-option {
+  padding: 4px 10px;
+  border-radius: 16px;
+  width: max-content;
+  /* margin-left: auto; */
+  border: 1px solid var(--border-dark);
+}
+
+.traffic-table-sidebar
+  .ant-menu.ant-menu-root.filter-applied
+  > .ant-menu-item:first-child
+  .clear-all-filter-option
+  .anticon {
+  font-size: 12px;
+}
+
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
   color: var(--primary);
   border: 1px solid var(--primary);
@@ -89,4 +119,9 @@
 .traffic-table-split-container .gutter-vertical,
 .traffic-table-split-container .ant-row.request-log-pane-container {
   margin-left: 1.25rem;
+}
+
+/* table */
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"] {
+  background-color: #1e69ffdb;
 }
