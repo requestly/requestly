@@ -12,6 +12,8 @@ import {
   trackTrafficTableRequestRightClicked,
 } from "modules/analytics/events/desktopApp";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 import "./index.css";
 
 interface ContextMenuProps {
@@ -42,8 +44,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     [dispatch]
   );
 
-  const items: MenuProps["items"] = useMemo(
-    () => [
+  const items: MenuProps["items"] = useMemo(() => {
+    const menuItems: MenuProps["items"] = [
       {
         key: "copy_curl",
         label: "Copy cURL",
@@ -58,14 +60,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_url");
-        },
-      },
-      {
-        key: "replace_request",
-        label: "Replay request",
-        onClick: () => {
-          trackTrafficTableDropdownClicked("replay_request");
-          onReplayRequest();
         },
       },
       {
@@ -127,9 +121,21 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
           },
         ],
       },
-    ],
-    [log, handleOnClick]
-  );
+    ];
+
+    if (isFeatureCompatible(FEATURES.API_CLIENT)) {
+      menuItems.splice(2, 0, {
+        key: "replace_request",
+        label: "Replay request",
+        onClick: () => {
+          trackTrafficTableDropdownClicked("replay_request");
+          onReplayRequest();
+        },
+      });
+    }
+
+    return menuItems;
+  }, [log, onReplayRequest, handleOnClick]);
 
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {
