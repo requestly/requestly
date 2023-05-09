@@ -56,6 +56,9 @@ import { createNewUsername } from "backend/auth/username";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
+import { DB_UTILS } from "@requestly/rq-common";
+
+const { getUserProfilePath } = DB_UTILS;
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -458,10 +461,6 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
   }
 
   return syncStatus;
-}
-
-export function getUserProfilePath(userId) {
-  return "users/" + userId + "/profile";
 }
 
 export function getAuthData(user) {

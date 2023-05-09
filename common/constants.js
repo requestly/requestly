@@ -135,6 +135,7 @@ CONSTANTS.EXTENSION_MESSAGES = {
   GET_RULES_AND_GROUPS: "getRulesAndGroups",
   GET_FLAGS: "getFlags",
   GET_TAB_SESSION: "getTabSession",
+  GET_API_RESPONSE: "getAPIResponse",
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",

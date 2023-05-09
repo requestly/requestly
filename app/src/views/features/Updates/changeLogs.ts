@@ -2,6 +2,15 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.5.9",
+    logs: [
+      {
+        title: "Support for API client",
+        link: "https://github.com/requestly/requestly/issues/600",
+      },
+    ],
+  },
+  {
     version: "23.4.25",
     logs: [
       {

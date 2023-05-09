@@ -62,6 +62,10 @@ export const trackMockUploadFailed = (type: string, cause: string) => {
   trackEvent(MOCKSV2.MOCK_UPLOAD_FAILED, params);
 };
 
+export const trackTestMockClicked = () => {
+  trackEvent(MOCKSV2.TEST_MOCK_CLICKED);
+};
+
 export const trackAiResponseButtonClicked = () => {
   const params = {};
   trackEvent(MOCKSV2.AI_MOCK_RESPONSE_BUTTON_CLICKED, params);

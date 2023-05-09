@@ -27,6 +27,7 @@ const CodeEditor = ({
   isCodeMinified,
   isCodeFormatted,
   validation = "editable",
+  isResizable = true,
 }) => {
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
@@ -49,7 +50,7 @@ const CodeEditor = ({
   const handleEditordidMount = (editor) => {
     editorRef.current = editor;
 
-    if (!value.length) {
+    if (!value?.length) {
       handleChange(defaultValue ? defaultValue : ""); //trigger handleChange for defaultValue in code editor
     }
   };
@@ -79,7 +80,7 @@ const CodeEditor = ({
           height={editorHeight}
           width={Infinity}
           onResize={handleResize}
-          handle={<div className="custom-handle"></div>}
+          handle={isResizable ? <div className="custom-handle" /> : null}
           axis="y"
           style={{
             minHeight: `${height}px`,

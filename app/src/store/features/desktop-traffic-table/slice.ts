@@ -1,4 +1,4 @@
-import { createSlice, createEntityAdapter, EntityState, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createEntityAdapter, EntityState, PayloadAction, prepareAutoBatched } from "@reduxjs/toolkit";
 import { ReducerKeys } from "store/constants";
 
 // TODO: @wrongsahil, add types here when send_network_logs is moved to new events schema
@@ -27,8 +27,11 @@ const slice = createSlice({
     logAdd: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.addOne(state.logs, action.payload);
     },
-    logUpsert: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
-      logsAdapter.upsertOne(state.logs, action.payload);
+    logUpsert: {
+      reducer(state: DesktopTrafficTableState, action: PayloadAction<any>) {
+        logsAdapter.upsertOne(state.logs, action.payload);
+      },
+      prepare: prepareAutoBatched<any>(),
     },
     logUpdate: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.updateOne(state.logs, action.payload);
@@ -36,8 +39,11 @@ const slice = createSlice({
     logsClearAll: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.removeAll(state.logs);
     },
-    logResponseBodyAdd: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
-      state.responses[action?.payload?.id] = action.payload?.response?.body;
+    logResponseBodyAdd: {
+      reducer(state: DesktopTrafficTableState, action: PayloadAction<any>) {
+        state.responses[action?.payload?.id] = action.payload?.response?.body;
+      },
+      prepare: prepareAutoBatched<any>(),
     },
     logResponsesClearAll: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       state.responses = {};
