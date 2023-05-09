@@ -103,7 +103,7 @@ const CurrentTrafficTable = ({
     setIsPreviewOpen(visible);
 
     if (visible) {
-      setRulePaneSizes([60, 40]);
+      setRulePaneSizes([55, 45]);
       return;
     }
 
