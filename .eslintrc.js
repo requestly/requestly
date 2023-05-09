@@ -4,6 +4,7 @@ module.exports = {
     "app/build/*",
     "app/public/**",
     "browser-extension/*",
+    "app/src/views/features/apis/curl-to-json.js",
   ],
   env: {
     browser: true,
