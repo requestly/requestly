@@ -9,7 +9,7 @@ export const shouldShowPersonaSurvey = async (appMode: string) => {
   if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE)) return false;
 
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
-  if (new Date(installDate) >= new Date("2023-03-06")) return true;
+  if (new Date(installDate) <= new Date("2023-03-06")) return true;
   else return false;
 };
 

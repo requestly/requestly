@@ -3,9 +3,8 @@ import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { setUserPersona } from "./actions";
 
 import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
-import redditIcon from "assets/img/icons/personaSurvey/reddit.svg";
 import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
-import hackerNewsIcon from "assets/img/icons/personaSurvey/yc.svg";
+import stackOverFlowIcon from "assets/img/icons/personaSurvey/stackoverflow.svg";
 
 export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
   1: {
@@ -205,16 +204,12 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
     action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "referralChannel"),
     options: [
       {
-        title: "Google search",
+        title: "Google search / Read an article",
         icon: <img src={chromeIcon} alt="google chrome" />,
       },
       {
-        title: "Friend/Colleague",
+        title: "Friend / Colleague",
         icon: "🙂",
-      },
-      {
-        title: "Online ads",
-        icon: "📢",
       },
       {
         title: "Chrome webstore",
@@ -222,27 +217,19 @@ export const OptionsConfig: Record<number, SurveyOptionsConfig> = {
       },
       {
         title: "Social media",
+        icon: "👥",
+      },
+      {
+        title: "HackerNews / Reddit",
         icon: "🌐",
-      },
-      {
-        title: "Read an article",
-        icon: "📄",
-      },
-      {
-        title: "Reddit",
-        icon: <img src={redditIcon} alt="reddit" />,
-      },
-      {
-        title: "HackerNews",
-        icon: <img src={hackerNewsIcon} alt="hacker news" />,
       },
       {
         title: "Company documentation",
         icon: "📋",
       },
       {
-        title: "ChatGPT",
-        icon: "🤖",
+        title: "Stack Overflow",
+        icon: <img src={stackOverFlowIcon} alt="chrome web store" />,
       },
     ],
   },
@@ -270,7 +257,7 @@ export const SurveyConfig: PageConfig[] = [
   },
   {
     pageId: 3,
-    title: "How many employees do you have in your organisation?",
+    title: "How did you hear about Requestly?",
     subTitle: "Select one",
     render: 3,
   },
