@@ -18,7 +18,7 @@ import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal"
 import { convertProxyLogToUILog, getSortedMenuItems } from "./utils/logUtils";
 import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
-import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
+import { getAllFilters, getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
 import { getConnectedAppsCount } from "utils/Misc";
@@ -51,6 +51,7 @@ const CurrentTrafficTable = ({
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
+  const trafficTableFilters = useSelector(getAllFilters);
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
@@ -134,6 +135,7 @@ const CurrentTrafficTable = ({
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
     setSearchKeyword(searchValue);
+    dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
 
   let previewData = [];
@@ -287,50 +289,79 @@ const CurrentTrafficTable = ({
     [logFilters]
   );
 
-  const getFilteredLogs = useCallback(
-    (logs) => {
-      const isLogFilterApplied = Object.values(logFilters).some((prop) => prop.length > 0);
-      if (isLogFilterApplied) {
-        return logs.filter((log) => {
-          if (logFilters.statusCode.length && !logFilters.statusCode.includes(log?.response?.statusCode?.toString())) {
-            return false;
-          }
-          if (logFilters.resourceType.length && !logFilters.resourceType.includes(log?.response?.contentType)) {
-            return false;
-          }
-          if (logFilters.method.length && !logFilters.method.includes(log?.request?.method)) {
-            return false;
-          }
+  const filterLog = useCallback(
+    (log) => {
+      let includeLog = true;
 
-          return true;
-        });
-      }
-      return null;
-    },
-    [logFilters]
-  );
-
-  const getSearchedLogs = useCallback(
-    (logs, searchKeyword) => {
-      let networkLogs = getFilteredLogs(logs) || logs;
-      if (searchKeyword) {
+      if (trafficTableFilters.search.term) {
+        const searchTerm = trafficTableFilters.search.term;
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
-          if (isRegexSearchActive) {
-            reg = new RegExp(searchKeyword);
-            return networkLogs.filter((log) => log.url.match(reg));
+          if (trafficTableFilters.search.regex) {
+            reg = new RegExp(searchTerm);
+            includeLog = log.url.match(reg);
           } else {
-            return networkLogs.filter((log) => log.url.includes(searchKeyword));
+            includeLog = log.url.includes(searchTerm);
           }
         } catch (err) {
           Logger.log(err);
         }
       }
 
-      return networkLogs;
+      if (!includeLog) {
+        return false;
+      }
+
+      if (
+        trafficTableFilters.statusCode.length > 0 &&
+        !trafficTableFilters.statusCode.includes(log?.response?.statusCode?.toString())
+      ) {
+        return false;
+      }
+      if (
+        trafficTableFilters.contentType.length > 0 &&
+        !trafficTableFilters.contentType.includes(log?.response?.contentType)
+      ) {
+        return false;
+      }
+      if (trafficTableFilters.method.length > 0 && !trafficTableFilters.method.includes(log?.request?.method)) {
+        return false;
+      }
+
+      return true;
     },
-    [isRegexSearchActive, getFilteredLogs]
+    [
+      trafficTableFilters.method,
+      trafficTableFilters.contentType,
+      trafficTableFilters.search.regex,
+      trafficTableFilters.search.term,
+      trafficTableFilters.statusCode,
+    ]
+  );
+
+  const getSearchedLogs = useCallback(
+    (logs) => {
+      // let networkLogs = getFilteredLogs(logs) || logs;
+      // if (searchKeyword) {
+      //   try {
+      //     // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+      //     let reg = null;
+      //     if (isRegexSearchActive) {
+      //       reg = new RegExp(searchKeyword);
+      //       return networkLogs.filter((log) => log.url.match(reg));
+      //     } else {
+      //       return networkLogs.filter((log) => log.url.includes(searchKeyword));
+      //     }
+      //   } catch (err) {
+      //     Logger.log(err);
+      //   }
+      // }
+
+      // return networkLogs;
+      return logs.filter(filterLog);
+    },
+    [filterLog]
   );
 
   const getRequestLogs = useCallback(
@@ -383,7 +414,7 @@ const CurrentTrafficTable = ({
       // remove logs with same id
       const filteredLogs = logs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
       const allLogs = Object.values(filteredLogs).length > 0 ? Object.values(filteredLogs) : requestLogs;
-      const searchedLogs = getSearchedLogs(allLogs, searchKeyword);
+      const searchedLogs = getSearchedLogs(allLogs);
 
       return (
         <GroupByNone
@@ -585,7 +616,10 @@ const CurrentTrafficTable = ({
                   filterPlaceholder="Filter by method"
                   options={METHOD_TYPE_OPTIONS}
                   value={logFilters.method}
-                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
+                  handleFilterChange={(options) => {
+                    setLogFilters((filter) => ({ ...filter, method: options }));
+                    dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                  }}
                 />
                 <LogFilter
                   filterId="filter-status-code"
@@ -593,7 +627,10 @@ const CurrentTrafficTable = ({
                   filterPlaceholder="Filter by status code"
                   options={STATUS_CODE_ONLY_OPTIONS}
                   value={logFilters.statusCode}
-                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+                  handleFilterChange={(options) => {
+                    setLogFilters((filter) => ({ ...filter, statusCode: options }));
+                    dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                  }}
                 />
                 <LogFilter
                   filterId="filter-resource-type"
@@ -601,7 +638,10 @@ const CurrentTrafficTable = ({
                   filterPlaceholder="Filter by content type"
                   options={CONTENT_TYPE_OPTIONS}
                   value={logFilters.resourceType}
-                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+                  handleFilterChange={(options) => {
+                    setLogFilters((filter) => ({ ...filter, resourceType: options }));
+                    dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
+                  }}
                 />
               </section>
               <RQButton

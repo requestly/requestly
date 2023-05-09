@@ -12,6 +12,8 @@ import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { useDispatch } from "react-redux";
+import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 
 const { Text } = Typography;
 
@@ -28,6 +30,8 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
 }) => {
+  const dispatch = useDispatch();
+
   const renderSearchInput = () => {
     if (isRegexSearchActive) {
       return (
@@ -68,7 +72,10 @@ const ActionHeader = ({
               className={`traffic-table-regex-btn ${
                 isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
               }`}
-              onClick={() => setIsRegexSearchActive((prev) => !prev)}
+              onClick={() => {
+                setIsRegexSearchActive((prev) => !prev);
+                dispatch(desktopTrafficTableActions.toggleRegexSearch);
+              }}
               iconOnly
               icon={<VscRegex />}
             />
@@ -91,7 +98,7 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
-          {/* <Col>
+          <Col>
             <Badge count={activeFiltersCount} size="small">
               <RQButton
                 type="default"
@@ -101,7 +108,7 @@ const ActionHeader = ({
                 className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
               />
             </Badge>
-          </Col> */}
+          </Col>
           <Col>
             <Tooltip placement="top" title="Clear Logs">
               <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
