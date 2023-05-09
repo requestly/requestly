@@ -42,7 +42,7 @@ export const getLocation = (location: Location) => {
 
   return {
     value: updatedUrl,
-    operator: isWildCardPresent ? SourceOperator.WILDCARD_MATCHES : SourceOperator.CONTAINS,
+    operator: isWildCardPresent ? SourceOperator.MATCHES : SourceOperator.CONTAINS,
   };
 };
 
