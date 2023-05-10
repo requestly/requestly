@@ -11,13 +11,19 @@ import {
   QueryParamRule,
   QueryParamRulePair,
   QueryParamModificationType,
+  ResponseRuleResourceType,
+  ResponseRule,
 } from "types";
 import { convertToArray } from "../utils";
+import { statusCodes } from "config/constants/sub/statusCode";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 
 // Cases
 // [x] headers
 // [x] query parms (1hr)
-// [] status (1hr)
+// [x] status (1hr)
 // [] host (1hr)
 // [] path (10min)
 // [] url (10min)
@@ -47,13 +53,23 @@ type QueryParamAction = Partial<{
   actionWhenParamExists: string;
 }>;
 
-const rewriteRuleActionTypes: Record<number, HeaderRuleActionType | QueryParamModificationType> = {
+enum RewriteRuleActionType {
+  PATH = "path",
+  HOST = "host",
+  STATUS = "status",
+}
+
+const rewriteRuleActionTypes: Record<
+  number,
+  RewriteRuleActionType | HeaderRuleActionType | QueryParamModificationType
+> = {
   1: HeaderRuleActionType.ADD,
   2: HeaderRuleActionType.REMOVE,
   3: HeaderRuleActionType.MODIFY,
   8: QueryParamModificationType.ADD,
   9: QueryParamModificationType.ADD,
   10: QueryParamModificationType.REMOVE,
+  11: RewriteRuleActionType.STATUS,
 };
 
 const getWhereToApplyRule = (pair: RewriteRulePair): WhereToApplyRule => {
@@ -74,6 +90,8 @@ const processRulePairs = (pairs: RewriteRulePair[]) => {
       return { ...result, [RuleType.HEADERS]: [...(result[RuleType.HEADERS] ?? []), pair] };
     } else if ([8, 9, 10].includes(pair.ruleType)) {
       return { ...result, [RuleType.QUERYPARAM]: [...(result[RuleType.QUERYPARAM] ?? []), pair] };
+    } else if ([11].includes(pair.ruleType)) {
+      return { ...result, [RuleType.RESPONSE]: [...(result[RuleType.RESPONSE] ?? []), pair] };
     }
     return result;
   }, {} as Record<RuleType, RewriteRulePair[]>);
@@ -164,45 +182,11 @@ const getQueryParamModifications = ({
   return [{ id: generateObjectId(), param, value, type: actionType, actionWhenParamExists: "Overwrite" }];
 };
 
-const createQueryParamRules = (queryParamRulePairs: RewriteRulePair[] = []) => {
-  const queryParamActions = queryParamRulePairs.reduce(
-    (result, pair) => [
-      ...result,
-      {
-        ...getQueryParamsData(pair),
-        active: pair.active,
-        ruleType: RuleType.QUERYPARAM,
-        actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamModificationType,
-      },
-    ],
-    [] as QueryParamAction[]
-  );
-
-  const exportedQueryParamRules = queryParamActions.map((action) => {
-    const newRule = getNewRule(RuleType.QUERYPARAM) as QueryParamRule;
-
-    return {
-      ...newRule,
-      isCharlesExported: true,
-      status: action.active ? Status.ACTIVE : Status.INACTIVE,
-      name: getModificationRuleName(action.param, action.value, action.actionType),
-      pairs: [
-        {
-          ...newRule.pairs[0],
-          modifications: getQueryParamModifications(action),
-        },
-      ],
-    };
-  });
-
-  return exportedQueryParamRules;
-};
-
 // create the rule and fill the configs
 // at the end fill the source URLs as it will be same for all the rules
 // then optimise for doing it in single pass
-const createHeaderRules = (headerRulePairs: RewriteRulePair[] = []) => {
-  const headerActions = headerRulePairs.reduce(
+const createHeaderRules = (pairs: RewriteRulePair[] = []) => {
+  const headerActions = pairs.reduce(
     (result, pair) => [
       ...result,
       {
@@ -216,7 +200,7 @@ const createHeaderRules = (headerRulePairs: RewriteRulePair[] = []) => {
     [] as HeaderAction[]
   );
 
-  const exportedHeaderRules = headerActions.map((action) => {
+  const exportedRules = headerActions.map((action) => {
     const newRule = getNewRule(RuleType.HEADERS) as HeadersRule;
     const modifications = getHeaderModifications(action);
 
@@ -237,7 +221,70 @@ const createHeaderRules = (headerRulePairs: RewriteRulePair[] = []) => {
     };
   });
 
-  return exportedHeaderRules;
+  return exportedRules;
+};
+
+const createQueryParamRules = (pairs: RewriteRulePair[] = []) => {
+  const queryParamActions = pairs.reduce(
+    (result, pair) => [
+      ...result,
+      {
+        ...getQueryParamsData(pair),
+        active: pair.active,
+        ruleType: RuleType.QUERYPARAM,
+        actionType: rewriteRuleActionTypes[pair.ruleType] as QueryParamModificationType,
+      },
+    ],
+    [] as QueryParamAction[]
+  );
+
+  const exportedRules = queryParamActions.map((action) => {
+    const newRule = getNewRule(RuleType.QUERYPARAM) as QueryParamRule;
+
+    return {
+      ...newRule,
+      isCharlesExported: true,
+      status: action.active ? Status.ACTIVE : Status.INACTIVE,
+      name: getModificationRuleName(action.param, action.value, action.actionType),
+      pairs: [
+        {
+          ...newRule.pairs[0],
+          modifications: getQueryParamModifications(action),
+        },
+      ],
+    };
+  });
+
+  return exportedRules;
+};
+
+const createModifyStatusRules = (pairs: RewriteRulePair[] = []) => {
+  const exportedRules = pairs.map((pair) => {
+    const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+
+    return {
+      ...newRule,
+      isCharlesExport: true,
+      name: `Modify status code to ${pair.newValue}`,
+      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      pairs: [
+        {
+          ...newRule.pairs[0],
+          response: {
+            ...newRule.pairs[0].response,
+            statusCode: `${pair.newValue}`,
+            //@ts-ignore
+            statusText: statusCodes[pair.newValue],
+            type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
+            resourceType: ResponseRuleResourceType.REST_API,
+            value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
+          },
+        },
+      ],
+    };
+  });
+
+  return exportedRules;
 };
 
 export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule): Promise<void> => {
@@ -267,8 +314,10 @@ export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule): Promise
 
       const headers = createHeaderRules(processedRulePairs[RuleType.HEADERS]);
       const queryparams = createQueryParamRules(processedRulePairs[RuleType.QUERYPARAM]);
+      const status = createModifyStatusRules(processedRulePairs[RuleType.RESPONSE]);
 
-      console.log({ headers, queryparams });
+      console.log({ status, headers, queryparams });
+
       resolve();
     });
   });
