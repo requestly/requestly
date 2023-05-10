@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
 import {
   CaretRightOutlined,
@@ -31,7 +31,7 @@ const ActionHeader = ({
   const dispatch = useDispatch();
   const trafficTableFilters = useSelector(getAllFilters);
 
-  const isRegexSearchActive = useMemo(() => trafficTableFilters.search.regex, [trafficTableFilters.search.regex]);
+  const isRegexSearchActive = trafficTableFilters.search.regex;
 
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
@@ -55,7 +55,7 @@ const ActionHeader = ({
                   className={`traffic-table-regex-btn ${
                     isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
                   }`}
-                  onClick={() => dispatch(desktopTrafficTableActions.toggleRegexSearch)}
+                  onClick={() => dispatch(desktopTrafficTableActions.toggleRegexSearch())}
                   iconOnly
                   icon={<VscRegex />}
                 />
@@ -79,7 +79,7 @@ const ActionHeader = ({
                 isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
               }`}
               onClick={() => {
-                dispatch(desktopTrafficTableActions.toggleRegexSearch);
+                dispatch(desktopTrafficTableActions.toggleRegexSearch());
               }}
               iconOnly
               icon={<VscRegex />}

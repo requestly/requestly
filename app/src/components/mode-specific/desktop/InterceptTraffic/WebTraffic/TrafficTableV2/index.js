@@ -50,15 +50,15 @@ const CurrentTrafficTable = ({
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
+  const newLogs = useSelector(getAllLogs);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
-  // Component State
   const previousLogsRef = useRef(logs);
-  const newLogs = useSelector(getAllLogs);
-  // {id: log, ...}
+
+  // Component State
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
