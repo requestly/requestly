@@ -15,7 +15,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
   trackPersonaQ1Completed,
   // trackPersonaQ2Completed,
-  // trackPersonaQ3Completed,
+  trackPersonaQ3Completed,
   trackPersonaQuestionnaireStarted,
 } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
@@ -35,8 +35,8 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
 
   const disableContinue = () => {
     if (page === 0) return false;
-    if (userPersona[OptionsConfig[page]?.key].length) return false;
-    else return true;
+    if (userPersona[OptionsConfig[page]?.key]?.length) return false;
+    return true;
   };
 
   const renderModalLeftSection = () => {
@@ -65,7 +65,17 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
       case 1:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
-
+        break;
+      //   case 2:
+      //     trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
+      //     submitAttrUtil(
+      //       APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASES,
+      //       getFormattedUserUseCases(userPersona.useCases)
+      //     );
+      //     break;
+      case 3:
+        trackPersonaQ3Completed(userPersona.referralChannel);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL, userPersona.referralChannel);
         if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
           //don't show recommendation screen for shared list users or desktop users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
@@ -80,46 +90,14 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
             redirectTo: location.pathname,
           },
         });
-      // break;
-      //   case 2:
-      //     trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
-      //     submitAttrUtil(
-      //       APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASES,
-      //       getFormattedUserUseCases(userPersona.useCases)
-      //     );
-      //     break;
-      //   case 3:
-      //     trackPersonaQ3Completed(userPersona.numberOfEmployees);
-      //     submitAttrUtil(
-      //       APP_CONSTANTS.GA_EVENTS.ATTR.NUMBER_OF_EMPLOYEES,
-      //       userPersona.numberOfEmployees
-      //     );
-      //     if (isSharedListUser) {
-      //       //don't show recommendation screen for shared list users
-      //       dispatch(actions.updateIsPersonaSurveyCompleted(true));
-      //       dispatch(actions.updatePersonaSurveyPage(page + 1));
-      //       return;
-      //     }
-      //     if (isPersonaRecommendationFlagOn) {
-      //       dispatch(
-      //         actions.toggleActiveModal({ modalName: "personaSurveyModal" })
-      //       );
-      //       navigate(PATHS.GETTING_STARTED, {
-      //         replace: true,
-      //         state: {
-      //           src: "persona_survey_modal",
-      //           redirectTo: location.pathname,
-      //         },
-      //       });
-      //     }
-      //     break;
+        break;
     }
-    dispatch(actions.updatePersonaSurveyPage(page === 1 ? 4 : page + 1));
+    dispatch(actions.updatePersonaSurveyPage(page + 1));
   };
 
   return (
     <>
-      {page !== surveyLength - 1 && (
+      {page !== surveyLength && (
         <div className="rq-modal-footer w-full">
           <Row justify="space-between" align="middle" className="w-full">
             <Col className="text-gray">{renderModalLeftSection()}</Col>
@@ -129,8 +107,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
                 className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
                 onClick={handleMoveToNextPage}
               >
-                {/* {page === surveyLength - 2 ? "Get started" : "Continue"} */}
-                {page === 1 ? "Get started" : "Continue"}
+                {page === 3 ? "Get started" : "Continue"}
               </RQButton>
             </Col>
           </Row>
