@@ -121,14 +121,6 @@ export type MapLocalRule = {
   };
 };
 
-// replacetype = 2 -> headers modification
-
-// export enum RewriteSubRuleType {
-//   ADD_HEADER = "add_Header",
-//   REMOVE_HEADER = "remove_header",
-//   MODIFY_HEADER = "modify_header",
-// }
-
 export type RewriteRulePair = {
   /**
    * Tells if rule active or not
