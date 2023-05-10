@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
 import {
   CaretRightOutlined,
@@ -12,28 +12,34 @@ import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
+import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
 
 const { Text } = Typography;
 
 const ActionHeader = ({
-  handleOnSearchChange,
   clearLogs,
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
   setIsInterceptingTraffic,
-  isRegexSearchActive,
   isFiltersCollapsed,
-  setIsRegexSearchActive,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
 }) => {
   const dispatch = useDispatch();
+  const trafficTableFilters = useSelector(getAllFilters);
+
+  const isRegexSearchActive = useMemo(() => trafficTableFilters.search.regex, [trafficTableFilters.search.regex]);
+
+  const handleOnSearchChange = (e) => {
+    const searchValue = e.target.value;
+    dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
+  };
 
   const renderSearchInput = () => {
-    if (isRegexSearchActive) {
+    if (trafficTableFilters.search.regex) {
       return (
         <Input.Search
           className="action-header-input"
@@ -49,7 +55,7 @@ const ActionHeader = ({
                   className={`traffic-table-regex-btn ${
                     isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
                   }`}
-                  onClick={() => setIsRegexSearchActive((prev) => !prev)}
+                  onClick={() => dispatch(desktopTrafficTableActions.toggleRegexSearch)}
                   iconOnly
                   icon={<VscRegex />}
                 />
@@ -73,7 +79,6 @@ const ActionHeader = ({
                 isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
               }`}
               onClick={() => {
-                setIsRegexSearchActive((prev) => !prev);
                 dispatch(desktopTrafficTableActions.toggleRegexSearch);
               }}
               iconOnly

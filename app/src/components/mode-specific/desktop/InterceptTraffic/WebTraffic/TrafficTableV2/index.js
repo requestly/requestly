@@ -62,7 +62,6 @@ const CurrentTrafficTable = ({
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
-  const [isRegexSearchActive, setIsRegexSearchActive] = useState(false);
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
@@ -127,11 +126,6 @@ const CurrentTrafficTable = ({
 
   const handleClosePane = () => {
     handlePreviewVisibility(false);
-  };
-
-  const handleOnSearchChange = (e) => {
-    const searchValue = e.target.value;
-    dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
 
   let previewData = [];
@@ -585,16 +579,13 @@ const CurrentTrafficTable = ({
         <Col flex="auto">
           <Row align={"middle"}>
             <ActionHeader
-              handleOnSearchChange={handleOnSearchChange}
               clearLogs={clearLogs}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
-              isRegexSearchActive={isRegexSearchActive}
               isFiltersCollapsed={isFiltersCollapsed}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
-              setIsRegexSearchActive={setIsRegexSearchActive}
               activeFiltersCount={activeFiltersCount}
             />
             {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
