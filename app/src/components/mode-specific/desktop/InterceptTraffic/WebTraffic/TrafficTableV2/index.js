@@ -628,7 +628,7 @@ const CurrentTrafficTable = ({
                 type="primary"
                 className="clear-logs-filter-btn"
                 onClick={() => {
-                  dispatch(desktopTrafficTableActions.clearFilters());
+                  dispatch(desktopTrafficTableActions.clearColumnFilters());
                 }}
               >
                 Clear

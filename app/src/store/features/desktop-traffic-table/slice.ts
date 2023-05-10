@@ -112,8 +112,13 @@ const slice = createSlice({
     toggleRegexSearch: (state: DesktopTrafficTableState) => {
       state.filters.search.regex = !state.filters.search.regex;
     },
-    clearFilters: (state: DesktopTrafficTableState) => {
-      state.filters = initialState.filters;
+    clearColumnFilters: (state: DesktopTrafficTableState) => {
+      state.filters = {
+        ...state.filters,
+        method: initialState.filters.method,
+        contentType: initialState.filters.contentType,
+        statusCode: initialState.filters.statusCode,
+      };
     },
   },
 });
