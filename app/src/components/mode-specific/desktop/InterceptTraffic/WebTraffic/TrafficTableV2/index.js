@@ -114,7 +114,7 @@ const CurrentTrafficTable = ({
     setIsPreviewOpen(visible);
 
     if (visible) {
-      setRulePaneSizes([60, 40]);
+      setRulePaneSizes([55, 45]);
       return;
     }
 
@@ -615,52 +615,53 @@ const CurrentTrafficTable = ({
               </RQButton>
             </Row>
           )}
-
-          <Split
-            sizes={rulePaneSizes}
-            minSize={[75, 0]}
-            gutterSize={gutterSize}
-            dragInterval={20}
-            direction="vertical"
-            cursor="row-resize"
-            className="traffic-table-split-container"
-          >
-            <Row className="gap-case-1" style={{ overflow: "hidden" }}>
-              <ProCard
-                className="primary-card github-like-border network-table-wrapper-override"
-                style={{
-                  boxShadow: "none",
-                  // borderBottom: "2px solid #f5f5f5",
-                  borderRadius: "0",
-                  paddingBottom: "0",
-                }}
-              >
-                {getGroupLogs()}
-              </ProCard>
-            </Row>
-
-            <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
-              <ProCard
-                className="primary-card github-like-border"
-                style={{
-                  boxShadow: "none",
-                  borderRadius: "0",
-                  // borderTop: "2px solid #f5f5f5",
-                }}
-                bodyStyle={{ padding: "0px 20px" }}
-              >
-                <FixedRequestLogPane
-                  selectedRequestData={{
-                    ...selectedRequestData,
-                    response: { ...selectedRequestData.response, body: selectedRequestResponse },
+          <div className={!isPreviewOpen && "hide-traffic-table-split-gutter"}>
+            <Split
+              sizes={rulePaneSizes}
+              minSize={[75, 0]}
+              gutterSize={gutterSize}
+              dragInterval={20}
+              direction="vertical"
+              cursor="row-resize"
+              className="traffic-table-split-container"
+            >
+              <Row className="gap-case-1" style={{ overflow: "hidden" }}>
+                <ProCard
+                  className="primary-card github-like-border network-table-wrapper-override"
+                  style={{
+                    boxShadow: "none",
+                    // borderBottom: "2px solid #f5f5f5",
+                    borderRadius: "0",
+                    paddingBottom: "0",
                   }}
-                  upsertRequestAction={upsertRequestAction}
-                  handleClosePane={handleClosePane}
-                  visibility={isPreviewOpen}
-                />
-              </ProCard>
-            </Row>
-          </Split>
+                >
+                  {getGroupLogs()}
+                </ProCard>
+              </Row>
+
+              <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
+                <ProCard
+                  className="primary-card github-like-border"
+                  style={{
+                    boxShadow: "none",
+                    borderRadius: "0",
+                    // borderTop: "2px solid #f5f5f5",
+                  }}
+                  bodyStyle={{ padding: "0px 20px" }}
+                >
+                  <FixedRequestLogPane
+                    selectedRequestData={{
+                      ...selectedRequestData,
+                      response: { ...selectedRequestData.response, body: selectedRequestResponse },
+                    }}
+                    upsertRequestAction={upsertRequestAction}
+                    handleClosePane={handleClosePane}
+                    visibility={isPreviewOpen}
+                  />
+                </ProCard>
+              </Row>
+            </Split>
+          </div>
 
           {/* ssl proxying is currently hidden */}
           <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />
