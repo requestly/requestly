@@ -130,6 +130,9 @@ export type MapLocalRule = {
 // }
 
 export type RewriteRulePair = {
+  /**
+   * Tells if rule active or not
+   */
   active: boolean;
 
   /**
