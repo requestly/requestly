@@ -62,7 +62,6 @@ const CurrentTrafficTable = ({
   const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
-  const [searchKeyword, setSearchKeyword] = useState("");
   const [isRegexSearchActive, setIsRegexSearchActive] = useState(false);
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
@@ -76,11 +75,6 @@ const CurrentTrafficTable = ({
   const [filterTypes, setFilterTypes] = useState({});
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
-  const [logFilters, setLogFilters] = useState({
-    statusCode: [],
-    resourceType: [],
-    method: [],
-  });
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -134,7 +128,6 @@ const CurrentTrafficTable = ({
 
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
-    setSearchKeyword(searchValue);
     dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
 
@@ -285,8 +278,8 @@ const CurrentTrafficTable = ({
   }, []);
 
   const activeFiltersCount = useMemo(
-    () => Object.values(logFilters).reduce((current, filter) => current + filter.length, 0),
-    [logFilters]
+    () => [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.contentType].length,
+    [trafficTableFilters.method, trafficTableFilters.contentType, trafficTableFilters.statusCode]
   );
 
   const filterLog = useCallback(
@@ -340,25 +333,8 @@ const CurrentTrafficTable = ({
     ]
   );
 
-  const getSearchedLogs = useCallback(
+  const getFilteredLogs = useCallback(
     (logs) => {
-      // let networkLogs = getFilteredLogs(logs) || logs;
-      // if (searchKeyword) {
-      //   try {
-      //     // TODO: @wrongsahil fix this. Special Characters are breaking the UI
-      //     let reg = null;
-      //     if (isRegexSearchActive) {
-      //       reg = new RegExp(searchKeyword);
-      //       return networkLogs.filter((log) => log.url.match(reg));
-      //     } else {
-      //       return networkLogs.filter((log) => log.url.includes(searchKeyword));
-      //     }
-      //   } catch (err) {
-      //     Logger.log(err);
-      //   }
-      // }
-
-      // return networkLogs;
       return logs.filter(filterLog);
     },
     [filterLog]
@@ -414,7 +390,7 @@ const CurrentTrafficTable = ({
       // remove logs with same id
       const filteredLogs = logs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
       const allLogs = Object.values(filteredLogs).length > 0 ? Object.values(filteredLogs) : requestLogs;
-      const searchedLogs = getSearchedLogs(allLogs);
+      const searchedLogs = getFilteredLogs(allLogs);
 
       return (
         <GroupByNone
@@ -423,8 +399,8 @@ const CurrentTrafficTable = ({
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
-          searchKeyword={searchKeyword}
-          logFilters={logFilters}
+          searchKeyword={trafficTableFilters.search.term}
+          logFilters={trafficTableFilters}
         />
       );
     },
@@ -435,11 +411,10 @@ const CurrentTrafficTable = ({
       emptyCtaText,
       emptyDesc,
       filterTypes,
-      getSearchedLogs,
+      getFilteredLogs,
       handleRowClick,
-      logFilters,
       requestLogs,
-      searchKeyword,
+      trafficTableFilters,
     ]
   );
 
@@ -615,9 +590,8 @@ const CurrentTrafficTable = ({
                   filterLabel="Method"
                   filterPlaceholder="Filter by method"
                   options={METHOD_TYPE_OPTIONS}
-                  value={logFilters.method}
+                  value={trafficTableFilters.method}
                   handleFilterChange={(options) => {
-                    setLogFilters((filter) => ({ ...filter, method: options }));
                     dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
                   }}
                 />
@@ -626,9 +600,8 @@ const CurrentTrafficTable = ({
                   filterLabel="Status code"
                   filterPlaceholder="Filter by status code"
                   options={STATUS_CODE_ONLY_OPTIONS}
-                  value={logFilters.statusCode}
+                  value={trafficTableFilters.statusCode}
                   handleFilterChange={(options) => {
-                    setLogFilters((filter) => ({ ...filter, statusCode: options }));
                     dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
                   }}
                 />
@@ -637,9 +610,8 @@ const CurrentTrafficTable = ({
                   filterLabel="Content type"
                   filterPlaceholder="Filter by content type"
                   options={CONTENT_TYPE_OPTIONS}
-                  value={logFilters.resourceType}
+                  value={trafficTableFilters.resourceType}
                   handleFilterChange={(options) => {
-                    setLogFilters((filter) => ({ ...filter, resourceType: options }));
                     dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
                   }}
                 />
@@ -648,7 +620,7 @@ const CurrentTrafficTable = ({
                 type="primary"
                 className="clear-logs-filter-btn"
                 onClick={() => {
-                  setLogFilters({ statusCode: [], resourceType: [], method: [] });
+                  dispatch(desktopTrafficTableActions.clearFilters());
                 }}
               >
                 Clear
