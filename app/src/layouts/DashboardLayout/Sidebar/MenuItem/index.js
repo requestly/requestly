@@ -13,6 +13,7 @@ import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/
 import { snakeCase } from "lodash";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import BetaBadge from "components/misc/BetaBadge";
 
 const { PATHS, LINKS } = APP_CONSTANTS;
 
@@ -45,6 +46,7 @@ const givenRoutes = [
     icon: <ApiOutlined />,
     key: "api-client",
     feature: FEATURES.API_CLIENT,
+    isBeta: true,
   },
   {
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
@@ -117,7 +119,6 @@ const MenuItem = (props) => {
   // Menu
   const locationURL = pathname;
 
-  // Set desktop app routes
   useEffect(() => {
     setMyRoutes((myRoutes) => {
       const routes = myRoutes.filter((route) => {
@@ -176,6 +177,12 @@ const MenuItem = (props) => {
         key: item.key,
       };
     }
+
+    let label = item.name;
+    if (item.isBeta) {
+      label = <BetaBadge text={item.name} />;
+    }
+
     return {
       key: item.key,
       icon: <div className="icon-wrapper">{item.icon}</div>,
@@ -185,11 +192,11 @@ const MenuItem = (props) => {
       label:
         item.path === LINKS.YOUTUBE_TUTORIALS ? (
           <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
-            {item.name}
+            {label}
           </a>
         ) : (
           <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
-            {item.name}
+            {label}
           </Link>
         ),
     };
