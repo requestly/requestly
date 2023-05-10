@@ -72,7 +72,6 @@ const CurrentTrafficTable = ({
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
-  const [filterTypes, setFilterTypes] = useState({});
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
@@ -84,6 +83,10 @@ const CurrentTrafficTable = ({
       })
     );
   }, [dispatch]);
+
+  const getGroupFiltersLength = useCallback(() => {
+    return [...trafficTableFilters.app, ...trafficTableFilters.domain].length;
+  }, [trafficTableFilters.app, trafficTableFilters.domain]);
 
   const upsertLogs = (logs) => {
     let _networkLogsMap = { ...networkLogsMap };
@@ -398,13 +401,13 @@ const CurrentTrafficTable = ({
     [filterLog, getGroupedLogs]
   );
 
-  const getGroupLogs = useMemo(
+  const renderLogs = useMemo(
     () => () => {
-      const searchedLogs = getFilteredLogs(requestLogs);
+      const logsToRender = getFilteredLogs(requestLogs);
 
       return (
         <GroupByNone
-          requestsLog={searchedLogs}
+          requestsLog={logsToRender}
           handleRowClick={handleRowClick}
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
@@ -421,11 +424,8 @@ const CurrentTrafficTable = ({
     (e, key, domain) => {
       e.stopPropagation();
       dispatch(desktopTrafficTableActions.removeGroupFilter({ key, domain }));
-      const updatedFilterTypes = JSON.parse(JSON.stringify(filterTypes));
-      delete updatedFilterTypes[key];
-      setFilterTypes(updatedFilterTypes);
     },
-    [dispatch, filterTypes]
+    [dispatch]
   );
 
   const getLogAvatar = useCallback(
@@ -514,8 +514,6 @@ const CurrentTrafficTable = ({
     [expandedLogTypes]
   );
 
-  const isFilterApplied = useMemo(() => Object.values(filterTypes).length > 0, [filterTypes]);
-
   const items = useMemo(() => {
     return [
       {
@@ -527,7 +525,7 @@ const CurrentTrafficTable = ({
         ),
         onClick: () => {
           dispatch(desktopTrafficTableActions.clearGroupFilters());
-          trackSidebarFilterClearAllClicked(ANALYTIC_EVENT_SOURCE, Object.values(filterTypes).length);
+          trackSidebarFilterClearAllClicked(ANALYTIC_EVENT_SOURCE, getGroupFiltersLength());
         },
       },
       {
@@ -543,7 +541,15 @@ const CurrentTrafficTable = ({
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ];
-  }, [appList, getAppLogsMenuItem, domainList, getDomainLogsMenuItem, dispatch, filterTypes, handleSubMenuTitleClick]);
+  }, [
+    appList,
+    getAppLogsMenuItem,
+    domainList,
+    getDomainLogsMenuItem,
+    dispatch,
+    getGroupFiltersLength,
+    handleSubMenuTitleClick,
+  ]);
 
   const handleSidebarMenuItemClick = useCallback(
     (e) => {
@@ -554,19 +560,18 @@ const CurrentTrafficTable = ({
           value: e.keyPath[0],
         })
       );
-      setFilterTypes((prev) => ({ ...prev, [e.key]: e.key }));
     },
     [dispatch]
   );
 
-  useEffect(() => {
-    console.log("!!!debug", "traffic filters", trafficTableFilters);
-  }, [trafficTableFilters]);
-
   return (
     <>
       <Row wrap={false}>
-        <Col flex="197px" style={isFilterApplied ? { paddingTop: "8px" } : {}} className="traffic-table-sidebar">
+        <Col
+          flex="197px"
+          style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
+          className="traffic-table-sidebar"
+        >
           <Menu
             theme="dark"
             mode="inline"
@@ -574,7 +579,7 @@ const CurrentTrafficTable = ({
             openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
             selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
-            className={isFilterApplied ? "filter-applied" : ""}
+            className={getGroupFiltersLength() > 0 ? "filter-applied" : ""}
           />
         </Col>
         <Col flex="auto">
@@ -659,7 +664,7 @@ const CurrentTrafficTable = ({
                     paddingBottom: "0",
                   }}
                 >
-                  {getGroupLogs()}
+                  {renderLogs()}
                 </ProCard>
               </Row>
 
