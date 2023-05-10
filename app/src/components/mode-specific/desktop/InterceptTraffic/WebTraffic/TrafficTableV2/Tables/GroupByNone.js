@@ -18,7 +18,15 @@ import {
 import "./index.css";
 import { getConnectedAppsCount } from "utils/Misc";
 
-const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc, searchKeyword }) => {
+const GroupByNone = ({
+  requestsLog,
+  handleRowClick,
+  emptyCtaText,
+  emptyCtaAction,
+  emptyDesc,
+  searchKeyword,
+  logFilters,
+}) => {
   const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
 
@@ -118,7 +126,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     }
 
     if (numberOfConnectedApps > 0) {
-      if (searchKeyword.length) {
+      if (searchKeyword.length || Object.values(logFilters).some((prop) => prop.length > 0)) {
         return <Typography.Text>No request matches the filter you applied</Typography.Text>;
       }
       return (
@@ -154,6 +162,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
     systemWideSource.isActive,
     systemWideSource.isAvailable,
     searchKeyword,
+    logFilters,
   ]);
 
   const renderNoTrafficCTA = () => {
