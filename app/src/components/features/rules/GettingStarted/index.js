@@ -28,12 +28,16 @@ const GettingStarted = () => {
   const appMode = useSelector(getAppMode);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
-    setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
+    setIsImportRulesModalActive((prev) => !prev);
+  };
+  const toggleImportCharlesRulesModal = () => {
+    setIsImportCharlesRulesModalActive((prev) => !prev);
   };
 
   const handleLoginOnClick = () => {
@@ -160,6 +164,9 @@ const GettingStarted = () => {
                       Upload rules
                     </RQButton>
                   </AuthConfirmationPopover>
+                  <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
+                    Import settings from Charles
+                  </RQButton>
                 </div>
               </div>
 
@@ -176,7 +183,10 @@ const GettingStarted = () => {
           </Col>
         </Row>
       )}
-      <ImportFromCharlesModal />
+      {isImportCharlesRulesModalActive ? (
+        <ImportFromCharlesModal isOpen={isImportCharlesRulesModalActive} toggle={toggleImportCharlesRulesModal} />
+      ) : null}
+
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}

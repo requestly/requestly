@@ -1,15 +1,23 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { useSelector, useDispatch } from "react-redux";
+import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { getXmlToJs } from "utils/charles-rule-adapters/getXmlToJs";
 import { Row } from "antd";
 import { createNewGroupAndSave } from "utils/charles-rule-adapters/utils";
+import { actions } from "store";
 
-export const ImportFromCharlesModal: React.FC = () => {
+interface ModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   //   const [isCharlesRulesParsed, setIsCharlesRulesParsed] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const [rulesToImport, setRulesToImport] = useState([]);
 
   const appMode = useSelector(getAppMode);
@@ -43,8 +51,8 @@ export const ImportFromCharlesModal: React.FC = () => {
   };
 
   const handleCharlesRulesImport = () => {
-    rulesToImport.forEach(({ rules, status, groupName, appMode }) => {
-      createNewGroupAndSave({
+    const importPromises = rulesToImport.map(({ rules, status, groupName, appMode }) => {
+      return createNewGroupAndSave({
         appMode,
         rules,
         status,
@@ -53,10 +61,20 @@ export const ImportFromCharlesModal: React.FC = () => {
         groupName,
       });
     });
+
+    Promise.all(importPromises).then(() => {
+      dispatch(
+        actions.updateRefreshPendingStatus({
+          type: "rules",
+          newValue: !isRulesListRefreshPending,
+        })
+      );
+      toggle();
+    });
   };
 
   return (
-    <RQModal open={true} centered>
+    <RQModal open={isOpen} centered>
       <div className="rq-modal-content">
         <div className="header text-center">Import Charles settings</div>
         <div className="mt-16">
