@@ -13,6 +13,8 @@ import {
   QueryParamModificationType,
   ResponseRuleResourceType,
   ResponseRule,
+  ReplaceRule,
+  SourceOperator,
 } from "types";
 import { convertToArray } from "../utils";
 import { statusCodes } from "config/constants/sub/statusCode";
@@ -24,9 +26,9 @@ import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 // [x] headers
 // [x] query parms (1hr)
 // [x] status (1hr)
-// [] host (1hr)
-// [] path (10min)
-// [] url (10min)
+// [x] host (1hr)
+// [x] path (10min)
+// [x] url (10min)
 // [] body (TBA)
 
 enum WhereToApplyRule {
@@ -54,9 +56,11 @@ type QueryParamAction = Partial<{
 }>;
 
 enum RewriteRuleActionType {
+  URL = "url",
   PATH = "path",
   HOST = "host",
   STATUS = "status",
+  BODY = "body",
 }
 
 const rewriteRuleActionTypes: Record<
@@ -66,6 +70,9 @@ const rewriteRuleActionTypes: Record<
   1: HeaderRuleActionType.ADD,
   2: HeaderRuleActionType.REMOVE,
   3: HeaderRuleActionType.MODIFY,
+  4: RewriteRuleActionType.HOST,
+  5: RewriteRuleActionType.PATH,
+  6: RewriteRuleActionType.URL,
   8: QueryParamModificationType.ADD,
   9: QueryParamModificationType.ADD,
   10: QueryParamModificationType.REMOVE,
@@ -88,6 +95,8 @@ const processRulePairs = (pairs: RewriteRulePair[]) => {
   return pairs?.reduce((result, pair) => {
     if ([1, 2, 3].includes(pair.ruleType)) {
       return { ...result, [RuleType.HEADERS]: [...(result[RuleType.HEADERS] ?? []), pair] };
+    } else if ([4, 5, 6].includes(pair.ruleType)) {
+      return { ...result, [RuleType.REPLACE]: [...(result[RuleType.REPLACE] ?? []), pair] };
     } else if ([8, 9, 10].includes(pair.ruleType)) {
       return { ...result, [RuleType.QUERYPARAM]: [...(result[RuleType.QUERYPARAM] ?? []), pair] };
     } else if ([11].includes(pair.ruleType)) {
@@ -185,7 +194,7 @@ const getQueryParamModifications = ({
 // create the rule and fill the configs
 // at the end fill the source URLs as it will be same for all the rules
 // then optimise for doing it in single pass
-const createHeaderRules = (pairs: RewriteRulePair[] = []) => {
+const createModifyHeaderRules = (pairs: RewriteRulePair[] = []) => {
   const headerActions = pairs.reduce(
     (result, pair) => [
       ...result,
@@ -224,7 +233,7 @@ const createHeaderRules = (pairs: RewriteRulePair[] = []) => {
   return exportedRules;
 };
 
-const createQueryParamRules = (pairs: RewriteRulePair[] = []) => {
+const createModifyQueryParamRules = (pairs: RewriteRulePair[] = []) => {
   const queryParamActions = pairs.reduce(
     (result, pair) => [
       ...result,
@@ -287,6 +296,44 @@ const createModifyStatusRules = (pairs: RewriteRulePair[] = []) => {
   return exportedRules;
 };
 
+const getReplaceRuleNamePrefix = (type: RewriteRulePair["ruleType"]) => {
+  if (rewriteRuleActionTypes[type] === RewriteRuleActionType.HOST) {
+    return "Host";
+  } else if (rewriteRuleActionTypes[type] === RewriteRuleActionType.PATH) {
+    return "Path";
+  } else if (rewriteRuleActionTypes[type] === RewriteRuleActionType.URL) {
+    return "URL";
+  } else {
+    return "";
+  }
+};
+
+const createReplaceRule = (pairs: RewriteRulePair[] = []) => {
+  const exportedRules = pairs.map((pair) => {
+    const newRule = getNewRule(RuleType.REPLACE) as ReplaceRule;
+
+    return {
+      ...newRule,
+      isCharlesExport: true,
+      name: `${getReplaceRuleNamePrefix(pair.ruleType)} ${pair.matchValue} -> ${pair.newValue}`,
+      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+      pairs: [
+        {
+          ...newRule.pairs[0],
+          source: {
+            ...newRule.pairs[0].source,
+            operator: pair.matchValueRegex ? SourceOperator.MATCHES : SourceOperator.CONTAINS,
+          },
+          from: pair.matchValue,
+          to: pair.newValue,
+        },
+      ],
+    };
+  });
+
+  return exportedRules;
+};
+
 export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule): Promise<void> => {
   return new Promise((resolve, reject) => {
     const rewriteRules = get(rules, "rewrite.sets.rewriteSet");
@@ -312,11 +359,12 @@ export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule): Promise
 
       console.log({ rewriteRulePairs, processedRulePairs });
 
-      const headers = createHeaderRules(processedRulePairs[RuleType.HEADERS]);
-      const queryparams = createQueryParamRules(processedRulePairs[RuleType.QUERYPARAM]);
+      const headers = createModifyHeaderRules(processedRulePairs[RuleType.HEADERS]);
+      const queryparams = createModifyQueryParamRules(processedRulePairs[RuleType.QUERYPARAM]);
       const status = createModifyStatusRules(processedRulePairs[RuleType.RESPONSE]);
+      const host = createReplaceRule(processedRulePairs[RuleType.REPLACE]);
 
-      console.log({ status, headers, queryparams });
+      console.log({ status, headers, queryparams, host });
 
       resolve();
     });
