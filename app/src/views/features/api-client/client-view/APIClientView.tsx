@@ -240,7 +240,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
             onChange={(evt) => setUrl(evt.target.value)}
             onPressEnter={onUrlInputEnterPressed}
             onBlur={onUrlInputBlur}
-            prefix={<Favicon url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+            prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
           />
         </Space.Compact>
         <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
