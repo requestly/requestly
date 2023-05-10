@@ -126,7 +126,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     if (isFeatureCompatible(FEATURES.API_CLIENT)) {
       menuItems.splice(2, 0, {
         key: "replace_request",
-        label: "Replay request",
+        label: "Edit and Replay",
         onClick: () => {
           trackTrafficTableDropdownClicked("replay_request");
           onReplayRequest();
