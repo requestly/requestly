@@ -1,12 +1,12 @@
 import xml2js from "xml2js";
 import { get } from "lodash";
 import { noCachingRuleAdapter } from "./no-caching";
-import { blockCookiesRuleAdapter } from "./block-cookies";
-import { blockListRuleAdapter } from "./block-list";
+// import { blockCookiesRuleAdapter } from "./block-cookies";
+// import { blockListRuleAdapter } from "./block-list";
 import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
-import { BlockCookiesRule, BlockListRule, CharlesRuleType, MapLocalRule, MapRemoteRule, NoCachingRule } from "./types";
-import { mapRemoteAdapter } from "./map-remote";
-import { mapLocalRuleAdapter } from "./map-local";
+import { CharlesRuleType, NoCachingRule } from "./types";
+// import { mapRemoteAdapter } from "./map-remote";
+// import { mapLocalRuleAdapter } from "./map-local";
 
 type CharlesExport = {
   "charles-export": Record<string, unknown>;
@@ -45,12 +45,12 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
       console.log("------- rules import started ---------");
       console.log({ recordsObject });
 
-      return Promise.allSettled([
+      return Promise.all([
         noCachingRuleAdapter(appMode, recordsObject[CharlesRuleType.NO_CACHING] as NoCachingRule),
-        blockCookiesRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_COOKIES] as BlockCookiesRule),
-        blockListRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
-        mapRemoteAdapter(appMode, recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
-        mapLocalRuleAdapter(appMode, recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
+        // blockCookiesRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_COOKIES] as BlockCookiesRule),
+        // blockListRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
+        // mapRemoteAdapter(appMode, recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
+        // mapLocalRuleAdapter(appMode, recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
       ]);
     });
 };
