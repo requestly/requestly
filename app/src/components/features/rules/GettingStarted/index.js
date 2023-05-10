@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
+import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -175,7 +176,7 @@ const GettingStarted = () => {
           </Col>
         </Row>
       )}
-
+      <ImportFromCharlesModal />
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
