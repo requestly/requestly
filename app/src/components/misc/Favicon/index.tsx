@@ -1,30 +1,36 @@
 import { Avatar } from "antd";
 import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { addUrlSchemeIfMissing } from "views/features/api-client/apiUtils";
-import classNames from "classnames";
 import { debounce } from "lodash";
-import "./favicon.scss";
 
-const FAVICON_ENDPOINT = (origin: string): string =>
-  "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=16&url=" + origin;
+const FAVICON_SIZE = {
+  small: 16,
+  normal: 64, // default
+};
 
-const EMPTY_FAVICON_URL = FAVICON_ENDPOINT("");
+type FaviconSize = keyof typeof FAVICON_SIZE;
+
+const FAVICON_ENDPOINT = (origin: string, size: FaviconSize): string =>
+  `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=${FAVICON_SIZE[size]}&url=${origin}`;
+
+const EMPTY_FAVICON_URL = (size: FaviconSize) => FAVICON_ENDPOINT("", size);
 
 interface Props {
   url: string;
+  size?: FaviconSize;
   debounceWait?: number;
   className?: string;
   style?: CSSProperties;
 }
 
-const Favicon: React.FC<Props> = ({ url, debounceWait, className, style }) => {
-  const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL);
+const Favicon: React.FC<Props> = ({ url, size = "normal", debounceWait, className, style = {} }) => {
+  const [faviconUrl, setFaviconUrl] = useState(EMPTY_FAVICON_URL(size));
   const setFaviconUrlDebounced = useMemo(() => {
     return debounceWait ? debounce(setFaviconUrl, 500) : setFaviconUrl;
   }, [debounceWait]);
 
   useEffect(() => {
-    let faviconUrl = EMPTY_FAVICON_URL;
+    let faviconUrl = EMPTY_FAVICON_URL(size);
 
     try {
       if (url) {
@@ -41,16 +47,23 @@ const Favicon: React.FC<Props> = ({ url, debounceWait, className, style }) => {
         }
 
         const origin = `${urlObj.protocol}//${domain}`;
-        faviconUrl = FAVICON_ENDPOINT(origin);
+        faviconUrl = FAVICON_ENDPOINT(origin, size);
       }
     } catch (e) {
       // skip
     }
 
     setFaviconUrlDebounced(faviconUrl);
-  }, [setFaviconUrlDebounced, url]);
+  }, [setFaviconUrlDebounced, size, url]);
 
-  return <Avatar size="small" src={faviconUrl} className={classNames(["rq-favicon", className])} style={style} />;
+  return (
+    <Avatar
+      size="small"
+      src={faviconUrl}
+      className={className}
+      style={{ height: FAVICON_SIZE[size], width: FAVICON_SIZE[size], ...style }}
+    />
+  );
 };
 
 export default Favicon;
