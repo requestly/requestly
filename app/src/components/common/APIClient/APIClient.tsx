@@ -9,6 +9,7 @@ import {
 import APIClientView from "views/features/api-client/client-view/APIClientView";
 import { RQAPI, RequestContentType, RequestMethod } from "views/features/api-client/types";
 import { APIClientRequest } from "./types";
+import BetaBadge from "components/misc/BetaBadge";
 import "./apiClient.scss";
 
 interface Props {
@@ -70,7 +71,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     <Modal
       className="api-client-modal"
       centered
-      title={modalTitle || "API Client"}
+      title={<BetaBadge text={modalTitle || "API Client"} />}
       open={isModalOpen}
       onCancel={onModalClose}
       footer={null}
