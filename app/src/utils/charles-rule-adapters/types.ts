@@ -46,8 +46,8 @@ export type Location = {
 };
 
 export type SourceUrl = {
-  location: Location;
   enabled: boolean;
+  location: Location;
 };
 
 // rules
@@ -117,6 +117,73 @@ export type MapLocalRule = {
     toolEnabled: boolean;
     mappings: {
       mapLocalMapping: MapLocalRuleMappings;
+    };
+  };
+};
+
+// replacetype = 2 -> headers modification
+
+// export enum RewriteSubRuleType {
+//   ADD_HEADER = "add_Header",
+//   REMOVE_HEADER = "remove_header",
+//   MODIFY_HEADER = "modify_header",
+// }
+
+export type RewriteRulePair = {
+  active: boolean;
+
+  /**
+   * Indicates the chosen option from rewrite rule
+   * @example 1 = add headers and 2 = remove headers
+   */
+  ruleType: number;
+  matchHeader: string;
+  matchValue: string;
+  matchHeaderRegex: boolean;
+  matchValueRegex: boolean;
+
+  /**
+   *  Apply rule on request if true
+   */
+  matchRequest: boolean;
+
+  /**
+   *  Apply rule on response if true
+   */
+  matchResponse: boolean;
+  newHeader: string;
+  newValue: string;
+  newHeaderRegex: boolean;
+  newValueRegex: boolean;
+  matchWholeValue: boolean;
+  caseSensitive: boolean;
+  replaceType: number;
+};
+
+export type RewriteRulePairs = RewriteRulePair | RewriteRulePair[];
+
+export type RewriteSet = {
+  active: boolean;
+  name: string;
+  hosts: {
+    locationPatterns: {
+      locationMatch: SourceUrl | SourceUrl[];
+    };
+  };
+  rules: {
+    rewriteRule: RewriteRulePairs;
+  };
+};
+
+export type RewriteSets = RewriteSet | RewriteSet[];
+
+export type RewriteRule = {
+  string: CharlesRuleType.REWRITE;
+  rewrite: {
+    toolEnabled: boolean;
+    debugging: boolean;
+    sets: {
+      rewriteSet: RewriteSets;
     };
   };
 };
