@@ -333,13 +333,6 @@ const CurrentTrafficTable = ({
     ]
   );
 
-  const getFilteredLogs = useCallback(
-    (logs) => {
-      return logs.filter(filterLog);
-    },
-    [filterLog]
-  );
-
   const getRequestLogs = useCallback(
     (desc = true) => {
       let logs = null;
@@ -379,18 +372,35 @@ const CurrentTrafficTable = ({
   const { appList, appLogs } = useMemo(() => getAppLogs(), [getAppLogs]);
   const { domainList, domainLogs } = useMemo(() => getDomainLogs(), [getDomainLogs]);
 
-  const getGroupLogs = useMemo(
-    () => () => {
-      const logs = Object.values(filterTypes).reduce((logs, filterType) => {
-        const [logType, filter] = filterType?.split(" ") ?? [];
-        const filteredLogs = filter ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : [];
-        return [...logs, ...(filteredLogs ?? [])];
-      }, []);
+  const getGroupedLogs = useCallback(() => {
+    const groupedLogs = [];
+    trafficTableFilters.app.forEach((app) => {
+      groupedLogs.push(...appLogs[app]);
+    });
+    trafficTableFilters.domain.forEach((domain) => {
+      groupedLogs.push(...domainLogs[domain]);
+    });
+
+    return groupedLogs;
+  }, [appLogs, domainLogs, trafficTableFilters.app, trafficTableFilters.domain]);
+
+  const getFilteredLogs = useCallback(
+    (logs) => {
+      const groupedLogs = getGroupedLogs();
+      const allLogs = groupedLogs.length > 0 ? groupedLogs : logs;
 
       // remove logs with same id
-      const filteredLogs = logs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
-      const allLogs = Object.values(filteredLogs).length > 0 ? Object.values(filteredLogs) : requestLogs;
-      const searchedLogs = getFilteredLogs(allLogs);
+      const prunedLogs = allLogs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
+      const prunedLogsArray = Object.values(prunedLogs);
+
+      return prunedLogsArray.filter(filterLog);
+    },
+    [filterLog, getGroupedLogs]
+  );
+
+  const getGroupLogs = useMemo(
+    () => () => {
+      const searchedLogs = getFilteredLogs(requestLogs);
 
       return (
         <GroupByNone
@@ -404,34 +414,23 @@ const CurrentTrafficTable = ({
         />
       );
     },
-    [
-      appLogs,
-      domainLogs,
-      emptyCtaAction,
-      emptyCtaText,
-      emptyDesc,
-      filterTypes,
-      getFilteredLogs,
-      handleRowClick,
-      requestLogs,
-      trafficTableFilters,
-    ]
+    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, requestLogs, trafficTableFilters]
   );
 
   const handleClearFilter = useCallback(
-    (e, key) => {
+    (e, key, domain) => {
       e.stopPropagation();
-
+      dispatch(desktopTrafficTableActions.removeGroupFilter({ key, domain }));
       const updatedFilterTypes = JSON.parse(JSON.stringify(filterTypes));
       delete updatedFilterTypes[key];
       setFilterTypes(updatedFilterTypes);
     },
-    [filterTypes]
+    [dispatch, filterTypes]
   );
 
   const getLogAvatar = useCallback(
     (key, logName = "", avatarUrl) => {
-      const isSelected = key in filterTypes;
+      const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
         <>
@@ -444,7 +443,7 @@ const CurrentTrafficTable = ({
                   size="small"
                   shape="circle"
                   icon={<CloseOutlined />}
-                  onClick={(e) => handleClearFilter(e, key)}
+                  onClick={(e) => handleClearFilter(e, key, logName)}
                   className="clear-log-filter-btn"
                 />
               </Tooltip>
@@ -453,7 +452,7 @@ const CurrentTrafficTable = ({
         </>
       );
     },
-    [filterTypes, handleClearFilter]
+    [handleClearFilter, trafficTableFilters]
   );
 
   const getApplogAvatar = useCallback(
@@ -479,8 +478,8 @@ const CurrentTrafficTable = ({
   const getAppLogsMenuItem = useCallback(
     (apps) => {
       return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
-        key: `${logType.APP} ${appName}`,
-        label: getApplogAvatar(`${logType.APP} ${appName}`, appName),
+        key: `${appName}`,
+        label: getApplogAvatar(`${logType.APP}`, appName),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
         },
@@ -492,8 +491,8 @@ const CurrentTrafficTable = ({
   const getDomainLogsMenuItem = useCallback(
     (domains) => {
       return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
-        key: `${logType.DOMAIN} ${domain}`,
-        label: getDomainLogAvatar(`${logType.DOMAIN} ${domain}`, domain),
+        key: `${domain}`,
+        label: getDomainLogAvatar(`${logType.DOMAIN}`, domain),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
         },
@@ -527,7 +526,7 @@ const CurrentTrafficTable = ({
           </span>
         ),
         onClick: () => {
-          setFilterTypes({});
+          dispatch(desktopTrafficTableActions.clearGroupFilters());
           trackSidebarFilterClearAllClicked(ANALYTIC_EVENT_SOURCE, Object.values(filterTypes).length);
         },
       },
@@ -544,12 +543,25 @@ const CurrentTrafficTable = ({
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
     ];
-  }, [appList, domainList, filterTypes, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
+  }, [appList, getAppLogsMenuItem, domainList, getDomainLogsMenuItem, dispatch, filterTypes, handleSubMenuTitleClick]);
 
-  const handleSidebarMenuItemClick = useCallback((e) => {
-    if (e.key === "clear_all") return;
-    setFilterTypes((prev) => ({ ...prev, [e.key]: e.key }));
-  }, []);
+  const handleSidebarMenuItemClick = useCallback(
+    (e) => {
+      if (e.key === "clear_all") return;
+      dispatch(
+        desktopTrafficTableActions.addGroupFilters({
+          key: e.keyPath[1],
+          value: e.keyPath[0],
+        })
+      );
+      setFilterTypes((prev) => ({ ...prev, [e.key]: e.key }));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    console.log("!!!debug", "traffic filters", trafficTableFilters);
+  }, [trafficTableFilters]);
 
   return (
     <>
@@ -561,7 +573,7 @@ const CurrentTrafficTable = ({
             items={items}
             openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
-            selectedKeys={Object.values(filterTypes)}
+            selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
             className={isFilterApplied ? "filter-applied" : ""}
           />
         </Col>

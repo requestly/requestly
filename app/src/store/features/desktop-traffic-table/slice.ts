@@ -1,11 +1,20 @@
 import { createSlice, createEntityAdapter, EntityState, PayloadAction, prepareAutoBatched } from "@reduxjs/toolkit";
 import { ReducerKeys } from "store/constants";
-import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 // TODO: @wrongsahil, add types here when send_network_logs is moved to new events schema
 
 interface ResponsesState {
   [id: string]: any;
+}
+
+interface GroupFilters {
+  app: string[];
+  domain: string[];
+}
+
+interface SearchFilters {
+  term: string;
+  regex: boolean;
 }
 
 interface TrafficTableFilters {
@@ -14,10 +23,7 @@ interface TrafficTableFilters {
   contentType: string[];
   app: string[];
   domain: string[];
-  search: {
-    term: string;
-    regex: boolean;
-  };
+  search: SearchFilters;
 }
 
 interface DesktopTrafficTableState {
@@ -84,6 +90,25 @@ const slice = createSlice({
     updateSearchTerm: (state: DesktopTrafficTableState, action: PayloadAction<string>) => {
       state.filters.search.term = action.payload;
     },
+    addGroupFilters: (
+      state: DesktopTrafficTableState,
+      action: PayloadAction<{ key: keyof GroupFilters; value: string }>
+    ) => {
+      state.filters[action.payload.key].push(action.payload.value);
+    },
+    removeGroupFilter: (
+      state: DesktopTrafficTableState,
+      action: PayloadAction<{ key: keyof GroupFilters; domain: string }>
+    ) => {
+      const index = state.filters[action.payload.key].indexOf(action.payload.domain);
+      if (index !== -1) {
+        state.filters[action.payload.key].splice(index, 1);
+      }
+    },
+    clearGroupFilters: (state: DesktopTrafficTableState) => {
+      state.filters.app = [];
+      state.filters.domain = [];
+    },
     toggleRegexSearch: (state: DesktopTrafficTableState) => {
       state.filters.search.regex = !state.filters.search.regex;
     },
@@ -93,10 +118,4 @@ const slice = createSlice({
   },
 });
 
-const { actions, reducer } = slice;
-
-export const desktopTrafficTableReducer = getReducerWithLocalStorageSync(ReducerKeys.DESKTOP_TRAFFIC_TABLE, reducer, [
-  "filters",
-]);
-
-export const desktopTrafficTableActions = actions;
+export const { actions: desktopTrafficTableActions, reducer: desktopTrafficTableReducer } = slice;
