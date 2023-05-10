@@ -20,7 +20,7 @@ const JSONResponsePreview: React.FC<{ responseText: string }> = ({ responseText 
   useEffect(() => {
     if (responseText) {
       try {
-        const sanitizedJsonString = responseText.substring(responseText.indexOf("{")); // removes padded characters before JSON
+        const sanitizedJsonString = /[[{][\s\S]*$/.exec(responseText)?.[0] || responseText; // removes padded characters before JSON
         const json = JSON.parse(sanitizedJsonString);
         setResponseJSON(json);
       } catch (e) {
