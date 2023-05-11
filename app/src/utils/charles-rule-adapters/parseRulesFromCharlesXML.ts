@@ -56,13 +56,22 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
       console.log("------- rules import started ---------");
       console.log({ recordsObject });
 
-      return Promise.allSettled([
-        noCachingRuleAdapter(appMode, recordsObject[CharlesRuleType.NO_CACHING] as NoCachingRule),
-        blockCookiesRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_COOKIES] as BlockCookiesRule),
-        blockListRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
-        mapRemoteAdapter(appMode, recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
-        mapLocalRuleAdapter(appMode, recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
-        rewriteRuleAdapter(appMode, recordsObject[CharlesRuleType.REWRITE] as RewriteRule),
-      ]);
+      const groupsToBeImported = [
+        noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING] as NoCachingRule),
+        blockCookiesRuleAdapter(recordsObject[CharlesRuleType.BLOCK_COOKIES] as BlockCookiesRule),
+        blockListRuleAdapter(recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
+        mapRemoteAdapter(recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
+        mapLocalRuleAdapter(recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
+        rewriteRuleAdapter(recordsObject[CharlesRuleType.REWRITE] as RewriteRule),
+      ].reduce(
+        (result, parsedRules) => (parsedRules?.groups ? result.concat(...(parsedRules.groups ?? [])) : result),
+        []
+      );
+
+      console.log("---------->>>>", { groupsToBeImported });
+      return groupsToBeImported;
+    })
+    .catch((error) => {
+      console.log(`----- parsing error -----`, error);
     });
 };

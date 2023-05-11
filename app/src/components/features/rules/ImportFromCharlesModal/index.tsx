@@ -7,6 +7,7 @@ import { parseRulesFromCharlesXML } from "utils/charles-rule-adapters/parseRules
 import { Row } from "antd";
 import { createNewGroupAndSave } from "utils/charles-rule-adapters/utils";
 import { actions } from "store";
+import { ParsedRule } from "utils/charles-rule-adapters/types";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,14 +15,14 @@ interface ModalProps {
 }
 
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
-  const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
-  const [validationError, setValidationError] = useState(null);
-  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
-  const [rulesToImport, setRulesToImport] = useState([]);
   const dispatch = useDispatch();
-  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const [validationError, setValidationError] = useState(null);
+  const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
+  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
+  const [rulesToImport, setRulesToImport] = useState<ParsedRule["groups"]>([]);
 
   const appMode = useSelector(getAppMode);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   const onFilesDrop = async (files: File[]) => {
     const file = files[0];
@@ -57,14 +58,14 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   const handleCharlesRulesImport = () => {
-    const importPromises = rulesToImport.map(({ value }) => {
+    const importPromises = rulesToImport.map((group) => {
       return createNewGroupAndSave({
-        appMode: value.appMode,
-        rules: value.rules,
-        status: value.status,
-        onError: () => setValidationError("Something went wrong while importing your settings! Try again."), // TODO: validations
+        appMode,
+        rules: group.rules,
+        status: group.status,
+        groupName: group.name,
         onSuccess: () => {},
-        groupName: value.groupName,
+        onError: () => setValidationError("Something went wrong while importing your settings! Try again."), // TODO: validations
       });
     });
     console.log({ rulesToImport });
