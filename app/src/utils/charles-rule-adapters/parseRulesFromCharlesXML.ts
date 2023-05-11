@@ -24,7 +24,7 @@ type CharlesExport = {
 
 type ConfigEntry = { string: CharlesRuleType } & Record<string, unknown>;
 
-export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
+export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<unknown> => {
   const options = {
     explicitArray: false,
     valueProcessors: [parseNumbers, parseBooleans],
