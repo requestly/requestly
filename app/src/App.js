@@ -22,7 +22,7 @@ import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 
-import { getXmlToJs } from "utils/charles-rule-adapters/getXmlToJs";
+import { parseRulesFromCharlesXML } from "utils/charles-rule-adapters/parseRulesFromCharlesXML";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
@@ -635,6 +635,290 @@ const exportedData = `<?charles serialisation-version='2.0' ?>
   </toolConfiguration>
 </charles-export>`;
 
+const rewriteHeadersExport = `<?xml version='1.0' encoding='UTF-8' ?>
+<?charles serialisation-version='2.0' ?>
+<charles-export>
+  <toolConfiguration>
+    <configs>
+      <entry>
+        <string>Rewrite</string>
+        <rewrite>
+          <toolEnabled>true</toolEnabled>
+          <debugging>true</debugging>
+          <sets>
+            <rewriteSet>
+              <active>false</active>
+              <name>amazon</name>
+              <hosts>
+                <locationPatterns>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>www.amazon.com</host>
+                    </location>
+                    <enabled>true</enabled>
+                  </locationMatch>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>www.amazon.com</host>
+                      <path>/gp/goldbox</path>
+                      <query>ref_=nav_cs_gb&amp;q=iphone</query>
+                    </location>
+                    <enabled>false</enabled>
+                  </locationMatch>
+                </locationPatterns>
+              </hosts>
+              <rules>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>11</ruleType>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newValue>401</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>false</active>
+                  <ruleType>8</ruleType>
+                  <matchHeader>add</matchHeader>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newHeader></newHeader>
+                  <newValue>iphone</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>false</active>
+                  <ruleType>9</ruleType>
+                  <matchHeader>modify</matchHeader>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newHeader></newHeader>
+                  <newValue>test</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>false</active>
+                  <ruleType>10</ruleType>
+                  <matchHeader>x-rq-test</matchHeader>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+              </rules>
+            </rewriteSet>
+            <rewriteSet>
+              <active>false</active>
+              <name>flipkart 1</name>
+              <hosts>
+                <locationPatterns>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>www.flipkart.com</host>
+                      <path>/search</path>
+                      <query>*</query>
+                    </location>
+                    <enabled>false</enabled>
+                  </locationMatch>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>www.flipkart.com</host>
+                    </location>
+                    <enabled>true</enabled>
+                  </locationMatch>
+                </locationPatterns>
+              </hosts>
+              <rules>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>9</ruleType>
+                  <matchHeader>q</matchHeader>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newHeader>mac</newHeader>
+                  <newValue></newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>1</ruleType>
+                  <matchHeader>x-rq-test</matchHeader>
+                  <matchValue></matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>true</matchRequest>
+                  <matchResponse>true</matchResponse>
+                  <newHeader></newHeader>
+                  <newValue>test</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+              </rules>
+            </rewriteSet>
+            <rewriteSet>
+              <active>false</active>
+              <name>myntra</name>
+              <hosts>
+                <locationPatterns>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>www.myntra.com</host>
+                    </location>
+                    <enabled>true</enabled>
+                  </locationMatch>
+                </locationPatterns>
+              </hosts>
+              <rules>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>3</ruleType>
+                  <matchHeader>User-Agent</matchHeader>
+                  <matchValue>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36</matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>true</matchRequest>
+                  <matchResponse>true</matchResponse>
+                  <newHeader></newHeader>
+                  <newValue>my-mac</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+              </rules>
+            </rewriteSet>
+            <rewriteSet>
+              <active>false</active>
+              <name>github</name>
+              <hosts>
+                <locationPatterns>
+                  <locationMatch>
+                    <location>
+                      <protocol>https</protocol>
+                      <host>github.com</host>
+                      <path>/</path>
+                    </location>
+                    <enabled>true</enabled>
+                  </locationMatch>
+                </locationPatterns>
+              </hosts>
+              <rules>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>11</ruleType>
+                  <matchValue>200</matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newValue>401</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>4</ruleType>
+                  <matchValue>github.com </matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newValue>amazon.com</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>5</ruleType>
+                  <matchValue>requestly</matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>true</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newValue>rohanmathur91</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>6</ruleType>
+                  <matchValue>https://github.com/requestly</matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>false</matchResponse>
+                  <newValue>https://github.com/rohanmathur91</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>2</replaceType>
+                </rewriteRule>
+              </rules>
+            </rewriteSet>
+          </sets>
+        </rewrite>
+      </entry>
+    </configs>
+  </toolConfiguration>
+</charles-export>`;
+
+// test the rule creation for each
+// update the source, handle regex for the same
+// start with body rule
+
 const App = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -647,7 +931,7 @@ const App = () => {
     console.clear();
 
     setIsLoading(true);
-    getXmlToJs(exportedData, appMode)
+    parseRulesFromCharlesXML(rewriteHeadersExport, appMode)
       .then((result) => {
         console.log("----- updating rules & groups ------", result);
 
@@ -657,10 +941,9 @@ const App = () => {
             newValue: !isRulesListRefreshPending,
           })
         );
-
-        setIsLoading(false);
       })
-      .catch((error) => console.log(`----- from import handler -----`, error));
+      .catch((error) => console.log(`----- from import handler -----`, error))
+      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {

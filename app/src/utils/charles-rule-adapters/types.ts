@@ -1,5 +1,11 @@
 import { HeaderRuleActionType, Rule } from "types";
 
+export enum WhereToApplyRule {
+  BOTH = "both",
+  REQUEST = "request",
+  RESPONSE = "response",
+}
+
 export enum Header {
   PRAGMA = "Pragma",
   CACHE_CONTROL = "Cache-Control",
@@ -46,8 +52,8 @@ export type Location = {
 };
 
 export type SourceUrl = {
-  location: Location;
   enabled: boolean;
+  location: Location;
 };
 
 // rules
@@ -124,6 +130,68 @@ export type MapLocalRule = {
     toolEnabled: boolean;
     mappings: {
       mapLocalMapping: MapLocalRuleMappings;
+    };
+  };
+};
+
+export type RewriteRulePair = {
+  /**
+   * Tells if rule active or not
+   */
+  active: boolean;
+
+  /**
+   * Indicates the chosen option from rewrite rule
+   * @example 1 = add headers and 2 = remove headers
+   */
+  ruleType: number;
+  matchHeader: string;
+  matchValue: string;
+  matchHeaderRegex: boolean;
+  matchValueRegex: boolean;
+
+  /**
+   *  Apply rule on request if true
+   */
+  matchRequest: boolean;
+
+  /**
+   *  Apply rule on response if true
+   */
+  matchResponse: boolean;
+  newHeader: string;
+  newValue: string;
+  newHeaderRegex: boolean;
+  newValueRegex: boolean;
+  matchWholeValue: boolean;
+  caseSensitive: boolean;
+  replaceType: 1 | 2;
+};
+
+export type RewriteRulePairs = RewriteRulePair | RewriteRulePair[];
+
+export type RewriteSet = {
+  active: boolean;
+  name: string;
+  hosts: {
+    locationPatterns: {
+      locationMatch: SourceUrl | SourceUrl[];
+    };
+  };
+  rules: {
+    rewriteRule: RewriteRulePairs;
+  };
+};
+
+export type RewriteSets = RewriteSet | RewriteSet[];
+
+export type RewriteRule = {
+  string: CharlesRuleType.REWRITE;
+  rewrite: {
+    toolEnabled: boolean;
+    debugging: boolean;
+    sets: {
+      rewriteSet: RewriteSets;
     };
   };
 };

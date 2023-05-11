@@ -14,6 +14,7 @@ import {
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import BetaBadge from "components/misc/BetaBadge";
 import "./index.css";
 
 interface ContextMenuProps {
@@ -125,8 +126,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
 
     if (isFeatureCompatible(FEATURES.API_CLIENT)) {
       menuItems.splice(2, 0, {
-        key: "replace_request",
-        label: "Replay request",
+        key: "replay_request",
+        label: <BetaBadge text="Edit and Replay" />,
         onClick: () => {
           trackTrafficTableDropdownClicked("replay_request");
           onReplayRequest();

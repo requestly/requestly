@@ -8,7 +8,9 @@ import {
 } from "views/features/api-client/apiUtils";
 import APIClientView from "views/features/api-client/client-view/APIClientView";
 import { RQAPI, RequestContentType, RequestMethod } from "views/features/api-client/types";
+import { CONTENT_TYPE_HEADER } from "views/features/api-client/constants";
 import { APIClientRequest } from "./types";
+import BetaBadge from "components/misc/BetaBadge";
 import "./apiClient.scss";
 
 interface Props {
@@ -46,7 +48,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       if (entry.request.contentType !== RequestContentType.FORM) {
         entry.request.contentType = RequestContentType.FORM;
         entry.request.headers.push({
-          key: "Content-Type",
+          key: CONTENT_TYPE_HEADER,
           value: RequestContentType.FORM,
           id: Math.random(),
         });
@@ -70,7 +72,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     <Modal
       className="api-client-modal"
       centered
-      title={modalTitle || "API Client"}
+      title={<BetaBadge text={modalTitle || "API Client"} />}
       open={isModalOpen}
       onCancel={onModalClose}
       footer={null}

@@ -101,3 +101,12 @@ export const STATUS_CODE_OPTIONS = Object.values(statusCodesGroupedByCategory).m
     }),
   };
 });
+
+export const STATUS_CODE_ONLY_OPTIONS = Object.values(statusCodesGroupedByCategory).map(({ label, codes }) => {
+  return {
+    label,
+    options: codes.map((code) => {
+      return { value: code, label: code, id: code };
+    }),
+  };
+});
