@@ -15,10 +15,11 @@ interface ModalProps {
 
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
-  //   const [isCharlesRulesParsed, setIsCharlesRulesParsed] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState(null);
+  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
+  const [rulesToImport, setRulesToImport] = useState([]);
   const dispatch = useDispatch();
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const [rulesToImport, setRulesToImport] = useState([]);
 
   const appMode = useSelector(getAppMode);
 
@@ -27,24 +28,29 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
     console.log({ file });
     const reader = new FileReader();
 
-    // TODO: handle these cases
-    //       // reader.onabort = () => toggleModal();
-    //       // reader.onerror = () => toggleModal();
+    reader.onerror = () => setValidationError("Could not process the selected file! Try again.");
 
     reader.onload = () => {
       const fileContent = reader.result;
       setIsDataProcessing(true);
-
       console.log({ fileContent });
 
+      if (!file.type.includes("xml")) {
+        // stop parsing for wrong file format
+        setIsDataProcessing(false);
+        setValidationError("Imported file dosen't match the required format");
+        return;
+      }
       parseRulesFromCharlesXML(fileContent as string, appMode)
         .then((importedRules: any) => {
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
+          setIsParseComplete(true);
           console.log({ importedRules });
         })
         .catch((error) => {
-          console.log(error); // TODO: validations
+          setValidationError(error.message);
+          setIsDataProcessing(false);
         });
     };
     reader.readAsText(file);
@@ -56,8 +62,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         appMode: value.appMode,
         rules: value.rules,
         status: value.status,
-        onError: () => {}, // TODO: validations
-        onSuccess: () => {}, // TODO: validations
+        onError: () => setValidationError("Something went wrong while importing your settings! Try again."), // TODO: validations
+        onSuccess: () => {},
         groupName: value.groupName,
       });
     });
@@ -74,13 +80,20 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
     });
   };
 
+  const handleResetImport = () => {
+    setValidationError(null);
+    setIsParseComplete(false);
+  };
+
   return (
-    <RQModal open={isOpen} centered>
+    <RQModal open={isOpen} centered onCancel={toggle}>
       <div className="rq-modal-content">
         <div className="header text-center">Import Charles settings</div>
         <div className="mt-16">
-          {rulesToImport.length ? (
-            <div className="text-center subtitle">Charles Settings successfully parsed</div>
+          {isParseComplete ? (
+            <div className="text-center subtitle mt-16">Charles Settings successfully parsed</div>
+          ) : validationError ? (
+            <div className="text-center subtitle mt-16">{validationError}</div>
           ) : (
             <FilePicker
               title="Drop your Charles export file, or click to select"
@@ -91,11 +104,20 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           )}
         </div>
       </div>
-      {rulesToImport.length ? (
+      {isParseComplete ? (
         <div className="rq-modal-footer">
           <Row justify="end">
             <RQButton type="primary" onClick={handleCharlesRulesImport}>
               Import
+            </RQButton>
+          </Row>
+        </div>
+      ) : null}
+      {validationError ? (
+        <div className="rq-modal-footer">
+          <Row justify="end">
+            <RQButton type="primary" onClick={handleResetImport}>
+              Try another file
             </RQButton>
           </Row>
         </div>
