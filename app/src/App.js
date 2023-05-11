@@ -22,7 +22,7 @@ import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 
-import { getXmlToJs } from "utils/charles-rule-adapters/getXmlToJs";
+import { parseRulesFromCharlesXML } from "utils/charles-rule-adapters/parseRulesFromCharlesXML";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
@@ -931,7 +931,7 @@ const App = () => {
     console.clear();
 
     setIsLoading(true);
-    getXmlToJs(rewriteHeadersExport, appMode)
+    parseRulesFromCharlesXML(rewriteHeadersExport, appMode)
       .then((result) => {
         console.log("----- updating rules & groups ------", result);
 
