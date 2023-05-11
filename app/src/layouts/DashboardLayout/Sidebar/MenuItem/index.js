@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu } from "antd";
+import { Menu, Skeleton } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
@@ -17,7 +17,13 @@ import BetaBadge from "components/misc/BetaBadge";
 
 const { PATHS, LINKS } = APP_CONSTANTS;
 
-const givenRoutes = [
+const menuItemKeys = {
+  ANDROID_DEBUGGER: "android-debugger",
+  NETWORK_TRAFFIC: "network-traffic",
+  HEADER_COLLABORATION: "header-collaboration",
+};
+
+const staticRoutes = [
   {
     header: "Product",
     key: "header-product",
@@ -57,7 +63,7 @@ const givenRoutes = [
   {
     header: "Collaboration",
     collapsedHeader: "Collab",
-    key: "header-collaboration",
+    key: menuItemKeys.HEADER_COLLABORATION,
   },
   {
     path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
@@ -112,7 +118,8 @@ const MenuItem = (props) => {
   const user = useSelector(getUserAuthDetails);
 
   // Component State
-  const [myRoutes, setMyRoutes] = useState(givenRoutes);
+  const [routes, setRoutes] = useState([]);
+  const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
 
   const splitLocation = pathname.split("/");
 
@@ -120,89 +127,86 @@ const MenuItem = (props) => {
   const locationURL = pathname;
 
   useEffect(() => {
-    setMyRoutes((myRoutes) => {
-      const routes = myRoutes.filter((route) => {
-        return !route.feature || isFeatureCompatible(route.feature);
-      });
-
-      // For Desktop App - Show Sources menu in Navbar only in  Desktop App
-      if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-        // Check if doesn't exist already!
-        if (routes.some((route) => route.key === "network-traffic")) return;
-        routes.unshift({
-          path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
-          key: "network-traffic",
-          name: "Network Traffic",
-          icon: <Swap set="curved" className="remix-icon" />,
-        });
-      }
-
-      return routes;
-    });
-  }, [appMode]);
+    isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
+  }, [user?.details?.profile?.uid]);
 
   useEffect(() => {
-    isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
-      setMyRoutes((myRoutes) => {
-        const ANDROID_DEBUGGER_KEY = "android-debugger";
-        const allRoutes = myRoutes.filter((route) => route.key !== ANDROID_DEBUGGER_KEY);
+    if (!appMode) {
+      return;
+    }
 
-        if (result) {
-          const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
-          allRoutes.splice(index, 0, {
-            path: PATHS.MOBILE_DEBUGGER.RELATIVE,
-            name: "Android Debugger",
-            icon: <MobileOutlined />,
-            key: ANDROID_DEBUGGER_KEY,
-          });
+    const finalRoutes = staticRoutes.filter((route) => {
+      return !route.feature || isFeatureCompatible(route.feature);
+    });
+
+    // For Desktop App - Show Sources menu in Navbar only in  Desktop App
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      finalRoutes.unshift({
+        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
+        key: menuItemKeys.NETWORK_TRAFFIC,
+        name: "Network Traffic",
+        icon: <Swap set="curved" className="remix-icon" />,
+      });
+    }
+
+    if (isAndroidDebuggerEnabled) {
+      const index = finalRoutes.findIndex((route) => route.key === menuItemKeys.HEADER_COLLABORATION);
+      finalRoutes.splice(index, 0, {
+        path: PATHS.MOBILE_DEBUGGER.RELATIVE,
+        name: "Android Debugger",
+        icon: <MobileOutlined />,
+        key: menuItemKeys.ANDROID_DEBUGGER,
+      });
+    }
+
+    setRoutes(finalRoutes);
+  }, [appMode, isAndroidDebuggerEnabled]);
+
+  const menuItems = useMemo(
+    () =>
+      routes.map((item) => {
+        if (item.header) {
+          if (item.key === "divider") {
+            return {
+              type: "divider",
+              key: item.key,
+              className: "sidebar-horizontal-divider",
+            };
+          }
+          return {
+            type: "group",
+            label: (collapsed && item.collapsedHeader) || item.header,
+            key: item.key,
+          };
         }
 
-        return allRoutes;
-      });
-    });
-  }, [user?.details?.profile?.uid, user.loggedIn]);
+        let label = item.name;
+        if (item.isBeta) {
+          label = <BetaBadge text={item.name} />;
+        }
 
-  const menuItems = myRoutes.map((item) => {
-    if (item.header) {
-      if (item.key === "divider") {
         return {
-          type: "divider",
           key: item.key,
-          className: "sidebar-horizontal-divider",
+          icon: <div className="icon-wrapper">{item.icon}</div>,
+          onClick: onClose,
+          style: { paddingLeft: "11px", paddingRight: "6px" },
+          className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
+          label:
+            item.path === LINKS.YOUTUBE_TUTORIALS ? (
+              <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
+                {label}
+              </a>
+            ) : (
+              <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
+                {label}
+              </Link>
+            ),
         };
-      }
-      return {
-        type: "group",
-        label: (collapsed && item.collapsedHeader) || item.header,
-        key: item.key,
-      };
-    }
+      }),
+    [collapsed, locationURL, routes, onClose]
+  );
 
-    let label = item.name;
-    if (item.isBeta) {
-      label = <BetaBadge text={item.name} />;
-    }
-
-    return {
-      key: item.key,
-      icon: <div className="icon-wrapper">{item.icon}</div>,
-      onClick: onClose,
-      style: { paddingLeft: "11px", paddingRight: "6px" },
-      className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
-      label:
-        item.path === LINKS.YOUTUBE_TUTORIALS ? (
-          <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
-            {label}
-          </a>
-        ) : (
-          <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
-            {label}
-          </Link>
-        ),
-    };
-  });
-
-  return (
+  return menuItems.length ? (
     <Menu
       mode="inline"
       selectedKeys={[]}
@@ -217,6 +221,8 @@ const MenuItem = (props) => {
       className={`siderbar-menu`}
       items={menuItems}
     />
+  ) : (
+    <Skeleton loading active style={{ padding: 10 }} />
   );
 };
 
