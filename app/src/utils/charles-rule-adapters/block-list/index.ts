@@ -1,6 +1,6 @@
 import { get } from "lodash";
-import { BlockListRule, CharlesRuleType } from "../types";
-import { createNewGroupAndSave, getSourceUrls } from "../utils";
+import { BlockListRule, CharlesRuleType, ParsedRule } from "../types";
+import { getSourceUrls } from "../utils";
 import { CancelRule, RuleType, Status, ResponseRuleResourceType, ResponseRule } from "types";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
@@ -31,7 +31,7 @@ const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: s
   };
 };
 
-export const blockListRuleAdapter = (appMode: string, rules: BlockListRule): Promise<void> => {
+export const blockListRuleAdapter = (appMode: string, rules: BlockListRule): Promise<ParsedRule> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "blacklist.locations.locationPatterns.locationMatch");
 
@@ -65,12 +65,10 @@ export const blockListRuleAdapter = (appMode: string, rules: BlockListRule): Pro
     });
 
     const isToolEnabled = rules?.blacklist.toolEnabled;
-    createNewGroupAndSave({
+    resolve({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
-      onError: reject,
-      onSuccess: resolve,
       groupName: CharlesRuleType.BLOCK_LIST,
     });
   });

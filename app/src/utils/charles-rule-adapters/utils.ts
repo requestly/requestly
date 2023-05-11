@@ -71,20 +71,27 @@ export const createNewGroupAndSave = ({
   groupName: CharlesRuleType | string;
   onSuccess: () => void;
   onError: () => void;
-}) => {
-  createNewGroup(
-    appMode,
-    groupName,
-    (groupId: string) => {
-      const updatedRules = rules.map((rule) => ({ ...rule, groupId }));
-      StorageService(appMode)
-        .saveMultipleRulesOrGroups(updatedRules)
-        .then(() => onSuccess())
-        .catch(() => onError());
-    },
-    null,
-    status
-  );
+}): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    createNewGroup(
+      appMode,
+      groupName,
+      (groupId: string) => {
+        const updatedRules = rules.map((rule) => ({ ...rule, groupId }));
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups(updatedRules)
+          .then(() => {
+            onSuccess();
+            resolve();
+          })
+          .catch((e) => {
+            onError();
+            reject();
+          });
+      },
+      status
+    );
+  });
 };
 
 export const convertToArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);

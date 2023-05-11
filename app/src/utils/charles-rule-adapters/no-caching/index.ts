@@ -1,12 +1,12 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { getSourceUrls, getHeaders, createNewGroupAndSave } from "../utils";
-import { CharlesRuleType, NoCachingRule, SourceUrl } from "../types";
+import { getSourceUrls, getHeaders } from "../utils";
+import { CharlesRuleType, NoCachingRule, ParsedRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
 // TODO: write test for the same
-export const noCachingRuleAdapter = (appMode: string, rules: NoCachingRule): Promise<void> => {
+export const noCachingRuleAdapter = (appMode: string, rules: NoCachingRule): Promise<ParsedRule> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch") as SourceUrl[];
 
@@ -40,12 +40,10 @@ export const noCachingRuleAdapter = (appMode: string, rules: NoCachingRule): Pro
     });
 
     const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
-    createNewGroupAndSave({
+    resolve({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
-      onError: reject,
-      onSuccess: resolve,
       groupName: CharlesRuleType.NO_CACHING,
     });
   });
