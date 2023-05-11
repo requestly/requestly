@@ -33,6 +33,8 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
   return xml2js
     .parseStringPromise(xml, options)
     .then((records: CharlesExport) => {
+      if (!records) throw new Error("Imported file is empty!");
+
       // "charles-export" indicates its a valid export
       // ie multiple rule types exported together from Charles
       if (!("charles-export" in records)) {
