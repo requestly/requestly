@@ -59,8 +59,12 @@ export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule) => {
             ...rule,
             pairs: [
               {
-                ...rule.pairs[0],
-                source: { ...rule.pairs[0].source, value, operator },
+                ...rule?.pairs[0],
+                source: {
+                  ...rule?.pairs[0].source,
+                  value,
+                  operator: rule?.pairs[0].source.operator || operator,
+                },
               },
             ],
           })
