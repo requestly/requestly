@@ -92,7 +92,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         <div className="header text-center">Import Charles settings</div>
         <div className="mt-16">
           {isParseComplete ? (
-            <div className="text-center subtitle mt-16">Charles Settings successfully parsed</div>
+            <div className="text-center subtitle mt-16">Charles Settings successfully parsed!</div>
           ) : validationError ? (
             <div className="text-center subtitle mt-16">{validationError}</div>
           ) : (
