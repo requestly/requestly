@@ -4,9 +4,19 @@ import { noCachingRuleAdapter } from "./no-caching";
 import { blockCookiesRuleAdapter } from "./block-cookies";
 import { blockListRuleAdapter } from "./block-list";
 import { parseBooleans, parseNumbers } from "xml2js/lib/processors";
-import { BlockCookiesRule, BlockListRule, CharlesRuleType, MapLocalRule, MapRemoteRule, NoCachingRule } from "./types";
+import {
+  BlockCookiesRule,
+  BlockListRule,
+  CharlesRuleType,
+  MapLocalRule,
+  MapRemoteRule,
+  NoCachingRule,
+  RewriteRule,
+} from "./types";
 import { mapRemoteAdapter } from "./map-remote";
 import { mapLocalRuleAdapter } from "./map-local";
+import { rewriteRuleAdapter } from "./rewrite";
+import { convertToArray } from "./utils";
 
 type CharlesExport = {
   "charles-export": Record<string, unknown>;
@@ -32,6 +42,7 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
       const rules = get(records, "charles-export.toolConfiguration.configs.entry");
       return rules as ConfigEntry[];
     })
+    .then((records) => convertToArray(records))
     .then((records) => {
       if (!records) {
         throw new Error("No rules found!");
@@ -51,6 +62,7 @@ export const getXmlToJs = (xml: string, appMode: string): Promise<unknown> => {
         blockListRuleAdapter(appMode, recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
         mapRemoteAdapter(appMode, recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
         mapLocalRuleAdapter(appMode, recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
+        rewriteRuleAdapter(appMode, recordsObject[CharlesRuleType.REWRITE] as RewriteRule),
       ]);
     });
 };
