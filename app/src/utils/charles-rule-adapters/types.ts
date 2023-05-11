@@ -1,5 +1,11 @@
 import { HeaderRuleActionType } from "types";
 
+export enum WhereToApplyRule {
+  BOTH = "both",
+  REQUEST = "request",
+  RESPONSE = "response",
+}
+
 export enum Header {
   PRAGMA = "Pragma",
   CACHE_CONTROL = "Cache-Control",
