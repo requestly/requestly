@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
-import { getXmlToJs } from "utils/charles-rule-adapters/getXmlToJs";
+import { parseRulesFromCharlesXML } from "utils/charles-rule-adapters/parseRulesFromCharlesXML";
 import { Row } from "antd";
 import { createNewGroupAndSave } from "utils/charles-rule-adapters/utils";
 import { actions } from "store";
@@ -37,7 +37,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
 
       console.log({ fileContent });
 
-      getXmlToJs(fileContent as string, appMode)
+      parseRulesFromCharlesXML(fileContent as string, appMode)
         .then((importedRules: any) => {
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
