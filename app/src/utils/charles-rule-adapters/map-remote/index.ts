@@ -2,10 +2,10 @@ import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
-import { createNewGroupAndSave, getLocation } from "../utils";
-import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings } from "../types";
+import { getLocation } from "../utils";
+import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings, ParsedRule } from "../types";
 
-export const mapRemoteAdapter = (appMode: string, rules: MapRemoteRule): Promise<void> => {
+export const mapRemoteAdapter = (appMode: string, rules: MapRemoteRule): Promise<ParsedRule> => {
   return new Promise((resolve, reject) => {
     const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
@@ -37,12 +37,10 @@ export const mapRemoteAdapter = (appMode: string, rules: MapRemoteRule): Promise
     });
 
     const isToolEnabled = get(rules, "map.toolEnabled");
-    createNewGroupAndSave({
+    resolve({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
-      onError: reject,
-      onSuccess: resolve,
       groupName: CharlesRuleType.MAP_REMOTE,
     });
   });

@@ -36,7 +36,7 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
       // "charles-export" indicates its a valid export
       // ie multiple rule types exported together from Charles
       if (!("charles-export" in records)) {
-        throw new Error("Not a valid export!");
+        throw new Error("Not a valid Charles export!");
       }
 
       const rules = get(records, "charles-export.toolConfiguration.configs.entry");
@@ -45,7 +45,7 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
     .then((records) => convertToArray(records))
     .then((records) => {
       if (!records) {
-        throw new Error("No rules found!");
+        throw new Error("No Charles settings found in file!");
       }
 
       const recordsObject = records.reduce(

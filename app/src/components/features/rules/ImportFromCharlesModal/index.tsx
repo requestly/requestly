@@ -174,7 +174,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           )}
         </div>
       </div>
-
       {isParseComplete ? (
         <div className="rq-modal-footer">
           <Row justify="end">
@@ -184,7 +183,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           </Row>
         </div>
       ) : null}
-
       {validationError ? (
         <div className="rq-modal-footer">
           <Row justify="end">
