@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import ImportRulesModal from "../ImportRulesModal";
+import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -27,12 +28,16 @@ const GettingStarted = () => {
   const appMode = useSelector(getAppMode);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
-    setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
+    setIsImportRulesModalActive((prev) => !prev);
+  };
+  const toggleImportCharlesRulesModal = () => {
+    setIsImportCharlesRulesModalActive((prev) => !prev);
   };
 
   const handleLoginOnClick = () => {
@@ -136,7 +141,7 @@ const GettingStarted = () => {
                 <p className="text-gray getting-started-subtitle">
                   Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
                 </p>
-                <div>
+                <div className="getting-started-btns-wrapper">
                   <Button
                     type="primary"
                     onClick={handleCreateMyFirstRuleClick}
@@ -159,6 +164,9 @@ const GettingStarted = () => {
                       Upload rules
                     </RQButton>
                   </AuthConfirmationPopover>
+                  <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
+                    Import settings from Charles
+                  </RQButton>
                 </div>
               </div>
 
@@ -175,6 +183,9 @@ const GettingStarted = () => {
           </Col>
         </Row>
       )}
+      {isImportCharlesRulesModalActive ? (
+        <ImportFromCharlesModal isOpen={isImportCharlesRulesModalActive} toggle={toggleImportCharlesRulesModal} />
+      ) : null}
 
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />

@@ -1,4 +1,4 @@
-import { HeaderRuleActionType } from "types";
+import { HeaderRuleActionType, Rule } from "types";
 
 export enum WhereToApplyRule {
   BOTH = "both",
@@ -87,6 +87,13 @@ export type BlockListRule = {
       };
     };
   };
+};
+
+export type ParsedRule = {
+  appMode: string;
+  status: boolean;
+  groupName: string;
+  rules: Rule[];
 };
 
 export type MapRemoteRuleMapping<T = Location> = {

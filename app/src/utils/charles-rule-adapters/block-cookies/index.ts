@@ -1,11 +1,11 @@
 import { get } from "lodash";
-import { BlockCookiesRule, CharlesRuleType } from "../types";
-import { createNewGroupAndSave, getHeaders, getSourceUrls } from "../utils";
+import { BlockCookiesRule, CharlesRuleType, ParsedRule } from "../types";
+import { getHeaders, getSourceUrls } from "../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { HeadersRule, RuleType, Status } from "types";
 
-export const blockCookiesRuleAdapter = (appMode: string, rules: BlockCookiesRule): Promise<void> => {
+export const blockCookiesRuleAdapter = (appMode: string, rules: BlockCookiesRule): Promise<ParsedRule> => {
   return new Promise((resolve, reject) => {
     const locations = get(rules, "selectedHostsTool.locations.locationPatterns.locationMatch");
 
@@ -38,12 +38,10 @@ export const blockCookiesRuleAdapter = (appMode: string, rules: BlockCookiesRule
     });
 
     const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
-    createNewGroupAndSave({
+    resolve({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
-      onError: reject,
-      onSuccess: resolve,
       groupName: CharlesRuleType.BLOCK_COOKIES,
     });
   });
