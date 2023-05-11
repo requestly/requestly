@@ -4,6 +4,7 @@ import parseCurlAsJson from "./curl-to-json";
 import { CurlParserResponse, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "./types";
 // @ts-ignore
 import { CONSTANTS } from "@requestly/requestly-core";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "./constants";
 
 export const makeRequest = async (
   appMode: string,
@@ -46,7 +47,7 @@ export const addUrlSchemeIfMissing = (url: string): string => {
 export const getEmptyAPIEntry = (): RQAPI.Entry => {
   return {
     request: {
-      url: "https://app.requestly.io/echo",
+      url: DEMO_API_URL,
       queryParams: [],
       method: RequestMethod.GET,
       headers: [],
@@ -76,7 +77,7 @@ export const generateKeyValuePairsFromJson = (json: Record<string, string> = {})
 };
 
 export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
-  const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === "content-type");
+  const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase());
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
 
   const contentType: RequestContentType =
@@ -86,7 +87,7 @@ export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): Reque
 };
 
 export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
-  return headers.find((header) => header.key.toLowerCase() === "content-type")?.value;
+  return headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase())?.value;
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {

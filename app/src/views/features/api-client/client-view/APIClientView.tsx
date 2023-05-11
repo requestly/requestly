@@ -23,6 +23,7 @@ import {
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import Favicon from "components/misc/Favicon";
+import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
 import "./apiClientView.scss";
 
 interface Props {
@@ -34,8 +35,6 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
   label: method,
 }));
-
-const CONTENT_TYPE_HEADER = "Content-Type";
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const appMode = useSelector(getAppMode);
@@ -211,6 +210,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       queryParamsCount: sanitizedEntry.request.queryParams.length,
       headersCount: sanitizedEntry.request.headers.length,
       requestContentType: sanitizedEntry.request.contentType,
+      isDemoURL: sanitizedEntry.request.url === DEMO_API_URL,
     });
   }, [appMode, entry, notifyApiRequestFinished]);
 
