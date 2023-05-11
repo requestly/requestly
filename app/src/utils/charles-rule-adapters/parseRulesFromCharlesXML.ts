@@ -70,8 +70,5 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
 
       console.log("---------->>>>", { groupsToBeImported });
       return groupsToBeImported;
-    })
-    .catch((error) => {
-      console.log(`----- parsing error -----`, error);
     });
 };
