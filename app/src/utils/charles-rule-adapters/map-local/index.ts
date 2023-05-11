@@ -2,10 +2,10 @@ import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
-import { createNewGroupAndSave, getLocation } from "../utils";
-import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings } from "../types";
+import { getLocation } from "../utils";
+import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings, ParsedRule } from "../types";
 
-export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promise<void> => {
+export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promise<ParsedRule> => {
   return new Promise((resolve, reject) => {
     const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
     const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
@@ -36,12 +36,10 @@ export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promi
     });
 
     const isToolEnabled = get(rules, "mapLocal.toolEnabled");
-    createNewGroupAndSave({
+    resolve({
       appMode,
       rules: exportedRules,
       status: isToolEnabled,
-      onError: reject,
-      onSuccess: resolve,
       groupName: CharlesRuleType.MAP_LOCAL,
     });
   });
