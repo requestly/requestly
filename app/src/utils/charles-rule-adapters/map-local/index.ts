@@ -5,42 +5,42 @@ import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
 import { getLocation } from "../utils";
 import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings, ParsedRule } from "../types";
 
-export const mapLocalRuleAdapter = (appMode: string, rules: MapLocalRule): Promise<ParsedRule> => {
-  return new Promise((resolve, reject) => {
-    const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
-    const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
+export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
+  const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
+  const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
-    if (!rules || !mappings) {
-      reject();
-      return;
-    }
+  if (!rules || !mappings) {
+    return;
+  }
 
-    const exportedRules = updatedMappings.map(({ dest, sourceLocation, enabled }) => {
-      const source = getLocation(sourceLocation);
-      const rule = getNewRule(RuleType.REDIRECT) as RedirectRule;
-      return {
-        ...rule,
-        isCharlesExported: true,
-        name: `${source.value} to ${dest}`,
-        status: enabled ? Status.ACTIVE : Status.INACTIVE,
-        pairs: [
-          {
-            ...rule.pairs[0],
-            id: generateObjectId(),
-            destination: `file://${dest}`,
-            destinationType: RedirectDestinationType.MAP_LOCAL,
-            source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
-          },
-        ],
-      };
-    });
-
-    const isToolEnabled = get(rules, "mapLocal.toolEnabled");
-    resolve({
-      appMode,
-      rules: exportedRules,
-      status: isToolEnabled,
-      groupName: CharlesRuleType.MAP_LOCAL,
-    });
+  const exportedRules = updatedMappings.map(({ dest: destination, sourceLocation, enabled }) => {
+    const source = getLocation(sourceLocation);
+    const rule = getNewRule(RuleType.REDIRECT) as RedirectRule;
+    return {
+      ...rule,
+      isCharlesExported: true,
+      name: `${source.value} to ${destination}`,
+      status: enabled ? Status.ACTIVE : Status.INACTIVE,
+      pairs: [
+        {
+          ...rule.pairs[0],
+          id: generateObjectId(),
+          destination: `file://${destination}`,
+          destinationType: RedirectDestinationType.MAP_LOCAL,
+          source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
+        },
+      ],
+    };
   });
+
+  const isToolEnabled = get(rules, "mapLocal.toolEnabled");
+  return {
+    groups: [
+      {
+        rules: exportedRules,
+        status: isToolEnabled,
+        name: CharlesRuleType.MAP_LOCAL,
+      },
+    ],
+  };
 };
