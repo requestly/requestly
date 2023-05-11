@@ -8,27 +8,26 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const getPathname = useCallback((pathname: string) => {
-    if (pathname.includes("filesv2")) {
-      return pathname.replace("filesv2", "files");
+  const getPathLabel = useCallback((path: string): string => {
+    if (path === "filesv2") {
+      return "Files";
     }
-    if (pathname.includes("apis")) {
-      return pathname.replace("apis", "API Client");
+
+    if (path === "api-client") {
+      return "API Client";
     }
-    return pathname;
+
+    // TODO: rather derive from the list used in Sidebar
+    return capitalize(path.includes("-") ? path.split("-").join(" ") : path);
   }, []);
 
   const getBreadcrumb = useCallback(
     (pathname: string) => {
-      return getPathname(pathname)
-        .split("/")
-        .slice(1)
-        .map((path) => capitalize(path.includes("-") ? path.split("-").join(" ") : path))
-        .slice(0, 2); // limiting the nesting because of some nested routes
+      return pathname.split("/").slice(1).map(getPathLabel).slice(0, 2); // limiting the nesting because of some nested routes
       // which does not exist and on clicking over them will navigate to 404 page
       // e.g sessions/saved/:id clicking on "saved" will take to 404 page
     },
-    [getPathname]
+    [getPathLabel]
   );
 
   const breadcrumbData = getBreadcrumb(pathname);
