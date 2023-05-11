@@ -68,7 +68,9 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
       return [...result, { status, name: value, rules: updatedRules }];
     }, []);
 
-    return { ...result, groups: [...result.groups, ...groups] } as ParsedRule;
+    console.log({ groups });
+
+    return { ...result, groups: [...(result.groups ?? []), ...groups] } as ParsedRule;
   }, {} as ParsedRule);
 
   return groupsToBeImported;
