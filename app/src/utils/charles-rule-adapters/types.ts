@@ -56,15 +56,13 @@ export type SourceUrl = {
   location: Location;
 };
 
-export type ParsedRuleData<T> = {
-  rules: T[];
-  status?: boolean;
-  name: CharlesRuleType | string;
-};
-
 export type ParsedRule<T = Rule> =
   | {
-      groups?: ParsedRuleData<T>[];
+      groups?: {
+        rules: T[];
+        status?: boolean;
+        name: CharlesRuleType | string;
+      }[];
     }
   | undefined;
 

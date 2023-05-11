@@ -19,7 +19,7 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
     return;
   }
 
-  const groupsToBeImported = updatedRewriteRules.reduce((result, { hosts, rules }: RewriteSet) => {
+  const groupsToBeImported = updatedRewriteRules.reduce((result, { active, hosts, rules }: RewriteSet) => {
     const locations = hosts?.locationPatterns?.locationMatch;
 
     if (!locations) {
@@ -52,7 +52,7 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
     }, []);
 
     const sourceUrls = getSourceUrls(locations);
-    const groups = sourceUrls.reduce((result, { value, operator, status }) => {
+    const groups = sourceUrls.reduce((result, { value, operator, status: groupStatus }) => {
       const updatedRules = rulesToBeImported.map(
         (rule: HeadersRule | QueryParamRule | ReplaceRule | RequestRule | ResponseRule) => ({
           ...rule,
@@ -65,7 +65,7 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
         })
       );
 
-      return [...result, { status, name: value, rules: updatedRules }];
+      return [...result, { status: active && groupStatus, name: value, rules: updatedRules }];
     }, []);
 
     console.log({ groups });
