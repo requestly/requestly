@@ -56,6 +56,18 @@ export type SourceUrl = {
   location: Location;
 };
 
+export type ParsedRuleData<T> = {
+  rules: T[];
+  status?: boolean;
+  name: CharlesRuleType | string;
+};
+
+export type ParsedRule<T = Rule> =
+  | {
+      groups?: ParsedRuleData<T>[];
+    }
+  | undefined;
+
 // rules
 export type NoCachingRule = {
   string: string;
@@ -87,13 +99,6 @@ export type BlockListRule = {
       };
     };
   };
-};
-
-export type ParsedRule = {
-  appMode: string;
-  status: boolean;
-  groupName: string;
-  rules: Rule[];
 };
 
 export type MapRemoteRuleMapping<T = Location> = {
