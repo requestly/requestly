@@ -86,3 +86,5 @@ export const createNewGroupAndSave = ({
     status
   );
 };
+
+export const convertToArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);
