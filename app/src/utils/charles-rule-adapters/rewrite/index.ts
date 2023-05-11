@@ -5,31 +5,23 @@ import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import {
   Status,
   RuleType,
-  HeadersRule,
-  HeadersRulePair,
-  HeaderRuleActionType,
-  QueryParamRule,
-  QueryParamRulePair,
-  QueryParamModificationType,
-  ResponseRuleResourceType,
-  ResponseRule,
   ReplaceRule,
+  HeadersRule,
+  RequestRule,
+  ResponseRule,
   SourceOperator,
+  QueryParamRule,
+  HeadersRulePair,
+  QueryParamRulePair,
+  HeaderRuleActionType,
+  ResponseRuleResourceType,
+  QueryParamModificationType,
 } from "types";
-import { convertToArray } from "../utils";
+import { convertToArray, getSourceUrls } from "../utils";
 import { statusCodes } from "config/constants/sub/statusCode";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-
-// Cases
-// [x] headers
-// [x] query parms (1hr)
-// [x] status (1hr)
-// [x] host (1hr)
-// [x] path (10min)
-// [x] url (10min)
-// [] body (TBA)
 
 enum WhereToApplyRule {
   BOTH = "both",
@@ -73,6 +65,7 @@ const rewriteRuleActionTypes: Record<
   4: RewriteRuleActionType.HOST,
   5: RewriteRuleActionType.PATH,
   6: RewriteRuleActionType.URL,
+  7: RewriteRuleActionType.BODY,
   8: QueryParamModificationType.ADD,
   9: QueryParamModificationType.ADD,
   10: QueryParamModificationType.REMOVE,
@@ -89,8 +82,6 @@ const getWhereToApplyRule = (pair: RewriteRulePair): WhereToApplyRule => {
   }
 };
 
-// TODO: add source URL in all the rules
-
 const processRulePairs = (pairs: RewriteRulePair[]) => {
   return pairs?.reduce((result, pair) => {
     if ([1, 2, 3].includes(pair.ruleType)) {
@@ -99,7 +90,7 @@ const processRulePairs = (pairs: RewriteRulePair[]) => {
       return { ...result, [RuleType.REPLACE]: [...(result[RuleType.REPLACE] ?? []), pair] };
     } else if ([8, 9, 10].includes(pair.ruleType)) {
       return { ...result, [RuleType.QUERYPARAM]: [...(result[RuleType.QUERYPARAM] ?? []), pair] };
-    } else if ([11].includes(pair.ruleType)) {
+    } else if ([7, 11].includes(pair.ruleType)) {
       return { ...result, [RuleType.RESPONSE]: [...(result[RuleType.RESPONSE] ?? []), pair] };
     }
     return result;
@@ -191,9 +182,6 @@ const getQueryParamModifications = ({
   return [{ id: generateObjectId(), param, value, type: actionType, actionWhenParamExists: "Overwrite" }];
 };
 
-// create the rule and fill the configs
-// at the end fill the source URLs as it will be same for all the rules
-// then optimise for doing it in single pass
 const createModifyHeaderRules = (pairs: RewriteRulePair[] = []) => {
   const headerActions = pairs.reduce(
     (result, pair) => [
@@ -268,30 +256,32 @@ const createModifyQueryParamRules = (pairs: RewriteRulePair[] = []) => {
 };
 
 const createModifyStatusRules = (pairs: RewriteRulePair[] = []) => {
-  const exportedRules = pairs.map((pair) => {
-    const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+  const exportedRules = pairs
+    .filter((pair) => pair.ruleType === 11)
+    .map((pair) => {
+      const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
 
-    return {
-      ...newRule,
-      isCharlesExport: true,
-      name: `Modify status code to ${pair.newValue}`,
-      status: pair.active ? Status.ACTIVE : Status.INACTIVE,
-      pairs: [
-        {
-          ...newRule.pairs[0],
-          response: {
-            ...newRule.pairs[0].response,
-            statusCode: `${pair.newValue}`,
-            //@ts-ignore
-            statusText: statusCodes[pair.newValue],
-            type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
-            resourceType: ResponseRuleResourceType.REST_API,
-            value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
+      return {
+        ...newRule,
+        isCharlesExport: true,
+        name: `Modify status code to ${pair.newValue}`,
+        status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+        pairs: [
+          {
+            ...newRule.pairs[0],
+            response: {
+              ...newRule.pairs[0].response,
+              statusCode: `${pair.newValue}`,
+              //@ts-ignore
+              statusText: statusCodes[pair.newValue],
+              type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
+              resourceType: ResponseRuleResourceType.REST_API,
+              value: RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE,
+            },
           },
-        },
-      ],
-    };
-  });
+        ],
+      };
+    });
 
   return exportedRules;
 };
@@ -308,7 +298,7 @@ const getReplaceRuleNamePrefix = (type: RewriteRulePair["ruleType"]) => {
   }
 };
 
-const createReplaceRule = (pairs: RewriteRulePair[] = []) => {
+const createReplaceRules = (pairs: RewriteRulePair[] = []) => {
   const exportedRules = pairs.map((pair) => {
     const newRule = getNewRule(RuleType.REPLACE) as ReplaceRule;
 
@@ -334,39 +324,179 @@ const createReplaceRule = (pairs: RewriteRulePair[] = []) => {
   return exportedRules;
 };
 
-export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const rewriteRules = get(rules, "rewrite.sets.rewriteSet");
-    const updatedRewriteRules = convertToArray<RewriteSet>(rewriteRules);
+const getUpdatedBody = (defaultBody: string, pair: RewriteRulePair, bodyObject: "body" | "response") => {
+  return defaultBody.replace(
+    `return ${bodyObject};`,
+    `return JSON.parse(JSON.stringify(${bodyObject}).${pair.replaceType === 1 ? `replace` : `replaceAll`}('${
+      pair.matchValue
+    }', '${pair.newValue}'));`
+  );
+};
 
-    if (!rules || !rewriteRules) {
-      reject();
-      return;
-    }
+const createModifyBodyRules = (pairs: RewriteRulePair[] = []) => {
+  const exportedRules = pairs
+    .filter((pair) => pair.ruleType === 7)
+    .reduce((rules, pair) => {
+      const defaultRequestBody =
+        RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.REQUEST].REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE;
 
-    // for each source url we need all the rules
-    updatedRewriteRules.forEach(({ active, hosts, rules, name }: RewriteSet) => {
+      const defaultResponseBody =
+        RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE].RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE;
+
+      const updatedRequestBody = getUpdatedBody(defaultRequestBody, pair, "body");
+      const updatedResponseBody = getUpdatedBody(defaultResponseBody, pair, "response");
+
+      if (pair.matchRequest && pair.matchResponse) {
+        const requestRule = getNewRule(RuleType.REQUEST) as RequestRule;
+        const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+
+        const updatedRequestRule = {
+          ...requestRule,
+          isCharlesExport: true,
+          name: `Modify request body`,
+          status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+          pairs: [
+            {
+              ...requestRule.pairs[0],
+              request: {
+                ...requestRule.pairs[0].request,
+                value: updatedRequestBody,
+                type: GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE,
+              },
+            },
+          ],
+        };
+
+        const updatedResponseRule = {
+          ...responseRule,
+          isCharlesExport: true,
+          name: `Modify response body`,
+          status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+          pairs: [
+            {
+              ...responseRule.pairs[0],
+              response: {
+                ...responseRule.pairs[0].response,
+                type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
+                resourceType: ResponseRuleResourceType.REST_API,
+                value: updatedResponseBody,
+              },
+            },
+          ],
+        };
+
+        return [...rules, updatedRequestRule, updatedResponseRule];
+      } else if (pair.matchRequest) {
+        const requestRule = getNewRule(RuleType.REQUEST) as RequestRule;
+
+        const updatedRequestRule = {
+          ...requestRule,
+          isCharlesExport: true,
+          name: `Modify request body`,
+          status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+          pairs: [
+            {
+              ...requestRule.pairs[0],
+              request: {
+                ...requestRule.pairs[0].request,
+                value: updatedRequestBody,
+                type: GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE,
+              },
+            },
+          ],
+        };
+        return [...rules, updatedRequestRule];
+      } else {
+        const responseRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
+
+        const updatedResponseRule = {
+          ...responseRule,
+          isCharlesExport: true,
+          name: `Modify response body`,
+          status: pair.active ? Status.ACTIVE : Status.INACTIVE,
+          pairs: [
+            {
+              ...responseRule.pairs[0],
+              response: {
+                ...responseRule.pairs[0].response,
+                type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
+                resourceType: ResponseRuleResourceType.REST_API,
+                value: updatedResponseBody,
+              },
+            },
+          ],
+        };
+
+        return [...rules, updatedResponseRule];
+      }
+    }, []);
+
+  return exportedRules;
+};
+
+export const rewriteRuleAdapter = (appMode: string, rules: RewriteRule) => {
+  const rewriteRules = get(rules, "rewrite.sets.rewriteSet");
+  const updatedRewriteRules = convertToArray<RewriteSet>(rewriteRules);
+
+  if (!rules || !rewriteRules) {
+    return {};
+  }
+
+  const groupsToBeImported = updatedRewriteRules.reduce(
+    (result, { hosts, rules }: RewriteSet) => {
       const locations = hosts?.locationPatterns?.locationMatch;
 
       if (!locations) {
-        return;
+        return result;
       }
-
-      console.log({ locations });
 
       const rewriteRulePairs = convertToArray(rules.rewriteRule);
       const processedRulePairs = processRulePairs(rewriteRulePairs);
 
-      console.log({ rewriteRulePairs, processedRulePairs });
+      const headersRules = createModifyHeaderRules(processedRulePairs[RuleType.HEADERS]);
+      const queryparamRules = createModifyQueryParamRules(processedRulePairs[RuleType.QUERYPARAM]);
+      const modifyStatusRules = createModifyStatusRules(processedRulePairs[RuleType.RESPONSE]);
+      const replaceRules = createReplaceRules(processedRulePairs[RuleType.REPLACE]);
+      const modifyResponseBodyRules = createModifyBodyRules(processedRulePairs[RuleType.RESPONSE]);
 
-      const headers = createModifyHeaderRules(processedRulePairs[RuleType.HEADERS]);
-      const queryparams = createModifyQueryParamRules(processedRulePairs[RuleType.QUERYPARAM]);
-      const status = createModifyStatusRules(processedRulePairs[RuleType.RESPONSE]);
-      const host = createReplaceRule(processedRulePairs[RuleType.REPLACE]);
+      // rewriteRulePairs.map((pair) => {
+      //   switch(pair.ruleType){
+      //       case 1:
+      //       case 2:
+      //       case 3:
+      //         return createModifyHeaderRules(pair)
+      //   }
+      // })
 
-      console.log({ status, headers, queryparams, host });
+      const rulesToBeImported = [
+        ...headersRules,
+        ...queryparamRules,
+        ...modifyStatusRules,
+        ...replaceRules,
+        ...modifyResponseBodyRules,
+      ];
 
-      resolve();
-    });
-  });
+      const sourceUrls = getSourceUrls(locations);
+      const groups = sourceUrls.reduce((result, { value, operator, status }) => {
+        const updatedRules = rulesToBeImported.map(
+          (rule: HeadersRule | QueryParamRule | ReplaceRule | RequestRule | ResponseRule) => ({
+            ...rule,
+            pairs: [
+              {
+                ...rule.pairs[0],
+                source: { ...rule.pairs[0].source, value, operator },
+              },
+            ],
+          })
+        );
+
+        return [...result, { status, name: value, rules: updatedRules }];
+      }, []);
+
+      return { ...result, groups: [...result.groups, ...groups] };
+    },
+    { groups: [] }
+  );
+
+  return groupsToBeImported;
 };

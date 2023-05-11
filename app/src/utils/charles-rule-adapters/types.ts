@@ -152,7 +152,7 @@ export type RewriteRulePair = {
   newValueRegex: boolean;
   matchWholeValue: boolean;
   caseSensitive: boolean;
-  replaceType: number;
+  replaceType: 1 | 2;
 };
 
 export type RewriteRulePairs = RewriteRulePair | RewriteRulePair[];
