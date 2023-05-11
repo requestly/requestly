@@ -44,23 +44,24 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           console.log({ importedRules });
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error); // TODO: validations
         });
     };
     reader.readAsText(file);
   };
 
   const handleCharlesRulesImport = () => {
-    const importPromises = rulesToImport.map(({ rules, status, groupName, appMode }) => {
+    const importPromises = rulesToImport.map(({ value }) => {
       return createNewGroupAndSave({
-        appMode,
-        rules,
-        status,
-        onError: () => {},
-        onSuccess: () => {},
-        groupName,
+        appMode: value.appMode,
+        rules: value.rules,
+        status: value.status,
+        onError: () => {}, // TODO: validations
+        onSuccess: () => {}, // TODO: validations
+        groupName: value.groupName,
       });
     });
+    console.log({ rulesToImport });
 
     Promise.all(importPromises).then(() => {
       dispatch(

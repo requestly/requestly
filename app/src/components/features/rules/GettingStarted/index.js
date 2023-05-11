@@ -141,7 +141,7 @@ const GettingStarted = () => {
                 <p className="text-gray getting-started-subtitle">
                   Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
                 </p>
-                <div>
+                <div className="getting-started-btns-wrapper">
                   <Button
                     type="primary"
                     onClick={handleCreateMyFirstRuleClick}
