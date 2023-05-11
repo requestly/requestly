@@ -45,9 +45,9 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
   //   return null;
   // }, [persona]);
 
-  // const shuffledQ3 = useMemo(() => {
-  //   return shuffleOptions(OptionsConfig[3].options);
-  // }, []);
+  const shuffledQ3 = useMemo(() => {
+    return shuffleOptions(OptionsConfig[3].options);
+  }, []);
 
   const SkippableButton = () => {
     switch (currentPage) {
@@ -101,10 +101,10 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
     switch (optionSet) {
       case 1:
         return renderOptions(shuffledQ1, optionSet);
-      // case 2:
-      //   return renderOptions(shuffledQ2, optionSet);
-      // case 3:
-      //   return renderOptions(shuffledQ3, optionSet);
+      case 2:
+        return null;
+      case 3:
+        return renderOptions(shuffledQ3, optionSet);
       default:
         return null;
     }
@@ -140,6 +140,12 @@ export const PersonaSurveyModal: React.FC<PersonaModalProps> = ({ isOpen, toggle
       </>
     );
   };
+
+  useEffect(() => {
+    if (SurveyConfig[currentPage]?.skip) {
+      dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+    }
+  }, [currentPage, dispatch]);
 
   useEffect(() => {
     shouldShowPersonaSurvey(appMode).then((result) => {

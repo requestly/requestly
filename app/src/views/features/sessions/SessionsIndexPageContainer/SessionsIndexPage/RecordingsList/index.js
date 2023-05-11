@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
-import { Avatar, Modal, Space, Tag, Tooltip, Typography } from "antd";
+import { Modal, Space, Tag, Tooltip, Typography } from "antd";
 import ReactHoverObserver from "react-hover-observer";
 import Text from "antd/lib/typography/Text";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
@@ -14,6 +14,7 @@ import TutorialButton from "../TutorialButton";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
+import Favicon from "components/misc/Favicon";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -72,13 +73,7 @@ const RecordingsList = ({
         render: (url) => {
           return (
             <>
-              <Avatar
-                size="small"
-                style={{ display: "inline-block", marginRight: "2px" }}
-                src={`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${
-                  new URL(url).origin
-                }&size=64`}
-              />
+              <Favicon url={url} />
               <Tooltip title={url}>{` ${new URL(url).hostname}`}</Tooltip>
             </>
           );
