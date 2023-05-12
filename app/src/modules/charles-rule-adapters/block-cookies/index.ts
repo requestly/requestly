@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { BlockCookiesRule, CharlesRuleType, ParsedRule } from "../types";
-import { getHeaders, getSourceUrls } from "../utils";
+import { getHeaders, getSourcesData } from "../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { HeadersRule, RuleType, Status } from "types";
@@ -12,9 +12,9 @@ export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<Hea
     return;
   }
 
-  const sourceUrls = getSourceUrls(locations);
+  const sources = getSourcesData(locations);
   const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-  const exportedRules = sourceUrls.map(({ value, status, operator }) => {
+  const exportedRules = sources.map(({ value, status, operator }) => {
     const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
     return {
       ...rule,

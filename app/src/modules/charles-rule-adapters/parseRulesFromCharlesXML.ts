@@ -11,6 +11,7 @@ import {
   MapLocalRule,
   MapRemoteRule,
   NoCachingRule,
+  ParsedRulesFromChalres,
   RewriteRule,
 } from "./types";
 import { mapRemoteAdapter } from "./map-remote";
@@ -24,7 +25,16 @@ type CharlesExport = {
 
 type ConfigEntry = { string: CharlesRuleType } & Record<string, unknown>;
 
-export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<unknown> => {
+const supportedRuleTypes = {
+  "No Caching": "noCaching",
+  "Block Cookies": "blockCookies",
+  "Block List": "blockList",
+  "Map Local": "mapLocal",
+  "Map Remote": "mapRemote",
+  Rewrite: "rewrite",
+};
+
+export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
   const options = {
     explicitArray: false,
     valueProcessors: [parseNumbers, parseBooleans],
@@ -73,6 +83,9 @@ export const parseRulesFromCharlesXML = (xml: string, appMode: string): Promise<
       );
 
       console.log("---------->>>>", { groupsToBeImported });
-      return groupsToBeImported;
+      return {
+        groups: groupsToBeImported,
+        parsedRuleTypes: Object.keys(recordsObject).filter((ruleType) => ruleType in supportedRuleTypes),
+      } as ParsedRulesFromChalres;
     });
 };

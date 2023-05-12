@@ -1,5 +1,5 @@
 import { Rule, SourceOperator } from "types";
-import { HeadersConfig, SourceUrl, Location, CharlesRuleType } from "./types";
+import { HeadersConfig, SourceUrl, Location, CharlesRuleType, SourceData } from "./types";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
@@ -46,7 +46,7 @@ export const getLocation = (location: Location) => {
   };
 };
 
-export const getSourceUrls = (locations: SourceUrl | SourceUrl[]) => {
+export const getSourcesData = (locations: SourceUrl | SourceUrl[]): SourceData[] => {
   const sources = Array.isArray(locations) ? locations : [locations];
   return sources.map((source: SourceUrl) => ({ ...getLocation(source.location), status: source.enabled }));
 };
@@ -78,6 +78,7 @@ export const createNewGroupAndSave = ({
       groupName,
       (groupId: string) => {
         const updatedRules = rules.map((rule) => ({ ...rule, groupId }));
+
         StorageService(appMode)
           .saveMultipleRulesOrGroups(updatedRules)
           .then(() => {

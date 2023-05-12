@@ -11,7 +11,7 @@ import {
   ResponseRuleResourceType,
   QueryParamModificationType,
 } from "types";
-import { RewriteRulePair } from "../types";
+import { RewriteRulePair, SourceData } from "../types";
 import {
   getHeadersData,
   getQueryParamsData,
@@ -28,7 +28,7 @@ import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RewriteRuleActionType } from "./types";
 import { statusCodes } from "config/constants/sub/statusCode";
 
-export const createModifyHeaderRule = (pair: RewriteRulePair) => {
+export const createModifyHeaderRule = (pair: RewriteRulePair, source: SourceData) => {
   const headerAction = {
     ...getHeadersData(pair),
     active: pair.active,
@@ -47,6 +47,7 @@ export const createModifyHeaderRule = (pair: RewriteRulePair) => {
     pairs: [
       {
         ...newRule.pairs[0],
+        source: { ...newRule.pairs[0].source, value: source.value, operator: source.operator },
         modifications: {
           ...newRule.pairs[0].modifications,
           ...modifications,
@@ -58,7 +59,7 @@ export const createModifyHeaderRule = (pair: RewriteRulePair) => {
   return ruleToBeImported;
 };
 
-export const createModifyQueryParamRule = (pair: RewriteRulePair) => {
+export const createModifyQueryParamRule = (pair: RewriteRulePair, source: SourceData) => {
   const queryParamAction = {
     ...getQueryParamsData(pair),
     active: pair.active,
@@ -76,6 +77,7 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair) => {
     pairs: [
       {
         ...newRule.pairs[0],
+        source: { ...newRule.pairs[0].source, value: source.value, operator: source.operator },
         modifications: getQueryParamModifications(queryParamAction),
       },
     ],
@@ -84,7 +86,7 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair) => {
   return ruleToBeImported;
 };
 
-export const createModifyStatusRule = (pair: RewriteRulePair) => {
+export const createModifyStatusRule = (pair: RewriteRulePair, source: SourceData) => {
   const newRule = getNewRule(RuleType.RESPONSE) as ResponseRule;
 
   const ruleToBeImported = {
@@ -95,6 +97,7 @@ export const createModifyStatusRule = (pair: RewriteRulePair) => {
     pairs: [
       {
         ...newRule.pairs[0],
+        source: { ...newRule.pairs[0].source, value: source.value, operator: source.operator },
         response: {
           ...newRule.pairs[0].response,
           statusCode: `${pair.newValue}`,
@@ -123,7 +126,7 @@ const getReplaceRuleNamePrefix = (type: RewriteRulePair["ruleType"]) => {
   }
 };
 
-export const createReplaceRule = (pair: RewriteRulePair) => {
+export const createReplaceRule = (pair: RewriteRulePair, source: SourceData) => {
   const newRule = getNewRule(RuleType.REPLACE) as ReplaceRule;
 
   const ruleToBeImported = {
@@ -136,6 +139,7 @@ export const createReplaceRule = (pair: RewriteRulePair) => {
         ...newRule.pairs[0],
         source: {
           ...newRule.pairs[0].source,
+          value: source.value,
           operator: pair.matchValueRegex ? SourceOperator.MATCHES : SourceOperator.CONTAINS,
         },
         from: pair.matchValue,
@@ -156,7 +160,7 @@ const getUpdatedBody = (defaultBody: string, pair: RewriteRulePair, bodyObject: 
   );
 };
 
-export const createModifyBodyRule = (pair: RewriteRulePair) => {
+export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) => {
   const defaultRequestBody =
     RULE_TYPES_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.REQUEST].REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE;
 
@@ -178,6 +182,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair) => {
       pairs: [
         {
           ...requestRule.pairs[0],
+          source: { ...requestRule.pairs[0].source, value: source.value, operator: source.operator },
           request: {
             ...requestRule.pairs[0].request,
             value: updatedRequestBody,
@@ -195,6 +200,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair) => {
       pairs: [
         {
           ...responseRule.pairs[0],
+          source: { ...responseRule.pairs[0].source, value: source.value, operator: source.operator },
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,
@@ -217,6 +223,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair) => {
       pairs: [
         {
           ...requestRule.pairs[0],
+          source: { ...requestRule.pairs[0].source, value: source.value, operator: source.operator },
           request: {
             ...requestRule.pairs[0].request,
             value: updatedRequestBody,
@@ -237,6 +244,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair) => {
       pairs: [
         {
           ...responseRule.pairs[0],
+          source: { ...responseRule.pairs[0].source, value: source.value, operator: source.operator },
           response: {
             ...responseRule.pairs[0].response,
             type: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE,

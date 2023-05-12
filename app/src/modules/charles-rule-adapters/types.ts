@@ -1,4 +1,4 @@
-import { HeaderRuleActionType, Rule } from "types";
+import { HeaderRuleActionType, Rule, SourceOperator } from "types";
 
 export enum WhereToApplyRule {
   BOTH = "both",
@@ -56,6 +56,12 @@ export type SourceUrl = {
   location: Location;
 };
 
+export type SourceData = {
+  value: string;
+  status: boolean;
+  operator: SourceOperator;
+};
+
 export type ParsedRule<T = Rule> =
   | {
       groups?: {
@@ -65,6 +71,11 @@ export type ParsedRule<T = Rule> =
       }[];
     }
   | undefined;
+
+export type ParsedRulesFromChalres = {
+  groups?: ParsedRule["groups"];
+  parsedRuleTypes?: CharlesRuleType[];
+};
 
 // rules
 export type NoCachingRule = {
