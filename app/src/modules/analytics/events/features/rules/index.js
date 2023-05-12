@@ -28,24 +28,24 @@ export const trackRulesJsonParsed = (params) => {
 
 export const trackCharlesSettingsImportStarted = (source) => {
   const params = { source };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED);
+  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
 };
 export const trackCharlesSettingsImportFailed = (cause) => {
   const params = { cause };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED);
+  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
 };
 
-export const trackCharlesSettingsParsed = (count, type) => {
-  const params = { count, type };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED);
+export const trackCharlesSettingsParsed = (type) => {
+  const params = { type };
+  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
 };
 
-export const trackCharlesSettingsImportComplete = (count, settingTypes) => {
-  const params = { count, settingTypes };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED);
+export const trackCharlesSettingsImportComplete = (settingTypes) => {
+  const params = { settingTypes };
+  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
 };
 
 export const trackCharlesSettingsImportDocsClicked = (source) => {
   const params = { source };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED);
+  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
 };
