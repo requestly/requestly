@@ -11,7 +11,6 @@ export function downloadLogs(logs: Log[]) {
 }
 
 export function downloadHar(har: Har, preferredName?: string) {
-  console.log("downloading har", har);
   const jsonBlob = new Blob([JSON.stringify(har, null, 2)], { type: "application/json" });
   saveAs(jsonBlob, preferredName ? `${preferredName}.har` : "requestly_logs.har");
 }

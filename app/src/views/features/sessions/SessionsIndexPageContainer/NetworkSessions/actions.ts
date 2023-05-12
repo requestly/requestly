@@ -13,7 +13,6 @@ export function deleteRecording(id: string) {
 
 // ipc wrapper
 function ipcRequest(channel: string, requestData: any, timeout = 5000): any {
-  console.log("ipc request for channel and data", channel, requestData);
   return new Promise((resolve, reject) => {
     let responseTimeout = setTimeout(() => {
       reject(new Error(`IPC request timed out after ${timeout} ms`));
@@ -24,7 +23,6 @@ function ipcRequest(channel: string, requestData: any, timeout = 5000): any {
     });
 
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(`reply-${channel}`, (event: any, responseData: any) => {
-      console.log("recieved response");
       clearTimeout(responseTimeout);
       resolve(responseData);
     });
@@ -46,7 +44,6 @@ export function getRecording(id: string): Promise<NetworkSessionRecord | null> {
       return res;
     })
     .catch((): null => {
-      console.log("ipc timedout");
       return null;
     });
 }

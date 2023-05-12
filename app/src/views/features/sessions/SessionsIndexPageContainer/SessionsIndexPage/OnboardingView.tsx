@@ -37,7 +37,6 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   const navigate = useNavigate();
   const stableNavigate = useCallback(
     (sessionId: string) => {
-      console.log("navigating for sessionId: ", sessionId);
       redirectToNetworkSession(navigate, sessionId);
     },
     [navigate]

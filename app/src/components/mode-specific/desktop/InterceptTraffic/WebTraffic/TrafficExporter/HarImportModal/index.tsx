@@ -42,7 +42,6 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
 
   const handleImportedData = useCallback(
     (data: Har) => {
-      console.log("handling logs", data);
       setImportedHar(data);
       trackHarImportCompleted();
       openSaveModal();
@@ -68,7 +67,6 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
           setProcessingDataToImport(false);
         } catch (error) {
           setProcessingDataToImport(false);
-          console.log(error);
           alert("Imported file doesn't match the HAR format. Please choose another file.");
           closeDropZone();
         }

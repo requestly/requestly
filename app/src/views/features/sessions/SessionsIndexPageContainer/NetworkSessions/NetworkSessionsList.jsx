@@ -107,9 +107,8 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                         <Tag
                           onClick={() => {
                             confirmAndDeleteRecording(id, () => {
-                              console.log(`${id} deleted`);
+                              trackDeleteNetworkSessionClicked(ActionSource.List);
                             });
-                            trackDeleteNetworkSessionClicked(ActionSource.List);
                           }}
                         >
                           <DeleteOutlined
