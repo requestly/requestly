@@ -118,11 +118,6 @@ const ActionHeader = ({
               />
             </Badge>
           </Col> */}
-          <Col>
-            <Tooltip placement="top" title="Clear Logs">
-              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
-            </Tooltip>
-          </Col>
           {isStaticPreview ? null : (
             <>
               <Col>
