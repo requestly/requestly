@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { HeaderRuleActionType, Rule, SourceOperator } from "types";
 
 export enum CharlesRuleImportErrorMessage {
@@ -9,6 +10,9 @@ export enum CharlesRuleImportErrorMessage {
 =======
 import { HeaderRuleActionType, Rule } from "types";
 >>>>>>> 46f7b913 (move charles adapters in modules)
+=======
+import { HeaderRuleActionType, Rule, SourceOperator } from "types";
+>>>>>>> 92754e8e (fix: empty group issue)
 
 export enum WhereToApplyRule {
   BOTH = "both",
@@ -67,14 +71,20 @@ export type SourceUrl = {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 92754e8e (fix: empty group issue)
 export type SourceData = {
   value: string;
   status: boolean;
   operator: SourceOperator;
 };
 
+<<<<<<< HEAD
 =======
 >>>>>>> 46f7b913 (move charles adapters in modules)
+=======
+>>>>>>> 92754e8e (fix: empty group issue)
 export type ParsedRule<T = Rule> =
   | {
       groups?: {
@@ -86,6 +96,7 @@ export type ParsedRule<T = Rule> =
   | undefined;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export type ParsedRulesFromChalres = {
   groups?: ParsedRule["groups"];
   parsedRuleTypes?: CharlesRuleType[];
@@ -94,6 +105,13 @@ export type ParsedRulesFromChalres = {
 
 =======
 >>>>>>> 46f7b913 (move charles adapters in modules)
+=======
+export type ParsedRulesFromChalres = {
+  groups?: ParsedRule["groups"];
+  parsedRuleTypes?: CharlesRuleType[];
+};
+
+>>>>>>> 92754e8e (fix: empty group issue)
 // rules
 export type NoCachingRule = {
   string: string;

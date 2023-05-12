@@ -1,9 +1,5 @@
 import { Rule, SourceOperator } from "types";
-<<<<<<< HEAD
 import { HeadersConfig, SourceUrl, Location, CharlesRuleType, SourceData } from "./types";
-=======
-import { HeadersConfig, SourceUrl, Location, CharlesRuleType } from "./types";
->>>>>>> 46f7b913 (move charles adapters in modules)
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageService } from "init";
 import { createNewGroup } from "components/features/rules/ChangeRuleGroupModal/actions";
@@ -50,11 +46,7 @@ export const getLocation = (location: Location) => {
   };
 };
 
-<<<<<<< HEAD
 export const getSourcesData = (locations: SourceUrl | SourceUrl[]): SourceData[] => {
-=======
-export const getSourceUrls = (locations: SourceUrl | SourceUrl[]) => {
->>>>>>> 46f7b913 (move charles adapters in modules)
   const sources = Array.isArray(locations) ? locations : [locations];
   return sources.map((source: SourceUrl) => ({ ...getLocation(source.location), status: source.enabled }));
 };
@@ -86,10 +78,6 @@ export const createNewGroupAndSave = ({
       groupName,
       (groupId: string) => {
         const updatedRules = rules.map((rule) => ({ ...rule, groupId }));
-<<<<<<< HEAD
-
-=======
->>>>>>> 46f7b913 (move charles adapters in modules)
         StorageService(appMode)
           .saveMultipleRulesOrGroups(updatedRules)
           .then(() => {
