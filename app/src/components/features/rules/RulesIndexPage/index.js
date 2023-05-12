@@ -19,6 +19,7 @@ import {
   getIsRefreshRulesPending,
   getIsHardRefreshRulesPending,
   getIsRulesListLoading,
+  getAllGroups,
 } from "../../../../store/selectors";
 import { isGroupsSanitizationPassed } from "./actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -45,6 +46,7 @@ const RulesIndexPage = () => {
   //Global State
   const dispatch = useDispatch();
   const rules = useSelector(getAllRules);
+  const groups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const appMode = useSelector(getAppMode);
@@ -130,7 +132,7 @@ const RulesIndexPage = () => {
       <MigrationCheckModal />
       <StorageMigrationCheckModal />
       {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
-        rules.length !== 0 ? (
+        rules.length !== 0 || groups.length !== 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
         ) : (
           <CreateFirstRule />
