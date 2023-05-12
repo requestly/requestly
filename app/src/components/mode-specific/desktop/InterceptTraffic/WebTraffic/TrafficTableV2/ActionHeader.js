@@ -15,6 +15,12 @@ import FEATURES from "config/constants/sub/features";
 import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
+import {
+  trackTrafficInterceptionPaused,
+  trackTrafficInterceptionResumed,
+  trackTrafficTableFilterClicked,
+  trackTrafficTableSearched,
+} from "modules/analytics/events/desktopApp";
 
 const { Text } = Typography;
 
@@ -35,6 +41,7 @@ const ActionHeader = ({
 
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
+    if (searchValue) trackTrafficTableSearched();
     dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
 
@@ -109,7 +116,10 @@ const ActionHeader = ({
                 type="default"
                 iconOnly
                 icon={<FaFilter />}
-                onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+                onClick={() => {
+                  setIsFiltersCollapsed((prev) => !prev);
+                  trackTrafficTableFilterClicked();
+                }}
                 className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
               />
             </Badge>
@@ -171,6 +181,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
           onClick={() => {
             setIsPaused(false);
             onChange(false); // isPaused
+            trackTrafficInterceptionResumed();
           }}
         />
       ) : (
@@ -182,6 +193,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
           onClick={() => {
             setIsPaused(true);
             onChange(true); // isPaused
+            trackTrafficInterceptionPaused();
           }}
         />
       )}

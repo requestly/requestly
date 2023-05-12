@@ -23,7 +23,11 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
-import { trackTrafficTableLogsCleared, trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
+import {
+  trackTrafficTableFilterApplied,
+  trackTrafficTableLogsCleared,
+  trackTrafficTableRequestClicked,
+} from "modules/analytics/events/desktopApp";
 import {
   trackSidebarFilterCollapsed,
   trackSidebarFilterExpanded,
@@ -601,6 +605,7 @@ const CurrentTrafficTable = ({
                   value={trafficTableFilters.method}
                   handleFilterChange={(options) => {
                     dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                    trackTrafficTableFilterApplied("method", options, options?.length);
                   }}
                 />
                 <LogFilter
@@ -611,6 +616,7 @@ const CurrentTrafficTable = ({
                   value={trafficTableFilters.statusCode}
                   handleFilterChange={(options) => {
                     dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                    trackTrafficTableFilterApplied("status_code", options, options?.length);
                   }}
                 />
                 <LogFilter
@@ -621,6 +627,7 @@ const CurrentTrafficTable = ({
                   value={trafficTableFilters.resourceType}
                   handleFilterChange={(options) => {
                     dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
+                    trackTrafficTableFilterApplied("content_type", options, options?.length);
                   }}
                 />
               </section>
