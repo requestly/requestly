@@ -5,7 +5,8 @@ import { debounce } from "lodash";
 
 const FAVICON_SIZE = {
   small: 16,
-  normal: 64, // default
+  normal: 24, // default
+  large: 64,
 };
 
 type FaviconSize = keyof typeof FAVICON_SIZE;
