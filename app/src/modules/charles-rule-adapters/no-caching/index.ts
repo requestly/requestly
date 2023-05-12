@@ -1,7 +1,7 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { getSourceUrls, getHeaders } from "../utils";
+import { getSourcesData, getHeaders } from "../utils";
 import { CharlesRuleType, NoCachingRule, ParsedRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
@@ -12,7 +12,7 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
     return;
   }
 
-  const sourcesUrls = getSourceUrls(locations);
+  const sourcesUrls = getSourcesData(locations);
   const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
   const exportedRules = sourcesUrls.map(({ value, status, operator }) => {
     const rule = getNewRule(RuleType.HEADERS) as HeadersRule;

@@ -3,7 +3,7 @@ import { BlockListRule, CharlesRuleType, ParsedRule } from "../types";
 import { CancelRule, RuleType, Status, ResponseRuleResourceType, ResponseRule } from "types";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { getSourceUrls } from "../utils";
+import { getSourcesData } from "../utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -41,8 +41,8 @@ export const blockListRuleAdapter = (rules: BlockListRule): ParsedRule => {
   // If blockingAction is 0, default behaviour (Drop connection)
   // If blockingAction is 1, return 403 response
   const blockingAction = rules?.blacklist.action;
-  const sourceUrls = getSourceUrls(locations);
-  const exportedRules = sourceUrls.map(({ value, status, operator }) => {
+  const sources = getSourcesData(locations);
+  const exportedRules = sources.map(({ value, status, operator }) => {
     if (blockingAction === 1) {
       return generate403ResponseRule(value, status, operator);
     }
