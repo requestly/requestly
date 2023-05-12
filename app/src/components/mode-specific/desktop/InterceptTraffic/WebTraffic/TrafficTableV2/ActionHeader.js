@@ -7,6 +7,7 @@ import {
   PauseOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
@@ -14,7 +15,12 @@ import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
-import { trackNetworkSessionSaveClicked } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import {
+  ActionSource,
+  trackDownloadNetworkSessionClicked,
+  trackNetworkSessionSaveClicked,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { downloadHar } from "../TrafficExporter/harLogs/utils";
 
 const { Text } = Typography;
 
@@ -132,19 +138,34 @@ const ActionHeader = ({
                 </Tooltip>
               </Col>
               {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) ? (
-                <Col>
-                  <Tooltip placement="top" title="Save Logs">
-                    <Button
-                      type="primary"
-                      disabled={!logsCount}
-                      icon={<SaveOutlined />}
-                      onClick={() => {
-                        trackNetworkSessionSaveClicked();
-                        openSaveModal();
-                      }}
-                    />
-                  </Tooltip>
-                </Col>
+                <>
+                  <Col>
+                    <Tooltip placement="top" title="Save Network Session">
+                      <Button
+                        type="primary"
+                        disabled={!logsCount}
+                        icon={<SaveOutlined />}
+                        onClick={() => {
+                          trackNetworkSessionSaveClicked();
+                          openSaveModal();
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                  <Col>
+                    <Tooltip placement="top" title="Export Network Session">
+                      <Button
+                        type="primary"
+                        disabled={!logsCount}
+                        icon={<DownloadOutlined />}
+                        onClick={() => {
+                          downloadHar(logsToSaveAsHar || {}, "");
+                          trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                </>
               ) : null}
               {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
                 <Col>

@@ -53,7 +53,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
             trackDeleteNetworkSessionClicked(ActionSource.Preview);
           }}
         >
-          <DeleteOutlined className="more-action-icon" /> Delete Recording
+          <DeleteOutlined className="more-action-icon" /> Delete Session
         </Menu.Item>
         <Menu.Item
           key="download"
@@ -64,7 +64,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
             trackDownloadNetworkSessionClicked(ActionSource.Preview);
           }}
         >
-          <DownloadOutlined className="more-action-icon" /> Save as Har
+          <DownloadOutlined className="more-action-icon" /> Export as Har
         </Menu.Item>
       </Menu>
     ),

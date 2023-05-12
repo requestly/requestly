@@ -46,7 +46,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
   const navigate = useNavigate();
   const stableOnSuccessfulHarImport = useCallback(
     (sessionId) => {
-      toast.success("Successfully imported Har");
+      toast.success("Successfully imported the HAR file");
       redirectToNetworkSession(navigate, sessionId);
     },
     [navigate]
@@ -95,7 +95,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                         trackDownloadNetworkSessionClicked(ActionSource.List);
                       }}
                     >
-                      <Tooltip title="Download Recording">
+                      <Tooltip title="Export Session">
                         <Tag>
                           <DownloadOutlined />
                         </Tag>
@@ -146,7 +146,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
             <Typography.Title level={4} className="network-session-list-heading">
               Network Session Recordings
             </Typography.Title>
-            <ImportandSaveNetworkHarModalButton onSaved={stableOnSuccessfulHarImport} btnText="Import External Har" />
+            <ImportandSaveNetworkHarModalButton onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
           </Space>
         }
       />

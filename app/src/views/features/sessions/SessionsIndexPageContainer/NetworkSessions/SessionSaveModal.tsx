@@ -32,7 +32,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     if (onSave) {
       onSave(id);
     } else {
-      toast.success("Network logs successfully saved!");
+      toast.success("Network session successfully saved!");
     }
     setName("");
     if (!networkSessionTooptipShown) {

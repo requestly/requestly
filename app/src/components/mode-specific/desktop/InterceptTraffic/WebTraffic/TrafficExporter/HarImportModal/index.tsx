@@ -109,7 +109,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
         }}
         className="mt-8"
       >
-        {btnText ? btnText : "Import Har File"}
+        {btnText ? btnText : "Import HAR File"}
       </RQButton>
       <Modal
         className="modal-dialog-centered"

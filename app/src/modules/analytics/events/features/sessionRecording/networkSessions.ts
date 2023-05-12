@@ -2,8 +2,9 @@ import { trackEvent } from "modules/analytics";
 import { SESSION_RECORDING } from "../constants";
 
 export enum ActionSource {
-  Preview = "Preview",
-  List = "List",
+  Preview = "preview",
+  List = "list",
+  TrafficTable = "taffic_table",
 }
 
 export function trackHarImportButtonClicked() {
