@@ -159,8 +159,6 @@ const RulesTable = ({
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
-  console.log({ rules });
-
   const selectedRules = getSelectedRules(rulesSelection);
 
   const isRemoveFromGroupDisabled = useMemo(

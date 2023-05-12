@@ -22,8 +22,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
 
-  console.log({ currentlySelectedRuleData });
-
   const getEventObject = (name, value) => ({ target: { name, value } });
 
   const handleRuleNameChange = (name) => {
