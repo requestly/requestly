@@ -25,6 +25,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
   const closeDropZone = useCallback(() => {
     setIsDropZoneVisible(false);
   }, []);
+
   const openDropZone = useCallback(() => {
     setIsDropZoneVisible(true);
   }, []);
@@ -33,9 +34,11 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
     setIsSaveModalVisible(false);
     closeDropZone();
   }, [closeDropZone]);
+
   const openSaveModal = useCallback(() => {
+    closeDropZone();
     setIsSaveModalVisible(true);
-  }, []);
+  }, [closeDropZone]);
 
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
   const [importedHar, setImportedHar] = useState<Har>();

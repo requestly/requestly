@@ -17,10 +17,10 @@ interface Props {
   har: Har;
   isVisible: boolean;
   closeModal: () => void;
-  onSave: (id: string) => void;
+  onSave?: (id: string) => void;
 }
 
-const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal }) => {
+const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave }) => {
   const dispatch = useDispatch();
 
   const networkSessionTooptipShown = useSelector(getIsNetworkTooptipShown);
@@ -28,8 +28,12 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal }) => {
   const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
-    await saveRecording(name, har);
-    toast.success("Network logs successfully saved!");
+    const id = await saveRecording(name, har);
+    if (onSave) {
+      onSave(id);
+    } else {
+      toast.success("Network logs successfully saved!");
+    }
     setName("");
     if (!networkSessionTooptipShown) {
       dispatch(actions.updateNetworkSessionSaveInProgress(true));
@@ -40,7 +44,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal }) => {
     }
     trackNetworkSessionSaved();
     closeModal();
-  }, [closeModal, dispatch, har, name, networkSessionTooptipShown]);
+  }, [closeModal, dispatch, har, name, networkSessionTooptipShown, onSave]);
 
   return (
     <RQModal
