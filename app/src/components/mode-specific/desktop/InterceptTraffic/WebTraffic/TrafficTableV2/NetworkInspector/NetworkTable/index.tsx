@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
-import { getIsTrafficTableTourCompleted } from "store/selectors";
+import { getIsTrafficTableTourCompleted, getIsConnectedAppsTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
 import _ from "lodash";
 import { getColumnKey } from "../utils";
@@ -30,6 +30,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
+  const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
 
   const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
 
@@ -114,7 +115,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         id={log.id}
         onContextMenu={() => setSelectedRowData(log)}
         {...rowProps}
-        data-tour-id={index === 0 ? "traffic-table-row" : null}
+        data-tour-id={index === 0 && !isTrafficTableTourCompleted ? "traffic-table-row" : null}
       >
         {columns.map((column: any) => {
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
@@ -160,7 +161,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     <>
       <ProductWalkthrough
         tourFor={FEATURES.DESKTOP_APP_TRAFFIC_TABLE}
-        startWalkthrough={!isTrafficTableTourCompleted}
+        startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
       {renderTable()}
