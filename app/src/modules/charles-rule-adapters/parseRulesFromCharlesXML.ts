@@ -8,6 +8,7 @@ import {
   BlockCookiesRule,
   BlockListRule,
   CharlesRuleType,
+  CharlesRuleImportErrorMessage,
   MapLocalRule,
   MapRemoteRule,
   NoCachingRule,
@@ -44,13 +45,13 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
     .parseStringPromise(xml, options)
     .then((records: CharlesExport) => {
       if (!records) {
-        throw new Error("Imported file is empty!");
+        throw new Error(CharlesRuleImportErrorMessage.EMPTY_FILE);
       }
 
       // "charles-export" indicates its a valid export
       // ie multiple rule types exported together from Charles
       if (!("charles-export" in (records ?? {}))) {
-        throw new Error("Not a valid Charles export!");
+        throw new Error(CharlesRuleImportErrorMessage.INVALID_EXPORT);
       }
 
       const rules = get(records, "charles-export.toolConfiguration.configs.entry");
@@ -59,16 +60,13 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
     .then((records) => convertToArray(records))
     .then((records) => {
       if (!records) {
-        throw new Error("No Charles settings found in file!");
+        throw new Error(CharlesRuleImportErrorMessage.SETTINGS_NOT_FOUND);
       }
 
       const recordsObject = records.reduce(
         (result, record) => ({ ...result, [record.string as CharlesRuleType]: record }),
         {} as Record<CharlesRuleType, ConfigEntry>
       );
-
-      console.log("------- rules import started ---------");
-      console.log({ recordsObject });
 
       const groupsToBeImported = [
         noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING] as NoCachingRule),
@@ -82,10 +80,12 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
         []
       );
 
-      console.log("---------->>>>", { groupsToBeImported });
+      const filteredRuleTypes = Object.keys(recordsObject).filter((ruleType) => ruleType in supportedRuleTypes);
+
       return {
         groups: groupsToBeImported,
-        parsedRuleTypes: Object.keys(recordsObject).filter((ruleType) => ruleType in supportedRuleTypes),
+        parsedRuleTypes: filteredRuleTypes,
+        isOtherRuleTypesPresent: filteredRuleTypes.length < Object.keys(recordsObject).length,
       } as ParsedRulesFromChalres;
     });
 };

@@ -1,0 +1,21 @@
+.parsed-rules-info {
+  margin-top: 1.5rem;
+}
+
+.parsed-rules-info ul {
+  margin-top: 4px;
+  padding-left: 14px;
+}
+
+.parsed-rules-info li {
+  list-style: disc;
+}
+
+.parsed-rules-error-info ol {
+  margin-top: 12px;
+  padding-left: 16px;
+}
+
+.parsed-rules-error-info li {
+  list-style: unset;
+}
