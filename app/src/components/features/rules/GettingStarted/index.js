@@ -170,7 +170,7 @@ const GettingStarted = () => {
 
                   {isCharlesImportFeatureFlagOn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
                     <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
-                      Import settings from Charles
+                      Import settings from Charles Proxy
                     </RQButton>
                   ) : null}
                 </div>

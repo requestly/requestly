@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Row, Typography } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
+import PATHS from "config/constants/sub/paths";
 import "./ImportFromCharlesModal.css";
 
 interface ModalProps {
@@ -16,15 +19,31 @@ interface ModalProps {
 }
 
 const validExportSteps = [
-  `Click on "Tools" in the top Menu bar in Charles Proxy`,
-  `Click on "Import/Export Settings" from the dropdown`,
-  `Click on "Export" tab`,
-  `Select settings that you need to export and click "Export"`,
-  `Import these settings to Requestly`,
+  {
+    step: `Click on "Tools" in the top Menu bar in Charles Proxy`,
+  },
+  {
+    step: `Click on "Import/Export Settings" from the dropdown`,
+  },
+  {
+    step: `Click on "Export" tab`,
+  },
+  {
+    step: `Select settings that you need to export and click "Export"`,
+  },
+  {
+    step: `Steps to be followed in Requestly:`,
+    additionalSteps: [
+      {
+        step: `Click "Import settings from Charles Proxy" to continue.`,
+      },
+    ],
+  },
 ];
 
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
   const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
@@ -45,7 +64,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       if (!file.type.includes("xml")) {
         // stop parsing for wrong file format
         setIsDataProcessing(false);
-        setValidationError("Imported file dosen't match the required format");
+        setValidationError("Failed to parse Charles proxy settings file.");
         return;
       }
       parseRulesFromCharlesXML(fileContent as string)
@@ -81,6 +100,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           newValue: !isRulesListRefreshPending,
         })
       );
+
+      navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
       toggle();
     });
   };
@@ -93,23 +114,24 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   return (
     <RQModal open={isOpen} centered onCancel={toggle}>
       <div className="rq-modal-content">
-        <div className="header text-center">Import Charles settings</div>
+        <div className="header text-center">Import Charles Proxy settings</div>
         <div className="mt-16">
           {isParseComplete ? (
             <div className="parsed-rules-info">
-              <div className="title mt-16">
-                Successfully parsed {rulesToImport.parsedRuleTypes?.length ?? 0} Charles settings:
-              </div>
+              <div className="title mt-16">Successfully parsed below settings:</div>
               <ul>
                 {rulesToImport.parsedRuleTypes?.length > 0 &&
-                  rulesToImport.parsedRuleTypes.map((ruleType) => <li key={ruleType}>{ruleType}</li>)}
+                  rulesToImport.parsedRuleTypes.map((ruleType) => (
+                    <li key={ruleType}>
+                      <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
+                    </li>
+                  ))}
               </ul>
               {rulesToImport.isOtherRuleTypesPresent && (
                 <>
                   <Typography.Text type="secondary">
-                    Other settings cannot be imported due to technical constraints. <br />
                     {/* eslint-disable-next-line */}
-                    Learn more <a href="#">about it</a>.
+                    Other settings are not supported in Requestly. <a href="#">Learn more</a>
                   </Typography.Text>
                 </>
               )}
@@ -119,11 +141,20 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
               {validationError === CharlesRuleImportErrorMessage.INVALID_EXPORT ? (
                 <div className="parsed-rules-error-info">
                   <div className="subtitle mt-16">
-                    This setting format is not supported. Follow these steps to export settings from Charles:
+                    Invalid settings file. Follow below steps to export settings from Charles:
                   </div>
                   <ol>
-                    {validExportSteps.map((step) => (
-                      <li>{step}</li>
+                    {validExportSteps.map(({ step, additionalSteps = [] }) => (
+                      <>
+                        <li>{step}</li>
+                        {additionalSteps.length > 0 && (
+                          <ul className="additional-import-steps-list">
+                            {additionalSteps.map(({ step }) => (
+                              <li>{step}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </>
                     ))}
                   </ol>
                 </div>

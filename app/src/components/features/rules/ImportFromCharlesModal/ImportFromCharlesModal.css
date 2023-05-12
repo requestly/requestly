@@ -4,18 +4,32 @@
 
 .parsed-rules-info ul {
   margin-top: 4px;
-  padding-left: 14px;
+  padding-left: 0;
 }
 
 .parsed-rules-info li {
-  list-style: disc;
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.parsed-rules-info .check-outlined-icon {
+  color: var(--success);
+}
+
+.parsed-rules-error-info {
+  margin-top: 1.5rem;
 }
 
 .parsed-rules-error-info ol {
-  margin-top: 12px;
+  margin-top: 14px;
   padding-left: 16px;
 }
 
 .parsed-rules-error-info li {
   list-style: unset;
+}
+
+.parsed-rules-error-info .additional-import-steps-list {
+  padding-left: 1rem;
 }
