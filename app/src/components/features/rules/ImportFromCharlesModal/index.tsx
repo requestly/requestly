@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
-import { parseRulesFromCharlesXML } from "utils/charles-rule-adapters/parseRulesFromCharlesXML";
+import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { Row } from "antd";
-import { createNewGroupAndSave } from "utils/charles-rule-adapters/utils";
+import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { actions } from "store";
-import { ParsedRule } from "utils/charles-rule-adapters/types";
+import { ParsedRule } from "modules/charles-rule-adapters/types";
 
 interface ModalProps {
   isOpen: boolean;
