@@ -43,7 +43,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
     reader.onload = () => {
       const fileContent = reader.result;
       setIsDataProcessing(true);
-      console.log({ fileContent });
 
       if (!file.type.includes("xml")) {
         // stop parsing for wrong file format
@@ -56,7 +55,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
           setIsParseComplete(true);
-          console.log({ importedRules });
         })
         .catch((error) => {
           setValidationError(error.message);
@@ -67,9 +65,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   const handleCharlesRulesImport = () => {
-    console.clear();
-    console.log({ rulesToImport });
-
     const rulesImportPromises = rulesToImport?.groups?.map((group) => {
       return createNewGroupAndSave({
         appMode,
