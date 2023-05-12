@@ -14,9 +14,11 @@ import PATHS from "config/constants/sub/paths";
 import "./ImportFromCharlesModal.css";
 import {
   trackCharlesSettingsImportComplete,
+  trackCharlesSettingsImportDocsClicked,
   trackCharlesSettingsImportFailed,
   trackCharlesSettingsParsed,
 } from "modules/analytics/events/features/rules";
+import { AUTH } from "modules/analytics/events/common/constants";
 
 interface ModalProps {
   isOpen: boolean;
@@ -153,6 +155,11 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
                   <Typography.Text type="secondary">
                     {/* eslint-disable-next-line */}
                     Other settings are not supported in Requestly. <a href="#">Learn more</a>
+                    Learn more {/* TODO: fix source when adding import dropdown in rules table screen */}
+                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(AUTH.SOURCE.GETTING_STARTED)}>
+                      about it
+                    </a>
+                    .
                   </Typography.Text>
                 </>
               )}
