@@ -12,9 +12,9 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
     return;
   }
 
-  const sourcesUrls = getSourcesData(locations);
+  const sources = getSourcesData(locations);
   const { requestHeaders, responseHeaders } = getHeaders(headersConfig);
-  const exportedRules = sourcesUrls.map(({ value, status, operator }) => {
+  const exportedRules = sources.map(({ value, status, operator }) => {
     const rule = getNewRule(RuleType.HEADERS) as HeadersRule;
 
     return {
