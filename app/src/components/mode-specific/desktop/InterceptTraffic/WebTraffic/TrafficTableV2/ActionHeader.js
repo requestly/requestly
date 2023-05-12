@@ -8,6 +8,7 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -28,7 +29,10 @@ const ActionHeader = ({
   logsToSaveAsHar,
   isStaticPreview,
   isRegexSearchActive,
+  isFiltersCollapsed,
   setIsRegexSearchActive,
+  setIsFiltersCollapsed,
+  activeFiltersCount = 0,
 }) => {
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
@@ -103,6 +107,22 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
+          {/* <Col>
+            <Badge count={activeFiltersCount} size="small">
+              <RQButton
+                type="default"
+                iconOnly
+                icon={<FaFilter />}
+                onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+                className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
+              />
+            </Badge>
+          </Col> */}
+          <Col>
+            <Tooltip placement="top" title="Clear Logs">
+              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
+            </Tooltip>
+          </Col>
           {isStaticPreview ? null : (
             <>
               <Col>

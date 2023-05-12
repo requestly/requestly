@@ -59,6 +59,7 @@ import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditVie
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
+import APIClientContainer from "views/features/api-client/APIClientContainer";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -526,6 +527,13 @@ var routes = [
     name: "Mocks",
     icon: "ni ni-lock-circle-open text-red",
     component: MockListView,
+  },
+  /** API Client */
+  {
+    path: PATHS.API_CLIENT.RELATIVE,
+    name: "API Client",
+    icon: "ni ni-lock-circle-open text-red",
+    component: APIClientContainer,
   },
   /*******/
   {

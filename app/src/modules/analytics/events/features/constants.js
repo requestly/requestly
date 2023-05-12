@@ -87,12 +87,29 @@ export const MOCKSV2 = {
   MOCK_UPLOAD_WORKFLOW_STARTED: "mock_upload_workflow_started",
   MOCK_UPLOADED: "mock_uploaded",
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
+  TEST_MOCK_CLICKED: "test_mock_clicked",
 
   AI_MOCK_RESPONSE_BUTTON_CLICKED: "ai_mock_response_button_clicked",
   AI_MOCK_RESPONSE_GENERATE_CLICKED: "ai_mock_response_generate_clicked",
   AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
   AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
   AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
+};
+
+export const API_CLIENT = {
+  REQUEST_SENT: "api_client_request_sent",
+  REQUEST_CANCELLED: "api_client_request_cancelled",
+  BEAUTIFY_REQUEST_JSON_CLICKED: "api_client_beautify_request_json_clicked",
+  IMPORT_CURL_CLICKED: "api_client_import_curl_clicked",
+  CURL_IMPORTED: "api_client_curl_imported",
+  CURL_IMPORT_FAILED: "api_client_curl_import_failed",
+  NEW_REQUEST_CLICKED: "api_client_new_request_clicked",
+  REQUEST_SELECTED_FROM_HISTORY: "api_client_request_selected_from_history",
+  HISTORY_CLEARED: "api_client_history_cleared",
+  REQUEST_FAILED: "api_client_request_failed",
+  RESPONSE_LOADED: "api_client_response_loaded",
+  RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
+  RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

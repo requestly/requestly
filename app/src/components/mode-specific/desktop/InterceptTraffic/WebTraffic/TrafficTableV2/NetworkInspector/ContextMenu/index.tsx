@@ -12,14 +12,18 @@ import {
   trackTrafficTableRequestRightClicked,
 } from "modules/analytics/events/desktopApp";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import BetaBadge from "components/misc/BetaBadge";
 import "./index.css";
 
 interface ContextMenuProps {
   log: any;
   children: ReactNode;
+  onReplayRequest: () => void;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
 
@@ -41,8 +45,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
     [dispatch]
   );
 
-  const items: MenuProps["items"] = useMemo(
-    () => [
+  const items: MenuProps["items"] = useMemo(() => {
+    const menuItems: MenuProps["items"] = [
       {
         key: "copy_curl",
         label: "Copy cURL",
@@ -118,9 +122,21 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
           },
         ],
       },
-    ],
-    [log, handleOnClick]
-  );
+    ];
+
+    if (isFeatureCompatible(FEATURES.API_CLIENT)) {
+      menuItems.splice(2, 0, {
+        key: "replay_request",
+        label: <BetaBadge text="Edit and Replay" />,
+        onClick: () => {
+          trackTrafficTableDropdownClicked("replay_request");
+          onReplayRequest();
+        },
+      });
+    }
+
+    return menuItems;
+  }, [log, onReplayRequest, handleOnClick]);
 
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {

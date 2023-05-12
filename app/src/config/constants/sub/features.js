@@ -61,4 +61,7 @@ FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 FEATURES.PERSONA_SURVEY = "persona-survey";
 
 FEATURES.NETWORK_SESSIONS = "network-sessions";
+// API CLIENT
+FEATURES.API_CLIENT = "api-client";
+
 export default FEATURES;

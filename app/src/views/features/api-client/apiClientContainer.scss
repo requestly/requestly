@@ -1,0 +1,23 @@
+.api-client-container {
+  height: 100%;
+  display: flex;
+
+  .api-client-sidebar {
+    width: 300px;
+    flex: 0 0 auto;
+    border-right: 1px solid var(--border-dark);
+  }
+
+  .api-client-view {
+    flex: auto;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.import-modal {
+  textarea.curl-command-input {
+    height: 400px;
+    resize: none;
+  }
+}

@@ -11,6 +11,7 @@ import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
+import { LogFilter } from "./LogFilter";
 import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
@@ -20,17 +21,22 @@ import { desktopTrafficTableActions } from "store/features/desktop-traffic-table
 import { getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
+import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import { trackTrafficTableLogsCleared, trackTrafficTableRequestClicked } from "modules/analytics/events/desktopApp";
 import {
   trackSidebarFilterCollapsed,
   trackSidebarFilterExpanded,
   trackSidebarFilterSelected,
+  trackSidebarFilterClearAllClicked,
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
-import { getConnectedAppsCount } from "utils/Misc";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
+import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
   logs = [],
@@ -68,8 +74,14 @@ const CurrentTrafficTable = ({
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
-  const [filterType, setFilterType] = useState(null);
+  const [filterTypes, setFilterTypes] = useState({});
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
+  const [logFilters, setLogFilters] = useState({
+    statusCode: [],
+    resourceType: [],
+    method: [],
+  });
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -104,18 +116,18 @@ const CurrentTrafficTable = ({
     setIsPreviewOpen(visible);
 
     if (visible) {
-      setRulePaneSizes([60, 40]);
+      setRulePaneSizes([55, 45]);
       return;
     }
 
     setRulePaneSizes([100, 0]);
   };
 
-  const handleRowClick = (row) => {
+  const handleRowClick = useCallback((row) => {
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
     trackTrafficTableRequestClicked();
-  };
+  }, []);
 
   const handleClosePane = () => {
     handlePreviewVisibility(false);
@@ -239,7 +251,8 @@ const CurrentTrafficTable = ({
       if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
 
-        printLogsToConsole(rqLog);
+        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+        // printLogsToConsole(rqLog);
 
         if (isTablePeristenceEnabled) {
           saveLogInRedux(rqLog);
@@ -271,26 +284,55 @@ const CurrentTrafficTable = ({
     };
   }, [isStaticPreview]);
 
+  const activeFiltersCount = useMemo(
+    () => Object.values(logFilters).reduce((current, filter) => current + filter.length, 0),
+    [logFilters]
+  );
+
+  const getFilteredLogs = useCallback(
+    (logs) => {
+      const isLogFilterApplied = Object.values(logFilters).some((prop) => prop.length > 0);
+      if (isLogFilterApplied) {
+        return logs.filter((log) => {
+          if (logFilters.statusCode.length && !logFilters.statusCode.includes(log?.response?.statusCode?.toString())) {
+            return false;
+          }
+          if (logFilters.resourceType.length && !logFilters.resourceType.includes(log?.response?.contentType)) {
+            return false;
+          }
+          if (logFilters.method.length && !logFilters.method.includes(log?.request?.method)) {
+            return false;
+          }
+
+          return true;
+        });
+      }
+      return null;
+    },
+    [logFilters]
+  );
+
   const getSearchedLogs = useCallback(
     (logs, searchKeyword) => {
+      let networkLogs = getFilteredLogs(logs) || logs;
       if (searchKeyword) {
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (isRegexSearchActive) {
             reg = new RegExp(searchKeyword);
-            return logs.filter((log) => log.url.match(reg));
+            return networkLogs.filter((log) => log.url.match(reg));
           } else {
-            return logs.filter((log) => log.url.includes(searchKeyword));
+            return networkLogs.filter((log) => log.url.includes(searchKeyword));
           }
         } catch (err) {
           Logger.log(err);
         }
       }
 
-      return logs;
+      return networkLogs;
     },
-    [isRegexSearchActive]
+    [isRegexSearchActive, getFilteredLogs]
   );
 
   const getRequestLogs = useCallback(
@@ -332,32 +374,60 @@ const CurrentTrafficTable = ({
   const { appList, appLogs } = useMemo(() => getAppLogs(), [getAppLogs]);
   const { domainList, domainLogs } = useMemo(() => getDomainLogs(), [getDomainLogs]);
 
-  const getGroupLogs = () => {
-    const [logType, filter] = filterType?.split(" ") ?? [];
-    const logs = (filterType ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : requestLogs) || [];
-    const searchedLogs = getSearchedLogs(logs, searchKeyword);
+  const getGroupLogs = useMemo(
+    () => () => {
+      const logs = Object.values(filterTypes).reduce((logs, filterType) => {
+        const [logType, filter] = filterType?.split(" ") ?? [];
+        const filteredLogs = filter ? (logType === "app" ? appLogs[filter] : domainLogs[filter]) : [];
+        return [...logs, ...(filteredLogs ?? [])];
+      }, []);
 
-    return (
-      <GroupByNone
-        requestsLog={searchedLogs}
-        handleRowClick={handleRowClick}
-        emptyCtaText={emptyCtaText}
-        emptyCtaAction={emptyCtaAction}
-        emptyDesc={emptyDesc}
-        searchKeyword={searchKeyword}
-      />
-    );
-  };
+      // remove logs with same id
+      const filteredLogs = logs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
+      const allLogs = Object.values(filteredLogs).length > 0 ? Object.values(filteredLogs) : requestLogs;
+      const searchedLogs = getSearchedLogs(allLogs, searchKeyword);
 
-  const handleClearFilter = useCallback((e) => {
-    e.stopPropagation();
-    setFilterType(null);
-  }, []);
+      return (
+        <GroupByNone
+          requestsLog={searchedLogs}
+          handleRowClick={handleRowClick}
+          emptyCtaText={emptyCtaText}
+          emptyCtaAction={emptyCtaAction}
+          emptyDesc={emptyDesc}
+          searchKeyword={searchKeyword}
+          logFilters={logFilters}
+        />
+      );
+    },
+    [
+      appLogs,
+      domainLogs,
+      emptyCtaAction,
+      emptyCtaText,
+      emptyDesc,
+      filterTypes,
+      getSearchedLogs,
+      handleRowClick,
+      logFilters,
+      requestLogs,
+      searchKeyword,
+    ]
+  );
+
+  const handleClearFilter = useCallback(
+    (e, key) => {
+      e.stopPropagation();
+
+      const updatedFilterTypes = JSON.parse(JSON.stringify(filterTypes));
+      delete updatedFilterTypes[key];
+      setFilterTypes(updatedFilterTypes);
+    },
+    [filterTypes]
+  );
 
   const getLogAvatar = useCallback(
-    (logName = "", avatarUrl) => {
-      const filter = filterType?.split(" ")?.[1] ?? [];
-      const isSelected = logName === filter;
+    (key, logName = "", avatarUrl) => {
+      const isSelected = key in filterTypes;
 
       return (
         <>
@@ -370,7 +440,7 @@ const CurrentTrafficTable = ({
                   size="small"
                   shape="circle"
                   icon={<CloseOutlined />}
-                  onClick={handleClearFilter}
+                  onClick={(e) => handleClearFilter(e, key)}
                   className="clear-log-filter-btn"
                 />
               </Tooltip>
@@ -379,25 +449,25 @@ const CurrentTrafficTable = ({
         </>
       );
     },
-    [filterType, handleClearFilter]
+    [filterTypes, handleClearFilter]
   );
 
   const getApplogAvatar = useCallback(
-    (logName) => {
+    (key, logName) => {
       const logNameURI = decodeURIComponent(logName.trim());
       const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
-      return getLogAvatar(logNameURI, avatarUrl);
+      return getLogAvatar(key, logNameURI, avatarUrl);
     },
     [getLogAvatar]
   );
 
   const getDomainLogAvatar = useCallback(
-    (logName) => {
+    (key, logName) => {
       const domainParts = logName.trim().split(".");
       const avatarDomain = domainParts.splice(domainParts.length - 2, 2).join(".");
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
-      return getLogAvatar(logName, avatarUrl);
+      return getLogAvatar(key, logName, avatarUrl);
     },
     [getLogAvatar]
   );
@@ -406,7 +476,7 @@ const CurrentTrafficTable = ({
     (apps) => {
       return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
         key: `${logType.APP} ${appName}`,
-        label: getApplogAvatar(appName),
+        label: getApplogAvatar(`${logType.APP} ${appName}`, appName),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
         },
@@ -419,7 +489,7 @@ const CurrentTrafficTable = ({
     (domains) => {
       return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
         key: `${logType.DOMAIN} ${domain}`,
-        label: getDomainLogAvatar(domain),
+        label: getDomainLogAvatar(`${logType.DOMAIN} ${domain}`, domain),
         onClick: () => {
           trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
         },
@@ -441,8 +511,22 @@ const CurrentTrafficTable = ({
     [expandedLogTypes]
   );
 
-  const items = useMemo(
-    () => [
+  const isFilterApplied = useMemo(() => Object.values(filterTypes).length > 0, [filterTypes]);
+
+  const items = useMemo(() => {
+    return [
+      {
+        key: "clear_all",
+        label: (
+          <span className="clear-all-filter-option">
+            Clear all <CloseOutlined style={{ marginLeft: "8px" }} />
+          </span>
+        ),
+        onClick: () => {
+          setFilterTypes({});
+          trackSidebarFilterClearAllClicked(ANALYTIC_EVENT_SOURCE, Object.values(filterTypes).length);
+        },
+      },
       {
         key: logType.APP,
         label: `Apps (${appList?.length ?? 0})`,
@@ -455,26 +539,31 @@ const CurrentTrafficTable = ({
         children: getDomainLogsMenuItem(domainList),
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
-    ],
-    [appList, domainList, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]
-  );
+    ];
+  }, [appList, domainList, filterTypes, handleSubMenuTitleClick, getAppLogsMenuItem, getDomainLogsMenuItem]);
 
-  const handleSidebarMenuItemClick = useCallback((e) => setFilterType(e.key), []);
   const stableGetLogsToExport = useMemo(() => {
     const logsToExport = getSearchedLogs(newLogs, searchKeyword);
     return createLogsHar(logsToExport);
   }, [getSearchedLogs, newLogs, searchKeyword]);
+
+  const handleSidebarMenuItemClick = useCallback((e) => {
+    if (e.key === "clear_all") return;
+    setFilterTypes((prev) => ({ ...prev, [e.key]: e.key }));
+  }, []);
+
   return (
     <>
       <Row wrap={false}>
-        <Col flex="197px" className="traffic-table-sidebar">
+        <Col flex="197px" style={isFilterApplied ? { paddingTop: "8px" } : {}} className="traffic-table-sidebar">
           <Menu
             theme="dark"
             mode="inline"
             items={items}
             openKeys={expandedLogTypes}
             onClick={handleSidebarMenuItemClick}
-            selectedKeys={filterType ? [filterType] : []}
+            selectedKeys={Object.values(filterTypes)}
+            className={isFilterApplied ? "filter-applied" : ""}
           />
         </Col>
         <Col flex="auto">
@@ -491,6 +580,9 @@ const CurrentTrafficTable = ({
               isStaticPreview={isStaticPreview}
               setIsRegexSearchActive={setIsRegexSearchActive}
               isRegexSearchActive={isRegexSearchActive}
+              isFiltersCollapsed={isFiltersCollapsed}
+              setIsFiltersCollapsed={setIsFiltersCollapsed}
+              activeFiltersCount={activeFiltersCount}
             />
             {isStaticPreview ? (
               <Tag>{logs.length} requests</Tag>
@@ -498,51 +590,92 @@ const CurrentTrafficTable = ({
               <Tag>{newLogs.length} requests</Tag>
             ) : null}
           </Row>
-          <Split
-            sizes={rulePaneSizes}
-            minSize={[75, 0]}
-            gutterSize={gutterSize}
-            dragInterval={20}
-            direction="vertical"
-            cursor="row-resize"
-            className="traffic-table-split-container"
-          >
-            <Row className="gap-case-1" style={{ overflow: "hidden" }}>
-              <ProCard
-                className="primary-card github-like-border network-table-wrapper-override"
-                style={{
-                  boxShadow: "none",
-                  // borderBottom: "2px solid #f5f5f5",
-                  borderRadius: "0",
-                  paddingBottom: "0",
-                }}
-              >
-                {getGroupLogs()}
-              </ProCard>
-            </Row>
-
-            <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
-              <ProCard
-                className="primary-card github-like-border"
-                style={{
-                  boxShadow: "none",
-                  borderRadius: "0",
-                  // borderTop: "2px solid #f5f5f5",
-                }}
-                bodyStyle={{ padding: "0px 20px" }}
-              >
-                <FixedRequestLogPane
-                  selectedRequestData={{
-                    ...selectedRequestData,
-                    response: { ...selectedRequestData.response, body: selectedRequestResponse },
-                  }}
-                  upsertRequestAction={upsertRequestAction}
-                  handleClosePane={handleClosePane}
-                  visibility={isPreviewOpen}
+          {!isFiltersCollapsed && (
+            <Row className="traffic-table-filters-container">
+              <section>
+                <LogFilter
+                  filterId="filter-method"
+                  filterLabel="Method"
+                  filterPlaceholder="Filter by method"
+                  options={METHOD_TYPE_OPTIONS}
+                  value={logFilters.method}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, method: options }))}
                 />
-              </ProCard>
+                <LogFilter
+                  filterId="filter-status-code"
+                  filterLabel="Status code"
+                  filterPlaceholder="Filter by status code"
+                  options={STATUS_CODE_ONLY_OPTIONS}
+                  value={logFilters.statusCode}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, statusCode: options }))}
+                />
+                <LogFilter
+                  filterId="filter-resource-type"
+                  filterLabel="Content type"
+                  filterPlaceholder="Filter by content type"
+                  options={CONTENT_TYPE_OPTIONS}
+                  value={logFilters.resourceType}
+                  handleFilterChange={(options) => setLogFilters((filter) => ({ ...filter, resourceType: options }))}
+                />
+              </section>
+              <RQButton
+                type="primary"
+                className="clear-logs-filter-btn"
+                onClick={() => {
+                  setLogFilters({ statusCode: [], resourceType: [], method: [] });
+                }}
+              >
+                Clear
+              </RQButton>
             </Row>
-          </Split>
+          )}
+          <div className={!isPreviewOpen && "hide-traffic-table-split-gutter"}>
+            <Split
+              sizes={rulePaneSizes}
+              minSize={[75, 0]}
+              gutterSize={gutterSize}
+              dragInterval={20}
+              direction="vertical"
+              cursor="row-resize"
+              className="traffic-table-split-container"
+            >
+              <Row className="gap-case-1" style={{ overflow: "hidden" }}>
+                <ProCard
+                  className="primary-card github-like-border network-table-wrapper-override"
+                  style={{
+                    boxShadow: "none",
+                    // borderBottom: "2px solid #f5f5f5",
+                    borderRadius: "0",
+                    paddingBottom: "0",
+                  }}
+                >
+                  {getGroupLogs()}
+                </ProCard>
+              </Row>
+
+              <Row className="request-log-pane-container" style={{ overflow: "auto", height: "100%" }}>
+                <ProCard
+                  className="primary-card github-like-border"
+                  style={{
+                    boxShadow: "none",
+                    borderRadius: "0",
+                    // borderTop: "2px solid #f5f5f5",
+                  }}
+                  bodyStyle={{ padding: "0px 20px" }}
+                >
+                  <FixedRequestLogPane
+                    selectedRequestData={{
+                      ...selectedRequestData,
+                      response: { ...selectedRequestData.response, body: selectedRequestResponse },
+                    }}
+                    upsertRequestAction={upsertRequestAction}
+                    handleClosePane={handleClosePane}
+                    visibility={isPreviewOpen}
+                  />
+                </ProCard>
+              </Row>
+            </Split>
+          </div>
 
           {/* ssl proxying is currently hidden */}
           <SSLProxyingModal isVisible={isSSLProxyingModalVisible} setIsVisible={setIsSSLProxyingModalVisible} />

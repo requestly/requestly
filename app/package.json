@@ -49,7 +49,7 @@
     "@devtools-ds/themes": "^1.2.1",
     "@growthbook/growthbook-react": "^0.13.0",
     "@monaco-editor/react": "^4.4.6",
-    "@reduxjs/toolkit": "^1.8.3",
+    "@reduxjs/toolkit": "^1.9.0",
     "@requestly/mock-server": "^0.0.1",
     "@requestly/requestly-core": "file:..",
     "@requestly/rq-common": "^1.0.2",
@@ -116,8 +116,10 @@
     "typewriter-effect": "^2.19.0",
     "ua-parser-js": "^1.0.2",
     "unique-names-generator": "^4.7.1",
+    "util": "^0.12.5",
     "uuid": "^8.3.2",
-    "validator": "^13.7.0"
+    "validator": "^13.7.0",
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
     "@requestly/web-sdk": "0.12.1",
