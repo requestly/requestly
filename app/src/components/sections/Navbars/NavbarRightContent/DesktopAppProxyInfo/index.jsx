@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getDesktopSpecificDetails, getIsConnectedAppsTourCompleted } from "store/selectors";
+import { getAllLogs } from "store/features/desktop-traffic-table/selectors";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
@@ -12,19 +13,27 @@ import { actions } from "store";
 import { trackConnectAppsClicked } from "modules/analytics/events/desktopApp/apps";
 import { getConnectedAppsCount } from "utils/Misc";
 import FEATURES from "config/constants/sub/features";
-import { shouldShowConnectedAppsTour } from "layouts/DashboardLayout/MenuHeader/utils";
 
 const DesktopAppProxyInfo = () => {
   // Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
+  const networkLogs = useSelector(getAllLogs);
   const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
-
   const { isBackgroundProcessActive, isProxyServerRunning, proxyPort, proxyIp, appsList } = desktopSpecificDetails;
 
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
+
+  const hasInterceptionStarted = useRef(false);
+
+  useEffect(() => {
+    if (!hasInterceptionStarted.current && networkLogs.length > 0) {
+      setStartWalkthrough(true);
+      hasInterceptionStarted.current = true;
+    }
+  }, [networkLogs.length]);
 
   useEffect(() => {
     setNumberOfConnectedApps(getConnectedAppsCount(Object.values(appsList)));
@@ -38,8 +47,6 @@ const DesktopAppProxyInfo = () => {
   };
 
   const handleConnectAppsButtonClick = () => {
-    if (!isConnectedAppsTourCompleted)
-      dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.CONNECTED_APPS }));
     dispatch(
       actions.toggleActiveModal({
         modalName: "connectedAppsModal",
@@ -50,17 +57,7 @@ const DesktopAppProxyInfo = () => {
     trackConnectAppsClicked("app_header");
   };
 
-  const ProxyStatusText = () => {
-    useEffect(() => {
-      if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-        shouldShowConnectedAppsTour(appMode).then((result) => {
-          if (result) {
-            setStartWalkthrough(true);
-          }
-        });
-      }
-    }, []);
-
+  const renderProxyStatusText = () => {
     if (!isBackgroundProcessActive)
       return <span className="proxy-status-text">Waiting for proxy server to start...</span>;
 
@@ -94,7 +91,7 @@ const DesktopAppProxyInfo = () => {
     <>
       <div className="desktop-app-proxy-info">
         <>{renderProxyBadgeStatus()}</>
-        <ProxyStatusText />
+        <>{renderProxyStatusText()}</>
       </div>
     </>
   );
