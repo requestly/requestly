@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { HeaderRuleActionType, Rule, SourceOperator } from "types";
 
 export enum CharlesRuleImportErrorMessage {
@@ -7,12 +5,6 @@ export enum CharlesRuleImportErrorMessage {
   INVALID_EXPORT = "Not a valid Charles export!",
   SETTINGS_NOT_FOUND = "No Charles settings found in a file!",
 }
-=======
-import { HeaderRuleActionType, Rule } from "types";
->>>>>>> 46f7b913 (move charles adapters in modules)
-=======
-import { HeaderRuleActionType, Rule, SourceOperator } from "types";
->>>>>>> 92754e8e (fix: empty group issue)
 
 export enum WhereToApplyRule {
   BOTH = "both",
@@ -70,21 +62,12 @@ export type SourceUrl = {
   location: Location;
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 92754e8e (fix: empty group issue)
 export type SourceData = {
   value: string;
   status: boolean;
   operator: SourceOperator;
 };
 
-<<<<<<< HEAD
-=======
->>>>>>> 46f7b913 (move charles adapters in modules)
-=======
->>>>>>> 92754e8e (fix: empty group issue)
 export type ParsedRule<T = Rule> =
   | {
       groups?: {
@@ -95,23 +78,12 @@ export type ParsedRule<T = Rule> =
     }
   | undefined;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type ParsedRulesFromChalres = {
   groups?: ParsedRule["groups"];
   parsedRuleTypes?: CharlesRuleType[];
   isOtherRuleTypesPresent?: boolean;
 };
 
-=======
->>>>>>> 46f7b913 (move charles adapters in modules)
-=======
-export type ParsedRulesFromChalres = {
-  groups?: ParsedRule["groups"];
-  parsedRuleTypes?: CharlesRuleType[];
-};
-
->>>>>>> 92754e8e (fix: empty group issue)
 // rules
 export type NoCachingRule = {
   string: string;
