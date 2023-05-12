@@ -15,7 +15,6 @@ import { trackWalkthroughCompleted } from "modules/analytics/events/misc/product
 import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 import BetaBadge from "components/misc/BetaBadge";
 import "./index.css";
 
