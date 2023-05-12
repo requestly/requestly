@@ -168,7 +168,8 @@ const GettingStarted = () => {
                     </RQButton>
                   </AuthConfirmationPopover>
 
-                  {isCharlesImportFeatureFlagOn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+                  {/* TODO: make desktop only */}
+                  {isCharlesImportFeatureFlagOn ? (
                     <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
                       Import settings from Charles Proxy
                     </RQButton>
