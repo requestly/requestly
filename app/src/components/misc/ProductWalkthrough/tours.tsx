@@ -79,11 +79,6 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 7,
       disableOverlayClose: false,
-      styles: {
-        options: {
-          overlayColor: "rgba(0, 0, 0, 0)",
-        },
-      },
     },
   ],
 };
