@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Row, Typography } from "antd";
+import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
-import { Row, Typography } from "antd";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
-import { actions } from "store";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
 import "./ImportFromCharlesModal.css";
 
@@ -35,11 +35,9 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
 
   const onFilesDrop = async (files: File[]) => {
     const file = files[0];
-    console.log({ file });
     const reader = new FileReader();
 
     reader.onerror = () => setValidationError("Could not process the selected file! Try again.");
-
     reader.onload = () => {
       const fileContent = reader.result;
       setIsDataProcessing(true);
