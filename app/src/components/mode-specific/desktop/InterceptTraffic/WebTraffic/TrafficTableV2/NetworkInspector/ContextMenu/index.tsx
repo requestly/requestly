@@ -11,6 +11,8 @@ import {
   trackTrafficTableDropdownClicked,
   trackTrafficTableRequestRightClicked,
 } from "modules/analytics/events/desktopApp";
+import { trackWalkthroughCompleted } from "modules/analytics/events/misc/productWalkthrough";
+import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import "./index.css";
 
@@ -127,6 +129,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {} }) 
       trackTrafficTableRequestRightClicked();
       if (!isTrafficTableTourCompleted) {
         dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }));
+        trackWalkthroughCompleted(FEATURES.DESKTOP_APP_TRAFFIC_TABLE);
       }
     }
   };
