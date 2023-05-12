@@ -42,6 +42,14 @@ export const RULES = {
     FAILED: "rules_import_failed",
     JSON_PARSED: "rules_json_parsed",
   },
+
+  CHARLES_SETTINGS: {
+    CHARLES_SETTINGS_IMPORT_STARTED: "charles_settings_import_started",
+    CHARLES_SETTINGS_PARSED: "charles_settings_parsed",
+    CHARLES_SETTINGS_IMPORT_FAILED: "charles_settings_import_failed",
+    CHARLES_SETTINGS_IMPORT_COMPLETE: "charles_settings_import_completed",
+    CHARLES_SETTINGS_IMPORT_DOCS_CLICKED: "charles_settings_import_docs_clicked",
+  },
 };
 
 export const MOCK_SERVER = {

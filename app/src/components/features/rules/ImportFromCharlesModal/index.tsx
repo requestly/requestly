@@ -12,6 +12,11 @@ import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
 import "./ImportFromCharlesModal.css";
+import {
+  trackCharlesSettingsImportComplete,
+  trackCharlesSettingsImportFailed,
+  trackCharlesSettingsParsed,
+} from "modules/analytics/events/features/rules";
 
 interface ModalProps {
   isOpen: boolean;
@@ -56,7 +61,11 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
     const file = files[0];
     const reader = new FileReader();
 
-    reader.onerror = () => setValidationError("Could not process the selected file! Try again.");
+    reader.onerror = () => {
+      setValidationError("Could not process the selected file! Try again.");
+      trackCharlesSettingsImportFailed("error reading the imported file");
+    };
+
     reader.onload = () => {
       const fileContent = reader.result;
       setIsDataProcessing(true);
@@ -65,6 +74,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         // stop parsing for wrong file format
         setIsDataProcessing(false);
         setValidationError("Failed to parse Charles proxy settings file.");
+        trackCharlesSettingsImportFailed("wrong file format imported");
+
         return;
       }
       parseRulesFromCharlesXML(fileContent as string)
@@ -72,9 +83,15 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
           setIsParseComplete(true);
+          trackCharlesSettingsParsed(
+            importedRules.parsedRuleTypes.length,
+            importedRules.parsedRuleTypes.length === 1 ? "single rule" : "multiple rules"
+          );
+          console.log({ importedRules });
         })
         .catch((error) => {
           setValidationError(error.message);
+          trackCharlesSettingsImportFailed(error.message);
           setIsDataProcessing(false);
         });
     };
@@ -89,7 +106,10 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         status: group.status,
         groupName: group.name,
         onSuccess: () => {},
-        onError: () => setValidationError("Something went wrong while importing your settings! Try again."), // TODO: validations
+        onError: () => {
+          setValidationError("Something went wrong while importing your settings! Try again.");
+          trackCharlesSettingsImportFailed("error on saving the parsed rules in storage");
+        }, // TODO: validations
       });
     });
 
@@ -102,6 +122,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       );
 
       navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
+      trackCharlesSettingsImportComplete(rulesToImport.parsedRuleTypes.length, rulesToImport.parsedRuleTypes);
       toggle();
     });
   };
