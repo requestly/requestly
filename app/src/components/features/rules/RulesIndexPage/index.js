@@ -132,7 +132,7 @@ const RulesIndexPage = () => {
       <MigrationCheckModal />
       <StorageMigrationCheckModal />
       {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
-        rules.length !== 0 || groups.length !== 0 ? (
+        rules?.length > 0 || groups?.length > 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
         ) : (
           <CreateFirstRule />
