@@ -1,5 +1,11 @@
 import { HeaderRuleActionType, Rule, SourceOperator } from "types";
 
+export enum CharlesRuleImportErrorMessage {
+  EMPTY_FILE = "Imported file is empty!",
+  INVALID_EXPORT = "Not a valid Charles export!",
+  SETTINGS_NOT_FOUND = "No Charles settings found in a file!",
+}
+
 export enum WhereToApplyRule {
   BOTH = "both",
   REQUEST = "request",
@@ -75,6 +81,7 @@ export type ParsedRule<T = Rule> =
 export type ParsedRulesFromChalres = {
   groups?: ParsedRule["groups"];
   parsedRuleTypes?: CharlesRuleType[];
+  isOtherRuleTypesPresent?: boolean;
 };
 
 // rules
