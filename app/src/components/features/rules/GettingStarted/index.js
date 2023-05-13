@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ImportRulesModal from "../ImportRulesModal";
+import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -14,7 +17,6 @@ import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modul
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
 
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const { PATHS } = APP_CONSTANTS;
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
@@ -27,12 +29,18 @@ const GettingStarted = () => {
   const appMode = useSelector(getAppMode);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
+  const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
+
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
 
   const toggleImportRulesModal = () => {
-    setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
+    setIsImportRulesModalActive((prev) => !prev);
+  };
+  const toggleImportCharlesRulesModal = () => {
+    setIsImportCharlesRulesModalActive((prev) => !prev);
   };
 
   const handleLoginOnClick = () => {
@@ -136,7 +144,7 @@ const GettingStarted = () => {
                 <p className="text-gray getting-started-subtitle">
                   Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
                 </p>
-                <div>
+                <div className="getting-started-btns-wrapper">
                   <Button
                     type="primary"
                     onClick={handleCreateMyFirstRuleClick}
@@ -159,6 +167,13 @@ const GettingStarted = () => {
                       Upload rules
                     </RQButton>
                   </AuthConfirmationPopover>
+
+                  {/* TODO: make desktop only */}
+                  {isCharlesImportFeatureFlagOn ? (
+                    <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
+                      Import settings from Charles Proxy
+                    </RQButton>
+                  ) : null}
                 </div>
               </div>
 
@@ -175,6 +190,9 @@ const GettingStarted = () => {
           </Col>
         </Row>
       )}
+      {isImportCharlesRulesModalActive ? (
+        <ImportFromCharlesModal isOpen={isImportCharlesRulesModalActive} toggle={toggleImportCharlesRulesModal} />
+      ) : null}
 
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />

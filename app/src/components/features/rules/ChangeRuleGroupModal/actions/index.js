@@ -10,16 +10,16 @@ import { getSelectedRules } from "../../actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
 
-export const createNewGroup = (appMode, newGroupName, callback, user) => {
+export const createNewGroup = (appMode, newGroupName, callback, user, status = GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE) => {
   const newGroupId = `Group_${generateObjectId()}`;
 
   const newGroupObject = {
-    creationDate: generateObjectCreationDate(),
-    description: "",
+    status,
     id: newGroupId,
     name: newGroupName,
+    description: "",
+    creationDate: generateObjectCreationDate(),
     objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP,
-    status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
   };
 
   Logger.log("Writing storage in createNewGroup");

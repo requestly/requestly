@@ -36,11 +36,10 @@
   margin-top: 1.25rem;
   margin-bottom: 1.75rem;
 }
-
-.getting-started-create-rule-btn {
-  margin-right: 12px;
+.getting-started-btns-wrapper {
+  display: flex;
+  gap: 12px;
 }
-
 .getting-started-subtitle {
   margin-bottom: 8px;
 }
