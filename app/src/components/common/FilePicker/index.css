@@ -1,0 +1,28 @@
+.file-picker-wrapper,
+.file-picker-wrapper-active {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed var(--border);
+  border-radius: var(--border-radius-sm);
+  padding: 40px 0;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+.file-picker-wrapper-active {
+  border-color: var(--white);
+  background: var(--component-background);
+}
+
+.file-picker-wrapper .file-picker-icon-lg,
+.file-picker-wrapper-active .file-picker-icon-lg {
+  font-size: 3rem;
+}
+
+.file-picker-wrapper .file-picker-icon-title,
+.file-picker-wrapper-active .file-picker-icon-title {
+  font-size: 1rem;
+}

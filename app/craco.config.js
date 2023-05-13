@@ -33,6 +33,9 @@ module.exports = {
       resolve: {
         extensions: [".d.ts", ".ts", ".tsx", ".js", ".jsx"],
         fallback: {
+          buffer: require.resolve("buffer/"),
+          timers: require.resolve("timers-browserify"),
+          stream: require.resolve("stream-browserify"),
           "process/browser": require.resolve("process/browser"),
           util: require.resolve("util"),
           path: false,
