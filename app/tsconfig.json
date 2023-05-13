@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "build",
     "target": "es5",
+    "lib": ["es2021", "dom"],
     "module": "esnext",
     "jsx": "react-jsx",
     "allowJs": true,
