@@ -139,14 +139,14 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
             <div className="parsed-rules-info">
               <div className="title mt-16">Successfully parsed below settings:</div>
               <ul>
-                {rulesToImport.parsedRuleTypes?.length > 0 &&
+                {rulesToImport?.parsedRuleTypes?.length > 0 &&
                   rulesToImport.parsedRuleTypes.map((ruleType) => (
                     <li key={ruleType}>
                       <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
                     </li>
                   ))}
               </ul>
-              {rulesToImport.isOtherRuleTypesPresent && (
+              {rulesToImport?.isOtherRuleTypesPresent && (
                 <>
                   <Typography.Text type="secondary">
                     {/* eslint-disable-next-line */}
