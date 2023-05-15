@@ -44,7 +44,7 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
-export const getEmptyAPIEntry = (): RQAPI.Entry => {
+export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   return {
     request: {
       url: DEMO_API_URL,
@@ -53,6 +53,7 @@ export const getEmptyAPIEntry = (): RQAPI.Entry => {
       headers: [],
       body: null,
       contentType: RequestContentType.RAW,
+      ...(request || {}),
     },
     response: null,
   };

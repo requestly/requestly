@@ -5,9 +5,7 @@ export enum RequestMethod {
   PATCH = "PATCH",
   DELETE = "DELETE",
   HEAD = "HEAD",
-  CONNECT = "CONNECT",
   OPTIONS = "OPTIONS",
-  TRACE = "TRACE",
 }
 
 export enum RequestContentType {

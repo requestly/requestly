@@ -20,17 +20,6 @@ export const fileTypeColorMap = {
   [FileType.IMAGE]: "#00C8AF",
 };
 
-export const mockMethodColorMap: { [key: string]: string } = {
-  GET: "#00C8AF",
-  POST: "#1E69FF",
-  PUT: "#FF6905",
-  DELETE: "#FC6675",
-  PATCH: "#FFCA5F",
-  HEAD: "#BEAAFF",
-  OPTIONS: "#57BEE6",
-  default: "#00C8AF",
-};
-
 export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSchema): RQMockSchema => {
   // Add content-type Header to Response
   mockEditorData.headers = {
