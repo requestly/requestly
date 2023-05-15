@@ -81,7 +81,7 @@ export type ParsedRule<T = Rule> =
 export type ParsedRulesFromChalres = {
   groups?: ParsedRule["groups"];
   parsedRuleTypes?: CharlesRuleType[];
-  isOtherRuleTypesPresent?: boolean;
+  otherRuleTypesCount?: number;
 };
 
 // rules
