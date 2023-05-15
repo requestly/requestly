@@ -14,7 +14,11 @@ import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
 import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
-import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
+import {
+  trackCharlesSettingsImportStarted,
+  trackRulesImportStarted,
+  trackUploadRulesButtonClicked,
+} from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -170,7 +174,13 @@ const GettingStarted = () => {
 
                   {/* TODO: make desktop only */}
                   {isCharlesImportFeatureFlagOn ? (
-                    <RQButton type="default" onClick={() => toggleImportCharlesRulesModal()}>
+                    <RQButton
+                      type="default"
+                      onClick={() => {
+                        toggleImportCharlesRulesModal();
+                        trackCharlesSettingsImportStarted(AUTH.SOURCE.GETTING_STARTED);
+                      }}
+                    >
                       Import settings from Charles Proxy
                     </RQButton>
                   ) : null}
