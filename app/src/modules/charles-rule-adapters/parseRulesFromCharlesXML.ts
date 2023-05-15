@@ -85,7 +85,7 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
       return {
         groups: groupsToBeImported,
         parsedRuleTypes: filteredRuleTypes,
-        isOtherRuleTypesPresent: filteredRuleTypes.length < Object.keys(recordsObject).length,
+        otherRuleTypesCount: Object.keys(recordsObject).length - filteredRuleTypes.length,
       } as ParsedRulesFromChalres;
     });
 };

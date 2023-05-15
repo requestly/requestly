@@ -78,7 +78,6 @@ export const createNewGroupAndSave = ({
       groupName,
       (groupId: string) => {
         const updatedRules = rules.map((rule) => ({ ...rule, groupId }));
-
         StorageService(appMode)
           .saveMultipleRulesOrGroups(updatedRules)
           .then(() => {
