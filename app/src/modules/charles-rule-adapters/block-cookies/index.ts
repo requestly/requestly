@@ -19,7 +19,7 @@ export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<Hea
     return {
       ...rule,
       name: `${value}`,
-      isCharlesExported: true,
+      isCharlesImport: true,
       status: status ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
         {
