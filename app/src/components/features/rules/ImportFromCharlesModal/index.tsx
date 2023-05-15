@@ -51,6 +51,7 @@ const validExportSteps = [
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
   const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
@@ -101,6 +102,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   const handleCharlesRulesImport = () => {
+    setIsLoading(true);
+
     const rulesImportPromises = rulesToImport?.groups?.map((group) => {
       return createNewGroupAndSave({
         appMode,
@@ -115,18 +118,20 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       });
     });
 
-    Promise.all(rulesImportPromises).then(() => {
-      dispatch(
-        actions.updateRefreshPendingStatus({
-          type: "rules",
-          newValue: !isRulesListRefreshPending,
-        })
-      );
+    Promise.all(rulesImportPromises)
+      .then(() => {
+        dispatch(
+          actions.updateRefreshPendingStatus({
+            type: "rules",
+            newValue: !isRulesListRefreshPending,
+          })
+        );
 
-      trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
-      navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-      toggle();
-    });
+        trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
+        navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
+        toggle();
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleResetImport = () => {
@@ -205,7 +210,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       {isParseComplete ? (
         <div className="rq-modal-footer">
           <Row justify="end">
-            <RQButton type="primary" onClick={handleCharlesRulesImport}>
+            <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
               Import
             </RQButton>
           </Row>
