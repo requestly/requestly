@@ -28,24 +28,24 @@ export const trackRulesJsonParsed = (params) => {
 
 export const trackCharlesSettingsImportStarted = (source) => {
   const params = { source };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
+  trackEvent(CHARLES_SETTINGS.IMPORT_STARTED, params);
 };
 export const trackCharlesSettingsImportFailed = (cause) => {
   const params = { cause };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
+  trackEvent(CHARLES_SETTINGS.IMPORT_FAILED, params);
 };
 
 export const trackCharlesSettingsParsed = (type) => {
   const params = { type };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
+  trackEvent(CHARLES_SETTINGS.PARSED, params);
 };
 
 export const trackCharlesSettingsImportComplete = (settingTypes) => {
   const params = { settingTypes };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
+  trackEvent(CHARLES_SETTINGS.IMPORT_COMPLETE, params);
 };
 
 export const trackCharlesSettingsImportDocsClicked = (source) => {
   const params = { source };
-  trackEvent(CHARLES_SETTINGS.CHARLES_SETTINGS_IMPORT_STARTED, params);
+  trackEvent(CHARLES_SETTINGS.DOCS_CLICKED, params);
 };

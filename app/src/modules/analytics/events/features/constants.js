@@ -44,11 +44,11 @@ export const RULES = {
   },
 
   CHARLES_SETTINGS: {
-    CHARLES_SETTINGS_IMPORT_STARTED: "charles_settings_import_started",
-    CHARLES_SETTINGS_PARSED: "charles_settings_parsed",
-    CHARLES_SETTINGS_IMPORT_FAILED: "charles_settings_import_failed",
-    CHARLES_SETTINGS_IMPORT_COMPLETE: "charles_settings_import_completed",
-    CHARLES_SETTINGS_IMPORT_DOCS_CLICKED: "charles_settings_import_docs_clicked",
+    IMPORT_STARTED: "charles_settings_import_started",
+    PARSED: "charles_settings_parsed",
+    IMPORT_FAILED: "charles_settings_import_failed",
+    IMPORT_COMPLETE: "charles_settings_import_completed",
+    DOCS_CLICKED: "charles_settings_import_docs_clicked",
   },
 };
 
