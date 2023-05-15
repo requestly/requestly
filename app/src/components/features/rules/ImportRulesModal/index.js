@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Col, List, Space } from "antd";
+import { Button, Col, List, Row, Space } from "antd";
 import { Modal } from "antd";
 import { useDropzone } from "react-dropzone";
 import { toast } from "utils/Toast.js";
@@ -18,12 +18,16 @@ import SpinnerColumn from "../../../misc/SpinnerColumn";
 import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import FEATURES from "../../../../config/constants/sub/features";
+import { AUTH } from "modules/analytics/events/common/constants";
 import {
-  trackRulesImportCompleted,
-  trackRulesImportFailed,
   trackRulesJsonParsed,
+  trackRulesImportFailed,
+  trackRulesImportCompleted,
+  trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import Logger from "lib/logger";
+import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { LeftOutlined } from "@ant-design/icons";
 
 const ImportRulesModal = (props) => {
   const { toggle: toggleModal, isOpen } = props;
@@ -41,6 +45,8 @@ const ImportRulesModal = (props) => {
   const [rulesToImportCount, setRulesToImportCount] = useState(false);
   const [groupsToImportCount, setGroupsToImportCount] = useState(false);
   const [conflictingRecords, setConflictingRecords] = useState([]);
+  const [showImportOptions, setShowImportOptions] = useState(true);
+  const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
 
   const ImportRulesDropzone = () => {
     const onDrop = useCallback(async (acceptedFiles) => {
@@ -253,27 +259,81 @@ const ImportRulesModal = (props) => {
     }
   }, [allRules, dataToImport]);
 
+  const toggleImportFromCharlesModal = useCallback(() => {
+    if (isImportFromCharlesModalOpen) {
+      toggleModal();
+    } else {
+      trackCharlesSettingsImportStarted(AUTH.SOURCE.RULES_LIST);
+    }
+
+    setIsImportFromCharlesModalOpen((prev) => !prev);
+  }, [toggleModal, isImportFromCharlesModalOpen]);
+
+  const handleRegularRuleImportClick = () => {
+    setShowImportOptions(false);
+  };
+
   return (
     <>
+      {isImportFromCharlesModalOpen ? (
+        <ImportFromCharlesModal
+          isOpen={isImportFromCharlesModalOpen}
+          toggle={toggleImportFromCharlesModal}
+          analyticEventSource={AUTH.SOURCE.RULES_LIST}
+        />
+      ) : null}
+
       <Modal
-        className="modal-dialog-centered "
-        visible={isOpen}
+        style={{ display: isImportFromCharlesModalOpen ? "none" : "block" }}
+        className="modal-dialog-centered"
+        open={isOpen}
         onCancel={toggleModal}
         footer={null}
-        title="Import Rules Wizard"
+        title={
+          <Row align="middle">
+            <Button
+              size="small"
+              style={{ marginRight: "6px" }}
+              onClick={() => setShowImportOptions(true)}
+              icon={<LeftOutlined style={{ fontSize: "14px" }} />}
+            />
+
+            {showImportOptions ? <span>Select the type of rules you want to import</span> : <span>Import Rules</span>}
+          </Row>
+        }
       >
-        <div className="modal-body ">
-          {dataToImport ? renderImportConfirmation() : processingDataToImport ? renderLoader() : renderFilePicker()}
-        </div>
-        <br />
-        <div
-          className="modal-footer "
-          style={{
-            textAlign: "center",
-          }}
-        >
-          {renderImportRulesBtn()}
-        </div>
+        {showImportOptions ? (
+          <>
+            <Row align="middle" justify="center">
+              <Button type="default" onClick={handleRegularRuleImportClick}>
+                Import Requestly rules (JSON file)
+              </Button>
+            </Row>
+            <center style={{ margin: "8px 0" }} className="text-gray">
+              or
+            </center>
+            <Row align="middle" justify="center">
+              <Button type="default" onClick={toggleImportFromCharlesModal}>
+                Import Charles Proxy settings (XML file)
+              </Button>
+            </Row>
+          </>
+        ) : (
+          <>
+            <div className="modal-body">
+              {dataToImport ? renderImportConfirmation() : processingDataToImport ? renderLoader() : renderFilePicker()}
+            </div>
+            <br />
+            <div
+              className="modal-footer"
+              style={{
+                textAlign: "center",
+              }}
+            >
+              {renderImportRulesBtn()}
+            </div>
+          </>
+        )}
       </Modal>
     </>
   );
