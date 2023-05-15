@@ -135,7 +135,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   return (
-    <RQModal open={isOpen} centered onCancel={toggle}>
+    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
       <div className="rq-modal-content">
         <div className="header text-center">Import Charles Proxy settings</div>
         <div className="mt-16">
