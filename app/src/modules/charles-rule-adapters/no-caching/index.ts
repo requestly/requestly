@@ -20,7 +20,7 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
     return {
       ...rule,
       name: `${value}`,
-      isCharlesExported: true,
+      isCharlesImport: true,
       status: status ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
         {

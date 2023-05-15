@@ -18,7 +18,7 @@ export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
     const rule = getNewRule(RuleType.REDIRECT) as RedirectRule;
     return {
       ...rule,
-      isCharlesExported: true,
+      isCharlesImport: true,
       name: `${source.value} to ${destination}`,
       status: enabled ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
