@@ -1,4 +1,7 @@
 module.exports = {
+  globals: {
+    NodeJS: true,
+  },
   ignorePatterns: [
     "node_modules",
     "app/build/*",

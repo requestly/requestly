@@ -17,17 +17,17 @@ import React, { useEffect, useState } from "react";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { IoMdLink } from "react-icons/io";
 import { UserIcon } from "components/common/UserIcon";
-
+import REQUEST_METHOD_COLORS from "constants/requestMethodColors";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { MockType, RQMockMetadataSchema } from "../../types";
-import { generateFinalUrl, fileTypeColorMap, mockMethodColorMap } from "../../utils";
+import { generateFinalUrl, fileTypeColorMap } from "../../utils";
 import CopyButton from "components/misc/CopyButton";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import "../../../../../styles/custom/RQTable.css";
 import "./index.css";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
@@ -118,7 +118,7 @@ const MocksTable: React.FC<Props> = ({
               style={{
                 color:
                   record?.type === MockType.API
-                    ? mockMethodColorMap[record.method] || mockMethodColorMap["default"]
+                    ? REQUEST_METHOD_COLORS[record.method]
                     : fileTypeColorMap[record.fileType],
               }}
               className="mock-tag"
