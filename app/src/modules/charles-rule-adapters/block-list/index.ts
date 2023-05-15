@@ -11,7 +11,7 @@ const generate403ResponseRule = (sourceUrl: string, status: boolean, operator: s
   const rule = getNewRule(RuleType.RESPONSE) as ResponseRule;
   return {
     ...rule,
-    isCharlesExport: true,
+    isCharlesImport: true,
     name: `${sourceUrl}`,
     status: status ? Status.ACTIVE : Status.INACTIVE,
     pairs: [
@@ -50,7 +50,7 @@ export const blockListRuleAdapter = (rules: BlockListRule): ParsedRule => {
     const rule = getNewRule(RuleType.CANCEL) as CancelRule;
     return {
       ...rule,
-      isCharlesExported: true,
+      isCharlesImport: true,
       name: value,
       status: status ? Status.ACTIVE : Status.INACTIVE,
       pairs: [

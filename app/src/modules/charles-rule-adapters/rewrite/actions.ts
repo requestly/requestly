@@ -41,7 +41,7 @@ export const createModifyHeaderRule = (pair: RewriteRulePair, source: SourceData
 
   const ruleToBeImported = {
     ...newRule,
-    isCharlesExported: true,
+    isCharlesImport: true,
     status: headerAction.active ? Status.ACTIVE : Status.INACTIVE,
     name: getModificationRuleName(headerAction.header, headerAction.value, headerAction.actionType),
     pairs: [
@@ -71,7 +71,7 @@ export const createModifyQueryParamRule = (pair: RewriteRulePair, source: Source
 
   const ruleToBeImported = {
     ...newRule,
-    isCharlesExported: true,
+    isCharlesImport: true,
     status: queryParamAction.active ? Status.ACTIVE : Status.INACTIVE,
     name: getModificationRuleName(queryParamAction.param, queryParamAction.value, queryParamAction.actionType),
     pairs: [
@@ -91,7 +91,7 @@ export const createModifyStatusRule = (pair: RewriteRulePair, source: SourceData
 
   const ruleToBeImported = {
     ...newRule,
-    isCharlesExport: true,
+    isCharlesImport: true,
     name: `Modify status code to ${pair.newValue}`,
     status: pair.active ? Status.ACTIVE : Status.INACTIVE,
     pairs: [
@@ -131,7 +131,7 @@ export const createReplaceRule = (pair: RewriteRulePair, source: SourceData) => 
 
   const ruleToBeImported = {
     ...newRule,
-    isCharlesExport: true,
+    isCharlesImport: true,
     name: `${getReplaceRuleNamePrefix(pair.ruleType)} ${pair.matchValue} -> ${pair.newValue}`,
     status: pair.active ? Status.ACTIVE : Status.INACTIVE,
     pairs: [
@@ -176,7 +176,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
 
     const updatedRequestRule = {
       ...requestRule,
-      isCharlesExport: true,
+      isCharlesImport: true,
       name: `Modify request body`,
       status: pair.active ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
@@ -194,7 +194,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
 
     const updatedResponseRule = {
       ...responseRule,
-      isCharlesExport: true,
+      isCharlesImport: true,
       name: `Modify response body`,
       status: pair.active ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
@@ -217,7 +217,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
 
     const updatedRequestRule = {
       ...requestRule,
-      isCharlesExport: true,
+      isCharlesImport: true,
       name: `Modify request body`,
       status: pair.active ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
@@ -238,7 +238,7 @@ export const createModifyBodyRule = (pair: RewriteRulePair, source: SourceData) 
 
     const updatedResponseRule = {
       ...responseRule,
-      isCharlesExport: true,
+      isCharlesImport: true,
       name: `Modify response body`,
       status: pair.active ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
