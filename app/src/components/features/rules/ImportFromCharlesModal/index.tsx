@@ -10,15 +10,15 @@ import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
+import { AUTH } from "modules/analytics/events/common/constants";
 import PATHS from "config/constants/sub/paths";
-import "./ImportFromCharlesModal.css";
 import {
+  trackCharlesSettingsParsed,
+  trackCharlesSettingsImportFailed,
   trackCharlesSettingsImportComplete,
   trackCharlesSettingsImportDocsClicked,
-  trackCharlesSettingsImportFailed,
-  trackCharlesSettingsParsed,
 } from "modules/analytics/events/features/rules";
-import { AUTH } from "modules/analytics/events/common/constants";
+import "./ImportFromCharlesModal.css";
 
 interface ModalProps {
   isOpen: boolean;
@@ -85,8 +85,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
           setIsParseComplete(true);
-          trackCharlesSettingsParsed(importedRules.parsedRuleTypes.length > 1 ? "multiple rules" : "single rule");
-          console.log({ importedRules });
+          trackCharlesSettingsParsed(importedRules?.parsedRuleTypes?.length, importedRules?.parsedRuleTypes);
         })
         .catch((error) => {
           setValidationError(error.message);
@@ -120,7 +119,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         })
       );
 
-      trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes);
+      trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
       navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
       toggle();
     });

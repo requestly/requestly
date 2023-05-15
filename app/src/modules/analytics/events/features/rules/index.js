@@ -35,13 +35,13 @@ export const trackCharlesSettingsImportFailed = (cause) => {
   trackEvent(CHARLES_SETTINGS.IMPORT_FAILED, params);
 };
 
-export const trackCharlesSettingsParsed = (type) => {
-  const params = { type };
+export const trackCharlesSettingsParsed = (settingsCount, settingTypes) => {
+  const params = { settingsCount, settingTypes };
   trackEvent(CHARLES_SETTINGS.PARSED, params);
 };
 
-export const trackCharlesSettingsImportComplete = (settingTypes) => {
-  const params = { settingTypes };
+export const trackCharlesSettingsImportComplete = (settingsCount, settingTypes) => {
+  const params = { settingsCount, settingTypes };
   trackEvent(CHARLES_SETTINGS.IMPORT_COMPLETE, params);
 };
 
