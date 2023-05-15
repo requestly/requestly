@@ -30,18 +30,19 @@ export const trackCharlesSettingsImportStarted = (source) => {
   const params = { source };
   trackEvent(CHARLES_SETTINGS.IMPORT_STARTED, params);
 };
+
 export const trackCharlesSettingsImportFailed = (cause) => {
   const params = { cause };
   trackEvent(CHARLES_SETTINGS.IMPORT_FAILED, params);
 };
 
-export const trackCharlesSettingsParsed = (settingsCount, settingTypes) => {
-  const params = { settingsCount, settingTypes };
+export const trackCharlesSettingsParsed = (settings_count, setting_types, not_supported_rule_types_count) => {
+  const params = { settings_count, setting_types, not_supported_rule_types_count };
   trackEvent(CHARLES_SETTINGS.PARSED, params);
 };
 
-export const trackCharlesSettingsImportComplete = (settingsCount, settingTypes) => {
-  const params = { settingsCount, settingTypes };
+export const trackCharlesSettingsImportComplete = (settings_count, setting_types) => {
+  const params = { settings_count, setting_types };
   trackEvent(CHARLES_SETTINGS.IMPORT_COMPLETE, params);
 };
 

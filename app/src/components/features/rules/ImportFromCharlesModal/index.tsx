@@ -81,11 +81,15 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         return;
       }
       parseRulesFromCharlesXML(fileContent as string)
-        .then((importedRules: any) => {
+        .then((importedRules: ParsedRulesFromChalres) => {
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
           setIsParseComplete(true);
-          trackCharlesSettingsParsed(importedRules?.parsedRuleTypes?.length, importedRules?.parsedRuleTypes);
+          trackCharlesSettingsParsed(
+            importedRules?.parsedRuleTypes?.length,
+            importedRules?.parsedRuleTypes,
+            importedRules?.otherRuleTypesCount
+          );
         })
         .catch((error) => {
           setValidationError(error.message);
@@ -146,16 +150,15 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
                     </li>
                   ))}
               </ul>
-              {rulesToImport?.isOtherRuleTypesPresent && (
+              {rulesToImport?.otherRuleTypesCount > 0 && (
                 <>
                   <Typography.Text type="secondary">
+                    Other settings are not supported in Requestly.{" "}
+                    {/* TODO: fix source when adding import dropdown in rules table screen */}
                     {/* eslint-disable-next-line */}
-                    Other settings are not supported in Requestly. <a href="#">Learn more</a>
-                    Learn more {/* TODO: fix source when adding import dropdown in rules table screen */}
                     <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(AUTH.SOURCE.GETTING_STARTED)}>
-                      about it
+                      Learn more
                     </a>
-                    .
                   </Typography.Text>
                 </>
               )}
