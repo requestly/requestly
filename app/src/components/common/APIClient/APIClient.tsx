@@ -28,7 +28,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     }
 
     if (typeof request === "string") {
-      return { request: parseCurlRequest(request), response: null };
+      return getEmptyAPIEntry(parseCurlRequest(request));
     }
 
     const entry: RQAPI.Entry = getEmptyAPIEntry();
