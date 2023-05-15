@@ -10,7 +10,14 @@ import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
+import { AUTH } from "modules/analytics/events/common/constants";
 import PATHS from "config/constants/sub/paths";
+import {
+  trackCharlesSettingsParsed,
+  trackCharlesSettingsImportFailed,
+  trackCharlesSettingsImportComplete,
+  trackCharlesSettingsImportDocsClicked,
+} from "modules/analytics/events/features/rules";
 import "./ImportFromCharlesModal.css";
 
 interface ModalProps {
@@ -56,7 +63,11 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
     const file = files[0];
     const reader = new FileReader();
 
-    reader.onerror = () => setValidationError("Could not process the selected file! Try again.");
+    reader.onerror = () => {
+      setValidationError("Could not process the selected file! Try again.");
+      trackCharlesSettingsImportFailed("error reading the imported file");
+    };
+
     reader.onload = () => {
       const fileContent = reader.result;
       setIsDataProcessing(true);
@@ -65,16 +76,24 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         // stop parsing for wrong file format
         setIsDataProcessing(false);
         setValidationError("Failed to parse Charles proxy settings file.");
+        trackCharlesSettingsImportFailed("wrong file format");
+
         return;
       }
       parseRulesFromCharlesXML(fileContent as string)
-        .then((importedRules: any) => {
+        .then((importedRules: ParsedRulesFromChalres) => {
           setIsDataProcessing(false);
           setRulesToImport(importedRules);
           setIsParseComplete(true);
+          trackCharlesSettingsParsed(
+            importedRules?.parsedRuleTypes?.length,
+            importedRules?.parsedRuleTypes,
+            importedRules?.otherRuleTypesCount
+          );
         })
         .catch((error) => {
           setValidationError(error.message);
+          trackCharlesSettingsImportFailed(error.message);
           setIsDataProcessing(false);
         });
     };
@@ -89,7 +108,10 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         status: group.status,
         groupName: group.name,
         onSuccess: () => {},
-        onError: () => setValidationError("Something went wrong while importing your settings! Try again."), // TODO: validations
+        onError: () => {
+          setValidationError("Something went wrong while importing your settings! Try again.");
+          trackCharlesSettingsImportFailed("error on saving the parsed rules in storage");
+        }, // TODO: validations
       });
     });
 
@@ -101,6 +123,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
         })
       );
 
+      trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
       navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
       toggle();
     });
@@ -120,18 +143,22 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
             <div className="parsed-rules-info">
               <div className="title mt-16">Successfully parsed below settings:</div>
               <ul>
-                {rulesToImport.parsedRuleTypes?.length > 0 &&
+                {rulesToImport?.parsedRuleTypes?.length > 0 &&
                   rulesToImport.parsedRuleTypes.map((ruleType) => (
                     <li key={ruleType}>
                       <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
                     </li>
                   ))}
               </ul>
-              {rulesToImport.isOtherRuleTypesPresent && (
+              {rulesToImport?.otherRuleTypesCount > 0 && (
                 <>
                   <Typography.Text type="secondary">
+                    Other settings are not supported in Requestly.{" "}
+                    {/* TODO: fix source when adding import dropdown in rules table screen */}
                     {/* eslint-disable-next-line */}
-                    Other settings are not supported in Requestly. <a href="#">Learn more</a>
+                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(AUTH.SOURCE.GETTING_STARTED)}>
+                      Learn more
+                    </a>
                   </Typography.Text>
                 </>
               )}
