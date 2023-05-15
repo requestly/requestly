@@ -19,6 +19,8 @@ import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRul
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import FEATURES from "../../../../config/constants/sub/features";
 import { AUTH } from "modules/analytics/events/common/constants";
+import { LeftOutlined } from "@ant-design/icons";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import {
   trackRulesJsonParsed,
   trackRulesImportFailed,
@@ -27,17 +29,17 @@ import {
 } from "modules/analytics/events/features/rules";
 import Logger from "lib/logger";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
-import { LeftOutlined } from "@ant-design/icons";
 
 const ImportRulesModal = (props) => {
   const { toggle: toggleModal, isOpen } = props;
 
   //Global State
   const dispatch = useDispatch();
-  const allRules = useSelector(getAllRules);
-  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const allRules = useSelector(getAllRules);
+  const user = useSelector(getUserAuthDetails);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   //Component State
   const [dataToImport, setDataToImport] = useState(false);
@@ -273,6 +275,8 @@ const ImportRulesModal = (props) => {
     setShowImportOptions(false);
   };
 
+  const modifyModalContentForCharlesImportOption = isCharlesImportFeatureFlagOn && showImportOptions;
+
   return (
     <>
       {isImportFromCharlesModalOpen ? (
@@ -291,18 +295,24 @@ const ImportRulesModal = (props) => {
         footer={null}
         title={
           <Row align="middle">
-            <Button
-              size="small"
-              style={{ marginRight: "6px" }}
-              onClick={() => setShowImportOptions(true)}
-              icon={<LeftOutlined style={{ fontSize: "14px" }} />}
-            />
+            {isCharlesImportFeatureFlagOn && (
+              <Button
+                size="small"
+                style={{ marginRight: "6px" }}
+                onClick={() => setShowImportOptions(true)}
+                icon={<LeftOutlined style={{ fontSize: "14px" }} />}
+              />
+            )}
 
-            {showImportOptions ? <span>Select the type of rules you want to import</span> : <span>Import Rules</span>}
+            {modifyModalContentForCharlesImportOption ? (
+              <span>Select the type of rules you want to import</span>
+            ) : (
+              <span>Import Rules</span>
+            )}
           </Row>
         }
       >
-        {showImportOptions ? (
+        {modifyModalContentForCharlesImportOption ? (
           <>
             <Row align="middle" justify="center">
               <Button type="default" onClick={handleRegularRuleImportClick}>
