@@ -1,5 +1,5 @@
-import { Button, Empty, Input, Select, Space, Spin } from "antd";
-import React, { SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
+import { Button, Empty, Input, Select, Skeleton, Space, Spin } from "antd";
+import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
@@ -43,11 +43,20 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const abortControllerRef = useRef<AbortController>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationTimerRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (apiEntry) {
+      clearTimeout(animationTimerRef.current);
+      setIsAnimating(true);
       setEntry(apiEntry);
+      animationTimerRef.current = setTimeout(() => setIsAnimating(false), 500);
     }
+
+    return () => {
+      clearTimeout(animationTimerRef.current);
+    };
   }, [apiEntry]);
 
   const setUrl = useCallback((url: string) => {
@@ -225,76 +234,78 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
 
   return (
     <div className="api-client-view">
-      <div className="api-client-header">
-        <Space.Compact className="api-client-url-container">
-          <Select
-            className="api-request-method-selector"
-            options={requestMethodOptions}
-            value={entry.request.method}
-            onChange={setMethod}
-          />
-          <Input
-            className="api-request-url"
-            placeholder="https://example.com"
-            value={entry.request.url}
-            onChange={(evt) => setUrl(evt.target.value)}
-            onPressEnter={onUrlInputEnterPressed}
-            onBlur={onUrlInputBlur}
-            prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-          />
-        </Space.Compact>
-        <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
-          Send
-        </Button>
-      </div>
-      <Split
-        className="api-client-body"
-        direction="vertical"
-        cursor="row-resize"
-        sizes={[40, 60]}
-        minSize={200}
-        gutterSize={6}
-        gutterAlign="center"
-        snapOffset={30}
-      >
-        <RequestTabs
-          request={entry.request}
-          setQueryParams={setQueryParams}
-          setBody={setBody}
-          setRequestHeaders={setRequestHeaders}
-          setContentType={setContentType}
-        />
-        <div className="api-response-view">
-          {entry.response ? (
-            <ResponseTabs response={entry.response} />
-          ) : (
-            <div className="api-response-empty-placeholder">
-              {isLoadingResponse ? (
-                <>
-                  <Spin size="large" tip="Request in progress..." />
-                  <Button onClick={cancelRequest} style={{ marginTop: 10 }}>
-                    Cancel request
-                  </Button>
-                </>
-              ) : isFailed ? (
-                <Space>
-                  <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-                  Failed to send the request. Please check if the URL is valid.
-                </Space>
-              ) : isRequestCancelled ? (
-                <Space>
-                  <CloseCircleFilled style={{ color: "#ff4d4f" }} />
-                  You have cancelled the request.
-                </Space>
-              ) : (
-                <Empty description="No request sent." />
-              )}
-            </div>
-          )}
+      <Skeleton loading={isAnimating} active>
+        <div className="api-client-header">
+          <Space.Compact className="api-client-url-container">
+            <Select
+              className="api-request-method-selector"
+              options={requestMethodOptions}
+              value={entry.request.method}
+              onChange={setMethod}
+            />
+            <Input
+              className="api-request-url"
+              placeholder="https://example.com"
+              value={entry.request.url}
+              onChange={(evt) => setUrl(evt.target.value)}
+              onPressEnter={onUrlInputEnterPressed}
+              onBlur={onUrlInputBlur}
+              prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+            />
+          </Space.Compact>
+          <Button type="primary" onClick={onSendButtonClick} loading={isLoadingResponse} disabled={!entry.request.url}>
+            Send
+          </Button>
         </div>
-      </Split>
+        <Split
+          className="api-client-body"
+          direction="vertical"
+          cursor="row-resize"
+          sizes={[40, 60]}
+          minSize={200}
+          gutterSize={6}
+          gutterAlign="center"
+          snapOffset={30}
+        >
+          <RequestTabs
+            request={entry.request}
+            setQueryParams={setQueryParams}
+            setBody={setBody}
+            setRequestHeaders={setRequestHeaders}
+            setContentType={setContentType}
+          />
+          <div className="api-response-view">
+            {entry.response ? (
+              <ResponseTabs response={entry.response} />
+            ) : (
+              <div className="api-response-empty-placeholder">
+                {isLoadingResponse ? (
+                  <>
+                    <Spin size="large" tip="Request in progress..." />
+                    <Button onClick={cancelRequest} style={{ marginTop: 10 }}>
+                      Cancel request
+                    </Button>
+                  </>
+                ) : isFailed ? (
+                  <Space>
+                    <CloseCircleFilled style={{ color: "#ff4d4f" }} />
+                    Failed to send the request. Please check if the URL is valid.
+                  </Space>
+                ) : isRequestCancelled ? (
+                  <Space>
+                    <CloseCircleFilled style={{ color: "#ff4d4f" }} />
+                    You have cancelled the request.
+                  </Space>
+                ) : (
+                  <Empty description="No request sent." />
+                )}
+              </div>
+            )}
+          </div>
+        </Split>
+      </Skeleton>
     </div>
   );
 };
 
-export default APIClientView;
+export default memo(APIClientView);

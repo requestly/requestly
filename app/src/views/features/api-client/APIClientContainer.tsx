@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import APIClientSidebar, { NO_HISTORY_INDEX } from "./sidebar/APIClientSidebar";
+import APIClientSidebar from "./sidebar/APIClientSidebar";
 import APIClientView from "./client-view/APIClientView";
 import { RQAPI } from "./types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "./historyStore";
@@ -9,14 +9,13 @@ import {
   trackImportCurlClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import "./apiClientContainer.scss";
 import ImportRequestModal from "./ImportRequestModal";
+import "./apiClientContainer.scss";
 
 interface Props {}
 
 const APIClientContainer: React.FC<Props> = () => {
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
-  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number>(NO_HISTORY_INDEX);
   const [selectedEntry, setSelectedEntry] = useState<RQAPI.Entry>();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -32,13 +31,7 @@ const APIClientContainer: React.FC<Props> = () => {
   }, [setHistory]);
 
   const handleImportRequest = useCallback((request: RQAPI.Request) => {
-    const newApiEntry: RQAPI.Entry = {
-      request,
-      response: null,
-    };
-
-    setSelectedEntry(newApiEntry);
-    setSelectedHistoryIndex(NO_HISTORY_INDEX);
+    setSelectedEntry(getEmptyAPIEntry(request));
     setIsImportModalOpen(false);
   }, []);
 
@@ -49,18 +42,22 @@ const APIClientContainer: React.FC<Props> = () => {
 
   const onNewClick = useCallback(() => {
     setSelectedEntry(getEmptyAPIEntry());
-    setSelectedHistoryIndex(NO_HISTORY_INDEX);
     trackNewRequestClicked();
   }, []);
+
+  const onSelectionFromHistory = useCallback(
+    (index: number) => {
+      setSelectedEntry(history[index]);
+    },
+    [history]
+  );
 
   return (
     <div className="api-client-container">
       <APIClientSidebar
         history={history}
-        selectedHistoryIndex={selectedHistoryIndex}
-        setSelectedHistoryIndex={setSelectedHistoryIndex}
+        onSelectionFromHistory={onSelectionFromHistory}
         clearHistory={clearHistory}
-        onSelectionFromHistory={setSelectedEntry}
         onNewClick={onNewClick}
         onImportClick={onImportClick}
       />
