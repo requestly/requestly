@@ -624,7 +624,7 @@ const CurrentTrafficTable = ({
                   filterLabel="Content type"
                   filterPlaceholder="Filter by content type"
                   options={CONTENT_TYPE_OPTIONS}
-                  value={trafficTableFilters.resourceType}
+                  value={trafficTableFilters.contentType}
                   handleFilterChange={(options) => {
                     dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
                     trackTrafficTableFilterApplied("content_type", options, options?.length);
