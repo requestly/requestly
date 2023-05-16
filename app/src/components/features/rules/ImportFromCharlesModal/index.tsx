@@ -10,7 +10,6 @@ import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
-import { AUTH } from "modules/analytics/events/common/constants";
 import PATHS from "config/constants/sub/paths";
 import {
   trackCharlesSettingsParsed,
@@ -23,6 +22,7 @@ import "./ImportFromCharlesModal.css";
 interface ModalProps {
   isOpen: boolean;
   toggle: () => void;
+  analyticEventSource: string;
 }
 
 const validExportSteps = [
@@ -48,9 +48,10 @@ const validExportSteps = [
   },
 ];
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle }) => {
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, analyticEventSource = "" }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
   const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
@@ -101,6 +102,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   const handleCharlesRulesImport = () => {
+    setIsLoading(true);
+
     const rulesImportPromises = rulesToImport?.groups?.map((group) => {
       return createNewGroupAndSave({
         appMode,
@@ -115,18 +118,20 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       });
     });
 
-    Promise.all(rulesImportPromises).then(() => {
-      dispatch(
-        actions.updateRefreshPendingStatus({
-          type: "rules",
-          newValue: !isRulesListRefreshPending,
-        })
-      );
+    Promise.all(rulesImportPromises)
+      .then(() => {
+        dispatch(
+          actions.updateRefreshPendingStatus({
+            type: "rules",
+            newValue: !isRulesListRefreshPending,
+          })
+        );
 
-      trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
-      navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-      toggle();
-    });
+        trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
+        navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
+        toggle();
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleResetImport = () => {
@@ -135,7 +140,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
   };
 
   return (
-    <RQModal open={isOpen} centered onCancel={toggle}>
+    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
       <div className="rq-modal-content">
         <div className="header text-center">Import Charles Proxy settings</div>
         <div className="mt-16">
@@ -153,10 +158,9 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
               {rulesToImport?.otherRuleTypesCount > 0 && (
                 <>
                   <Typography.Text type="secondary">
-                    Other settings are not supported in Requestly.{" "}
-                    {/* TODO: fix source when adding import dropdown in rules table screen */}
+                    Other settings are not supported in Requestly.
                     {/* eslint-disable-next-line */}
-                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(AUTH.SOURCE.GETTING_STARTED)}>
+                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}>
                       Learn more
                     </a>
                   </Typography.Text>
@@ -205,7 +209,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle })
       {isParseComplete ? (
         <div className="rq-modal-footer">
           <Row justify="end">
-            <RQButton type="primary" onClick={handleCharlesRulesImport}>
+            <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
               Import
             </RQButton>
           </Row>
