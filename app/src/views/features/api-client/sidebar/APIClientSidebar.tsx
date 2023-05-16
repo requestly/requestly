@@ -51,10 +51,21 @@ const APIClientSidebar: React.FC<Props> = ({
       </div>
       {history?.length ? (
         <Timeline reverse className="api-history-list" mode="left">
+          <Timeline.Item key="end" color="gray">
+            <div className="api-history-row">
+              <Typography.Text type="secondary" italic className="api-history-end-marker">
+                END
+              </Typography.Text>
+            </div>
+          </Timeline.Item>
           {history.map((entry, index) => (
             <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
-              <div className="api-history-row">
-                <Typography.Text className="api-method" style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}>
+              <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
+                <Typography.Text
+                  className="api-method"
+                  strong
+                  style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
+                >
                   {entry.request.method}
                 </Typography.Text>
                 <Typography.Text
