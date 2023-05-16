@@ -1,3 +1,8 @@
+.import-from-charles-modal .ant-modal-body .rq-modal-content:last-child {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
 .parsed-rules-info {
   margin-top: 1.5rem;
 }
