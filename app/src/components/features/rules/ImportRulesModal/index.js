@@ -295,7 +295,7 @@ const ImportRulesModal = (props) => {
         footer={null}
         title={
           <Row align="middle">
-            {isCharlesImportFeatureFlagOn && (
+            {isCharlesImportFeatureFlagOn && !showImportOptions && (
               <Button
                 size="small"
                 style={{ marginRight: "6px" }}
