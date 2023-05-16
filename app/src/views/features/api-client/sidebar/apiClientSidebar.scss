@@ -48,14 +48,14 @@
       display: flex;
       align-items: baseline;
       gap: 10px;
-      cursor: pointer;
       line-height: 23px;
       padding: 8px 10px;
       margin: -8px 10px;
       border-radius: 4px;
 
-      &:hover {
+      &.clickable:hover {
         background-color: var(--component-background);
+        cursor: pointer;
 
         .api-history-url {
           color: #fff;
@@ -78,6 +78,10 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+      }
+
+      .api-history-end-marker {
+        font-size: 11px;
       }
     }
   }
