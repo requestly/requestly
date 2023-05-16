@@ -15,9 +15,9 @@ import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
 import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import {
-  trackCharlesSettingsImportStarted,
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
+  trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
 
@@ -201,7 +201,11 @@ const GettingStarted = () => {
         </Row>
       )}
       {isImportCharlesRulesModalActive ? (
-        <ImportFromCharlesModal isOpen={isImportCharlesRulesModalActive} toggle={toggleImportCharlesRulesModal} />
+        <ImportFromCharlesModal
+          isOpen={isImportCharlesRulesModalActive}
+          toggle={toggleImportCharlesRulesModal}
+          analyticEventSource={AUTH.SOURCE.GETTING_STARTED}
+        />
       ) : null}
 
       {isImportRulesModalActive ? (
