@@ -15,17 +15,26 @@ interface Props {
   renderLogRow: any;
   selectedRowData: any;
   onReplayRequest: () => void;
+  EmptyStateComponent: React.FC<any>;
 }
 
-const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onReplayRequest }: Props) => {
+const VirtualTableV2: React.FC<Props> = ({
+  logs = [],
+  renderHeader,
+  renderLogRow,
+  selectedRowData,
+  onReplayRequest,
+  EmptyStateComponent,
+}) => {
   const [selected, setSelected] = useState(null);
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
+  const [logsLength, setLogsLength] = useState(logs.length);
 
   const parentRef = useRef(null);
 
   const rowVirtualizer = useVirtualizer({
-    count: logs.length,
+    count: logsLength,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
     onChange: (virtualizer) => {
@@ -63,9 +72,9 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onR
   };
 
   const scrollToBottom = useCallback(() => {
-    rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
-    // rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), {align: 'start'});
-  }, [logs, rowVirtualizer]);
+    if (logsLength > 0) rowVirtualizer.scrollToIndex(logsLength - 1, { align: "start" });
+    // rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: "start" });
+  }, [logsLength, rowVirtualizer]);
 
   useEffect(() => {
     if (isScrollToBottomEnabled) {
@@ -73,7 +82,7 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onR
     }
   }, [scrollToBottom, isScrollToBottomEnabled]);
 
-  const renderNewLogsButton = () => {
+  const renderNewLogsButton = useCallback(() => {
     if (isScrollToBottomEnabled) {
       return null;
     }
@@ -82,7 +91,7 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onR
 
     let newLogsCount = 0;
     if (lastKnowBottomIndex) {
-      newLogsCount = logs.length - 1 - lastKnowBottomIndex;
+      newLogsCount = (logsLength > 0 ? logsLength - 1 : logsLength) - lastKnowBottomIndex;
       buttonText = newLogsCount > 1 ? `${newLogsCount} new logs` : "1 new log";
     }
 
@@ -100,7 +109,15 @@ const VirtualTableV2 = ({ logs, renderHeader, renderLogRow, selectedRowData, onR
     }
 
     return null;
-  };
+  }, [isScrollToBottomEnabled, lastKnowBottomIndex, logsLength, scrollToBottom]);
+
+  useEffect(() => {
+    setLogsLength(logs.length);
+  }, [logs, setLogsLength]);
+
+  if (logs.length === 0) {
+    return <EmptyStateComponent />;
+  }
 
   return (
     <>

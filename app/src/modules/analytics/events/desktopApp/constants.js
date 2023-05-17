@@ -20,8 +20,13 @@ export const APPS = {
 
 export const TRAFFIC_TABLE = {
   TRAFFIC_INTERCEPTION_STARTED: "traffic_interception_started",
+  TRAFFIC_INTERCEPTION_PAUSED: "traffic_interception_paused",
+  TRAFFIC_INTERCEPTION_RESUMED: "traffic_interception_resumed",
   TRAFFIC_TABLE_LOGS_CLEARED: "traffic_table_logs_cleared",
   TRAFFIC_TABLE_REQUEST_CLICKED: "traffic_table_request_clicked",
   TRAFFIC_TABLE_REQUEST_RIGHT_CLICKED: "traffic_table_request_right_clicked",
   TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED: "traffic_table_request_dropdown_clicked",
+  TRAFFIC_TABLE_SEARCHED: "traffic_table_searched",
+  TRAFFIC_TABLE_FILTER_CLICKED: "traffic_table_filter_clicked",
+  TRAFFIC_TABLE_FILTER_APPLIED: "traffic_table_filter_clicked",
 };
