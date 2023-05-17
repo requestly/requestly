@@ -23,30 +23,65 @@
     align-items: center;
   }
 
-  .api-history-menu {
+  .api-history-list {
     width: 100%;
     height: 100%;
     flex: auto;
     overflow: auto;
+    padding-left: 16px;
+    padding-top: 16px;
 
-    &.ant-menu {
-      background: transparent;
+    .ant-timeline-item {
+      padding-top: 12px;
+      padding-bottom: 12px;
 
-      .ant-menu-item {
-        padding: 0 12px !important;
-        font-size: 13px;
+      .ant-timeline-item-tail {
+        margin-top: 12px;
+      }
 
-        &.ant-menu-item-selected {
-          background-color: var(--component-background);
-        }
+      .ant-timeline-item-content {
+        margin-left: 10px;
       }
     }
 
-    .api-method {
-      font-size: 11px;
+    .api-history-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      line-height: 23px;
+      padding: 8px 10px;
+      margin: -8px 10px;
+      border-radius: 4px;
 
-      .ant-tag {
-        margin-right: 0;
+      &.clickable:hover {
+        background-color: var(--component-background);
+        cursor: pointer;
+
+        .api-history-url {
+          color: #fff;
+        }
+      }
+
+      .api-method {
+        font-size: 11px;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+
+      .api-history-url {
+        font-size: 13px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        line-height: 18px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .api-history-start-marker {
+        font-size: 13px;
       }
     }
   }
