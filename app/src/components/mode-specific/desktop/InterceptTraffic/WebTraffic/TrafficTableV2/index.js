@@ -376,10 +376,10 @@ const CurrentTrafficTable = ({
   const getGroupedLogs = useCallback(() => {
     const groupedLogs = [];
     trafficTableFilters.app.forEach((app) => {
-      groupedLogs.push(...appLogs[app]);
+      appLogs[app] && groupedLogs.push(...appLogs[app]);
     });
     trafficTableFilters.domain.forEach((domain) => {
-      groupedLogs.push(...domainLogs[domain]);
+      domainLogs[domain] && groupedLogs.push(...domainLogs[domain]);
     });
 
     return groupedLogs;
