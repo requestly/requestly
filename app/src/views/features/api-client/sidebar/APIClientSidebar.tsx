@@ -1,83 +1,34 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
+import React, { useCallback } from "react";
 import placeholderImage from "../../../../assets/images/illustrations/empty-sheets-dark.svg";
-import { Button, Menu, Tag, Typography } from "antd";
-import { RQAPI, RequestMethod } from "../types";
+import { Button, Timeline, Typography } from "antd";
+import { RQAPI } from "../types";
 import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
+import REQUEST_METHOD_COLORS from "constants/requestMethodColors";
 import "./apiClientSidebar.scss";
-
-export const NO_HISTORY_INDEX = -1;
 
 interface Props {
   history: RQAPI.Entry[];
-  selectedHistoryIndex: number;
-  setSelectedHistoryIndex: (index: number) => void;
+  onSelectionFromHistory: (index: number) => void;
   clearHistory: () => void;
-  onSelectionFromHistory: (entry: RQAPI.Entry) => void;
   onNewClick: () => void;
   onImportClick: () => void;
 }
 
-const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
-  [RequestMethod.GET]: "green",
-  [RequestMethod.POST]: "blue",
-  [RequestMethod.PUT]: "cyan",
-  [RequestMethod.PATCH]: "geekblue",
-  [RequestMethod.DELETE]: "red",
-  [RequestMethod.HEAD]: "magenta",
-  [RequestMethod.CONNECT]: "lime",
-  [RequestMethod.OPTIONS]: "gold",
-  [RequestMethod.TRACE]: "cyan",
-};
-
 const APIClientSidebar: React.FC<Props> = ({
   history,
-  selectedHistoryIndex,
-  setSelectedHistoryIndex,
-  clearHistory,
   onSelectionFromHistory,
+  clearHistory,
   onNewClick,
   onImportClick,
 }) => {
-  // using layout effect ensures that the updated list does not render with older selection
-  useLayoutEffect(() => {
-    if (history?.length) {
-      setSelectedHistoryIndex(history.length - 1);
-    } else {
-      setSelectedHistoryIndex(NO_HISTORY_INDEX);
-    }
-  }, [history, setSelectedHistoryIndex]);
-
-  useEffect(() => {
-    if (selectedHistoryIndex !== NO_HISTORY_INDEX) {
-      onSelectionFromHistory(history[selectedHistoryIndex]);
-    }
-  }, [history, onSelectionFromHistory, selectedHistoryIndex]);
-
-  const onMenuItemClick = useCallback(({ key }: { key: string }) => {
-    const historyIndex = parseInt(key);
-    setSelectedHistoryIndex(historyIndex);
-    trackRequestSelectedFromHistory();
-  }, []);
-
-  const menuItems = useMemo(() => {
-    return history
-      .map((entry: RQAPI.Entry, index) => {
-        const method = entry.request.method.toUpperCase();
-
-        return {
-          key: String(index),
-          icon: (
-            <span className="api-method">
-              <Tag color={REQUEST_METHOD_COLOR_CODES[method]}>{method}</Tag>
-            </span>
-          ),
-          label: entry.request.url,
-          entry,
-        };
-      })
-      .reverse();
-  }, [history]);
+  const onHistoryLinkClick = useCallback(
+    (index: number) => {
+      onSelectionFromHistory(index);
+      trackRequestSelectedFromHistory();
+    },
+    [onSelectionFromHistory]
+  );
 
   return (
     <div className="api-client-sidebar">
@@ -99,14 +50,36 @@ const APIClientSidebar: React.FC<Props> = ({
         </div>
       </div>
       {history?.length ? (
-        <Menu
-          className="api-history-menu"
-          theme={"dark"}
-          onClick={onMenuItemClick}
-          selectedKeys={selectedHistoryIndex !== NO_HISTORY_INDEX ? [String(selectedHistoryIndex)] : []}
-          mode="inline"
-          items={menuItems}
-        />
+        <Timeline reverse className="api-history-list" mode="left">
+          <Timeline.Item key="end" color="gray">
+            <div className="api-history-row">
+              <Typography.Text type="secondary" italic className="api-history-end-marker">
+                END
+              </Typography.Text>
+            </div>
+          </Timeline.Item>
+          {history.map((entry, index) => (
+            <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
+              <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
+                <Typography.Text
+                  className="api-method"
+                  strong
+                  style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
+                >
+                  {entry.request.method}
+                </Typography.Text>
+                <Typography.Text
+                  type="secondary"
+                  className="api-history-url"
+                  title={entry.request.url}
+                  onClick={() => onHistoryLinkClick(index)}
+                >
+                  {entry.request.url}
+                </Typography.Text>
+              </div>
+            </Timeline.Item>
+          ))}
+        </Timeline>
       ) : (
         <div className="api-client-sidebar-placeholder">
           <img src={placeholderImage} alt="empty" />

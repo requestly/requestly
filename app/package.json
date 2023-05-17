@@ -61,6 +61,7 @@
     "@typeform/embed-react": "^1.15.0",
     "antd": "4.24.5",
     "axios": "^0.26.0",
+    "buffer": "^6.0.3",
     "capture-console-logs": "^1.0.1",
     "classnames": "^2.3.1",
     "cmdk": "^0.1.21",
@@ -112,6 +113,8 @@
     "rrweb": "2.0.0-alpha.5",
     "rrweb-player": "2.0.0-alpha.5",
     "semver": "^7.3.5",
+    "stream-browserify": "^3.0.0",
+    "timers-browserify": "^2.0.12",
     "ts-loader": "^9.3.0",
     "typewriter-effect": "^2.19.0",
     "ua-parser-js": "^1.0.2",
@@ -119,7 +122,8 @@
     "util": "^0.12.5",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
-    "yargs-parser": "^21.1.1"
+    "yargs-parser": "^21.1.1",
+    "xml2js": "^0.5.0"
   },
   "devDependencies": {
     "@requestly/web-sdk": "0.12.1",
@@ -132,6 +136,7 @@
     "@types/react-window": "^1.8.5",
     "@types/semver": "^7.3.13",
     "@types/uuid": "^9.0.0",
+    "@types/xml2js": "^0.4.11",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "process": "^0.11.10",
     "sass": "^1.58.3",

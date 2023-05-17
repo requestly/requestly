@@ -44,7 +44,7 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
-export const getEmptyAPIEntry = (): RQAPI.Entry => {
+export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
   return {
     request: {
       url: DEMO_API_URL,
@@ -53,6 +53,7 @@ export const getEmptyAPIEntry = (): RQAPI.Entry => {
       headers: [],
       body: null,
       contentType: RequestContentType.RAW,
+      ...(request || {}),
     },
     response: null,
   };
@@ -95,7 +96,14 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     // @ts-ignore
     const json: CurlParserResponse = parseCurlAsJson(curl);
     const queryParams = generateKeyValuePairsFromJson(json.queries);
-    const headers = generateKeyValuePairsFromJson(json.headers);
+    let headers = generateKeyValuePairsFromJson(json.headers);
+
+    // remove headers dependent on original source
+    headers = headers.filter((header) => {
+      const headersToIgnore = ["host", "accept-encoding"];
+      return !headersToIgnore.includes(header.key.toLowerCase());
+    });
+
     const contentType = getContentTypeFromRequestHeaders(headers);
 
     let body: RQAPI.RequestBody;

@@ -4,6 +4,9 @@
   .ant-pro-card-body {
     padding-right: 0;
   }
+  .ant-pro-card-body > div > div > div {
+    overflow: auto !important;
+  }
 }
 
 .network-table-override {
