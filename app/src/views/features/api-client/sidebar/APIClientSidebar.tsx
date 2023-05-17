@@ -53,8 +53,8 @@ const APIClientSidebar: React.FC<Props> = ({
         <Timeline reverse className="api-history-list" mode="left">
           <Timeline.Item key="end" color="gray">
             <div className="api-history-row">
-              <Typography.Text type="secondary" italic className="api-history-end-marker">
-                END
+              <Typography.Text type="secondary" italic className="api-history-start-marker">
+                Start
               </Typography.Text>
             </div>
           </Timeline.Item>
