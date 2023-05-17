@@ -410,12 +410,10 @@ const CurrentTrafficTable = ({
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
-          searchKeyword={trafficTableFilters.search.term}
-          logFilters={trafficTableFilters}
         />
       );
     },
-    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, requestLogs, trafficTableFilters]
+    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, requestLogs]
   );
 
   const handleClearFilter = useCallback(
