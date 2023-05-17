@@ -49,6 +49,7 @@ const ActionHeader = ({
     if (trafficTableFilters.search.regex) {
       return (
         <Input.Search
+          value={trafficTableFilters.search.term || ""}
           className="action-header-input"
           placeholder="Input RegEx"
           onChange={handleOnSearchChange}
@@ -76,6 +77,7 @@ const ActionHeader = ({
 
     return (
       <Input.Search
+        value={trafficTableFilters.search.term || ""}
         className="action-header-input"
         placeholder="Input Search Keyword"
         onChange={handleOnSearchChange}
