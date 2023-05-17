@@ -7,9 +7,29 @@ interface ResponsesState {
   [id: string]: any;
 }
 
+interface GroupFilters {
+  app: string[];
+  domain: string[];
+}
+
+interface SearchFilters {
+  term: string;
+  regex: boolean;
+}
+
+interface TrafficTableFilters {
+  statusCode: string[];
+  method: string[];
+  contentType: string[];
+  app: string[];
+  domain: string[];
+  search: SearchFilters;
+}
+
 interface DesktopTrafficTableState {
   logs: EntityState<any>;
   responses: ResponsesState; // Stores all the bodies in different state key
+  filters: TrafficTableFilters;
 }
 
 export const logsAdapter = createEntityAdapter<any>({
@@ -17,12 +37,25 @@ export const logsAdapter = createEntityAdapter<any>({
   sortComparer: (a, b) => (a?.timestamp > b?.timestamp ? 1 : -1),
 });
 
+const initialState: DesktopTrafficTableState = {
+  logs: logsAdapter.getInitialState(),
+  responses: {},
+  filters: {
+    statusCode: [],
+    method: [],
+    contentType: [],
+    app: [],
+    domain: [],
+    search: {
+      term: "",
+      regex: false,
+    },
+  },
+};
+
 const slice = createSlice({
   name: ReducerKeys.DESKTOP_TRAFFIC_TABLE,
-  initialState: {
-    logs: logsAdapter.getInitialState(),
-    responses: {},
-  },
+  initialState,
   reducers: {
     logAdd: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.addOne(state.logs, action.payload);
@@ -47,6 +80,45 @@ const slice = createSlice({
     },
     logResponsesClearAll: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       state.responses = {};
+    },
+    updateFilters: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
+      state.filters = {
+        ...state.filters,
+        ...action.payload,
+      };
+    },
+    updateSearchTerm: (state: DesktopTrafficTableState, action: PayloadAction<string>) => {
+      state.filters.search.term = action.payload;
+    },
+    addGroupFilters: (
+      state: DesktopTrafficTableState,
+      action: PayloadAction<{ key: keyof GroupFilters; value: string }>
+    ) => {
+      state.filters[action.payload.key].push(action.payload.value);
+    },
+    removeGroupFilter: (
+      state: DesktopTrafficTableState,
+      action: PayloadAction<{ key: keyof GroupFilters; domain: string }>
+    ) => {
+      const index = state.filters[action.payload.key].indexOf(action.payload.domain);
+      if (index !== -1) {
+        state.filters[action.payload.key].splice(index, 1);
+      }
+    },
+    clearGroupFilters: (state: DesktopTrafficTableState) => {
+      state.filters.app = [];
+      state.filters.domain = [];
+    },
+    toggleRegexSearch: (state: DesktopTrafficTableState) => {
+      state.filters.search.regex = !state.filters.search.regex;
+    },
+    clearColumnFilters: (state: DesktopTrafficTableState) => {
+      state.filters = {
+        ...state.filters,
+        method: initialState.filters.method,
+        contentType: initialState.filters.contentType,
+        statusCode: initialState.filters.statusCode,
+      };
     },
   },
 });

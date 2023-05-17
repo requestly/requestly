@@ -13,6 +13,7 @@ import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient } from "components/common/APIClient";
+import NoTrafficCTA from "./NoTrafficCTA";
 
 export const ITEM_SIZE = 30;
 
@@ -139,6 +140,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
           logs={logs}
           selectedRowData={selectedRowData}
           onReplayRequest={onReplayRequest}
+          EmptyStateComponent={NoTrafficCTA}
         />
       );
     }
