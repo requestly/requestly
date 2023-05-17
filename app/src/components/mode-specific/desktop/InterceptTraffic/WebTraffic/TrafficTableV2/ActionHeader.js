@@ -12,24 +12,41 @@ import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { useDispatch, useSelector } from "react-redux";
+import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
+import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
+import {
+  trackTrafficInterceptionPaused,
+  trackTrafficInterceptionResumed,
+  trackTrafficTableFilterClicked,
+  trackTrafficTableSearched,
+} from "modules/analytics/events/desktopApp";
 
 const { Text } = Typography;
 
 const ActionHeader = ({
-  handleOnSearchChange,
   clearLogs,
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
   setIsInterceptingTraffic,
-  isRegexSearchActive,
   isFiltersCollapsed,
-  setIsRegexSearchActive,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
 }) => {
+  const dispatch = useDispatch();
+  const trafficTableFilters = useSelector(getAllFilters);
+
+  const isRegexSearchActive = trafficTableFilters.search.regex;
+
+  const handleOnSearchChange = (e) => {
+    const searchValue = e.target.value;
+    if (searchValue) trackTrafficTableSearched();
+    dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
+  };
+
   const renderSearchInput = () => {
-    if (isRegexSearchActive) {
+    if (trafficTableFilters.search.regex) {
       return (
         <Input.Search
           className="action-header-input"
@@ -45,7 +62,7 @@ const ActionHeader = ({
                   className={`traffic-table-regex-btn ${
                     isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
                   }`}
-                  onClick={() => setIsRegexSearchActive((prev) => !prev)}
+                  onClick={() => dispatch(desktopTrafficTableActions.toggleRegexSearch())}
                   iconOnly
                   icon={<VscRegex />}
                 />
@@ -68,7 +85,9 @@ const ActionHeader = ({
               className={`traffic-table-regex-btn ${
                 isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
               }`}
-              onClick={() => setIsRegexSearchActive((prev) => !prev)}
+              onClick={() => {
+                dispatch(desktopTrafficTableActions.toggleRegexSearch());
+              }}
               iconOnly
               icon={<VscRegex />}
             />
@@ -91,17 +110,20 @@ const ActionHeader = ({
       >
         <Space direction="horizontal">
           <Col>{renderSearchInput()}</Col>
-          {/* <Col>
+          <Col>
             <Badge count={activeFiltersCount} size="small">
               <RQButton
                 type="default"
                 iconOnly
                 icon={<FaFilter />}
-                onClick={() => setIsFiltersCollapsed((prev) => !prev)}
+                onClick={() => {
+                  setIsFiltersCollapsed((prev) => !prev);
+                  trackTrafficTableFilterClicked();
+                }}
                 className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
               />
             </Badge>
-          </Col> */}
+          </Col>
           <Col>
             <Tooltip placement="top" title="Clear Logs">
               <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
@@ -159,6 +181,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
           onClick={() => {
             setIsPaused(false);
             onChange(false); // isPaused
+            trackTrafficInterceptionResumed();
           }}
         />
       ) : (
@@ -170,6 +193,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
           onClick={() => {
             setIsPaused(true);
             onChange(true); // isPaused
+            trackTrafficInterceptionPaused();
           }}
         />
       )}
