@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useState } from "react";
 import { DesktopOutlined } from "@ant-design/icons";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -9,7 +10,6 @@ import {
   trackConnectAppsClicked,
   trackSystemWideConnected,
 } from "modules/analytics/events/desktopApp/apps";
-import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getAllFilters } from "store/features/desktop-traffic-table/selectors";

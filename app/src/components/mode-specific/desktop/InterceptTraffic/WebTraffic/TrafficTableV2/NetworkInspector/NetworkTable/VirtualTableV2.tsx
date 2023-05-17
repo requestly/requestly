@@ -8,7 +8,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import "./virtualTableV2.css";
 import { Button } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons";
-import NoTrafficCTA from "./NoTrafficCTA";
 
 interface Props {
   logs: any;
@@ -16,9 +15,17 @@ interface Props {
   renderLogRow: any;
   selectedRowData: any;
   onReplayRequest: () => void;
+  EmptyStateComponent: React.FC<any>;
 }
 
-const VirtualTableV2 = ({ logs = [], renderHeader, renderLogRow, selectedRowData, onReplayRequest }: Props) => {
+const VirtualTableV2: React.FC<Props> = ({
+  logs = [],
+  renderHeader,
+  renderLogRow,
+  selectedRowData,
+  onReplayRequest,
+  EmptyStateComponent,
+}) => {
   const [selected, setSelected] = useState(null);
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
@@ -109,7 +116,7 @@ const VirtualTableV2 = ({ logs = [], renderHeader, renderLogRow, selectedRowData
   }, [logs, setLogsLength]);
 
   if (logs.length === 0) {
-    return <NoTrafficCTA />;
+    return <EmptyStateComponent />;
   }
 
   return (
