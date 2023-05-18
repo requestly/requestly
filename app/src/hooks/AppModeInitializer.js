@@ -190,7 +190,6 @@ const AppModeInitializer = () => {
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
-        console.log("!!!debug", "extension events", message);
         return {
           ackIds: batchIdsToAcknowledge,
           received: true,
