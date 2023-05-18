@@ -72,6 +72,7 @@
     "firebase": "^9.6.8",
     "fuzzysort": "^2.0.4",
     "is-empty": "^1.2.0",
+    "javascript-1flow-sdk": "^1.0.2",
     "js-file-download": "^0.4.12",
     "jsoneditor": "^9.7.3",
     "jsoneditor-react": "^3.1.2",
@@ -122,8 +123,8 @@
     "util": "^0.12.5",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
-    "yargs-parser": "^21.1.1",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.5.0",
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
     "@requestly/web-sdk": "0.12.1",

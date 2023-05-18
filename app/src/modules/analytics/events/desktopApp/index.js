@@ -72,3 +72,28 @@ export const trackTrafficTableDropdownClicked = (action) => {
 export const trackTrafficTableLogsCleared = (app_connected) => {
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_LOGS_CLEARED, { app_connected });
 };
+
+export const trackTrafficInterceptionPaused = () => {
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_PAUSED);
+};
+
+export const trackTrafficInterceptionResumed = () => {
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_RESUMED);
+};
+
+export const trackTrafficTableFilterClicked = () => {
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
+};
+
+export const trackTrafficTableSearched = () => {
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_SEARCHED);
+};
+
+export const trackTrafficTableFilterApplied = (filter_type, filter_value, count) => {
+  const params = {
+    filter_type,
+    filter_value,
+    count,
+  };
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_APPLIED, params);
+};

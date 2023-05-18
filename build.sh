@@ -28,4 +28,5 @@ echo -e "\n***** Building browser extension *****"
 cd browser-extension
 bash build.sh ${env}
 
+
 echo -e "\n***** Requestly build complete *****"
