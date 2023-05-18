@@ -43,7 +43,7 @@ import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
-  logs = [],
+  logs: propLogs = [],
   emptyCtaText,
   emptyCtaAction,
   emptyDesc,
@@ -62,7 +62,7 @@ const CurrentTrafficTable = ({
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
-  const previousLogsRef = useRef(logs);
+  const previousLogsRef = useRef(propLogs);
 
   // Component State
   const [networkLogsMap, setNetworkLogsMap] = useState({});
@@ -107,11 +107,11 @@ const CurrentTrafficTable = ({
   const stableUpsertLogs = useCallback(upsertLogs, [networkLogsMap]);
 
   useEffect(() => {
-    if (!isEqual(sortBy(previousLogsRef.current), sortBy(logs))) {
-      stableUpsertLogs(logs);
-      previousLogsRef.current = logs;
+    if (!isEqual(sortBy(previousLogsRef.current), sortBy(propLogs))) {
+      stableUpsertLogs(propLogs);
+      previousLogsRef.current = propLogs;
     }
-  }, [logs, stableUpsertLogs]);
+  }, [propLogs, stableUpsertLogs]);
 
   const handlePreviewVisibility = (visible = false) => {
     setIsPreviewOpen(visible);
@@ -345,11 +345,11 @@ const CurrentTrafficTable = ({
       }
       // New Redux
       else {
-        logs = newLogs;
+        logs = isStaticPreview ? propLogs : newLogs;
       }
       return logs;
     },
-    [networkLogsMap, newLogs]
+    [isStaticPreview, networkLogsMap, newLogs, propLogs]
   );
 
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
@@ -412,10 +412,11 @@ const CurrentTrafficTable = ({
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
+          isStaticPreview={isStaticPreview}
         />
       );
     },
-    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, requestLogs]
+    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, isStaticPreview, requestLogs]
   );
 
   const handleClearFilter = useCallback(
@@ -601,7 +602,7 @@ const CurrentTrafficTable = ({
               activeFiltersCount={activeFiltersCount}
             />
             {isStaticPreview ? (
-              <Tag>{logs.length} requests</Tag>
+              <Tag>{propLogs.length} requests</Tag>
             ) : newLogs.length ? (
               <Tag>{newLogs.length} requests</Tag>
             ) : null}

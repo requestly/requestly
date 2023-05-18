@@ -3,7 +3,7 @@ import { Button } from "antd";
 import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/NetworkInspector";
 import "./index.css";
 
-const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc }) => {
+const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc, isStaticPreview }) => {
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
       return (
@@ -23,6 +23,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
 
   return (
     <NetworkInspector
+      isStaticPreview={isStaticPreview}
       logs={requestsLog}
       onRow={(record) => {
         const { actions } = record;
