@@ -81,7 +81,7 @@ export function createLogsHar(logs: Log[]) {
  * - importing any random (but valid) har file too!
  */
 export const convertHarJsonToRQLogs = (har: Har): Log[] => {
-  const res: Log[] = har.log.entries.map((entry) => {
+  const res: Log[] = har?.log?.entries?.map((entry) => {
     const requestHeaders: Record<string, string> = {};
     entry.request.headers.forEach((headerObj) => {
       requestHeaders[headerObj.name] = headerObj.value;

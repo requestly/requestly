@@ -52,8 +52,8 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
     [openSaveModal]
   );
 
-  const ImportRulesDropzone = () => {
-    const onDrop = useCallback(async (acceptedFiles: any) => {
+  const onDrop = useCallback(
+    (acceptedFiles: any) => {
       //Ignore other uploaded files
       const file = acceptedFiles[0];
 
@@ -75,9 +75,13 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
         }
       };
       reader.readAsText(file);
-    }, []);
-    const { getRootProps, getInputProps } = useDropzone({ onDrop });
+    },
+    [closeDropZone, handleImportedData]
+  );
 
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  const importDropzone = () => {
     return (
       <div {...getRootProps()}>
         <input {...getInputProps()} />
@@ -124,7 +128,7 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
         }}
         title="Import Traffic Logs"
       >
-        {processingDataToImport ? renderLoader() : <ImportRulesDropzone />}
+        {processingDataToImport ? renderLoader() : importDropzone()}
       </Modal>
       <SessionSaveModal isVisible={isSaveModalVisible} closeModal={closeSaveModal} har={importedHar} onSave={onSaved} />
     </React.Fragment>

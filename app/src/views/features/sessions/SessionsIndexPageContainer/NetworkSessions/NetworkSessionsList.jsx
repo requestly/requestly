@@ -28,7 +28,7 @@ export const confirmAndDeleteRecording = (id, callback) => {
     icon: <ExclamationCircleOutlined />,
     content: (
       <div>
-        <p>Are you sure you want to delete this recording?</p>
+        <p>Are you sure you want to delete this session?</p>
       </div>
     ),
     okText: "Delete",
