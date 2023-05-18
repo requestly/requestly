@@ -8,7 +8,7 @@ This repository contains most of the modules that make up Requestly.
 
 ### Install
 
-Please make sure that Node version >= 16.15.0 is installed on your system. 
+Please make sure that Node version >= 16.15.0 is installed on your system.
 
 ```sh
 sh install.sh local
