@@ -17,13 +17,9 @@ RQ.registerPredefinedFunction("rq_rand", {
 
   argument: RQ.PreDefinedFunction.patterns.NUMBER, // rq_rand(argument)
 
-  getRandomNumber: function (numDigits) {
-    return Math.ceil(Math.random() * Math.pow(10, numDigits));
-  },
-
   argumentEvaluator: function (arg) {
     var numDigits = Math.min(arg, 8),
-      valueToFit = this.getRandomNumber(numDigits);
+      valueToFit = Math.ceil(Math.random() * Math.pow(10, numDigits));
 
     // Catch: For <rq_rand(4)>, we may get 3 digit value because leading zeros are omitted from numbers
     valueToFit = valueToFit.toString();
@@ -78,5 +74,27 @@ RQ.registerPredefinedFunction("rq_decrement", {
   argumentEvaluator: function (num, step) {
     step = step || 1;
     return parseInt(num) - parseInt(step);
+  },
+});
+
+RQ.registerPredefinedFunction("rq_request_origin", {
+  description: "The origin from where the request originated",
+
+  usage: "rq_request_origin()",
+
+  argument: [],
+
+  // the function is invoked in the context of network request details object
+  argumentEvaluator: function () {
+    if (this.initiator && this.initiator !== "null") {
+      return this.initiator;
+    }
+
+    try {
+      const url = new URL(window.tabService.getTabUrl(this.tabId));
+      return url.origin;
+    } catch (e) {
+      return "";
+    }
   },
 });
