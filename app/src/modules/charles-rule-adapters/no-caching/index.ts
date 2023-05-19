@@ -1,7 +1,7 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { getSourcesData, getHeaders } from "../utils";
+import { getSourcesData, getHeaders, getGroupName } from "../utils";
 import { CharlesRuleType, NoCachingRule, ParsedRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
@@ -43,7 +43,7 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
       {
         rules: exportedRules,
         status: isToolEnabled,
-        name: CharlesRuleType.NO_CACHING,
+        name: getGroupName(CharlesRuleType.NO_CACHING),
       },
     ],
   };

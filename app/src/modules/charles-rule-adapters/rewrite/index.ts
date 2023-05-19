@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { CharlesRuleType, ParsedRule, RewriteRule, RewriteRulePair, RewriteSet, SourceData } from "../types";
-import { convertToArray, getSourcesData } from "../utils";
+import { convertToArray, getGroupName, getSourcesData } from "../utils";
 import { rewriteRuleActionTypes } from "./constants";
 import {
   createModifyBodyRule,
@@ -58,7 +58,7 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
           ...result,
           {
             status: active && source.status,
-            name: source.value,
+            name: getGroupName(source.value),
             rules: getRulesToBeImported(rewriteRulePairs, source),
           },
         ];

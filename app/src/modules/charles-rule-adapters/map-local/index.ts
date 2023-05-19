@@ -2,7 +2,7 @@ import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
-import { getLocation } from "../utils";
+import { getGroupName, getLocation } from "../utils";
 import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings, ParsedRule } from "../types";
 
 export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
@@ -40,7 +40,7 @@ export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
       {
         rules: exportedRules,
         status: isToolEnabled,
-        name: CharlesRuleType.MAP_LOCAL,
+        name: getGroupName(CharlesRuleType.MAP_LOCAL),
       },
     ],
   };
