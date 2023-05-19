@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
-import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu, Skeleton } from "antd";
+import { getAppMode, getAppTheme, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
+import { Menu, Skeleton, Tooltip } from "antd";
 import { useLocation, Link } from "react-router-dom";
 import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
@@ -116,6 +116,7 @@ const MenuItem = (props) => {
   const appMode = useSelector(getAppMode);
   const appTheme = useSelector(getAppTheme);
   const user = useSelector(getUserAuthDetails);
+  const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
 
   // Component State
   const [routes, setRoutes] = useState([]);
@@ -139,6 +140,22 @@ const MenuItem = (props) => {
       return !route.feature || isFeatureCompatible(route.feature);
     });
 
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession) {
+      const sessionItemIndex = finalRoutes.findIndex((route) => route.key === "sessions");
+
+      sessionItemIndex !== -1 &&
+        finalRoutes.splice(sessionItemIndex, 1, {
+          path: PATHS.SESSIONS.RELATIVE,
+          name: "Sessions",
+          icon: (
+            <Tooltip title={"View and manage your saved sessions here"} placement="right" open={isSavingNetworkSession}>
+              <Video set="curved" className="remix-icon" />
+            </Tooltip>
+          ),
+          key: "sessions",
+        });
+    }
+
     // For Desktop App - Show Sources menu in Navbar only in  Desktop App
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       finalRoutes.unshift({
@@ -160,7 +177,7 @@ const MenuItem = (props) => {
     }
 
     setRoutes(finalRoutes);
-  }, [appMode, isAndroidDebuggerEnabled]);
+  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
 
   const menuItems = useMemo(
     () =>

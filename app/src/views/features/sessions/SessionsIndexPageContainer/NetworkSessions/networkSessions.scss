@@ -1,0 +1,71 @@
+.network-session-viewer-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.network-session-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  margin-left: 197px;
+
+  .network-session-recording-name {
+    line-height: 40px;
+    margin: 0;
+  }
+}
+
+.network-session-viewer-more-actions {
+  .more-action {
+    padding: 5px 10px;
+
+    .more-action-icon {
+      width: initial;
+      padding: 5px;
+    }
+  }
+}
+
+.network-session-table-container {
+  .ant-pro-table-list-toolbar-left,
+  .ant-pro-table-list-toolbar-title {
+    width: 100%;
+  }
+
+  .network-session-list-header {
+    width: 100%;
+    justify-content: space-between;
+    .rq-btn {
+      margin: 0;
+    }
+    .network-session-list-heading {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .session-viewer-page {
+    .session-viewer-header {
+      flex-direction: column;
+    }
+  }
+}
+
+.network-session-modal {
+  .network-session-modal-content {
+    padding: 20px;
+    background: var(--body-background);
+    overflow: auto;
+    border-radius: var(--border-radius-md);
+
+    .network-session-modal-footer {
+      justify-content: end;
+      margin-top: 16px;
+    }
+  }
+}

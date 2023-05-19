@@ -13,20 +13,20 @@ import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient } from "components/common/APIClient";
-import NoTrafficCTA from "./NoTrafficCTA";
 
 export const ITEM_SIZE = 30;
 
 interface Props {
   logs: any;
   onRow: Function;
+  isStaticPreview: boolean;
 }
 
 interface RowData {
   requestShellCurl?: string;
 }
 
-const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
+const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
   const [selectedRowData, setSelectedRowData] = useState<RowData>({});
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -74,6 +74,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
       dataIndex: ["actions"],
       width: "10%",
       responsive: ["xs", "sm"],
+      hideColumn: isStaticPreview,
       render: (actions: any) => {
         if (!actions || actions === "-" || actions.length === 0) {
           return "-";
@@ -93,11 +94,16 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
     return (
       <Table.Head style={{ zIndex: 1000 }}>
         <Table.Row>
-          {columns.map((column: any) => (
-            <Table.HeadCell key={column.id} style={{ width: column.width }}>
-              {column.title}
-            </Table.HeadCell>
-          ))}
+          {columns.map((column: any) => {
+            if (column.hideColumn === true) {
+              return null;
+            }
+            return (
+              <Table.HeadCell key={column.id} style={{ width: column.width }}>
+                {column.title}
+              </Table.HeadCell>
+            );
+          })}
         </Table.Row>
       </Table.Head>
     );
@@ -119,6 +125,9 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
         data-tour-id={index === 0 && !isTrafficTableTourCompleted ? "traffic-table-row" : null}
       >
         {columns.map((column: any) => {
+          if (column.hideColumn === true) {
+            return null;
+          }
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
           return <Table.Cell key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
@@ -140,7 +149,6 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow }) => {
           logs={logs}
           selectedRowData={selectedRowData}
           onReplayRequest={onReplayRequest}
-          EmptyStateComponent={NoTrafficCTA}
         />
       );
     }
