@@ -38,6 +38,10 @@ const LINKS = {
   // Docs - Source Filters
   REQUESTLY_DOCS_SOURCE_FILTERS: "https://docs.requestly.io/browser-extension/chrome/features/advance-targeting",
 
+  // Docs - Import rules from charles proxy (desktop only)
+  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES:
+    "https://docs.requestly.io/desktop-app/mac/features/import-settings-from-charles",
+
   /** LANDING PAGES **/
 
   // Home
