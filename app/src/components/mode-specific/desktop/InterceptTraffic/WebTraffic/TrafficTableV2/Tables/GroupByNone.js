@@ -17,7 +17,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       );
     }
 
-    return <NoTrafficCTA />;
+    return <NoTrafficCTA isStaticPreview={isStaticPreview} />;
   };
 
   if (requestsLog?.length === 0) {

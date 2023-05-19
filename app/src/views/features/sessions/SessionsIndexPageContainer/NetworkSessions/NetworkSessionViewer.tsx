@@ -3,7 +3,7 @@ import {
   convertHarJsonToRQLogs,
   createLogsHar,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
-import { redirectToSessionRecordingHome, redirectToTraffic } from "utils/RedirectionUtils";
+import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { Log } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
@@ -83,9 +83,9 @@ const NetworkSessionViewer: React.FC<{}> = () => {
         <TrafficTable
           logs={recordedLogs}
           isStaticPreview={true}
-          emptyCtaText="Capture Traffic in Network Inspector"
-          emptyDesc="The har file you imported does not contain any network logs."
-          emptyCtaAction={() => redirectToTraffic(navigate)}
+          emptyCtaText=""
+          emptyDesc=""
+          emptyCtaAction={null}
           showDeviceSelector={undefined}
           deviceId={undefined}
           clearLogsCallback={undefined}

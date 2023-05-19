@@ -29,7 +29,7 @@ const convertLogToHarEntry = (log: Log) => {
     httpVersion: "HTTP/1.1",
     cookies: [],
     content: {
-      size: 33,
+      size: 0,
       compression: 0,
       text: log.response.body,
       mimeType: log.response.contentType,
