@@ -1,17 +1,26 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
 import {
+  SaveOutlined,
   CaretRightOutlined,
   ClearOutlined,
   PauseOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
+import {
+  ActionSource,
+  trackDownloadNetworkSessionClicked,
+  trackNetworkSessionSaveClicked,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { downloadHar } from "../TrafficExporter/harLogs/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
@@ -21,6 +30,7 @@ import {
   trackTrafficTableFilterClicked,
   trackTrafficTableSearched,
 } from "modules/analytics/events/desktopApp";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const { Text } = Typography;
 
@@ -29,11 +39,26 @@ const ActionHeader = ({
   setIsSSLProxyingModalVisible,
   showDeviceSelector,
   deviceId,
+  logsCount,
   setIsInterceptingTraffic,
+  logsToSaveAsHar,
+  isStaticPreview,
   isFiltersCollapsed,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
 }) => {
+  const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
+
+  const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
+
+  const closeSaveModal = useCallback(() => {
+    setIsSessionSaveModalOpen(false);
+  }, []);
+
+  const openSaveModal = useCallback(() => {
+    setIsSessionSaveModalOpen(true);
+  }, []);
+
   const dispatch = useDispatch();
   const trafficTableFilters = useSelector(getAllFilters);
 
@@ -126,52 +151,94 @@ const ActionHeader = ({
               />
             </Badge>
           </Col>
-          <Col>
-            <Tooltip placement="top" title="Clear Logs">
-              <Button type="primary" shape="circle" icon={<ClearOutlined />} onClick={clearLogs} />
-            </Tooltip>
-          </Col>
-          {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
-            <Col>
-              <Tooltip title="SSL Proxying">
-                <Button
-                  type="primary"
-                  shape="circle"
-                  icon={<SafetyCertificateOutlined />}
-                  onClick={() => setIsSSLProxyingModalVisible(true)}
-                />
-              </Tooltip>
-            </Col>
-          ) : null}
-          {showDeviceSelector ? (
+          {isStaticPreview ? null : (
             <>
               <Col>
-                <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
-                  <SettingOutlined />
-                </Button>
+                <Tooltip placement="top" title="Clear Logs">
+                  <Button
+                    type="primary"
+                    disabled={!logsCount}
+                    shape="circle"
+                    icon={<ClearOutlined />}
+                    onClick={clearLogs}
+                  />
+                </Tooltip>
               </Col>
+              {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
+                <>
+                  <Col>
+                    <Tooltip placement="top" title="Save Network Session">
+                      <Button
+                        type="primary"
+                        disabled={!logsCount}
+                        icon={<SaveOutlined />}
+                        onClick={() => {
+                          trackNetworkSessionSaveClicked();
+                          openSaveModal();
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                  <Col>
+                    <Tooltip placement="top" title="Export Network Session">
+                      <Button
+                        type="primary"
+                        disabled={!logsCount}
+                        icon={<DownloadOutlined />}
+                        onClick={() => {
+                          downloadHar(logsToSaveAsHar || {}, "");
+                          trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                </>
+              ) : null}
+              {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
+                <Col>
+                  <Tooltip title="SSL Proxying">
+                    <Button
+                      type="primary"
+                      shape="circle"
+                      icon={<SafetyCertificateOutlined />}
+                      onClick={() => setIsSSLProxyingModalVisible(true)}
+                    />
+                  </Tooltip>
+                </Col>
+              ) : null}
+              {showDeviceSelector ? (
+                <>
+                  <Col>
+                    <Button onClick={showDeviceSelector} shape="circle" danger type="primary">
+                      <SettingOutlined />
+                    </Button>
+                  </Col>
+                  <Col>
+                    <Text code>Device Id: {deviceId || "Null"}</Text>
+                  </Col>
+                </>
+              ) : null}
               <Col>
-                <Text code>Device Id: {deviceId || "Null"}</Text>
+                <PauseAndPlayButton
+                  defaultIsPaused={false}
+                  onChange={(isPaused) => {
+                    setIsInterceptingTraffic(!isPaused);
+                  }}
+                  disabled={!logsCount}
+                />
               </Col>
             </>
-          ) : null}
-          <Col>
-            <PauseAndPlayButton
-              defaultIsPaused={false}
-              onChange={(isPaused) => {
-                setIsInterceptingTraffic(!isPaused);
-              }}
-            />
-          </Col>
+          )}
         </Space>
       </Row>
+      <SessionSaveModal har={logsToSaveAsHar} isVisible={isSessionSaveModalOpen} closeModal={closeSaveModal} />
     </>
   );
 };
 
 export default ActionHeader;
 
-function PauseAndPlayButton({ defaultIsPaused, onChange }) {
+function PauseAndPlayButton({ defaultIsPaused, onChange, disabled }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
   return (
     <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
@@ -197,6 +264,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange }) {
             onChange(true); // isPaused
             trackTrafficInterceptionPaused();
           }}
+          disabled={disabled}
         />
       )}
     </Tooltip>

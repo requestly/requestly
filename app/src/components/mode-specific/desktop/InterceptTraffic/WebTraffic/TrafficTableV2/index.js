@@ -36,19 +36,21 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
+import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
-  logs = [],
+  logs: propLogs = [],
   emptyCtaText,
   emptyCtaAction,
   emptyDesc,
   showDeviceSelector,
   deviceId,
   clearLogsCallback,
+  isStaticPreview = false,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -60,7 +62,7 @@ const CurrentTrafficTable = ({
 
   const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
 
-  const previousLogsRef = useRef(logs);
+  const previousLogsRef = useRef(propLogs);
 
   // Component State
   const [networkLogsMap, setNetworkLogsMap] = useState({});
@@ -105,11 +107,11 @@ const CurrentTrafficTable = ({
   const stableUpsertLogs = useCallback(upsertLogs, [networkLogsMap]);
 
   useEffect(() => {
-    if (!isEqual(sortBy(previousLogsRef.current), sortBy(logs))) {
-      stableUpsertLogs(logs);
-      previousLogsRef.current = logs;
+    if (!isEqual(sortBy(previousLogsRef.current), sortBy(propLogs))) {
+      stableUpsertLogs(propLogs);
+      previousLogsRef.current = propLogs;
     }
-  }, [logs, stableUpsertLogs]);
+  }, [propLogs, stableUpsertLogs]);
 
   const handlePreviewVisibility = (visible = false) => {
     setIsPreviewOpen(visible);
@@ -266,17 +268,17 @@ const CurrentTrafficTable = ({
   }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
 
   useEffect(() => {
-    if (window.RQ && window.RQ.DESKTOP) {
+    if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
     }
 
     return () => {
-      if (window.RQ && window.RQ.DESKTOP) {
+      if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
         // Disable sending logs from bg window
         window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
-  }, []);
+  }, [isStaticPreview]);
 
   const activeFiltersCount = useMemo(
     () => [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.contentType].length,
@@ -343,11 +345,11 @@ const CurrentTrafficTable = ({
       }
       // New Redux
       else {
-        logs = newLogs;
+        logs = isStaticPreview ? propLogs : newLogs;
       }
       return logs;
     },
-    [networkLogsMap, newLogs]
+    [isStaticPreview, networkLogsMap, newLogs, propLogs]
   );
 
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
@@ -410,10 +412,11 @@ const CurrentTrafficTable = ({
           emptyCtaText={emptyCtaText}
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
+          isStaticPreview={isStaticPreview}
         />
       );
     },
-    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, requestLogs]
+    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, isStaticPreview, requestLogs]
   );
 
   const handleClearFilter = useCallback(
@@ -547,6 +550,11 @@ const CurrentTrafficTable = ({
     handleSubMenuTitleClick,
   ]);
 
+  const stableGetLogsToExport = useMemo(() => {
+    const logsToExport = getFilteredLogs(newLogs);
+    return createLogsHar(logsToExport);
+  }, [getFilteredLogs, newLogs]);
+
   const handleSidebarMenuItemClick = useCallback(
     (e) => {
       if (e.key === "clear_all") return;
@@ -586,11 +594,18 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
               setIsInterceptingTraffic={setIsInterceptingTraffic}
+              logsCount={newLogs.length}
+              logsToSaveAsHar={stableGetLogsToExport}
+              isStaticPreview={isStaticPreview}
               isFiltersCollapsed={isFiltersCollapsed}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               activeFiltersCount={activeFiltersCount}
             />
-            {newLogs.length ? <Tag>{newLogs.length} requests</Tag> : null}
+            {isStaticPreview ? (
+              <Tag>{propLogs.length} requests</Tag>
+            ) : newLogs.length ? (
+              <Tag>{newLogs.length} requests</Tag>
+            ) : null}
           </Row>
           {!isFiltersCollapsed && (
             <Row className="traffic-table-filters-container">
