@@ -11,6 +11,7 @@ import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRul
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
+import LINKS from "config/constants/sub/links";
 import {
   trackCharlesSettingsParsed,
   trackCharlesSettingsImportFailed,
@@ -158,9 +159,13 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
               {rulesToImport?.otherRuleTypesCount > 0 && (
                 <>
                   <Typography.Text type="secondary">
-                    Other settings are not supported in Requestly.
-                    {/* eslint-disable-next-line */}
-                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}>
+                    Other settings are not supported in Requestly.{" "}
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
+                      onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}
+                    >
                       Learn more
                     </a>
                   </Typography.Text>
