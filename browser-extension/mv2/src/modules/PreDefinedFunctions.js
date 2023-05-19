@@ -77,10 +77,10 @@ RQ.registerPredefinedFunction("rq_decrement", {
   },
 });
 
-RQ.registerPredefinedFunction("rq_request_origin", {
-  description: "The origin from where the request originated",
+RQ.registerPredefinedFunction("rq_request_initiator_origin", {
+  description: "The origin from where the request initiated",
 
-  usage: "rq_request_origin()",
+  usage: "rq_request_initiator_origin()",
 
   argument: [],
 
