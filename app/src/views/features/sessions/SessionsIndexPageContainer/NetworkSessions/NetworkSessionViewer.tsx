@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-// import { NetworkSessionRecord } from "./types"
+import React, { useCallback, useEffect, useState } from "react";
 import {
   convertHarJsonToRQLogs,
   createLogsHar,
@@ -9,8 +8,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { Log } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
-import { Button, Dropdown, Menu, Space, Typography } from "antd";
-import { DeleteOutlined, DownloadOutlined, MoreOutlined } from "@ant-design/icons";
+import { Button, Space, Typography } from "antd";
+import { DeleteOutlined, DownloadOutlined } from "@ant-design/icons";
 
 import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "./NetworkSessionsList";
@@ -40,36 +39,6 @@ const NetworkSessionViewer: React.FC<{}> = () => {
   }, [fetchRecording]);
 
   const renderLoader = () => <PageLoader message="Fetching session details..." />;
-  const sessionActionsDropdownMenu = useMemo(
-    () => (
-      <Menu className="network-session-viewer-more-actions">
-        <Menu.Item
-          key="delete"
-          className="more-action"
-          onClick={() => {
-            confirmAndDeleteRecording(id, () => {
-              redirectToSessionRecordingHome(navigate);
-            });
-            trackDeleteNetworkSessionClicked(ActionSource.Preview);
-          }}
-        >
-          <DeleteOutlined className="more-action-icon" /> Delete Session
-        </Menu.Item>
-        <Menu.Item
-          key="download"
-          className="more-action"
-          disabled={!(!!recordedLogs && recordedLogs?.length !== 0)}
-          onClick={() => {
-            downloadHar(createLogsHar(recordedLogs), sessionName);
-            trackDownloadNetworkSessionClicked(ActionSource.Preview);
-          }}
-        >
-          <DownloadOutlined className="more-action-icon" /> Export as Har
-        </Menu.Item>
-      </Menu>
-    ),
-    [navigate, id, recordedLogs, sessionName]
-  );
 
   return recordedLogs ? (
     <>
@@ -87,9 +56,26 @@ const NetworkSessionViewer: React.FC<{}> = () => {
           </div>
           <div className="session-viewer-actions">
             <Space>
-              <Dropdown overlay={sessionActionsDropdownMenu} trigger={["click"]}>
-                <Button icon={<MoreOutlined />} onClick={(e) => e.preventDefault()} />
-              </Dropdown>
+              <Button
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  confirmAndDeleteRecording(id, () => {
+                    redirectToSessionRecordingHome(navigate);
+                  });
+                  trackDeleteNetworkSessionClicked(ActionSource.Preview);
+                }}
+              >
+                Delete session
+              </Button>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={() => {
+                  downloadHar(createLogsHar(recordedLogs), sessionName);
+                  trackDownloadNetworkSessionClicked(ActionSource.Preview);
+                }}
+              >
+                Export as HAR
+              </Button>
             </Space>
           </div>
         </div>
