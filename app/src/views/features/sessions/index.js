@@ -10,12 +10,15 @@ import NetworkSessionsIndexPage from "./SessionsIndexPageContainer/NetworkSessio
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import DesktopAppError from "./errors/DesktopAppError";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const SessionsHomeView = () => {
+  const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
+
   //Global State
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS)) {
+  if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) {
     return <NetworkSessionsIndexPage />;
   }
 

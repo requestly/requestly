@@ -30,6 +30,7 @@ import {
   trackTrafficTableFilterClicked,
   trackTrafficTableSearched,
 } from "modules/analytics/events/desktopApp";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const { Text } = Typography;
 
@@ -46,6 +47,8 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
 }) => {
+  const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
+
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
   const closeSaveModal = useCallback(() => {
@@ -161,7 +164,7 @@ const ActionHeader = ({
                   />
                 </Tooltip>
               </Col>
-              {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) ? (
+              {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
                 <>
                   <Col>
                     <Tooltip placement="top" title="Save Network Session">
