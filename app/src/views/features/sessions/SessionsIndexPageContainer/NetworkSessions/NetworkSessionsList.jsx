@@ -8,7 +8,7 @@ import { Modal, Space, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { deleteNetworkSession, getNetworkSession } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
-import ImportandSaveNetworkHarModalButton from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
+import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { toast } from "utils/Toast";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useCallback } from "react";
@@ -146,7 +146,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
             <Typography.Title level={4} className="network-session-list-heading">
               Network Session Recordings
             </Typography.Title>
-            <ImportandSaveNetworkHarModalButton onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+            <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
           </Space>
         }
       />

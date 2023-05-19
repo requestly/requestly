@@ -9,7 +9,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { getUserAuthDetails } from "store/selectors";
 import { AUTH } from "modules/analytics/events/common/constants.js";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
-import ImportandSaveNetworkHarModalButton from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
+import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
@@ -56,7 +56,7 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
       </Typography.Text>
       <div>
-        <ImportandSaveNetworkHarModalButton onSaved={stableNavigate} />
+        <HarImportModal onSaved={stableNavigate} />
       </div>
       <Divider />
       <Typography.Text type="secondary">

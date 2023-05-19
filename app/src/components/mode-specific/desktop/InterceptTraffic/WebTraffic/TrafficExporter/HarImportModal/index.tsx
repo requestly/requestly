@@ -18,7 +18,7 @@ interface Props {
   btnText?: string;
 }
 
-const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText }) => {
+const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
 
@@ -135,4 +135,4 @@ const ImportandSaveNetworkHarModalButton: React.FC<Props> = ({ onSaved, btnText 
   );
 };
 
-export default ImportandSaveNetworkHarModalButton;
+export default HarImportModal;
