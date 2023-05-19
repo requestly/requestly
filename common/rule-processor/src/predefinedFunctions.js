@@ -40,10 +40,10 @@ PREDEFINED_FUNCTIONS.GENERATE_RANDOM_NUMBER = {
 // Get Request Origin
 PREDEFINED_FUNCTIONS.GET_REQUEST_ORIGIN = {
   applicableRuleTypes: [RULE_TYPES.HEADERS],
-  name: "rq_request_origin", // Name of predefined function, mandatory to start with 'rq_'.
+  name: "rq_request_initiator_origin", // Name of predefined function, mandatory to start with 'rq_'.
   description: "The origin request header",
-  usage: "rq_request_origin()",
-  argument: PATTERNS.EMPTY_STRING, // rq_request_origin()
+  usage: "rq_request_initiator_origin()",
+  argument: PATTERNS.EMPTY_STRING,
   argumentEvaluator: function ([args], payload = {}) {
     if (payload && payload["requestOrigin"]) return payload["requestOrigin"];
     return "*";

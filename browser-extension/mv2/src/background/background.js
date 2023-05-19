@@ -180,7 +180,7 @@ BG.Methods.applyDelayRequestRule = function (rule, url, details) {
       continue;
     }
 
-    resultingUrl = RuleMatcher.matchValueForPredefinedFunctions(resultingUrl, RQ.PreDefinedFunctions);
+    resultingUrl = RuleMatcher.matchValueForPredefinedFunctions(resultingUrl, details);
 
     delay = pair.delay;
 
@@ -319,10 +319,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
         isRuleApplied = true;
 
         // Check if user has used predefinedFunction in (add/modify) header value
-        var valueWithPreDefFunctionsApplied = RuleMatcher.matchValueForPredefinedFunctions(
-          modification.value,
-          RQ.PreDefinedFunctions
-        );
+        var valueWithPreDefFunctionsApplied = RuleMatcher.matchValueForPredefinedFunctions(modification.value, details);
 
         switch (modification.type) {
           case RQ.MODIFICATION_TYPES.ADD:
@@ -480,7 +477,7 @@ BG.Methods.modifyUrl = function (details) {
         }
 
         processedUrl = RuleMatcher.matchUrlWithRulePairs(rule.pairs, requestUrl, details);
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, details);
 
         break;
 
@@ -509,13 +506,13 @@ BG.Methods.modifyUrl = function (details) {
 
       case RQ.RULE_TYPES.REPLACE:
         processedUrl = BG.Methods.applyReplaceRule(rule, requestUrl, details);
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, details);
 
         break;
 
       case RQ.RULE_TYPES.QUERYPARAM:
         processedUrl = BG.Methods.applyQueryParamRule(rule, requestUrl, details);
-        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, RQ.PreDefinedFunctions);
+        processedUrl = RuleMatcher.matchValueForPredefinedFunctions(processedUrl, details);
 
         break;
 

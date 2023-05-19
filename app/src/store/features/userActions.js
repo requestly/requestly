@@ -80,5 +80,13 @@ export const updateUserAttributes = (prevState, action) => {
 };
 
 export const updateProductTourCompleted = (prevState, action) => {
-  prevState.misc[action.payload.tour] = true;
+  prevState.misc.persist[action.payload.tour] = true;
+};
+
+export const updateNetworkSessionSaveInProgress = (prevState, action) => {
+  prevState.misc.nonPersist.networkSessionSaveInProgress = action.payload;
+};
+
+export const updateNetworkSessionTooltipShown = (prevState) => {
+  prevState.misc.persist.isNetworkSessionTooltipShown = true;
 };

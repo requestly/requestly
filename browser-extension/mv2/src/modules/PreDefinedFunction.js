@@ -30,7 +30,7 @@ RQ.PreDefinedFunction.patterns = {
 RQ.PreDefinedFunction.prototype = {
   argument: RQ.PreDefinedFunction.patterns.STRING,
 
-  eval: function (value) {
+  eval: function (value, requestDetails = {}) {
     var that = this;
 
     if (typeof this.argumentEvaluator !== "function") {
@@ -45,7 +45,7 @@ RQ.PreDefinedFunction.prototype = {
         matches[1].split(",").forEach(function (arg) {
           args.push(arg.trim());
         });
-        return that.argumentEvaluator.apply(that, args);
+        return that.argumentEvaluator.apply(requestDetails, args);
       }
 
       return token;

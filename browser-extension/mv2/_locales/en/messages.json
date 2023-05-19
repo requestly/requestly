@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "Redirect URL, Modify Headers & Mock APIs",
+    "message": "Requestly: Open Source HTTPs Debugging Proxy",
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "Web Debugging Proxy to Intercept & Modify HTTPs Requests - Redirect URL, Modify Headers, Mock APIs, Modify Response, Insert Scripts",
+    "message": "Build, Test & Debug 10x faster with API Client, Mock Server, Intercept & Modify HTTPs Requests/Response & Session Recording.",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {

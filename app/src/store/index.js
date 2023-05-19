@@ -46,7 +46,7 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "initializations",
   "userPreferences",
   "userAttributes",
-  "misc",
+  "misc.persist",
 ]);
 
 export const reduxStore = configureStore({

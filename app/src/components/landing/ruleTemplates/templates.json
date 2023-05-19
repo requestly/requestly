@@ -103,7 +103,7 @@
                   {
                     "header": "Access-Control-Allow-Origin",
                     "type": "Add",
-                    "value": "*"
+                    "value": "rq_request_initiator_origin()"
                   },
                   {
                     "header": "Access-Control-Allow-Methods",
