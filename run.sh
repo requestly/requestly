@@ -24,6 +24,3 @@ else
     npm start
     cd ..
 fi
-
-
-# TODO: @nsr add startup for desktop app 
