@@ -37,6 +37,7 @@ export const blockCookiesRuleAdapter = (rules: BlockCookiesRule): ParsedRule<Hea
 
   const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
   return {
+    type: CharlesRuleType.BLOCK_COOKIES,
     groups: [
       {
         rules: exportedRules,

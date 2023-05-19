@@ -1,5 +1,5 @@
 import { get } from "lodash";
-import { ParsedRule, RewriteRule, RewriteRulePair, RewriteSet, SourceData } from "../types";
+import { CharlesRuleType, ParsedRule, RewriteRule, RewriteRulePair, RewriteSet, SourceData } from "../types";
 import { convertToArray, getSourcesData } from "../utils";
 import { rewriteRuleActionTypes } from "./constants";
 import {
@@ -43,24 +43,31 @@ export const rewriteRuleAdapter = (rules: RewriteRule): ParsedRule => {
     return;
   }
 
-  const groupsToBeImported = updatedRewriteRules.reduce((result, { active, hosts, rules }: RewriteSet) => {
-    const locations = hosts?.locationPatterns?.locationMatch;
+  const groupsToBeImported = updatedRewriteRules.reduce(
+    (result, { active, hosts, rules }: RewriteSet) => {
+      const locations = hosts?.locationPatterns?.locationMatch;
 
-    if (!locations) {
-      return result;
-    }
+      if (!locations) {
+        return result;
+      }
 
-    const rewriteRulePairs = convertToArray(rules.rewriteRule);
-    const sources = getSourcesData(locations);
-    const groups = sources.reduce((result, source) => {
-      return [
-        ...result,
-        { status: active && source.status, name: source.value, rules: getRulesToBeImported(rewriteRulePairs, source) },
-      ];
-    }, []);
+      const rewriteRulePairs = convertToArray(rules.rewriteRule);
+      const sources = getSourcesData(locations);
+      const groups = sources.reduce((result, source) => {
+        return [
+          ...result,
+          {
+            status: active && source.status,
+            name: source.value,
+            rules: getRulesToBeImported(rewriteRulePairs, source),
+          },
+        ];
+      }, []);
 
-    return { ...result, groups: [...(result.groups ?? []), ...groups] } as ParsedRule;
-  }, {} as ParsedRule);
+      return { ...result, groups: [...(result.groups ?? []), ...groups] } as ParsedRule;
+    },
+    { type: CharlesRuleType.REWRITE } as ParsedRule
+  );
 
   return groupsToBeImported;
 };

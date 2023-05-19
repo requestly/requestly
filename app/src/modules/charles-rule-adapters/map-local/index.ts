@@ -35,6 +35,7 @@ export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
 
   const isToolEnabled = get(rules, "mapLocal.toolEnabled");
   return {
+    type: CharlesRuleType.MAP_LOCAL,
     groups: [
       {
         rules: exportedRules,

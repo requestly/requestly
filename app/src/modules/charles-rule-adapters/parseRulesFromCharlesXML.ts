@@ -26,14 +26,14 @@ type CharlesExport = {
 
 type ConfigEntry = { string: CharlesRuleType } & Record<string, unknown>;
 
-const supportedRuleTypes = {
-  "No Caching": "noCaching",
-  "Block Cookies": "blockCookies",
-  "Block List": "blockList",
-  "Map Local": "mapLocal",
-  "Map Remote": "mapRemote",
-  Rewrite: "rewrite",
-};
+// const supportedRuleTypes = {
+//   "No Caching": "noCaching",
+//   "Block Cookies": "blockCookies",
+//   "Block List": "blockList",
+//   "Map Local": "mapLocal",
+//   "Map Remote": "mapRemote",
+//   Rewrite: "rewrite",
+// };
 
 export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
   const options = {
@@ -68,24 +68,26 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
         {} as Record<CharlesRuleType, ConfigEntry>
       );
 
-      const groupsToBeImported = [
+      const parsedRules = [
         noCachingRuleAdapter(recordsObject[CharlesRuleType.NO_CACHING] as NoCachingRule),
         blockCookiesRuleAdapter(recordsObject[CharlesRuleType.BLOCK_COOKIES] as BlockCookiesRule),
         blockListRuleAdapter(recordsObject[CharlesRuleType.BLOCK_LIST] as BlockListRule),
         mapRemoteAdapter(recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
         mapLocalRuleAdapter(recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
         rewriteRuleAdapter(recordsObject[CharlesRuleType.REWRITE] as RewriteRule),
-      ].reduce(
-        (result, parsedRules) => (parsedRules?.groups ? result.concat(...(parsedRules.groups ?? [])) : result),
+      ].filter((parsedRule) => !!parsedRule);
+
+      const parsedRuleTypes = parsedRules.map((parsedRule) => parsedRule.type);
+
+      const groupsToBeImported = parsedRules.reduce(
+        (result, parsedRule) => (parsedRule?.groups ? result.concat(...(parsedRule.groups ?? [])) : result),
         []
       );
 
-      const filteredRuleTypes = Object.keys(recordsObject).filter((ruleType) => ruleType in supportedRuleTypes);
-
       return {
         groups: groupsToBeImported,
-        parsedRuleTypes: filteredRuleTypes,
-        otherRuleTypesCount: Object.keys(recordsObject).length - filteredRuleTypes.length,
+        parsedRuleTypes: parsedRuleTypes,
+        otherRuleTypesCount: Object.keys(recordsObject).length - parsedRuleTypes.length,
       } as ParsedRulesFromChalres;
     });
 };

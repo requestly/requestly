@@ -64,6 +64,7 @@ export const blockListRuleAdapter = (rules: BlockListRule): ParsedRule => {
 
   const isToolEnabled = rules?.blacklist.toolEnabled;
   return {
+    type: CharlesRuleType.BLOCK_LIST,
     groups: [
       {
         rules: exportedRules,

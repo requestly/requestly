@@ -36,6 +36,7 @@ export const mapRemoteAdapter = (rules: MapRemoteRule): ParsedRule => {
 
   const isToolEnabled = get(rules, "map.toolEnabled");
   return {
+    type: CharlesRuleType.MAP_REMOTE,
     groups: [
       {
         rules: exportedRules,

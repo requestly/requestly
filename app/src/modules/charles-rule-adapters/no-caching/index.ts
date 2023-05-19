@@ -38,6 +38,7 @@ export const noCachingRuleAdapter = (rules: NoCachingRule): ParsedRule<HeadersRu
 
   const isToolEnabled = get(rules, "selectedHostsTool.toolEnabled");
   return {
+    type: CharlesRuleType.NO_CACHING,
     groups: [
       {
         rules: exportedRules,
