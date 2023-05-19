@@ -4,7 +4,7 @@ import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffi
 // import { saveRecording } from "./actions"; // takes har and name
 import React, { useCallback, useState } from "react";
 import { toast } from "utils/Toast";
-import { saveRecording } from "./actions";
+import { saveNetworkSession } from "./actions";
 import {
   trackNetworkSessionSaveCanceled,
   trackNetworkSessionSaved,
@@ -28,7 +28,10 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
-    const id = await saveRecording(name, har);
+    const id = await saveNetworkSession(name, har).then((id) => {
+      window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
+      return id;
+    });
     if (onSave) {
       onSave(id);
     } else {

@@ -8,16 +8,19 @@ const NetworkSessionsIndexPage: React.FC<{}> = () => {
 
   const [recievedRecordings, setRecievedRecordings] = useState(false);
 
-  window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("all-network-sessions", (payload: NetworkSessionRecord[]) => {
-    setNetworkSessions(payload || []);
-    setRecievedRecordings(true);
-  });
-
   useEffect(() => {
     if (!recievedRecordings) {
       window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
     }
   }, [recievedRecordings]);
+
+  useEffect(() => {
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("all-network-sessions", (payload: NetworkSessionRecord[]) => {
+      setNetworkSessions(payload || []);
+      setRecievedRecordings(true);
+    });
+  }, []);
+
   return networkSessions.length ? (
     <NetworkSessionsList networkSessionsMetadata={networkSessions} />
   ) : (

@@ -7,8 +7,8 @@ declare global {
   }
 }
 
-export function deleteRecording(id: string) {
-  window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("delete-network-session", { id });
+export async function deleteNetworkSession(id: string) {
+  return window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("delete-network-session", { id });
 }
 
 // ipc wrapper
@@ -29,14 +29,14 @@ function ipcRequest(channel: string, requestData: any, timeout = 5000): any {
   });
 }
 
-export async function saveRecording(name: string, har: Har): Promise<string> {
+export async function saveNetworkSession(name: string, har: Har): Promise<string> {
   // return await window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("save-network-session", {name, har})
 
   const id: string = await ipcRequest("save-network-session", { name, har });
   return id;
 }
 
-export function getRecording(id: string): Promise<NetworkSessionRecord | null> {
+export async function getNetworkSession(id: string): Promise<NetworkSessionRecord | null> {
   // return (await window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-network-session", {id})) as NetworkSessionRecord
 
   return ipcRequest("get-network-session", { id })

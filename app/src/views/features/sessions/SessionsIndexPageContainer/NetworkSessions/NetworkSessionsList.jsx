@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { Modal, Space, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { deleteRecording, getRecording } from "./actions";
+import { deleteNetworkSession, getNetworkSession } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
 import ImportandSaveNetworkHarModalButton from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { toast } from "utils/Toast";
@@ -35,7 +35,9 @@ export const confirmAndDeleteRecording = (id, callback) => {
     cancelText: "Cancel",
     onCancel: trackDeleteNetworkSessionCanceled,
     onOk: () => {
-      deleteRecording(id);
+      deleteNetworkSession(id).then(() => {
+        window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
+      });
       trackDeleteNetworkSessionConfirmed();
       callback();
     },
@@ -90,7 +92,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                         cursor: "pointer",
                       }}
                       onClick={async () => {
-                        const sessionRecord = await getRecording(id);
+                        const sessionRecord = await getNetworkSession(id);
                         downloadHar(sessionRecord.har || {}, record.name);
                         trackDownloadNetworkSessionClicked(ActionSource.List);
                       }}

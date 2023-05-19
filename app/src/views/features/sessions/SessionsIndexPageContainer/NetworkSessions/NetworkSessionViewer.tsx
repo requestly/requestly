@@ -14,7 +14,7 @@ import { DeleteOutlined, DownloadOutlined, MoreOutlined } from "@ant-design/icon
 
 import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "./NetworkSessionsList";
-import { getRecording } from "./actions";
+import { getNetworkSession } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
 import {
   ActionSource,
@@ -30,7 +30,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
   const navigate = useNavigate();
 
   const fetchRecording = useCallback(async () => {
-    const recording = await getRecording(id);
+    const recording = await getNetworkSession(id);
     setSessionName(recording.name);
     setRecordedLogs(convertHarJsonToRQLogs(recording.har));
   }, [id]);
