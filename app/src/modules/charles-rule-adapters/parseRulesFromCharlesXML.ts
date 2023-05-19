@@ -14,6 +14,7 @@ import {
   NoCachingRule,
   ParsedRulesFromChalres,
   RewriteRule,
+  ParsedRule,
 } from "./types";
 import { mapRemoteAdapter } from "./map-remote";
 import { mapLocalRuleAdapter } from "./map-local";
@@ -25,15 +26,6 @@ type CharlesExport = {
 };
 
 type ConfigEntry = { string: CharlesRuleType } & Record<string, unknown>;
-
-// const supportedRuleTypes = {
-//   "No Caching": "noCaching",
-//   "Block Cookies": "blockCookies",
-//   "Block List": "blockList",
-//   "Map Local": "mapLocal",
-//   "Map Remote": "mapRemote",
-//   Rewrite: "rewrite",
-// };
 
 export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
   const options = {
@@ -75,19 +67,24 @@ export const parseRulesFromCharlesXML = (xml: string): Promise<unknown> => {
         mapRemoteAdapter(recordsObject[CharlesRuleType.MAP_REMOTE] as MapRemoteRule),
         mapLocalRuleAdapter(recordsObject[CharlesRuleType.MAP_LOCAL] as MapLocalRule),
         rewriteRuleAdapter(recordsObject[CharlesRuleType.REWRITE] as RewriteRule),
-      ].filter((parsedRule) => !!parsedRule);
-
-      const parsedRuleTypes = parsedRules.map((parsedRule) => parsedRule.type);
+      ];
 
       const groupsToBeImported = parsedRules.reduce(
-        (result, parsedRule) => (parsedRule?.groups ? result.concat(...(parsedRule.groups ?? [])) : result),
-        []
+        (result, parsedRule) =>
+          parsedRule
+            ? {
+                ...result,
+                types: result.types.concat(parsedRule.type),
+                groups: result.groups.concat(...parsedRule.groups),
+              }
+            : result,
+        { types: [], groups: [] } as { types: CharlesRuleType[]; groups: ParsedRule["groups"] }
       );
 
       return {
-        groups: groupsToBeImported,
-        parsedRuleTypes: parsedRuleTypes,
-        otherRuleTypesCount: Object.keys(recordsObject).length - parsedRuleTypes.length,
+        groups: groupsToBeImported.groups,
+        parsedRuleTypes: groupsToBeImported.types,
+        otherRuleTypesCount: Object.keys(recordsObject).length - groupsToBeImported.types.length,
       } as ParsedRulesFromChalres;
     });
 };
