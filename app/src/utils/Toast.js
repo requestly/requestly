@@ -5,6 +5,7 @@ export const toast = {};
 message.config({
   top: 60,
   maxCount: 2,
+  duration: 2,
 });
 
 toast.success = (messageText, duration = 3) => {

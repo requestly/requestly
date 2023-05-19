@@ -6,12 +6,13 @@ import NetworkTable from "./NetworkTable";
 interface Props {
   logs: any;
   onRow: Function;
+  isStaticPreview: boolean;
 }
 
 const NetworkInspector: React.FC<Props> = (props) => {
   return (
     <AutoThemeProvider colorScheme={"dark"} style={{ height: "100%" }}>
-      <NetworkTable logs={props.logs} onRow={props.onRow} />
+      <NetworkTable logs={props.logs} onRow={props.onRow} isStaticPreview={props.isStaticPreview} />
     </AutoThemeProvider>
   );
 };

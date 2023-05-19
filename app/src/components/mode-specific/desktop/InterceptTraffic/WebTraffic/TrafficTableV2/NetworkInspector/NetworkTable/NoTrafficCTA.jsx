@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { DesktopOutlined } from "@ant-design/icons";
-import { Col, Row, Space, Typography } from "antd";
+import { Button, Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import Logger from "lib/logger";
 import {
@@ -16,9 +16,13 @@ import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
 import { getDesktopSpecificDetails } from "store/selectors";
 import { getConnectedAppsCount } from "utils/Misc";
 import { toast } from "utils/Toast";
+import { redirectToTraffic } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
-const NoTrafficCTA = () => {
+const NoTrafficCTA = ({ isStaticPreview }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { appsList } = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const systemWideSource = appsList["system-wide"];
@@ -115,13 +119,18 @@ const NoTrafficCTA = () => {
       );
     }
 
+    if (
+      trafficTableFilters.search.term.length ||
+      Object.values({
+        ...trafficTableFilters.method,
+        ...trafficTableFilters.contentType,
+        ...trafficTableFilters.statusCode,
+      }).some((prop) => prop.length > 0)
+    ) {
+      return <Typography.Text>No request matches the filter you applied</Typography.Text>;
+    }
+
     if (numberOfConnectedApps > 0) {
-      if (
-        trafficTableFilters.search.term.length ||
-        Object.values(trafficTableFilters).some((prop) => prop.length > 0)
-      ) {
-        return <Typography.Text>No request matches the filter you applied</Typography.Text>;
-      }
       return (
         <>
           <Typography.Text>
@@ -130,6 +139,23 @@ const NoTrafficCTA = () => {
           <RQButton type="primary" onClick={openConnectedAppsModal}>
             Connect Another App
           </RQButton>
+        </>
+      );
+    }
+
+    if (isStaticPreview) {
+      return (
+        <>
+          <Button
+            type="primary"
+            href={() => redirectToTraffic(navigate)}
+            target="_blank"
+            style={{ margin: 8 }}
+            size="small"
+          >
+            {"Capture Traffic in Network Inspector"}
+          </Button>
+          <p>{"The har file you imported does not contain any network logs."}</p>
         </>
       );
     }
@@ -150,6 +176,8 @@ const NoTrafficCTA = () => {
   }, [
     connectSystemWide,
     disconnectSystemWide,
+    isStaticPreview,
+    navigate,
     numberOfConnectedApps,
     openConnectedAppsModal,
     systemWideSource.isActive,

@@ -100,6 +100,10 @@ export const redirectToSessionRecordingHome = (navigate) => {
   navigate(PATHS.SESSIONS.ABSOLUTE);
 };
 
+export const redirectToNetworkSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
+};
+
 /* Settings */
 export const redirectToSettings = (navigate) => {
   navigate(PATHS.SETTINGS.ABSOLUTE);

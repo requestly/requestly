@@ -17,7 +17,7 @@ const SessionsIndexPageContainer = () => {
   if (!isFeatureCompatible && !isWorkspaceMode) {
     return <ExtensionVersionError />;
   }
-
+  // todo: change to network index page
   return <SessionsIndexPage />;
 };
 
