@@ -28,10 +28,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
-    const id = await saveNetworkSession(name, har).then((id) => {
-      window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
-      return id;
-    });
+    const id = await saveNetworkSession(name, har);
     if (onSave) {
       onSave(id);
     } else {

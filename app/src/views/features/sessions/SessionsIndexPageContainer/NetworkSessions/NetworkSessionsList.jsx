@@ -35,9 +35,7 @@ export const confirmAndDeleteRecording = (id, callback) => {
     cancelText: "Cancel",
     onCancel: trackDeleteNetworkSessionCanceled,
     onOk: () => {
-      deleteNetworkSession(id).then(() => {
-        window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
-      });
+      deleteNetworkSession(id);
       trackDeleteNetworkSessionConfirmed();
       callback();
     },

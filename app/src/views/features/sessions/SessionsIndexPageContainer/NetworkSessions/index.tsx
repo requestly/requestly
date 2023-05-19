@@ -10,14 +10,18 @@ const NetworkSessionsIndexPage: React.FC<{}> = () => {
 
   useEffect(() => {
     if (!recievedRecordings) {
-      window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions");
+      window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-all-network-sessions").then(
+        (sessions: NetworkSessionRecord[]) => {
+          setNetworkSessions(sessions || []);
+          setRecievedRecordings(true);
+        }
+      );
     }
   }, [recievedRecordings]);
 
   useEffect(() => {
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("all-network-sessions", (payload: NetworkSessionRecord[]) => {
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("network-sessions-updated", (payload: NetworkSessionRecord[]) => {
       setNetworkSessions(payload || []);
-      setRecievedRecordings(true);
     });
   }, []);
 
