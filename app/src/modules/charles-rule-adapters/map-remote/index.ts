@@ -3,7 +3,7 @@ import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
 import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings, ParsedRule } from "../types";
-import { getLocation } from "../utils";
+import { getGroupName, getLocation } from "../utils";
 
 export const mapRemoteAdapter = (rules: MapRemoteRule): ParsedRule => {
   const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
@@ -36,11 +36,12 @@ export const mapRemoteAdapter = (rules: MapRemoteRule): ParsedRule => {
 
   const isToolEnabled = get(rules, "map.toolEnabled");
   return {
+    type: CharlesRuleType.MAP_REMOTE,
     groups: [
       {
         rules: exportedRules,
         status: isToolEnabled,
-        name: CharlesRuleType.MAP_REMOTE,
+        name: getGroupName(CharlesRuleType.MAP_REMOTE),
       },
     ],
   };

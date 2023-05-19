@@ -70,6 +70,7 @@ export type SourceData = {
 
 export type ParsedRule<T = Rule> =
   | {
+      type: CharlesRuleType;
       groups?: {
         rules: T[];
         status?: boolean;

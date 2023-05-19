@@ -3,7 +3,7 @@ import { BlockListRule, CharlesRuleType, ParsedRule } from "../types";
 import { CancelRule, RuleType, Status, ResponseRuleResourceType, ResponseRule } from "types";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { getSourcesData } from "../utils";
+import { getGroupName, getSourcesData } from "../utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -64,11 +64,12 @@ export const blockListRuleAdapter = (rules: BlockListRule): ParsedRule => {
 
   const isToolEnabled = rules?.blacklist.toolEnabled;
   return {
+    type: CharlesRuleType.BLOCK_LIST,
     groups: [
       {
         rules: exportedRules,
         status: isToolEnabled,
-        name: CharlesRuleType.BLOCK_LIST,
+        name: getGroupName(CharlesRuleType.BLOCK_LIST),
       },
     ],
   };
