@@ -16,7 +16,6 @@ interface Props {
   renderLogRow: any;
   selectedRowData: any;
   onReplayRequest: () => void;
-  EmptyStateComponent: React.FC<any>;
 }
 
 const VirtualTableV2: React.FC<Props> = ({
@@ -25,19 +24,17 @@ const VirtualTableV2: React.FC<Props> = ({
   renderLogRow,
   selectedRowData,
   onReplayRequest,
-  EmptyStateComponent,
 }) => {
   const [selected, setSelected] = useState(null);
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
-  const [logsLength, setLogsLength] = useState(logs.length);
   const [, setScrollElemHeight] = useState(null);
   const [, setScrollElemWidth] = useState(null);
 
   const parentRef = useRef(null);
 
   const rowVirtualizer = useVirtualizer({
-    count: logsLength,
+    count: logs.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
     onChange: (virtualizer) => {
@@ -75,9 +72,9 @@ const VirtualTableV2: React.FC<Props> = ({
   };
 
   const scrollToBottom = useCallback(() => {
-    if (logsLength > 0) rowVirtualizer.scrollToIndex(logsLength - 1, { align: "start" });
+    if (logs.length > 0) rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
     // rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: "start" });
-  }, [logsLength, rowVirtualizer]);
+  }, [logs.length, rowVirtualizer]);
 
   useEffect(() => {
     if (isScrollToBottomEnabled) {
@@ -94,7 +91,7 @@ const VirtualTableV2: React.FC<Props> = ({
 
     let newLogsCount = 0;
     if (lastKnowBottomIndex) {
-      newLogsCount = (logsLength > 0 ? logsLength - 1 : logsLength) - lastKnowBottomIndex;
+      newLogsCount = (logs.length > 0 ? logs.length - 1 : logs.length) - lastKnowBottomIndex;
       buttonText = newLogsCount > 1 ? `${newLogsCount} new logs` : "1 new log";
     }
 
@@ -112,15 +109,7 @@ const VirtualTableV2: React.FC<Props> = ({
     }
 
     return null;
-  }, [isScrollToBottomEnabled, lastKnowBottomIndex, logsLength, scrollToBottom]);
-
-  useEffect(() => {
-    setLogsLength(logs.length);
-  }, [logs, setLogsLength]);
-
-  if (logs.length === 0) {
-    return <EmptyStateComponent />;
-  }
+  }, [isScrollToBottomEnabled, lastKnowBottomIndex, logs.length, scrollToBottom]);
 
   return (
     <>

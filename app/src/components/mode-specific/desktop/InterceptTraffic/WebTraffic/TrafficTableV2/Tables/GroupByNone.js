@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "antd";
 import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/NetworkInspector";
 import "./index.css";
+import NoTrafficCTA from "../NetworkInspector/NetworkTable/NoTrafficCTA";
 
 const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc, isStaticPreview }) => {
   const renderNoTrafficCTA = () => {
@@ -15,9 +16,11 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         </>
       );
     }
+
+    return <NoTrafficCTA />;
   };
 
-  if (requestsLog?.length === 0 && emptyCtaAction && emptyCtaText) {
+  if (requestsLog?.length === 0) {
     return renderNoTrafficCTA();
   }
 
