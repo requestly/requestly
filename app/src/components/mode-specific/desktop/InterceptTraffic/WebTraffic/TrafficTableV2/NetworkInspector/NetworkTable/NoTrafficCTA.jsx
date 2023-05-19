@@ -108,17 +108,6 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       return null;
     }
 
-    if (systemWideSource.isActive) {
-      return (
-        <>
-          <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
-          <RQButton type="default" className="danger-btn" onClick={disconnectSystemWide}>
-            Disconnect
-          </RQButton>
-        </>
-      );
-    }
-
     if (
       trafficTableFilters.search.term.length ||
       Object.values({
@@ -128,19 +117,6 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       }).some((prop) => prop.length > 0)
     ) {
       return <Typography.Text>No request matches the filter you applied</Typography.Text>;
-    }
-
-    if (numberOfConnectedApps > 0) {
-      return (
-        <>
-          <Typography.Text>
-            {numberOfConnectedApps} app connected. All the intercepted network logs will be displayed here.
-          </Typography.Text>
-          <RQButton type="primary" onClick={openConnectedAppsModal}>
-            Connect Another App
-          </RQButton>
-        </>
-      );
     }
 
     if (isStaticPreview) {
@@ -156,6 +132,30 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
             {"Capture Traffic in Network Inspector"}
           </Button>
           <p>{"The har file you imported does not contain any network logs."}</p>
+        </>
+      );
+    }
+
+    if (systemWideSource.isActive) {
+      return (
+        <>
+          <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
+          <RQButton type="default" className="danger-btn" onClick={disconnectSystemWide}>
+            Disconnect
+          </RQButton>
+        </>
+      );
+    }
+
+    if (numberOfConnectedApps > 0) {
+      return (
+        <>
+          <Typography.Text>
+            {numberOfConnectedApps} app connected. All the intercepted network logs will be displayed here.
+          </Typography.Text>
+          <RQButton type="primary" onClick={openConnectedAppsModal}>
+            Connect Another App
+          </RQButton>
         </>
       );
     }
