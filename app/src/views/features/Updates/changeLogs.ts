@@ -2,6 +2,15 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.5.19",
+    logs: [
+      {
+        title: "Introduced predefined function rq_request_initiator_origin() to solve CORS issues reliably",
+        link: "https://github.com/requestly/requestly/issues/622",
+      },
+    ],
+  },
+  {
     version: "23.5.9",
     logs: [
       {
