@@ -236,8 +236,8 @@ describe("RuleMatcher: ", function () {
 
   describe("#matchValueForPredefinedFunctions ", function () {
     it("should return original value when value is falsy", function () {
-      expect(RuleMatcher.matchValueForPredefinedFunctions("", {})).toBe("");
-      expect(RuleMatcher.matchValueForPredefinedFunctions(null, {})).toBe(null);
+      expect(RuleMatcher.matchValueForPredefinedFunctions("")).toBe("");
+      expect(RuleMatcher.matchValueForPredefinedFunctions(null)).toBe(null);
     });
   });
 
