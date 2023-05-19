@@ -22,7 +22,7 @@ Please note that we have multiple Git repositories. The [Development](#developme
 
 1. Fork the repo and create your branch from `master`.
 2. Add a clear description covering your changes.
-3. Reference the Github issue in the PR description. 
+3. Reference the Github issue in the PR description.
 4. Follow and update all items in the PR checklist.
 
 All submissions require code review from team. So, please be patient. In case your PR is in opened state for more than 2 weeks without any response from us, feel free to escalate at contact@requestly.io. 
