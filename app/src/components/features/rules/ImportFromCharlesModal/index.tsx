@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Typography } from "antd";
@@ -11,6 +11,7 @@ import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRul
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
 import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
+import LINKS from "config/constants/sub/links";
 import {
   trackCharlesSettingsParsed,
   trackCharlesSettingsImportFailed,
@@ -47,6 +48,17 @@ const validExportSteps = [
     ],
   },
 ];
+
+const CharlesDocsLink = ({ title, analyticEventSource }: { title: string; analyticEventSource: string }) => (
+  <a
+    target="_blank"
+    rel="noreferrer"
+    href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
+    onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}
+  >
+    {title}
+  </a>
+);
 
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, analyticEventSource = "" }) => {
   const dispatch = useDispatch();
@@ -137,7 +149,12 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
   const handleResetImport = () => {
     setValidationError(null);
     setIsParseComplete(false);
+    setRulesToImport({});
   };
+
+  const isParsedRulesExist = useMemo(() => !!rulesToImport?.parsedRuleTypes?.length, [
+    rulesToImport?.parsedRuleTypes?.length,
+  ]);
 
   return (
     <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
@@ -146,26 +163,31 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
         <div className="mt-16">
           {isParseComplete ? (
             <div className="parsed-rules-info">
-              <div className="title mt-16">Successfully parsed below settings:</div>
-              <ul>
-                {rulesToImport?.parsedRuleTypes?.length > 0 &&
-                  rulesToImport.parsedRuleTypes.map((ruleType) => (
-                    <li key={ruleType}>
-                      <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
-                    </li>
-                  ))}
-              </ul>
-              {rulesToImport?.otherRuleTypesCount > 0 && (
+              {rulesToImport?.parsedRuleTypes?.length > 0 && (
                 <>
-                  <Typography.Text type="secondary">
-                    Other settings are not supported in Requestly.
-                    {/* eslint-disable-next-line */}
-                    <a href="#" onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}>
-                      Learn more
-                    </a>
-                  </Typography.Text>
+                  <div className="title mt-16">Successfully parsed below settings:</div>
+                  <ul>
+                    {rulesToImport.parsedRuleTypes.map((ruleType) => (
+                      <li key={ruleType}>
+                        <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
+                      </li>
+                    ))}
+                  </ul>
                 </>
               )}
+              {rulesToImport?.otherRuleTypesCount > 0 &&
+                (isParsedRulesExist ? (
+                  <div className="text-sm text-dark-gray">
+                    Other settings are not supported.{" "}
+                    <CharlesDocsLink title="Learn more" analyticEventSource={analyticEventSource} />
+                  </div>
+                ) : (
+                  <div className="text-center title mt-16" style={{ fontWeight: "normal" }}>
+                    Uploaded settings are not supported. <br />
+                    Learn more about supported setting types{" "}
+                    <CharlesDocsLink title="here" analyticEventSource={analyticEventSource} />.
+                  </div>
+                ))}
             </div>
           ) : validationError ? (
             <>
@@ -175,13 +197,13 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
                     Invalid settings file. Follow below steps to export settings from Charles:
                   </div>
                   <ol>
-                    {validExportSteps.map(({ step, additionalSteps = [] }) => (
+                    {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
                       <>
-                        <li>{step}</li>
+                        <li key={index}>{step}</li>
                         {additionalSteps.length > 0 && (
                           <ul className="additional-import-steps-list">
-                            {additionalSteps.map(({ step }) => (
-                              <li>{step}</li>
+                            {additionalSteps.map(({ step }, index) => (
+                              <li key={index}>{step}</li>
                             ))}
                           </ul>
                         )}
@@ -206,24 +228,24 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
         </div>
       </div>
 
-      {isParseComplete ? (
-        <div className="rq-modal-footer">
-          <Row justify="end">
-            <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
-              Import
-            </RQButton>
-          </Row>
-        </div>
-      ) : null}
-
-      {validationError ? (
-        <div className="rq-modal-footer">
-          <Row justify="end">
-            <RQButton type="primary" onClick={handleResetImport}>
-              Try another file
-            </RQButton>
-          </Row>
-        </div>
+      {isParseComplete || validationError ? (
+        isParsedRulesExist ? (
+          <div className="rq-modal-footer">
+            <Row justify="end">
+              <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
+                Import
+              </RQButton>
+            </Row>
+          </div>
+        ) : (
+          <div className="rq-modal-footer">
+            <Row justify="end">
+              <RQButton type="primary" onClick={handleResetImport}>
+                Try another file
+              </RQButton>
+            </Row>
+          </div>
+        )
       ) : null}
     </RQModal>
   );
