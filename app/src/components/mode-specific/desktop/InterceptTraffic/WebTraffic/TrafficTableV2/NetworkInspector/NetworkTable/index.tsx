@@ -75,7 +75,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
       dataIndex: ["actions"],
       width: "10%",
       responsive: ["xs", "sm"],
-      hideColumn: !isStaticPreview,
+      hideColumn: isStaticPreview,
       render: (actions: any) => {
         if (!actions || actions === "-" || actions.length === 0) {
           return "-";
@@ -96,7 +96,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
       <Table.Head style={{ zIndex: 1000 }}>
         <Table.Row>
           {columns.map((column: any) => {
-            if (column.hideColumn === false) {
+            if (column.hideColumn === true) {
               return null;
             }
             return (
@@ -126,7 +126,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         data-tour-id={index === 0 && !isTrafficTableTourCompleted ? "traffic-table-row" : null}
       >
         {columns.map((column: any) => {
-          if (column.hideColumn === false) {
+          if (column.hideColumn === true) {
             return null;
           }
           const columnData = _.get(log, getColumnKey(column?.dataIndex));
