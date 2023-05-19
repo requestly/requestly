@@ -8,6 +8,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import "./virtualTableV2.css";
 import { Button } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons";
+import Logger from "lib/logger";
 
 interface Props {
   logs: any;
@@ -30,6 +31,8 @@ const VirtualTableV2: React.FC<Props> = ({
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
   const [logsLength, setLogsLength] = useState(logs.length);
+  const [, setScrollElemHeight] = useState(null);
+  const [, setScrollElemWidth] = useState(null);
 
   const parentRef = useRef(null);
 
@@ -123,6 +126,10 @@ const VirtualTableV2: React.FC<Props> = ({
     <>
       <AutoSizer>
         {({ height, width }) => {
+          setScrollElemHeight(height);
+          setScrollElemWidth(width);
+
+          Logger.log(height, width);
           return (
             <div
               ref={parentRef}
