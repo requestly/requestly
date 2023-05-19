@@ -97,36 +97,36 @@ describe("PreDefined Functions: ", function () {
     });
   });
 
-  describe("rq_request_origin()", function () {
-    var F = RQ.PreDefinedFunctions["rq_request_origin"];
+  describe("rq_request_initiator_origin()", function () {
+    var F = RQ.PreDefinedFunctions["rq_request_initiator_origin"];
 
-    it("should replace rq_request_origin usage with the request initiator", function () {
+    it("should replace rq_request_initiator_origin usage with the request initiator", function () {
       const initiator = "https://example.com";
-      expect(F.eval("rq_request_origin()", { initiator })).toBe(initiator);
+      expect(F.eval("rq_request_initiator_origin()", { initiator })).toBe(initiator);
     });
 
-    it("should replace rq_request_origin usage with the page origin when initiator is empty", function () {
+    it("should replace rq_request_initiator_origin usage with the page origin when initiator is empty", function () {
       const pageOrigin = "https://example.com";
       const pageUrl = `${pageOrigin}/page`;
 
       spyOn(window.tabService, "getTabUrl").andReturn(pageUrl);
-      expect(F.eval("rq_request_origin()", {})).toBe(pageOrigin);
+      expect(F.eval("rq_request_initiator_origin()", {})).toBe(pageOrigin);
     });
 
-    it("should replace rq_request_origin usage with the page origin when initiator is null string", function () {
+    it("should replace rq_request_initiator_origin usage with the page origin when initiator is null string", function () {
       const pageOrigin = "https://example.com";
       const pageUrl = `${pageOrigin}/page`;
 
       spyOn(window.tabService, "getTabUrl").andReturn(pageUrl);
-      expect(F.eval("rq_request_origin()", { initiator: "null" })).toBe(pageOrigin);
+      expect(F.eval("rq_request_initiator_origin()", { initiator: "null" })).toBe(pageOrigin);
     });
 
-    it("should replace rq_request_origin usage with empty string when initiator is empty and tabService does not have record for the page", function () {
+    it("should replace rq_request_initiator_origin usage with empty string when initiator is empty and tabService does not have record for the page", function () {
       const pageOrigin = "https://example.com";
       const pageUrl = `${pageOrigin}/page`;
 
       spyOn(window.tabService, "getTabUrl").andReturn("");
-      expect(F.eval("rq_request_origin()", {})).toBe("");
+      expect(F.eval("rq_request_initiator_origin()", {})).toBe("");
     });
   });
 });
