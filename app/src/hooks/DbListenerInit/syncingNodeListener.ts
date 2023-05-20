@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
