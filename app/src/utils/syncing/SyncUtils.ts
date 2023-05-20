@@ -75,15 +75,30 @@ export const doSyncRecords = async (
   }
 };
 
-export const setSyncState = async (uid, state, appMode) => {
-  return new Promise((resolve, reject) => {
+/**
+ * This function is used to set the sync state
+ *
+ * @param {string} uid - The unique identifier of the user
+ * @param {boolean} state - The state of synchronization to be set (true or false)
+ * @param {AppMode} appMode - The current mode of the application
+ * @return {Promise<boolean>} - Returns a promise which resolves to a boolean. True if successful, false otherwise.
+ */
+export const setSyncState = async (uid: string, state: boolean, appMode: AppMode): Promise<boolean> => {
+  return new Promise<boolean>((resolve, reject) => {
+    // Update the sync state in user's profile
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
+        // If state is false, remove records without syncing
         if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
+
+        // Track the event of toggling synchronization
         trackSyncToggled(uid, state);
+
+        // Resolve the promise with true indicating success
         resolve(true);
       })
       .catch(() => {
+        // Reject the promise with false indicating failure
         reject(false);
       });
   });
