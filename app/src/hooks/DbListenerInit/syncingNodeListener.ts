@@ -308,10 +308,22 @@ const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args: any): Promis
   }
 };
 
-export const getSyncTarget = (currentlyActiveWorkspaceId) => {
-  if (currentlyActiveWorkspaceId) return "teamSync";
+/**
+ * Function to determine the sync target based on team workspace activity.
+ *
+ * @param currentlyActiveWorkspaceId - The ID of the currently active team workspace.
+ * @returns 'teamSync' if a workspace is currently active, otherwise returns 'sync'.
+ */
+export function getSyncTarget(currentlyActiveWorkspaceId?: string): string {
+  // Check if a workspace ID was provided
+  if (currentlyActiveWorkspaceId) {
+    // If a workspace ID was provided, return 'teamSync'
+    return "teamSync";
+  }
+
+  // If no workspace ID was provided, return 'sync'
   return "sync";
-};
+}
 
 const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => {
   const syncTarget = getSyncTarget(team_id);
