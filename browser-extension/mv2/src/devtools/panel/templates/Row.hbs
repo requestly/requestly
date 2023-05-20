@@ -1,0 +1,8 @@
+<tr>
+  <td class="cell-time">{{time}}s</td>
+  <td class="cell-url">{{requestURL}}</td>
+  <td class="cell-method">{{#if requestMethod}}{{requestMethod}}{{else}}-{{/if}}</td>
+  <td class="cell-type">{{#if requestType}}{{parseRequestType requestType}}{{else}}-{{/if}}</td>
+  <td class="cell-rule-name"><a href="{{ruleLink}}" target="_blank" title="Open in new tab">{{rule.name}}</a></td>
+  <td class="cell-modification">{{modification}}</td>
+</tr>

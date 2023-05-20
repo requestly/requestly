@@ -1,21 +1,22 @@
-const ENV = {
+const REACT_ENV = {
   // Are set by scripts in package.json on start
   DEV: "DEV",
   EMULATOR: "EMULATOR",
 };
 
-const isEnv = (env) => {
-  return process.env.REACT_APP_ENV === ENV[env];
+const isReactEnv = (env) => {
+  return process.env.REACT_APP_ENV === REACT_ENV[env];
 };
+
 /* When running local emulator */
 export const isEnvEmulator = () => {
-  return isEnv(ENV.EMULATOR);
+  return isReactEnv(REACT_ENV.EMULATOR);
 };
 /* When backend is requestly beta */
 export const isEnvBeta = () => {
-  return isEnv(ENV.DEV);
+  return isReactEnv(REACT_ENV.DEV);
 };
 
-export const isEnvDev = () => {
-  return isEnvBeta() || isEnvEmulator();
+export const isEnvDevWithBeta = () => {
+  return process.env.NODE_ENV === "development" && !isEnvEmulator();
 };

@@ -1,0 +1,97 @@
+.api-client-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 10px;
+  box-sizing: border-box;
+  background-color: #242529;
+
+  .api-client-header {
+    flex: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+
+    .api-client-url-container {
+      display: flex;
+      flex: auto;
+
+      .api-request-method-selector {
+        width: 120px;
+      }
+
+      .api-request-url {
+        padding: 4px 8px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+
+  .api-client-body {
+    flex: auto;
+    height: 100%;
+    min-height: 0;
+
+    .gutter:hover {
+      background-color: #1e69ff;
+    }
+  }
+
+  .api-request-tabs {
+    height: 100%;
+    padding: 0 10px;
+  }
+
+  .api-response-view {
+    height: 100%;
+    padding: 0 10px;
+
+    .api-response-empty-placeholder {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
+  .ant-tabs-ink-bar {
+    display: none;
+  }
+
+  .ant-tabs-tab {
+    border-bottom: 2px solid transparent;
+
+    + .ant-tabs-tab {
+      margin-left: 20px;
+    }
+
+    &.ant-tabs-tab-active {
+      border-bottom-color: #1e69ff;
+    }
+
+    .ant-tabs-tab-btn {
+      display: flex;
+      align-items: center;
+      padding: 0 5px;
+
+      .dot {
+        margin-left: 2px;
+        margin-top: 5px;
+      }
+
+      .count {
+        font-size: 10px;
+        padding: 0 4px;
+        line-height: 14px;
+        margin-left: 5px;
+        margin-right: 0;
+      }
+    }
+  }
+}

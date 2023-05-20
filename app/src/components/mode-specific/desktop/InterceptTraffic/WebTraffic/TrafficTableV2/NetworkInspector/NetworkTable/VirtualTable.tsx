@@ -15,12 +15,14 @@ const VirtualTableContext = React.createContext<{
   setTop: (top: number) => void;
   header: React.ReactNode;
   footer: React.ReactNode;
+  onReplayRequest: () => void;
 }>({
   selectedRowData: {},
   top: 0,
   setTop: (value: number) => {},
   header: <></>,
   footer: <></>,
+  onReplayRequest: () => {},
 });
 
 /** The virtual table. It basically accepts all of the same params as the original FixedSizeList.*/
@@ -29,18 +31,20 @@ export const VirtualTable = ({
   header,
   footer,
   selectedRowData,
+  onReplayRequest,
   ...rest
 }: {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   selectedRowData: any;
   row: FixedSizeListProps["children"];
+  onReplayRequest: () => void;
 } & Omit<FixedSizeListProps, "children" | "innerElementType">) => {
   const listRef = useRef<FixedSizeList | null>();
   const [top, setTop] = useState(0);
 
   return (
-    <VirtualTableContext.Provider value={{ top, setTop, header, footer, selectedRowData }}>
+    <VirtualTableContext.Provider value={{ top, setTop, header, footer, selectedRowData, onReplayRequest }}>
       <AutoSizer>
         {({ height, width }) => (
           <FixedSizeList
@@ -92,13 +96,17 @@ export const VirtualTable = ({
  * Other than that, render an optional header and footer.
  **/
 const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function Inner(
-  { children, ...rest },
+  { children, ...rest }: any,
   ref
 ) {
   // To higlight the row
   const [selected, setSelected] = useState(null);
 
-  const { header, footer, top, selectedRowData } = useContext(VirtualTableContext);
+  const { header, footer, top, selectedRowData, onReplayRequest } = useContext(VirtualTableContext);
+
+  // Prevent flickering due to alternating colors
+  const isFirstElementEvenIndex = children?.[0]?.props?.index % 2 === 0;
+
   return (
     <div {...rest} ref={ref}>
       <Table
@@ -112,10 +120,15 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
         onSelected={(id) => {
           setSelected(id);
         }}
+        //@ts-ignore
+        onContextMenu={(e) => setSelected(e.target?.parentElement.id)}
       >
         {header}
-        <ContextMenu log={selectedRowData}>
-          <Table.Body>{children}</Table.Body>
+        <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
+          <Table.Body>
+            {isFirstElementEvenIndex ? null : <tr style={{}}></tr>}
+            {children}
+          </Table.Body>
         </ContextMenu>
         {footer}
       </Table>

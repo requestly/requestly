@@ -58,6 +58,8 @@ import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreat
 import FileMockEditorEditView from "views/features/mocksV2/FileMockEditorEditView";
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
+import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
+import APIClientContainer from "views/features/api-client/APIClientContainer";
 
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
@@ -254,6 +256,10 @@ var routes = [
   {
     path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
     component: SavedSessionViewer,
+  },
+  {
+    path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    component: NetworkSessionViewer,
   },
   {
     path: PATHS.GOODBYE.RELATIVE,
@@ -521,6 +527,13 @@ var routes = [
     name: "Mocks",
     icon: "ni ni-lock-circle-open text-red",
     component: MockListView,
+  },
+  /** API Client */
+  {
+    path: PATHS.API_CLIENT.RELATIVE,
+    name: "API Client",
+    icon: "ni ni-lock-circle-open text-red",
+    component: APIClientContainer,
   },
   /*******/
   {

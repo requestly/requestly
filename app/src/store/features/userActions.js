@@ -79,10 +79,14 @@ export const updateUserAttributes = (prevState, action) => {
   };
 };
 
-export const updateRedirectRuleTourCompleted = (prevState, action) => {
-  prevState.misc.isRedirectRuleTourCompleted = true;
+export const updateProductTourCompleted = (prevState, action) => {
+  prevState.misc.persist[action.payload.tour] = true;
 };
 
-export const updateTrafficTableTourCompleted = (prevState, action) => {
-  prevState.misc.isTrafficTableTourCompleted = true;
+export const updateNetworkSessionSaveInProgress = (prevState, action) => {
+  prevState.misc.nonPersist.networkSessionSaveInProgress = action.payload;
+};
+
+export const updateNetworkSessionTooltipShown = (prevState) => {
+  prevState.misc.persist.isNetworkSessionTooltipShown = true;
 };

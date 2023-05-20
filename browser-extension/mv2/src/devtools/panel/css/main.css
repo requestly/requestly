@@ -1,0 +1,90 @@
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #3c4043;
+  font-size: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 35px;
+}
+
+table,
+th,
+td {
+  border: 1px #d0d0d0 solid;
+}
+
+thead tr {
+  background-color: #eaeaea;
+}
+
+tbody tr:hover {
+  background-color: #eaeaea;
+}
+
+th,
+td {
+  padding: 2px 10px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cell-time {
+  width: 60px;
+}
+
+.cell-method {
+  width: 60px;
+}
+
+.cell-type {
+  width: 100px;
+}
+
+.cell-rule-name {
+  width: 240px;
+}
+
+.cell-rule-name a {
+  color: inherit;
+  cursor: pointer;
+}
+
+.cell-modification {
+  width: 500px;
+}
+
+.toolbar {
+  padding: 4px 10px;
+  background-color: #eaeaea;
+  border-bottom: 1px #d0d0d0 solid;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 26px;
+}
+
+.toolbar-item {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.clear-logs {
+  font-size: 12px;
+  height: 26px;
+}
+
+tbody.rq-empty-table::before {
+  content: "\1F551  No logs captured yet. Perform a request or reload the page to see network requests intercepted and modified by Requestly.";
+  position: fixed;
+  top: 30%;
+  width: 100%;
+  text-align: center;
+}

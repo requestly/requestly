@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AddUser, Bag2, Delete, Document, Filter, PaperUpload, Swap, Video, Play, People } from "react-iconly";
-import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
-import { Menu } from "antd";
+import { getAppMode, getAppTheme, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
+import { Menu, Skeleton, Tooltip } from "antd";
 import { useLocation, Link } from "react-router-dom";
-import { MobileOutlined } from "@ant-design/icons";
+import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { snakeCase } from "lodash";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import BetaBadge from "components/misc/BetaBadge";
 
 const { PATHS, LINKS } = APP_CONSTANTS;
 
-const givenRoutes = [
+const menuItemKeys = {
+  ANDROID_DEBUGGER: "android-debugger",
+  NETWORK_TRAFFIC: "network-traffic",
+  HEADER_COLLABORATION: "header-collaboration",
+};
+
+const staticRoutes = [
   {
     header: "Product",
     key: "header-product",
@@ -38,6 +47,14 @@ const givenRoutes = [
     key: "my-mocks",
   },
   {
+    path: PATHS.API_CLIENT.ABSOLUTE,
+    name: "API Client",
+    icon: <ApiOutlined />,
+    key: "api-client",
+    feature: FEATURES.API_CLIENT,
+    isBeta: true,
+  },
+  {
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
     name: "File Server",
     icon: <PaperUpload set="curved" className="remix-icon" />,
@@ -46,7 +63,7 @@ const givenRoutes = [
   {
     header: "Collaboration",
     collapsedHeader: "Collab",
-    key: "header-collaboration",
+    key: menuItemKeys.HEADER_COLLABORATION,
   },
   {
     path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
@@ -99,86 +116,114 @@ const MenuItem = (props) => {
   const appMode = useSelector(getAppMode);
   const appTheme = useSelector(getAppTheme);
   const user = useSelector(getUserAuthDetails);
+  const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
 
   // Component State
-  const [myRoutes, setMyRoutes] = useState(givenRoutes);
+  const [routes, setRoutes] = useState([]);
+  const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
 
   const splitLocation = pathname.split("/");
 
   // Menu
   const locationURL = pathname;
 
-  // Set desktop app routes
   useEffect(() => {
+    isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
+  }, [user?.details?.profile?.uid]);
+
+  useEffect(() => {
+    if (!appMode) {
+      return;
+    }
+
+    const finalRoutes = staticRoutes.filter((route) => {
+      return !route.feature || isFeatureCompatible(route.feature);
+    });
+
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession) {
+      const sessionItemIndex = finalRoutes.findIndex((route) => route.key === "sessions");
+
+      sessionItemIndex !== -1 &&
+        finalRoutes.splice(sessionItemIndex, 1, {
+          path: PATHS.SESSIONS.RELATIVE,
+          name: "Sessions",
+          icon: (
+            <Tooltip title={"View and manage your saved sessions here"} placement="right" open={isSavingNetworkSession}>
+              <Video set="curved" className="remix-icon" />
+            </Tooltip>
+          ),
+          key: "sessions",
+        });
+    }
+
     // For Desktop App - Show Sources menu in Navbar only in  Desktop App
-    if (appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      const allRoutes = [...myRoutes];
-      // Check if doesn't exist already!
-      if (allRoutes.some((route) => route.key === "network-traffic")) return;
-      allRoutes.unshift({
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      finalRoutes.unshift({
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
-        key: "network-traffic",
+        key: menuItemKeys.NETWORK_TRAFFIC,
         name: "Network Traffic",
         icon: <Swap set="curved" className="remix-icon" />,
       });
-      setMyRoutes(allRoutes);
     }
-  }, [appMode, myRoutes]);
 
-  useEffect(() => {
-    isUserUsingAndroidDebugger(user?.details?.profile?.uid).then((result) => {
-      if (result) {
-        const allRoutes = [...myRoutes];
-        const index = allRoutes.findIndex((route) => route.key === "header-collaboration");
-        allRoutes.splice(index, 0, {
-          path: PATHS.MOBILE_DEBUGGER.RELATIVE,
-          name: "Android Debugger",
-          icon: <MobileOutlined />,
-          key: "android-debugger",
-        });
-        setMyRoutes(allRoutes);
-      } else {
-        setMyRoutes((prev) => prev.filter((route) => route.key !== "android-debugger"));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+    if (isAndroidDebuggerEnabled) {
+      const index = finalRoutes.findIndex((route) => route.key === menuItemKeys.HEADER_COLLABORATION);
+      finalRoutes.splice(index, 0, {
+        path: PATHS.MOBILE_DEBUGGER.RELATIVE,
+        name: "Android Debugger",
+        icon: <MobileOutlined />,
+        key: menuItemKeys.ANDROID_DEBUGGER,
+      });
+    }
 
-  const menuItems = myRoutes.map((item) => {
-    if (item.header) {
-      if (item.key === "divider") {
+    setRoutes(finalRoutes);
+  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
+
+  const menuItems = useMemo(
+    () =>
+      routes.map((item) => {
+        if (item.header) {
+          if (item.key === "divider") {
+            return {
+              type: "divider",
+              key: item.key,
+              className: "sidebar-horizontal-divider",
+            };
+          }
+          return {
+            type: "group",
+            label: (collapsed && item.collapsedHeader) || item.header,
+            key: item.key,
+          };
+        }
+
+        let label = item.name;
+        if (item.isBeta) {
+          label = <BetaBadge text={item.name} />;
+        }
+
         return {
-          type: "divider",
           key: item.key,
-          className: "sidebar-horizontal-divider",
+          icon: <div className="icon-wrapper">{item.icon}</div>,
+          onClick: onClose,
+          style: { paddingLeft: "11px", paddingRight: "6px" },
+          className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
+          label:
+            item.path === LINKS.YOUTUBE_TUTORIALS ? (
+              <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
+                {label}
+              </a>
+            ) : (
+              <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
+                {label}
+              </Link>
+            ),
         };
-      }
-      return {
-        type: "group",
-        label: (collapsed && item.collapsedHeader) || item.header,
-        key: item.key,
-      };
-    }
-    return {
-      key: item.key,
-      icon: <div className="icon-wrapper">{item.icon}</div>,
-      onClick: onClose,
-      style: { paddingLeft: "11px", paddingRight: "6px" },
-      className: locationURL === item.path ? "ant-menu-item-selected" : "ant-menu-item-selected-in-active",
-      label:
-        item.path === LINKS.YOUTUBE_TUTORIALS ? (
-          <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
-            {item.name}
-          </a>
-        ) : (
-          <Link onClick={() => trackSidebarClicked(snakeCase(item.name))} to={item.path}>
-            {item.name}
-          </Link>
-        ),
-    };
-  });
+      }),
+    [collapsed, locationURL, routes, onClose]
+  );
 
-  return (
+  return menuItems.length ? (
     <Menu
       mode="inline"
       selectedKeys={[]}
@@ -193,6 +238,8 @@ const MenuItem = (props) => {
       className={`siderbar-menu`}
       items={menuItems}
     />
+  ) : (
+    <Skeleton loading active style={{ padding: 10 }} />
   );
 };
 

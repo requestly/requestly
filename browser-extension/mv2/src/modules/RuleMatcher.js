@@ -252,14 +252,14 @@ RuleMatcher.matchPageUrlFilter = function (pageUrlFilter, requestDetails) {
  * Matches given value with predefined function patterns,
  * If pattern exists, replaces the pattern with computed value otherwise returns the original value
  * @param value
- * @param preDefinedFunctionsMap
+ * @param requestDetails
  */
-RuleMatcher.matchValueForPredefinedFunctions = function (value, preDefinedFunctionsMap) {
+RuleMatcher.matchValueForPredefinedFunctions = function (value, requestDetails) {
   if (!value) return value;
 
-  for (var preDefFuncName in preDefinedFunctionsMap) {
-    var preDefFunc = preDefinedFunctionsMap[preDefFuncName];
-    value = preDefFunc.eval(value);
+  for (var preDefFuncName in RQ.PreDefinedFunctions) {
+    var preDefFunc = RQ.PreDefinedFunctions[preDefFuncName];
+    value = preDefFunc.eval(value, requestDetails);
   }
 
   return value;

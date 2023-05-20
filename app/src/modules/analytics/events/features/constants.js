@@ -19,6 +19,25 @@ export const SESSION_RECORDING = {
   session_recording_description_added: "session_recording_description_added",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
+
+  network: {
+    import: {
+      btn_clicked: "import_external_har_button_clicked",
+      completed: "import_external_har_completed",
+      canceled: "import_external_har_canceled",
+    },
+    delete: {
+      btn_clicked: "delete_network_session_clicked_from_list",
+      confirmed: "delete_network_session_confimed",
+      canceled: "delete_network_session_canceled",
+    },
+    save: {
+      btn_clicked: "save_network_session_button_clicked",
+      saved: "new_network_session_saved",
+      canceled: "new_network_session_canceled",
+    },
+    download: "download_network_session_clicked",
+  },
 };
 
 export const SHARED_LIST = {
@@ -41,6 +60,14 @@ export const RULES = {
     COMPLETED: "rules_import_completed",
     FAILED: "rules_import_failed",
     JSON_PARSED: "rules_json_parsed",
+  },
+
+  CHARLES_SETTINGS: {
+    IMPORT_STARTED: "charles_settings_import_started",
+    PARSED: "charles_settings_parsed",
+    IMPORT_FAILED: "charles_settings_import_failed",
+    IMPORT_COMPLETE: "charles_settings_import_completed",
+    DOCS_CLICKED: "charles_settings_import_docs_clicked",
   },
 };
 
@@ -68,12 +95,29 @@ export const MOCKSV2 = {
   MOCK_UPLOAD_WORKFLOW_STARTED: "mock_upload_workflow_started",
   MOCK_UPLOADED: "mock_uploaded",
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
+  TEST_MOCK_CLICKED: "test_mock_clicked",
 
   AI_MOCK_RESPONSE_BUTTON_CLICKED: "ai_mock_response_button_clicked",
   AI_MOCK_RESPONSE_GENERATE_CLICKED: "ai_mock_response_generate_clicked",
   AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
   AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
   AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
+};
+
+export const API_CLIENT = {
+  REQUEST_SENT: "api_client_request_sent",
+  REQUEST_CANCELLED: "api_client_request_cancelled",
+  BEAUTIFY_REQUEST_JSON_CLICKED: "api_client_beautify_request_json_clicked",
+  IMPORT_CURL_CLICKED: "api_client_import_curl_clicked",
+  CURL_IMPORTED: "api_client_curl_imported",
+  CURL_IMPORT_FAILED: "api_client_curl_import_failed",
+  NEW_REQUEST_CLICKED: "api_client_new_request_clicked",
+  REQUEST_SELECTED_FROM_HISTORY: "api_client_request_selected_from_history",
+  HISTORY_CLEARED: "api_client_history_cleared",
+  REQUEST_FAILED: "api_client_request_failed",
+  RESPONSE_LOADED: "api_client_response_loaded",
+  RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
+  RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {

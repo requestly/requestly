@@ -1,9 +1,13 @@
 module.exports = {
+  globals: {
+    NodeJS: true,
+  },
   ignorePatterns: [
     "node_modules",
     "app/build/*",
     "app/public/**",
     "browser-extension/*",
+    "app/src/views/features/apis/curl-to-json.js",
   ],
   env: {
     browser: true,

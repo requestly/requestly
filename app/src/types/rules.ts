@@ -125,8 +125,10 @@ export interface CancelRule extends Rule {
 }
 
 export interface QueryParamRuleModification {
+  id?: string;
   param: string;
   value: string;
+  actionWhenParamExists?: string;
   type: QueryParamModificationType;
 }
 
@@ -140,6 +142,7 @@ export interface QueryParamRule extends Rule {
 }
 
 export interface HeadersRuleModificationData {
+  id?: string;
   header: string;
   type: HeaderRuleActionType;
   value: string;

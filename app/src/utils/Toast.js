@@ -5,6 +5,7 @@ export const toast = {};
 message.config({
   top: 60,
   maxCount: 1,
+  duration: 2,
 });
 
 window.toastBroadcastChannel = new BroadcastChannel("toast");

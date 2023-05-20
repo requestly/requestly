@@ -1,7 +1,7 @@
 {
   "name": "@requestly/requestly",
   "version": "1.0.0",
-  "description": "Requestly app, extension and other components",
+  "description": "Requestly app, extension and other compoents ",
   "main": "index.js",
   "directories": {
     "doc": "docs"

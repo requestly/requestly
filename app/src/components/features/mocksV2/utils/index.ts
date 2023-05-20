@@ -1,7 +1,7 @@
 // @ts-ignore
 import { createMock } from "backend/mocks/createMock";
 import APP_CONSTANTS from "config/constants";
-import { isEnvBeta, isEnvEmulator } from "utils/EnvUtils";
+import { isEnvBeta, isEnvDevWithBeta, isEnvEmulator } from "utils/EnvUtils";
 import { v4 as uuidv4 } from "uuid";
 import {
   defaultCssEditorMock,
@@ -18,17 +18,6 @@ export const fileTypeColorMap = {
   [FileType.HTML]: "#FF6905",
   [FileType.CSS]: "#57BEE6",
   [FileType.IMAGE]: "#00C8AF",
-};
-
-export const mockMethodColorMap: { [key: string]: string } = {
-  GET: "#00C8AF",
-  POST: "#1E69FF",
-  PUT: "#FF6905",
-  DELETE: "#FC6675",
-  PATCH: "#FFCA5F",
-  HEAD: "#BEAAFF",
-  OPTIONS: "#57BEE6",
-  default: "#00C8AF",
 };
 
 export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSchema): RQMockSchema => {
@@ -95,7 +84,7 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
 export const generateFinalUrl = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
   let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}`;
 
-  if (isEnvBeta()) {
+  if (isEnvBeta() || isEnvDevWithBeta()) {
     finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}`;
   } else if (isEnvEmulator()) {
     finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}`;

@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.4.25",
+  "version": "23.5.19",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,
@@ -32,6 +32,7 @@
     "grunt-cli": "^1.4.3",
     "grunt-contrib-concat": "^2.1.0",
     "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-handlebars": "^3.0.0",
     "grunt-contrib-jshint": "^3.2.0",
     "grunt-contrib-uglify": "^5.2.2",
     "grunt-contrib-watch": "^1.1.0",

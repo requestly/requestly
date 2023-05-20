@@ -1,11 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Layout, Col, Tooltip } from "antd";
+import { ExperimentOutlined } from "@ant-design/icons";
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
 import { redirectToFileMocksList, redirectToMocksList } from "utils/RedirectionUtils";
 import "./index.css";
 import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -13,6 +16,7 @@ interface HeaderProps {
   savingInProgress: boolean;
   handleClose: Function;
   handleSave: Function;
+  handleTest: () => void;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -21,6 +25,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   savingInProgress,
   handleClose,
   handleSave,
+  handleTest,
 }) => {
   const navigate = useNavigate();
 
@@ -48,6 +53,11 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           <RQBreadcrumb />
         </Col>
         <Col className="header-right-section">
+          {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
+            <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
+              Test
+            </RQButton>
+          )}
           <RQButton type="default" onClick={() => handleClose()}>
             Cancel
           </RQButton>

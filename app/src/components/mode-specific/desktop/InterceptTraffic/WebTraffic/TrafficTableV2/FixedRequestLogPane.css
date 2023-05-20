@@ -1,3 +1,16 @@
+.request-log-main-wrapper {
+  position: relative;
+}
+
+.request-log-pane-header {
+  width: 100%;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--body-background);
+}
+
 .request-log-pane {
   font-size: 13px;
   background-color: transparent;
@@ -51,4 +64,55 @@
 /* payload preview */
 .payload-preview-collapse .ant-collapse-item {
   padding: 8px;
+}
+
+.request-log-pane-url {
+  width: 800px;
+  font-size: 13px;
+}
+
+@media only screen and (max-width: 1200px) {
+  .request-log-pane-url {
+    width: 600px;
+  }
+}
+
+/* action header */
+.action-header-input .ant-input {
+  padding: 5px;
+}
+
+.action-header-input .ant-input-group-addon .ant-btn .anticon {
+  margin: 11px 0;
+}
+.action-header-input .traffic-table-regex-btn-inactive {
+  background: transparent;
+}
+.action-header-input .traffic-table-regex-btn:hover,
+.action-header-input .traffic-table-regex-btn-active,
+.traffic-table-filter-btn-active.ant-btn {
+  background: var(--border-dark);
+  color: var(--white);
+}
+.traffic-table-filters-container {
+  margin-top: 1rem;
+  display: flex;
+  gap: 10px;
+  padding: 0 25px;
+}
+.traffic-table-filters-container section {
+  display: flex;
+  gap: 20px;
+}
+.clear-logs-filter-btn {
+  align-self: flex-end;
+}
+.traffic-table-filter-label {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.traffic-table-filter-select .ant-select-selector {
+  width: 220px;
+  margin-top: -10px;
 }
