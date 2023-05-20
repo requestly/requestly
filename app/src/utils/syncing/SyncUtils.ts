@@ -16,34 +16,61 @@ import { StorageService } from "init";
 import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
 
+declare global {
+  interface Window {
+    uid: string | undefined;
+    isSyncEnabled: boolean | undefined;
+    currentlyActiveWorkspaceTeamId: string | undefined;
+  }
+}
+type SyncType = "update_records" | "remove_records" | "session_recording_page_config";
+type AppMode = "EXTENSION" | "DESKTOP";
+
 /**
- * This functions triggers syncing process
- * @param {Object|Array} formattedObject - It is object when updating else its an array
- * @param {String} syncType
+ * This function triggers the syncing process based on syncType and records.
+ *
+ * @param {Array | Object} records - Records to be synced, it can be an object or array.
+ * @param {String} syncType - The type of sync operation.
+ * @param {AppMode} appMode Current mode of the app.
+ * @param {Object} options - Additional options for syncing.
+ *
  * @returns void
  *
- * syncing is disabled when storage is remote
+ * Note: Syncing is disabled when storage is remote.
  */
-export const doSyncRecords = async (records, syncType, appMode, options = {}) => {
-  if (!window.uid) return; // If user is not logged in
-  if (!options.forceSync && !window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return; // If personal syncing is disabled and user has no active workspace
+
+export const doSyncRecords = async (
+  records: Array<any> | object,
+  syncType: SyncType,
+  appMode: AppMode,
+  options: { forceSync?: boolean; workspaceId?: string } = {}
+): Promise<void> => {
+  // If the user is not logged in, do not proceed with syncing
+  if (!window.uid) return;
+
+  // If personal syncing is disabled and user has no active workspace, do not proceed with syncing unless forceSync is true
+  if (!options.forceSync && !window.isSyncEnabled && !window.currentlyActiveWorkspaceTeamId) return;
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
+      // Update user sync records
       await updateUserSyncRecords(window.uid, records, appMode, {
         workspaceId: options.workspaceId,
       }).catch(Logger.error);
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
+      // Sync records removal
       syncRecordsRemoval(records, appMode);
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG:
+      // Sync session recording page configuration
       syncSessionRecordingPageConfig(records, appMode);
       break;
 
     default:
+      // If the syncType is not recognized, do not proceed with syncing
       return null;
   }
 };
