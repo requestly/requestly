@@ -11,6 +11,7 @@ import Logger from "lib/logger";
 import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
+import { isArray } from "lodash";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -41,7 +42,11 @@ export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSync
   dispatch(actions.updateIsRulesListLoading(true));
 
   setLoader?.();
-  if (window.unsubscribeSyncingNodeRef.current) window.unsubscribeSyncingNodeRef.current();
+  if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
+    window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
+      removeFirebaseListener && removeFirebaseListener();
+    });
+  }
 
   const mergeLocalRecords = async () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) return;
