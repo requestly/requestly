@@ -82,18 +82,39 @@ const setLastSyncTarget = async (
   });
 };
 
-export const mergeRecordsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
-  const localRecords = await getAllLocalRecords(appMode);
-  const mergedRecords = mergeRecords(recordsOnFirebase, localRecords);
+/**
+ * Merges local and Firebase records and updates Firebase with the merged data.
+ *
+ * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param recordsOnFirebase - The records currently stored on Firebase.
+ * @returns Promise of merged records after syncing them with Firebase.
+ */
+export const mergeRecordsAndSaveToFirebase = async (
+  appMode: "EXTENSION" | "DESKTOP",
+  recordsOnFirebase: Record<string, any>[]
+): Promise<Record<string, any>[]> => {
+  // Fetch all local records based on the current application mode
+  const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
 
-  // Write to firebase
-  const formattedObject = {};
-  mergedRecords.forEach((object) => {
-    if (object && object.id) formattedObject[object.id] = object;
-  });
+  // Merge the records from Firebase with the local records
+  const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
+
+  // Format the merged records into an object where the keys are the record IDs
+  const formattedObject: Record<string, any> = mergedRecords.reduce(
+    (acc: Record<string, any>, record: Record<string, any>) => {
+      if (record && record.id) {
+        acc[record.id] = record;
+      }
+      return acc;
+    },
+    {}
+  );
+
+  // Sync the formatted records with Firebase
   await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
   return mergedRecords;
 };
+
 const resolveLocalConflictsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
   const localRecords = await getAllLocalRecords(appMode, false);
   const resolvedRecords = handleLocalConflicts(recordsOnFirebase, localRecords);
