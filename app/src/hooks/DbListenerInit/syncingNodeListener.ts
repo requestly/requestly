@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { Dispatch } from "redux";
+import { database } from "firebase";
 import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
@@ -22,6 +24,9 @@ import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
+
+type NodeRef = database.Reference;
+type Snapshot = database.DataSnapshot;
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
@@ -325,15 +330,36 @@ export function getSyncTarget(currentlyActiveWorkspaceId?: string): string {
   return "sync";
 }
 
-const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => {
-  const syncTarget = getSyncTarget(team_id);
-  const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
+/**
+ * Function that listens for changes in a syncing node, it reacts differently based on the sync target.
+ *
+ * @param {Dispatch} dispatch - Dispatch function to emit actions to the Redux store.
+ * @param {string} uid - The unique user id.
+ * @param {string} team_id - The unique team id.
+ * @param {('EXTENSION' | 'DESKTOP')} appMode - Current mode of the app.
+ * @param {boolean} isSyncEnabled - Flag indicating whether syncing is enabled.
+ *
+ * @returns {Function[]} An array of unsubscribe functions to call when you're done listening.
+ */
+const syncingNodeListener = (
+  dispatch: Dispatch,
+  uid: string,
+  team_id: string,
+  appMode: "EXTENSION" | "DESKTOP",
+  isSyncEnabled: boolean
+): Function[] | null => {
+  // Get sync target
+  const syncTarget: string = getSyncTarget(team_id);
+
+  // Get reference to the node to be synced
+  const syncNodeRef: NodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
+
   try {
+    // Check for individual sync target
     if (syncTarget === "sync") {
-      // This is individual sync
-      // Listen to only records only
+      // Listen to only records
       return [
-        onValue(syncNodeRef, async (snap) => {
+        onValue(syncNodeRef, async (snap: Snapshot) => {
           await invokeSyncingIfRequired({
             dispatch,
             latestFirebaseRecords: snap.val(),
@@ -344,12 +370,12 @@ const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => 
           });
         }),
       ];
-    } else if (syncTarget === "teamSync") {
-      // This is team sync
+    }
+    // Check for team sync target
+    else if (syncTarget === "teamSync") {
       // Listen to records node & rulesConfig node
-
-      return [
-        onValue(syncNodeRef, async (snap) => {
+      const listeners: Function[] = [
+        onValue(syncNodeRef, async (snap: Snapshot) => {
           await callInvokeSyncingIfRequiredIfNotCalledRecently({
             dispatch,
             latestFirebaseRecords: snap.val(),
@@ -359,11 +385,13 @@ const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => 
             isSyncEnabled,
           });
         }),
-        (() => {
-          const rulesConfigPath = getTeamUserRuleAllConfigsPath(team_id, uid);
-          if (!rulesConfigPath) return;
-          const rulesConfigRef = getNodeRef(rulesConfigPath);
-          return onValue(rulesConfigRef, async () => {
+      ];
+
+      const rulesConfigPath: string | undefined = getTeamUserRuleAllConfigsPath(team_id, uid);
+      if (rulesConfigPath) {
+        const rulesConfigRef: NodeRef = getNodeRef(rulesConfigPath);
+        listeners.push(
+          onValue(rulesConfigRef, async () => {
             await callInvokeSyncingIfRequiredIfNotCalledRecently({
               dispatch,
               uid,
@@ -371,9 +399,11 @@ const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => 
               appMode,
               isSyncEnabled,
             });
-          });
-        })(),
-      ];
+          })
+        );
+      }
+
+      return listeners;
     }
   } catch (e) {
     Logger.log(e);
