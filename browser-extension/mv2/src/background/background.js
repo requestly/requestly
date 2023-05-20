@@ -717,7 +717,7 @@ BG.Methods.handleExtensionDisabled = function () {
       chrome.tabs.sendMessage(tab.id, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 });
     });
   });
-  BG.Methods.sendMessage({ isExtensionEnabled: false });
+  BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: false });
 
   Logger.log("Requestly disabled");
 };
@@ -729,7 +729,7 @@ BG.Methods.handleExtensionEnabled = function () {
     onclick: BG.Methods.disableExtension,
   });
   chrome.browserAction.setIcon({ path: RQ.RESOURCES.EXTENSION_ICON });
-  BG.Methods.sendMessage({ isExtensionEnabled: true });
+  BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: true });
 
   Logger.log("Requestly enabled");
 };
@@ -802,14 +802,14 @@ BG.Methods.createContextMenu = function (title, contexts, handler) {
   });
 };
 
-BG.Methods.sendMessage = function (messageObject, callback) {
+BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
   callback =
     callback ||
     function () {
       console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
     };
 
-  chrome.tabs.query({ url: RQ.CONSTANTS.RULES_PAGE_URL_PATTERN }, function (tabs) {
+  chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, function (tabs) {
     // Send message to each opened tab which matches the url
     for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
       chrome.tabs.sendMessage(tabs[tabIndex].id, messageObject, callback);
@@ -834,9 +834,9 @@ BG.Methods.getAppTabs = () => {
  * @param {Object} messageObject
  * @param {Number} tabId
  * @param {Number} timeout
- * @returns Promise resolving to the response from app or timeout error
+ * @returns Promise resolving to {wasMessageSent,payload} from app or timeout error
  */
-BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
+BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
   const sendMessageToTab = (messageObject, tabId) => {
     return new Promise((resolve) => {
       chrome.tabs.sendMessage(tabId, messageObject, (response) => {
@@ -845,10 +845,43 @@ BG.Methods.sendMessageToApp = (messageObject, tabId, timeout = 2000) => {
     });
   };
 
-  return Promise.race([
-    sendMessageToTab(messageObject, tabId),
-    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), timeout)),
-  ]);
+  const lastTriedTabIds = [];
+
+  while (BG.isAppOnline) {
+    /* Getting one app tab (that we haven't tried sending) */
+    const appTabId = await BG.Methods.getAppTabs().then((tabs) => {
+      const filteredTab = tabs.find((tab) => !lastTriedTabIds.includes(tab.id));
+      if (filteredTab) {
+        lastTriedTabIds.push(filteredTab.id);
+        return filteredTab.id;
+      } else {
+        BG.isAppOnline = false;
+        return null;
+      }
+    });
+
+    if (!appTabId) break;
+
+    const response = await Promise.race([
+      sendMessageToTab(messageObject, appTabId),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), timeout)),
+    ])
+      .then((payload) => {
+        if (payload) {
+          return { wasMessageSent: true, payload };
+        }
+        return { wasMessageSent: false };
+      })
+      .catch((err) => {
+        // todo: can add check if timeout based on err
+        return { wasMessageSent: false };
+      });
+
+    if (response.wasMessageSent) {
+      return response;
+    }
+  }
+  return null;
 };
 
 BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
@@ -969,6 +1002,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
         BG.Methods.onSessionRecordingStoppedNotification(sender.tab.id);
         break;
+
+      case RQ.CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
+        BG.Methods.sendMessageToApp({ action: RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED });
+        return true;
 
       case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
         BG.Methods.getTabSession(message.tabId, sendResponse);

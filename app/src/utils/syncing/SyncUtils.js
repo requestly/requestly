@@ -77,7 +77,9 @@ export const syncRecordsRemoval = async (recordIds, appMode) => {
     // If Team Workspace - Delete user specific rule/group config
     if (window.currentlyActiveWorkspaceTeamId) {
       for (const recordId of recordIds) {
-        await removeValueAsPromise(getTeamUserRuleConfigPath(recordId));
+        const teamUserRuleConfigPath = getTeamUserRuleConfigPath(recordId);
+        if (!teamUserRuleConfigPath) return;
+        await removeValueAsPromise(teamUserRuleConfigPath);
       }
     }
 
