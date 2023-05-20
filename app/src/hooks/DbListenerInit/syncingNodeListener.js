@@ -14,6 +14,7 @@ import {
   handleLocalConflicts,
   getSyncedSessionRecordingPageConfig,
   saveSessionRecordingPageConfigLocallyWithoutSync,
+  getTeamUserRuleAllConfigsPath,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
 import { StorageService } from "init";
@@ -133,47 +134,118 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
 };
 export const doSyncDebounced = _.debounce(doSync, 5000);
 
-const syncingNodeListener = (dispatch, syncTarget, uid, team_id, appMode) => {
-  try {
+export const invokeSyncingIfRequired = async ({
+  dispatch,
+  latestFirebaseRecords,
+  uid,
+  team_id,
+  appMode,
+  isSyncEnabled,
+}) => {
+  if (!uid) return;
+  if (!team_id & !isSyncEnabled) return;
+
+  if (window.skipSyncListenerForNextOneTime) {
+    window.skipSyncListenerForNextOneTime = false;
+    window.isFirstSyncComplete = true; // Just in case!
+    dispatch(actions.updateIsRulesListLoading(false));
+    return;
+  }
+
+  const syncTarget = getSyncTarget(team_id);
+  let updatedFirebaseRecords;
+  if (latestFirebaseRecords) {
+    // Means invoked for the newer time
+    updatedFirebaseRecords = latestFirebaseRecords;
+  } else {
+    // Means invoked for the first time
     const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
+    const syncNodeRefNode = await get(syncNodeRef);
+    updatedFirebaseRecords = syncNodeRefNode.val();
+  }
 
-    const invokeSyncingIfRequired = async (latestFirebaseRecords) => {
-      if (window.skipSyncListenerForNextOneTime) {
-        window.skipSyncListenerForNextOneTime = false;
-        window.isFirstSyncComplete = true; // Just in case!
-        dispatch(actions.updateIsRulesListLoading(false));
-        return;
-      }
+  animateSyncIcon();
 
-      let updatedFirebaseRecords;
-      if (latestFirebaseRecords) {
-        // Means invoked for the newer time
-        updatedFirebaseRecords = latestFirebaseRecords;
-      } else {
-        // Means invoked for the first time
-        const syncNodeRefNode = await get(syncNodeRef);
-        updatedFirebaseRecords = syncNodeRefNode.val();
-      }
+  if (!isLocalStoragePresent(appMode)) {
+    // Just refresh the rules table in this case
+    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+    window.isFirstSyncComplete = true;
+    dispatch(actions.updateIsRulesListLoading(false));
+    return;
+  }
+  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+  } else {
+    doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+  }
+};
 
-      animateSyncIcon();
+let lastCalled = null;
+const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args) => {
+  const now = new Date().getTime();
+  const timeSinceLastCalled = now - (lastCalled || 0);
 
-      if (!isLocalStoragePresent(appMode)) {
-        // Just refresh the rules table in this case
-        dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-        window.isFirstSyncComplete = true;
-        dispatch(actions.updateIsRulesListLoading(false));
-        return;
-      }
-      if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-        doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
-      } else {
-        doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
-      }
-    };
+  if (timeSinceLastCalled > 2000 || !lastCalled) {
+    lastCalled = now;
+    await invokeSyncingIfRequired(args);
+  }
+};
 
-    return onValue(syncNodeRef, async (snap) => {
-      await invokeSyncingIfRequired(snap.val());
-    });
+export const getSyncTarget = (currentlyActiveWorkspaceId) => {
+  if (currentlyActiveWorkspaceId) return "teamSync";
+  return "sync";
+};
+
+const syncingNodeListener = (dispatch, uid, team_id, appMode, isSyncEnabled) => {
+  const syncTarget = getSyncTarget(team_id);
+  const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
+  try {
+    if (syncTarget === "sync") {
+      // This is individual sync
+      // Listen to only records only
+      return [
+        onValue(syncNodeRef, async (snap) => {
+          await invokeSyncingIfRequired({
+            dispatch,
+            latestFirebaseRecords: snap.val(),
+            uid,
+            team_id,
+            appMode,
+            isSyncEnabled,
+          });
+        }),
+      ];
+    } else if (syncTarget === "teamSync") {
+      // This is team sync
+      // Listen to records node & rulesConfig node
+
+      return [
+        onValue(syncNodeRef, async (snap) => {
+          await callInvokeSyncingIfRequiredIfNotCalledRecently({
+            dispatch,
+            latestFirebaseRecords: snap.val(),
+            uid,
+            team_id,
+            appMode,
+            isSyncEnabled,
+          });
+        }),
+        (() => {
+          const rulesConfigPath = getTeamUserRuleAllConfigsPath(team_id, uid);
+          if (!rulesConfigPath) return;
+          const rulesConfigRef = getNodeRef(rulesConfigPath);
+          return onValue(rulesConfigRef, async () => {
+            await callInvokeSyncingIfRequiredIfNotCalledRecently({
+              dispatch,
+              uid,
+              team_id,
+              appMode,
+              isSyncEnabled,
+            });
+          });
+        })(),
+      ];
+    }
   } catch (e) {
     Logger.log(e);
     return null;

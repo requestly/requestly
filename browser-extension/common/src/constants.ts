@@ -34,6 +34,7 @@ export const CLIENT_MESSAGES = {
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   ADD_EVENT: "addEvent",
+  NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
 };
 
 export const STORAGE_TYPE = "local";
