@@ -58,12 +58,26 @@ const animateSyncIcon = (): void => {
   }
 };
 
-const setLastSyncTarget = async (appMode, syncTarget, uid, team_id) => {
-  let desiredValue;
-  if (syncTarget === "teamSync") desiredValue = team_id;
-  if (syncTarget === "sync") desiredValue = uid;
+/**
+ * This function sets the last sync target using sync target, user ID, and team ID.
+ *
+ * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param {('teamSync' | 'sync')} syncTarget The target to sync, can be either 'teamSync' or 'sync'.
+ * @param {string} uid The unique ID of the user.
+ * @param {string} team_id The ID of the team.
+ * @returns {Promise<void>} Returns a promise which resolves when the operation is complete.
+ * @throws {Error} If an error occurs during storage.
+ */
+const setLastSyncTarget = async (
+  appMode: "EXTENSION" | "DESKTOP",
+  syncTarget: "teamSync" | "sync",
+  uid: string,
+  team_id: string
+): Promise<void> => {
+  const desiredValue: string = syncTarget === "teamSync" ? team_id : uid;
 
-  await StorageService(appMode).saveRecord({
+  const storageService = new StorageService(appMode);
+  await storageService.saveRecord({
     [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
 };
