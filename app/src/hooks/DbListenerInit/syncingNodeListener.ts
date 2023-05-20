@@ -27,16 +27,34 @@ export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart 
 resetSyncDebounceTimerStart();
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
-const animateSyncIcon = () => {
+/**
+ * This function applies an animation to the "sync-icon" element in the DOM.
+ * The animation is "1s rotate infinite linear", and it lasts for 2.5 seconds.
+ * If the "sync-icon" element is not found in the DOM, an error will be thrown and logged.
+ *
+ * @returns {void}
+ * @throws Will throw an error if the "sync-icon" element is not found in the DOM.
+ */
+const animateSyncIcon = (): void => {
   try {
-    if (document.getElementById("sync-icon")) {
-      document.getElementById("sync-icon").style.animation = "1s rotate infinite linear";
-      setTimeout(() => {
-        document.getElementById("sync-icon").style.removeProperty("animation");
-      }, 2500);
+    const syncIcon: HTMLElement | null = document.getElementById("sync-icon");
+    if (!syncIcon) {
+      throw new Error("Sync icon not found");
     }
-  } catch (_e) {
-    Logger.error(_e);
+
+    syncIcon.style.animation = "1s rotate infinite linear";
+
+    setTimeout(() => {
+      if (syncIcon) {
+        syncIcon.style.removeProperty("animation");
+      }
+    }, 2500);
+  } catch (e) {
+    if (e instanceof Error) {
+      Logger.error(e.message);
+    } else {
+      Logger.error("Unknown error occurred");
+    }
   }
 };
 
