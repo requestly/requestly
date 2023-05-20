@@ -212,6 +212,19 @@ export const doSync = async (
 /** Debounced version of the doSync function */
 export const doSyncDebounced = _.debounce(doSync, 5000);
 
+/**
+ * Initiates the syncing process if conditions are met
+ *
+ * @param {Object} params - The parameters for the function.
+ * @param {Function} params.dispatch - Dispatch function to manage the state.
+ * @param {Array} params.latestFirebaseRecords - Most recent records fetched from Firebase.
+ * @param {string} params.uid - User ID.
+ * @param {string} params.team_id - Team ID.
+ * @param {('EXTENSION' | 'DESKTOP')}  params.appMode - Current mode of the app.
+ * @param {boolean} params.isSyncEnabled - Flag to check if sync is enabled.
+ *
+ * @returns {Promise<void>} - Returns a Promise that resolves to void.
+ */
 export const invokeSyncingIfRequired = async ({
   dispatch,
   latestFirebaseRecords,
@@ -219,9 +232,15 @@ export const invokeSyncingIfRequired = async ({
   team_id,
   appMode,
   isSyncEnabled,
-}) => {
-  if (!uid) return;
-  if (!team_id & !isSyncEnabled) return;
+}: {
+  dispatch: Function;
+  latestFirebaseRecords?: any[];
+  uid?: string;
+  team_id?: string;
+  appMode?: string;
+  isSyncEnabled?: boolean;
+}): Promise<void> => {
+  if (!uid || (!team_id && !isSyncEnabled)) return;
 
   if (window.skipSyncListenerForNextOneTime) {
     window.skipSyncListenerForNextOneTime = false;
@@ -231,16 +250,10 @@ export const invokeSyncingIfRequired = async ({
   }
 
   const syncTarget = getSyncTarget(team_id);
-  let updatedFirebaseRecords;
-  if (latestFirebaseRecords) {
-    // Means invoked for the newer time
-    updatedFirebaseRecords = latestFirebaseRecords;
-  } else {
-    // Means invoked for the first time
-    const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
-    const syncNodeRefNode = await get(syncNodeRef);
-    updatedFirebaseRecords = syncNodeRefNode.val();
-  }
+  // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
+  let updatedFirebaseRecords = latestFirebaseRecords
+    ? latestFirebaseRecords
+    : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
 
   animateSyncIcon();
 
@@ -256,6 +269,21 @@ export const invokeSyncingIfRequired = async ({
   } else {
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
+};
+
+/**
+ * Fetches initial Firebase records for first time sync.
+ *
+ * @param {string} syncTarget - Sync target for fetching records.
+ * @param {string} uid - User ID.
+ * @param {string} team_id - Team ID.
+ *
+ * @returns {Promise<any[]>} - Returns a Promise that resolves to the fetched Firebase records.
+ */
+const fetchInitialFirebaseRecords = async (syncTarget: string, uid: string, team_id: string): Promise<any[]> => {
+  const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
+  const syncNodeRefNode = await get(syncNodeRef);
+  return syncNodeRefNode.val();
 };
 
 let lastCalled = null;
