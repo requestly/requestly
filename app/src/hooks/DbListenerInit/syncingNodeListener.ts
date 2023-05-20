@@ -286,13 +286,24 @@ const fetchInitialFirebaseRecords = async (syncTarget: string, uid: string, team
   return syncNodeRefNode.val();
 };
 
-let lastCalled = null;
-const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args) => {
-  const now = new Date().getTime();
-  const timeSinceLastCalled = now - (lastCalled || 0);
+/**
+ * Calls the 'invokeSyncingIfRequired' function if it hasn't been called in the last 2 seconds.
+ * The lastCalled variable is intended to be a global variable that records the last time the function was called.
+ *
+ * @param args The arguments to be passed to the 'invokeSyncingIfRequired' function.
+ */
+let lastCalled: number | null = null;
+const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args: any): Promise<void> => {
+  const now: number = new Date().getTime();
 
-  if (timeSinceLastCalled > 2000 || !lastCalled) {
+  // Check if lastCalled is null for the first call
+  const timeSinceLastCalled: number = lastCalled !== null ? now - lastCalled : Infinity;
+
+  // 2000 milliseconds = 2 seconds
+  if (timeSinceLastCalled > 2000 || lastCalled === null) {
     lastCalled = now;
+
+    // Now, it is guaranteed that invokeSyncingIfRequired is not recently called
     await invokeSyncingIfRequired(args);
   }
 };
