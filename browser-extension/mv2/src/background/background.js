@@ -1004,9 +1004,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
-        BG.Methods.sendMessageToApp({ action: RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED }).then((res) =>
-          console.log("!!!debug", "res from app", res)
-        );
+        BG.Methods.sendMessageToApp({ action: RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED });
         return true;
 
       case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
