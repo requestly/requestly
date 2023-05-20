@@ -47,16 +47,19 @@ export const getRecordsSyncPath = (syncTarget, uid, team_id) => {
   }
 };
 
-export const getAllTeamUserRulesConfigPath = () => {
-  return ["teamSync", window.currentlyActiveWorkspaceTeamId, "userConfig", window.uid, "rulesConfig"];
+export const getTeamUserRuleAllConfigsPath = (
+  currentlyActiveWorkspaceTeamId = window.currentlyActiveWorkspaceTeamId,
+  uid = window.uid
+) => {
+  if (!currentlyActiveWorkspaceTeamId || !uid) return null;
+  return ["teamSync", currentlyActiveWorkspaceTeamId, "userConfig", uid, "rulesConfig"];
 };
+
 export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
   const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath();
+  if (!teamUserRuleAllConfigsPath) return null;
   teamUserRuleAllConfigsPath.push(ruleOrGroupId);
   return teamUserRuleAllConfigsPath;
-};
-export const getTeamUserRuleAllConfigsPath = () => {
-  return ["teamSync", window.currentlyActiveWorkspaceTeamId, "userConfig", window.uid, "rulesConfig"];
 };
 
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
@@ -66,7 +69,9 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
     //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated.
-    updateValueAsPromise(getTeamUserRuleConfigPath(objectId), {
+    const teamUserRuleConfigPath = getTeamUserRuleConfigPath(objectId);
+    if (!teamUserRuleConfigPath) return;
+    updateValueAsPromise(teamUserRuleConfigPath, {
       [key]: latestRules[objectId][key],
     });
   }
@@ -209,8 +214,10 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
     // Check if it's team syncing. We might not want to read some props like "isFavourite" from this not. Instead we an read from userConfig node
     if (window.currentlyActiveWorkspaceTeamId) {
       const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
-      // Get current values from local storage and use them xD
-      const personalRuleConfigs = await getValueAsPromise(getTeamUserRuleAllConfigsPath());
+      // Get current values from local storage and use them
+      const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath();
+      if (!teamUserRuleAllConfigsPath) return [];
+      const personalRuleConfigs = await getValueAsPromise(teamUserRuleAllConfigsPath);
       for (const objectId in remoteRecords) {
         // Get a copy of user's own value
         try {
@@ -298,7 +305,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   if (window.currentlyActiveWorkspaceTeamId) {
     allSyncedRecords = processRecordsArrayIntoObject(allSyncedRecords);
     const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
-    const personalRuleConfigs = await getValueAsPromise(getAllTeamUserRulesConfigPath());
+    const personalRuleConfigs = await getValueAsPromise(getTeamUserRuleAllConfigsPath(null, uid));
     // Get current values from local storage and use them xD
     for (const objectId in allSyncedRecords) {
       // Get a copy of user's own value

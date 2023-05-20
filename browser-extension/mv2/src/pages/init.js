@@ -13,6 +13,12 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
         sendResponse(response);
       });
       return true;
+
+    case RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED:
+      RQ.ContentScriptMessageHandler.sendMessage(message, (response) => {
+        sendResponse(response);
+      });
+      return true;
   }
 });
 

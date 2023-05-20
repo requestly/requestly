@@ -12,6 +12,7 @@ import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
 import { actions } from "store";
+import { isArray } from "lodash";
 
 window.isFirstSyncComplete = false;
 
@@ -56,27 +57,23 @@ const DBListeners = () => {
       dispatch(actions.updateIsRulesListLoading(true));
     }
 
-    if (window.unsubscribeSyncingNodeRef.current) window.unsubscribeSyncingNodeRef.current(); // Unsubscribe any existing listener
+    // Unsubscribe any existing listener
+    if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
+      window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
+        removeFirebaseListener && removeFirebaseListener();
+      });
+    }
+
     if (user?.loggedIn && user?.details?.profile?.uid) {
-      if (currentlyActiveWorkspace.id) {
-        // This is a team sync
+      if (currentlyActiveWorkspace.id || user?.details?.isSyncEnabled) {
+        // This is a team or individual sync
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
-          "teamSync",
           user?.details?.profile.uid,
-          currentlyActiveWorkspace.id,
-          appMode
-        );
-      } else if (user?.details?.isSyncEnabled) {
-        // This is individual syncing
-        // Set the db node listener
-        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
-          dispatch,
-          "sync",
-          user?.details?.profile.uid,
-          null,
-          appMode
+          currentlyActiveWorkspace?.id,
+          appMode,
+          user?.details?.isSyncEnabled
         );
       } else {
         // Do it here if syncing is not enabled. Else syncing would have triggered this.
