@@ -61,7 +61,7 @@ const animateSyncIcon = (): void => {
 /**
  * This function sets the last sync target using sync target, user ID, and team ID.
  *
- * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param {('EXTENSION' | 'DESKTOP')} appMode Current mode of the app.
  * @param {('teamSync' | 'sync')} syncTarget The target to sync, can be either 'teamSync' or 'sync'.
  * @param {string} uid The unique ID of the user.
  * @param {string} team_id The ID of the team.
@@ -85,7 +85,7 @@ const setLastSyncTarget = async (
 /**
  * Merges local and Firebase records and updates Firebase with the merged data.
  *
- * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param {('EXTENSION' | 'DESKTOP')} appMode Current mode of the app.
  * @param recordsOnFirebase - The records currently stored on Firebase.
  * @returns Promise of merged records after syncing them with Firebase.
  */
@@ -118,7 +118,7 @@ export const mergeRecordsAndSaveToFirebase = async (
 /**
  * Resolves local conflicts and saves the records to Firebase.
  *
- * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param {('EXTENSION' | 'DESKTOP')} appMode Current mode of the app.
  * @param {Array<any>} recordsOnFirebase - The records currently on Firebase.
  * @returns {Promise<Array<any>>} The resolved records.
  */
@@ -139,38 +139,48 @@ const resolveLocalConflictsAndSaveToFirebase = async (
   return resolvedRecords;
 };
 
-export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+/**
+ * Performs synchronization between local and remote data.
+ *
+ * @param uid - User identifier.
+ * @param {('EXTENSION' | 'DESKTOP')} appMode Current mode of the app.
+ * @param dispatch - Redux dispatch function.
+ * @param updatedFirebaseRecords - Newly updated records from Firebase.
+ * @param syncTarget - Target for synchronization.
+ * @param team_id - Team identifier.
+ */
+export const doSync = async (
+  uid: string,
+  appMode: "EXTENSION" | "DESKTOP",
+  dispatch: Function,
+  updatedFirebaseRecords: Record<string, any>,
+  syncTarget: string,
+  team_id: string
+): Promise<void> => {
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
   // Consistency check. Merge records if inconsistent
-  const lastSyncTarget = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
-  let consistencyCheckPassed = false;
-  if (syncTarget === "teamSync") {
-    if (lastSyncTarget === team_id) consistencyCheckPassed = true;
-  } else if (syncTarget === "sync") {
-    if (lastSyncTarget === uid) consistencyCheckPassed = true;
-  }
-  let allSyncedRecords = await parseRemoteRecords(appMode, updatedFirebaseRecords);
+  const storageService = StorageService(appMode);
+  const lastSyncTarget: string = await storageService.getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
+
+  let consistencyCheckPassed: boolean =
+    (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
+
+  let allSyncedRecords: Record<string, any> = await parseRemoteRecords(appMode, updatedFirebaseRecords);
+
   if (!consistencyCheckPassed) {
     // Merge records
-    const recordsOnFirebaseAfterMerge = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
-    allSyncedRecords = recordsOnFirebaseAfterMerge;
-
+    allSyncedRecords = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
   } else {
     // At this stage we are sure that we want to sync with this target only, target is consistent
     // Now let's check if there are any local update that we should prioritize
-    const tsResult = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
-    if (tsResult === false) {
+    const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
+    if (!tsResult) {
       // This means some updates have been performed locally and they have not been synced with firebase yet
       // Handle conflicts
-      const recordsOnFirebaseAfterConflictResolution = await resolveLocalConflictsAndSaveToFirebase(
-        appMode,
-        allSyncedRecords
-      );
-      allSyncedRecords = recordsOnFirebaseAfterConflictResolution;
-
+      allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
       await setLastSyncTarget(appMode, syncTarget, uid, team_id);
     }
   }
@@ -185,10 +195,11 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
   dispatch(actions.updateIsRulesListLoading(false));
 
   // Fetch Session Recording
-  const sessionRecordingConfigOnFirebase = await getSyncedSessionRecordingPageConfig(uid);
-  if (sessionRecordingConfigOnFirebase) {
-    saveSessionRecordingPageConfigLocallyWithoutSync(sessionRecordingConfigOnFirebase, appMode);
-  } else saveSessionRecordingPageConfigLocallyWithoutSync({}, appMode);
+  const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
+  saveSessionRecordingPageConfigLocallyWithoutSync(
+    sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : {},
+    appMode
+  );
 
   // Refresh Session Recording Config
   dispatch(
@@ -197,6 +208,8 @@ export const doSync = async (uid, appMode, dispatch, updatedFirebaseRecords, syn
     })
   );
 };
+
+/** Debounced version of the doSync function */
 export const doSyncDebounced = _.debounce(doSync, 5000);
 
 export const invokeSyncingIfRequired = async ({
