@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { Dispatch } from "redux";
-import { database } from "firebase";
+import { DataSnapshot, DatabaseReference } from "firebase/database";
 import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
@@ -25,8 +24,16 @@ import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 
-type NodeRef = database.Reference;
-type Snapshot = database.DataSnapshot;
+type NodeRef = DatabaseReference;
+type Snapshot = DataSnapshot;
+
+declare global {
+  interface Window {
+    syncDebounceTimerStart: any;
+    isFirstSyncComplete: any;
+    skipSyncListenerForNextOneTime: any;
+  }
+}
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
@@ -81,7 +88,7 @@ const setLastSyncTarget = async (
 ): Promise<void> => {
   const desiredValue: string = syncTarget === "teamSync" ? team_id : uid;
 
-  const storageService = new StorageService(appMode);
+  const storageService = StorageService(appMode);
   await storageService.saveRecord({
     [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
@@ -159,7 +166,7 @@ export const doSync = async (
   appMode: "EXTENSION" | "DESKTOP",
   dispatch: Function,
   updatedFirebaseRecords: Record<string, any>,
-  syncTarget: string,
+  syncTarget: "teamSync" | "sync",
   team_id: string
 ): Promise<void> => {
   if (!isLocalStoragePresent(appMode)) {
@@ -172,7 +179,7 @@ export const doSync = async (
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
 
-  let allSyncedRecords: Record<string, any> = await parseRemoteRecords(appMode, updatedFirebaseRecords);
+  let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
 
   if (!consistencyCheckPassed) {
     // Merge records
@@ -242,7 +249,7 @@ export const invokeSyncingIfRequired = async ({
   latestFirebaseRecords?: any[];
   uid?: string;
   team_id?: string;
-  appMode?: string;
+  appMode?: "EXTENSION" | "DESKTOP";
   isSyncEnabled?: boolean;
 }): Promise<void> => {
   if (!uid || (!team_id && !isSyncEnabled)) return;
@@ -285,7 +292,11 @@ export const invokeSyncingIfRequired = async ({
  *
  * @returns {Promise<any[]>} - Returns a Promise that resolves to the fetched Firebase records.
  */
-const fetchInitialFirebaseRecords = async (syncTarget: string, uid: string, team_id: string): Promise<any[]> => {
+const fetchInitialFirebaseRecords = async (
+  syncTarget: "teamSync" | "sync",
+  uid: string,
+  team_id: string
+): Promise<any[]> => {
   const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
   const syncNodeRefNode = await get(syncNodeRef);
   return syncNodeRefNode.val();
@@ -319,7 +330,7 @@ const callInvokeSyncingIfRequiredIfNotCalledRecently = async (args: any): Promis
  * @param currentlyActiveWorkspaceId - The ID of the currently active team workspace.
  * @returns 'teamSync' if a workspace is currently active, otherwise returns 'sync'.
  */
-export function getSyncTarget(currentlyActiveWorkspaceId?: string): string {
+export function getSyncTarget(currentlyActiveWorkspaceId?: string): "teamSync" | "sync" {
   // Check if a workspace ID was provided
   if (currentlyActiveWorkspaceId) {
     // If a workspace ID was provided, return 'teamSync'
@@ -387,7 +398,7 @@ const syncingNodeListener = (
         }),
       ];
 
-      const rulesConfigPath: string | undefined = getTeamUserRuleAllConfigsPath(team_id, uid);
+      const rulesConfigPath: string[] | undefined = getTeamUserRuleAllConfigsPath(team_id, uid);
       if (rulesConfigPath) {
         const rulesConfigRef: NodeRef = getNodeRef(rulesConfigPath);
         listeners.push(
