@@ -115,15 +115,26 @@ export const mergeRecordsAndSaveToFirebase = async (
   return mergedRecords;
 };
 
-const resolveLocalConflictsAndSaveToFirebase = async (appMode, recordsOnFirebase) => {
-  const localRecords = await getAllLocalRecords(appMode, false);
-  const resolvedRecords = handleLocalConflicts(recordsOnFirebase, localRecords);
+/**
+ * Resolves local conflicts and saves the records to Firebase.
+ *
+ * @param {('EXTENSION' | 'DESKTOP')} appMode The application mode, usually 'DESKTOP' or 'EXTENSION'.
+ * @param {Array<any>} recordsOnFirebase - The records currently on Firebase.
+ * @returns {Promise<Array<any>>} The resolved records.
+ */
+const resolveLocalConflictsAndSaveToFirebase = async (
+  appMode: "EXTENSION" | "DESKTOP",
+  recordsOnFirebase: any[]
+): Promise<any[]> => {
+  const localRecords: any[] = await getAllLocalRecords(appMode, false);
+  const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
 
   // Write to firebase
-  const formattedObject = {};
+  const formattedObject: { [key: string]: any } = {};
   resolvedRecords.forEach((object) => {
     if (object && object.id) formattedObject[object.id] = object;
   });
+
   await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
   return resolvedRecords;
 };
