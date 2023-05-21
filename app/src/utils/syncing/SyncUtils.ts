@@ -23,8 +23,8 @@ declare global {
     currentlyActiveWorkspaceTeamId: string | undefined;
   }
 }
-type SyncType = "update_records" | "remove_records" | "session_recording_page_config";
-type AppMode = "EXTENSION" | "DESKTOP";
+export type SyncType = keyof typeof SYNC_CONSTANTS.SYNC_TYPES;
+export type AppMode = "EXTENSION" | "DESKTOP";
 
 /**
  * This function triggers the syncing process based on syncType and records.

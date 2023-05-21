@@ -23,6 +23,7 @@ import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
+import { SyncType } from "utils/syncing/SyncUtils";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
@@ -123,7 +124,9 @@ export const mergeRecordsAndSaveToFirebase = async (
   );
 
   // Sync the formatted records with Firebase
-  await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
+  await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS as SyncType, appMode, {
+    forceSync: true,
+  });
   return mergedRecords;
 };
 
@@ -147,7 +150,9 @@ const resolveLocalConflictsAndSaveToFirebase = async (
     if (object && object.id) formattedObject[object.id] = object;
   });
 
-  await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, appMode, { forceSync: true });
+  await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS as SyncType, appMode, {
+    forceSync: true,
+  });
   return resolvedRecords;
 };
 
