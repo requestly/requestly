@@ -144,11 +144,24 @@ export const syncRecordsRemoval = async (recordIds: string[], appMode: AppMode):
   }
 };
 
-const syncSessionRecordingPageConfig = async (object, appMode) => {
+/**
+ * Synchronize the session recording page configuration.
+ *
+ * @param {object} config - The configuration object to update the session recording page with.
+ * @param {AppMode} appMode - The current application mode.
+ */
+async function syncSessionRecordingPageConfig(config: Record<string, unknown>, appMode: AppMode): Promise<void> {
+  // Track that synchronization has been triggered
   trackSyncTriggered(window.uid, 1, SYNC_CONSTANTS.SESSION_PAGE_CONFIG);
-  updateSessionRecordingPageConfig(window.uid, object)
-    .then(() => {
-      trackSyncCompleted(window.uid);
-    })
-    .catch((e) => trackSyncFailed(window.uid, SYNC_CONSTANTS.SESSION_PAGE_CONFIG, JSON.stringify(e)));
-};
+
+  try {
+    // Update the session recording page configuration
+    await updateSessionRecordingPageConfig(window.uid, config);
+
+    // Track that synchronization has been successfully completed
+    trackSyncCompleted(window.uid);
+  } catch (e) {
+    // If an error occurs during synchronization, track that synchronization has failed
+    trackSyncFailed(window.uid, SYNC_CONSTANTS.SESSION_PAGE_CONFIG, JSON.stringify(e));
+  }
+}
