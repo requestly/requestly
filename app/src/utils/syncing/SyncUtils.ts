@@ -105,28 +105,41 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
 };
 
 /**
- * Should run when records from storage are deleted and needs syncing with database. Expects an array of ruleIds
- * @param {Array} recordIds
- * @param {String} uid
- * @param {String} appMode
+ * Syncs record removal from storage with the database.
+ *
+ * This function is designed to be called when records are deleted from storage and
+ * needs to be synchronized with the database. It expects an array of recordIds.
+ *
+ * @param recordIds - An array of unique identifiers for records to be removed.
+ * @param {AppMode} appMode - A string representing the current mode of the application.
  */
-export const syncRecordsRemoval = async (recordIds, appMode) => {
+export const syncRecordsRemoval = async (recordIds: string[], appMode: AppMode): Promise<void> => {
+  // Trigger the record synchronization tracking with provided user id, record count and sync type.
   trackSyncTriggered(window.uid, recordIds.length, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS);
 
   try {
-    window.skipSyncListenerForNextOneTime = true; // Prevents unnecessary syncing on same browser tab
+    // Set a global flag to skip the next one-time sync listener. This prevents unnecessary syncing on the same browser tab.
+    window.skipSyncListenerForNextOneTime = true;
+
+    // Remove user-specific sync records
     await removeUserSyncRecords(window.uid, recordIds);
-    // If Team Workspace - Delete user specific rule/group config
+
+    // If in Team Workspace mode, delete user-specific rule/group configuration
     if (window.currentlyActiveWorkspaceTeamId) {
       for (const recordId of recordIds) {
+        // Get the path for the team user rule configuration
         const teamUserRuleConfigPath = getTeamUserRuleConfigPath(recordId);
         if (!teamUserRuleConfigPath) return;
+
+        // Remove the value at the configuration path
         await removeValueAsPromise(teamUserRuleConfigPath);
       }
     }
 
+    // Track the completion of the synchronization process.
     trackSyncCompleted(window.uid);
   } catch (e) {
+    // If any error occurs, track the sync failure with provided user id, sync type, and error details.
     trackSyncFailed(window.uid, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS, JSON.stringify(e));
   }
 };
