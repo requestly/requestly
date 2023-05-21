@@ -40,7 +40,7 @@ type AppMode = "EXTENSION" | "DESKTOP";
  */
 
 export const doSyncRecords = async (
-  records: Array<any> | object,
+  records: any,
   syncType: SyncType,
   appMode: AppMode,
   options: { forceSync?: boolean; workspaceId?: string } = {}
