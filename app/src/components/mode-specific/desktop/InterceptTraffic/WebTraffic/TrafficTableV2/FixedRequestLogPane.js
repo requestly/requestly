@@ -104,7 +104,7 @@ const LogPane = (props) => {
           </div>
         </Navigation.Panel>
         <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <div className="navigation-panel-wrapper">
             <RequestPayloadPreview query_params={query_params} body={body} />
           </div>
         </Navigation.Panel>
@@ -127,7 +127,9 @@ const LogPane = (props) => {
           </div>
         </Navigation.Panel>
         <Navigation.Panel>
-          <JSONPreview logId={log_id} payload={body} />
+          <div className="navigation-panel-wrapper">
+            <JSONPreview logId={log_id} payload={body} />
+          </div>
         </Navigation.Panel>
       </Navigation.Panels>
     </Navigation>

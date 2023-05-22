@@ -4,7 +4,7 @@ import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Typography } from "antd";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 200 * 1024; // 200KB
-const isWithInLimit = (data: any) => {
+const isWithinLimit = (data: unknown) => {
   try {
     if (typeof data == "object") {
       return JSON.stringify(data).length < MAX_ALLOWED_NETWORK_RESPONSE_SIZE;
@@ -20,28 +20,28 @@ const isWithInLimit = (data: any) => {
 };
 
 type Props = {
-  payload: any;
+  payload: unknown;
   logId: string;
 };
 
 const JSONPreview: React.FC<Props> = ({ payload, logId }) => {
   const parsedPayload = useMemo(() => {
     try {
-      if (isWithInLimit(payload)) {
+      if (isWithinLimit(payload)) {
         if (typeof payload === "string") {
           const parsedObject = JSON.parse(payload);
           return parsedObject;
         }
-        return payload;
+        return null;
       }
       return "Response too large / Not supported";
     } catch (e) {
       // skip
     }
-    return payload;
+    return null;
   }, [payload]);
 
-  if (typeof parsedPayload === "object") {
+  if (parsedPayload && typeof parsedPayload === "object") {
     return (
       <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
         <ObjectInspector
@@ -54,11 +54,11 @@ const JSONPreview: React.FC<Props> = ({ payload, logId }) => {
     );
   }
 
-  return (
-    <ThemeProvider theme={"chrome"} colorScheme="light">
-      <Typography.Title level={5}>&nbsp; Preview not available</Typography.Title>
-    </ThemeProvider>
-  );
+  if (parsedPayload && typeof parsedPayload === "string") {
+    return <Typography.Text type="secondary">{parsedPayload}</Typography.Text>;
+  }
+
+  return <Typography.Text type="secondary">&nbsp; No preview available</Typography.Text>;
 };
 
 export default JSONPreview;
