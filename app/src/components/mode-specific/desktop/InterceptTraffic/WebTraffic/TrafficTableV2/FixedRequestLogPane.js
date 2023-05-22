@@ -3,12 +3,12 @@ import { Badge, Space, Divider, Typography, Row, Col } from "antd";
 import { Navigation } from "@devtools-ds/navigation";
 import { Table } from "@devtools-ds/table";
 import { CloseOutlined } from "@ant-design/icons";
-import RequestBodyPreview from "./Preview/RequestBodyPreview";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import CopyButton from "components/misc/CopyButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./FixedRequestLogPane.css";
+import JSONPreview from "./Preview/JsonPreviewV2";
 
 const { Text } = Typography;
 
@@ -47,12 +47,9 @@ const Header = (props) => {
 const LogPane = (props) => {
   const log_id = props.log_id;
   const query_params = props.data.query_params;
-  const upsertRequestAction = props.upsertRequestAction;
   const request_data = props.data;
   const headers = props.data.headers;
   const body = props.data && props.data.body;
-  const url = props.url;
-  const actions = props.actions;
   const title = props.title;
   const requestState = props.requestState;
   const timestamp = props.timestamp;
@@ -130,16 +127,7 @@ const LogPane = (props) => {
           </div>
         </Navigation.Panel>
         <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <RequestBodyPreview
-              data={body}
-              type={request_data.contentType}
-              url={url}
-              actions={actions}
-              log_id={log_id}
-              upsertRequestAction={upsertRequestAction}
-            />
-          </div>
+          <JSONPreview logId={log_id} payload={body} />
         </Navigation.Panel>
       </Navigation.Panels>
     </Navigation>
