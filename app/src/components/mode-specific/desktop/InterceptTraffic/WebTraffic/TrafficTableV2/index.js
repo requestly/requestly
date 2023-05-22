@@ -80,6 +80,10 @@ const CurrentTrafficTable = ({
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
+  const isAppsConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
+    desktopSpecificDetails.appsList,
+  ]);
+
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
       actions.toggleActiveModal({
@@ -589,17 +593,18 @@ const CurrentTrafficTable = ({
         <Col flex="auto">
           <Row align={"middle"}>
             <ActionHeader
-              clearLogs={clearLogs}
-              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
-              showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
-              setIsInterceptingTraffic={setIsInterceptingTraffic}
+              clearLogs={clearLogs}
               logsCount={newLogs.length}
-              logsToSaveAsHar={stableGetLogsToExport}
+              isAppsConnected={isAppsConnected}
               isStaticPreview={isStaticPreview}
-              isFiltersCollapsed={isFiltersCollapsed}
-              setIsFiltersCollapsed={setIsFiltersCollapsed}
               activeFiltersCount={activeFiltersCount}
+              logsToSaveAsHar={stableGetLogsToExport}
+              isFiltersCollapsed={isFiltersCollapsed}
+              showDeviceSelector={showDeviceSelector}
+              setIsFiltersCollapsed={setIsFiltersCollapsed}
+              setIsInterceptingTraffic={setIsInterceptingTraffic}
+              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
             />
             {isStaticPreview ? (
               <Tag>{propLogs.length} requests</Tag>

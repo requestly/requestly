@@ -36,20 +36,21 @@ const { Text } = Typography;
 
 const ActionHeader = ({
   clearLogs,
-  setIsSSLProxyingModalVisible,
-  showDeviceSelector,
   deviceId,
   logsCount,
-  setIsInterceptingTraffic,
+  isAppsConnected,
+  showDeviceSelector,
   logsToSaveAsHar,
   isStaticPreview,
   isFiltersCollapsed,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
+  setIsInterceptingTraffic,
+  setIsSSLProxyingModalVisible,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
+  const isDisableActionButton = !isAppsConnected;
 
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
@@ -143,6 +144,7 @@ const ActionHeader = ({
                 type="default"
                 iconOnly
                 icon={<FaFilter />}
+                disabled={isDisableActionButton}
                 onClick={() => {
                   setIsFiltersCollapsed((prev) => !prev);
                   trackTrafficTableFilterClicked();
@@ -157,10 +159,10 @@ const ActionHeader = ({
                 <Tooltip placement="top" title="Clear Logs">
                   <Button
                     type="primary"
-                    disabled={!logsCount}
                     shape="circle"
                     icon={<ClearOutlined />}
                     onClick={clearLogs}
+                    disabled={!logsCount || isDisableActionButton}
                   />
                 </Tooltip>
               </Col>
@@ -170,8 +172,8 @@ const ActionHeader = ({
                     <Tooltip placement="top" title="Save Network Session">
                       <Button
                         type="primary"
-                        disabled={!logsCount}
                         icon={<SaveOutlined />}
+                        disabled={!logsCount || isDisableActionButton}
                         onClick={() => {
                           trackNetworkSessionSaveClicked();
                           openSaveModal();
@@ -183,8 +185,8 @@ const ActionHeader = ({
                     <Tooltip placement="top" title="Export Network Session">
                       <Button
                         type="primary"
-                        disabled={!logsCount}
                         icon={<DownloadOutlined />}
+                        disabled={!logsCount || isDisableActionButton}
                         onClick={() => {
                           downloadHar(logsToSaveAsHar || {}, "");
                           trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
@@ -221,10 +223,11 @@ const ActionHeader = ({
               <Col>
                 <PauseAndPlayButton
                   defaultIsPaused={false}
+                  isDisableActionButton={isDisableActionButton} // only disable resume button when app not connected
                   onChange={(isPaused) => {
                     setIsInterceptingTraffic(!isPaused);
                   }}
-                  disabled={!logsCount}
+                  disabled={!logsCount || isDisableActionButton}
                 />
               </Col>
             </>
@@ -238,7 +241,7 @@ const ActionHeader = ({
 
 export default ActionHeader;
 
-function PauseAndPlayButton({ defaultIsPaused, onChange, disabled }) {
+function PauseAndPlayButton({ defaultIsPaused, onChange, isDisableActionButton, disabled }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
   return (
     <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
@@ -246,6 +249,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, disabled }) {
         <Button
           type="primary"
           shape="circle"
+          disabled={isDisableActionButton}
           icon={<CaretRightOutlined />}
           onClick={() => {
             setIsPaused(false);
