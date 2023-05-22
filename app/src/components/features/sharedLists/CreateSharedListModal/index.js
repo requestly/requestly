@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Button, Col, Row, Radio, Tag, Space, Tooltip, Typography } from "antd";
-import { AiOutlineLink } from "react-icons/ai";
+import { Button, Col, Row, Radio, Tag, Space, Tooltip } from "antd";
 import { Modal } from "antd";
 import { toast } from "utils/Toast.js";
 import { ReactMultiEmail, isEmail } from "react-multi-email";
@@ -21,11 +20,9 @@ import { BsBuilding } from "react-icons/bs";
 import { Visibility } from "utils/sharedListUtils";
 
 import {
-  trackSharedListUrlCopied,
   trackSharedListRecipientAdded,
   trackSharedListVisibilityToggled,
 } from "modules/analytics/events/features/sharedList";
-import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import "./index.css";
 import CopyButton from "components/misc/CopyButton";
 
@@ -47,7 +44,6 @@ const CreateSharedListModal = (props) => {
   const [permittedEmailsList, setPermittedEmailsList] = useState([]);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListVisibility, setSharedListVisibility] = useState(Visibility.PUBLIC);
-  const [copiedText, setCopiedText] = useState("");
   const [sharedListName, setSharedListName] = useState(() => {
     const rule = rulesCount === 1 ? rules.find((rule) => rule.id === rulesToShare[0]) : null;
 
@@ -111,16 +107,6 @@ const CreateSharedListModal = (props) => {
   const handlePostSharedListCreation = (url) => {
     setIsSharedListCreated(true);
     setSharedListURL(url);
-  };
-
-  const onCopyHandler = () => {
-    trackSharedListUrlCopied("create_modal");
-    trackRQLastActivity("sharedList_url_copied");
-    setCopiedText(sharedListURL);
-    navigator.clipboard.writeText(sharedListURL);
-    setTimeout(() => {
-      setCopiedText("");
-    }, 700);
   };
 
   const getPrettyDescription = (visibility) => {
