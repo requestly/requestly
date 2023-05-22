@@ -1,28 +1,19 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Layout, Button, Row, Col, Tooltip, Dropdown, Menu, Divider } from "antd";
+import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import LINKS from "config/constants/sub/links";
+// import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
-import {
-  GithubOutlined,
-  NotificationOutlined,
-  PhoneOutlined,
-  QuestionCircleOutlined,
-  ReadOutlined,
-  SlackOutlined,
-  SnippetsOutlined,
-  YoutubeOutlined,
-} from "@ant-design/icons";
+import { NotificationOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings, redirectToProductUpdates } from "utils/RedirectionUtils";
 import { RQBreadcrumb } from "lib/design-system/components";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
-import { trackHeaderClicked, trackHelpdeskClicked } from "modules/analytics/events/common/onboarding/header";
+import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -56,41 +47,41 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     setVisible(true);
   };
 
-  const helpMenu = (
-    <Menu className="header-help-menu-container" onClick={({ key }) => trackHelpdeskClicked(key)}>
-      <Menu.Item key="github">
-        <a href={LINKS.REQUESTLY_GITHUB_ISSUES} target="_blank" rel="noreferrer">
-          <GithubOutlined /> <span>Github</span>
-        </a>
-      </Menu.Item>
-      <Divider className="header-help-menu-divider" />
-      <Menu.Item key="documentation">
-        <a href={LINKS.REQUESTLY_DOCS} target="_blank" rel="noreferrer">
-          <ReadOutlined />
-          <span>Documentation</span>
-        </a>
-      </Menu.Item>
-      <Menu.Item key="how_to_articles">
-        <a href={LINKS.REQUESTLY_BLOG} target="_blank" rel="noreferrer">
-          <SnippetsOutlined />
-          <span>How to articles</span>
-        </a>
-      </Menu.Item>
-      <Menu.Item key="video_tutorials">
-        <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer">
-          <YoutubeOutlined />
-          <span>Video tutorials</span>
-        </a>
-      </Menu.Item>
-      <Divider className="header-help-menu-divider" />
-      <Menu.Item key="support">
-        <a href={LINKS.CONTACT_US_PAGE} target="_blank" rel="noreferrer">
-          <PhoneOutlined rotate={180} />
-          <span>Support</span>
-        </a>
-      </Menu.Item>
-    </Menu>
-  );
+  // const helpMenu = (
+  //   <Menu className="header-help-menu-container" onClick={({ key }) => trackHelpdeskClicked(key)}>
+  //     <Menu.Item key="github">
+  //       <a href={LINKS.REQUESTLY_GITHUB_ISSUES} target="_blank" rel="noreferrer">
+  //         <GithubOutlined /> <span>Github</span>
+  //       </a>
+  //     </Menu.Item>
+  //     <Divider className="header-help-menu-divider" />
+  //     <Menu.Item key="documentation">
+  //       <a href={LINKS.REQUESTLY_DOCS} target="_blank" rel="noreferrer">
+  //         <ReadOutlined />
+  //         <span>Documentation</span>
+  //       </a>
+  //     </Menu.Item>
+  //     <Menu.Item key="how_to_articles">
+  //       <a href={LINKS.REQUESTLY_BLOG} target="_blank" rel="noreferrer">
+  //         <SnippetsOutlined />
+  //         <span>How to articles</span>
+  //       </a>
+  //     </Menu.Item>
+  //     <Menu.Item key="video_tutorials">
+  //       <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer">
+  //         <YoutubeOutlined />
+  //         <span>Video tutorials</span>
+  //       </a>
+  //     </Menu.Item>
+  //     <Divider className="header-help-menu-divider" />
+  //     <Menu.Item key="support">
+  //       <a href={LINKS.CONTACT_US_PAGE} target="_blank" rel="noreferrer">
+  //         <PhoneOutlined rotate={180} />
+  //         <span>Support</span>
+  //       </a>
+  //     </Menu.Item>
+  //   </Menu>
+  // );
 
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
 
