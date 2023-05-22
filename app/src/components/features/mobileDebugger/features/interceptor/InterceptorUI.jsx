@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "antd/lib/modal/Modal";
 import ProCard from "@ant-design/pro-card";
@@ -37,7 +37,7 @@ const InterceptorUI = ({ appId }) => {
     dispatch(actions.updateMobileDebuggerInterceptorDetails({ deviceId }));
   };
 
-  const attachUserRulesToDevice = (sdkId, deviceId) => {
+  const attachUserRulesToDevice = useCallback(() => {
     let functions = getFunctions();
     const createUserDeviceMapping = httpsCallable(functions, "createUserDeviceMapping");
     createUserDeviceMapping({
@@ -57,7 +57,7 @@ const InterceptorUI = ({ appId }) => {
         toast.error(err);
         trackDeviceIdSelectedFailureEvent();
       });
-  };
+  }, [deviceId, sdkId]);
 
   const handleInterceptorParamSelection = () => {
     if (!sdkId) {
@@ -75,7 +75,7 @@ const InterceptorUI = ({ appId }) => {
     }
 
     saveUserDeviceSelectionInStore();
-    attachUserRulesToDevice(sdkId, deviceId);
+    attachUserRulesToDevice();
     setShowLogger(true);
     setIsDeviceSelectorVisible(false);
   };
@@ -88,16 +88,16 @@ const InterceptorUI = ({ appId }) => {
     if (!mobileDebuggerInterceptorDetails["deviceId"]) {
       setIsDeviceSelectorVisible(true);
     } else {
-      attachUserRulesToDevice(sdkId, deviceId);
+      attachUserRulesToDevice();
       setShowLogger(true);
       setIsDeviceSelectorVisible(false);
     }
-  }, [mobileDebuggerAppDetails, mobileDebuggerInterceptorDetails]);
+  }, [attachUserRulesToDevice, mobileDebuggerAppDetails, mobileDebuggerInterceptorDetails]);
 
   return (
     <>
       <Modal
-        visible={isDeviceSelectorVisible}
+        open={isDeviceSelectorVisible}
         onCancel={() => setIsDeviceSelectorVisible(false)}
         onOk={handleInterceptorParamSelection}
         okText="Intercept"
