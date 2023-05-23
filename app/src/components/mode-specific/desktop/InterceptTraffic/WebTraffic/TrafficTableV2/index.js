@@ -606,9 +606,9 @@ const CurrentTrafficTable = ({
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
             >
               {isStaticPreview ? (
-                <Tag style={{ padding: "4px 7px" }}>{propLogs.length} requests</Tag>
+                <Tag>{propLogs.length} requests</Tag>
               ) : newLogs.length ? (
-                <Tag style={{ padding: "4px 7px" }}>{newLogs.length} requests</Tag>
+                <Tag>{newLogs.length} requests</Tag>
               ) : null}
             </ActionHeader>
           </Row>
