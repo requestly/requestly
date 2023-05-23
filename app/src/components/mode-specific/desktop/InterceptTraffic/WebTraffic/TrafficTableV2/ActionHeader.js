@@ -39,7 +39,7 @@ const ActionHeader = ({
   clearLogs,
   deviceId,
   logsCount,
-  isAppsConnected,
+  isAnyAppConnected,
   showDeviceSelector,
   logsToSaveAsHar,
   isStaticPreview,
@@ -51,7 +51,6 @@ const ActionHeader = ({
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
-  const isDisableActionButton = !isAppsConnected;
 
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
@@ -145,7 +144,7 @@ const ActionHeader = ({
         <Space size={12}>
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={isDisableActionButton}>
+            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={!isAnyAppConnected}>
               <span className="traffic-table-filter-btn-content">
                 <span>Filter</span>
                 <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
@@ -155,19 +154,19 @@ const ActionHeader = ({
           {isStaticPreview ? null : (
             <>
               <Col>
-                <Button icon={<ClearOutlined />} onClick={clearLogs} disabled={!logsCount || isDisableActionButton}>
+                <Button icon={<ClearOutlined />} onClick={clearLogs} disabled={!logsCount || !isAnyAppConnected}>
                   Clear log
                 </Button>
               </Col>
 
               <Col>
                 <PauseAndPlayButton
+                  logsCount={logsCount}
                   defaultIsPaused={false}
-                  isDisableActionButton={isDisableActionButton} // only disable resume button when app not connected
+                  isAnyAppConnected={isAnyAppConnected}
                   onChange={(isPaused) => {
                     setIsInterceptingTraffic(!isPaused);
                   }}
-                  disabled={!logsCount || isDisableActionButton}
                 />
               </Col>
 
@@ -207,7 +206,7 @@ const ActionHeader = ({
             <Col>
               <Button
                 icon={<DownloadOutlined />}
-                disabled={!logsCount || isDisableActionButton}
+                disabled={!logsCount || !isAnyAppConnected}
                 onClick={() => {
                   downloadHar(logsToSaveAsHar || {}, "");
                   trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
@@ -222,7 +221,7 @@ const ActionHeader = ({
             <Col>
               <Button
                 icon={<SaveOutlined />}
-                disabled={!logsCount || isDisableActionButton}
+                disabled={!logsCount || !isAnyAppConnected}
                 onClick={() => {
                   trackNetworkSessionSaveClicked();
                   openSaveModal();
@@ -241,13 +240,13 @@ const ActionHeader = ({
 
 export default ActionHeader;
 
-function PauseAndPlayButton({ defaultIsPaused, onChange, isDisableActionButton, disabled }) {
+function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConnected }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
   const buttonText = isPaused ? "Resume" : "Pause";
 
   return isPaused ? (
     <Button
-      disabled={isDisableActionButton}
+      disabled={!isAnyAppConnected}
       icon={<CaretRightOutlined />}
       onClick={() => {
         setIsPaused(false);
@@ -266,7 +265,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, isDisableActionButton, 
         onChange(true); // isPaused
         trackTrafficInterceptionPaused();
       }}
-      disabled={disabled}
+      disabled={!logsCount || !isAnyAppConnected}
     >
       {buttonText}
     </Button>

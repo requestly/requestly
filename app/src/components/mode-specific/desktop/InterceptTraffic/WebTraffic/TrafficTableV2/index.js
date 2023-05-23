@@ -79,7 +79,7 @@ const CurrentTrafficTable = ({
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
-  const isAppsConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
+  const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
     desktopSpecificDetails.appsList,
   ]);
 
@@ -595,7 +595,7 @@ const CurrentTrafficTable = ({
               deviceId={deviceId}
               clearLogs={clearLogs}
               logsCount={newLogs.length}
-              isAppsConnected={isAppsConnected}
+              isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
               activeFiltersCount={activeFiltersCount}
               logsToSaveAsHar={stableGetLogsToExport}
