@@ -121,7 +121,7 @@
   min-height: 180px;
 }
 .navigation-panel-wrapper {
-  overflow-y: "auto";
-  height: "100%";
-  padding: "0.8rem";
+  overflow-y: auto;
+  height: 100%;
+  padding: 12px;
 }

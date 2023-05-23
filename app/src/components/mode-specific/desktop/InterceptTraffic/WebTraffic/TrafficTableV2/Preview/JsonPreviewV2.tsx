@@ -58,7 +58,7 @@ const JSONPreview: React.FC<Props> = ({ payload, logId }) => {
     return <Typography.Text type="secondary">{parsedPayload}</Typography.Text>;
   }
 
-  return <Typography.Text type="secondary">&nbsp; No preview available</Typography.Text>;
+  return <Typography.Text type="secondary">No preview available</Typography.Text>;
 };
 
 export default JSONPreview;
