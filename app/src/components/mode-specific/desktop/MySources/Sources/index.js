@@ -288,7 +288,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         )}
       </>
     );
-  }, [systemWideSource, handleActivateAppOnClick, handleDisconnectAppOnClick]);
+  }, [systemWideSource.isActive, systemWideSource.id, handleActivateAppOnClick, handleDisconnectAppOnClick]);
 
   return (
     <React.Fragment>

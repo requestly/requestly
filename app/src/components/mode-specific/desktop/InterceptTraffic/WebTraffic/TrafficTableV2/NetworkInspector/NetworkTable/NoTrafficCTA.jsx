@@ -78,7 +78,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
   }, [dispatch, openConnectedAppsModal, systemWideSource.id, systemWideSource.name]);
 
   const disconnectSystemWide = useCallback(() => {
-    if (!window.RQ || !window.RQ.DESKTOP || !systemWideSource) return;
+    if (!window.RQ || !window.RQ.DESKTOP || !systemWideSource.isAvailable) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
       id: systemWideSource.id,
@@ -101,7 +101,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         }
       })
       .catch((err) => Logger.log(err));
-  }, [dispatch, systemWideSource]);
+  }, [dispatch, systemWideSource.id, systemWideSource.name, systemWideSource.isAvailable]);
 
   const renderEmptyTablePlaceholder = useCallback(() => {
     if (
@@ -180,7 +180,8 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
     navigate,
     numberOfConnectedApps,
     openConnectedAppsModal,
-    systemWideSource,
+    systemWideSource.isAvailable,
+    systemWideSource.isActive,
     trafficTableFilters,
   ]);
 
