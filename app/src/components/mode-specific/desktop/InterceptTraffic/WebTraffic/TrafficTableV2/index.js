@@ -40,7 +40,6 @@ import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import { RQButton } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -79,6 +78,10 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
+
+  const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
+    desktopSpecificDetails.appsList,
+  ]);
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -589,71 +592,76 @@ const CurrentTrafficTable = ({
         <Col flex="auto">
           <Row align={"middle"}>
             <ActionHeader
-              clearLogs={clearLogs}
-              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
-              showDeviceSelector={showDeviceSelector}
               deviceId={deviceId}
-              setIsInterceptingTraffic={setIsInterceptingTraffic}
+              clearLogs={clearLogs}
               logsCount={newLogs.length}
-              logsToSaveAsHar={stableGetLogsToExport}
+              isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
-              isFiltersCollapsed={isFiltersCollapsed}
-              setIsFiltersCollapsed={setIsFiltersCollapsed}
               activeFiltersCount={activeFiltersCount}
-            />
-            {isStaticPreview ? (
-              <Tag>{propLogs.length} requests</Tag>
-            ) : newLogs.length ? (
-              <Tag>{newLogs.length} requests</Tag>
-            ) : null}
+              logsToSaveAsHar={stableGetLogsToExport}
+              isFiltersCollapsed={isFiltersCollapsed}
+              showDeviceSelector={showDeviceSelector}
+              setIsFiltersCollapsed={setIsFiltersCollapsed}
+              setIsInterceptingTraffic={setIsInterceptingTraffic}
+              setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+            >
+              {isStaticPreview ? (
+                <Tag>{propLogs.length} requests</Tag>
+              ) : newLogs.length ? (
+                <Tag>{newLogs.length} requests</Tag>
+              ) : null}
+            </ActionHeader>
           </Row>
           {!isFiltersCollapsed && (
-            <Row className="traffic-table-filters-container">
-              <section>
-                <LogFilter
-                  filterId="filter-method"
-                  filterLabel="Method"
-                  filterPlaceholder="Filter by method"
-                  options={METHOD_TYPE_OPTIONS}
-                  value={trafficTableFilters.method}
-                  handleFilterChange={(options) => {
-                    dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
-                    trackTrafficTableFilterApplied("method", options, options?.length);
+            <div className="traffic-table-filters-container">
+              <div className="text-dark-gray caption">FILTER BY</div>
+              <Row>
+                <section>
+                  <LogFilter
+                    filterId="filter-method"
+                    filterLabel="Method"
+                    filterPlaceholder="Filter by method"
+                    options={METHOD_TYPE_OPTIONS}
+                    value={trafficTableFilters.method}
+                    handleFilterChange={(options) => {
+                      dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                      trackTrafficTableFilterApplied("method", options, options?.length);
+                    }}
+                  />
+                  <LogFilter
+                    filterId="filter-status-code"
+                    filterLabel="Status code"
+                    filterPlaceholder="Filter by status code"
+                    options={STATUS_CODE_ONLY_OPTIONS}
+                    value={trafficTableFilters.statusCode}
+                    handleFilterChange={(options) => {
+                      dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                      trackTrafficTableFilterApplied("status_code", options, options?.length);
+                    }}
+                  />
+                  <LogFilter
+                    filterId="filter-resource-type"
+                    filterLabel="Content type"
+                    filterPlaceholder="Filter by content type"
+                    options={CONTENT_TYPE_OPTIONS}
+                    value={trafficTableFilters.contentType}
+                    handleFilterChange={(options) => {
+                      dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
+                      trackTrafficTableFilterApplied("content_type", options, options?.length);
+                    }}
+                  />
+                </section>
+                <Button
+                  type="link"
+                  className="clear-logs-filter-btn"
+                  onClick={() => {
+                    dispatch(desktopTrafficTableActions.clearColumnFilters());
                   }}
-                />
-                <LogFilter
-                  filterId="filter-status-code"
-                  filterLabel="Status code"
-                  filterPlaceholder="Filter by status code"
-                  options={STATUS_CODE_ONLY_OPTIONS}
-                  value={trafficTableFilters.statusCode}
-                  handleFilterChange={(options) => {
-                    dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
-                    trackTrafficTableFilterApplied("status_code", options, options?.length);
-                  }}
-                />
-                <LogFilter
-                  filterId="filter-resource-type"
-                  filterLabel="Content type"
-                  filterPlaceholder="Filter by content type"
-                  options={CONTENT_TYPE_OPTIONS}
-                  value={trafficTableFilters.contentType}
-                  handleFilterChange={(options) => {
-                    dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
-                    trackTrafficTableFilterApplied("content_type", options, options?.length);
-                  }}
-                />
-              </section>
-              <RQButton
-                type="primary"
-                className="clear-logs-filter-btn"
-                onClick={() => {
-                  dispatch(desktopTrafficTableActions.clearColumnFilters());
-                }}
-              >
-                Clear
-              </RQButton>
-            </Row>
+                >
+                  Clear all
+                </Button>
+              </Row>
+            </div>
           )}
           <div className={!isPreviewOpen && "hide-traffic-table-split-gutter"}>
             <Split
