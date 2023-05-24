@@ -42,6 +42,7 @@ RQ.RequestResponseRuleHandler.init = function () {
   RQ.ClientUtils.executeJS(`(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
 
   RQ.RequestResponseRuleHandler.cacheRequestRules();
+  RQ.RequestResponseRuleHandler.cacheStaticResponseRules();
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE) {
@@ -77,16 +78,30 @@ RQ.RequestResponseRuleHandler.init = function () {
   RQ.RequestResponseRuleHandler.isInitialized = true;
 };
 
-RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
-  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
-    RQ.ClientUtils.executeJS(
-      `
-      window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
-      window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
-    `,
-      true
-    );
+RQ.RequestResponseRuleHandler.cacheRequestRules = async () => {
+  const requestRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
+  `,
+    true
+  );
+};
+
+RQ.RequestResponseRuleHandler.cacheStaticResponseRules = async () => {
+  const allResponseRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE);
+  const staticResponseRules = allResponseRules.filter((rule) => {
+    return rule.pairs[0].response.type === "static"; // TODO: also check UI setting if user wants to skip original request
   });
+
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.staticResponseRules = ${JSON.stringify(staticResponseRules)};
+  `,
+    true
+  );
 };
 
 RQ.RequestResponseRuleHandler.cacheResponseRule = (url, responseRule) => {
@@ -109,16 +124,16 @@ RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
   RQ.RequestResponseRuleHandler.cachedResponseRuleIds.delete(ruleId);
 };
 
-RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
+RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = async () => {
   RQ.RequestResponseRuleHandler.cacheRequestRules();
+  RQ.RequestResponseRuleHandler.cacheStaticResponseRules();
 
-  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then((responseRules) => {
-    const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
-    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
-      if (!enabledResponseRuleIds.includes(ruleId)) {
-        RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
-      }
-    });
+  const responseRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE);
+  const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
+  RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
+    if (!enabledResponseRuleIds.includes(ruleId)) {
+      RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
+    }
   });
 };
 
@@ -131,6 +146,7 @@ RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
 RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   window[namespace] = window[namespace] || {};
   window[namespace].requestRules = [];
+  window[namespace].staticResponseRules = [];
   window[namespace].responseRulesByUrl = {};
   let isDebugMode = false;
 
@@ -231,6 +247,18 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     );
   };
 
+  const getStaticResponseRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    const absoluteUrl = getAbsoluteUrl(url);
+
+    return window[namespace].staticResponseRules.findLast((rule) =>
+      window[namespace].matchSourceUrl(rule.pairs[0].source, absoluteUrl)
+    );
+  };
+
   const getFunctionFromCode = (code) => {
     return new Function("args", `return (${code})(args);`);
   };
@@ -277,6 +305,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     return defaultValue;
   };
 
+  const isJSON = (data) => {
+    const parsedJson = jsonifyValidJSONString(data);
+    return parsedJson !== data; // if data is not a JSON, jsonifyValidJSONString() returns same value
+  };
+
   /**
    * @param  url
    * Does not handle duplicate query params for now
@@ -294,7 +327,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     const paramsObject = Object.fromEntries(new URLSearchParams(searchParamsString));
 
     // Traverse paramsObject to convert JSON strings into JSON object
-    for (paramName in paramsObject) {
+    for (let paramName in paramsObject) {
       const paramValue = paramsObject[paramName];
       paramsObject[paramName] = jsonifyValidJSONString(paramValue);
     }
@@ -455,6 +488,34 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     }
   };
 
+  const resolveXHR = (xhr, responseData) => {
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    const updateReadyState = (readyState) => {
+      xhr.readyState = readyState;
+      xhr.dispatchEvent(new CustomEvent("readystatechange"));
+    };
+    const dispatchProgressEvent = (type) => {
+      xhr.dispatchEvent(new ProgressEvent(type));
+    };
+
+    dispatchProgressEvent("loadstart");
+
+    // update response headers
+    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
+    xhr.getResponseHeader = (key) => {
+      if (key.toLowerCase() === "content-type") {
+        return contentType;
+      }
+      return null;
+    };
+    updateReadyState(xhr.HEADERS_RECEIVED);
+
+    // mark resolved
+    updateReadyState(xhr.DONE);
+    dispatchProgressEvent("load");
+    dispatchProgressEvent("loadend");
+  };
+
   const XHR = XMLHttpRequest;
   XMLHttpRequest = function () {
     const xhr = new XHR();
@@ -475,6 +536,16 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
+    // this.requestData = data;
+
+    const staticResponseRule = getStaticResponseRule(this.requestURL);
+    if (staticResponseRule) {
+      window[namespace].responseRulesByUrl[getAbsoluteUrl(this.requestURL)] = staticResponseRule;
+      this.requestData = data;
+      resolveXHR(this, staticResponseRule.pairs[0].response.value);
+      return;
+    }
+
     const requestRule = getRequestRule(this.requestURL);
     let requestBody;
 
