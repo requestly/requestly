@@ -78,7 +78,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
   }, [dispatch, openConnectedAppsModal, systemWideSource.id, systemWideSource.name]);
 
   const disconnectSystemWide = useCallback(() => {
-    if (!window.RQ || !window.RQ.DESKTOP) return;
+    if (!window.RQ || !window.RQ.DESKTOP || !systemWideSource) return;
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
       id: systemWideSource.id,
@@ -101,13 +101,9 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         }
       })
       .catch((err) => Logger.log(err));
-  }, [dispatch, systemWideSource.id, systemWideSource.name]);
+  }, [dispatch, systemWideSource]);
 
   const renderEmptyTablePlaceholder = useCallback(() => {
-    if (!systemWideSource.isAvailable) {
-      return null;
-    }
-
     if (
       trafficTableFilters.search.term.length ||
       Object.values({
@@ -136,7 +132,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       );
     }
 
-    if (systemWideSource.isActive) {
+    if (systemWideSource?.isActive) {
       return (
         <>
           <Typography.Text>Requestly is enabled to inspect all traffic from this device.</Typography.Text>
@@ -166,11 +162,15 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         <RQButton type="primary" onClick={openConnectedAppsModal}>
           Connect apps
         </RQButton>
-        <Typography.Text>Or</Typography.Text>
-        <Typography.Text>Capture all the requests from this device</Typography.Text>
-        <RQButton type="default" onClick={connectSystemWide} icon={<DesktopOutlined />}>
-          Enable Requestly system-wide
-        </RQButton>
+        {systemWideSource.isAvailable ? (
+          <>
+            <Typography.Text>Or</Typography.Text>
+            <Typography.Text>Capture all the requests from this device</Typography.Text>
+            <RQButton type="default" onClick={connectSystemWide} icon={<DesktopOutlined />}>
+              Enable Requestly system-wide
+            </RQButton>
+          </>
+        ) : null}
       </>
     );
   }, [
@@ -180,8 +180,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
     navigate,
     numberOfConnectedApps,
     openConnectedAppsModal,
-    systemWideSource.isActive,
-    systemWideSource.isAvailable,
+    systemWideSource,
     trafficTableFilters,
   ]);
 
