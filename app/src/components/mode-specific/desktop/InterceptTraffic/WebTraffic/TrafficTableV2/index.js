@@ -677,6 +677,7 @@ const CurrentTrafficTable = ({
                 <ProCard
                   className="primary-card github-like-border network-table-wrapper-override"
                   style={{
+                    height: "-webkit-fill-available",
                     boxShadow: "none",
                     // borderBottom: "2px solid #f5f5f5",
                     borderRadius: "0",
