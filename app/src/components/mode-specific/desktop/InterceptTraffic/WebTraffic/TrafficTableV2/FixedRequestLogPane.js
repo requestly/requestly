@@ -32,10 +32,12 @@ const Header = (props) => {
         <Text ellipsis={{ tooltip: props.url }} className="request-log-pane-url">
           {props.url}
         </Text>
-        <div style={{ display: "flex", marginLeft: "auto", cursor: "pointer" }}>
+      </Space>
+      <Col className="ml-auto">
+        <div style={{ display: "flex", marginLeft: "15px", cursor: "pointer" }}>
           <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
         </div>
-      </Space>
+      </Col>
     </Row>
   );
 };
