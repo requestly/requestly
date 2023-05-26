@@ -165,6 +165,10 @@
   margin-bottom: 12px;
 }
 
+.mb-16 {
+  margin-bottom: 1rem;
+}
+
 .visibility-hidden {
   visibility: hidden;
 }
