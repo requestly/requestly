@@ -1,34 +1,28 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, List, Row, Space } from "antd";
-import { Modal } from "antd";
-import { useDropzone } from "react-dropzone";
 import { toast } from "utils/Toast.js";
-//ICONS
 import { AiOutlineWarning } from "react-icons/ai";
 import { BsFileEarmarkCheck } from "react-icons/bs";
-import { FiUpload } from "react-icons/fi";
-//UTILS
 import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-//ACTIONS
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import SpinnerColumn from "../../../misc/SpinnerColumn";
 import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import FEATURES from "../../../../config/constants/sub/features";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { LeftOutlined } from "@ant-design/icons";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { RQModal } from "lib/design-system/components";
+import Logger from "lib/logger";
 import {
   trackRulesJsonParsed,
   trackRulesImportFailed,
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
-import Logger from "lib/logger";
-import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { FilePicker } from "components/common/FilePicker";
 
 const ImportRulesModal = (props) => {
   const { toggle: toggleModal, isOpen } = props;
@@ -49,9 +43,10 @@ const ImportRulesModal = (props) => {
   const [conflictingRecords, setConflictingRecords] = useState([]);
   const [showImportOptions, setShowImportOptions] = useState(true);
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
-  const ImportRulesDropzone = () => {
-    const onDrop = useCallback(async (acceptedFiles) => {
+  const onDrop = useCallback(
+    async (acceptedFiles) => {
       //Ignore other uploaded files
       const file = acceptedFiles[0];
 
@@ -87,31 +82,36 @@ const ImportRulesModal = (props) => {
         }
       };
       reader.readAsText(file);
-    }, []);
-    const { getRootProps, getInputProps } = useDropzone({ onDrop });
+    },
+    [user, allRules, toggleModal]
+  );
 
-    return (
-      <div {...getRootProps()}>
-        <input {...getInputProps()} />
-        <center>
-          <h1 className="display-2">
-            <FiUpload />
-          </h1>
-          <p>Drag and drop requestly export file, or click to select</p>
-        </center>
-      </div>
-    );
-  };
+  // const ImportRulesDropzone = () => {
+  //   const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  //   return (
+  //     <div {...getRootProps()}>
+  //       <input {...getInputProps()} />
+  //       <center>
+  //         <h1 className="display-2">
+  //           <FiUpload />
+  //         </h1>
+  //         <p>Drag and drop requestly export file, or click to select</p>
+  //       </center>
+  //     </div>
+  //   );
+  // };
 
   const renderFilePicker = () => {
     return (
-      <React.Fragment>
-        <ImportRulesDropzone />
-      </React.Fragment>
+      <FilePicker
+        onFilesDrop={onDrop}
+        loaderMessage="Processing rules..."
+        isProcessing={processingDataToImport}
+        title="Drag and drop your exported file"
+      />
     );
   };
-
-  const renderLoader = () => <SpinnerColumn message="Processing data" />;
 
   const RenderConflictingRules = () => {
     if (conflictingRecords.length !== 0) {
@@ -120,16 +120,12 @@ const ImportRulesModal = (props) => {
           <List
             size="small"
             dataSource={conflictingRecords.slice(0, 5)}
-            renderItem={(item) => (
-              // <List.Item>
-              <h5 style={{ textAlign: "left" }}>{item.name}</h5>
-              // </List.Item>
-            )}
+            renderItem={(item) => <div style={{ marginLeft: "3.7rem", textAlign: "left" }}>{item.name}</div>}
           />
           {conflictingRecords.length > 5 ? (
             <h4>+ {conflictingRecords.length - 5} more rules are in conflict. Select an option to continue?</h4>
           ) : (
-            <h4>Above rules are in conflict. Select an option to continue?</h4>
+            <h4 style={{ marginTop: "2rem" }}>Above rules are in conflict. Select an option to continue?</h4>
           )}
         </>
       );
@@ -141,7 +137,7 @@ const ImportRulesModal = (props) => {
     return (rulesToImportCount && rulesToImportCount > 0) || (groupsToImportCount && groupsToImportCount > 0) ? (
       <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center" style={{ textAlign: "center" }}>
         <h1 className="display-2">
-          <BsFileEarmarkCheck />
+          <BsFileEarmarkCheck style={{ color: "var(--success)" }} />
         </h1>
         <h4>
           Successfully parsed{" "}
@@ -159,6 +155,7 @@ const ImportRulesModal = (props) => {
   };
 
   const doImportRules = (natureOfImport) => {
+    setIsImporting(true);
     const migratedDataToImport = isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)
       ? migrateHeaderRulesToV2(dataToImport)
       : dataToImport;
@@ -184,7 +181,8 @@ const ImportRulesModal = (props) => {
       })
       .catch((e) => {
         trackRulesImportFailed("unsuccessful_save");
-      });
+      })
+      .finally(() => setIsImporting(false));
   };
 
   const renderImportRulesBtn = () => {
@@ -196,30 +194,32 @@ const ImportRulesModal = (props) => {
       conflictingRecords.length !== 0
     ) {
       return (
-        <Space>
-          <Button
-            color="primary"
-            data-dismiss="modal"
-            type="button"
-            onClick={() => {
-              // by default overwrite is true so we dont need to process the importData again
-              doImportRules("overwrite");
-            }}
-          >
-            Overwrite Conflicting Rules
-          </Button>
-          <Button
-            color="primary"
-            data-dismiss="modal"
-            type="button"
-            onClick={() => {
-              processDataToImport(dataToImport, user, allRules, false);
-              doImportRules("duplicate");
-            }}
-          >
-            Duplicate Conflicting Rules
-          </Button>
-        </Space>
+        <Row className="rq-modal-footer">
+          <Space className="ml-auto">
+            <Button
+              color="primary"
+              data-dismiss="modal"
+              type="button"
+              onClick={() => {
+                // by default overwrite is true so we dont need to process the importData again
+                doImportRules("overwrite");
+              }}
+            >
+              Overwrite Conflicting Rules
+            </Button>
+            <Button
+              color="primary"
+              data-dismiss="modal"
+              type="button"
+              onClick={() => {
+                processDataToImport(dataToImport, user, allRules, false);
+                doImportRules("duplicate");
+              }}
+            >
+              Duplicate Conflicting Rules
+            </Button>
+          </Space>
+        </Row>
       );
     }
     return dataToImport &&
@@ -227,9 +227,17 @@ const ImportRulesModal = (props) => {
       rulesToImportCount &&
       rulesToImportCount > 0 &&
       conflictingRecords.length === 0 ? (
-      <Button color="primary" data-dismiss="modal" type="button" onClick={() => doImportRules("normal")}>
-        Import
-      </Button>
+      <Row className="rq-modal-footer">
+        <Button
+          type="primary"
+          className="ml-auto"
+          data-dismiss="modal"
+          loading={isImporting}
+          onClick={() => doImportRules("normal")}
+        >
+          Import
+        </Button>
+      </Row>
     ) : null;
   };
 
@@ -287,22 +295,21 @@ const ImportRulesModal = (props) => {
         />
       ) : null}
 
-      <Modal
-        style={{ display: isImportFromCharlesModalOpen ? "none" : "block" }}
-        className="modal-dialog-centered"
+      <RQModal
         open={isOpen}
         onCancel={toggleModal}
-        footer={null}
-        title={
-          <Row align="middle">
-            {isCharlesImportFeatureFlagOn && !showImportOptions && (
+        style={{ display: isImportFromCharlesModalOpen ? "none" : "block" }}
+      >
+        <div className="rq-modal-content">
+          <Row align="middle" justify="center" className="header mb-16">
+            {/* {isCharlesImportFeatureFlagOn && !showImportOptions && (
               <Button
                 size="small"
                 style={{ marginRight: "6px" }}
                 onClick={() => setShowImportOptions(true)}
                 icon={<LeftOutlined style={{ fontSize: "14px" }} />}
               />
-            )}
+            )} */}
 
             {modifyModalContentForCharlesImportOption ? (
               <span>Select the type of rules you want to import</span>
@@ -310,41 +317,28 @@ const ImportRulesModal = (props) => {
               <span>Import Rules</span>
             )}
           </Row>
-        }
-      >
-        {modifyModalContentForCharlesImportOption ? (
-          <>
-            <Row align="middle" justify="center">
-              <Button type="default" onClick={handleRegularRuleImportClick}>
-                Import Requestly rules (JSON file)
-              </Button>
-            </Row>
-            <center style={{ margin: "8px 0" }} className="text-gray">
-              or
-            </center>
-            <Row align="middle" justify="center">
-              <Button type="default" onClick={toggleImportFromCharlesModal}>
-                Import Charles Proxy settings (XML file)
-              </Button>
-            </Row>
-          </>
-        ) : (
-          <>
-            <div className="modal-body">
-              {dataToImport ? renderImportConfirmation() : processingDataToImport ? renderLoader() : renderFilePicker()}
-            </div>
-            <br />
-            <div
-              className="modal-footer"
-              style={{
-                textAlign: "center",
-              }}
-            >
-              {renderImportRulesBtn()}
-            </div>
-          </>
-        )}
-      </Modal>
+          {modifyModalContentForCharlesImportOption ? (
+            <>
+              <Row align="middle" justify="center">
+                <Button type="default" onClick={handleRegularRuleImportClick}>
+                  Import Requestly rules (JSON file)
+                </Button>
+              </Row>
+              <center style={{ margin: "8px 0" }} className="text-gray">
+                or
+              </center>
+              <Row align="middle" justify="center">
+                <Button type="default" onClick={toggleImportFromCharlesModal}>
+                  Import Charles Proxy settings (XML file)
+                </Button>
+              </Row>
+            </>
+          ) : (
+            <>{dataToImport ? renderImportConfirmation() : renderFilePicker()}</>
+          )}
+        </div>
+        {renderImportRulesBtn()}
+      </RQModal>
     </>
   );
 };

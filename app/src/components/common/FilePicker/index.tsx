@@ -6,16 +6,18 @@ import "./index.css";
 
 interface FilePickerProps {
   onFilesDrop: (files: File[]) => void;
-  isProcessing: boolean;
   title: string;
   maxFiles?: number;
+  isProcessing: boolean;
+  loaderMessage?: string;
 }
 
 export const FilePicker: React.FC<FilePickerProps> = ({
+  title,
   onFilesDrop,
   isProcessing,
-  title,
   maxFiles = 0, // no limitations
+  loaderMessage = "Processing...",
 }) => {
   const [isFilePickerActive, setIsFilePickerActive] = useState<boolean>(false);
 
@@ -23,7 +25,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
     return (
       <>
         <Spin size="large" />
-        <Typography.Text className="title text-center">Processing...</Typography.Text>
+        <Typography.Text className="title text-center">{loaderMessage}</Typography.Text>
       </>
     );
   };
