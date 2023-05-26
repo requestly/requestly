@@ -12,7 +12,7 @@ export async function deleteNetworkSession(id: string) {
 }
 
 // ipc wrapper
-function ipcRequest(channel: string, requestData: any, timeout = 5000): any {
+function ipcRequest(channel: string, requestData: any, timeout = 10_000): any {
   return new Promise((resolve, reject) => {
     let responseTimeout = setTimeout(() => {
       reject(new Error(`IPC request timed out after ${timeout} ms`));
@@ -30,20 +30,23 @@ function ipcRequest(channel: string, requestData: any, timeout = 5000): any {
 }
 
 export async function saveNetworkSession(name: string, har: Har): Promise<string> {
-  // return await window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("save-network-session", {name, har})
-
-  const id: string = await ipcRequest("save-network-session", { name, har });
-  return id;
+  return ipcRequest("save-network-session", { name, har })
+    .then((id: string) => {
+      return id;
+    })
+    .catch((e: unknown) => {
+      console.error("Got error while saving session", e);
+      return "";
+    });
 }
 
 export async function getNetworkSession(id: string): Promise<NetworkSessionRecord | null> {
-  // return (await window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain("get-network-session", {id})) as NetworkSessionRecord
-
   return ipcRequest("get-network-session", { id })
     .then((res: NetworkSessionRecord) => {
       return res;
     })
-    .catch((): null => {
+    .catch((e: unknown): null => {
+      console.error(`Got error while getting session ${id}`, e);
       return null;
     });
 }
