@@ -48,7 +48,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const [currentApp, setCurrentApp] = useState(props.appId ?? null);
 
   const { appsList } = desktopSpecificDetails;
-
+  const systemWideSource = appsList["system-wide"];
   const appsListRef = useRef(null);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
@@ -257,15 +257,17 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   );
 
   const renderInterceptSystemWideSourceToggle = useCallback(() => {
-    const source = desktopSpecificDetails.appsList["system-wide"];
-
     return (
       <>
-        {source.isActive ? (
+        {systemWideSource.isActive ? (
           <>
             <CheckCircleOutlined className="system-wide-check-icon" />
             Requestly everywhere enabled to inspect all traffic from this device.
-            <RQButton type="default" className="danger-btn" onClick={() => handleDisconnectAppOnClick(source.id)}>
+            <RQButton
+              type="default"
+              className="danger-btn"
+              onClick={() => handleDisconnectAppOnClick(systemWideSource.id)}
+            >
               Disconnect
             </RQButton>
           </>
@@ -276,7 +278,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               type="default"
               icon={<DesktopOutlined />}
               onClick={() => {
-                handleActivateAppOnClick(source.id);
+                handleActivateAppOnClick(systemWideSource.id);
                 trackSystemWideConnected("app_source_modal");
               }}
             >
@@ -286,7 +288,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         )}
       </>
     );
-  }, [desktopSpecificDetails.appsList, handleActivateAppOnClick, handleDisconnectAppOnClick]);
+  }, [systemWideSource.isActive, systemWideSource.id, handleActivateAppOnClick, handleDisconnectAppOnClick]);
 
   return (
     <React.Fragment>
@@ -344,9 +346,9 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               Intercept traffic
             </RQButton>
           </Col>
-        ) : (
+        ) : systemWideSource.isAvailable ? (
           <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
-        )}
+        ) : null}
       </RQModal>
       {/* Modals */}
       {isCloseConfirmModalActive ? (
