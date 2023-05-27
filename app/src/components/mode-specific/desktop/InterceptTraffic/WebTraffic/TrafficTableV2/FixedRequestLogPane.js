@@ -27,18 +27,16 @@ const Header = (props) => {
   return (
     <Row className="request-log-pane-header" align="middle" wrap={false}>
       <Space>
-        <div style={{ display: "flex", marginLeft: "4px", cursor: "pointer" }}>
-          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
-        </div>
         <Badge count={props.method} style={{ backgroundColor: "grey" }} />
         <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
         <Text ellipsis={{ tooltip: props.url }} className="request-log-pane-url">
           {props.url}
         </Text>
       </Space>
-
       <Col className="ml-auto">
-        <CopyCurlButton requestShellCurl={props.requestShellCurl} />
+        <div style={{ display: "flex", marginLeft: "15px", cursor: "pointer" }}>
+          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
+        </div>
       </Col>
     </Row>
   );
