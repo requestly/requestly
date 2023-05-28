@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
@@ -73,7 +73,7 @@ const CurrentTrafficTable = ({
 
   const [appList, setAppList] = useState(new Set());
   const [domainList, setDomainList] = useState(new Set());
-  const [isComponentMounted, setIsComponentMounted] = useState(false);
+  const mounted = useRef(false);
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
     desktopSpecificDetails.appsList,
@@ -290,7 +290,7 @@ const CurrentTrafficTable = ({
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
 
   useEffect(() => {
-    if (isComponentMounted) {
+    if (mounted.current) {
       return;
     }
 
@@ -308,10 +308,9 @@ const CurrentTrafficTable = ({
       setDomainList(domains);
       setAppList(apps);
 
-      setIsComponentMounted(true);
       return null;
     });
-  }, [requestLogs, isComponentMounted]);
+  }, [requestLogs]);
 
   const getFilteredLogs = useCallback(
     (logs) => {
@@ -490,6 +489,14 @@ const CurrentTrafficTable = ({
     },
     [dispatch]
   );
+
+  // IMP: Keep this in the end to wait for other useEffects to run first
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   return (
     <>
