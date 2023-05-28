@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Badge, Space, Divider, Typography, Row, Col } from "antd";
 import { Navigation } from "@devtools-ds/navigation";
 import { Table } from "@devtools-ds/table";
@@ -54,81 +54,107 @@ const LogPane = (props) => {
 
   const timePassedInSeconds = (new Date() - new Date(timestamp * 1000)) / 1000;
 
+  const [currentTabIndex, setCurrentTabIndex] = useState(0);
+  const tabs = [
+    {
+      header: (
+        <Navigation.Tab id={title}>
+          <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
+        </Navigation.Tab>
+      ),
+      body: (
+        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <RequestSummary data={request_data} />
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Headers">Headers</Navigation.Tab>,
+      body: (
+        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <Table className="log-table">
+            <Table.Head>
+              <Table.Row>
+                <Table.HeadCell>Key</Table.HeadCell>
+                <Table.HeadCell>Value</Table.HeadCell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {Object.entries(headers).map(([key, value], i) => {
+                return (
+                  <Table.Row key={i} id={i}>
+                    <Table.Cell>
+                      <Text ellipsis={{ tooltip: true }}>{key}</Text>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Text ellipsis={{ tooltip: true }}>{value}</Text>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </div>
+      ),
+    },
+    {
+      header: (
+        <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
+          Payload
+        </Navigation.Tab>
+      ),
+      body: (
+        <div className="navigation-panel-wrapper">
+          <RequestPayloadPreview query_params={query_params} body={body} />
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Body">Body</Navigation.Tab>,
+      body: (
+        <div
+          style={{
+            overflowY: "auto",
+            height: "100%",
+            color: "#ffffffd9",
+            padding: "0.8rem",
+          }}
+        >
+          {body ? (
+            body
+          ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
+            <h3>Loading Body...</h3>
+          ) : (
+            <h3>The request has no body available</h3>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Preview">Preview</Navigation.Tab>,
+      body: (
+        <div className="navigation-panel-wrapper">
+          <JSONPreview logId={log_id} payload={body} />
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <Navigation className="navigation request-log-pane">
+    <Navigation
+      className="navigation request-log-pane"
+      index={currentTabIndex}
+      onChange={(index) => {
+        setCurrentTabIndex(index);
+      }}
+    >
       <Navigation.Controls>
-        <Navigation.TabList>
-          <Navigation.Tab id={title}>
-            <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
-          </Navigation.Tab>
-          <Navigation.Tab id="Headers">Headers</Navigation.Tab>
-          <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
-            Payload
-          </Navigation.Tab>
-          <Navigation.Tab id="Body">Body</Navigation.Tab>
-          <Navigation.Tab id="Preview">Preview</Navigation.Tab>
-        </Navigation.TabList>
+        <Navigation.TabList>{tabs.map((tab, idx) => tab?.header)}</Navigation.TabList>
       </Navigation.Controls>
       <Navigation.Panels>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <RequestSummary data={request_data} />
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <Table className="log-table">
-              <Table.Head>
-                <Table.Row>
-                  <Table.HeadCell>Key</Table.HeadCell>
-                  <Table.HeadCell>Value</Table.HeadCell>
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
-                {Object.entries(headers).map(([key, value], i) => {
-                  return (
-                    <Table.Row key={i} id={i}>
-                      <Table.Cell>
-                        <Text ellipsis={{ tooltip: true }}>{key}</Text>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Text ellipsis={{ tooltip: true }}>{value}</Text>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })}
-              </Table.Body>
-            </Table>
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div className="navigation-panel-wrapper">
-            <RequestPayloadPreview query_params={query_params} body={body} />
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div
-            style={{
-              overflowY: "auto",
-              height: "100%",
-              color: "#ffffffd9",
-              padding: "0.8rem",
-            }}
-          >
-            {body ? (
-              body
-            ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
-              <h3>Loading Body...</h3>
-            ) : (
-              <h3>The request has no body available</h3>
-            )}
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div className="navigation-panel-wrapper">
-            <JSONPreview logId={log_id} payload={body} />
-          </div>
-        </Navigation.Panel>
+        {tabs.map((tab, idx) => {
+          return <Navigation.Panel id={idx}>{currentTabIndex === idx ? tab?.body : null}</Navigation.Panel>;
+        })}
       </Navigation.Panels>
     </Navigation>
   );
