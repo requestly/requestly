@@ -90,6 +90,8 @@ export interface Log {
   requestState: string;
   actions: any; // array of applied actions
   consoleLogs: any; // array of logs generated in script based rules
+  domain?: string;
+  app?: string;
 }
 
 interface LogRequest {
