@@ -1,4 +1,3 @@
-import AutoSizer from "react-virtualized-auto-sizer";
 import { Table } from "@devtools-ds/table";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ContextMenu } from "../ContextMenu";
@@ -8,7 +7,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import "./virtualTableV2.css";
 import { Button } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons";
-import Logger from "lib/logger";
 
 interface Props {
   logs: any;
@@ -28,8 +26,6 @@ const VirtualTableV2: React.FC<Props> = ({
   const [selected, setSelected] = useState(null);
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
-  const [, setScrollElemHeight] = useState(null);
-  const [, setScrollElemWidth] = useState(null);
 
   const parentRef = useRef(null);
 
@@ -113,53 +109,43 @@ const VirtualTableV2: React.FC<Props> = ({
 
   return (
     <>
-      <AutoSizer>
-        {({ height, width }) => {
-          setScrollElemHeight(height);
-          setScrollElemWidth(width);
-
-          Logger.log(height, width);
-          return (
-            <div
-              ref={parentRef}
-              style={{
-                height: height,
-                width: width,
-                overflow: "auto",
-              }}
-            >
-              <Table
-                id="vtable"
-                style={
-                  {
-                    "--virtualPaddingTop": paddingTop + "px",
-                    "--virtualPaddingBottom": paddingBottom + "px",
-                  } as React.CSSProperties
-                }
-                selected={selected}
-                onSelected={(id: string) => {
-                  setSelected(id);
-                }}
-                onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
-              >
-                {renderHeader()}
-                <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
-                  <Table.Body id="vtbody" style={{}}>
-                    {/* Hack to fix alternate colors flickering due to virtualization*/}
-                    {rowVirtualizer.getVirtualItems()?.[0]?.index % 2 === 0 ? null : <tr></tr>}
-
-                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                      const log = logs[virtualRow.index];
-                      return renderLogRow(log, virtualRow.index);
-                    })}
-                  </Table.Body>
-                </ContextMenu>
-              </Table>
-              {renderNewLogsButton()}
-            </div>
-          );
+      <div
+        ref={parentRef}
+        style={{
+          height: "100%",
+          width: "100%",
+          overflow: "auto",
         }}
-      </AutoSizer>
+      >
+        <Table
+          id="vtable"
+          style={
+            {
+              "--virtualPaddingTop": paddingTop + "px",
+              "--virtualPaddingBottom": paddingBottom + "px",
+            } as React.CSSProperties
+          }
+          selected={selected}
+          onSelected={(id: string) => {
+            setSelected(id);
+          }}
+          onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
+        >
+          {renderHeader()}
+          <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
+            <Table.Body id="vtbody" style={{}}>
+              {/* Hack to fix alternate colors flickering due to virtualization*/}
+              {rowVirtualizer.getVirtualItems()?.[0]?.index % 2 === 0 ? null : <tr></tr>}
+
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const log = logs[virtualRow.index];
+                return renderLogRow(log, virtualRow.index);
+              })}
+            </Table.Body>
+          </ContextMenu>
+        </Table>
+        {renderNewLogsButton()}
+      </div>
     </>
   );
 };

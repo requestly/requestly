@@ -137,6 +137,7 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "@types/semver": "^7.3.13",
+    "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^9.0.0",
     "@types/xml2js": "^0.4.11",
     "monaco-editor-webpack-plugin": "^7.0.1",
