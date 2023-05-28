@@ -27,10 +27,12 @@ const VirtualTableV2: React.FC<Props> = ({
   const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
 
+  const mounted = useRef(false);
   const parentRef = useRef(null);
 
   const rowVirtualizer = useVirtualizer({
-    count: logs.length,
+    // Hack to fix initial mounting lag when given large count @wrongsahil
+    count: mounted.current ? logs.length : 100,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ITEM_SIZE,
     onChange: (virtualizer) => {
@@ -106,6 +108,14 @@ const VirtualTableV2: React.FC<Props> = ({
 
     return null;
   }, [isScrollToBottomEnabled, lastKnowBottomIndex, logs.length, scrollToBottom]);
+
+  // IMP: Keep this in the end to wait for other useEffects to run first
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   return (
     <>
