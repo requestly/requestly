@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
-import { isEqual, sortBy } from "lodash";
 import { makeOriginalLog } from "capture-console-logs";
 import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
@@ -12,14 +11,12 @@ import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
 import RuleEditorModal from "components/common/RuleEditorModal";
 import { LogFilter } from "./LogFilter";
-import { groupByApp, groupByDomain } from "../../../../../../utils/TrafficTableUtils";
 import GroupByNone from "./Tables/GroupByNone";
 import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal";
-import { convertProxyLogToUILog, getSortedMenuItems } from "./utils/logUtils";
+import { convertProxyLogToUILog } from "./utils/logUtils";
 import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
 import { getAllFilters, getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "lib/logger";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
@@ -59,12 +56,7 @@ const CurrentTrafficTable = ({
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
 
-  const isTablePeristenceEnabled = useFeatureIsOn("traffic_table_perisitence");
-
-  const previousLogsRef = useRef(propLogs);
-
   // Component State
-  const [networkLogsMap, setNetworkLogsMap] = useState({});
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
@@ -78,6 +70,10 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
+
+  const [appList, setAppList] = useState(new Set());
+  const [domainList, setDomainList] = useState(new Set());
+  const [isComponentMounted, setIsComponentMounted] = useState(false);
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
     desktopSpecificDetails.appsList,
@@ -95,26 +91,6 @@ const CurrentTrafficTable = ({
   const getGroupFiltersLength = useCallback(() => {
     return [...trafficTableFilters.app, ...trafficTableFilters.domain].length;
   }, [trafficTableFilters.app, trafficTableFilters.domain]);
-
-  const upsertLogs = (logs) => {
-    let _networkLogsMap = { ...networkLogsMap };
-    logs?.forEach((log) => {
-      if (log) {
-        _networkLogsMap[log.id] = log;
-      }
-    });
-
-    setNetworkLogsMap(_networkLogsMap);
-  };
-
-  const stableUpsertLogs = useCallback(upsertLogs, [networkLogsMap]);
-
-  useEffect(() => {
-    if (!isEqual(sortBy(previousLogsRef.current), sortBy(propLogs))) {
-      stableUpsertLogs(propLogs);
-      previousLogsRef.current = propLogs;
-    }
-  }, [propLogs, stableUpsertLogs]);
 
   const handlePreviewVisibility = (visible = false) => {
     setIsPreviewOpen(visible);
@@ -137,69 +113,6 @@ const CurrentTrafficTable = ({
     handlePreviewVisibility(false);
   };
 
-  let previewData = [];
-
-  // Show Details of a Request in the Preview pane
-  if (selectedRequestData.timestamp) {
-    previewData = [
-      {
-        property: "Time",
-        value: selectedRequestData.timestamp,
-      },
-      {
-        property: "Method",
-        value: selectedRequestData.request.method,
-      },
-      {
-        property: "Status Code",
-        value: selectedRequestData.response.statusCode,
-      },
-      {
-        property: "Path",
-        value: selectedRequestData.request.path,
-      },
-      {
-        property: "Host",
-        value: selectedRequestData.request.host,
-      },
-      {
-        property: "Port",
-        value: selectedRequestData.request.port,
-      },
-      {
-        property: "REQUEST HEADERS",
-        value: "",
-      },
-    ];
-    for (const [key, value] of Object.entries(selectedRequestData.request.headers)) {
-      const header = {
-        property: key,
-        value,
-      };
-      previewData.push(header);
-    }
-    previewData.push({
-      property: "RESPONSE HEADERS",
-      value: "",
-    });
-    for (const [key, value] of Object.entries(selectedRequestData.response.headers)) {
-      const header = {
-        property: key,
-        value,
-      };
-      previewData.push(header);
-    }
-  }
-
-  const upsertNetworkLogMap = useCallback(
-    (log) => {
-      let _networkLogsMap = { ...networkLogsMap };
-      _networkLogsMap[log.id] = log;
-      setNetworkLogsMap(_networkLogsMap);
-    },
-    [networkLogsMap]
-  );
-
   const printLogsToConsole = useCallback(
     (log) => {
       if (log.consoleLogs && !consoleLogsShown.includes(log.id)) {
@@ -211,12 +124,12 @@ const CurrentTrafficTable = ({
   );
 
   const clearLogs = () => {
-    // Old Logs Clear
-    setNetworkLogsMap({});
-
     // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
+    setDomainList(new Set([]));
+    setAppList(new Set([]));
+    dispatch(desktopTrafficTableActions.clearGroupFilters());
     trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
 
     if (clearLogsCallback) clearLogsCallback();
@@ -238,37 +151,44 @@ const CurrentTrafficTable = ({
     [stableDispatch]
   );
 
+  const updateDomainList = useCallback(
+    (domain) => {
+      setDomainList((prev) => new Set(prev.add(domain)));
+    },
+    [setDomainList]
+  );
+
+  const updateAppList = useCallback(
+    (app) => {
+      setAppList((prev) => new Set(prev.add(app)));
+    },
+    [setAppList]
+  );
+
   useEffect(() => {
-    // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request", (payload) => {
-      if (isInterceptingTraffic) {
-        // TODO: @sahil865gupta Fix this multiple time registering
-        upsertNetworkLogMap(payload);
-      }
-    });
     window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
       if (isInterceptingTraffic) {
         const rqLog = convertProxyLogToUILog(payload);
+        if (rqLog?.domain) {
+          updateDomainList(rqLog.domain);
+        }
+        if (rqLog?.app) {
+          updateAppList(rqLog.app);
+        }
 
         // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
         // printLogsToConsole(rqLog);
 
-        if (isTablePeristenceEnabled) {
-          saveLogInRedux(rqLog);
-        } else {
-          upsertNetworkLogMap(rqLog);
-        }
+        saveLogInRedux(rqLog);
       }
     });
 
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
-        // TODO: Remove this ipc when all of the users are shifted to new version 1.4.0
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request");
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
-  }, [upsertNetworkLogMap, printLogsToConsole, saveLogInRedux, isTablePeristenceEnabled, isInterceptingTraffic]);
+  }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
 
   useEffect(() => {
     if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
@@ -328,9 +248,29 @@ const CurrentTrafficTable = ({
         return false;
       }
 
+      if (
+        log?.domain &&
+        trafficTableFilters.domain &&
+        trafficTableFilters.domain.length > 0 &&
+        !trafficTableFilters?.domain.includes(log?.domain)
+      ) {
+        return false;
+      }
+
+      if (
+        log?.app &&
+        trafficTableFilters.app &&
+        trafficTableFilters.app.length > 0 &&
+        !trafficTableFilters?.app.includes(log?.app)
+      ) {
+        return false;
+      }
+
       return true;
     },
     [
+      trafficTableFilters.app,
+      trafficTableFilters.domain,
       trafficTableFilters.method,
       trafficTableFilters.contentType,
       trafficTableFilters.search.regex,
@@ -341,67 +281,43 @@ const CurrentTrafficTable = ({
 
   const getRequestLogs = useCallback(
     (desc = true) => {
-      let logs = null;
-      // Old Logs or Mobile Debugger Logs
-      if (Object.keys(networkLogsMap).length > 0) {
-        logs = Object.values(networkLogsMap).sort((log1, log2) => log2.timestamp - log1.timestamp);
-      }
-      // New Redux
-      else {
-        logs = isStaticPreview ? propLogs : newLogs;
-      }
+      let logs = isStaticPreview ? propLogs : newLogs;
       return logs;
     },
-    [isStaticPreview, networkLogsMap, newLogs, propLogs]
+    [isStaticPreview, newLogs, propLogs]
   );
 
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
 
-  const getDomainLogs = useCallback(() => {
-    const { domainArray: domainList, domainLogs } = groupByDomain(requestLogs);
-    return { domainLogs, domainList };
-  }, [requestLogs]);
-
-  const getAppLogs = useCallback(() => {
-    const { appArray: appList, appLogs } = groupByApp(requestLogs);
-    return { appLogs, appList };
-  }, [requestLogs]);
-
-  const upsertRequestAction = (log_id, action) => {
-    let _networkLogsMap = { ...networkLogsMap };
-    if (_networkLogsMap[log_id].actions) {
-      _networkLogsMap[log_id].actions.push(action);
+  useEffect(() => {
+    if (isComponentMounted) {
+      return;
     }
-    setNetworkLogsMap(_networkLogsMap);
-  };
 
-  const { appList, appLogs } = useMemo(() => getAppLogs(), [getAppLogs]);
-  const { domainList, domainLogs } = useMemo(() => getDomainLogs(), [getDomainLogs]);
+    const domains = new Set();
+    const apps = new Set();
 
-  const getGroupedLogs = useCallback(() => {
-    const groupedLogs = [];
-    trafficTableFilters.app.forEach((app) => {
-      appLogs[app] && groupedLogs.push(...appLogs[app]);
+    requestLogs.map((log) => {
+      if (log?.domain) {
+        domains.add(log?.domain);
+      }
+      if (log?.app) {
+        apps.add(log?.app);
+      }
+
+      setDomainList(domains);
+      setAppList(apps);
+
+      setIsComponentMounted(true);
+      return null;
     });
-    trafficTableFilters.domain.forEach((domain) => {
-      domainLogs[domain] && groupedLogs.push(...domainLogs[domain]);
-    });
-
-    return groupedLogs;
-  }, [appLogs, domainLogs, trafficTableFilters.app, trafficTableFilters.domain]);
+  }, [requestLogs, isComponentMounted]);
 
   const getFilteredLogs = useCallback(
     (logs) => {
-      const groupedLogs = getGroupedLogs();
-      const allLogs = groupedLogs.length > 0 ? groupedLogs : logs;
-
-      // remove logs with same id
-      const prunedLogs = allLogs.reduce((result, log) => ({ ...result, [log.id]: log }), {});
-      const prunedLogsArray = Object.values(prunedLogs);
-
-      return prunedLogsArray.filter(filterLog);
+      return logs.filter(filterLog);
     },
-    [filterLog, getGroupedLogs]
+    [filterLog]
   );
 
   const renderLogs = useMemo(
@@ -479,26 +395,30 @@ const CurrentTrafficTable = ({
 
   const getAppLogsMenuItem = useCallback(
     (apps) => {
-      return getSortedMenuItems(apps, "appName").map(({ appName }) => ({
-        key: `${appName}`,
-        label: getApplogAvatar(`${logType.APP}`, appName),
-        onClick: () => {
-          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
-        },
-      }));
+      return Array.from(apps)
+        .sort()
+        .map((appName) => ({
+          key: `${appName}`,
+          label: getApplogAvatar(`${logType.APP}`, appName),
+          onClick: () => {
+            trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
+          },
+        }));
     },
     [getApplogAvatar]
   );
 
   const getDomainLogsMenuItem = useCallback(
     (domains) => {
-      return getSortedMenuItems(domains, "domain").map(({ domain }) => ({
-        key: `${domain}`,
-        label: getDomainLogAvatar(`${logType.DOMAIN}`, domain),
-        onClick: () => {
-          trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
-        },
-      }));
+      return Array.from(domains)
+        .sort()
+        .map((domain) => ({
+          key: `${domain}`,
+          label: getDomainLogAvatar(`${logType.DOMAIN}`, domain),
+          onClick: () => {
+            trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
+          },
+        }));
     },
     [getDomainLogAvatar]
   );
@@ -532,13 +452,13 @@ const CurrentTrafficTable = ({
       },
       {
         key: logType.APP,
-        label: `Apps (${appList?.length ?? 0})`,
+        label: `Apps (${appList?.size ?? 0})`,
         children: getAppLogsMenuItem(appList),
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
       {
         key: logType.DOMAIN,
-        label: `Domains (${domainList?.length ?? 0})`,
+        label: `Domains (${domainList?.size ?? 0})`,
         children: getDomainLogsMenuItem(domainList),
         onTitleClick: ({ key }) => handleSubMenuTitleClick(key),
       },
@@ -703,7 +623,6 @@ const CurrentTrafficTable = ({
                       ...selectedRequestData,
                       response: { ...selectedRequestData.response, body: selectedRequestResponse },
                     }}
-                    upsertRequestAction={upsertRequestAction}
                     handleClosePane={handleClosePane}
                     visibility={isPreviewOpen}
                   />
