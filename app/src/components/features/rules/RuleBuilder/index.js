@@ -282,7 +282,7 @@ const RuleBuilder = (props) => {
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.REDIRECT_RULE }))}
+        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header

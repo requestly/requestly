@@ -1,16 +1,10 @@
 import React from "react";
 import { RQButton } from "lib/design-system/components";
-import { TooltipRenderProps } from "react-joyride";
 import { CloseOutlined } from "@ant-design/icons";
-import { CustomSteps } from "../tours";
+import { CustomTooltipProps } from "../types";
 //@ts-ignore
 import TooltipPointer from "../../../../assets/icons/tooltip-pointer.svg";
 import "./index.css";
-
-interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
-  step: CustomSteps;
-  context: any;
-}
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   index,
