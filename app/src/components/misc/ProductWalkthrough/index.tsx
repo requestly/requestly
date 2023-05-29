@@ -15,7 +15,6 @@ interface TourProps {
   startWalkthrough: boolean;
   tourFor: string;
   context?: any;
-  runTourWithABTest?: boolean; //temporary flag
   onTourComplete: () => void;
 }
 
@@ -23,7 +22,6 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
   context,
-  runTourWithABTest = true,
   onTourComplete,
 }) => {
   const dispatch = useDispatch();
@@ -55,17 +53,17 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   };
 
   useEffect(() => {
-    if (startWalkthrough && runTourWithABTest) {
+    if (startWalkthrough) {
       trackWalkthroughViewed(tourFor);
     }
-  }, [runTourWithABTest, startWalkthrough, tourFor]);
+  }, [startWalkthrough, tourFor]);
 
   return (
     <>
       {startWalkthrough && (
         <JoyRide
           ref={joyrideRef}
-          run={startWalkthrough && runTourWithABTest}
+          run={startWalkthrough}
           steps={tourSteps}
           continuous={true}
           callback={callback}

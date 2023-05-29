@@ -26,6 +26,7 @@ import {
   getCurrentlySelectedRuleConfig,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsRedirectRuleTourCompleted,
+  getIsRuleEditorTourCompleted,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
@@ -71,7 +72,7 @@ const RuleBuilder = (props) => {
   }, [currentlySelectedRuleData.ruleType, props.isSharedListViewRule, redirectRuleOnboardingExp]);
 
   const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
-  const isRedirectRuleTourEnabled = redirectRuleOnboardingExp === "tour" && !isRedirectRuleTourCompleted;
+  const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
 
   //References
   const isCleaningUpRef = useRef(false);
@@ -197,10 +198,10 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && RULE_TYPE_TO_CREATE === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !isRedirectRuleTourCompleted) {
       setStartWalkthrough(true);
     }
-  }, [MODE, RULE_TYPE_TO_CREATE]);
+  }, [MODE, isRuleEditorTourCompleted, isRedirectRuleTourCompleted]);
 
   useEffect(() => {
     const source = state?.source ?? null;
@@ -281,7 +282,6 @@ const RuleBuilder = (props) => {
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
-        runTourWithABTest={isRedirectRuleTourEnabled}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.REDIRECT_RULE }))}
       />
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
