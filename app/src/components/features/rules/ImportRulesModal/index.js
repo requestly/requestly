@@ -86,22 +86,6 @@ const ImportRulesModal = (props) => {
     [user, allRules, toggleModal]
   );
 
-  // const ImportRulesDropzone = () => {
-  //   const { getRootProps, getInputProps } = useDropzone({ onDrop });
-
-  //   return (
-  //     <div {...getRootProps()}>
-  //       <input {...getInputProps()} />
-  //       <center>
-  //         <h1 className="display-2">
-  //           <FiUpload />
-  //         </h1>
-  //         <p>Drag and drop requestly export file, or click to select</p>
-  //       </center>
-  //     </div>
-  //   );
-  // };
-
   const renderFilePicker = () => {
     return (
       <FilePicker
