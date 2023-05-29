@@ -302,15 +302,6 @@ const ImportRulesModal = (props) => {
       >
         <div className="rq-modal-content">
           <Row align="middle" justify="center" className="header mb-16">
-            {/* {isCharlesImportFeatureFlagOn && !showImportOptions && (
-              <Button
-                size="small"
-                style={{ marginRight: "6px" }}
-                onClick={() => setShowImportOptions(true)}
-                icon={<LeftOutlined style={{ fontSize: "14px" }} />}
-              />
-            )} */}
-
             {modifyModalContentForCharlesImportOption ? (
               <span>Select the type of rules you want to import</span>
             ) : (
