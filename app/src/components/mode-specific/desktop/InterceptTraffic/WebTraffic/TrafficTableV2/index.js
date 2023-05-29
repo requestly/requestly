@@ -71,8 +71,8 @@ const CurrentTrafficTable = ({
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
-  const [appList, setAppList] = useState(new Set());
-  const [domainList, setDomainList] = useState(new Set());
+  const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
+  const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
@@ -127,9 +127,8 @@ const CurrentTrafficTable = ({
     // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
-    setDomainList(new Set([]));
-    setAppList(new Set([]));
-    dispatch(desktopTrafficTableActions.clearGroupFilters());
+    setDomainList(new Set([...trafficTableFilters.domain]));
+    setAppList(new Set([...trafficTableFilters.app]));
     trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
 
     if (clearLogsCallback) clearLogsCallback();
