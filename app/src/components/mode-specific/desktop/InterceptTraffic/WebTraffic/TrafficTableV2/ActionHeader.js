@@ -74,7 +74,7 @@ const ActionHeader = ({
   const renderSearchInput = () => {
     if (trafficTableFilters.search.regex) {
       return (
-        <Input.Search
+        <Input
           value={trafficTableFilters.search.term || ""}
           className="action-header-input"
           placeholder="Input RegEx"
@@ -97,15 +97,16 @@ const ActionHeader = ({
             </>
           }
           style={{ width: 300 }}
+          size="small"
         />
       );
     }
 
     return (
-      <Input.Search
+      <Input
         value={trafficTableFilters.search.term || ""}
         className="action-header-input"
-        placeholder="Input Search Keyword"
+        placeholder="Input Search URL"
         onChange={handleOnSearchChange}
         suffix={
           <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
@@ -122,6 +123,7 @@ const ActionHeader = ({
           </Tooltip>
         }
         style={{ width: 300 }}
+        size="small"
       />
     );
   };
