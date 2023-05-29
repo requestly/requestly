@@ -146,7 +146,7 @@ const ActionHeader = ({
         <Space size={12}>
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={!isAnyAppConnected}>
+            <Button icon={<FilterOutlined />} onClick={handleFilterClick}>
               <span className="traffic-table-filter-btn-content">
                 <span>Filter</span>
                 <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
@@ -156,7 +156,7 @@ const ActionHeader = ({
           {isStaticPreview ? null : (
             <>
               <Col>
-                <Button icon={<ClearOutlined />} onClick={clearLogs} disabled={!logsCount || !isAnyAppConnected}>
+                <Button icon={<ClearOutlined />} onClick={clearLogs} disabled={!logsCount}>
                   Clear log
                 </Button>
               </Col>
@@ -248,7 +248,6 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConn
 
   return isPaused ? (
     <Button
-      disabled={!isAnyAppConnected}
       icon={<CaretRightOutlined />}
       onClick={() => {
         setIsPaused(false);
@@ -267,7 +266,6 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConn
         onChange(true); // isPaused
         trackTrafficInterceptionPaused();
       }}
-      disabled={!logsCount || !isAnyAppConnected}
     >
       {buttonText}
     </Button>
