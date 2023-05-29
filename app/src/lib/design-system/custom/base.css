@@ -178,6 +178,10 @@
   font-size: 12px;
 }
 
+.success {
+  color: var(--success);
+}
+
 .relative {
   position: relative;
 }

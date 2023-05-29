@@ -137,7 +137,7 @@ const ImportRulesModal = (props) => {
     return (rulesToImportCount && rulesToImportCount > 0) || (groupsToImportCount && groupsToImportCount > 0) ? (
       <Col lg="12" md="12" xl="12" sm="12" xs="12" className="text-center" style={{ textAlign: "center" }}>
         <h1 className="display-2">
-          <BsFileEarmarkCheck style={{ color: "var(--success)" }} />
+          <BsFileEarmarkCheck className="success" />
         </h1>
         <h4>
           Successfully parsed{" "}
