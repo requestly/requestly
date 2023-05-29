@@ -39,6 +39,7 @@ const ActionHeader = ({
   clearLogs,
   deviceId,
   logsCount,
+  filteredLogsCount,
   isAnyAppConnected,
   showDeviceSelector,
   logsToSaveAsHar,
@@ -203,12 +204,12 @@ const ActionHeader = ({
         </Space>
       </Row>
       <Row className="ml-auto" align="middle" justify="end">
-        {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
+        {!isStaticPreview && isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
           <>
             <Col>
               <Button
                 icon={<DownloadOutlined />}
-                disabled={!logsCount || !isAnyAppConnected}
+                disabled={!filteredLogsCount}
                 onClick={() => {
                   downloadHar(logsToSaveAsHar || {}, "");
                   trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
@@ -223,7 +224,7 @@ const ActionHeader = ({
             <Col>
               <Button
                 icon={<SaveOutlined />}
-                disabled={!logsCount || !isAnyAppConnected}
+                disabled={!filteredLogsCount}
                 onClick={() => {
                   trackNetworkSessionSaveClicked();
                   openSaveModal();

@@ -522,6 +522,7 @@ const CurrentTrafficTable = ({
               deviceId={deviceId}
               clearLogs={clearLogs}
               logsCount={newLogs.length}
+              filteredLogsCount={newLogs.length}
               isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
               activeFiltersCount={activeFiltersCount}
