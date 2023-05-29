@@ -541,7 +541,6 @@ const CurrentTrafficTable = ({
           </Row>
           {!isFiltersCollapsed && (
             <div className="traffic-table-filters-container">
-              <div className="text-dark-gray caption">FILTER BY</div>
               <Row>
                 <section>
                   <LogFilter
