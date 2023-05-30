@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge } from "antd";
+import { Row, Col, Input, Typography, Space, Button, Tooltip, Badge, Divider } from "antd";
 import {
   SaveOutlined,
   CaretRightOutlined,
@@ -8,8 +8,8 @@ import {
   SafetyCertificateOutlined,
   SettingOutlined,
   DownloadOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
-import { FaFilter } from "react-icons/fa";
 import { VscRegex } from "react-icons/vsc";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -35,20 +35,22 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 const { Text } = Typography;
 
 const ActionHeader = ({
+  children,
   clearLogs,
-  setIsSSLProxyingModalVisible,
-  showDeviceSelector,
   deviceId,
   logsCount,
-  setIsInterceptingTraffic,
+  filteredLogsCount,
+  isAnyAppConnected,
+  showDeviceSelector,
   logsToSaveAsHar,
   isStaticPreview,
   isFiltersCollapsed,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
+  setIsInterceptingTraffic,
+  setIsSSLProxyingModalVisible,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
   const closeSaveModal = useCallback(() => {
@@ -73,7 +75,7 @@ const ActionHeader = ({
   const renderSearchInput = () => {
     if (trafficTableFilters.search.regex) {
       return (
-        <Input.Search
+        <Input
           value={trafficTableFilters.search.term || ""}
           className="action-header-input"
           placeholder="Input RegEx"
@@ -96,15 +98,16 @@ const ActionHeader = ({
             </>
           }
           style={{ width: 300 }}
+          size="small"
         />
       );
     }
 
     return (
-      <Input.Search
+      <Input
         value={trafficTableFilters.search.term || ""}
         className="action-header-input"
-        placeholder="Input Search Keyword"
+        placeholder="Input Search URL"
         onChange={handleOnSearchChange}
         suffix={
           <Tooltip title="Use regular expression" placement="bottom" mouseEnterDelay={0.5}>
@@ -121,8 +124,14 @@ const ActionHeader = ({
           </Tooltip>
         }
         style={{ width: 300 }}
+        size="small"
       />
     );
+  };
+
+  const handleFilterClick = () => {
+    setIsFiltersCollapsed((prev) => !prev);
+    trackTrafficTableFilterClicked();
   };
 
   return (
@@ -135,65 +144,35 @@ const ActionHeader = ({
           paddingRight: "12px",
         }}
       >
-        <Space direction="horizontal">
+        <Space size={12}>
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <Badge count={activeFiltersCount} size="small">
-              <RQButton
-                type="default"
-                iconOnly
-                icon={<FaFilter />}
-                onClick={() => {
-                  setIsFiltersCollapsed((prev) => !prev);
-                  trackTrafficTableFilterClicked();
-                }}
-                className={isFiltersCollapsed ? "traffic-table-filter-btn-inactive" : "traffic-table-filter-btn-active"}
-              />
-            </Badge>
+            <Button icon={<FilterOutlined />} onClick={handleFilterClick}>
+              <span className="traffic-table-filter-btn-content">
+                <span>Filter</span>
+                <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
+              </span>
+            </Button>
           </Col>
           {isStaticPreview ? null : (
             <>
               <Col>
-                <Tooltip placement="top" title="Clear Logs">
-                  <Button
-                    type="primary"
-                    disabled={!logsCount}
-                    shape="circle"
-                    icon={<ClearOutlined />}
-                    onClick={clearLogs}
-                  />
-                </Tooltip>
+                <Button icon={<ClearOutlined />} onClick={clearLogs} disabled={!logsCount}>
+                  Clear log
+                </Button>
               </Col>
-              {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
-                <>
-                  <Col>
-                    <Tooltip placement="top" title="Save Network Session">
-                      <Button
-                        type="primary"
-                        disabled={!logsCount}
-                        icon={<SaveOutlined />}
-                        onClick={() => {
-                          trackNetworkSessionSaveClicked();
-                          openSaveModal();
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <Col>
-                    <Tooltip placement="top" title="Export Network Session">
-                      <Button
-                        type="primary"
-                        disabled={!logsCount}
-                        icon={<DownloadOutlined />}
-                        onClick={() => {
-                          downloadHar(logsToSaveAsHar || {}, "");
-                          trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-                </>
-              ) : null}
+
+              <Col>
+                <PauseAndPlayButton
+                  logsCount={logsCount}
+                  defaultIsPaused={false}
+                  isAnyAppConnected={isAnyAppConnected}
+                  onChange={(isPaused) => {
+                    setIsInterceptingTraffic(!isPaused);
+                  }}
+                />
+              </Col>
+
               {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
                 <Col>
                   <Tooltip title="SSL Proxying">
@@ -218,18 +197,44 @@ const ActionHeader = ({
                   </Col>
                 </>
               ) : null}
-              <Col>
-                <PauseAndPlayButton
-                  defaultIsPaused={false}
-                  onChange={(isPaused) => {
-                    setIsInterceptingTraffic(!isPaused);
-                  }}
-                  disabled={!logsCount}
-                />
-              </Col>
+
+              {children}
             </>
           )}
         </Space>
+      </Row>
+      <Row className="ml-auto" align="middle" justify="end">
+        {!isStaticPreview && isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
+          <>
+            <Col>
+              <Button
+                icon={<DownloadOutlined />}
+                disabled={!filteredLogsCount}
+                onClick={() => {
+                  downloadHar(logsToSaveAsHar || {}, "");
+                  trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
+                }}
+              >
+                Download
+              </Button>
+            </Col>
+
+            <Divider type="vertical" style={{ margin: "0 16px" }} />
+
+            <Col>
+              <Button
+                icon={<SaveOutlined />}
+                disabled={!filteredLogsCount}
+                onClick={() => {
+                  trackNetworkSessionSaveClicked();
+                  openSaveModal();
+                }}
+              >
+                Save
+              </Button>
+            </Col>
+          </>
+        ) : null}
       </Row>
       <SessionSaveModal har={logsToSaveAsHar} isVisible={isSessionSaveModalOpen} closeModal={closeSaveModal} />
     </>
@@ -238,35 +243,32 @@ const ActionHeader = ({
 
 export default ActionHeader;
 
-function PauseAndPlayButton({ defaultIsPaused, onChange, disabled }) {
+function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConnected }) {
   const [isPaused, setIsPaused] = useState(defaultIsPaused);
-  return (
-    <Tooltip title={isPaused ? "Resume logging requests" : "Pause logging requests"}>
-      {isPaused ? (
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<CaretRightOutlined />}
-          onClick={() => {
-            setIsPaused(false);
-            onChange(false); // isPaused
-            trackTrafficInterceptionResumed();
-          }}
-        />
-      ) : (
-        <Button
-          type="primary"
-          shape="circle"
-          danger
-          icon={<PauseOutlined />}
-          onClick={() => {
-            setIsPaused(true);
-            onChange(true); // isPaused
-            trackTrafficInterceptionPaused();
-          }}
-          disabled={disabled}
-        />
-      )}
-    </Tooltip>
+  const buttonText = isPaused ? "Resume" : "Pause";
+
+  return isPaused ? (
+    <Button
+      icon={<CaretRightOutlined />}
+      onClick={() => {
+        setIsPaused(false);
+        onChange(false); // isPaused
+        trackTrafficInterceptionResumed();
+      }}
+    >
+      {buttonText}
+    </Button>
+  ) : (
+    <Button
+      danger
+      icon={<PauseOutlined />}
+      onClick={() => {
+        setIsPaused(true);
+        onChange(true); // isPaused
+        trackTrafficInterceptionPaused();
+      }}
+    >
+      {buttonText}
+    </Button>
   );
 }

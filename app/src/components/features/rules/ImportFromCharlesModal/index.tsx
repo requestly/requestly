@@ -222,7 +222,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
               maxFiles={1}
               onFilesDrop={onFilesDrop}
               isProcessing={isDataProcessing}
-              title="Drop your Charles export file, or click to select"
+              title="Drag and drop your Charles export file"
             />
           )}
         </div>

@@ -161,6 +161,14 @@
   margin-right: 1rem;
 }
 
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.mb-16 {
+  margin-bottom: 1rem;
+}
+
 .visibility-hidden {
   visibility: hidden;
 }
@@ -168,6 +176,10 @@
 .field-error-prompt {
   color: #fa2828cb;
   font-size: 12px;
+}
+
+.success {
+  color: var(--success);
 }
 
 .relative {
