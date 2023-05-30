@@ -7,6 +7,8 @@ import {
   ResponseRule,
   ResponseRulePair,
   ResponseRuleResourceType,
+  RequestRule,
+  RequestRulePair,
 } from "types";
 
 const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
@@ -22,9 +24,29 @@ const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
   };
 };
 
-const prefillResponseRuleData = <T extends ResponseRule>(data: any, newRule: T): T => {
+const prefillRequestRuleData = <T extends RequestRule>(data: unknown, newRule: T): T => {
   const updatedRule = updateRulePairSource(data, newRule);
-  const response: Partial<ResponseRulePair["response"]> = {
+  const updatedRequestData: Partial<RequestRulePair["request"]> = {
+    // @ts-ignore
+    value: data?.request?.body ?? "",
+  };
+
+  return {
+    ...updatedRule,
+    pairs: [
+      {
+        ...updatedRule.pairs[0],
+        request: { ...updatedRule.pairs[0].request, ...updatedRequestData },
+      },
+    ],
+  };
+};
+
+const prefillResponseRuleData = <T extends ResponseRule>(data: unknown, newRule: T): T => {
+  const updatedRule = updateRulePairSource(data, newRule);
+  const updatedResponseData: Partial<ResponseRulePair["response"]> = {
+    // @ts-ignore
+    value: data?.response?.body ?? "",
     resourceType: ResponseRuleResourceType.REST_API,
   };
 
@@ -33,7 +55,7 @@ const prefillResponseRuleData = <T extends ResponseRule>(data: any, newRule: T):
     pairs: [
       {
         ...updatedRule.pairs[0],
-        response: { ...updatedRule.pairs[0].response, ...response },
+        response: { ...updatedRule.pairs[0].response, ...updatedResponseData },
       },
     ],
   };
@@ -43,6 +65,8 @@ export const prefillRuleData = <T extends Rule>(data: any, rule: T): T => {
   switch (rule.ruleType) {
     case RuleType.REDIRECT:
     case RuleType.REQUEST:
+      //@ts-ignore
+      return prefillRequestRuleData(data, rule);
     case RuleType.REPLACE:
     case RuleType.HEADERS:
     case RuleType.CANCEL:

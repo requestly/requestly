@@ -16,6 +16,7 @@ import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import BetaBadge from "components/misc/BetaBadge";
+import { getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import "./index.css";
 
 interface ContextMenuProps {
@@ -27,6 +28,7 @@ interface ContextMenuProps {
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
+  const selectedRequestResponse = useSelector(getLogResponseById(log?.id)) || log?.response?.body;
 
   const handleOnClick = useCallback(
     (menuInfo: Parameters<MenuProps["onClick"]>[0], log: any) => {
@@ -35,7 +37,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
           newValue: true,
           modalName: "ruleEditorModal",
           newProps: {
-            ruleData: log,
+            ruleData: { ...log, response: { ...(log?.response ?? {}), body: selectedRequestResponse } },
             ruleType: menuInfo.key,
           },
         })
@@ -43,7 +45,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       trackTrafficTableDropdownClicked(menuInfo.key);
       trackRuleCreationWorkflowStartedEvent(menuInfo.key, "modal");
     },
-    [dispatch]
+    [dispatch, selectedRequestResponse]
   );
 
   const items: MenuProps["items"] = useMemo(() => {
