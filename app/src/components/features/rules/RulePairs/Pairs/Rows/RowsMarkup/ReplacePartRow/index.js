@@ -14,6 +14,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDis
           disabled={isInputDisabled}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "from")}
           data-selectionid="replace-from-in-url"
+          data-tour-id="rule-editor-replace-from"
         />
       </Col>
       <Col span={12}>
@@ -25,6 +26,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDis
           disabled={isInputDisabled}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "to")}
           data-selectionid="replace-to-in-url"
+          data-tour-id="rule-editor-replace-to"
         />
       </Col>
     </Row>
