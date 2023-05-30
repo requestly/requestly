@@ -19,6 +19,30 @@ export const productTours: Record<string, CustomSteps[]> = {
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.CANCEL]: generateRuleEditorTour([]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.DELAY]: generateRuleEditorTour([
+    {
+      target: getTourTarget("rule-editor-delay-value"),
+      title: "Add Delay duration",
+      content: "The delay time (in milliseconds) that is applied to the request matching the source condition.",
+      disableBeacon: true,
+      offset: 12,
+      pointerPlacement: "center",
+      placement: "bottom-start",
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
+    },
+  ]),
+  // [GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT]: generateRuleEditorTour([
+  //   {
+  //     target: getTourTarget("rule-editor-useragent-type"),
+  //     title: "Select a user-agent type you want to emulate",
+  //     content: "Select either devices, browsers or add your own custom user agent",
+  //     disableBeacon: true,
+  //     offset: 12,
+  //     pointerPlacement: "center",
+  //     placement: "top",
+  //     // disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
+  //   },
+  // ]),
   [FEATURES.DESKTOP_APP_TRAFFIC_TABLE]: [
     {
       target: getTourTarget("traffic-table-row"),

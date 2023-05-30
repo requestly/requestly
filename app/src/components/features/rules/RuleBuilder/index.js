@@ -103,6 +103,8 @@ const RuleBuilder = (props) => {
     return ref.current;
   };
 
+  console.log({ currentlySelectedRuleData }); // TODO: remove this log
+
   useEffect(() => {
     if (isDocsVisible) {
       trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);
@@ -198,7 +200,10 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !isRedirectRuleTourCompleted) {
+    if (
+      MODE === RULE_EDITOR_CONFIG.MODES.CREATE
+      // && !isRuleEditorTourCompleted && !isRedirectRuleTourCompleted  TODO: undo this comment
+    ) {
       setStartWalkthrough(true);
     }
   }, [MODE, isRuleEditorTourCompleted, isRedirectRuleTourCompleted]);
