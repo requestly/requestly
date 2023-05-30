@@ -25,7 +25,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Add Delay duration",
       content: "The delay time (in milliseconds) that is applied to the request matching the source condition.",
       disableBeacon: true,
-      offset: 12,
+      offset: 8,
       pointerPlacement: "center",
       placement: "bottom-start",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,

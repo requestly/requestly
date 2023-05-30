@@ -39,8 +39,15 @@
 
 .tour-tooltip-pointer {
   position: absolute;
+}
+.tour-tooltip-pointer-top {
   top: -27px;
 }
+.tour-tooltip-pointer-bottom {
+  bottom: 27px;
+  transform: rotate(180deg);
+}
+
 .tour-tooltip-pointer-center {
   left: 50%;
 }
@@ -49,4 +56,10 @@
 }
 .tour-tooltip-pointer-right {
   left: 85%;
+}
+.tour-tooltip-pointer-right-half {
+  left: 67.5%;
+}
+.tour-tooltip-pointer-left-half {
+  left: 30%;
 }
