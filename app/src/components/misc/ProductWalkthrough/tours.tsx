@@ -22,6 +22,26 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].destination?.length,
     },
   ]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: generateRuleEditorTour([
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-requestbody-types"),
+      title: "Select Request override method",
+      content:
+        "Select the method to override the API request body with static data or programmatically modify the existing request payload.",
+      placement: "bottom",
+      pointerPlacement: "left-half",
+      offset: 20,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("code-editor"),
+      title: "Request body",
+      content: "Define the request body which must be passed to the server.",
+      placement: "top",
+      offset: 16,
+    },
+  ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,

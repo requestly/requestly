@@ -110,7 +110,12 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
             cancelText="Cancel"
             open={requestTypePopupVisible}
           >
-            <Radio.Group onChange={showPopup} value={pair.request.type} disabled={isInputDisabled}>
+            <Radio.Group
+              onChange={showPopup}
+              value={pair.request.type}
+              disabled={isInputDisabled}
+              data-tour-id="rule-editor-requestbody-types"
+            >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>Programmatic (JavaScript)</Radio>
             </Radio.Group>
@@ -119,7 +124,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
       </Row>
 
       {pair.request.type !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.LOCAL_FILE ? (
-        <>
+        <Col span={24} data-tour-id="code-editor">
           <Row
             span={24}
             style={{
@@ -163,7 +168,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
               <span>{getByteSize(pair.request.value)} characters</span>
             </Col>
           </Row>
-        </>
+        </Col>
       ) : null}
     </React.Fragment>
   );
