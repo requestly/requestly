@@ -914,6 +914,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
         EventActions.queueEventToWrite(message.payload);
         break;
 
+      case RQ.CLIENT_MESSAGES.ADD_EXECUTION_EVENT:
+        EventActions.queueExecutionEventToWrite(message.payload);
+        break;
+
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
         if (message.url) {
           sendResponse(

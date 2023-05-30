@@ -2,9 +2,11 @@
 const EventActions = {};
 /* STATE */
 EventActions.eventsToWrite = [];
+EventActions.executionEventsToWrite = [];
 EventActions.eventWriterInterval = null;
 EventActions.batchesWaitingForAck = [];
 EventActions.STORE_EVENTS_KEY = "eventBatches";
+EventActions.STORE_EXECUTION_EVENTS_KEY = "executionEventBatches";
 
 /* UTILITIES */
 
@@ -12,26 +14,35 @@ EventActions.queueEventToWrite = (event) => {
   EventActions.eventsToWrite.push(event);
 };
 
+EventActions.queueExecutionEventToWrite = (event) => {
+  EventActions.executionEventsToWrite.push(event);
+};
+
 EventActions.getEventBatches = async () => {
-  return RQ.StorageService.getRecord(EventActions.STORE_EVENTS_KEY)
-    .then((storedEventBatches) => {
-      return storedEventBatches || {};
-    })
-    .catch(() => {
-      return {};
-    });
+  const eventBatches = (await RQ.StorageService.getRecord(EventActions.STORE_EVENTS_KEY)) || {};
+  const executionEventBatches = (await RQ.StorageService.getRecord(EventActions.STORE_EXECUTION_EVENTS_KEY)) || {};
+
+  return [eventBatches, executionEventBatches];
 };
 
 EventActions.deleteBatches = async (batchIds) => {
-  const batchesInStorage = await EventActions.getEventBatches();
-  if (batchesInStorage) {
+  const [batches, executionBatches] = await EventActions.getEventBatches();
+
+  if (batches) {
     batchIds.forEach((id) => {
-      delete batchesInStorage[id];
+      delete batches[id];
+    });
+  }
+
+  if (executionBatches) {
+    batchIds.forEach((id) => {
+      delete executionBatches[id];
     });
   }
 
   const newStoredBatches = {};
-  newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
+  newStoredBatches[EventActions.STORE_EVENTS_KEY] = batches;
+  newStoredBatches[EventActions.STORE_EXECUTION_EVENTS_KEY] = executionBatches;
 
   await RQ.StorageService.saveRecord(newStoredBatches);
 };
@@ -40,14 +51,27 @@ EventActions.getEventsToWrite = () => {
   /* also removes from the local events buffer */
   const _eventsToWrite = [...EventActions.eventsToWrite];
   EventActions.eventsToWrite = [];
-  return _eventsToWrite;
+
+  const _executionEventsToWrite = [...EventActions.executionEventsToWrite];
+  EventActions.executionEventsToWrite = [];
+
+  return [_eventsToWrite, _executionEventsToWrite];
+};
+
+EventActions.getExecutionEventsToWrite = () => {
+  /* also removes from the local events buffer */
+  const _executionEventsToWrite = [...EventActions.executionEventsToWrite];
+  EventActions.executionEventsToWrite = [];
+  return _executionEventsToWrite;
 };
 
 /* batches recognised for sending here are added to batchesWaitingForAck */
 EventActions.getBatchesToSend = async () => {
   let batchesToSend = [];
 
-  const allEventBatches = await EventActions.getEventBatches();
+  const [eventBatches, executionEventBatches] = await EventActions.getEventBatches();
+  const allEventBatches = { ...eventBatches, ...executionEventBatches };
+
   batchesToSend = Object.keys(allEventBatches)
     .filter((batchId) => !EventActions.batchesWaitingForAck.includes(batchId))
     .map((batchIdToSend) => {
@@ -109,8 +133,13 @@ EventActions.sendExtensionEvents = async () => {
 };
 
 EventActions.writeEventsToLocalStorage = async () => {
-  const createBatch = (eventsArray) => {
-    const batchId = RQ.commonUtils.generateUUID();
+  const createBatch = (eventsArray, isExecutionEventBatch = false) => {
+    let batchId = RQ.commonUtils.generateUUID();
+
+    if (isExecutionEventBatch) {
+      batchId = "execution_" + batchId;
+    }
+
     return {
       id: batchId,
       events: eventsArray,
@@ -118,23 +147,36 @@ EventActions.writeEventsToLocalStorage = async () => {
     };
   };
 
-  const _eventsToWrite = [...EventActions.getEventsToWrite()];
+  const [_eventsToWrite, _executionEventsToWrite] = EventActions.getEventsToWrite();
+
+  let newEventsBatch = null,
+    newExecutionEventsBatch = null;
 
   if (_eventsToWrite.length) {
-    const newEventsBatch = createBatch(_eventsToWrite);
-
-    return EventActions.getEventBatches().then(async (batchesInStorage) => {
-      batchesInStorage[newEventsBatch.id] = newEventsBatch;
-
-      // todo: needs to be updated if local storage structure is changed
-      const newStoredBatches = {};
-      newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
-
-      return RQ.StorageService.saveRecord(newStoredBatches).then((_) => {
-        EventActions.sendExtensionEvents();
-      });
-    });
+    newEventsBatch = createBatch(_eventsToWrite);
   }
+
+  if (_executionEventsToWrite.length) {
+    newExecutionEventsBatch = createBatch(_executionEventsToWrite, true);
+  }
+
+  return EventActions.getEventBatches().then(async ([batchesInStorage, executionBatchesInStorage]) => {
+    if (newEventsBatch) {
+      batchesInStorage[newEventsBatch.id] = newEventsBatch;
+    }
+    if (newExecutionEventsBatch) {
+      executionBatchesInStorage[newExecutionEventsBatch.id] = newExecutionEventsBatch;
+    }
+
+    // todo: needs to be updated if local storage structure is changed
+    const newStoredBatches = {};
+    newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
+    newStoredBatches[EventActions.STORE_EXECUTION_EVENTS_KEY] = executionBatchesInStorage;
+
+    return RQ.StorageService.saveRecord(newStoredBatches).then(() => {
+      EventActions.sendExtensionEvents();
+    });
+  });
 };
 
 EventActions.startPeriodicEventWriter = async (intervalTime = 10000) => {
