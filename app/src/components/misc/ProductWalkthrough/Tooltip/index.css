@@ -44,7 +44,8 @@
   top: -27px;
 }
 .tour-tooltip-pointer-bottom {
-  bottom: 27px;
+  bottom: -27px;
+  z-index: -1;
   transform: rotate(180deg);
 }
 
@@ -58,7 +59,7 @@
   left: 85%;
 }
 .tour-tooltip-pointer-right-half {
-  left: 67.5%;
+  left: 67%;
 }
 .tour-tooltip-pointer-left-half {
   left: 30%;

@@ -31,18 +31,28 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
     },
   ]),
-  // [GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT]: generateRuleEditorTour([
-  //   {
-  //     target: getTourTarget("rule-editor-useragent-type"),
-  //     title: "Select a user-agent type you want to emulate",
-  //     content: "Select either devices, browsers or add your own custom user agent",
-  //     disableBeacon: true,
-  //     offset: 12,
-  //     pointerPlacement: "center",
-  //     placement: "top",
-  //     // disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
-  //   },
-  // ]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT]: generateRuleEditorTour([
+    {
+      target: getTourTarget("rule-editor-useragent-selector"),
+      title: "Device/Browser Selector",
+      content: "Select whether you want to test on a device or a browser.",
+      disableBeacon: true,
+      offset: 20,
+      pointerPlacement: "right-half",
+      placement: "top",
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].envType?.length,
+    },
+    {
+      target: getTourTarget("rule-editor-useragent-type"),
+      title: "Device/Browser Type Selector",
+      content: "Select or search the type of browser/device on which you want to test.",
+      disableBeacon: true,
+      offset: 12,
+      pointerPlacement: "center",
+      placement: "top",
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].userAgent?.length,
+    },
+  ]),
   [FEATURES.DESKTOP_APP_TRAFFIC_TABLE]: [
     {
       target: getTourTarget("traffic-table-row"),
