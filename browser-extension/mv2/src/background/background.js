@@ -1063,6 +1063,7 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
 
 BG.Methods.onAppLoadedNotification = () => {
   BG.isAppOnline = true;
+
   RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE).then((useEngine) => {
     if (useEngine === false) {
       EventActions.stopPeriodicEventWriter();
@@ -1070,6 +1071,13 @@ BG.Methods.onAppLoadedNotification = () => {
       EventActions.startPeriodicEventWriter();
     }
   });
+
+  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SEND_EXECUTION_EVENTS).then(async (sendExecutionEvents) => {
+    if (sendExecutionEvents === false) {
+      await EventActions.clearExecutionEvents();
+    }
+  });
+
   EventActions.sendExtensionEvents();
 };
 

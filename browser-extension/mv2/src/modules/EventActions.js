@@ -195,3 +195,7 @@ EventActions.stopPeriodicEventWriter = () => {
     EventActions.eventWriterInterval = null;
   }
 };
+
+EventActions.clearExecutionEvents = async () => {
+  await RQ.StorageService.removeRecord(EventActions.STORE_EXECUTION_EVENTS_KEY);
+};
