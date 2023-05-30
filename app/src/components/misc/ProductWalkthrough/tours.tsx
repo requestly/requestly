@@ -22,6 +22,24 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].destination?.length,
     },
   ]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT]: generateRuleEditorTour([
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-script-language"),
+      title: "Script Language",
+      content: "Select specific script language (JS/CSS) that needs to be inserted.",
+      placement: "top",
+      offset: 18,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("code-editor"),
+      title: "Script",
+      content: "Add the script you want to inject here.",
+      placement: "top",
+      offset: 16,
+    },
+  ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.REPLACE]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
