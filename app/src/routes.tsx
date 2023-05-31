@@ -64,7 +64,7 @@ import APIClientContainer from "views/features/api-client/APIClientContainer";
 //CONSTANTS
 const { PATHS, AUTH } = APP_CONSTANTS;
 
-var routes = [
+export const routes = [
   {
     path: PATHS.RULE_EDITOR.RELATIVE + "/" + PATHS.ANY,
     name: "Rule Editor",
@@ -137,18 +137,6 @@ var routes = [
     icon: "ni ni-folder-17",
     component: FileViewer,
   },
-  // {
-  //   path: PATHS.FILES.MY_FILES.ABSOLUTE,
-  //   name: "Files",
-  //   icon: "fas fa-folder-open",
-  //   component: () => <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
-  // },
-  // {
-  //   path: PATHS.FILES.RELATIVE,
-  //   name: "Mock APIs",
-  //   icon: "fas fa-server",
-  //   component: () => <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
-  // },
   {
     path: PATHS.MOCK_SERVER.VIEWER.RELATIVE + "/" + PATHS.ANY,
     name: "Mock Server",
@@ -324,6 +312,7 @@ var routes = [
     path: PATHS.ACCOUNT.CHECKOUT.RELATIVE,
     name: "Checkout",
     icon: "ni ni-lock-circle-open text-red",
+    // @ts-ignore
     component: () => {
       window.location.href = APP_CONSTANTS.LINKS.CONTACT_US_PAGE;
       return null;
@@ -438,6 +427,7 @@ var routes = [
     path: PATHS.ACCOUNT.SUPPORT.RELATIVE,
     name: "Requestly Support",
     icon: "ni ni-support-16 text-red",
+    // @ts-ignore
     component: () => {
       window.location.href = APP_CONSTANTS.LINKS.CONTACT_US_PAGE;
       return null;
@@ -572,4 +562,3 @@ var routes = [
     component: InviteView,
   },
 ];
-export default routes;

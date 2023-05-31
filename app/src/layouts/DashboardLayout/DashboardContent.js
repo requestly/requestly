@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, Navigate, useLocation, useSearchParams, useNavigate } from "react-router-dom";
 //FOR ROUTER
-import routes from "../../routes";
+import { routes } from "../../routes";
 //SUB COMPONENTS
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
@@ -107,7 +107,7 @@ const DashboardContent = () => {
 
   return (
     <>
-      <div id="dashboardMainContent">
+      <div>
         <Routes>
           {getRoutes(routes)}
           {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
@@ -117,14 +117,6 @@ const DashboardContent = () => {
           <Route path={PATHS.INDEX_HTML} element={<Navigate to={PATHS.RULES.ABSOLUTE} />} />
           <Route path={PATHS.FEEDBACK.ABSOLUTE} element={<Navigate to={PATHS.FEEDBACK.ABSOLUTE} />} />
           <Route path={PATHS.HOME.ABSOLUTE} element={<Navigate to={PATHS.HOME.ABSOLUTE} />} />
-          {/* <Route
-            path={PATHS.RULES.ABSOLUTE}
-            element={
-              <Navigate
-                to={<ProtectedRoute component={<RulesIndexView />} />}
-              />
-            }
-          /> */}
 
           {/** SUPPORT LEGACY URLS */}
           <Route
