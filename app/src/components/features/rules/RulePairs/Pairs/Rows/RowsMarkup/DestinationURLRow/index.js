@@ -10,7 +10,10 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import {
+  displayFileSelector,
+  handleOpenLocalFileInBrowser,
+} from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import {
@@ -85,12 +88,6 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
       return true;
     }
     return false;
-  };
-
-  const handleOpenLocalFileInBrowser = () => {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-      link: pair.destination,
-    });
   };
 
   const getDestinationTypeForExistingRule = (destination) => {
@@ -188,7 +185,10 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
           {pair.destination.length ? pair.destination : " No file chosen"}
         </span>{" "}
         {pair.destination && isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
-          <HiOutlineExternalLink className="external-link-icon" onClick={handleOpenLocalFileInBrowser} />
+          <HiOutlineExternalLink
+            className="external-link-icon"
+            onClick={() => handleOpenLocalFileInBrowser(pair.destination)}
+          />
         )}
         <span>
           {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (

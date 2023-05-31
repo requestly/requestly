@@ -17,3 +17,20 @@
 .response-body-type-radio-group.ant-radio-group .ant-radio-wrapper .ant-radio {
   padding-right: 4px;
 }
+
+.ant-row .local-file-selector-row {
+  background: #26272a;
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+  border-top: 1px solid var(--border-dark);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-row .local-file-selector-row .external-link-icon {
+  align-self: center;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-gray);
+}
