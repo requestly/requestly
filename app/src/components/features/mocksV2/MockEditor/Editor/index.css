@@ -26,7 +26,7 @@
 .meta-data-option .ant-input-number-group .ant-input-number-input {
   background: var(--component-dark-background);
   border-radius: var(--border-radius-sm);
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  box-shadow: var(--input-box-shadow);
   color: var(--white);
 }
 
@@ -61,7 +61,7 @@
 .meta-data-option .ant-input-disabled,
 .meta-data-option .ant-input-group-wrapper .ant-input {
   background: var(--component-dark-background);
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  box-shadow: var(--input-box-shadow);
 }
 
 .generate-ai-response-button {
