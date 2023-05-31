@@ -87,6 +87,16 @@
       "contributions": [
         "projectManagement"
       ]
+    },
+    {
+      "login": "echo-sg",
+      "name": "Shrey Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56088056?v=4",
+      "profile": "https://github.com/echo-sg",
+      "contributions": [
+        "code",
+        "projectManagement"
+      ]
     }
   ],
   "contributorsPerLine": 7,
