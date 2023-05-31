@@ -1,3 +1,4 @@
+
 # Contributing to Requestly
 
 First off, thank you for considering to contribute! It’s people like you that make Requestly such a great tool. We look forward to improve the lives of web engineers together. 
@@ -50,3 +51,23 @@ Documentations are managed in a separate repository:
 https://github.com/requestly/requestly-docs
 
 Please follow the steps in [README](https://github.com/requestly/requestly-docs/blob/master/README.md) file to get started.
+
+## How to add yourself to the list of contributors
+
+Comment on Issue or Pull Request, asking @all-contributors to add a contributor:
+```@all-contributors please add @<username> for <contributions>. please add @<username> for <contributions>.```
+
+Replace ```<username>``` with your GitHub username and repalce ```<contributions>``` with one of the following values
+
+ - bug
+ - blog
+ - code
+ - content
+ - doc
+ - design
+ - infra
+ - maintenance
+ - projectManagement
+ - review
+ - security
+ - test
