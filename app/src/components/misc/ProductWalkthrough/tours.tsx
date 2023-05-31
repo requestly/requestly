@@ -1,6 +1,6 @@
 import { Rule } from "types";
 import { CustomSteps, pointerPlacement } from "./types";
-import { generateRuleEditorTour, getTourTarget } from "./utils";
+import { generateRuleEditorTour, getTourTarget, getTourTargetByClassName } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
@@ -8,6 +8,7 @@ import FEATURES from "config/constants/sub/features";
 const tourTooltipPresets = {
   disableBeacon: true,
   offset: 12,
+  showNext: true,
   pointerPlacement: "center" as pointerPlacement,
 };
 
@@ -22,6 +23,65 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].destination?.length,
     },
   ]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]: generateRuleEditorTour([
+    {
+      ...tourTooltipPresets,
+      target: getTourTargetByClassName("ant-tabs-nav-wrap"),
+      title: "Request/Response Headers",
+      content: "Select this tab to modify the Request/Response Headers of the Request.",
+      placement: "bottom-start",
+      pointerPlacement: "left-half",
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-header-modification-types"),
+      title: "Request/Response Headers",
+      content: "Select this tab to modify the Request/Response Headers of the Request.",
+      placement: "top",
+      pointerPlacement: "left",
+      showNext: false,
+      autoMoveToNext: true,
+      offset: 20,
+      disableNext: (ruleData: Rule) =>
+        !ruleData.pairs[0].modifications.Request?.length && !ruleData.pairs[0].modifications.Response?.length,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-header-modification-row"),
+      title: "Header Modification",
+      content:
+        "This is where the header modification will happen. Search or type the header name you want to add/override and type its corresponding value. For removing the header just type the header name",
+      placement: "top",
+      pointerPlacement: "center",
+      offset: 18,
+      spotlightPadding: 2,
+    },
+  ]),
+  // rule-editor-queryparam-modification-row
+  [GLOBAL_CONSTANTS.RULE_TYPES.QUERYPARAM]: generateRuleEditorTour([
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-queryparam-modification-type"),
+      title: "Select modification type",
+      content:
+        "Select the type of modification you want to do on query params. You can add/repalce params, remove a specific param or remove all query params from the URL that matches the source condition.",
+      placement: "top",
+      pointerPlacement: "center",
+      offset: 18,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-queryparam-modification-row"),
+      title: "Query params Modification",
+      content:
+        "This is where the modification will happen. Type the param name you want to add/replace and type its corresponding value. For removing a specific param just type the param name. For removing all just select the Remove all option from modification menu.",
+      placement: "bottom",
+      pointerPlacement: "center",
+      offset: 18,
+    },
+  ]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE]: generateRuleEditorTour([]),
+
   [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,

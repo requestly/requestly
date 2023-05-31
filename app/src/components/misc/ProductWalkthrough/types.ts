@@ -4,6 +4,8 @@ import { TooltipRenderProps } from "react-joyride";
 export type pointerPlacement = "left" | "center" | "right" | "left-half" | "right-half";
 export interface CustomSteps extends Step {
   disableNext?: (ruleData: any) => boolean;
+  showNext?: boolean;
+  autoMoveToNext?: boolean;
   pointerPlacement?: pointerPlacement;
 }
 

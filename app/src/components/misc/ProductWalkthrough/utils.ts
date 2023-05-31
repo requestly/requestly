@@ -2,6 +2,7 @@ import { Rule } from "types";
 import { CustomSteps } from "./types";
 
 export const getTourTarget = (tourId: string) => `[data-tour-id="${tourId}"]`;
+export const getTourTargetByClassName = (targetClass: string) => `.${targetClass}`;
 
 export const generateRuleEditorTour = (ruleSpecificTour: CustomSteps[]) => {
   return [
@@ -13,6 +14,7 @@ export const generateRuleEditorTour = (ruleSpecificTour: CustomSteps[]) => {
       offset: 12,
       placement: "bottom-start",
       pointerPlacement: "center",
+      showNext: true,
       disableNext: (ruleData: Rule) => !ruleData.name.length,
     },
     {
@@ -26,6 +28,7 @@ export const generateRuleEditorTour = (ruleSpecificTour: CustomSteps[]) => {
       offset: 12,
       pointerPlacement: "center",
       placement: "bottom-start",
+      showNext: true,
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].source.value?.length,
     },
     ...ruleSpecificTour,
@@ -37,6 +40,7 @@ export const generateRuleEditorTour = (ruleSpecificTour: CustomSteps[]) => {
       offset: 12,
       pointerPlacement: "right",
       placement: "bottom-start",
+      showNext: true,
     },
   ];
 };
