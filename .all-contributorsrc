@@ -17,6 +17,24 @@
       ]
     },
     {
+      "login": "wrongsahil",
+      "name": "Sahil Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16779465?v=4",
+      "profile": "http://sahil865gupta.github.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lazyvab",
+      "name": "Vaibhav Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6367566?v=4",
+      "profile": "https://github.com/lazyvab",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
       "login": "RuntimeTerror10",
       "name": "Parth Bhardwaj",
       "avatar_url": "https://avatars.githubusercontent.com/u/53986600?v=4",
@@ -26,10 +44,10 @@
       ]
     },
     {
-      "login": "wrongsahil",
-      "name": "Sahil Gupta",
-      "avatar_url": "https://avatars.githubusercontent.com/u/16779465?v=4",
-      "profile": "http://sahil865gupta.github.io",
+      "login": "rohanmathur91",
+      "name": "Rohan Mathur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61556757?v=4",
+      "profile": "http://linkedin.com/in/rohanmathur91",
       "contributions": [
         "code"
       ]
