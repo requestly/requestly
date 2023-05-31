@@ -111,3 +111,13 @@ For **payment/billing related issues**, feel free to contact us at [contact@requ
 Our mission is to help developers ship web and mobile apps faster and with confidence by giving then the tools to debug & resolve issues without external dependency.
 
 
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
