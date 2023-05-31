@@ -47,12 +47,12 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
     <Col span={24}>
       <div className="card-container">
         <Tabs
-          data-tour-id="rule-editor-headertype-tabs"
           type="line"
           tabBarGutter={16}
           activeKey={activeTab}
           onChange={setActiveTab}
           tabBarStyle={{ margin: 0 }}
+          data-tour-id="rule-editor-header-modification-types"
         >
           {["Request", "Response"].map((modificationType) => (
             <Tabs.TabPane
@@ -68,11 +68,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
               }
               key={modificationType}
             >
-              <Card
-                bordered={false}
-                className="headers-rule-pair-card"
-                data-tour-id="rule-editor-header-modification-types"
-              >
+              <Card bordered={false} className="headers-rule-pair-card">
                 {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
                   <HeadersPairModificationRowV2
                     modification={modification}

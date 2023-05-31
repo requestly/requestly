@@ -1,6 +1,6 @@
 import { Rule } from "types";
 import { CustomSteps, pointerPlacement } from "./types";
-import { generateRuleEditorTour, getTourTarget, getTourTargetByClassName } from "./utils";
+import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
@@ -13,7 +13,7 @@ const tourTooltipPresets = {
 };
 
 export const productTours: Record<string, CustomSteps[]> = {
-  // TOURS FOR RULE EDITORS
+  // TOURS FOR RULE EDITORS STARTS HERE
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
@@ -27,17 +27,14 @@ export const productTours: Record<string, CustomSteps[]> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
-      target: getTourTargetByClassName("ant-tabs-nav-wrap"),
-      title: "Request/Response Headers",
-      content: "Select this tab to modify the Request/Response Headers of the Request.",
-      placement: "bottom-start",
-      pointerPlacement: "left-half",
-    },
-    {
-      ...tourTooltipPresets,
       target: getTourTarget("rule-editor-header-modification-types"),
-      title: "Request/Response Headers",
-      content: "Select this tab to modify the Request/Response Headers of the Request.",
+      title: "Select header modification type",
+      content: (
+        <>
+          Switch between these tabs to modify the Request/Response Headers and select the type of header modification{" "}
+          <strong>(add, remove or override)</strong>, you want to perform.{" "}
+        </>
+      ),
       placement: "top",
       pointerPlacement: "left",
       showNext: false,
@@ -50,8 +47,13 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-header-modification-row"),
       title: "Header Modification",
-      content:
-        "This is where the header modification will happen. Search or type the header name you want to add/override and type its corresponding value. For removing the header just type the header name",
+      content: (
+        <>
+          This is where the header modification will happen. Search or type the header name you want to{" "}
+          <strong>add/override</strong> and type its corresponding value. For <strong>removing</strong> the header just
+          type the header name.
+        </>
+      ),
       placement: "top",
       pointerPlacement: "center",
       offset: 18,
@@ -63,8 +65,13 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-queryparam-modification-type"),
       title: "Select modification type",
-      content:
-        "Select the type of modification you want to do on query params. You can add/repalce params, remove a specific param or remove all query params from the URL that matches the source condition.",
+      content: (
+        <>
+          Select the type of modification you want to do on query params. You can <strong>add/replace</strong> params,
+          <strong>remove specific</strong> param or <strong>remove all</strong> query params from the URL that matches
+          the source condition.
+        </>
+      ),
       placement: "top",
       pointerPlacement: "center",
       offset: 18,
@@ -73,8 +80,13 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-queryparam-modification-row"),
       title: "Query params Modification",
-      content:
-        "This is where the modification will happen. Type the param name you want to add/replace and type its corresponding value. For removing a specific param just type the param name. For removing all just select the Remove all option from modification menu.",
+      content: (
+        <>
+          This is where the modification will happen. Type the param name you want to add/replace and type its
+          corresponding value. For removing a specific param just type the param name. For removing all just select the
+          Remove all option from modification menu.
+        </>
+      ),
       placement: "bottom",
       pointerPlacement: "center",
       offset: 18,
@@ -93,11 +105,18 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-response-resource-type"),
       title: "Select resource type",
-      content: "Click here to select between various resource types: Rest API, GraphQL or HTML/JS/CSS",
-      placement: "bottom",
+      content: (
+        <>
+          Click here to select between various resource types: <strong>Rest API</strong>, <strong>GraphQL</strong> or{" "}
+          <strong>HTML/JS/CSS</strong>.
+        </>
+      ),
+      placement: "bottom-start",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.resourceType.length,
       offset: 0,
-      pointerPlacement: "left",
+      pointerPlacement: "center",
+      showNext: false,
+      autoMoveToNext: true,
     },
     {
       ...tourTooltipPresets,
@@ -118,22 +137,27 @@ export const productTours: Record<string, CustomSteps[]> = {
       You can target GraphQL requests using the operation name in request body. To do so add Paylaod JSON key (eg. operationName) and Value (eg. getUsers)
       `,
       placement: "bottom-start",
-      // disableNext: (ruleData: Rule) => !ruleData.pairs[0].source.value?.length,
+      disableNext: (ruleData: Rule) =>
+        !ruleData.pairs[0].source.filters[0]?.requestPayload?.key?.length &&
+        !ruleData.pairs[0].source.filters[0]?.requestPayload?.value?.length,
     },
     {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-response-status-code"),
       title: "Select response status code (optional)",
-      content: `Select the response status code which must be returned with the response. Leave it empty if you want the original status code to be returned`,
+      content:
+        "Select the response status code which must be returned with the response. Leave it empty if you want the original status code to be returned.",
       placement: "top",
     },
     {
       ...tourTooltipPresets,
       target: getTourTarget("code-editor"),
       title: "Response Body",
-      content: "Define the modifed Response body which must be returned.",
+      content:
+        "For static mode simply define the response body. For programmatic mode override the response data programmatically with JS.",
       placement: "top",
       offset: 16,
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.value?.length,
     },
     {
       ...tourTooltipPresets,
@@ -150,8 +174,12 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-requestbody-types"),
       title: "Select Request override method",
-      content:
-        "Select the method to override the API request body with static data or programmatically modify the existing request payload.",
+      content: (
+        <>
+          Select the method to override the API request body with <strong>static</strong> data or{" "}
+          <strong>programmatically</strong> modify the existing request payload.
+        </>
+      ),
       placement: "bottom",
       pointerPlacement: "left-half",
       offset: 20,
@@ -160,17 +188,23 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("code-editor"),
       title: "Request body",
-      content: "Define the request body which must be passed to the server.",
+      content:
+        "For static mode define the request body which must be passed to the server. For programmatic mode override the request payload programmatically with JS.",
       placement: "top",
       offset: 16,
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].request.value?.length,
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-script-language"),
-      title: "Script Language",
-      content: "Select specific script language (JS/CSS) that needs to be inserted.",
+      title: "Select script language",
+      content: (
+        <>
+          Select the script language <strong>(JavaScript/CSS)</strong> that needs to be inserted.
+        </>
+      ),
       placement: "top",
       offset: 18,
     },
@@ -178,7 +212,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("code-editor"),
       title: "Script",
-      content: "Add the script you want to inject here.",
+      content: <>Type the script you want to insert here.</>,
       placement: "top",
       offset: 16,
     },
@@ -188,15 +222,19 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-replace-from"),
       title: "Replace string",
-      content: "Enter to string that needs to be replaced from source condition",
-      placement: "bottom-start",
+      content: (
+        <>
+          Enter the string that needs to be <strong>replaced</strong> from source condition.
+        </>
+      ),
+      placement: "bottom",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].from?.length,
     },
     {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-replace-to"),
       title: "Replace with",
-      content: "Add the new string here",
+      content: <>Add the new string here which you want to replace with.</>,
       placement: "bottom-start",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].to?.length,
     },
@@ -207,7 +245,12 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-delay-value"),
       title: "Add Delay duration",
-      content: "The delay time (in milliseconds) that is applied to the request matching the source condition.",
+      content: (
+        <>
+          The delay time <strong>(in milliseconds)</strong> that is applied to the request matching the source
+          condition.
+        </>
+      ),
       offset: 8,
       placement: "bottom-start",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
@@ -218,7 +261,12 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-useragent-selector"),
       title: "Device/Browser Selector",
-      content: "Select whether you want to test on a device or a browser.",
+      content: (
+        <>
+          Select whether you want to test on a <strong>device</strong> or a <strong>browser</strong>. select{" "}
+          <strong>custom</strong> if you want add your custom user-agent.
+        </>
+      ),
       offset: 20,
       pointerPlacement: "right-half",
       placement: "top",
@@ -227,8 +275,10 @@ export const productTours: Record<string, CustomSteps[]> = {
     {
       ...tourTooltipPresets,
       target: getTourTarget("rule-editor-useragent-type"),
-      title: "Device/Browser Type Selector",
-      content: "Select or search the type of browser/device on which you want to test.",
+      title: "Select/Type your user-agent",
+      content: (
+        <>Select or search the type of browser/device or type your own custom user-agent on which you want to test.</>
+      ),
       placement: "top",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].userAgent?.length,
     },

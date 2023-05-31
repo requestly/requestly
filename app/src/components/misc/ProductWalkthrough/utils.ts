@@ -2,7 +2,6 @@ import { Rule } from "types";
 import { CustomSteps } from "./types";
 
 export const getTourTarget = (tourId: string) => `[data-tour-id="${tourId}"]`;
-export const getTourTargetByClassName = (targetClass: string) => `.${targetClass}`;
 
 export const generateRuleEditorTour = (ruleSpecificTour: CustomSteps[]) => {
   return [

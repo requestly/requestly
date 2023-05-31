@@ -103,8 +103,6 @@ const RuleBuilder = (props) => {
     return ref.current;
   };
 
-  console.log({ currentlySelectedRuleData }); // TODO: remove this log
-
   useEffect(() => {
     if (isDocsVisible) {
       trackDocsSidebarViewed(currentlySelectedRuleData.ruleType);

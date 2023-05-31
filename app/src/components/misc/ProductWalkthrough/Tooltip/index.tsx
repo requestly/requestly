@@ -19,7 +19,6 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   const nextButtonRef = useRef(null);
   useEffect(() => {
     if (step.autoMoveToNext && !step.disableNext?.(context)) {
-      console.log(nextButtonRef.current);
       nextButtonRef.current?.click();
     }
   }, [context, step]);
