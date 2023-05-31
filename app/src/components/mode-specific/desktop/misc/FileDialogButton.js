@@ -18,7 +18,6 @@ export function displayFileSelector(callback) {
 }
 
 export const handleOpenLocalFileInBrowser = (link) => {
-  console.log("!!!debug", "link", link);
   window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
     link,
   });

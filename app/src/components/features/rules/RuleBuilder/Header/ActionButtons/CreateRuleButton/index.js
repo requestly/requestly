@@ -18,7 +18,7 @@ import { validateRule } from "./actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { getAllRedirectDestinationTypes } from "utils/rules/misc";
+import { getAllRedirectDestinationTypes, getAllResponseBodyTypes } from "utils/rules/misc";
 import { ruleModifiedAnalytics } from "./actions";
 import {
   trackErrorInRuleCreation,
@@ -94,14 +94,19 @@ const CreateRuleButton = ({
         if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
           ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
 
-          trackRuleCreatedEvent(
+          trackRuleCreatedEvent({
             rule_type,
-            currentlySelectedRuleData.description,
-            currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-              ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-              : null,
-            analyticEventRuleCreatedSource
-          );
+            description: currentlySelectedRuleData.description,
+            destinationTypes:
+              currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                : null,
+            source: analyticEventRuleCreatedSource,
+            body_types:
+              currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+                ? getAllResponseBodyTypes(currentlySelectedRuleData)
+                : null,
+          });
         } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
           trackRuleEditedEvent(
             rule_type,

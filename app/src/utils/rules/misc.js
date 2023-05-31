@@ -171,6 +171,11 @@ export const getAllRedirectDestinationTypes = (rule) => {
   return destinationTypes;
 };
 
+export const getAllResponseBodyTypes = (rule) => {
+  const bodyTypes = rule.pairs.map((pair) => pair.response.type);
+  return bodyTypes;
+};
+
 /**
  * Check if the regex string contains the forward and backward slashes or not
  * @param {string} regexStr
