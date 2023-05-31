@@ -24,6 +24,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "wrongsahil",
+      "name": "Sahil Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16779465?v=4",
+      "profile": "http://sahil865gupta.github.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
