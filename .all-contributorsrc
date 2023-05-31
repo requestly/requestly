@@ -1,0 +1,26 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "sagarsoni7",
+      "name": "Sagar Soni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29792913?v=4",
+      "profile": "https://sagarsoni.dev/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "requestly",
+  "projectOwner": "requestly"
+}
