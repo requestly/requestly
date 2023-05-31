@@ -1,4 +1,5 @@
 <p align="center">
+<p align="center">
   <a rel="noreferrer noopener" href="https://requestly.io/">
     <img src="https://user-images.githubusercontent.com/16779465/194505910-b6a7be70-df20-4b1a-9730-06a48cdd75ac.png" alt="Requestly Logo" width="40%"/>
   </a>
@@ -35,7 +36,7 @@ Requestly also offers a library service which allows you to upload and host JS/C
 
 ## Documentation 📕
 
-Please visit our [documentation](https://docs.requestly.io/) for step-by-step guide to get started with Requestly. 
+Please visit our [documentation](https://docs.requestly.io/) for step-by-step guide to get started with Requestly.
 
 ## Features ✨
 
@@ -79,10 +80,12 @@ Host your APIs & files using Requestly Mock Server which can be directly used in
 Share data rich bug reports with Video, console logs, network logs, and env details with teammates.
 
 ## Development
+
 This repository contains the source code for Browser extension and UI application which make up the core of Requestly.
 Please follow the [Getting Started Guide](./getting-started.md) to get to know about the development process in this repository.
 
 Start working on individual modules:
+
 - [Browser extension](./browser-extension)
 - [UI application](./app)
 - [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
@@ -91,14 +94,13 @@ Start working on individual modules:
 - [Mock Server](https://github.com/requestly/requestly-mock-server)
 - [Backend](https://github.com/requestly/requestly-backend)
 
-
 ## Contributing ⌨️
 
-Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works. 
+Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
 ## Links 🔗
 
-- 🏠 Website: [https://www.requestly.io](https://www.requestly.io) 
+- 🏠 Website: [https://www.requestly.io](https://www.requestly.io)
 - 🌐 Web application: [https://app.requestly.io](https://app.requestly.io)
 - 📖 Documentation: [https://docs.requestly.io](https://docs.requestly.io)
 - Chrome Store: [Visit Chrome Store](https://chrome.google.com/webstore/detail/requestly-redirect-url-mo/mdnleldcmiljblolnjhpnblkcekpdkpa)
@@ -108,6 +110,43 @@ For **payment/billing related issues**, feel free to contact us at [contact@requ
 
 ## Our Mission
 
-Our mission is to help developers ship web and mobile apps faster and with confidence by giving then the tools to debug & resolve issues without external dependency.
+Our mission is to help developers ship web and mobile apps faster and with confidence by giving them the tools to debug & resolve issues without external dependency.
 
+## Contributors
 
+[![All Contributors](https://img.shields.io/github/all-contributors/requestly/requestly?color=ee8449&style=flat-square)](#contributors)
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://sagarsoni.dev/"><img src="https://avatars.githubusercontent.com/u/29792913?v=4?s=100" width="100px;" alt="Sagar Soni"/><br /><sub><b>Sagar Soni</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sagarsoni7" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://sahil865gupta.github.io"><img src="https://avatars.githubusercontent.com/u/16779465?v=4?s=100" width="100px;" alt="Sahil Gupta"/><br /><sub><b>Sahil Gupta</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=wrongsahil" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lazyvab"><img src="https://avatars.githubusercontent.com/u/6367566?v=4?s=100" width="100px;" alt="Vaibhav Nigam"/><br /><sub><b>Vaibhav Nigam</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=lazyvab" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/RuntimeTerror10"><img src="https://avatars.githubusercontent.com/u/53986600?v=4?s=100" width="100px;" alt="Parth Bhardwaj"/><br /><sub><b>Parth Bhardwaj</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=RuntimeTerror10" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://linkedin.com/in/rohanmathur91"><img src="https://avatars.githubusercontent.com/u/61556757?v=4?s=100" width="100px;" alt="Rohan Mathur"/><br /><sub><b>Rohan Mathur</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=rohanmathur91" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nafees87n"><img src="https://avatars.githubusercontent.com/u/56021937?v=4?s=100" width="100px;" alt="Nafees Nehar"/><br /><sub><b>Nafees Nehar</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=nafees87n" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nsrCodes"><img src="https://avatars.githubusercontent.com/u/57226514?v=4?s=100" width="100px;" alt="Navdeep Singh Rathore"/><br /><sub><b>Navdeep Singh Rathore</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=nsrCodes" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://requestly.io"><img src="https://avatars.githubusercontent.com/u/3108399?v=4?s=100" width="100px;" alt="Sachin Jain"/><br /><sub><b>Sachin Jain</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sachinjain024" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ashishsangle707"><img src="https://avatars.githubusercontent.com/u/124448580?v=4?s=100" width="100px;" alt="ashishsangle707"/><br /><sub><b>ashishsangle707</b></sub></a><br /><a href="#projectManagement-ashishsangle707" title="Project Management">📆</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/echo-sg"><img src="https://avatars.githubusercontent.com/u/56088056?v=4?s=100" width="100px;" alt="Shrey Gupta"/><br /><sub><b>Shrey Gupta</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=echo-sg" title="Code">💻</a> <a href="#projectManagement-echo-sg" title="Project Management">📆</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->

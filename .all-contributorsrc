@@ -1,0 +1,108 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "sagarsoni7",
+      "name": "Sagar Soni",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29792913?v=4",
+      "profile": "https://sagarsoni.dev/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "wrongsahil",
+      "name": "Sahil Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16779465?v=4",
+      "profile": "http://sahil865gupta.github.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lazyvab",
+      "name": "Vaibhav Nigam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6367566?v=4",
+      "profile": "https://github.com/lazyvab",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "RuntimeTerror10",
+      "name": "Parth Bhardwaj",
+      "avatar_url": "https://avatars.githubusercontent.com/u/53986600?v=4",
+      "profile": "https://github.com/RuntimeTerror10",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rohanmathur91",
+      "name": "Rohan Mathur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61556757?v=4",
+      "profile": "http://linkedin.com/in/rohanmathur91",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nafees87n",
+      "name": "Nafees Nehar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56021937?v=4",
+      "profile": "https://github.com/nafees87n",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nsrCodes",
+      "name": "Navdeep Singh Rathore",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57226514?v=4",
+      "profile": "https://github.com/nsrCodes",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "sachinjain024",
+      "name": "Sachin Jain",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3108399?v=4",
+      "profile": "http://requestly.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ashishsangle707",
+      "name": "ashishsangle707",
+      "avatar_url": "https://avatars.githubusercontent.com/u/124448580?v=4",
+      "profile": "https://github.com/ashishsangle707",
+      "contributions": [
+        "projectManagement"
+      ]
+    },
+    {
+      "login": "echo-sg",
+      "name": "Shrey Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56088056?v=4",
+      "profile": "https://github.com/echo-sg",
+      "contributions": [
+        "code",
+        "projectManagement"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "requestly",
+  "projectOwner": "requestly"
+}
