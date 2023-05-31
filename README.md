@@ -122,6 +122,7 @@ Our mission is to help developers ship web and mobile apps faster and with confi
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://sagarsoni.dev/"><img src="https://avatars.githubusercontent.com/u/29792913?v=4?s=100" width="100px;" alt="Sagar Soni"/><br /><sub><b>Sagar Soni</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sagarsoni7" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lazyvab"><img src="https://avatars.githubusercontent.com/u/6367566?v=4?s=100" width="100px;" alt="Vaibhav Nigam"/><br /><sub><b>Vaibhav Nigam</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=lazyvab" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
