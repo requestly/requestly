@@ -25,6 +25,7 @@ import {
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
+import LINKS from "config/constants/sub/links";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
@@ -199,7 +200,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                 <>
                   This rule cannot be executed using Extension because the request redirects to a local file that cannot
                   be accessed by the browser.{" "}
-                  <a className="tooltip-link" href="https://requestly.io/downloads" target="_blank" rel="noreferrer">
+                  <a className="tooltip-link" href={LINKS.REQUESTLY_DOWNLOAD_PAGE} target="_blank" rel="noreferrer">
                     Use this on Desktop App!
                   </a>
                 </>
@@ -283,7 +284,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                       <>
                         Map Local file option is available only in desktop app.{" "}
                         <a
-                          href="https://requestly.io/downloads"
+                          href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
                           target="_blank"
                           rel="noreferrer"
                           className="tooltip-link"

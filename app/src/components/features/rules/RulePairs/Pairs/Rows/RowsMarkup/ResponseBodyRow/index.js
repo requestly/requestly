@@ -17,6 +17,7 @@ import APP_CONSTANTS from "config/constants";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system/components";
+import LINKS from "config/constants/sub/links";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
@@ -105,12 +106,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
                     <>
                       This rule cannot be executed using Extension because the request accesses a local file that cannot
                       be accessed by the browser.{" "}
-                      <a
-                        className="tooltip-link"
-                        href="https://requestly.io/downloads"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <a className="tooltip-link" href={LINKS.REQUESTLY_DOWNLOAD_PAGE} target="_blank" rel="noreferrer">
                         Use this on Desktop App!
                       </a>
                     </>
