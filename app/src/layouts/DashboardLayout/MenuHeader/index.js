@@ -7,14 +7,15 @@ import HeaderText from "./HeaderText";
 // import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
-import { NotificationOutlined, SlackOutlined } from "@ant-design/icons";
-import { redirectToSettings, redirectToProductUpdates } from "utils/RedirectionUtils";
+import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
+import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
 import { RQBreadcrumb } from "lib/design-system/components";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
+import LINKS from "config/constants/sub/links";
 
 const { Header } = Layout;
 
@@ -175,6 +176,21 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                       <Button type="text" className="header-icon-btn" icon={<QuestionCircleOutlined />} />
                     </Dropdown>
                   </Col> */}
+
+                  {/* documentation */}
+                  <Col className="hidden-on-small-screen">
+                    <Tooltip title={<span className="text-gray text-sm">Documentation</span>}>
+                      <Button
+                        type="text"
+                        className="header-icon-btn"
+                        icon={<ReadOutlined />}
+                        onClick={() => {
+                          trackHeaderClicked("documentation");
+                          redirectToUrl(LINKS.REQUESTLY_DOCS, true);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
 
                   {/* product updates */}
                   <Col className="hidden-on-small-screen">
