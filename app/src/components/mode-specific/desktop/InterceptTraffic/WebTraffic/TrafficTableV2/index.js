@@ -500,21 +500,23 @@ const CurrentTrafficTable = ({
   return (
     <>
       <Row wrap={false}>
-        <Col
-          flex="197px"
-          style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
-          className="traffic-table-sidebar"
-        >
-          <Menu
-            theme="dark"
-            mode="inline"
-            items={items}
-            openKeys={expandedLogTypes}
-            onClick={handleSidebarMenuItemClick}
-            selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
-            className={getGroupFiltersLength() > 0 ? "filter-applied" : ""}
-          />
-        </Col>
+        {isStaticPreview ? null : (
+          <Col
+            flex="197px"
+            style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
+            className="traffic-table-sidebar"
+          >
+            <Menu
+              theme="dark"
+              mode="inline"
+              items={items}
+              openKeys={expandedLogTypes}
+              onClick={handleSidebarMenuItemClick}
+              selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
+              className={getGroupFiltersLength() > 0 ? "filter-applied" : ""}
+            />
+          </Col>
+        )}
         <Col flex="auto">
           <Row align={"middle"}>
             <ActionHeader
