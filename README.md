@@ -130,6 +130,9 @@ Our mission is to help developers ship web and mobile apps faster and with confi
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nafees87n"><img src="https://avatars.githubusercontent.com/u/56021937?v=4?s=100" width="100px;" alt="Nafees Nehar"/><br /><sub><b>Nafees Nehar</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=nafees87n" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nsrCodes"><img src="https://avatars.githubusercontent.com/u/57226514?v=4?s=100" width="100px;" alt="Navdeep Singh Rathore"/><br /><sub><b>Navdeep Singh Rathore</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=nsrCodes" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://requestly.io"><img src="https://avatars.githubusercontent.com/u/3108399?v=4?s=100" width="100px;" alt="Sachin Jain"/><br /><sub><b>Sachin Jain</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sachinjain024" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
