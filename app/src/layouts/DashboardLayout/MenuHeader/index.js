@@ -13,8 +13,7 @@ import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
-import { Newbadge } from "components/common/Newbadge";
-import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
+import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import "./MenuHeader.css";
 
