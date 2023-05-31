@@ -7,7 +7,7 @@
   border-right: 1px solid var(--border-dark);
 }
 
-.primary-sidebar-container:last-child {
+.primary-sidebar-container div:last-child {
   border-top: 1px solid var(--border-dark);
 }
 

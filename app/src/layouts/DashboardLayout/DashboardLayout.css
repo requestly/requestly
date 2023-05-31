@@ -33,7 +33,7 @@
 }
 
 .app-main-content {
-  --main-content-height: calc(100vh - 4.5rem);
+  --main-content-height: calc(100vh - 4.5rem); /* 48px header + 24px footer height  = 72px = 4.5rem */
 
   overflow: auto;
   grid-area: main;
