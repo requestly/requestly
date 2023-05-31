@@ -182,7 +182,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
       </Row>
       {renderFileSelector()}
       {pair.response.type !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
-        <>
+        <Col span={24} data-tour-id="code-editor">
           <Row
             span={24}
             style={{
@@ -229,7 +229,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
               </span>
             </Col>
           </Row>
-        </>
+        </Col>
       ) : null}
     </React.Fragment>
   );

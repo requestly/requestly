@@ -13,6 +13,7 @@ const tourTooltipPresets = {
 };
 
 export const productTours: Record<string, CustomSteps[]> = {
+  // TOURS FOR RULE EDITORS
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
@@ -57,7 +58,6 @@ export const productTours: Record<string, CustomSteps[]> = {
       spotlightPadding: 2,
     },
   ]),
-  // rule-editor-queryparam-modification-row
   [GLOBAL_CONSTANTS.RULE_TYPES.QUERYPARAM]: generateRuleEditorTour([
     {
       ...tourTooltipPresets,
@@ -80,7 +80,70 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 18,
     },
   ]),
-  [GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE]: generateRuleEditorTour([]),
+  [GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-title"),
+      title: "Start by adding the “Rule name”",
+      content: "Rule name will help you find the rule easily.",
+      placement: "bottom-start",
+      disableNext: (ruleData: Rule) => !ruleData.name.length,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-response-resource-type"),
+      title: "Select resource type",
+      content: "Click here to select between various resource types: Rest API, GraphQL or HTML/JS/CSS",
+      placement: "bottom",
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.resourceType.length,
+      offset: 0,
+      pointerPlacement: "left",
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-source"),
+      title: "Add Source condition to set criteria for the rules",
+      content: `
+        You can use URL , Host or Path with Regex,
+        Contains, Wildcard or Equals to match the source request.
+      `,
+      placement: "bottom-start",
+      disableNext: (ruleData: Rule) => !ruleData.pairs[0].source.value?.length,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-response-graphql-payload"),
+      title: "Target query and operationName",
+      content: `
+      You can target GraphQL requests using the operation name in request body. To do so add Paylaod JSON key (eg. operationName) and Value (eg. getUsers)
+      `,
+      placement: "bottom-start",
+      // disableNext: (ruleData: Rule) => !ruleData.pairs[0].source.value?.length,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-response-status-code"),
+      title: "Select response status code (optional)",
+      content: `Select the response status code which must be returned with the response. Leave it empty if you want the original status code to be returned`,
+      placement: "top",
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("code-editor"),
+      title: "Response Body",
+      content: "Define the modifed Response body which must be returned.",
+      placement: "top",
+      offset: 16,
+    },
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-create-btn"),
+      title: "Save the rule",
+      content: "Click here to Create and Save the rule.",
+      pointerPlacement: "right",
+      placement: "bottom-start",
+    },
+  ],
 
   [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: generateRuleEditorTour([
     {
@@ -170,6 +233,8 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].userAgent?.length,
     },
   ]),
+  // TOUR FOR RULE EDITORS ENDS HERE
+
   [FEATURES.DESKTOP_APP_TRAFFIC_TABLE]: [
     {
       ...tourTooltipPresets,
