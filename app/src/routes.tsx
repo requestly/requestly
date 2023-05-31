@@ -563,28 +563,3 @@ export const routes = [
     component: InviteView,
   },
 ];
-
-export const updatedRoutes: RouteObject[] = [
-  {
-    path: PATHS.NEW.RULES.INDEX,
-    children: [
-      {
-        index: true,
-        path: PATHS.NEW.RULES.MY_RULES.RELATIVE,
-        element: <RulesIndexView />,
-      },
-      {
-        path: PATHS.NEW.RULES.SHARED_LISTS.RELATIVE,
-        element: <SharedListsIndexView />,
-      },
-      {
-        path: PATHS.NEW.RULES.TEMPLATES.RELATIVE,
-        element: <Navigate to={PATHS.RULES.TEMPLATES.ABSOLUTE} />,
-      },
-      {
-        path: PATHS.NEW.RULES.TRASH.RELATIVE,
-        element: <TrashIndexView />,
-      },
-    ],
-  },
-];
