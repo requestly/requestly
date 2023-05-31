@@ -1,5 +1,6 @@
-import APP_CONSTANTS from "./config/constants";
 import { Navigate } from "react-router";
+import { RouteObject } from "react-router-dom";
+import APP_CONSTANTS from "./config/constants";
 import AcceptTeamInviteView from "./views/user/Teams/AcceptInvite";
 import Account from "./views/user/Account";
 import AppModeView from "./views/misc/AppMode";
@@ -560,5 +561,30 @@ export const routes = [
     path: PATHS.INVITE.RELATIVE,
     name: "Accept Invite",
     component: InviteView,
+  },
+];
+
+export const updatedRoutes: RouteObject[] = [
+  {
+    path: PATHS.NEW.RULES.INDEX,
+    children: [
+      {
+        index: true,
+        path: PATHS.NEW.RULES.MY_RULES.RELATIVE,
+        element: <RulesIndexView />,
+      },
+      {
+        path: PATHS.NEW.RULES.SHARED_LISTS.RELATIVE,
+        element: <SharedListsIndexView />,
+      },
+      {
+        path: PATHS.NEW.RULES.TEMPLATES.RELATIVE,
+        element: <Navigate to={PATHS.RULES.TEMPLATES.ABSOLUTE} />,
+      },
+      {
+        path: PATHS.NEW.RULES.TRASH.RELATIVE,
+        element: <TrashIndexView />,
+      },
+    ],
   },
 ];
