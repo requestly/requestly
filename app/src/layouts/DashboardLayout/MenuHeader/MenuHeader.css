@@ -164,3 +164,9 @@
 .header-profile-dropdown-trigger.ant-avatar {
   margin-top: -2px;
 }
+
+@media screen and (max-width: 1150px) {
+  .header-left-section a {
+    display: none;
+  }
+}

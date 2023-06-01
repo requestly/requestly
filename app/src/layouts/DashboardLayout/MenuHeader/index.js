@@ -28,10 +28,10 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   // const isMyRulesPage = pathname.includes("my-rules");
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const editorPaths = [
-    "/rules/editor",
-    "/mocks/editor",
-    "/filesv2/editor",
-    "/mock-server/viewer",
+    // "/rules/editor",
+    // "/mocks/editor",
+    // "/filesv2/editor",
+    // "/mock-server/viewer",
     "/pricing",
     "/invite",
   ];
@@ -76,7 +76,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
 
                     <WorkspaceSelector />
 
-                    <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer" onClick={trackTutorialsClicked}>
+                    <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
                       Tutorials
                     </a>
 
