@@ -72,6 +72,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import "./rulesTable.css";
 import Logger from "lib/logger";
+import LINKS from "config/constants/sub/links";
 
 //Lodash
 const set = require("lodash/set");
@@ -615,7 +616,7 @@ const RulesTable = ({
                           {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
                           <a
                             className="tooltip-link"
-                            href="https://requestly.io/downloads"
+                            href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
                             target="_blank"
                             rel="noreferrer"
                           >

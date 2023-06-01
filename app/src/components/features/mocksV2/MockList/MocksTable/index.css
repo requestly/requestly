@@ -44,7 +44,7 @@
 .mock-table-header-actions .mock-search-input {
   padding: 4px 6px;
   background: var(--background-dark);
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  box-shadow: var(--input-box-shadow);
   flex: 1;
   max-width: 275px;
 }

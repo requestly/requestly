@@ -298,6 +298,7 @@ const RulePairs = (props) => {
           className="rule-pairs-collapse"
           defaultActiveKey={activePanelKey}
           key={activePanelKey[activePanelKey.length - 1]}
+          expandIconPosition="end"
         >
           {currentlySelectedRuleData?.pairs?.length > 0
             ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (

@@ -17,6 +17,12 @@ export function displayFileSelector(callback) {
   }
 }
 
+export const handleOpenLocalFileInBrowser = (link) => {
+  window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
+    link,
+  });
+};
+
 const FileDialogButton = ({ text, callback }) => {
   return (
     <Button onClick={() => displayFileSelector(callback)} style={{ marginRight: 8 }}>

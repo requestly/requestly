@@ -11,13 +11,14 @@ const AddCustomScriptRow = ({ rowIndex, helperFunctions }) => {
       <Col span={24}>
         <Button
           block
-          size="small"
+          size="large"
           type="dashed"
           onClick={addEmptyScript}
           icon={<PlusOutlined />}
           className="add-custom-script-btn"
         >
-          Insert Custom Script (scripts are executed serially)
+          <span className="text-white">Insert Custom Script</span>
+          (scripts are executed serially)
         </Button>
       </Col>
     </Row>

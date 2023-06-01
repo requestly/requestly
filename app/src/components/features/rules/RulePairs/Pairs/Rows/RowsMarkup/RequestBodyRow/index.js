@@ -94,11 +94,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
 
   return (
     <React.Fragment key={rowIndex}>
+      <div className="subtitle response-body-row-header">Request Body</div>
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
-        <Col span={12}>
-          <span>Request Body</span>
-        </Col>
-        <Col align="right" span={12}>
+        <Col span={24}>
           <Popconfirm
             title="This will clear the existing body content"
             onConfirm={() => {
@@ -110,7 +108,12 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
             cancelText="Cancel"
             open={requestTypePopupVisible}
           >
-            <Radio.Group onChange={showPopup} value={pair.request.type} disabled={isInputDisabled}>
+            <Radio.Group
+              onChange={showPopup}
+              value={pair.request.type}
+              disabled={isInputDisabled}
+              className="response-body-type-radio-group"
+            >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>Programmatic (JavaScript)</Radio>
             </Radio.Group>

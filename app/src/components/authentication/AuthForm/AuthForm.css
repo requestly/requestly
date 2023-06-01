@@ -1,6 +1,6 @@
 .signup-modal-section-wrapper {
   background: #1c1d21;
-  padding: 2.5rem 1.87rem;
+  padding: 32px;
   width: 55%;
 }
 .login-modal-wrapper {
@@ -51,7 +51,7 @@
   margin-bottom: 4px;
 }
 .auth-modal-input {
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15), inset 0px -1px 2px #4f5154;
+  box-shadow: var(--input-box-shadow);
   border: 0 !important;
   min-height: 38px;
 }
