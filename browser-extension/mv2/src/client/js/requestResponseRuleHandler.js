@@ -593,11 +593,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     const responseRule = getResponseRule(url);
     const { response: responseModification, source } = responseRule.pairs[0];
 
-    if (fetchedResponse?.status === 204) {
-      // Return the same response when status is 204. fetch doesn't allow to create new response with empty body
-      return fetchedResponse;
-    }
-
     isDebugMode &&
       console.log("RQ", "Inside the fetch block for url", {
         url,
@@ -675,9 +670,12 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       requestDetails,
     });
 
-    return new Response(new Blob([customResponse]), {
-      // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      status: responseModification.statusCode || fetchedResponse?.status || 200,
+    // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
+    const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status || 200);
+    const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
+
+    return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
+      status: finalStatusCode,
       statusText: responseModification.statusText || fetchedResponse?.statusText,
       headers: fetchedResponse?.headers,
     });
