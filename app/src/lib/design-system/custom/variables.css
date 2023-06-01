@@ -11,6 +11,7 @@
   --primary: #1e69ff;
   --background: #141414;
   --background-dark: #1c1d21;
+  --layout-component-background: #212121;
   --component-background: #323337;
   --component-dark-background: #2c2d31;
   --input-background: var(--component-dark-background);

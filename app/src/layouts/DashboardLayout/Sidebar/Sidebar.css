@@ -235,6 +235,7 @@ li.sidebar-horizontal-divider.ant-menu-item-divider {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 4px;
   }
 }
 
