@@ -68,25 +68,23 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
         </Col>
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
-            <div className="header-left-section hidden-on-small-screen">
-              <div className="header-left-section">
-                <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
+            <div className="header-left-section">
+              <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
 
-                <WorkspaceSelector />
+              <WorkspaceSelector />
 
-                <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
-                  Tutorials
-                </a>
+              <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
+                Tutorials
+              </a>
 
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={LINKS.REQUESTLY_DESKTOP_APP}
-                  onClick={() => trackDesktopAppPromoClicked("topbar")}
-                >
-                  Desktop App <Newbadge />
-                </a>
-              </div>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={LINKS.REQUESTLY_DESKTOP_APP}
+                onClick={() => trackDesktopAppPromoClicked("topbar")}
+              >
+                Desktop App <Newbadge />
+              </a>
             </div>
           </Col>
         ) : null}
