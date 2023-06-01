@@ -1,10 +1,10 @@
+import { Col, Row } from "antd";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { RQButton } from "lib/design-system/components";
 import React from "react";
 import { useSelector } from "react-redux";
-import { Row, Col } from "antd";
-import { RQButton } from "lib/design-system/components";
-import { MockType } from "../../types";
 import { getUserAuthDetails } from "store/selectors";
-import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { MockType } from "../../types";
 
 import { AiOutlineCloudUpload, AiOutlineQuestionCircle } from "react-icons/ai";
 import { FiArrowUpRight } from "react-icons/fi";

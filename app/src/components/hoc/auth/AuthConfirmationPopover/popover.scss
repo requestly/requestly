@@ -10,16 +10,14 @@
   & .ant-popover-buttons {
     text-align: left;
   }
-  & .ant-btn-default,
-  & .ant-btn-primary {
+  & .ant-btn-default {
     border: 0;
     background: var(--hover-color);
     color: var(--white);
     padding: 2px 6px;
   }
-  & .ant-btn-default:hover,
-  & .ant-btn-primary:hover {
-    background: var(--primary);
+  & .ant-btn-default:hover {
+    background: var(--hover-color);
     color: var(--white);
   }
 }

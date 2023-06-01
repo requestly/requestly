@@ -1,14 +1,14 @@
-import { useRef } from "react";
-import { actions } from "store";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
 import { Popconfirm } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
-  trackPopoverForAuthShown,
-  trackPopoverForAuthContinued,
   trackPopoverForAuthCancelled,
+  trackPopoverForAuthContinued,
+  trackPopoverForAuthShown,
 } from "modules/analytics/events/common/auth/authPopover";
+import { useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
+import { getUserAuthDetails } from "store/selectors";
 
 import "./popover.scss";
 
@@ -52,6 +52,7 @@ export const AuthConfirmationPopover = ({
     <Popconfirm
       title={title}
       okText={okText}
+      okButtonProps={{ type: "primary" }}
       cancelText={cancelText}
       icon={null}
       disabled={user?.details?.isLoggedIn || disabled}
