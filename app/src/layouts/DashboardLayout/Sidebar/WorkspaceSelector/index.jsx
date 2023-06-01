@@ -17,7 +17,7 @@ import {
   showSwitchWorkspaceSuccessToast,
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
-import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Row, Spin, Tag, Tooltip } from "antd";
+import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackCreateNewWorkspaceClicked,
@@ -59,7 +59,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName[0].toUpperCase();
 };
 
-const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, menu }) => {
+const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -79,49 +79,36 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, men
   };
 
   return (
-    <Row align="middle" justify="center">
-      <Dropdown
-        overlay={menu}
-        trigger={["click"]}
-        className="workspace-dropdown"
-        onOpenChange={handleWorkspaceDropdownClick}
-      >
-        <div className="cursor-pointer items-center">
-          <Avatar
-            size={28}
-            shape="square"
-            icon={getWorkspaceIcon(activeWorkspaceName)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: user.loggedIn
-                ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                  ? "#1E69FF"
-                  : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
-                : "#ffffff4d",
-            }}
-          />
-          <Tooltip
-            overlayClassName="workspace-selector-tooltip"
-            style={{
-              top: "35px",
-            }}
-            title={prettifyWorkspaceName(activeWorkspaceName)}
-            placement={"bottomRight"}
-            showArrow={false}
-            mouseEnterDelay={1}
-          >
-            <span className={isCollapsed ? "hidden" : "items-center"}>
-              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-              <DownOutlined className="active-workspace-name-down-icon" />
-            </span>
-          </Tooltip>
-        </div>
-      </Dropdown>
-    </Row>
+    <Dropdown
+      overlay={menu}
+      trigger={["click"]}
+      className="workspace-selector-dropdown"
+      onOpenChange={handleWorkspaceDropdownClick}
+    >
+      <div className="cursor-pointer items-center">
+        <Tooltip
+          overlayClassName="workspace-selector-tooltip"
+          style={{ top: "35px" }}
+          title={prettifyWorkspaceName(activeWorkspaceName)}
+          placement={"bottomRight"}
+          showArrow={false}
+          mouseEnterDelay={1}
+        >
+          <span className={isCollapsed ? "hidden" : "items-center"}>
+            <span className="active-workspace-name">Workspace {prettifyWorkspaceName(activeWorkspaceName)}</span>
+            <DownOutlined className="active-workspace-name-down-icon" />
+          </span>
+        </Tooltip>
+      </div>
+    </Dropdown>
   );
 };
 
-const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSidebarClose }) => {
+const WorkspaceSelector = ({
+  isCollapsed = false,
+  handleSidebarCollapsed = () => {},
+  handleMobileSidebarClose = () => {},
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
