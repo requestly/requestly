@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
+import { Row, Col, Radio, Popover, Button, Popconfirm, Space } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
-import FileDialogButton from "components/mode-specific/desktop/misc/FileDialogButton";
+import {
+  displayFileSelector,
+  handleOpenLocalFileInBrowser,
+} from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
@@ -11,8 +14,10 @@ import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
-
-const { Text } = Typography;
+import { HiOutlineExternalLink } from "react-icons/hi";
+import { InfoTag } from "components/misc/InfoTag";
+import { RQButton } from "lib/design-system/components";
+import LINKS from "config/constants/sub/links";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
@@ -35,6 +40,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
       let value = "{}";
       if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
         value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
+      } else if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
+        value = "";
       } else {
         setIsCodeMinified(true);
         setEditorStaticValue(value);
@@ -53,7 +60,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
     modifyPairAtGivenPath(null, pairIndex, `response.type`, GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE, [
       {
         path: `response.value`,
-        value: selectedFile,
+        value: `file://${selectedFile}`,
       },
     ]);
   };
@@ -68,12 +75,45 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
   const renderFileSelector = () => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
       return (
-        <Row span={24} className="margin-top-one">
-          <Col span={24} align="right">
-            <Text keyboard style={{ paddingRight: 8 }}>
-              {pair.response.value || "No File Selected"}
-            </Text>
-            <FileDialogButton callback={handleFileSelectCallback} />
+        <Row span={24}>
+          <Col span={24} className="picker-container local-file-selector-row">
+            <Space>
+              <RQButton
+                // onPointerEnter={() => trackDesktopActionInterestCaptured("map_local")}
+                disabled={!isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) || isInputDisabled}
+                type="default"
+                onClick={() => {
+                  displayFileSelector(handleFileSelectCallback);
+                  // trackClickMapLocalFile();
+                }}
+              >
+                {pair.response.value ? "Change file" : " Select file"}
+              </RQButton>
+              <span className="file-path"> {pair.response.value ? pair.response.value : " No file chosen"}</span>{" "}
+            </Space>
+            {pair.response.value && isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) && (
+              <HiOutlineExternalLink
+                className="external-link-icon"
+                onClick={() => handleOpenLocalFileInBrowser(pair.response.value)}
+              />
+            )}
+            <span>
+              {!isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) && (
+                <InfoTag
+                  title="DESKTOP ONLY RULE"
+                  tooltipWidth="400px"
+                  description={
+                    <>
+                      This rule cannot be executed using Extension because the request accesses a local file that cannot
+                      be accessed by the browser.{" "}
+                      <a className="tooltip-link" href={LINKS.REQUESTLY_DOWNLOAD_PAGE} target="_blank" rel="noreferrer">
+                        Use this on Desktop App!
+                      </a>
+                    </>
+                  }
+                />
+              )}
+            </span>
           </Col>
         </Row>
       );
