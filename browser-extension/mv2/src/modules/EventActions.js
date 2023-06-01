@@ -32,15 +32,19 @@ EventActions.deleteBatches = async (batchIds) => {
 
   if (batches) {
     batchIds.forEach((id) => {
-      EventActions.eventsCount -= batches[id].events.length;
-      delete batches[id];
+      if (batches[id]) {
+        EventActions.eventsCount -= batches[id].events.length;
+        delete batches[id];
+      }
     });
   }
 
   if (executionBatches) {
     batchIds.forEach((id) => {
-      EventActions.eventsCount -= batches[id].events.length;
-      delete executionBatches[id];
+      if (executionBatches[id]) {
+        EventActions.eventsCount -= executionBatches[id].events.length;
+        delete executionBatches[id];
+      }
     });
   }
 
