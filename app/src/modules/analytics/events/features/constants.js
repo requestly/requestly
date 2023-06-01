@@ -181,6 +181,12 @@ export const RULE_SIMULATOR = {
   SIMULATED: "rule_simulated",
 };
 
+export const RULE_EDITOR = {
+  MODIFY_API_RESPONSE: {
+    SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
+  },
+};
+
 export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",

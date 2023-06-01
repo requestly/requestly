@@ -34,3 +34,7 @@
   cursor: pointer;
   color: var(--text-gray);
 }
+
+.serve-without-request-setting {
+  margin-top: 10px;
+}
