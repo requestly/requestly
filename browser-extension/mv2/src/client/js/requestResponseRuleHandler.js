@@ -588,9 +588,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       request = new Request(resource.toString(), initOptions);
     }
 
-    let fetchedResponse;
-    let exceptionCaught;
-
     const method = request.method;
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
@@ -630,32 +627,62 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       });
     }
 
-    try {
-      if (requestRule) {
-        // request has already been read while processing requestRule, so needs to be cloned
-        fetchedResponse = await _fetch(request.clone());
-      } else {
-        fetchedResponse = await getOriginalResponse();
-      }
-    } catch (error) {
-      exceptionCaught = error;
-    }
-
-    let url;
-
-    if (fetchedResponse && isResponseRuleApplicableOnUrl(fetchedResponse.url)) {
-      url = fetchedResponse.url; // final URL obtained after any redirects
-    } else if (isResponseRuleApplicableOnUrl(request.url)) {
-      url = request.url;
+    let requestData;
+    if (canRequestBodyBeSent) {
+      requestData = jsonifyValidJSONString(await request.text());
     } else {
-      if (exceptionCaught) {
-        return Promise.reject(exceptionCaught);
-      }
-      return fetchedResponse;
+      requestData = convertSearchParamsToJSON(request.url);
     }
 
-    const responseRule = getResponseRule(url);
-    const { response: responseModification, source } = responseRule.pairs[0];
+    let fetchedResponse;
+    let url;
+    let responseRule;
+    let serveOriginalResponse = false;
+
+    const staticResponseRule = getStaticResponseRule(request.url);
+    if (staticResponseRule) {
+      if (!isRequestPayloadFilterApplicable({ requestData, method }, staticResponseRule.pairs[0].source?.filters)) {
+        serveOriginalResponse = true;
+      } else {
+        responseRule = staticResponseRule;
+        url = getAbsoluteUrl(request.url);
+      }
+    }
+
+    if (!staticResponseRule || serveOriginalResponse) {
+      let exceptionCaught;
+      try {
+        if (requestRule) {
+          // request has already been read while processing requestRule, so needs to be cloned
+          fetchedResponse = await _fetch(request.clone());
+        } else {
+          fetchedResponse = await getOriginalResponse();
+        }
+
+        if (serveOriginalResponse) {
+          return fetchedResponse;
+        }
+      } catch (error) {
+        // don't throw error immediately as there can be a matching rule
+        exceptionCaught = error;
+      }
+
+      if (fetchedResponse && isResponseRuleApplicableOnUrl(fetchedResponse.url)) {
+        url = fetchedResponse.url; // final URL obtained after any redirects
+      } else if (isResponseRuleApplicableOnUrl(request.url)) {
+        url = request.url;
+      } else {
+        if (exceptionCaught) {
+          return Promise.reject(exceptionCaught);
+        }
+        return fetchedResponse;
+      }
+
+      responseRule = getResponseRule(url);
+      if (!isRequestPayloadFilterApplicable({ requestData, method }, responseRule.pairs[0].source?.filters)) {
+        return fetchedResponse;
+      }
+    }
 
     isDebugMode &&
       console.log("RQ", "Inside the fetch block for url", {
@@ -665,19 +692,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         fetchedResponse,
       });
 
-    let requestData;
-
-    if (canRequestBodyBeSent) {
-      requestData = jsonifyValidJSONString(await request.text());
-    } else {
-      requestData = convertSearchParamsToJSON(url);
-    }
-
-    if (!isRequestPayloadFilterApplicable({ requestData, method }, source?.filters)) {
-      return fetchedResponse;
-    }
-
     let customResponse;
+    const responseModification = responseRule.pairs[0].response;
 
     if (responseModification.type === "code") {
       const requestHeaders =
