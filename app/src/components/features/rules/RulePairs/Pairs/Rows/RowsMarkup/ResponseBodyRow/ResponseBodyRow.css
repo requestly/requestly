@@ -17,3 +17,7 @@
 .response-body-type-radio-group.ant-radio-group .ant-radio-wrapper .ant-radio {
   padding-right: 4px;
 }
+
+.serve-without-request-setting {
+  margin-top: 10px;
+}

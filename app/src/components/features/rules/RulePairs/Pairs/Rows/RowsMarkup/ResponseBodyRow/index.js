@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Row, Col, Radio, Typography, Popover, Button, Popconfirm } from "antd";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Row, Col, Radio, Typography, Popover, Button, Popconfirm, Checkbox } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
@@ -11,12 +11,18 @@ import { getAppDetails } from "utils/AppUtils";
 import "./ResponseBodyRow.css";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
+import InfoIcon from "components/misc/InfoIcon";
+import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
 
 const { Text } = Typography;
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
   const { MODE } = getModeData(window.location);
+  const isServeWithoutRequestSupported = useMemo(
+    () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
+    []
+  );
 
   const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(false);
   const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
@@ -44,6 +50,10 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
         {
           path: `response.value`,
           value: value,
+        },
+        {
+          path: `response.serveWithoutRequest`,
+          value: undefined,
         },
       ]);
     }
@@ -117,6 +127,18 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
       setIsCodeFormatted(false);
       codeFormattedFlag.current = false;
     }, 2000);
+  };
+
+  const handleServeWithoutRequestFlagChange = (evt) => {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      const flag = evt.target.checked;
+
+      if (flag) {
+        trackServeResponseWithoutRequestEnabled();
+      }
+
+      modifyPairAtGivenPath(evt, pairIndex, "response.serveWithoutRequest", flag);
+    }
   };
 
   const getEditorDefaultValue = useCallback(() => {
@@ -229,6 +251,19 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
               </span>
             </Col>
           </Row>
+          {isServeWithoutRequestSupported && pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
+            <Row className="serve-without-request-setting">
+              <Col xl="12" span={24}>
+                <Checkbox onChange={handleServeWithoutRequestFlagChange} checked={pair.response.serveWithoutRequest}>
+                  Serve this response body without making a call to the server.
+                </Checkbox>
+                <InfoIcon
+                  tooltipPlacement="right"
+                  text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
+                />
+              </Col>
+            </Row>
+          ) : null}
         </>
       ) : null}
     </React.Fragment>
