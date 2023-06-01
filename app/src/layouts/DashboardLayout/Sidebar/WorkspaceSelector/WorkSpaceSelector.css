@@ -3,8 +3,6 @@
 }
 
 .active-workspace-name {
-  margin-left: 8px;
-  margin-right: 5px;
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
@@ -13,6 +11,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.active-workspace-name:hover,
+.active-workspace-name:focus {
+  opacity: 0.7;
 }
 
 .active-workspace-name-down-icon {

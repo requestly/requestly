@@ -69,7 +69,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               )}
             </Col>
             {!isPricingOrGoodbyePage ? (
-              <Col>
+              <Col span={8}>
                 <div className="header-left-section hidden-on-small-screen">
                   <div className="header-left-section">
                     <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
@@ -93,7 +93,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
               </Col>
             ) : null}
 
-            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 8) : 8}>
+            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 9) : 9}>
               <div className="header-middle-section hidden-on-small-screen">
                 <HeaderText />
               </div>

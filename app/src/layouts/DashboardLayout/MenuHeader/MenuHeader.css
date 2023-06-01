@@ -43,11 +43,12 @@
 }
 
 .header-middle-section {
+  margin: 8px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 8px;
-  font-size: 13px;
+  height: 3rem;
 }
 
 .header-middle-section > div {
@@ -165,8 +166,12 @@
   margin-top: -2px;
 }
 
-@media screen and (max-width: 1150px) {
-  .header-left-section a {
+@media screen and (max-width: 1280px) {
+  .header-left-section > a {
+    display: none;
+  }
+
+  .header-middle-section {
     display: none;
   }
 }
