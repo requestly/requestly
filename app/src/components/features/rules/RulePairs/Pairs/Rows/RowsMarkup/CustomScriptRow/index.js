@@ -296,7 +296,7 @@ const CustomScriptRow = ({
 
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
-      <Row span={24} align="middle" className="code-editor-header-row">
+      <Row span={24} align="middle" className="code-editor-header-row mt-20">
         <Col span={5} align="left">
           <Text className="text-gray">Language: </Text>
           <CodeTypeOptions />

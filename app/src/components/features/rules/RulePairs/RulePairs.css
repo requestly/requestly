@@ -1,5 +1,6 @@
 .delete-pair-icon {
   font-size: 1rem;
+  margin-top: 6px;
 }
 
 .panel-header {
@@ -28,9 +29,11 @@
   border-top-right-radius: var(--border-radius-md);
 }
 
-.rule-pairs-collapse.ant-collapse
-  > .ant-collapse-item:not(.ant-collapse-item-active)
-  .ant-collapse-header {
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-expand-icon .anticon {
+  margin-right: 32px;
+}
+
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item:not(.ant-collapse-item-active) .ant-collapse-header {
   border-radius: var(--border-radius-md);
 }
 
@@ -41,16 +44,11 @@
   border-bottom-right-radius: var(--border-radius-md);
 }
 
-.rule-pairs-collapse.ant-collapse
-  > .ant-collapse-item
-  > .ant-collapse-content
-  .ant-collapse-content-box {
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-content .ant-collapse-content-box {
   padding: 1rem 1.25rem;
 }
 
-.rule-pairs-collapse.ant-collapse
-  > .ant-collapse-item:last-child
-  > .ant-collapse-header {
+.rule-pairs-collapse.ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
   border-top-left-radius: var(--border-radius-md);
   border-top-right-radius: var(--border-radius-md);
 }

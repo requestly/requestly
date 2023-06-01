@@ -10,7 +10,10 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import {
+  displayFileSelector,
+  handleOpenLocalFileInBrowser,
+} from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import {
@@ -22,6 +25,7 @@ import {
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./index.css";
+import LINKS from "config/constants/sub/links";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
@@ -85,12 +89,6 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
       return true;
     }
     return false;
-  };
-
-  const handleOpenLocalFileInBrowser = () => {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-      link: pair.destination,
-    });
   };
 
   const getDestinationTypeForExistingRule = (destination) => {
@@ -188,7 +186,10 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
           {pair.destination.length ? pair.destination : " No file chosen"}
         </span>{" "}
         {pair.destination && isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
-          <HiOutlineExternalLink className="external-link-icon" onClick={handleOpenLocalFileInBrowser} />
+          <HiOutlineExternalLink
+            className="external-link-icon"
+            onClick={() => handleOpenLocalFileInBrowser(pair.destination)}
+          />
         )}
         <span>
           {!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
@@ -199,7 +200,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                 <>
                   This rule cannot be executed using Extension because the request redirects to a local file that cannot
                   be accessed by the browser.{" "}
-                  <a className="tooltip-link" href="https://requestly.io/downloads" target="_blank" rel="noreferrer">
+                  <a className="tooltip-link" href={LINKS.REQUESTLY_DOWNLOAD_PAGE} target="_blank" rel="noreferrer">
                     Use this on Desktop App!
                   </a>
                 </>
@@ -283,7 +284,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
                       <>
                         Map Local file option is available only in desktop app.{" "}
                         <a
-                          href="https://requestly.io/downloads"
+                          href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
                           target="_blank"
                           rel="noreferrer"
                           className="tooltip-link"
