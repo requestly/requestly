@@ -35,7 +35,7 @@ export const syncUserPersona = async (uid: string, dispatch: any, userPersona: U
     const { isSurveyCompleted, ...surveyData } = userPersona;
     setValue(["users", uid, "persona"], { ...surveyData });
   } else {
-    delete persona.isSurveyCompleted;
+    delete persona.isSurveyCompleted; // disable syncing this for existing users
     dispatch(actions.setUserPersonaData({ ...persona }));
   }
 };

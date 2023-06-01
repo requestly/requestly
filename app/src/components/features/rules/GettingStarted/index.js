@@ -137,7 +137,7 @@ const GettingStarted = () => {
                   </Button>
                   <AuthConfirmationPopover
                     title="You need to sign up to upload rules"
-                    callback={() => handleUploadRulesClick()}
+                    callback={handleUploadRulesClick}
                     source={AUTH.SOURCE.UPLOAD_RULES}
                   >
                     <RQButton
