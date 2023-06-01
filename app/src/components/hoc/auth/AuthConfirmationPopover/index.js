@@ -52,10 +52,12 @@ export const AuthConfirmationPopover = ({
     <Popconfirm
       title={title}
       okText={okText}
-      cancelText={cancelText}
+      cancelButtonProps={{ style: { display: "none" } }}
+      okButtonProps={{ style: { margin: 0 } }}
+      cancelText={""}
       icon={null}
       disabled={user?.details?.isLoggedIn || disabled}
-      overlayClassName="confirmation-popover"
+      overlayClassName="auth-confirmation-popover"
       onConfirm={() => {
         flag.current = true;
         openAuthModal();

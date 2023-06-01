@@ -1,3 +1,4 @@
+import { getRequestApp, getRequestDomain } from ".";
 import { convertHarJsonToRQLogs } from "../../TrafficExporter/harLogs/converter";
 
 export const convertProxyLogToUILog = (log) => {
@@ -10,8 +11,9 @@ export const convertProxyLogToUILog = (log) => {
   finalLog.requestShellCurl = log.requestShellCurl || "";
   finalLog.requestState = log.requestState || "";
   finalLog.consoleLogs = log.consoleLogs || [];
+
+  // TODO: This should be moved to background process
+  finalLog.app = getRequestApp(finalLog);
+  finalLog.domain = getRequestDomain(finalLog);
   return finalLog;
-};
-export const getSortedMenuItems = (items, key) => {
-  return [...(items ?? [])].sort((a, b) => (a[key].trim() < b[key].trim() ? -1 : 1));
 };

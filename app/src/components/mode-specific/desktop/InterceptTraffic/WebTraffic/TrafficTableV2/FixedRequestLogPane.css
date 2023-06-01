@@ -85,28 +85,56 @@
 .action-header-input .ant-input-group-addon .ant-btn .anticon {
   margin: 11px 0;
 }
+
 .action-header-input .traffic-table-regex-btn-inactive {
   background: transparent;
 }
+
 .action-header-input .traffic-table-regex-btn:hover,
 .action-header-input .traffic-table-regex-btn-active,
 .traffic-table-filter-btn-active.ant-btn {
   background: var(--border-dark);
   color: var(--white);
 }
+
+.ant-btn span.traffic-table-filter-btn-content {
+  display: inline-flex;
+  align-items: center;
+}
+
+.traffic-table-applied-filter-count.ant-badge {
+  margin-left: 6px;
+}
+
+.traffic-table-applied-filter-count .ant-badge-count {
+  border-radius: 3px;
+}
+
+.traffic-table-applied-filter-count .ant-scroll-number-only {
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .traffic-table-filters-container {
-  margin-top: 1rem;
   display: flex;
+  flex-direction: column;
   gap: 10px;
+  margin-top: 1.25rem;
   padding: 0 25px;
 }
+
 .traffic-table-filters-container section {
   display: flex;
-  gap: 20px;
+  gap: 12px;
 }
-.clear-logs-filter-btn {
-  align-self: flex-end;
+
+.clear-logs-filter-btn.ant-btn {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 1.6rem;
+  color: var(--primary);
 }
+
 .traffic-table-filter-label {
   color: var(--white);
   font-weight: 500;
@@ -115,4 +143,14 @@
 .traffic-table-filter-select .ant-select-selector {
   width: 220px;
   margin-top: -10px;
+}
+
+[data-reach-tab-panels] > div {
+  min-height: 180px;
+}
+
+.navigation-panel-wrapper {
+  overflow-y: auto;
+  height: 100%;
+  padding: 12px;
 }

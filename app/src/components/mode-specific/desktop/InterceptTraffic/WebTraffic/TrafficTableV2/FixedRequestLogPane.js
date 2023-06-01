@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Badge, Space, Divider, Typography, Row, Col } from "antd";
 import { Navigation } from "@devtools-ds/navigation";
 import { Table } from "@devtools-ds/table";
 import { CloseOutlined } from "@ant-design/icons";
-import RequestBodyPreview from "./Preview/RequestBodyPreview";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import CopyButton from "components/misc/CopyButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./FixedRequestLogPane.css";
+import JSONPreview from "./Preview/JsonPreviewV2";
 
 const { Text } = Typography;
 
@@ -27,18 +27,16 @@ const Header = (props) => {
   return (
     <Row className="request-log-pane-header" align="middle" wrap={false}>
       <Space>
-        <div style={{ display: "flex", marginLeft: "4px", cursor: "pointer" }}>
-          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
-        </div>
         <Badge count={props.method} style={{ backgroundColor: "grey" }} />
         <Badge overflowCount={699} count={props.statusCode} style={{ backgroundColor: "#87d068" }} />
         <Text ellipsis={{ tooltip: props.url }} className="request-log-pane-url">
           {props.url}
         </Text>
       </Space>
-
       <Col className="ml-auto">
-        <CopyCurlButton requestShellCurl={props.requestShellCurl} />
+        <div style={{ display: "flex", marginLeft: "15px", cursor: "pointer" }}>
+          <CloseOutlined onClick={props.handleClosePane} style={{ alignSelf: "center", margin: "0" }} />
+        </div>
       </Col>
     </Row>
   );
@@ -47,100 +45,116 @@ const Header = (props) => {
 const LogPane = (props) => {
   const log_id = props.log_id;
   const query_params = props.data.query_params;
-  const upsertRequestAction = props.upsertRequestAction;
   const request_data = props.data;
   const headers = props.data.headers;
   const body = props.data && props.data.body;
-  const url = props.url;
-  const actions = props.actions;
   const title = props.title;
   const requestState = props.requestState;
   const timestamp = props.timestamp;
 
   const timePassedInSeconds = (new Date() - new Date(timestamp * 1000)) / 1000;
 
+  const [currentTabIndex, setCurrentTabIndex] = useState(0);
+  const tabs = [
+    {
+      header: (
+        <Navigation.Tab id={title}>
+          <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
+        </Navigation.Tab>
+      ),
+      body: (
+        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <RequestSummary data={request_data} />
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Headers">Headers</Navigation.Tab>,
+      body: (
+        <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
+          <Table className="log-table">
+            <Table.Head>
+              <Table.Row>
+                <Table.HeadCell>Key</Table.HeadCell>
+                <Table.HeadCell>Value</Table.HeadCell>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {Object.entries(headers).map(([key, value], i) => {
+                return (
+                  <Table.Row key={i} id={i}>
+                    <Table.Cell>
+                      <Text ellipsis={{ tooltip: true }}>{key}</Text>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Text ellipsis={{ tooltip: true }}>{value}</Text>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </div>
+      ),
+    },
+    {
+      header: (
+        <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
+          Payload
+        </Navigation.Tab>
+      ),
+      body: (
+        <div className="navigation-panel-wrapper">
+          <RequestPayloadPreview query_params={query_params} body={body} />
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Body">Body</Navigation.Tab>,
+      body: (
+        <div
+          style={{
+            overflowY: "auto",
+            height: "100%",
+            color: "#ffffffd9",
+            padding: "0.8rem",
+          }}
+        >
+          {body ? (
+            body
+          ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
+            <h3>Loading Body...</h3>
+          ) : (
+            <h3>The request has no body available</h3>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: <Navigation.Tab id="Preview">Preview</Navigation.Tab>,
+      body: (
+        <div className="navigation-panel-wrapper">
+          <JSONPreview logId={log_id} payload={body} />
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <Navigation className="navigation request-log-pane">
+    <Navigation
+      className="navigation request-log-pane"
+      index={currentTabIndex}
+      onChange={(index) => {
+        setCurrentTabIndex(index);
+      }}
+    >
       <Navigation.Controls>
-        <Navigation.TabList>
-          <Navigation.Tab id={title}>
-            <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
-          </Navigation.Tab>
-          <Navigation.Tab id="Headers">Headers</Navigation.Tab>
-          <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
-            Payload
-          </Navigation.Tab>
-          <Navigation.Tab id="Body">Body</Navigation.Tab>
-          <Navigation.Tab id="Preview">Preview</Navigation.Tab>
-        </Navigation.TabList>
+        <Navigation.TabList>{tabs.map((tab, idx) => tab?.header)}</Navigation.TabList>
       </Navigation.Controls>
       <Navigation.Panels>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <RequestSummary data={request_data} />
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <Table className="log-table">
-              <Table.Head>
-                <Table.Row>
-                  <Table.HeadCell>Key</Table.HeadCell>
-                  <Table.HeadCell>Value</Table.HeadCell>
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
-                {Object.entries(headers).map(([key, value], i) => {
-                  return (
-                    <Table.Row key={i} id={i}>
-                      <Table.Cell>
-                        <Text ellipsis={{ tooltip: true }}>{key}</Text>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Text ellipsis={{ tooltip: true }}>{value}</Text>
-                      </Table.Cell>
-                    </Table.Row>
-                  );
-                })}
-              </Table.Body>
-            </Table>
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <RequestPayloadPreview query_params={query_params} body={body} />
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div
-            style={{
-              overflowY: "auto",
-              height: "100%",
-              color: "#ffffffd9",
-              padding: "0.8rem",
-            }}
-          >
-            {body ? (
-              body
-            ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
-              <h3>Loading Body...</h3>
-            ) : (
-              <h3>The request has no body available</h3>
-            )}
-          </div>
-        </Navigation.Panel>
-        <Navigation.Panel>
-          <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
-            <RequestBodyPreview
-              data={body}
-              type={request_data.contentType}
-              url={url}
-              actions={actions}
-              log_id={log_id}
-              upsertRequestAction={upsertRequestAction}
-            />
-          </div>
-        </Navigation.Panel>
+        {tabs.map((tab, idx) => {
+          return <Navigation.Panel id={idx}>{currentTabIndex === idx ? tab?.body : null}</Navigation.Panel>;
+        })}
       </Navigation.Panels>
     </Navigation>
   );
