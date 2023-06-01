@@ -92,7 +92,7 @@ RQ.RequestResponseRuleHandler.cacheRequestRules = async () => {
 RQ.RequestResponseRuleHandler.cacheStaticResponseRules = async () => {
   const allResponseRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE);
   const staticResponseRules = allResponseRules.filter((rule) => {
-    return rule.pairs[0].response.type === "static"; // TODO: also check UI setting if user wants to skip original request
+    return rule.pairs[0].response.type === "static" && rule.pairs[0].response.serveWithoutRequest;
   });
 
   RQ.ClientUtils.executeJS(
@@ -536,21 +536,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
-    // this.requestData = data;
-
-    const staticResponseRule = getStaticResponseRule(this.requestURL);
-    if (staticResponseRule) {
-      window[namespace].responseRulesByUrl[getAbsoluteUrl(this.requestURL)] = staticResponseRule;
-      this.requestData = data;
-      resolveXHR(this, staticResponseRule.pairs[0].response.value);
-      return;
-    }
+    this.requestData = data;
 
     const requestRule = getRequestRule(this.requestURL);
-    let requestBody;
-
     if (requestRule) {
-      requestBody = getCustomRequestBody(requestRule, {
+      this.requestData = getCustomRequestBody(requestRule, {
         method: this.method,
         url: this.requestURL,
         body: data,
@@ -566,12 +556,15 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
           timeStamp: Date.now(),
         },
       });
-    } else {
-      requestBody = data;
     }
 
-    this.requestData = requestBody;
-    send.call(this, requestBody);
+    const staticResponseRule = getStaticResponseRule(this.requestURL);
+    if (staticResponseRule) {
+      window[namespace].responseRulesByUrl[getAbsoluteUrl(this.requestURL)] = staticResponseRule;
+      resolveXHR(this, staticResponseRule.pairs[0].response.value);
+    } else {
+      send.call(this, this.requestData);
+    }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
