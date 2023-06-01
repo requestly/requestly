@@ -32,8 +32,10 @@ export const shuffleOptions = (options: Option[]) => {
 export const syncUserPersona = async (uid: string, dispatch: any, userPersona: UserPersona) => {
   const persona: any = await getValueAsPromise(["users", uid, "persona"]);
   if (!persona) {
-    setValue(["users", uid, "persona"], { ...userPersona });
+    const { isSurveyCompleted, ...surveyData } = userPersona;
+    setValue(["users", uid, "persona"], { ...surveyData });
   } else {
+    delete persona.isSurveyCompleted;
     dispatch(actions.setUserPersonaData({ ...persona }));
   }
 };

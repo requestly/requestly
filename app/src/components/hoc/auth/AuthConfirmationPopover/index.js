@@ -17,7 +17,7 @@ export const AuthConfirmationPopover = ({
   okText = "Continue",
   cancelText = "Cancel",
   disabled = false,
-  callback = null,
+  callback = () => {},
   source,
   children,
 }) => {
