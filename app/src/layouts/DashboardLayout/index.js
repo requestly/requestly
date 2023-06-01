@@ -5,12 +5,12 @@ import { Col, Layout, Row } from "antd";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import Footer from "../../components/sections/Footer/index";
+import MenuFooter from "../../components/sections/Footer/index";
 import PATHS from "config/constants/sub/paths";
 import DashboardContent from "./DashboardContent";
 import Sidebar from "./Sidebar";
 import MenuHeader from "./MenuHeader";
-import { Content } from "antd/lib/layout/layout";
+import { Content, Footer } from "antd/lib/layout/layout";
 import "./dashboardLayout.scss";
 
 const DashboardLayout = () => {
@@ -31,7 +31,9 @@ const DashboardLayout = () => {
       ) ||
       pathname.includes(PATHS.PRICING.ABSOLUTE) ||
       pathname.includes(PATHS.HOME.ABSOLUTE) ? (
-      <Footer />
+      <Footer>
+        <MenuFooter />
+      </Footer>
     ) : null;
   };
 
@@ -44,12 +46,12 @@ const DashboardLayout = () => {
   return (
     <>
       <Layout className="hp-app-layout">
-        {isSidebarVisible && (
-          <Sidebar visible={visible} setVisible={setVisible} collapsed={collapsed} setCollapsed={setCollapsed} />
-        )}
+        {!isPersonaRecommendationScreen && <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />}
 
-        <Layout className="hp-bg-color-dark-90">
-          {!isPersonaRecommendationScreen && <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />}
+        <Layout>
+          {isSidebarVisible && (
+            <Sidebar visible={visible} setVisible={setVisible} collapsed={collapsed} setCollapsed={setCollapsed} />
+          )}
 
           <Content className="hp-content-main">
             <Row justify="center" style={{ height: "100%" }}>
@@ -62,9 +64,8 @@ const DashboardLayout = () => {
               </Col>
             </Row>
           </Content>
-
-          <AppFooter />
         </Layout>
+        <AppFooter />
       </Layout>
     </>
   );
