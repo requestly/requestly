@@ -14,11 +14,10 @@
 .getting-started-video-container {
   padding: 56.25% 0 0 0;
   position: relative;
-  border: 1px solid var(--border-dark);
-  border-radius: var(--border-radius-md);
   -webkit-box-shadow: 0px 7px 16px 1px rgba(15, 15, 15, 1);
   -moz-box-shadow: 0px 7px 16px 1px rgba(15, 15, 15, 1);
   box-shadow: 0px 7px 16px 1px rgba(15, 15, 15, 1);
+  border-radius: 20px;
 }
 
 .getting-started-video-container video {
@@ -27,6 +26,8 @@
   left: 0;
   height: 100%;
   width: 100%;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
 }
 .getting-started-video-container iframe {
   border-radius: inherit;
