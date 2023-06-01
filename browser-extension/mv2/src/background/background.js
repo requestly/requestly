@@ -877,7 +877,7 @@ BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
         return { wasMessageSent: false };
       });
 
-    if (response.wasMessageSent) {
+    if (response?.wasMessageSent) {
       return response;
     }
   }
@@ -1409,6 +1409,7 @@ BG.Methods.init = function () {
 
     // Fetch records
     RQ.StorageService.fetchRecords().then(BG.Methods.readExtensionStatus);
+    EventActions.setEventsCount();
   });
 
   // Add Listener to reply to requests from extension content scripts or popup

@@ -5,6 +5,8 @@ EventActions.eventsToWrite = [];
 EventActions.executionEventsToWrite = [];
 EventActions.eventWriterInterval = null;
 EventActions.batchesWaitingForAck = [];
+EventActions.eventsCount = 0;
+EventActions.EVENTS_LIMIT = 50000;
 EventActions.STORE_EVENTS_KEY = "eventBatches";
 EventActions.STORE_EXECUTION_EVENTS_KEY = "executionEventBatches";
 
@@ -30,12 +32,14 @@ EventActions.deleteBatches = async (batchIds) => {
 
   if (batches) {
     batchIds.forEach((id) => {
+      EventActions.eventsCount -= batches[id].events.length;
       delete batches[id];
     });
   }
 
   if (executionBatches) {
     batchIds.forEach((id) => {
+      EventActions.eventsCount -= batches[id].events.length;
       delete executionBatches[id];
     });
   }
@@ -122,7 +126,7 @@ EventActions.sendExtensionEvents = async () => {
 
     const response = await BG.Methods.sendMessageToApp(extensionEventsMessage);
 
-    if (response.wasMessageSent) {
+    if (response?.wasMessageSent) {
       await EventActions.handleAcknowledgements(response.payload.ackIds);
     } else {
       eventBatchesPayload.forEach((batch) => {
@@ -133,6 +137,12 @@ EventActions.sendExtensionEvents = async () => {
 };
 
 EventActions.writeEventsToLocalStorage = async () => {
+  if (EventActions.eventsCount > EventActions.EVENTS_LIMIT) {
+    EventActions.clearAllEventBatches();
+    EventActions.eventsCount = 0;
+    return;
+  }
+
   const createBatch = (eventsArray, isExecutionEventBatch = false) => {
     let batchId = RQ.commonUtils.generateUUID();
 
@@ -153,10 +163,12 @@ EventActions.writeEventsToLocalStorage = async () => {
     newExecutionEventsBatch = null;
 
   if (_eventsToWrite.length) {
+    EventActions.eventsCount += _eventsToWrite.length;
     newEventsBatch = createBatch(_eventsToWrite);
   }
 
   if (_executionEventsToWrite.length) {
+    EventActions.eventsCount += _executionEventsToWrite.length;
     newExecutionEventsBatch = createBatch(_executionEventsToWrite, true);
   }
 
@@ -179,6 +191,15 @@ EventActions.writeEventsToLocalStorage = async () => {
   });
 };
 
+EventActions.setEventsCount = async () => {
+  const [batchesInStorage, executionBatchesInStorage] = await EventActions.getEventBatches();
+
+  EventActions.eventsCount = Object.values({ ...batchesInStorage, ...executionBatchesInStorage })?.reduce(
+    (total, { events }) => total + events.length,
+    0
+  );
+};
+
 EventActions.startPeriodicEventWriter = async (intervalTime = 10000) => {
   if (!EventActions.eventWriterInterval) {
     EventActions.eventWriterInterval = setInterval(async () => {
@@ -198,4 +219,9 @@ EventActions.stopPeriodicEventWriter = () => {
 
 EventActions.clearExecutionEvents = async () => {
   await RQ.StorageService.removeRecord(EventActions.STORE_EXECUTION_EVENTS_KEY);
+};
+
+EventActions.clearAllEventBatches = async () => {
+  await RQ.StorageService.removeRecord(EventActions.STORE_EVENTS_KEY);
+  EventActions.clearExecutionEvents();
 };
