@@ -10,8 +10,8 @@ import PATHS from "config/constants/sub/paths";
 import DashboardContent from "./DashboardContent";
 import Sidebar from "./Sidebar";
 import MenuHeader from "./MenuHeader";
-import { Content, Footer } from "antd/lib/layout/layout";
-import "./dashboardLayout.scss";
+import { Content } from "antd/lib/layout/layout";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -31,9 +31,7 @@ const DashboardLayout = () => {
       ) ||
       pathname.includes(PATHS.PRICING.ABSOLUTE) ||
       pathname.includes(PATHS.HOME.ABSOLUTE) ? (
-      <Footer>
-        <MenuFooter />
-      </Footer>
+      <MenuFooter />
     ) : null;
   };
 
@@ -53,19 +51,22 @@ const DashboardLayout = () => {
             <Sidebar visible={visible} setVisible={setVisible} collapsed={collapsed} setCollapsed={setCollapsed} />
           )}
 
-          <Content className="hp-content-main">
-            <Row justify="center" style={{ height: "100%" }}>
-              <Col span={24} style={{ height: "100%" }}>
-                <React.Fragment>
-                  <Routes>
-                    <Route path={PATHS.DASHBOARD + PATHS.ANY} element={<DashboardContent />} />
-                  </Routes>
-                </React.Fragment>
-              </Col>
-            </Row>
-          </Content>
+          <Layout>
+            <Content className="hp-content-main" style={{ height: "calc(100vh - 3rem)" }}>
+              <Row justify="center" style={{ height: "100%" }}>
+                <Col span={24} style={{ height: "100%" }}>
+                  <React.Fragment>
+                    <Routes>
+                      <Route path={PATHS.DASHBOARD + PATHS.ANY} element={<DashboardContent />} />
+                    </Routes>
+                  </React.Fragment>
+                </Col>
+              </Row>
+            </Content>
+
+            <AppFooter />
+          </Layout>
         </Layout>
-        <AppFooter />
       </Layout>
     </>
   );

@@ -1,0 +1,28 @@
+#dashboardMainContent {
+  height: 100%;
+}
+
+#requestly-dashboard-layout > .ant-layout {
+  height: 100%;
+}
+
+#requestly-dashboard-layout .hp-content-main {
+  overflow: auto;
+}
+
+.app-layout-footer.ant-layout-footer {
+  font-size: 12px;
+  padding: 0.5rem 1.4rem;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+}
+
+@media screen and (max-width: 768px) {
+  #requestly-dashboard-layout .hp-app-layout {
+    height: 100%;
+  }
+
+  #requestly-dashboard-layout .hidden-on-small-screen {
+    display: none;
+  }
+}
