@@ -636,6 +636,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
     let fetchedResponse;
     let url;
+    let responseHeaders;
     let responseRule;
     let serveOriginalResponse = false;
 
@@ -646,6 +647,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       } else {
         responseRule = staticResponseRule;
         url = getAbsoluteUrl(request.url);
+
+        const contentType = isJSON(staticResponseRule.pairs[0].response.value) ? "application/json" : "text/plain";
+        responseHeaders = new Headers({ "content-type": contentType });
       }
     }
 
@@ -678,6 +682,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         return fetchedResponse;
       }
 
+      responseHeaders = fetchedResponse?.headers;
       responseRule = getResponseRule(url);
       if (!isRequestPayloadFilterApplicable({ requestData, method }, responseRule.pairs[0].source?.filters)) {
         return fetchedResponse;
@@ -757,7 +762,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
       status: finalStatusCode,
       statusText: responseModification.statusText || fetchedResponse?.statusText,
-      headers: fetchedResponse?.headers,
+      headers: responseHeaders,
     });
   };
 };
