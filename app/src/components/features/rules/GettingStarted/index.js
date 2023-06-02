@@ -39,7 +39,7 @@ const GettingStarted = () => {
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal" && !userPersona.isSurveyCompleted;
+  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal" && !userPersona?.isSurveyCompleted;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
