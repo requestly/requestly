@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
-import { Input, Row, Tooltip } from "antd";
+import { Input, Row, Col, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
@@ -111,7 +111,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   return isRequestPayloadFilterCompatible ? (
-    <>
+    <Col span={24} data-tour-id="rule-editor-response-graphql-payload">
       <label className="subtitle graphql-operation-label">
         GraphQL Operation (Request Payload Filter)
         <Tooltip
@@ -148,7 +148,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           onChange={handleRequestPayloadValueChange}
         />
       </Row>
-    </>
+    </Col>
   ) : null;
 };
 

@@ -1,16 +1,10 @@
-import React from "react";
-import { RQButton } from "lib/design-system/components";
-import { TooltipRenderProps } from "react-joyride";
+import React, { useEffect, useRef } from "react";
+import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import { CustomSteps } from "../tours";
+import { CustomTooltipProps } from "../types";
 //@ts-ignore
 import TooltipPointer from "../../../../assets/icons/tooltip-pointer.svg";
 import "./index.css";
-
-interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {
-  step: CustomSteps;
-  context: any;
-}
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   index,
@@ -22,10 +16,18 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   tooltipProps,
   context,
 }) => {
+  const nextButtonRef = useRef(null);
+  useEffect(() => {
+    if (step.autoMoveToNext && !step.disableNext?.(context)) {
+      nextButtonRef.current?.click();
+    }
+  }, [context, step]);
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
       <img
-        className={`tour-tooltip-pointer tour-tooltip-pointer-${step.pointerPlacement}`}
+        className={`tour-tooltip-pointer tour-tooltip-pointer-${
+          step.pointerPlacement.includes("bottom") ? "bottom" : "top"
+        } tour-tooltip-pointer-${step.pointerPlacement}`}
         src={TooltipPointer}
         alt="tooltip pointer"
       />
@@ -36,9 +38,11 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
       <div className="text-gray tour-tooltip-content">{step.content}</div>
       <div className="tour-tooltip-buttons-container">
         {size > 1 && (
-          <RQButton
+          <Button
             type="default"
+            ref={nextButtonRef}
             className="tour-tooltip-next-btn"
+            style={{ visibility: step.showNext ? "visible" : "hidden" }}
             // used closeProps because primary props takes away the focus from input boxes when tooltip appears
             {...closeProps}
             disabled={step.disableNext?.(context)}
@@ -50,7 +54,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
                 Next <img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />
               </>
             )}
-          </RQButton>
+          </Button>
         )}
       </div>
     </div>

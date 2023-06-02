@@ -69,7 +69,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
   };
 
   return isNewResponseRule && responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
-    <div className="resource-types-container">
+    <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>

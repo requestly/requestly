@@ -46,8 +46,19 @@ const QueryParamModificationRow = ({
   );
 
   return (
-    <Row gutter={16} key={rowIndex} align="middle" className="margin-top-one">
-      <Col span={3} align="right" className="min-dropdown-tile-width-lg">
+    <Row
+      gutter={16}
+      key={rowIndex}
+      align="middle"
+      className="margin-top-one"
+      data-tour-id="rule-editor-queryparam-modification-row"
+    >
+      <Col
+        span={3}
+        align="right"
+        className="min-dropdown-tile-width-lg"
+        data-tour-id="rule-editor-queryparam-modification-type"
+      >
         <Dropdown overlay={modificationTypeMenu}>
           <Text strong className="uppercase ant-dropdown-link cursor-pointer" onClick={(e) => e.preventDefault()}>
             {modification.type} <DownOutlined />
