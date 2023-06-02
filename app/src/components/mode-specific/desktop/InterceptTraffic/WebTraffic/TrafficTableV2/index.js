@@ -71,8 +71,8 @@ const CurrentTrafficTable = ({
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
-  const [appList, setAppList] = useState(new Set());
-  const [domainList, setDomainList] = useState(new Set());
+  const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
+  const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
@@ -127,9 +127,8 @@ const CurrentTrafficTable = ({
     // New Logs Clear
     dispatch(desktopTrafficTableActions.logResponsesClearAll());
     dispatch(desktopTrafficTableActions.logsClearAll());
-    setDomainList(new Set([]));
-    setAppList(new Set([]));
-    dispatch(desktopTrafficTableActions.clearGroupFilters());
+    setDomainList(new Set([...trafficTableFilters.domain]));
+    setAppList(new Set([...trafficTableFilters.app]));
     trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
 
     if (clearLogsCallback) clearLogsCallback();
@@ -501,27 +500,30 @@ const CurrentTrafficTable = ({
   return (
     <>
       <Row wrap={false}>
-        <Col
-          flex="197px"
-          style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
-          className="traffic-table-sidebar"
-        >
-          <Menu
-            theme="dark"
-            mode="inline"
-            items={items}
-            openKeys={expandedLogTypes}
-            onClick={handleSidebarMenuItemClick}
-            selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
-            className={getGroupFiltersLength() > 0 ? "filter-applied" : ""}
-          />
-        </Col>
+        {isStaticPreview ? null : (
+          <Col
+            flex="197px"
+            style={getGroupFiltersLength() > 0 ? { paddingTop: "8px" } : {}}
+            className="traffic-table-sidebar"
+          >
+            <Menu
+              theme="dark"
+              mode="inline"
+              items={items}
+              openKeys={expandedLogTypes}
+              onClick={handleSidebarMenuItemClick}
+              selectedKeys={[...trafficTableFilters.app, ...trafficTableFilters.domain]}
+              className={getGroupFiltersLength() > 0 ? "filter-applied" : ""}
+            />
+          </Col>
+        )}
         <Col flex="auto">
           <Row align={"middle"}>
             <ActionHeader
               deviceId={deviceId}
               clearLogs={clearLogs}
               logsCount={newLogs.length}
+              filteredLogsCount={newLogs.length}
               isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
               activeFiltersCount={activeFiltersCount}
@@ -541,7 +543,6 @@ const CurrentTrafficTable = ({
           </Row>
           {!isFiltersCollapsed && (
             <div className="traffic-table-filters-container">
-              <div className="text-dark-gray caption">FILTER BY</div>
               <Row>
                 <section>
                   <LogFilter

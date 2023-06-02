@@ -94,11 +94,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
 
   return (
     <Col span={24} data-tour-id="code-editor">
+      <div className="subtitle response-body-row-header">Request Body</div>
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
-        <Col span={12}>
-          <span>Request Body</span>
-        </Col>
-        <Col align="right" span={12}>
+        <Col span={24}>
           <Popconfirm
             title="This will clear the existing body content"
             onConfirm={() => {
@@ -115,6 +113,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
               value={pair.request.type}
               disabled={isInputDisabled}
               data-tour-id="rule-editor-requestbody-types"
+              className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>Programmatic (JavaScript)</Radio>
