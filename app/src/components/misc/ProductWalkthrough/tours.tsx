@@ -67,7 +67,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Select modification type",
       content: (
         <>
-          Select the type of modification you want to do on query params. You can <strong>add/replace</strong> params,
+          Select the type of modification you want to do on query params. You can <strong>add/replace</strong> params,{" "}
           <strong>remove specific</strong> param or <strong>remove all</strong> query params from the URL that matches
           the source condition.
         </>
