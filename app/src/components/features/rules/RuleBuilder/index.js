@@ -196,10 +196,7 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (
-      MODE === RULE_EDITOR_CONFIG.MODES.CREATE
-      // && !isRuleEditorTourCompleted  TODO: undo this comment
-    ) {
+    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted) {
       setStartWalkthrough(true);
     }
   }, [MODE, isRuleEditorTourCompleted]);
