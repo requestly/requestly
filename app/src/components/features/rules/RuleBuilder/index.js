@@ -25,7 +25,6 @@ import {
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getIsRedirectRuleTourCompleted,
   getIsRuleEditorTourCompleted,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
@@ -71,7 +70,6 @@ const RuleBuilder = (props) => {
     );
   }, [currentlySelectedRuleData.ruleType, props.isSharedListViewRule, redirectRuleOnboardingExp]);
 
-  const isRedirectRuleTourCompleted = useSelector(getIsRedirectRuleTourCompleted);
   const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
 
   //References
@@ -200,11 +198,11 @@ const RuleBuilder = (props) => {
   useEffect(() => {
     if (
       MODE === RULE_EDITOR_CONFIG.MODES.CREATE
-      // && !isRuleEditorTourCompleted && !isRedirectRuleTourCompleted  TODO: undo this comment
+      // && !isRuleEditorTourCompleted  TODO: undo this comment
     ) {
       setStartWalkthrough(true);
     }
-  }, [MODE, isRuleEditorTourCompleted, isRedirectRuleTourCompleted]);
+  }, [MODE, isRuleEditorTourCompleted]);
 
   useEffect(() => {
     const source = state?.source ?? null;

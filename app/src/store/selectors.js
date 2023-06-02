@@ -221,7 +221,10 @@ export const getIsTrafficTableTourCompleted = (state) => {
 };
 
 export const getIsRuleEditorTourCompleted = (state) => {
-  return getGlobalState(state).misc.persist?.isRuleEditorTourCompleted;
+  return (
+    getGlobalState(state).misc.persist?.isRuleEditorTourCompleted ||
+    getGlobalState(state).misc.persist?.isRedirectRuleTourCompleted
+  );
 };
 
 export const getIsConnectedAppsTourCompleted = (state) => {
