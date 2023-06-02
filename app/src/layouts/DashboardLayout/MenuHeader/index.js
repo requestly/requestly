@@ -1,21 +1,23 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-// import LINKS from "config/constants/sub/links";
+import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
-import { RQBreadcrumb } from "lib/design-system/components";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
-import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
+import PATHS from "config/constants/sub/paths";
+import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
+import { Newbadge } from "components/common/Newbadge";
+import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
+import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import "./MenuHeader.css";
-import LINKS from "config/constants/sub/links";
 
 const { Header } = Layout;
 
@@ -23,13 +25,13 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
-  const isMyRulesPage = pathname.includes("my-rules");
+  // const isMyRulesPage = pathname.includes("my-rules");
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const editorPaths = [
-    "/rules/editor",
-    "/mocks/editor",
-    "/filesv2/editor",
-    "/mock-server/viewer",
+    // "/rules/editor",
+    // "/mocks/editor",
+    // "/filesv2/editor",
+    // "/mock-server/viewer",
     "/pricing",
     "/invite",
   ];
@@ -47,42 +49,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     setCollapsed(false);
     setVisible(true);
   };
-
-  // const helpMenu = (
-  //   <Menu className="header-help-menu-container" onClick={({ key }) => trackHelpdeskClicked(key)}>
-  //     <Menu.Item key="github">
-  //       <a href={LINKS.REQUESTLY_GITHUB_ISSUES} target="_blank" rel="noreferrer">
-  //         <GithubOutlined /> <span>Github</span>
-  //       </a>
-  //     </Menu.Item>
-  //     <Divider className="header-help-menu-divider" />
-  //     <Menu.Item key="documentation">
-  //       <a href={LINKS.REQUESTLY_DOCS} target="_blank" rel="noreferrer">
-  //         <ReadOutlined />
-  //         <span>Documentation</span>
-  //       </a>
-  //     </Menu.Item>
-  //     <Menu.Item key="how_to_articles">
-  //       <a href={LINKS.REQUESTLY_BLOG} target="_blank" rel="noreferrer">
-  //         <SnippetsOutlined />
-  //         <span>How to articles</span>
-  //       </a>
-  //     </Menu.Item>
-  //     <Menu.Item key="video_tutorials">
-  //       <a href={LINKS.YOUTUBE_TUTORIALS} target="_blank" rel="noreferrer">
-  //         <YoutubeOutlined />
-  //         <span>Video tutorials</span>
-  //       </a>
-  //     </Menu.Item>
-  //     <Divider className="header-help-menu-divider" />
-  //     <Menu.Item key="support">
-  //       <a href={LINKS.CONTACT_US_PAGE} target="_blank" rel="noreferrer">
-  //         <PhoneOutlined rotate={180} />
-  //         <span>Support</span>
-  //       </a>
-  //     </Menu.Item>
-  //   </Menu>
-  // );
 
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
 
@@ -102,30 +68,36 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                 />
               )}
             </Col>
-
             {!isPricingOrGoodbyePage ? (
-              <Col span={4} flex="1 1">
+              <Col span={8}>
                 <div className="header-left-section hidden-on-small-screen">
-                  {!isMyRulesPage && (
-                    <Button
-                      type="text"
-                      className="header-icon-btn"
-                      icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-                      onClick={() => navigate(-1)}
-                    />
-                  )}
+                  <div className="header-left-section">
+                    <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
 
-                  <RQBreadcrumb />
+                    <WorkspaceSelector />
+
+                    <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
+                      Tutorials
+                    </a>
+
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href={LINKS.REQUESTLY_DESKTOP_APP}
+                      onClick={() => trackDesktopAppPromoClicked("topbar")}
+                    >
+                      Desktop App <Newbadge />
+                    </a>
+                  </div>
                 </div>
               </Col>
             ) : null}
 
-            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 11 : 14) : 16}>
+            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 9) : 9}>
               <div className="header-middle-section hidden-on-small-screen">
                 <HeaderText />
               </div>
             </Col>
-
             <Col className="ml-auto">
               <div className="header-right-section">
                 <Row align="middle" gutter={8} wrap={false}>
@@ -163,19 +135,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
                   <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
                     <RulesSyncToggle />
                   </div>
-                  {/* info */}
-                  {/* <Col className="hidden-on-small-screen">
-                    <Dropdown
-                      trigger={["click"]}
-                      menu={helpMenu}
-                      placement="bottomRight"
-                      onOpenChange={(open) => {
-                        open && trackHeaderClicked("helpdesk");
-                      }}
-                    >
-                      <Button type="text" className="header-icon-btn" icon={<QuestionCircleOutlined />} />
-                    </Dropdown>
-                  </Col> */}
 
                   {/* documentation */}
                   <Col className="hidden-on-small-screen">

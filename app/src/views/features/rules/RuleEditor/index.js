@@ -74,7 +74,7 @@ const RuleEditor = (props) => {
                 cursor="row-resize"
                 onDragEnd={(paneSizes) => setRulePaneSizes(paneSizes)}
                 style={{
-                  height: location.pathname.includes("/rules/editor") ? "100vh" : "91vh",
+                  height: location.pathname.includes("/rules/editor") ? "calc(100vh - 3rem)" : "91vh",
                 }}
               >
                 <Row className="overflow-hidden">

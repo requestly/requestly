@@ -7,7 +7,7 @@ import Status from "./ActionButtons/Status";
 import ActionButtons from "./ActionButtons";
 import PinButton from "./ActionButtons/PinButton";
 import EditorGroupDropdown from "./EditorGroupDropdown";
-import CloseButton from "./ActionButtons/CloseButton";
+// import CloseButton from "./ActionButtons/CloseButton";
 import RuleOptions from "./RuleOptions";
 import { capitalize } from "lodash";
 import "./RuleEditorHeader.css";
@@ -41,7 +41,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
       <Row wrap={false} align="middle" className="rule-editor-row">
         <Col span={8}>
           <Row wrap={false} align="middle">
-            <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} />
+            {/* <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} /> */}
             <div className="text-gray rule-editor-header-title">
               {getRuleTitle(currentlySelectedRuleConfig.NAME, mode)}
             </div>

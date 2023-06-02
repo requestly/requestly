@@ -128,6 +128,7 @@ export const ONBOARDING = {
   SIDEBAR_CLICKED: "sidebar_clicked",
   HEADER_CLICKED: "header_clicked",
   HELPDESK_CLICKED: "helpdesk_clicked",
+  DESKTOP_APP_PROMO_CLICKED: "desktop_app_promo_clicked",
 };
 
 export const TEAMS = {

@@ -4,13 +4,14 @@
   --text-gray: #b0b0b5;
   --text-dark-gray: #b0b0b5b3;
   --border: #4f5053;
-  --border-dark: #3e4044;
+  --border-dark: #303030;
   --danger: #fc5f5f;
   --danger-rgb: 252, 95, 95;
   --success: #069d4f;
   --primary: #1e69ff;
   --background: #141414;
   --background-dark: #1c1d21;
+  --layout-component-background: #212121;
   --component-background: #323337;
   --component-dark-background: #2c2d31;
   --input-background: var(--component-dark-background);

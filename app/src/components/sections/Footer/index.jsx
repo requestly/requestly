@@ -47,23 +47,23 @@ const MenuFooter = () => {
 
   return (
     <>
-      <Footer style={{ padding: "18px 32px" }} className="dark-bg-footer">
+      <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between">
           <Col md={12} span={24}>
-            <p className="dark-bg-footer">
+            <div>
               © 2023{" "}
               <a
-                className="font-weight-bold ml-1 dark-bg-footer"
+                className="font-weight-bold ml-1"
                 href="https://requestly.io"
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 RQ Labs, Inc.
               </a>
-            </p>
+            </div>
           </Col>
 
-          <Col md={12} span={24} className="dark-bg-footer" align="right">
+          <Col md={12} span={24} align="right">
             {SHOW_YC_BRANDING ? renderYCBranding() : renderFooterLinks()}
           </Col>
         </Row>
