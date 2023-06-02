@@ -151,6 +151,20 @@ export const productTours: Record<string, CustomSteps[]> = {
     },
     {
       ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-responsebody-types"),
+      title: "Select Response override method",
+      content: (
+        <>
+          Select the method to override the response body with <strong>static</strong> data or{" "}
+          <strong>programmatically</strong> modify the existing response.
+        </>
+      ),
+      placement: "top",
+      pointerPlacement: "left-half",
+      offset: 20,
+    },
+    {
+      ...tourTooltipPresets,
       target: getTourTarget("code-editor"),
       title: "Response Body",
       content:

@@ -93,7 +93,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
   }, [pair.request.type]);
 
   return (
-    <React.Fragment key={rowIndex}>
+    <Col span={24} data-tour-id="code-editor">
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
         <Col span={12}>
           <span>Request Body</span>
@@ -124,7 +124,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
       </Row>
 
       {pair.request.type !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.LOCAL_FILE ? (
-        <Col span={24} data-tour-id="code-editor">
+        <>
           <Row
             span={24}
             style={{
@@ -168,9 +168,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
               <span>{getByteSize(pair.request.value)} characters</span>
             </Col>
           </Row>
-        </Col>
+        </>
       ) : null}
-    </React.Fragment>
+    </Col>
   );
 };
 
