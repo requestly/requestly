@@ -1,6 +1,6 @@
 {
-  "name": "@requestly/requestly",
-  "version": "1.0.0",
+  "name": "@requestly/requestly-core",
+  "version": "1.0.3",
   "description": "Requestly app, extension and other compoents ",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,6 @@
   },
   "files": [
     "index.js",
-    "config.js",
     "common/*"
   ],
   "lint-staged": {

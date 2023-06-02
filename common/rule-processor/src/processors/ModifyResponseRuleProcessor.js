@@ -13,6 +13,7 @@ class ModifyResponseRuleProcessor {
       response: pair.response.value,
       responseType: pair.response.type,
       statusCode: pair.response.statusCode,
+      serveWithoutRequest: !!pair.response.serveWithoutRequest,
     };
   }
 }
