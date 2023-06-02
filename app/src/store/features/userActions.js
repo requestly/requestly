@@ -26,7 +26,7 @@ export const updateUsername = (prevState, action) => {
 
 //Persona Survey actions
 export const setUserPersonaData = (prevState, action) => {
-  prevState.userPersona = action.payload;
+  prevState.userPersona = { ...prevState.userPersona, ...action.payload };
 };
 
 export const updateUserPersona = (prevState, action) => {
