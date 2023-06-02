@@ -49,18 +49,23 @@
   transform: rotate(180deg);
 }
 
-.tour-tooltip-pointer-center {
-  left: 50%;
-}
-.tour-tooltip-pointer-left {
+.tour-tooltip-pointer-bottom-0,
+.tour-tooltip-pointer-top-0 {
   left: 10%;
 }
-.tour-tooltip-pointer-right {
-  left: 85%;
+.tour-tooltip-pointer-bottom-25,
+.tour-tooltip-pointer-top-25 {
+  left: 30%;
 }
-.tour-tooltip-pointer-right-half {
+.tour-tooltip-pointer-bottom-50,
+.tour-tooltip-pointer-top-50 {
+  left: 50%;
+}
+.tour-tooltip-pointer-bottom-75,
+.tour-tooltip-pointer-top-75 {
   left: 67%;
 }
-.tour-tooltip-pointer-left-half {
-  left: 30%;
+.tour-tooltip-pointer-bottom-100,
+.tour-tooltip-pointer-top-100 {
+  left: 85%;
 }

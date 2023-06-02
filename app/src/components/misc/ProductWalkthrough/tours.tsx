@@ -1,5 +1,5 @@
 import { Rule } from "types";
-import { CustomSteps, pointerPlacement } from "./types";
+import { CustomSteps, PointerPlacement } from "./types";
 import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -9,7 +9,7 @@ const tourTooltipPresets = {
   disableBeacon: true,
   offset: 12,
   showNext: true,
-  pointerPlacement: "center" as pointerPlacement,
+  pointerPlacement: PointerPlacement.TOP_50,
 };
 
 export const productTours: Record<string, CustomSteps[]> = {
@@ -36,7 +36,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "top",
-      pointerPlacement: "left",
+      pointerPlacement: PointerPlacement.BOTTOM_0,
       showNext: false,
       autoMoveToNext: true,
       offset: 20,
@@ -55,7 +55,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "top",
-      pointerPlacement: "center",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 18,
       spotlightPadding: 2,
     },
@@ -73,7 +73,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "top",
-      pointerPlacement: "center",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 18,
     },
     {
@@ -88,7 +88,6 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "bottom",
-      pointerPlacement: "center",
       offset: 18,
     },
   ]),
@@ -114,7 +113,6 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom-start",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.resourceType.length,
       offset: 0,
-      pointerPlacement: "center",
       showNext: false,
       autoMoveToNext: true,
     },
@@ -148,6 +146,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       content:
         "Select the response status code which must be returned with the response. Leave it empty if you want the original status code to be returned.",
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
     },
     {
       ...tourTooltipPresets,
@@ -160,7 +159,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "top",
-      pointerPlacement: "left-half",
+      pointerPlacement: PointerPlacement.BOTTOM_25,
       offset: 20,
     },
     {
@@ -170,6 +169,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       content:
         "For static mode simply define the response body. For programmatic mode override the response data programmatically with JS.",
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 16,
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.value?.length,
     },
@@ -178,7 +178,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       target: getTourTarget("rule-editor-create-btn"),
       title: "Save the rule",
       content: "Click here to Create and Save the rule.",
-      pointerPlacement: "right",
+      pointerPlacement: PointerPlacement.TOP_100,
       placement: "bottom-start",
     },
   ],
@@ -195,7 +195,8 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "bottom",
-      pointerPlacement: "left-half",
+      pointerPlacement: PointerPlacement.TOP_25,
+
       offset: 20,
     },
     {
@@ -205,6 +206,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       content:
         "For static mode define the request body which must be passed to the server. For programmatic mode override the request payload programmatically with JS.",
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 16,
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].request.value?.length,
     },
@@ -220,6 +222,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 18,
     },
     {
@@ -228,6 +231,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Script",
       content: <>Type the script you want to insert here.</>,
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 16,
     },
   ]),
@@ -267,6 +271,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       ),
       offset: 8,
       placement: "bottom-start",
+      pointerPlacement: PointerPlacement.TOP_25,
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
     },
   ]),
@@ -282,7 +287,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       offset: 20,
-      pointerPlacement: "right-half",
+      pointerPlacement: PointerPlacement.BOTTOM_75,
       placement: "top",
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].envType?.length,
     },
@@ -294,6 +299,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         <>Select or search the type of browser/device or type your own custom user-agent on which you want to test.</>
       ),
       placement: "top",
+      pointerPlacement: PointerPlacement.BOTTOM_50,
       disableNext: (ruleData: Rule) => !ruleData.pairs[0].userAgent?.length,
     },
   ]),

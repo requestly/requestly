@@ -26,7 +26,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
     <div {...tooltipProps} className="tour-tooltip-container">
       <img
         className={`tour-tooltip-pointer tour-tooltip-pointer-${
-          step.placement.includes("bottom") ? "top" : "bottom"
+          step.pointerPlacement.includes("bottom") ? "bottom" : "top"
         } tour-tooltip-pointer-${step.pointerPlacement}`}
         src={TooltipPointer}
         alt="tooltip pointer"
