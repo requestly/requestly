@@ -1,7 +1,3 @@
-#dashboardMainContent {
-  height: 100%;
-}
-
 .app-layout {
   width: 100vw;
   height: 100vh;
@@ -16,12 +12,12 @@
 }
 
 .app-layout-columns {
-  grid-template-columns: 297px 1fr;
-}
-
-.app-layout-sidebar-collapsed {
   grid-template-columns: 80px 1fr;
 }
+
+/* .app-layout-sidebar-collapsed {
+
+} */
 
 .app-header {
   grid-area: header;
@@ -43,7 +39,6 @@
 
 .app-footer {
   grid-area: footer;
-  border-top: 1px solid var(--border-dark);
 }
 
 #requestly-dashboard-layout > .ant-layout {
@@ -55,9 +50,12 @@
   overflow: auto;
 }
 
-.app-layout-footer.ant-layout-footer {
+.app-layout .ant-layout-footer {
+  height: 1.5rem;
   font-size: 12px;
-  padding: 0.5rem 1.4rem;
+  display: flex;
+  align-items: center;
+  padding: 5px 1.5rem;
   border-top: 1px solid var(--border-dark);
   background-color: var(--body-background);
 }

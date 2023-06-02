@@ -29,6 +29,7 @@
 .primary-sidebar-link {
   padding: 8px 4px;
   min-height: 4.5rem;
+  margin-bottom: 2px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -46,7 +47,7 @@
 
 .primary-sidebar-link:hover,
 .primary-sidebar-link:focus,
-.primary-sidebar-link-active {
+.primary-sidebar-active-link {
   cursor: pointer;
   color: var(--white);
   background-color: var(--gray-dark);

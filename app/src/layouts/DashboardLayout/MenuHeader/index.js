@@ -1,10 +1,8 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
@@ -15,7 +13,8 @@ import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
-import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
+import { Newbadge } from "components/common/Newbadge";
+import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import "./MenuHeader.css";
 
@@ -55,17 +54,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   return showMenuHeader() ? (
     <Header className="layout-header">
       <Row wrap={false} align="middle" className="w-full">
-        <Col span={isTabletView ? 1 : 0} flex="0 0 32px">
-          {/* if pricing or goodbye page then replace the menu button with logo */}
-          {isPricingOrGoodbyePage ? null : (
-            <Button
-              className="mobile-sidebar-btn hamburger-menu"
-              type="text"
-              onClick={showDrawer}
-              icon={<RiMenuFill size={24} />}
-            />
-          )}
-        </Col>
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
             <div className="header-left-section">
