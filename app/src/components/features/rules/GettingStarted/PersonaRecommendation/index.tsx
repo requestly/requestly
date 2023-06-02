@@ -86,7 +86,10 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
 
           <AuthConfirmationPopover
             title="You need to sign up to upload rules"
-            callback={handleUploadRulesClick}
+            callback={() => {
+              handleUploadRulesClick();
+              dispatch(actions.updateIsPersonaSurveyCompleted(true));
+            }}
             source={AUTH.SOURCE.UPLOAD_RULES}
           >
             <RQButton
