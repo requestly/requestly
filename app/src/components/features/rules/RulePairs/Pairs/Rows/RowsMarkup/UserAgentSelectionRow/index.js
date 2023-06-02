@@ -93,17 +93,19 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
 
   return (
     <Row key={rowIndex} span={24} align="middle" gutter={16} className="margin-top-one">
-      <Col className="my-auto">
-        <span>UserAgent</span>
-      </Col>
-      <Col className="my-auto" align="right">
-        <Dropdown overlay={renderEnvOptions} disabled={isInputDisabled}>
-          <Text strong onClick={(e) => e.preventDefault()} className="uppercase cursor-pointer ant-dropdown-link">
-            {pair.envType === "" ? "Select" : pair.envType} <DownOutlined />
-          </Text>
-        </Dropdown>
-      </Col>
-      <Col span={12} lg={14}>
+      <div className="display-row-center" data-tour-id="rule-editor-useragent-selector">
+        <Col className="my-auto">
+          <span>UserAgent</span>
+        </Col>
+        <Col className="my-auto" align="right">
+          <Dropdown overlay={renderEnvOptions} disabled={isInputDisabled}>
+            <Text strong onClick={(e) => e.preventDefault()} className="uppercase cursor-pointer ant-dropdown-link">
+              {pair.envType === "" ? "Select" : pair.envType} <DownOutlined />
+            </Text>
+          </Dropdown>
+        </Col>
+      </div>
+      <Col span={12} lg={14} data-tour-id="rule-editor-useragent-type">
         {pair.envType === "custom" ? (
           <Input
             placeholder="Enter custom UserAgent string"

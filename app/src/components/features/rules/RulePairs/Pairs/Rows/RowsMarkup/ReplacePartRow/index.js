@@ -5,7 +5,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDis
   const { modifyPairAtGivenPath } = helperFunctions;
   return (
     <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one">
-      <Col span={12}>
+      <Col span={12} data-tour-id="rule-editor-replace-from">
         <Input
           type="text"
           value={pair.from}
@@ -14,9 +14,10 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDis
           disabled={isInputDisabled}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "from")}
           data-selectionid="replace-from-in-url"
+          x
         />
       </Col>
-      <Col span={12}>
+      <Col span={12} data-tour-id="rule-editor-replace-to">
         <Input
           type="text"
           value={pair.to}

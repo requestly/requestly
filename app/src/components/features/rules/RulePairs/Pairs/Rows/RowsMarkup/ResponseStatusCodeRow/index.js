@@ -13,7 +13,7 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
 
   return (
     <Row key={rowIndex} className="w-full">
-      <Col span={24} className="response-status-code-container">
+      <Col span={24} className="response-status-code-container" data-tour-id="rule-editor-response-status-code">
         <label className="subtitle response-status-code-label">Response Status Code</label>
         <AutoComplete
           showSearch={true}

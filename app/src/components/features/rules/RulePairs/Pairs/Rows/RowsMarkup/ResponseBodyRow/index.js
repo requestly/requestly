@@ -204,7 +204,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
   }, [pair.response.type]);
 
   return (
-    <React.Fragment key={rowIndex}>
+    <Col span={24} data-tour-id="code-editor" key={rowIndex}>
       <div className="subtitle response-body-row-header">Response Body</div>
       <Row key={rowIndex} span={24} align="middle" className="code-editor-header-row">
         <Col span={24}>
@@ -224,6 +224,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
               value={pair.response.type}
               disabled={isInputDisabled}
               className="response-body-type-radio-group"
+              data-tour-id="rule-editor-responsebody-types"
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>Dynamic (JavaScript)</Radio>
@@ -306,7 +307,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
           ) : null}
         </>
       ) : null}
-    </React.Fragment>
+    </Col>
   );
 };
 

@@ -159,6 +159,7 @@ const INITIAL_STATE = {
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
+      isRuleEditorTourCompleted: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
