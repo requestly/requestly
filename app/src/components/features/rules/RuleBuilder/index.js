@@ -196,7 +196,7 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted) {
+    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !allRules.length) {
       setStartWalkthrough(true);
     }
   }, [MODE, isRuleEditorTourCompleted]);
