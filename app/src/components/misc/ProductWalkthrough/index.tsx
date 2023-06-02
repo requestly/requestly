@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import JoyRide, { EVENTS, STATUS, CallBackProps, TooltipRenderProps } from "react-joyride";
 import { productTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
@@ -22,6 +22,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   onTourComplete,
 }) => {
   const joyrideRef = useRef(null);
+  const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
   const tourSteps = useMemo(() => productTours[tourFor], [tourFor]);
 
@@ -45,6 +46,9 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       onTourComplete();
       trackWalkthroughCompleted(tourFor);
     }
+    if (index >= tourSteps?.length - 1) {
+      setHasReachedLastStep(true);
+    }
   };
 
   useEffect(() => {
@@ -52,6 +56,17 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       trackWalkthroughViewed(tourFor);
     }
   }, [startWalkthrough, tourFor]);
+
+  useEffect(() => {
+    // complete the tour is  TOUR_END does not trigger after last step
+    // eg. clicking on create rule button in rule editor tour
+    return () => {
+      if (hasReachedLastStep) {
+        trackWalkthroughCompleted(tourFor);
+        onTourComplete();
+      }
+    };
+  }, [hasReachedLastStep]);
 
   return (
     <>
