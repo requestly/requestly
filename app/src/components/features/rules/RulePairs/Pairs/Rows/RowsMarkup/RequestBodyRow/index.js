@@ -93,7 +93,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
   }, [pair.request.type]);
 
   return (
-    <React.Fragment key={rowIndex}>
+    <Col span={24} data-tour-id="code-editor">
       <div className="subtitle response-body-row-header">Request Body</div>
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
         <Col span={24}>
@@ -112,6 +112,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
               onChange={showPopup}
               value={pair.request.type}
               disabled={isInputDisabled}
+              data-tour-id="rule-editor-requestbody-types"
               className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
@@ -168,7 +169,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
           </Row>
         </>
       ) : null}
-    </React.Fragment>
+    </Col>
   );
 };
 
