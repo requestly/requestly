@@ -30,7 +30,6 @@
 
 .app-footer {
   grid-area: footer;
-  border-top: 1px solid var(--border-dark);
 }
 
 .app-main-content,
