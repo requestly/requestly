@@ -3,16 +3,13 @@ RQ.RuleExecutionHandler = {
 };
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
-  //disable rule execution event
-  return;
-
   const eventName = "rule_executed";
   const eventParams = {
     rule_type: rule.ruleType,
     rule_id: rule.id,
     platform: "extension",
   };
-  RQ.ClientUtils.sendEventToBackground(eventName, eventParams);
+  RQ.ClientUtils.sendExecutionEventToBackground(eventName, eventParams);
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {

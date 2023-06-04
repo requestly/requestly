@@ -144,7 +144,7 @@ const CustomScriptRow = ({
     };
 
     return (
-      <React.Fragment>
+      <Col span={24} data-tour-id="code-editor">
         <Row
           key={rowIndex}
           span={24}
@@ -180,7 +180,7 @@ const CustomScriptRow = ({
             <span className="codemirror-character-count text-gray">{script.value.length} characters</span>
           </Col>
         </Row>
-      </React.Fragment>
+      </Col>
     );
   };
 
@@ -297,7 +297,7 @@ const CustomScriptRow = ({
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
       <Row span={24} align="middle" className="code-editor-header-row mt-20">
-        <Col span={5} align="left">
+        <Col span={5} align="left" data-tour-id="rule-editor-script-language">
           <Text className="text-gray">Language: </Text>
           <CodeTypeOptions />
         </Col>
