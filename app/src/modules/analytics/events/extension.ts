@@ -34,4 +34,5 @@ export const handleEventBatches = (batches: EventBatch[]): string[] => {
 /* EXTENSION EVENTS ENGINE FLAG */
 export const getEventsEngineFlag = {
   [CONSTANTS.STORAGE_KEYS.USE_EVENTS_ENGINE]: true,
+  [CONSTANTS.STORAGE_KEYS.SEND_EXECUTION_EVENTS]: true,
 };
