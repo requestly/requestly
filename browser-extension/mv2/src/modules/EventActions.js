@@ -20,7 +20,7 @@ EventActions.queueExecutionEventToWrite = (event) => {
   EventActions.executionEventsToWrite.push(event);
 };
 
-EventActions.getEventBatches = async () => {
+EventActions.getAllEventBatches = async () => {
   const eventBatches = (await RQ.StorageService.getRecord(EventActions.STORE_EVENTS_KEY)) || {};
   const executionEventBatches = (await RQ.StorageService.getRecord(EventActions.STORE_EXECUTION_EVENTS_KEY)) || {};
 
@@ -28,7 +28,7 @@ EventActions.getEventBatches = async () => {
 };
 
 EventActions.deleteBatches = async (batchIds) => {
-  const [batches, executionBatches] = await EventActions.getEventBatches();
+  const [batches, executionBatches] = await EventActions.getAllEventBatches();
 
   if (batches) {
     batchIds.forEach((id) => {
@@ -55,7 +55,7 @@ EventActions.deleteBatches = async (batchIds) => {
   await RQ.StorageService.saveRecord(newStoredBatches);
 };
 
-EventActions.getEventsToWrite = () => {
+EventActions.getAllEventsToWrite = () => {
   /* also removes from the local events buffer */
   const _eventsToWrite = [...EventActions.eventsToWrite];
   EventActions.eventsToWrite = [];
@@ -66,18 +66,11 @@ EventActions.getEventsToWrite = () => {
   return [_eventsToWrite, _executionEventsToWrite];
 };
 
-EventActions.getExecutionEventsToWrite = () => {
-  /* also removes from the local events buffer */
-  const _executionEventsToWrite = [...EventActions.executionEventsToWrite];
-  EventActions.executionEventsToWrite = [];
-  return _executionEventsToWrite;
-};
-
 /* batches recognised for sending here are added to batchesWaitingForAck */
 EventActions.getBatchesToSend = async () => {
   let batchesToSend = [];
 
-  const [eventBatches, executionEventBatches] = await EventActions.getEventBatches();
+  const [eventBatches, executionEventBatches] = await EventActions.getAllEventBatches();
   const allEventBatches = { ...eventBatches, ...executionEventBatches };
 
   batchesToSend = Object.keys(allEventBatches)
@@ -163,7 +156,7 @@ EventActions.writeEventsToLocalStorage = async () => {
     };
   };
 
-  const [_eventsToWrite, _executionEventsToWrite] = EventActions.getEventsToWrite();
+  const [_eventsToWrite, _executionEventsToWrite] = EventActions.getAllEventsToWrite();
 
   let newEventsBatch = null,
     newExecutionEventsBatch = null;
@@ -178,7 +171,7 @@ EventActions.writeEventsToLocalStorage = async () => {
     newExecutionEventsBatch = createBatch(_executionEventsToWrite, true);
   }
 
-  return EventActions.getEventBatches().then(async ([batchesInStorage, executionBatchesInStorage]) => {
+  return EventActions.getAllEventBatches().then(([batchesInStorage, executionBatchesInStorage]) => {
     if (newEventsBatch) {
       batchesInStorage[newEventsBatch.id] = newEventsBatch;
     }
@@ -186,7 +179,6 @@ EventActions.writeEventsToLocalStorage = async () => {
       executionBatchesInStorage[newExecutionEventsBatch.id] = newExecutionEventsBatch;
     }
 
-    // todo: needs to be updated if local storage structure is changed
     const newStoredBatches = {};
     newStoredBatches[EventActions.STORE_EVENTS_KEY] = batchesInStorage;
     newStoredBatches[EventActions.STORE_EXECUTION_EVENTS_KEY] = executionBatchesInStorage;
@@ -198,7 +190,7 @@ EventActions.writeEventsToLocalStorage = async () => {
 };
 
 EventActions.setEventsCount = async () => {
-  const [batchesInStorage, executionBatchesInStorage] = await EventActions.getEventBatches();
+  const [batchesInStorage, executionBatchesInStorage] = await EventActions.getAllEventBatches();
 
   EventActions.eventsCount = Object.values({ ...batchesInStorage, ...executionBatchesInStorage })?.reduce(
     (total, { events }) => total + events.length,
