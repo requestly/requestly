@@ -147,6 +147,8 @@ EventActions.writeEventsToLocalStorage = async () => {
     return;
   }
 
+  const _sendExecutionEvents = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SEND_EXECUTION_EVENTS);
+
   const createBatch = (eventsArray, isExecutionEventBatch = false) => {
     let batchId = RQ.commonUtils.generateUUID();
 
@@ -171,7 +173,7 @@ EventActions.writeEventsToLocalStorage = async () => {
     newEventsBatch = createBatch(_eventsToWrite);
   }
 
-  if (_executionEventsToWrite.length) {
+  if (_sendExecutionEvents !== false && _executionEventsToWrite.length) {
     EventActions.eventsCount += _executionEventsToWrite.length;
     newExecutionEventsBatch = createBatch(_executionEventsToWrite, true);
   }
