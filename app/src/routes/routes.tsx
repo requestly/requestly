@@ -25,7 +25,7 @@ import RefreshSubscriptionView from "../views/misc/payments/RefreshSubscription"
 import RulesIndexView from "../views/features/rules/RulesIndexView";
 import RuleEditor from "../views/features/rules/RuleEditor";
 import Settings from "../views/user/Settings";
-import SharedListsIndexView from "../views/features/sharedLists/SharedListsIndexView";
+// import SharedListsIndexView from "../views/features/sharedLists/SharedListsIndexView";
 import SharedListImportView from "../views/features/sharedLists/SharedListImportView";
 import TrashIndexView from "views/features/trash/TrashIndexView";
 import SharedListViewer from "../views/features/sharedLists/SharedListViewer";
@@ -107,12 +107,12 @@ export const routes = [
     icon: "far fa-file-alt",
     component: Templates,
   },
-  {
-    path: PATHS.RULES.RELATIVE,
-    name: "Rules",
-    icon: "fas fa-exchange-alt",
-    component: () => <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`} />,
-  },
+  // {
+  //   path: PATHS.RULES.RELATIVE,
+  //   name: "Rules",
+  //   icon: "fas fa-exchange-alt",
+  //   component: () => <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + `${window.location.search}`} />,
+  // },
   {
     path: PATHS.INSTALL_EXTENSION.RELATIVE,
     name: "Install Extension",
@@ -185,24 +185,24 @@ export const routes = [
     icon: "ni ni-curved-next",
     component: SharedListViewer,
   },
-  {
-    path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
-    name: "Sharing",
-    icon: "fas fa-share-alt",
-    component: SharedListsIndexView,
-  },
+  // {
+  //   path: PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE,
+  //   name: "Sharing",
+  //   icon: "fas fa-share-alt",
+  //   component: SharedListsIndexView,
+  // },
   {
     path: PATHS.SHARED_LISTS.IMPORT_LIST.ABSOLUTE,
     name: "Sharing",
     icon: "fas fa-share-alt",
     component: SharedListImportView,
   },
-  {
-    path: PATHS.SHARED_LISTS.RELATIVE,
-    name: "Sharing",
-    icon: "fas fa-share-alt",
-    component: () => <Navigate to={PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE} />,
-  },
+  // {
+  //   path: PATHS.SHARED_LISTS.RELATIVE,
+  //   name: "Sharing",
+  //   icon: "fas fa-share-alt",
+  //   component: () => <Navigate to={PATHS.SHARED_LISTS.MY_LISTS.ABSOLUTE} />,
+  // },
   {
     path: PATHS.BACKUP.RELATIVE,
     name: "Data Backup",
