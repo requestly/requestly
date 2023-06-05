@@ -1,8 +1,0 @@
-.secondary-sidebar-container {
-  width: 100%;
-  border-right: 1px solid var(--border-dark);
-}
-
-.secondary-sidebar-active-link {
-  color: white;
-}
