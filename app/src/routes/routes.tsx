@@ -1,43 +1,42 @@
 import { Navigate } from "react-router";
-import { RouteObject } from "react-router-dom";
-import APP_CONSTANTS from "./config/constants";
-import AcceptTeamInviteView from "./views/user/Teams/AcceptInvite";
-import Account from "./views/user/Account";
-import AppModeView from "./views/misc/AppMode";
-import AuthPageView from "./views/auth/authPage";
-import DesktopSignInView from "./views/auth/desktopSignIn";
-import EmailAction from "./views/misc/EmailAction";
-import FilesListIndex from "./views/features/filesLibrary/FilesListIndex";
-import FilesLibIndex from "./views/features/filesLibrary/FilesLibIndex";
-import FileViewer from "./views/features/filesLibrary/FileViewer";
+import APP_CONSTANTS from "../config/constants";
+import AcceptTeamInviteView from "../views/user/Teams/AcceptInvite";
+import Account from "../views/user/Account";
+import AppModeView from "../views/misc/AppMode";
+import AuthPageView from "../views/auth/authPage";
+import DesktopSignInView from "../views/auth/desktopSignIn";
+import EmailAction from "../views/misc/EmailAction";
+import FilesListIndex from "../views/features/filesLibrary/FilesListIndex";
+import FilesLibIndex from "../views/features/filesLibrary/FilesLibIndex";
+import FileViewer from "../views/features/filesLibrary/FileViewer";
 import Goodbye from "components/misc/Goodbye";
 import Home from "components/misc/Home";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import Feedback from "./views/misc/Feedback";
-import ManageLicense from "./views/user/ManageLicense";
-import Templates from "./views/landing/RuleTemplates";
-import MyTeamsView from "./views/user/Account/Teams/MyTeams";
-import Page404 from "./views/misc/ServerResponses/404";
-import Page403 from "./views/misc/ServerResponses/403";
-import PersonalSubscription from "./views/user/Account/PersonalSubscription";
-import Pricing from "./views/landing/Pricing";
-import Backup from "./views/user/Backup";
-import RefreshSubscriptionView from "./views/misc/payments/RefreshSubscription";
-import RulesIndexView from "./views/features/rules/RulesIndexView";
-import RuleEditor from "./views/features/rules/RuleEditor";
-import Settings from "./views/user/Settings";
-import SharedListsIndexView from "./views/features/sharedLists/SharedListsIndexView";
-import SharedListImportView from "./views/features/sharedLists/SharedListImportView";
+import Feedback from "../views/misc/Feedback";
+import ManageLicense from "../views/user/ManageLicense";
+import Templates from "../views/landing/RuleTemplates";
+import MyTeamsView from "../views/user/Account/Teams/MyTeams";
+import Page404 from "../views/misc/ServerResponses/404";
+import Page403 from "../views/misc/ServerResponses/403";
+import PersonalSubscription from "../views/user/Account/PersonalSubscription";
+import Pricing from "../views/landing/Pricing";
+import Backup from "../views/user/Backup";
+import RefreshSubscriptionView from "../views/misc/payments/RefreshSubscription";
+import RulesIndexView from "../views/features/rules/RulesIndexView";
+import RuleEditor from "../views/features/rules/RuleEditor";
+import Settings from "../views/user/Settings";
+import SharedListsIndexView from "../views/features/sharedLists/SharedListsIndexView";
+import SharedListImportView from "../views/features/sharedLists/SharedListImportView";
 import TrashIndexView from "views/features/trash/TrashIndexView";
-import SharedListViewer from "./views/features/sharedLists/SharedListViewer";
-import TeamViewerIndex from "./views/user/Account/Teams/TeamViewerIndex";
-import VerifyEmail from "./views/misc/VerifyEmail";
-import SignInViaEmailLink from "./views/misc/SignInViaEmailLink";
-import UpdatePaymentMethodView from "./views/misc/payments/UpdatePaymentMethod";
-import UpdateSubscriptionContactUsView from "./views/misc/payments/UpdateSubscriptionContactUs";
-import MySourcesView from "./views/mode-specific/desktop/MySourcesView";
-import InterceptTrafficView from "./views/mode-specific/desktop/InterceptTrafficView";
-import ManualSetupView from "./views/mode-specific/desktop/ManualSetupView";
+import SharedListViewer from "../views/features/sharedLists/SharedListViewer";
+import TeamViewerIndex from "../views/user/Account/Teams/TeamViewerIndex";
+import VerifyEmail from "../views/misc/VerifyEmail";
+import SignInViaEmailLink from "../views/misc/SignInViaEmailLink";
+import UpdatePaymentMethodView from "../views/misc/payments/UpdatePaymentMethod";
+import UpdateSubscriptionContactUsView from "../views/misc/payments/UpdateSubscriptionContactUs";
+import MySourcesView from "../views/mode-specific/desktop/MySourcesView";
+import InterceptTrafficView from "../views/mode-specific/desktop/InterceptTrafficView";
+import ManualSetupView from "../views/mode-specific/desktop/ManualSetupView";
 // import MyOrganizationView from "views/user/Organization/MyOrganization"
 import MobileDebuggerCreateApp from "views/features/mobileDebugger/createApp";
 import MobileDebuggerHomeView from "views/features/mobileDebugger/home";
@@ -45,7 +44,7 @@ import MobileDebuggerDashboardView from "views/features/mobileDebugger";
 import MobileDebuggerInterceptorView from "views/features/mobileDebugger/features/interceptor";
 import MobileDebuggerUnauthorized from "components/features/mobileDebugger/screens/unauthorized";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
-import SessionsHomeView from "./views/features/sessions";
+import SessionsHomeView from "../views/features/sessions";
 import Updates from "views/features/Updates";
 import DesktopPreference from "views/user/Settings/DesktopPreferences";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
@@ -138,6 +137,18 @@ export const routes = [
     icon: "ni ni-folder-17",
     component: FileViewer,
   },
+  // {
+  //   path: PATHS.FILES.MY_FILES.ABSOLUTE,
+  //   name: "Files",
+  //   icon: "fas fa-folder-open",
+  //   component: () => <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
+  // },
+  // {
+  //   path: PATHS.FILES.RELATIVE,
+  //   name: "Mock APIs",
+  //   icon: "fas fa-server",
+  //   component: () => <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
+  // },
   {
     path: PATHS.MOCK_SERVER.VIEWER.RELATIVE + "/" + PATHS.ANY,
     name: "Mock Server",
@@ -313,7 +324,7 @@ export const routes = [
     path: PATHS.ACCOUNT.CHECKOUT.RELATIVE,
     name: "Checkout",
     icon: "ni ni-lock-circle-open text-red",
-    // @ts-ignore
+    //@ts-ignore
     component: () => {
       window.location.href = APP_CONSTANTS.LINKS.CONTACT_US_PAGE;
       return null;
@@ -428,7 +439,7 @@ export const routes = [
     path: PATHS.ACCOUNT.SUPPORT.RELATIVE,
     name: "Requestly Support",
     icon: "ni ni-support-16 text-red",
-    // @ts-ignore
+    //@ts-ignore
     component: () => {
       window.location.href = APP_CONSTANTS.LINKS.CONTACT_US_PAGE;
       return null;
@@ -551,7 +562,7 @@ export const routes = [
     icon: "ni ni-lock-circle-open text-red",
     component: FileMockListView,
   },
-  /*******/
+
   {
     path: PATHS.GETTING_STARTED,
     name: "Getting started",
@@ -561,30 +572,5 @@ export const routes = [
     path: PATHS.INVITE.RELATIVE,
     name: "Accept Invite",
     component: InviteView,
-  },
-];
-
-export const updatedRoutes: RouteObject[] = [
-  {
-    path: PATHS.NEW.RULES.INDEX,
-    children: [
-      {
-        index: true,
-        path: PATHS.NEW.RULES.MY_RULES.RELATIVE,
-        element: <RulesIndexView />,
-      },
-      {
-        path: PATHS.NEW.RULES.SHARED_LISTS.RELATIVE,
-        element: <SharedListsIndexView />,
-      },
-      {
-        path: PATHS.NEW.RULES.TEMPLATES.RELATIVE,
-        element: <Navigate to={PATHS.RULES.TEMPLATES.ABSOLUTE} />,
-      },
-      {
-        path: PATHS.NEW.RULES.TRASH.RELATIVE,
-        element: <TrashIndexView />,
-      },
-    ],
   },
 ];
