@@ -1,10 +1,8 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { RiMenuFill } from "react-icons/ri";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import LINKS from "config/constants/sub/links";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
@@ -12,6 +10,7 @@ import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "uti
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
+import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
 import { Newbadge } from "components/common/Newbadge";
@@ -45,146 +44,129 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
   };
 
   // Mobile Sidebar
-  const showDrawer = () => {
-    setCollapsed(false);
-    setVisible(true);
-  };
+  // const showDrawer = () => {
+  //   setCollapsed(false);
+  //   setVisible(true);
+  // };
 
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
 
   return showMenuHeader() ? (
     <Header className="layout-header">
-      <Row justify="center" className="w-full" wrap={false}>
-        <Col span={24}>
-          <Row wrap={false} align="middle" className="w-full">
-            <Col span={isTabletView ? 1 : 0} flex="0 0 32px">
-              {/* if pricing or goodbye page then replace the menu button with logo */}
-              {isPricingOrGoodbyePage ? null : (
-                <Button
-                  className="mobile-sidebar-btn hamburger-menu"
-                  type="text"
-                  onClick={showDrawer}
-                  icon={<RiMenuFill size={24} />}
-                />
-              )}
-            </Col>
-            {!isPricingOrGoodbyePage ? (
-              <Col span={8}>
-                <div className="header-left-section hidden-on-small-screen">
-                  <div className="header-left-section">
-                    <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
+      <Row wrap={false} align="middle" className="w-full">
+        {!isPricingOrGoodbyePage ? (
+          <Col span={8}>
+            <div className="header-left-section">
+              <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
 
-                    <WorkspaceSelector />
+              <WorkspaceSelector />
 
-                    <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
-                      Tutorials
-                    </a>
+              <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
+                Tutorials
+              </a>
 
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href={LINKS.REQUESTLY_DESKTOP_APP}
-                      onClick={() => trackDesktopAppPromoClicked("topbar")}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={LINKS.REQUESTLY_DESKTOP_APP}
+                onClick={() => trackDesktopAppPromoClicked("topbar")}
+              >
+                Desktop App <Newbadge />
+              </a>
+            </div>
+          </Col>
+        ) : null}
+
+        <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 9) : 9}>
+          <div className="header-middle-section hidden-on-small-screen">
+            <HeaderText />
+          </div>
+        </Col>
+        <Col className="ml-auto">
+          <div className="header-right-section">
+            <Row align="middle" gutter={8} wrap={false}>
+              {randomNumberBetween1And2 === 1 ? (
+                <Col className="hidden-on-small-screen">
+                  <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                    <GitHubButton
+                      style={{ display: "flex" }}
+                      className="github-star-button"
+                      href="https://github.com/requestly/requestly"
+                      data-color-scheme="dark_dimmed"
+                      data-text="Star"
+                      data-show-count="true"
+                      aria-label="Star Requestly on GitHub"
+                    />
+                  </span>
+                </Col>
+              ) : (
+                <Col className="hidden-on-small-screen">
+                  <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
+                    <Button
+                      style={{ display: "flex" }}
+                      type="default"
+                      size="small"
+                      icon={<SlackOutlined />}
+                      onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
                     >
-                      Desktop App <Newbadge />
-                    </a>
-                  </div>
-                </div>
+                      Join Slack Community
+                    </Button>
+                  </span>
+                </Col>
+              )}
+
+              <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
+              <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
+                <RulesSyncToggle />
+              </div>
+
+              {/* documentation */}
+              <Col className="hidden-on-small-screen">
+                <Tooltip title={<span className="text-gray text-sm">Documentation</span>}>
+                  <Button
+                    type="text"
+                    className="header-icon-btn"
+                    icon={<ReadOutlined />}
+                    onClick={() => {
+                      trackHeaderClicked("documentation");
+                      redirectToUrl(LINKS.REQUESTLY_DOCS, true);
+                    }}
+                  />
+                </Tooltip>
               </Col>
-            ) : null}
 
-            <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 9) : 9}>
-              <div className="header-middle-section hidden-on-small-screen">
-                <HeaderText />
-              </div>
-            </Col>
-            <Col className="ml-auto">
-              <div className="header-right-section">
-                <Row align="middle" gutter={8} wrap={false}>
-                  {randomNumberBetween1And2 === 1 ? (
-                    <Col className="hidden-on-small-screen">
-                      <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
-                        <GitHubButton
-                          style={{ display: "flex" }}
-                          className="github-star-button"
-                          href="https://github.com/requestly/requestly"
-                          data-color-scheme="dark_dimmed"
-                          data-text="Star"
-                          data-show-count="true"
-                          aria-label="Star Requestly on GitHub"
-                        />
-                      </span>
-                    </Col>
-                  ) : (
-                    <Col className="hidden-on-small-screen">
-                      <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
-                        <Button
-                          style={{ display: "flex" }}
-                          type="default"
-                          size="small"
-                          icon={<SlackOutlined />}
-                          onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
-                        >
-                          Join Slack Community
-                        </Button>
-                      </span>
-                    </Col>
-                  )}
+              {/* product updates */}
+              <Col className="hidden-on-small-screen">
+                <Tooltip title={<span className="text-gray text-sm">Product updates</span>}>
+                  <Button
+                    type="text"
+                    className="header-icon-btn"
+                    icon={<NotificationOutlined />}
+                    onClick={() => {
+                      trackHeaderClicked("product_updates");
+                      redirectToProductUpdates(navigate);
+                    }}
+                  />
+                </Tooltip>
+              </Col>
 
-                  <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-                  <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
-                    <RulesSyncToggle />
-                  </div>
-
-                  {/* documentation */}
-                  <Col className="hidden-on-small-screen">
-                    <Tooltip title={<span className="text-gray text-sm">Documentation</span>}>
-                      <Button
-                        type="text"
-                        className="header-icon-btn"
-                        icon={<ReadOutlined />}
-                        onClick={() => {
-                          trackHeaderClicked("documentation");
-                          redirectToUrl(LINKS.REQUESTLY_DOCS, true);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-
-                  {/* product updates */}
-                  <Col className="hidden-on-small-screen">
-                    <Tooltip title={<span className="text-gray text-sm">Product updates</span>}>
-                      <Button
-                        type="text"
-                        className="header-icon-btn"
-                        icon={<NotificationOutlined />}
-                        onClick={() => {
-                          trackHeaderClicked("product_updates");
-                          redirectToProductUpdates(navigate);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-
-                  {/* settings */}
-                  <Col>
-                    <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
-                      <Button
-                        type="text"
-                        className="header-icon-btn"
-                        icon={<Settings />}
-                        onClick={() => {
-                          trackHeaderClicked("settings");
-                          redirectToSettings(navigate);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-                  <HeaderUser />
-                </Row>
-              </div>
-            </Col>
-          </Row>
+              {/* settings */}
+              <Col>
+                <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
+                  <Button
+                    type="text"
+                    className="header-icon-btn"
+                    icon={<Settings />}
+                    onClick={() => {
+                      trackHeaderClicked("settings");
+                      redirectToSettings(navigate);
+                    }}
+                  />
+                </Tooltip>
+              </Col>
+              <HeaderUser />
+            </Row>
+          </div>
         </Col>
       </Row>
     </Header>

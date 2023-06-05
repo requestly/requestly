@@ -48,7 +48,7 @@ const MenuFooter = () => {
   return (
     <>
       <Footer className="app-layout-footer">
-        <Row align="middle" justify="space-between">
+        <Row align="middle" justify="space-between" className="w-full">
           <Col md={12} span={24}>
             <div>
               © 2023{" "}
