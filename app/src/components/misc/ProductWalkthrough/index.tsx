@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useCallback, useMemo } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import JoyRide, { EVENTS, STATUS, CallBackProps, TooltipRenderProps } from "react-joyride";
 import { productTours } from "./tours";
 import { WalkthroughTooltip } from "./Tooltip";
@@ -8,14 +7,11 @@ import {
   trackWalkthroughStepCompleted,
   trackWalkthroughViewed,
 } from "modules/analytics/events/misc/productWalkthrough";
-import { actions } from "store";
-import { TOUR_TYPES } from "./constants";
 
 interface TourProps {
   startWalkthrough: boolean;
   tourFor: string;
   context?: any;
-  runTourWithABTest?: boolean; //temporary flag
   onTourComplete: () => void;
 }
 
@@ -23,12 +19,10 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
   startWalkthrough = false,
   tourFor,
   context,
-  runTourWithABTest = true,
   onTourComplete,
 }) => {
-  const dispatch = useDispatch();
-
   const joyrideRef = useRef(null);
+  const [hasReachedLastStep, setHasReachedLastStep] = useState<boolean>(false);
   const WalkthroughHelpers = joyrideRef.current?.WalkthroughHelpers;
   const tourSteps = useMemo(() => productTours[tourFor], [tourFor]);
 
@@ -43,7 +37,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     const { index, type, status } = data;
     if (status === STATUS.SKIPPED) {
       WalkthroughHelpers?.skip();
-      dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.REDIRECT_RULE }));
+      onTourComplete();
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
       trackWalkthroughStepCompleted(index + 1, tourFor);
       WalkthroughHelpers?.next();
@@ -52,20 +46,34 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
       onTourComplete();
       trackWalkthroughCompleted(tourFor);
     }
+    if (index >= tourSteps?.length - 1) {
+      setHasReachedLastStep(true);
+    }
   };
 
   useEffect(() => {
-    if (startWalkthrough && runTourWithABTest) {
+    if (startWalkthrough) {
       trackWalkthroughViewed(tourFor);
     }
-  }, [runTourWithABTest, startWalkthrough, tourFor]);
+  }, [startWalkthrough, tourFor]);
+
+  useEffect(() => {
+    // complete the tour is  TOUR_END does not trigger after last step
+    // eg. clicking on create rule button in rule editor tour
+    return () => {
+      if (hasReachedLastStep) {
+        trackWalkthroughCompleted(tourFor);
+        onTourComplete();
+      }
+    };
+  }, [hasReachedLastStep, onTourComplete, tourFor]);
 
   return (
     <>
       {startWalkthrough && (
         <JoyRide
           ref={joyrideRef}
-          run={startWalkthrough && runTourWithABTest}
+          run={startWalkthrough}
           steps={tourSteps}
           continuous={true}
           callback={callback}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
@@ -9,7 +9,7 @@ import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails, getAppMode } from "store/selectors";
+import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
@@ -31,6 +31,7 @@ const GettingStarted = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
@@ -38,7 +39,7 @@ const GettingStarted = () => {
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal";
+  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal" && !userPersona?.isSurveyCompleted;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -67,32 +68,10 @@ const GettingStarted = () => {
     navigate(PATHS.RULES.CREATE);
   };
 
-  const handleUploadRulesClick = useCallback(() => {
-    if (window.isChinaUser) {
-      setIsImportRulesModalActive(true);
-      trackRulesImportStarted();
-      return;
-    }
-
-    if (isUserLoggedIn) {
-      setIsImportRulesModalActive(true);
-      trackRulesImportStarted();
-    } else {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            userActionMessage: "Sign up to upload rules",
-            callback: handleUploadRulesClick,
-            src: APP_CONSTANTS.FEATURES.RULES,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-            eventSource: AUTH.SOURCE.UPLOAD_RULES,
-          },
-        })
-      );
-    }
-  }, [dispatch, isUserLoggedIn]);
+  const handleUploadRulesClick = () => {
+    setIsImportRulesModalActive(true);
+    trackRulesImportStarted();
+  };
 
   useEffect(() => {
     if (gettingStartedVideo.current) {

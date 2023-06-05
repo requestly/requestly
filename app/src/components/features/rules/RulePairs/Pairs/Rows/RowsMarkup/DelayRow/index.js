@@ -6,7 +6,7 @@ const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled 
 
   return (
     <Row align="middle" key={rowIndex}>
-      <Col align="right" span={24}>
+      <Col align="right" span={24} data-tour-id="rule-editor-delay-value">
         <RQInput
           type="text"
           value={pair.delay}

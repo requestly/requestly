@@ -21,6 +21,7 @@ import {
   trackResponseLoaded,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
@@ -38,6 +39,7 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
   const appMode = useSelector(getAppMode);
+  const location = useLocation();
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
@@ -220,8 +222,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       headersCount: sanitizedEntry.request.headers.length,
       requestContentType: sanitizedEntry.request.contentType,
       isDemoURL: sanitizedEntry.request.url === DEMO_API_URL,
+      path: location.pathname,
     });
-  }, [appMode, entry, notifyApiRequestFinished]);
+  }, [appMode, entry, notifyApiRequestFinished, location.pathname]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();

@@ -877,7 +877,7 @@ BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
         return { wasMessageSent: false };
       });
 
-    if (response.wasMessageSent) {
+    if (response?.wasMessageSent) {
       return response;
     }
   }
@@ -912,6 +912,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.ADD_EVENT:
         EventActions.queueEventToWrite(message.payload);
+        break;
+
+      case RQ.CLIENT_MESSAGES.ADD_EXECUTION_EVENT:
+        EventActions.queueExecutionEventToWrite(message.payload);
         break;
 
       case RQ.CLIENT_MESSAGES.GET_SCRIPT_RULES:
@@ -1059,6 +1063,7 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
 
 BG.Methods.onAppLoadedNotification = () => {
   BG.isAppOnline = true;
+
   RQ.StorageService.getRecord(RQ.STORAGE_KEYS.USE_EVENTS_ENGINE).then((useEngine) => {
     if (useEngine === false) {
       EventActions.stopPeriodicEventWriter();
@@ -1066,6 +1071,13 @@ BG.Methods.onAppLoadedNotification = () => {
       EventActions.startPeriodicEventWriter();
     }
   });
+
+  RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SEND_EXECUTION_EVENTS).then(async (sendExecutionEvents) => {
+    if (sendExecutionEvents === false) {
+      await EventActions.clearExecutionEvents();
+    }
+  });
+
   EventActions.sendExtensionEvents();
 };
 
@@ -1397,6 +1409,7 @@ BG.Methods.init = function () {
 
     // Fetch records
     RQ.StorageService.fetchRecords().then(BG.Methods.readExtensionStatus);
+    EventActions.setEventsCount();
   });
 
   // Add Listener to reply to requests from extension content scripts or popup
