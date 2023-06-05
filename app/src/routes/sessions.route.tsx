@@ -5,7 +5,7 @@ import SessionsHomeView from "views/features/sessions";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
 
-export const sessionsRoutes: RouteObject[] = [
+export const sessionRoutes: RouteObject[] = [
   {
     path: PATHS.SESSIONS.INDEX,
     element: <SessionsContainer />,
