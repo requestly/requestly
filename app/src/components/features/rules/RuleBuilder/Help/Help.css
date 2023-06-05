@@ -202,9 +202,7 @@ li {
 }
 
 .rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item,
-.rule-editor-docs-faqs-collapse.ant-collapse
-  .ant-collapse-item
-  .ant-collapse-content {
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item .ant-collapse-content {
   background-color: transparent;
 }
 
@@ -212,18 +210,60 @@ li {
   border-bottom: 1px solid var(--border-dark);
 }
 
-.rule-editor-docs-faqs-collapse.ant-collapse
-  .ant-collapse-item
-  .ant-collapse-header-text {
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item .ant-collapse-header-text {
   max-width: 94%;
   font-size: 13px;
   font-weight: 500;
 }
 
-.rule-editor-docs-faqs-collapse.ant-collapse
-  .ant-collapse-item
-  .ant-collapse-content
-  p {
+.rule-editor-docs-faqs-collapse.ant-collapse .ant-collapse-item .ant-collapse-content p {
   font-size: 13px;
   margin-bottom: 0;
+}
+
+/* NEW STYLES FOR DOCS FROM NOTION*/
+
+.rule-editor-docs .notion {
+  font-family: "Roboto";
+}
+.rule-editor-docs .notion .notion-h1 {
+  font-size: 18px;
+  line-height: 1.625rem;
+  font-weight: 500;
+  color: var(--white);
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.rule-editor-docs .notion .notion-text {
+  color: var(--text-gray);
+  font-size: 14px;
+  line-height: 22px;
+}
+.rule-editor-docs .notion .notion-list {
+  padding-left: 0;
+  color: var(--text-gray);
+  font-size: 14px;
+}
+.rule-editor-docs .notion a {
+  color: #3ba0ff;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.rule-editor-docs .notion a:hover {
+  color: #2051b4;
+}
+.rule-editor-docs .notion .notion-toggle:not(:first-child) {
+  margin-top: 14px;
+}
+
+.rule-editor-docs .notion .notion-toggle summary {
+  font-size: 14px;
+}
+
+.rule-editor-docs .notion b {
+  font-weight: 500;
+  color: var(--white);
 }

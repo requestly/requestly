@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Col, Collapse, Row } from "antd";
+import { Button, Col, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { YouTubePlayer } from "components/misc/YoutubeIframe";
+// import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import APP_CONSTANTS from "config/constants";
-import Zoom from "react-medium-image-zoom";
+// import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
-import { RQCollapse } from "lib/design-system/components/RQCollapse";
+// import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
@@ -15,7 +15,7 @@ import {
   trackDocsSidebarClosed,
   // trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
-  trackDocsSidebarDemovideoWatched,
+  // trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
@@ -52,11 +52,11 @@ const externalLinks: ExternalLink[] = [
   },
 ];
 
-const Link: React.FC<{ text: string; href: string }> = ({ text, href }) => (
-  <a target="_blank" rel="noreferrer" href={href}>
-    {text}
-  </a>
-);
+// const Link: React.FC<{ text: string; href: string }> = ({ text, href }) => (
+//   <a target="_blank" rel="noreferrer" href={href}>
+//     {text}
+//   </a>
+// );
 
 // type DocumentationListItem = {
 //   title: string;
@@ -73,13 +73,13 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [notionPageData, setNotionPageData] = useState(null);
   const [tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
-  const getStartedRef = useRef<HTMLDivElement | null>(null);
-  const demoVideoRef = useRef<HTMLDivElement | null>(null);
-  const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
-  const useCasesRef = useRef<HTMLDivElement | null>(null);
-  const testingRuleRef = useRef<HTMLDivElement | null>(null);
-  const examplesRef = useRef<HTMLDivElement | null>(null);
-  const faqsRef = useRef<HTMLDivElement | null>(null);
+  // const getStartedRef = useRef<HTMLDivElement | null>(null);
+  // const demoVideoRef = useRef<HTMLDivElement | null>(null);
+  // const howToCreateRuleRef = useRef<HTMLDivElement | null>(null);
+  // const useCasesRef = useRef<HTMLDivElement | null>(null);
+  // const testingRuleRef = useRef<HTMLDivElement | null>(null);
+  // const examplesRef = useRef<HTMLDivElement | null>(null);
+  // const faqsRef = useRef<HTMLDivElement | null>(null);
 
   // const handleDocumentationList = useCallback((ref: React.MutableRefObject<HTMLDivElement>) => {
   //   if (ref.current) {
@@ -133,9 +133,9 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     setIsDocsVisible((prev) => !prev);
   };
 
-  const handleDemoVideoPlay = () => {
-    trackDocsSidebarDemovideoWatched(ruleType);
-  };
+  // const handleDemoVideoPlay = () => {
+  //   trackDocsSidebarDemovideoWatched(ruleType);
+  // };
 
   // const handleDocumentationListItemClick = (title: string, handler: () => void) => {
   //   toggleDocs();
@@ -199,7 +199,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
           <>
             <div className="rule-editor-docs">
               <NotionRenderer blockMap={notionPageData} />
-              <div ref={getStartedRef} className="rule-editor-docs-intro">
+              {/* <div ref={getStartedRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">URL Redirect Rule</div>
                 <p className="text-gray">
                   The redirect Rule helps in changing the HTTP Requests location to a new destination as per the
@@ -358,7 +358,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     </p>
                   </Collapse.Panel>
                 </RQCollapse>
-              </div>
+              </div> */}
             </div>
           </>
         ) : (
