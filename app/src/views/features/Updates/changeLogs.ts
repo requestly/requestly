@@ -2,6 +2,15 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.6.5",
+    logs: [
+      {
+        title: "Configuration to modify response in static mode without making a call to the server.",
+        link: "https://github.com/requestly/requestly/issues/266",
+      },
+    ],
+  },
+  {
     version: "23.5.19",
     logs: [
       {
