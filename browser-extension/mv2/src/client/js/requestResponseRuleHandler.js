@@ -42,6 +42,7 @@ RQ.RequestResponseRuleHandler.init = function () {
   RQ.ClientUtils.executeJS(`(${RQ.ClientRuleMatcher.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
 
   RQ.RequestResponseRuleHandler.cacheRequestRules();
+  RQ.RequestResponseRuleHandler.cacheStaticResponseRules();
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE) {
@@ -77,16 +78,30 @@ RQ.RequestResponseRuleHandler.init = function () {
   RQ.RequestResponseRuleHandler.isInitialized = true;
 };
 
-RQ.RequestResponseRuleHandler.cacheRequestRules = () => {
-  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST).then((requestRules) => {
-    RQ.ClientUtils.executeJS(
-      `
-      window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
-      window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
-    `,
-      true
-    );
+RQ.RequestResponseRuleHandler.cacheRequestRules = async () => {
+  const requestRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REQUEST);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
+  `,
+    true
+  );
+};
+
+RQ.RequestResponseRuleHandler.cacheStaticResponseRules = async () => {
+  const allResponseRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE);
+  const staticResponseRules = allResponseRules.filter((rule) => {
+    return rule.pairs[0].response.type === "static" && rule.pairs[0].response.serveWithoutRequest;
   });
+
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.staticResponseRules = ${JSON.stringify(staticResponseRules)};
+  `,
+    true
+  );
 };
 
 RQ.RequestResponseRuleHandler.cacheResponseRule = (url, responseRule) => {
@@ -109,16 +124,16 @@ RQ.RequestResponseRuleHandler.removeResponseRuleFromCache = (ruleId) => {
   RQ.RequestResponseRuleHandler.cachedResponseRuleIds.delete(ruleId);
 };
 
-RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
+RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = async () => {
   RQ.RequestResponseRuleHandler.cacheRequestRules();
+  RQ.RequestResponseRuleHandler.cacheStaticResponseRules();
 
-  RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE).then((responseRules) => {
-    const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
-    RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
-      if (!enabledResponseRuleIds.includes(ruleId)) {
-        RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
-      }
-    });
+  const responseRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.RESPONSE);
+  const enabledResponseRuleIds = responseRules.map((rule) => rule.id);
+  RQ.RequestResponseRuleHandler.cachedResponseRuleIds.forEach((ruleId) => {
+    if (!enabledResponseRuleIds.includes(ruleId)) {
+      RQ.RequestResponseRuleHandler.removeResponseRuleFromCache(ruleId);
+    }
   });
 };
 
@@ -131,6 +146,7 @@ RQ.RequestResponseRuleHandler.updateCacheOnRuleChanges = () => {
 RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   window[namespace] = window[namespace] || {};
   window[namespace].requestRules = [];
+  window[namespace].staticResponseRules = [];
   window[namespace].responseRulesByUrl = {};
   let isDebugMode = false;
 
@@ -231,6 +247,18 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     );
   };
 
+  const getStaticResponseRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    const absoluteUrl = getAbsoluteUrl(url);
+
+    return window[namespace].staticResponseRules.findLast((rule) =>
+      window[namespace].matchSourceUrl(rule.pairs[0].source, absoluteUrl)
+    );
+  };
+
   const getFunctionFromCode = (code) => {
     return new Function("args", `return (${code})(args);`);
   };
@@ -277,6 +305,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     return defaultValue;
   };
 
+  const isJSON = (data) => {
+    const parsedJson = jsonifyValidJSONString(data);
+    return parsedJson !== data; // if data is not a JSON, jsonifyValidJSONString() returns same value
+  };
+
   /**
    * @param  url
    * Does not handle duplicate query params for now
@@ -294,7 +327,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     const paramsObject = Object.fromEntries(new URLSearchParams(searchParamsString));
 
     // Traverse paramsObject to convert JSON strings into JSON object
-    for (paramName in paramsObject) {
+    for (let paramName in paramsObject) {
       const paramValue = paramsObject[paramName];
       paramsObject[paramName] = jsonifyValidJSONString(paramValue);
     }
@@ -455,6 +488,34 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     }
   };
 
+  const resolveXHR = (xhr, responseData) => {
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    const updateReadyState = (readyState) => {
+      xhr.readyState = readyState;
+      xhr.dispatchEvent(new CustomEvent("readystatechange"));
+    };
+    const dispatchProgressEvent = (type) => {
+      xhr.dispatchEvent(new ProgressEvent(type));
+    };
+
+    dispatchProgressEvent("loadstart");
+
+    // update response headers
+    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
+    xhr.getResponseHeader = (key) => {
+      if (key.toLowerCase() === "content-type") {
+        return contentType;
+      }
+      return null;
+    };
+    updateReadyState(xhr.HEADERS_RECEIVED);
+
+    // mark resolved
+    updateReadyState(xhr.DONE);
+    dispatchProgressEvent("load");
+    dispatchProgressEvent("loadend");
+  };
+
   const XHR = XMLHttpRequest;
   XMLHttpRequest = function () {
     const xhr = new XHR();
@@ -475,11 +536,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
-    const requestRule = getRequestRule(this.requestURL);
-    let requestBody;
+    this.requestData = data;
 
+    const requestRule = getRequestRule(this.requestURL);
     if (requestRule) {
-      requestBody = getCustomRequestBody(requestRule, {
+      this.requestData = getCustomRequestBody(requestRule, {
         method: this.method,
         url: this.requestURL,
         body: data,
@@ -495,12 +556,15 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
           timeStamp: Date.now(),
         },
       });
-    } else {
-      requestBody = data;
     }
 
-    this.requestData = requestBody;
-    send.call(this, requestBody);
+    const staticResponseRule = getStaticResponseRule(this.requestURL);
+    if (staticResponseRule) {
+      window[namespace].responseRulesByUrl[getAbsoluteUrl(this.requestURL)] = staticResponseRule;
+      resolveXHR(this, staticResponseRule.pairs[0].response.value);
+    } else {
+      send.call(this, this.requestData);
+    }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
@@ -523,9 +587,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     } else {
       request = new Request(resource.toString(), initOptions);
     }
-
-    let fetchedResponse;
-    let exceptionCaught;
 
     const method = request.method;
     // Request body can be sent only for request methods other than GET and HEAD.
@@ -566,32 +627,67 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       });
     }
 
-    try {
-      if (requestRule) {
-        // request has already been read while processing requestRule, so needs to be cloned
-        fetchedResponse = await _fetch(request.clone());
-      } else {
-        fetchedResponse = await getOriginalResponse();
-      }
-    } catch (error) {
-      exceptionCaught = error;
-    }
-
-    let url;
-
-    if (fetchedResponse && isResponseRuleApplicableOnUrl(fetchedResponse.url)) {
-      url = fetchedResponse.url; // final URL obtained after any redirects
-    } else if (isResponseRuleApplicableOnUrl(request.url)) {
-      url = request.url;
+    let requestData;
+    if (canRequestBodyBeSent) {
+      requestData = jsonifyValidJSONString(await request.text());
     } else {
-      if (exceptionCaught) {
-        return Promise.reject(exceptionCaught);
-      }
-      return fetchedResponse;
+      requestData = convertSearchParamsToJSON(request.url);
     }
 
-    const responseRule = getResponseRule(url);
-    const { response: responseModification, source } = responseRule.pairs[0];
+    let fetchedResponse;
+    let url;
+    let responseHeaders;
+    let responseRule;
+    let serveOriginalResponse = false;
+
+    const staticResponseRule = getStaticResponseRule(request.url);
+    if (staticResponseRule) {
+      if (!isRequestPayloadFilterApplicable({ requestData, method }, staticResponseRule.pairs[0].source?.filters)) {
+        serveOriginalResponse = true;
+      } else {
+        responseRule = staticResponseRule;
+        url = getAbsoluteUrl(request.url);
+
+        const contentType = isJSON(staticResponseRule.pairs[0].response.value) ? "application/json" : "text/plain";
+        responseHeaders = new Headers({ "content-type": contentType });
+      }
+    }
+
+    if (!staticResponseRule || serveOriginalResponse) {
+      let exceptionCaught;
+      try {
+        if (requestRule) {
+          // request has already been read while processing requestRule, so needs to be cloned
+          fetchedResponse = await _fetch(request.clone());
+        } else {
+          fetchedResponse = await getOriginalResponse();
+        }
+
+        if (serveOriginalResponse) {
+          return fetchedResponse;
+        }
+      } catch (error) {
+        // don't throw error immediately as there can be a matching rule
+        exceptionCaught = error;
+      }
+
+      if (fetchedResponse && isResponseRuleApplicableOnUrl(fetchedResponse.url)) {
+        url = fetchedResponse.url; // final URL obtained after any redirects
+      } else if (isResponseRuleApplicableOnUrl(request.url)) {
+        url = request.url;
+      } else {
+        if (exceptionCaught) {
+          return Promise.reject(exceptionCaught);
+        }
+        return fetchedResponse;
+      }
+
+      responseHeaders = fetchedResponse?.headers;
+      responseRule = getResponseRule(url);
+      if (!isRequestPayloadFilterApplicable({ requestData, method }, responseRule.pairs[0].source?.filters)) {
+        return fetchedResponse;
+      }
+    }
 
     isDebugMode &&
       console.log("RQ", "Inside the fetch block for url", {
@@ -601,19 +697,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         fetchedResponse,
       });
 
-    let requestData;
-
-    if (canRequestBodyBeSent) {
-      requestData = jsonifyValidJSONString(await request.text());
-    } else {
-      requestData = convertSearchParamsToJSON(url);
-    }
-
-    if (!isRequestPayloadFilterApplicable({ requestData, method }, source?.filters)) {
-      return fetchedResponse;
-    }
-
     let customResponse;
+    const responseModification = responseRule.pairs[0].response;
 
     if (responseModification.type === "code") {
       const requestHeaders =
@@ -677,7 +762,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
       status: finalStatusCode,
       statusText: responseModification.statusText || fetchedResponse?.statusText,
-      headers: fetchedResponse?.headers,
+      headers: responseHeaders,
     });
   };
 };
