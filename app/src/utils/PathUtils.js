@@ -2,6 +2,10 @@ import APP_CONSTANTS from "../config/constants";
 
 const { PATHS } = APP_CONSTANTS;
 
+export const joinPaths = (path1 = "", path2 = "") => {
+  return path1.concat(path2?.[0] !== "/" ? "/" + path2 : path2).replace(/\/\//g, "/");
+};
+
 export const getDesktopSignInAuthPath = (authCode, source) => {
   if (!authCode) return PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE;
   return `${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?ot-auth-code=${authCode}&source=${source}`;
@@ -42,11 +46,6 @@ export const getSessionRecordingSharedLink = (recordingId) => {
 export const getSharedListURL = (shareId, sharedListName) => {
   const formattedSharedListName = sharedListName.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
   return (
-    window.location.origin +
-    APP_CONSTANTS.PATHS.RULES.RELATIVE +
-    "#sharedList/" +
-    shareId +
-    "-" +
-    formattedSharedListName
+    window.location.origin + APP_CONSTANTS.PATHS.RULES.INDEX + "#sharedList/" + shareId + "-" + formattedSharedListName
   );
 };
