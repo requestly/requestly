@@ -23,6 +23,8 @@ export const EXTENSION_MESSAGES = {
 };
 
 export const CLIENT_MESSAGES = {
+  ADD_EVENT: "addEvent",
+  ADD_EXECUTION_EVENT: "addExecutionEvent",
   INIT_SESSION_RECORDING: "initSessionRecording",
   NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
   IS_RECORDING_SESSION: "isRecordingSession",
@@ -33,7 +35,6 @@ export const CLIENT_MESSAGES = {
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
-  ADD_EVENT: "addEvent",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
 };
 
