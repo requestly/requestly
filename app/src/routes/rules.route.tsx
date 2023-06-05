@@ -22,7 +22,7 @@ import SharedListImportView from "views/features/sharedLists/SharedListImportVie
  *  - trash  [DONE]
  */
 
-export const rulesRoutes: RouteObject[] = [
+export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
