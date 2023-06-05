@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer/RulesContainer";
@@ -6,50 +6,89 @@ import RulesIndexView from "views/features/rules/RulesIndexView";
 import SharedListsIndexView from "views/features/sharedLists/SharedListsIndexView";
 import TrashIndexView from "views/features/trash/TrashIndexView";
 import RuleEditor from "views/features/rules/RuleEditor";
+import SharedListViewer from "views/features/sharedLists/SharedListViewer";
+import { joinPaths } from "utils/PathUtils";
+import SharedListImportView from "views/features/sharedLists/SharedListImportView";
 
-// highlighting the sub routes
-// fix all the sub routes (ie remove new routes)
-// continue with the other screens
+/**
+ *  - table / listing [DONE]
+ *  - editor
+ *
+ *  - sharedlist list [DONE]
+ *  - /:id [TODO: broken]
+ *
+ *  - templates [DONE]
+ *
+ *  - trash  [DONE]
+ */
 
-export const rulesRoutes = [
+export const rulesRoutes: RouteObject[] = [
   {
-    path: "/",
-    element: <Navigate to={PATHS.NEW.RULES.MY_RULES.ABSOLUTE} />,
-  },
-  {
-    path: PATHS.MARKETPLACE.RELATIVE,
-    element: <Navigate to={PATHS.NEW.RULES.TEMPLATES.ABSOLUTE} />,
-  },
-  {
-    path: PATHS.NEW.RULES.INDEX,
+    path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
-
     children: [
       {
-        path: "*",
-        element: <Navigate to={PATHS.NEW.RULES.MY_RULES.RELATIVE} />,
+        path: "",
+        element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
       },
       {
         index: true,
-        path: PATHS.NEW.RULES.MY_RULES.RELATIVE,
+        path: PATHS.RULES.MY_RULES.RELATIVE,
         element: <RulesIndexView />,
       },
       {
-        path: "editor" + "/" + PATHS.ANY,
+        path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
         element: <RuleEditor location={window.location} />,
       },
       {
-        path: PATHS.NEW.RULES.SHARED_LISTS.RELATIVE,
+        path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
+        element: <RuleEditor location={window.location} />,
+      },
+      {
+        path: PATHS.SHARED_LISTS.RELATIVE,
         element: <SharedListsIndexView />,
       },
       {
-        path: PATHS.NEW.RULES.TEMPLATES.RELATIVE,
+        path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
+        element: <SharedListViewer />,
+      },
+      {
+        path: PATHS.SHARED_LISTS.VIEWER.RELATIVE, // currently broken in prod
+        element: <Navigate to={PATHS.SHARED_LISTS.ABSOLUTE} />,
+      },
+      {
+        path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE,
+        element: <SharedListImportView />,
+      },
+      {
+        path: PATHS.RULES.TEMPLATES.RELATIVE,
         element: <TemplatesIndexPage />,
       },
       {
-        path: PATHS.NEW.RULES.TRASH.RELATIVE,
+        path: PATHS.RULES.TRASH.RELATIVE,
         element: <TrashIndexView />,
       },
+      {
+        path: "*",
+        element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
+      },
     ],
+  },
+  // redirects
+  {
+    path: "/",
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
+  },
+  {
+    path: PATHS.MARKETPLACE.RELATIVE,
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
+  },
+  {
+    path: PATHS.ROOT,
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
+  },
+  {
+    path: PATHS.INDEX_HTML,
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
   },
 ];
