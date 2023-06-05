@@ -313,7 +313,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               <Row className="white header text-bold">Connect apps</Row>
               <Row className="text-gray mt-8">
                 Connect your system apps to Requestly. After connecting the required app, click&nbsp;
-                <Link to={PATHS.RULES.RELATIVE} className="connected-apps-secondary-link" onClick={toggle}>
+                <Link to={PATHS.RULES.INDEX} className="connected-apps-secondary-link" onClick={toggle}>
                   here
                 </Link>
                 &nbsp;to setup rules.
