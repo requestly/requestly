@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Collapse, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
@@ -10,15 +10,18 @@ import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
-import { snakeCase } from "lodash";
+// import { snakeCase } from "lodash";
 import {
   trackDocsSidebarClosed,
-  trackDocsSidebarPrimaryCategoryClicked,
+  // trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
+import "react-notion/src/styles.css";
+import { NotionRenderer } from "react-notion";
+import { TocItem } from "./types";
 
 type ExternalLink = { title: string; link: string };
 
@@ -55,10 +58,10 @@ const Link: React.FC<{ text: string; href: string }> = ({ text, href }) => (
   </a>
 );
 
-type DocumentationListItem = {
-  title: string;
-  onClick: () => void;
-};
+// type DocumentationListItem = {
+//   title: string;
+//   onClick: () => void;
+// };
 
 interface HelpProps {
   ruleType: RuleType;
@@ -67,6 +70,8 @@ interface HelpProps {
 
 const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
+  const [notionPageData, setNotionPageData] = useState(null);
+  const [tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
   const getStartedRef = useRef<HTMLDivElement | null>(null);
   const demoVideoRef = useRef<HTMLDivElement | null>(null);
@@ -76,46 +81,46 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const examplesRef = useRef<HTMLDivElement | null>(null);
   const faqsRef = useRef<HTMLDivElement | null>(null);
 
-  const handleDocumentationList = useCallback((ref: React.MutableRefObject<HTMLDivElement>) => {
-    if (ref.current) {
-      const target = ref.current;
-      const { offsetTop } = target;
-      (target.parentNode as HTMLElement).scrollTop = offsetTop - 87;
-    }
-  }, []);
+  // const handleDocumentationList = useCallback((ref: React.MutableRefObject<HTMLDivElement>) => {
+  //   if (ref.current) {
+  //     const target = ref.current;
+  //     const { offsetTop } = target;
+  //     (target.parentNode as HTMLElement).scrollTop = offsetTop - 87;
+  //   }
+  // }, []);
 
-  const documentationList: DocumentationListItem[] = useMemo(() => {
-    return [
-      {
-        title: "Get Started",
-        onClick: () => handleDocumentationList(getStartedRef),
-      },
-      {
-        title: "Demo",
-        onClick: () => handleDocumentationList(demoVideoRef),
-      },
-      {
-        title: "How to create a redirect rule?",
-        onClick: () => handleDocumentationList(howToCreateRuleRef),
-      },
-      {
-        title: "Popular Use cases",
-        onClick: () => handleDocumentationList(useCasesRef),
-      },
-      {
-        title: "Testing Rule",
-        onClick: () => handleDocumentationList(testingRuleRef),
-      },
-      {
-        title: "Examples",
-        onClick: () => handleDocumentationList(examplesRef),
-      },
-      {
-        title: "FAQ",
-        onClick: () => handleDocumentationList(faqsRef),
-      },
-    ];
-  }, [handleDocumentationList]);
+  // const documentationList: DocumentationListItem[] = useMemo(() => {
+  //   return [
+  //     {
+  //       title: "Get Started",
+  //       onClick: () => handleDocumentationList(getStartedRef),
+  //     },
+  //     {
+  //       title: "Demo",
+  //       onClick: () => handleDocumentationList(demoVideoRef),
+  //     },
+  //     {
+  //       title: "How to create a redirect rule?",
+  //       onClick: () => handleDocumentationList(howToCreateRuleRef),
+  //     },
+  //     {
+  //       title: "Popular Use cases",
+  //       onClick: () => handleDocumentationList(useCasesRef),
+  //     },
+  //     {
+  //       title: "Testing Rule",
+  //       onClick: () => handleDocumentationList(testingRuleRef),
+  //     },
+  //     {
+  //       title: "Examples",
+  //       onClick: () => handleDocumentationList(examplesRef),
+  //     },
+  //     {
+  //       title: "FAQ",
+  //       onClick: () => handleDocumentationList(faqsRef),
+  //     },
+  //   ];
+  // }, [handleDocumentationList]);
 
   const toggleDocs = () => {
     if (isDocsVisible) {
@@ -132,12 +137,40 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     trackDocsSidebarDemovideoWatched(ruleType);
   };
 
-  const handleDocumentationListItemClick = (title: string, handler: () => void) => {
-    toggleDocs();
-    // ensures element is mounted
-    setTimeout(() => handler(), 0);
-    trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
+  // const handleDocumentationListItemClick = (title: string, handler: () => void) => {
+  //   toggleDocs();
+  //   // ensures element is mounted
+  //   setTimeout(() => handler(), 0);
+  //   trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
+  // };
+
+  const GetDocTableOfContents = (data: any[]) => {
+    const headers = [];
+    if (data) {
+      for (const key in data) {
+        const elem = data[key];
+        if (elem?.value?.type === "header") {
+          headers.push({ id: elem.value.id, title: elem.value.properties.title[0][0] });
+        }
+      }
+      setTableOfContents(headers);
+    }
   };
+
+  const fetchRuleDocFromNotionPage = async () => {
+    const data = await fetch("https://notion-api.splitbee.io/v1/page/023f63c7f9fd4baebb558f28c531ae90").then((res) =>
+      res.json()
+    );
+    setNotionPageData(data);
+    GetDocTableOfContents(data);
+    console.log({ data }); // TODO: remove this
+  };
+
+  useEffect(() => {
+    fetchRuleDocFromNotionPage();
+  }, []);
+
+  console.log({ tableOfContents }); // TODO: remove this
 
   return (
     <div className="rule-editor-help-container">
@@ -165,6 +198,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
+              <NotionRenderer blockMap={notionPageData} />
               <div ref={getStartedRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">URL Redirect Rule</div>
                 <p className="text-gray">
@@ -333,14 +367,25 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
             <div ref={documentationListRef} className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
-                Documentation for Redirect request
+                Documentation for Redirect request {/* TODO: change according to rule type */}
               </div>
               <ul className="rule-editor-help-list">
-                {documentationList.map(({ title, onClick }) => (
-                  <li key={title}>
-                    <Button onClick={() => handleDocumentationListItemClick(title, onClick)}>{title}</Button>
-                  </li>
-                ))}
+                <>
+                  {tableOfContents?.length && (
+                    <>
+                      {" "}
+                      {tableOfContents.map(({ title, id }: TocItem) => (
+                        <li key={id} id={id} onClick={toggleDocs}>
+                          <Button
+                          // onClick={() => handleDocumentationListItemClick(title, onClick)} //TODO: add scroll
+                          >
+                            {title}
+                          </Button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                </>
               </ul>
 
               {/* external links */}
