@@ -29,10 +29,10 @@ const EmailAction = () => {
           setRedirectPath(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE + queryParamString);
           break;
         default:
-          setRedirectPath(PATHS.RULES.RELATIVE);
+          setRedirectPath(PATHS.RULES.INDEX);
       }
     } else {
-      setRedirectPath(PATHS.RULES.RELATIVE);
+      setRedirectPath(PATHS.RULES.INDEX);
     }
   }, [redirectPath]);
 
