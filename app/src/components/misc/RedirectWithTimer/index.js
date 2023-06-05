@@ -5,7 +5,7 @@ import APP_CONSTANTS from "../../../config/constants";
 const { PATHS } = APP_CONSTANTS;
 
 const RedirectWithTimer = ({ delay, path, message }) => {
-  path = path ? path : PATHS.RULES.INDEX;
+  path = path ? path : PATHS.RULES.RELATIVE;
   // COMPONENT STATE
   const [timer, setTimer] = useState(delay);
   const [redirect, setRedirect] = useState(false);
