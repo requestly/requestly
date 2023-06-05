@@ -46,6 +46,11 @@ export const getSessionRecordingSharedLink = (recordingId) => {
 export const getSharedListURL = (shareId, sharedListName) => {
   const formattedSharedListName = sharedListName.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
   return (
-    window.location.origin + APP_CONSTANTS.PATHS.RULES.INDEX + "#sharedList/" + shareId + "-" + formattedSharedListName
+    window.location.origin +
+    APP_CONSTANTS.PATHS.RULES.RELATIVE +
+    "#sharedList/" +
+    shareId +
+    "-" +
+    formattedSharedListName
   );
 };
