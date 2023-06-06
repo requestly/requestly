@@ -6,10 +6,10 @@ const joinPaths = (path1, path2) => {
 };
 
 /**
- * @description Paths consist of mostly INDEX, RELATIVE and ABSOLUTE paths.
+ * @description Paths consist of INDEX, RELATIVE and ABSOLUTE paths.
  *
  * - INDEX and RELATIVE paths are almost same and are used for routing purpose
- * - ABSOLUTE paths are used for navigating in app and handling redirects
+ * - ABSOLUTE paths are used in app navigation and handling redirects
  */
 const PATHS = {};
 PATHS.ABSOLUTE = {};
