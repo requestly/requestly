@@ -57,7 +57,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
             <div className="header-left-section">
-              <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
+              <Link to={PATHS.RULES.MY_RULES.ABSOLUTE}>Home</Link>
 
               <WorkspaceSelector />
 
