@@ -1,9 +1,0 @@
-.rules-secondary-sidebar-container {
-  width: 100%;
-  min-height: calc(100vh - 4.5rem);
-  border-right: 1px solid var(--border-dark);
-}
-
-.rules-secondary-sidebar-active-link {
-  color: white;
-}
