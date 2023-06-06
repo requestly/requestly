@@ -12,7 +12,7 @@ import Page403 from "views/misc/ServerResponses/403";
 import Page404 from "views/misc/ServerResponses/404";
 import AcceptTeamInviteView from "views/user/Teams/AcceptInvite";
 
-export const onboardingRoutes: RouteObject[] = [
+export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.EXTENSION_INSTALLED.RELATIVE,
     element: <ExtensionInstalled />,
