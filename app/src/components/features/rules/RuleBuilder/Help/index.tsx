@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Button, Col, Row } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 // import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import APP_CONSTANTS from "config/constants";
-// import Zoom from "react-medium-image-zoom";
+import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 // import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
-// import { snakeCase } from "lodash";
+import { snakeCase } from "lodash";
 import {
   trackDocsSidebarClosed,
-  // trackDocsSidebarPrimaryCategoryClicked,
+  trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   // trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
@@ -81,13 +81,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   // const examplesRef = useRef<HTMLDivElement | null>(null);
   // const faqsRef = useRef<HTMLDivElement | null>(null);
 
-  // const handleDocumentationList = useCallback((ref: React.MutableRefObject<HTMLDivElement>) => {
-  //   if (ref.current) {
-  //     const target = ref.current;
-  //     const { offsetTop } = target;
-  //     (target.parentNode as HTMLElement).scrollTop = offsetTop - 87;
-  //   }
-  // }, []);
+  const handleScrollToSection = useCallback((id: string) => {
+    const target = document.getElementById(id);
+    if (target) {
+      const { offsetTop } = target;
+      const parentContainer = target.parentNode.parentNode as HTMLElement;
+      parentContainer.scrollTop = offsetTop - 87;
+    }
+  }, []);
 
   // const documentationList: DocumentationListItem[] = useMemo(() => {
   //   return [
@@ -137,12 +138,11 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   //   trackDocsSidebarDemovideoWatched(ruleType);
   // };
 
-  // const handleDocumentationListItemClick = (title: string, handler: () => void) => {
-  //   toggleDocs();
-  //   // ensures element is mounted
-  //   setTimeout(() => handler(), 0);
-  //   trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
-  // };
+  const handleDocumentationListItemClick = (title: string, handler: () => void) => {
+    toggleDocs();
+    setTimeout(() => handler(), 0);
+    trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
+  };
 
   const GetDocTableOfContents = (data: any[]) => {
     const headers = [];
@@ -198,7 +198,30 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         {isDocsVisible ? (
           <>
             <div className="rule-editor-docs">
-              <NotionRenderer blockMap={notionPageData} />
+              <NotionRenderer
+                blockMap={notionPageData}
+                customBlockComponents={{
+                  image: ({ blockValue }) => {
+                    return (
+                      <Zoom classDialog="rule-editor-docs-image">
+                        <img
+                          width="260px"
+                          height="100px"
+                          alt="rule editor example"
+                          src={blockValue?.properties?.source[0][0]}
+                        />
+                      </Zoom>
+                    );
+                  },
+                  header: ({ blockValue }) => {
+                    return (
+                      <h1 className="notion-h1" id={blockValue?.id}>
+                        {blockValue?.properties?.title[0][0]}
+                      </h1>
+                    );
+                  },
+                }}
+              />
               {/* <div ref={getStartedRef} className="rule-editor-docs-intro">
                 <div className="title rule-editor-docs-rule-name">URL Redirect Rule</div>
                 <p className="text-gray">
@@ -375,9 +398,13 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     <>
                       {" "}
                       {tableOfContents.map(({ title, id }: TocItem) => (
-                        <li key={id} id={id} onClick={toggleDocs}>
+                        <li
+                          key={id}
+                          id={id}
+                          onClick={() => handleDocumentationListItemClick(title, () => handleScrollToSection(id))}
+                        >
                           <Button
-                          // onClick={() => handleDocumentationListItemClick(title, onClick)} //TODO: add scroll
+                          //TODO: add scroll
                           >
                             {title}
                           </Button>
