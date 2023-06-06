@@ -176,7 +176,7 @@ const CreateSharedListModal = (props) => {
   };
 
   const renderPostConfirmationFooter = () => {
-    return isSharedListCreated ? <CopyButton copyText={sharedListURL} type="primary" title={"Copy Text"} /> : null;
+    return isSharedListCreated ? <CopyButton copyText={sharedListURL} type="primary" title={"Copy Link"} /> : null;
   };
 
   const handleVisibilityChange = (e) => {
