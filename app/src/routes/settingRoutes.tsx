@@ -11,5 +11,8 @@ export const settingRoutes: RouteObject[] = [
     path: PATHS.SETTINGS.STORAGE_SETTINGS.RELATIVE,
     element: <Navigate to={PATHS.SETTINGS.STORAGE_SETTINGS.RELATIVE} />,
   },
-  { path: PATHS.LEGACY.SETTINGS.ABSOLUTE, element: <Navigate to={PATHS.SETTINGS.RELATIVE} /> },
+  {
+    path: PATHS.LEGACY.SETTINGS.ABSOLUTE,
+    element: <Navigate to={PATHS.SETTINGS.RELATIVE} />,
+  },
 ];
