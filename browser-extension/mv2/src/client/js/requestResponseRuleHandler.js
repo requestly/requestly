@@ -629,7 +629,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
     let requestData;
     if (canRequestBodyBeSent) {
-      requestData = jsonifyValidJSONString(await request.text());
+      requestData = jsonifyValidJSONString(await request.clone().text()); // cloning because the request will be used to make API call
     } else {
       requestData = convertSearchParamsToJSON(request.url);
     }
@@ -657,8 +657,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
       let exceptionCaught;
       try {
         if (requestRule) {
-          // request has already been read while processing requestRule, so needs to be cloned
-          fetchedResponse = await _fetch(request.clone());
+          fetchedResponse = await _fetch(request);
         } else {
           fetchedResponse = await getOriginalResponse();
         }
