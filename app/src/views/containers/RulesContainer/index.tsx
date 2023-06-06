@@ -1,17 +1,13 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
 import { RulesSidebar } from "./RulesSidebar";
-import "./RulesContainer.css";
+import { ContainerWithSecondarySidebar } from "../common/ContainerWithSecondarySidebar";
 
 export const RulesContainer: React.FC = () => {
   console.log({ location: window.location.href });
 
   return (
-    <div className="rules-container">
+    <ContainerWithSecondarySidebar>
       <RulesSidebar />
-      <div className="rules-outlet-container">
-        <Outlet />
-      </div>
-    </div>
+    </ContainerWithSecondarySidebar>
   );
 };
