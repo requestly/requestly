@@ -72,10 +72,6 @@ export const ruleRoutes: RouteObject[] = [
   },
   // redirects
   {
-    path: "/",
-    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
-  },
-  {
     path: PATHS.MARKETPLACE.RELATIVE,
     element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
   },
