@@ -1,7 +1,7 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
-import { RulesContainer } from "views/containers/RulesContainer/RulesContainer";
+import { RulesContainer } from "views/containers/RulesContainer";
 import RulesIndexView from "views/features/rules/RulesIndexView";
 import SharedListsIndexView from "views/features/sharedLists/SharedListsIndexView";
 import TrashIndexView from "views/features/trash/TrashIndexView";
