@@ -63,7 +63,8 @@ const RuleBuilder = (props) => {
   // TODO: use feature flag
   const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
   const enableDocs = useMemo(() => {
-    return !props.isSharedListViewRule && currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT;
+    return !props.isSharedListViewRule;
+    //  && currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
   }, [currentlySelectedRuleData.ruleType, props.isSharedListViewRule, redirectRuleOnboardingExp]);
 
   const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);

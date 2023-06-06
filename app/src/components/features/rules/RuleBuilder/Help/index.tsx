@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback, ReactNode } from "react";
-import { Button, Col, Row, Collapse } from "antd";
+import { Button, Col, Row, Collapse, Skeleton } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
+import { NotionRenderer } from "react-notion";
 import APP_CONSTANTS from "config/constants";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
@@ -10,6 +11,7 @@ import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
+import { TocItem, ExternalLink } from "./types";
 import { snakeCase } from "lodash";
 import {
   trackDocsSidebarClosed,
@@ -20,8 +22,6 @@ import {
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 import "react-notion/src/styles.css";
-import { NotionRenderer } from "react-notion";
-import { TocItem, ExternalLink } from "./types";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -50,6 +50,19 @@ const externalLinks: ExternalLink[] = [
   },
 ];
 
+const RuleEditorDocID = {
+  [RuleType.REDIRECT as string]: "7265677fb9b445a2aa629cb64501af45",
+  [RuleType.CANCEL as string]: "69f41c9988804640b35a2ccb50f6a2cd",
+  [RuleType.REPLACE as string]: "415445cb486048c6ab75ce34a41c5025",
+  [RuleType.HEADERS as string]: "4688854c33f34d618439c9388081289a",
+  [RuleType.QUERYPARAM as string]: "53c4702625a746b8a43c919b9ca235c9",
+  [RuleType.SCRIPT as string]: "c727eb7e5b3942169b10f267ecaf7e31",
+  [RuleType.RESPONSE as string]: "f05b11e6643348f0a3acbb583a3289be",
+  [RuleType.REQUEST as string]: "72808fff78fb4ea3ae893ffdc8a52422",
+  [RuleType.DELAY as string]: "2e02669c8e6246e993aab6c3d7e6e428",
+  [RuleType.USERAGENT as string]: "8522c44d1f1a42e1aad766847f9d4785",
+};
+
 interface HelpProps {
   ruleType: RuleType;
   setShowDocs: (showDocs: boolean) => void;
@@ -65,7 +78,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     return data.map((item: ReactNode, index: number) => {
       if (Array.isArray(item)) {
         if (item.length === 1) {
-          return <span key={index}>{item[0]}</span>;
+          return <span key={index}>{item?.[0]}</span>;
         } else {
           const linkText = item[0];
           const [linkHref, linkUrl] = item[1][0];
@@ -128,7 +141,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   };
 
   const fetchRuleDocFromNotionPage = async () => {
-    const data = await fetch("https://notion-api.splitbee.io/v1/page/023f63c7f9fd4baebb558f28c531ae90").then((res) =>
+    const data = await fetch(`https://notion-api.splitbee.io/v1/page/${RuleEditorDocID[ruleType]}`).then((res) =>
       res.json()
     );
     setNotionPageData(data);
@@ -225,7 +238,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
               </div>
               <ul className="rule-editor-help-list">
                 <>
-                  {tableOfContents?.length && (
+                  {tableOfContents?.length ? (
                     <>
                       {" "}
                       {tableOfContents.map(({ title, id }: TocItem) => (
@@ -238,6 +251,11 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                         </li>
                       ))}
                     </>
+                  ) : (
+                    <Skeleton
+                      paragraph={{ rows: 4, width: ["90%", "90%", "90%", "90%"] }}
+                      className="rule-editor-doc-skeleton"
+                    />
                   )}
                 </>
               </ul>

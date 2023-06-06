@@ -268,3 +268,11 @@ li {
   font-weight: 500;
   color: var(--white);
 }
+
+.rule-editor-doc-skeleton .ant-skeleton-content .ant-skeleton-paragraph > li {
+  height: 40px;
+}
+
+.rule-editor-doc-skeleton .ant-skeleton-content .ant-skeleton-title {
+  display: none;
+}
