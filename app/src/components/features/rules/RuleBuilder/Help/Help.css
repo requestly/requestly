@@ -225,6 +225,7 @@ li {
 
 .rule-editor-docs .notion {
   font-family: "Roboto";
+  overflow-x: hidden;
 }
 .rule-editor-docs .notion .notion-h1 {
   font-size: 18px;

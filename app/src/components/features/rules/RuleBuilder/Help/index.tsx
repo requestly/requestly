@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Row } from "antd";
+import React, { useEffect, useRef, useState, useCallback, ReactNode } from "react";
+import { Button, Col, Row, Collapse } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
-// import { YouTubePlayer } from "components/misc/YoutubeIframe";
+import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import APP_CONSTANTS from "config/constants";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
-// import { RQCollapse } from "lib/design-system/components/RQCollapse";
+import { RQCollapse } from "lib/design-system/components/RQCollapse";
 import { ReactComponent as Cross } from "assets/icons/cross.svg";
 import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
@@ -15,15 +15,13 @@ import {
   trackDocsSidebarClosed,
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
-  // trackDocsSidebarDemovideoWatched,
+  trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 import "react-notion/src/styles.css";
 import { NotionRenderer } from "react-notion";
-import { TocItem } from "./types";
-
-type ExternalLink = { title: string; link: string };
+import { TocItem, ExternalLink } from "./types";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -58,11 +56,6 @@ const externalLinks: ExternalLink[] = [
 //   </a>
 // );
 
-// type DocumentationListItem = {
-//   title: string;
-//   onClick: () => void;
-// };
-
 interface HelpProps {
   ruleType: RuleType;
   setShowDocs: (showDocs: boolean) => void;
@@ -81,6 +74,29 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   // const examplesRef = useRef<HTMLDivElement | null>(null);
   // const faqsRef = useRef<HTMLDivElement | null>(null);
 
+  const renderFAQDescription = (data: any) => {
+    return data.map((item: ReactNode, index: number) => {
+      if (Array.isArray(item)) {
+        if (item.length === 1) {
+          return <span key={index}>{item[0]}</span>;
+        } else {
+          const linkText = item[0];
+          const [linkHref, linkUrl] = item[1][0];
+          if (linkHref === "a") {
+            return (
+              <span key={index}>
+                <a href={linkUrl}>{linkText}</a>
+              </span>
+            );
+          }
+          return null;
+        }
+      } else {
+        return <span key={index}>{item}</span>;
+      }
+    });
+  };
+
   const handleScrollToSection = useCallback((id: string) => {
     const target = document.getElementById(id);
     if (target) {
@@ -89,39 +105,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       parentContainer.scrollTop = offsetTop - 87;
     }
   }, []);
-
-  // const documentationList: DocumentationListItem[] = useMemo(() => {
-  //   return [
-  //     {
-  //       title: "Get Started",
-  //       onClick: () => handleDocumentationList(getStartedRef),
-  //     },
-  //     {
-  //       title: "Demo",
-  //       onClick: () => handleDocumentationList(demoVideoRef),
-  //     },
-  //     {
-  //       title: "How to create a redirect rule?",
-  //       onClick: () => handleDocumentationList(howToCreateRuleRef),
-  //     },
-  //     {
-  //       title: "Popular Use cases",
-  //       onClick: () => handleDocumentationList(useCasesRef),
-  //     },
-  //     {
-  //       title: "Testing Rule",
-  //       onClick: () => handleDocumentationList(testingRuleRef),
-  //     },
-  //     {
-  //       title: "Examples",
-  //       onClick: () => handleDocumentationList(examplesRef),
-  //     },
-  //     {
-  //       title: "FAQ",
-  //       onClick: () => handleDocumentationList(faqsRef),
-  //     },
-  //   ];
-  // }, [handleDocumentationList]);
 
   const toggleDocs = () => {
     if (isDocsVisible) {
@@ -134,9 +117,9 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     setIsDocsVisible((prev) => !prev);
   };
 
-  // const handleDemoVideoPlay = () => {
-  //   trackDocsSidebarDemovideoWatched(ruleType);
-  // };
+  const handleDemoVideoPlay = () => {
+    trackDocsSidebarDemovideoWatched(ruleType);
+  };
 
   const handleDocumentationListItemClick = (title: string, handler: () => void) => {
     toggleDocs();
@@ -218,6 +201,28 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                       <h1 className="notion-h1" id={blockValue?.id}>
                         {blockValue?.properties?.title[0][0]}
                       </h1>
+                    );
+                  },
+                  video: ({ blockValue }) => {
+                    return (
+                      <YouTubePlayer
+                        width="320"
+                        height="160"
+                        handleOnPlay={handleDemoVideoPlay}
+                        src={blockValue?.properties?.source[0][0]}
+                      />
+                    );
+                  },
+                  toggle: ({ blockValue }) => {
+                    console.log({ blockValue });
+                    return (
+                      <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
+                        <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
+                          <p>
+                            {renderFAQDescription(notionPageData[blockValue?.content[0]]?.value?.properties?.title)}
+                          </p>
+                        </Collapse.Panel>
+                      </RQCollapse>
                     );
                   },
                 }}
@@ -403,11 +408,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                           id={id}
                           onClick={() => handleDocumentationListItemClick(title, () => handleScrollToSection(id))}
                         >
-                          <Button
-                          //TODO: add scroll
-                          >
-                            {title}
-                          </Button>
+                          <Button>{title}</Button>
                         </li>
                       ))}
                     </>
