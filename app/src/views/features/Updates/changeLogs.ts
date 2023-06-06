@@ -2,6 +2,15 @@ import { VersionedChangeLogs } from "./types";
 
 const changeLogs: VersionedChangeLogs[] = [
   {
+    version: "23.6.7",
+    logs: [
+      {
+        title: "Bug fix: Modify Request body rule failed to execute due to clone error",
+        link: "https://github.com/requestly/requestly/issues/688",
+      },
+    ],
+  },
+  {
     version: "23.6.5",
     logs: [
       {
