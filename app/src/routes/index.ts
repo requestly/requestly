@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
-import { ruleRoutes } from "./rules-route";
-import { sessionRoutes } from "./sessions-route";
-import { apiClientRoutes } from "./apiClient-route";
-import { accountRoutes } from "./account-route";
+import { ruleRoutes } from "./ruleRoutes";
+import { sessionRoutes } from "./sessionRoutes";
+import { apiClientRoutes } from "./apiClientRoutes";
+import { accountRoutes } from "./accountRoutes";
 
 export const updatedRoutes: RouteObject[] = [...ruleRoutes, ...sessionRoutes, ...apiClientRoutes, ...accountRoutes];
