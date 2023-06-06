@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import "./RulesSecondarySidebar.css";
+import "./RulesSidebar.css";
 
 const ruleRoutes = [
   {
@@ -22,13 +22,13 @@ const ruleRoutes = [
   },
 ];
 
-export const RulesSecondarySidebar: React.FC = () => {
+export const RulesSidebar: React.FC = () => {
   return (
-    <div className="rules-secondary-sidebar-container">
+    <div className="rules-sidebar-container">
       <ul>
         {ruleRoutes.map(({ path, title }) => (
           <li key={title}>
-            <NavLink to={path} className={({ isActive }) => (isActive ? `rules-secondary-sidebar-active-link` : ``)}>
+            <NavLink to={path} className={({ isActive }) => (isActive ? `rules-sidebar-active-link` : ``)}>
               {title}
             </NavLink>
           </li>
