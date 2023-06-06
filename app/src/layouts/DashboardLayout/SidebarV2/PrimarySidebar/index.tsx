@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { PrimarySidebarItem } from "../type";
 import PATHS from "config/constants/sub/paths";
+import { ApiOutlined } from "@ant-design/icons";
 import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
@@ -26,27 +27,27 @@ export const PrimarySidebar: React.FC = () => {
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
-        title: "HTTP rules",
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
+        title: "HTTP Rules",
+        path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
         display: true,
       },
       {
-        title: "Session",
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
+        title: "Sessions",
+        path: PATHS.SESSIONS.INDEX,
         icon: <SessionIcon />,
         display: true,
       },
       {
         title: "Mock server",
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
+        path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
       },
       {
         title: "API client",
-        path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
-        icon: <SessionIcon />,
+        path: PATHS.API_CLIENT.INDEX,
+        icon: <ApiOutlined />,
         display: true,
       },
     ],
@@ -59,14 +60,14 @@ export const PrimarySidebar: React.FC = () => {
         {sidebarItems
           .filter((item) => item.display)
           .map((item) => (
-            <li>
+            <li key={item.title}>
               <PrimarySidebarLink {...item} />
             </li>
           ))}
       </ul>
 
       <div>
-        <PrimarySidebarLink title="Invite" icon={<InviteIcon />} path="/" />
+        <PrimarySidebarLink title="Invite" icon={<InviteIcon />} path={PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE} />
       </div>
     </div>
   );
