@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { RulesSecondarySidebar } from "./RulesSecondarySidebar";
+import { RulesSidebar } from "./RulesSidebar";
 import "./RulesContainer.css";
 
 export const RulesContainer: React.FC = () => {
@@ -8,7 +8,7 @@ export const RulesContainer: React.FC = () => {
 
   return (
     <div className="rules-container">
-      <RulesSecondarySidebar />
+      <RulesSidebar />
       <div className="rules-outlet-container">
         <Outlet />
       </div>
