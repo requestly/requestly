@@ -68,10 +68,6 @@ export const ruleRoutes: RouteObject[] = [
         path: PATHS.RULES.TRASH.RELATIVE,
         element: <TrashIndexView />,
       },
-      {
-        path: "*",
-        element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
-      },
     ],
   },
   // redirects

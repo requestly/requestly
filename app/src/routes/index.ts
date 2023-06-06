@@ -11,7 +11,7 @@ import { onboardingRoutes } from "./onboardingRoutes";
 import { miscRoutes } from "./miscRoutes";
 import { settingRoutes } from "./settingRoutes";
 
-export const updatedRoutes: RouteObject[] = [
+export const routes: RouteObject[] = [
   ...ruleRoutes,
   ...sessionRoutes,
   ...apiClientRoutes,
@@ -21,6 +21,6 @@ export const updatedRoutes: RouteObject[] = [
   ...mobileDebuggerRoutes,
   ...mockServerRoutes,
   ...onboardingRoutes,
-  ...miscRoutes,
   ...settingRoutes,
+  ...miscRoutes,
 ];

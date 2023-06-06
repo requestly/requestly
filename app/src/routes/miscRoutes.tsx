@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import AppModeView from "views/misc/AppMode";
 import FeedbackView from "views/misc/Feedback";
@@ -39,12 +39,32 @@ export const miscRoutes: RouteObject[] = [
     element: <Pricing />,
   },
   {
+    path: PATHS.LEGACY.PRICING.ABSOLUTE,
+    element: <Navigate to={PATHS.PRICING.RELATIVE} />,
+  },
+  {
     path: PATHS.LICENSE.MANAGE.RELATIVE,
     element: <ManageLicense />,
   },
   {
+    path: PATHS.LEGACY.LICENSE.MANAGE.ABSOLUTE,
+    element: <Navigate to={PATHS.LICENSE.MANAGE.RELATIVE} />,
+  },
+  {
+    path: PATHS.LICENSE.RELATIVE,
+    element: <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
+  },
+  {
+    path: PATHS.LEGACY.LICENSE.ABSOLUTE,
+    element: <Navigate to={PATHS.LICENSE.RELATIVE} />,
+  },
+  {
     path: PATHS.GOODBYE.RELATIVE,
     element: <Goodbye />,
+  },
+  {
+    path: PATHS.LEGACY.GOODBYE.ABSOLUTE,
+    element: <Navigate to={PATHS.GOODBYE.RELATIVE} />,
   },
   {
     path: PATHS.PAGE403.RELATIVE,
@@ -57,5 +77,9 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
     element: <AcceptTeamInviteView />,
+  },
+  {
+    path: PATHS.ANY,
+    element: <Navigate to={PATHS.PAGE404.RELATIVE} />,
   },
 ];

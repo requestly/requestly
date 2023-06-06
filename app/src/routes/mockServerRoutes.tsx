@@ -74,4 +74,8 @@ export const mockServerRoutes: RouteObject[] = [
     path: PATHS.MOCK_SERVER.INDEX,
     element: <Navigate to={PATHS.MOCK_SERVER_V2.ABSOLUTE} />,
   },
+  {
+    path: joinPaths(PATHS.LEGACY.FILES_LIBRARY.ABSOLUTE, "/:id"),
+    element: <Navigate to={joinPaths(PATHS.FILES.VIEWER.ABSOLUTE, "/:id")} />,
+  },
 ];
