@@ -8,8 +8,8 @@ const joinPaths = (path1, path2) => {
 /**
  * @description Paths consist of INDEX, RELATIVE and ABSOLUTE paths.
  *
- * - INDEX: Indicates the top-level path eg: /rules or /editor.
- * - RELATIVE: Its a combination of INDEX + sub-path eg: /rules/editor, and are used for routing purpose.
+ * - INDEX: Indicates the top-level path eg: `/rules` or `/editor`.
+ * - RELATIVE: Its a combination of INDEX + sub-path eg: `/rules/editor`, are used for routing purpose.
  * - ABSOLUTE: Used for in app navigation and handling redirects.
  */
 const PATHS = {};
