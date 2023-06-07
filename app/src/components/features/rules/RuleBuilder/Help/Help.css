@@ -166,35 +166,6 @@ li {
   background-color: rgba(13, 13, 16, 0.85);
 }
 
-.rule-editor-docs-use-cases li,
-.rule-editor-docs-examples li {
-  list-style: disc;
-  color: var(--text-gray);
-}
-
-.rule-editor-docs-create-rule li {
-  list-style: auto;
-  color: var(--text-gray);
-}
-
-.rule-editor-docs-create-rule li > span,
-.rule-editor-docs-use-cases li > span {
-  font-weight: 500;
-  color: var(--white);
-}
-
-.rule-editor-docs-create-rule li code {
-  font-size: 14px;
-  padding: 1px 3px;
-  border-radius: 2px;
-  color: var(--white);
-  background-color: #3e404486;
-}
-
-.rule-editor-docs-create-rule img {
-  margin-bottom: 1rem;
-}
-
 /* faqs collapse */
 .rule-editor-docs-faqs {
   margin-right: 11px;

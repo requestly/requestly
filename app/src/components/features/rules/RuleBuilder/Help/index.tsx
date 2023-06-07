@@ -52,7 +52,7 @@ const externalLinks: ExternalLink[] = [
   },
 ];
 
-const RuleEditorDocID = {
+const ruleTypeToNotionDocIdMap = {
   [RuleType.REDIRECT]: "7265677fb9b445a2aa629cb64501af45",
   [RuleType.CANCEL]: "69f41c9988804640b35a2ccb50f6a2cd",
   [RuleType.REPLACE]: "415445cb486048c6ab75ce34a41c5025",
@@ -75,10 +75,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [notionPageData, setNotionPageData] = useState(null);
   const [tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
-
-  const renderFAQDescription = useCallback((DescriptionBlock: any) => {
-    return <NotionRenderer blockMap={DescriptionBlock} />;
-  }, []);
 
   const handleScrollToSection = useCallback((id: string) => {
     const target = document.getElementById(id);
@@ -110,7 +106,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
   };
 
-  const GetDocTableOfContents = (data: any[]) => {
+  const updateDocTableOfContent = (data: any[]) => {
     const headers = [];
     if (data) {
       for (const key in data) {
@@ -124,11 +120,11 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   };
 
   useEffect(() => {
-    fetch(`https://notion-api.splitbee.io/v1/page/${RuleEditorDocID[ruleType]}`)
+    fetch(`https://notion-api.splitbee.io/v1/page/${ruleTypeToNotionDocIdMap[ruleType]}`)
       .then((res) => res.json())
       .then((data) => {
         setNotionPageData(data);
-        GetDocTableOfContents(data);
+        updateDocTableOfContent(data);
       });
   }, [ruleType]);
 
@@ -193,7 +189,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     return (
                       <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
                         <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
-                          <p>{renderFAQDescription({ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] })}</p>
+                          <NotionRenderer blockMap={{ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] }} />
                         </Collapse.Panel>
                       </RQCollapse>
                     );
