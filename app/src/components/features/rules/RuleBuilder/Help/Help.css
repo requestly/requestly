@@ -235,6 +235,13 @@ li {
   padding-left: 0;
   margin-bottom: 8px;
 }
+.rule-editor-docs .notion .notion-h3 {
+  font-size: 14px;
+}
+.rule-editor-docs .notion .notion-h2 {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
 
 .rule-editor-docs .notion .notion-text {
   color: var(--text-gray);

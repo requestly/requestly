@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback, ReactNode } from "react";
-import { Button, Col, Row, Collapse, Skeleton } from "antd";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Button, Col, Row, Skeleton, Collapse } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import { NotionRenderer } from "react-notion";
-import APP_CONSTANTS from "config/constants";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { RQCollapse } from "lib/design-system/components/RQCollapse";
@@ -13,6 +12,8 @@ import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
 import { RuleType } from "types/rules";
 import { TocItem, ExternalLink } from "./types";
 import { snakeCase } from "lodash";
+import APP_CONSTANTS from "config/constants";
+import { rulesData } from "components/landing/ruleSelection/rules-data";
 import {
   trackDocsSidebarClosed,
   trackDocsSidebarPrimaryCategoryClicked,
@@ -22,6 +23,7 @@ import {
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 import "react-notion/src/styles.css";
+import "prismjs/themes/prism-tomorrow.css";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -74,28 +76,9 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   const [tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
 
-  const renderFAQDescription = (data: any) => {
-    return data.map((item: ReactNode, index: number) => {
-      if (Array.isArray(item)) {
-        if (item.length === 1) {
-          return <span key={index}>{item?.[0]}</span>;
-        } else {
-          const linkText = item[0];
-          const [linkHref, linkUrl] = item[1][0];
-          if (linkHref === "a") {
-            return (
-              <span key={index}>
-                <a href={linkUrl}>{linkText}</a>
-              </span>
-            );
-          }
-          return null;
-        }
-      } else {
-        return <span key={index}>{item}</span>;
-      }
-    });
-  };
+  const renderFAQDescription = useCallback((DescriptionBlock: any) => {
+    return <NotionRenderer blockMap={DescriptionBlock} />;
+  }, []);
 
   const handleScrollToSection = useCallback((id: string) => {
     const target = document.getElementById(id);
@@ -140,20 +123,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
     }
   };
 
-  const fetchRuleDocFromNotionPage = async () => {
-    const data = await fetch(`https://notion-api.splitbee.io/v1/page/${RuleEditorDocID[ruleType]}`).then((res) =>
-      res.json()
-    );
-    setNotionPageData(data);
-    GetDocTableOfContents(data);
-    console.log({ data }); // TODO: remove this
-  };
-
   useEffect(() => {
-    fetchRuleDocFromNotionPage();
-  }, []);
-
-  console.log({ tableOfContents }); // TODO: remove this
+    fetch(`https://notion-api.splitbee.io/v1/page/${RuleEditorDocID[ruleType]}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setNotionPageData(data);
+        GetDocTableOfContents(data);
+      });
+  }, [ruleType]);
 
   return (
     <div className="rule-editor-help-container">
@@ -212,14 +189,11 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                       />
                     );
                   },
-                  toggle: ({ blockValue }) => {
-                    console.log({ blockValue });
+                  toggle: ({ blockValue, blockMap }) => {
                     return (
                       <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
                         <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
-                          <p>
-                            {renderFAQDescription(notionPageData[blockValue?.content[0]]?.value?.properties?.title)}
-                          </p>
+                          <p>{renderFAQDescription({ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] })}</p>
                         </Collapse.Panel>
                       </RQCollapse>
                     );
@@ -234,7 +208,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
             <div ref={documentationListRef} className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
-                Documentation for Redirect request {/* TODO: change according to rule type */}
+                Documentation for {rulesData[ruleType]?.name}
               </div>
               <ul className="rule-editor-help-list">
                 <>
@@ -253,6 +227,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
                     </>
                   ) : (
                     <Skeleton
+                      active
                       paragraph={{ rows: 4, width: ["90%", "90%", "90%", "90%"] }}
                       className="rule-editor-doc-skeleton"
                     />
