@@ -45,7 +45,7 @@ export const ruleRoutes: RouteObject[] = [
         element: <Navigate to={PATHS.SHARED_LISTS.ABSOLUTE} />,
       },
       {
-        path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE,
+        path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE, // for desktop app
         element: <SharedListImportView />,
       },
       {
