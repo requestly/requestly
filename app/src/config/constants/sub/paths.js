@@ -8,8 +8,9 @@ const joinPaths = (path1, path2) => {
 /**
  * @description Paths consist of INDEX, RELATIVE and ABSOLUTE paths.
  *
- * - INDEX and RELATIVE paths are almost same and are used for routing purpose
- * - ABSOLUTE paths are used in app navigation and handling redirects
+ * - INDEX: Indicates the top-level path eg /rules or /editor.
+ * - RELATIVE: Its a combination of INDEX + sub-path eg /rules/editor, and are used for routing purpose.
+ * - ABSOLUTE: Used for in app navigation and handling redirects.
  */
 const PATHS = {};
 PATHS.ABSOLUTE = {};
@@ -107,8 +108,8 @@ PATHS.RULES.TRASH.ABSOLUTE = joinPaths(PATHS.RULES.ABSOLUTE, PATHS.RULES.TRASH.R
 // Rules - Rules Editor - Base
 PATHS.RULE_EDITOR = {};
 PATHS.RULE_EDITOR.INDEX = "editor";
-PATHS.RULE_EDITOR.RELATIVE = joinPaths(PATHS.RULES.MY_RULES.RELATIVE, PATHS.RULE_EDITOR.INDEX);
-PATHS.RULE_EDITOR.ABSOLUTE = joinPaths(PATHS.RULES.MY_RULES.ABSOLUTE, PATHS.RULE_EDITOR.INDEX);
+PATHS.RULE_EDITOR.RELATIVE = joinPaths(PATHS.RULES.RELATIVE, PATHS.RULE_EDITOR.INDEX);
+PATHS.RULE_EDITOR.ABSOLUTE = joinPaths(PATHS.RULES.ABSOLUTE, PATHS.RULE_EDITOR.INDEX);
 
 // Rules - Rules Editor - Create
 PATHS.RULE_EDITOR.CREATE_RULE = {};
