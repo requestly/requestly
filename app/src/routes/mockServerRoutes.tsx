@@ -17,6 +17,26 @@ export const mockServerRoutes: RouteObject[] = [
     path: PATHS.MOCK_SERVER.RELATIVE,
     element: <MockServerContainer />,
     children: [
+      /** @deprecated */
+      {
+        path: PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE,
+        element: <FilesListIndex />,
+      },
+      /** @deprecated */
+      {
+        path: PATHS.FILES.MY_FILES.ABSOLUTE,
+        element: <FilesLibIndex />,
+      },
+      /** @deprecated */
+      {
+        path: PATHS.MOCK_SERVER.RELATIVE,
+        element: <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
+      },
+      /** @deprecated */
+      {
+        path: PATHS.FILES.RELATIVE,
+        element: <Navigate to={PATHS.FILES.MY_FILES.ABSOLUTE} />,
+      },
       {
         path: joinPaths(PATHS.FILES.VIEWER.RELATIVE, PATHS.ANY),
         element: <FileViewer />,
@@ -24,22 +44,6 @@ export const mockServerRoutes: RouteObject[] = [
       {
         path: joinPaths(PATHS.MOCK_SERVER.VIEWER.RELATIVE, PATHS.ANY),
         element: <FileViewer />,
-      },
-      {
-        path: PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE,
-        element: <FilesListIndex />,
-      },
-      {
-        path: PATHS.FILES.MY_FILES.ABSOLUTE,
-        element: <FilesLibIndex />,
-      },
-      {
-        path: PATHS.MOCK_SERVER.RELATIVE,
-        element: <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
-      },
-      {
-        path: PATHS.FILES.RELATIVE,
-        element: <Navigate to={PATHS.FILES.MY_FILES.ABSOLUTE} />,
       },
       //  MOCKS V2
       {
