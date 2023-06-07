@@ -39,7 +39,6 @@ import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -60,12 +59,9 @@ const RuleBuilder = (props) => {
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
-  // TODO: use feature flag
-  const redirectRuleOnboardingExp = useFeatureValue("redirect_rule_onboarding", null);
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
-    //  && currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-  }, [currentlySelectedRuleData.ruleType, props.isSharedListViewRule, redirectRuleOnboardingExp]);
+  }, [props.isSharedListViewRule]);
 
   const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
 
