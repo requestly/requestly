@@ -11,7 +11,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getIsNetworkTooptipShown } from "store/selectors";
+import { getIsNetworkTooltipShown } from "store/selectors";
 
 interface Props {
   har: Har;
@@ -23,7 +23,7 @@ interface Props {
 const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave }) => {
   const dispatch = useDispatch();
 
-  const networkSessionTooptipShown = useSelector(getIsNetworkTooptipShown);
+  const networkSessionTooltipShown = useSelector(getIsNetworkTooltipShown);
 
   const [name, setName] = useState<string>("");
 
@@ -35,7 +35,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
       toast.success("Network session successfully saved!");
     }
     setName("");
-    if (!networkSessionTooptipShown) {
+    if (!networkSessionTooltipShown) {
       dispatch(actions.updateNetworkSessionSaveInProgress(true));
       dispatch(actions.updateNetworkSessionTooltipShown());
       setTimeout(() => {
@@ -44,7 +44,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     }
     trackNetworkSessionSaved();
     closeModal();
-  }, [closeModal, dispatch, har, name, networkSessionTooptipShown, onSave]);
+  }, [closeModal, dispatch, har, name, networkSessionTooltipShown, onSave]);
 
   return (
     <RQModal

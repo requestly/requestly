@@ -235,6 +235,6 @@ export const getNetworkSessionSaveInProgress = (state) => {
   return getGlobalState(state).misc.nonPersist?.networkSessionSaveInProgress;
 };
 
-export const getIsNetworkTooptipShown = (state) => {
+export const getIsNetworkTooltipShown = (state) => {
   return getGlobalState(state).misc.persist?.isNetworkSessionTooltipShown;
 };
