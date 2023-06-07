@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, Navigate, useLocation, useSearchParams, useNavigate, useRoutes } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate, useRoutes } from "react-router-dom";
 import { routes } from "routes";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
@@ -65,6 +65,12 @@ const DashboardContent = () => {
   const prevProps = usePrevious({ location });
 
   useEffect(() => {
+    if (PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
+    }
+  }, [appMode, location, navigate]);
+
+  useEffect(() => {
     if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
@@ -91,19 +97,7 @@ const DashboardContent = () => {
 
   return (
     <>
-      <div id="dashboardMainContent">
-        {appRoutes}
-        <Routes>
-          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
-            <Route path={PATHS.ROOT} element={<Navigate to={PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE} />} />
-          )}
-
-          {/* <Route
-            path={PATHS.EXTENSION_INSTALLED.RELATIVE}
-            element={<Navigate to={PATHS.EXTENSION_INSTALLED.ABSOLUTE} />}
-          /> */}
-        </Routes>
-      </div>
+      <div id="dashboardMainContent">{appRoutes}</div>
 
       {/* MODALS */}
       {activeModals.loadingModal.isActive ? (
