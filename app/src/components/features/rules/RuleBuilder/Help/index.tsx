@@ -53,16 +53,16 @@ const externalLinks: ExternalLink[] = [
 ];
 
 const RuleEditorDocID = {
-  [RuleType.REDIRECT as string]: "7265677fb9b445a2aa629cb64501af45",
-  [RuleType.CANCEL as string]: "69f41c9988804640b35a2ccb50f6a2cd",
-  [RuleType.REPLACE as string]: "415445cb486048c6ab75ce34a41c5025",
-  [RuleType.HEADERS as string]: "4688854c33f34d618439c9388081289a",
-  [RuleType.QUERYPARAM as string]: "53c4702625a746b8a43c919b9ca235c9",
-  [RuleType.SCRIPT as string]: "c727eb7e5b3942169b10f267ecaf7e31",
-  [RuleType.RESPONSE as string]: "f05b11e6643348f0a3acbb583a3289be",
-  [RuleType.REQUEST as string]: "72808fff78fb4ea3ae893ffdc8a52422",
-  [RuleType.DELAY as string]: "2e02669c8e6246e993aab6c3d7e6e428",
-  [RuleType.USERAGENT as string]: "8522c44d1f1a42e1aad766847f9d4785",
+  [RuleType.REDIRECT]: "7265677fb9b445a2aa629cb64501af45",
+  [RuleType.CANCEL]: "69f41c9988804640b35a2ccb50f6a2cd",
+  [RuleType.REPLACE]: "415445cb486048c6ab75ce34a41c5025",
+  [RuleType.HEADERS]: "4688854c33f34d618439c9388081289a",
+  [RuleType.QUERYPARAM]: "53c4702625a746b8a43c919b9ca235c9",
+  [RuleType.SCRIPT]: "c727eb7e5b3942169b10f267ecaf7e31",
+  [RuleType.RESPONSE]: "f05b11e6643348f0a3acbb583a3289be",
+  [RuleType.REQUEST]: "72808fff78fb4ea3ae893ffdc8a52422",
+  [RuleType.DELAY]: "2e02669c8e6246e993aab6c3d7e6e428",
+  [RuleType.USERAGENT]: "8522c44d1f1a42e1aad766847f9d4785",
 };
 
 interface HelpProps {
