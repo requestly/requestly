@@ -1,9 +1,12 @@
-.mock-server-sidebar-container {
-  width: 100%;
-  min-height: calc(100vh - 4.5rem);
-  border-right: 1px solid var(--border-dark);
+.mock-server-sidebar-container ul {
+  padding: 1.25rem 10px;
 }
 
-.mock-server-sidebar-active-link {
-  color: white;
+.mock-server-sidebar-container ul li .icon__wrapper {
+  padding: 0;
+}
+
+.mock-server-sidebar-container ul li .icon__wrapper svg {
+  width: 18px;
+  height: 18px;
 }
