@@ -10,18 +10,6 @@ import SharedListViewer from "views/features/sharedLists/SharedListViewer";
 import { joinPaths } from "utils/PathUtils";
 import SharedListImportView from "views/features/sharedLists/SharedListImportView";
 
-/**
- *  - table / listing [DONE]
- *  - editor
- *
- *  - sharedlist list [DONE]
- *  - /:id [TODO: broken]
- *
- *  - templates [DONE]
- *
- *  - trash  [DONE]
- */
-
 export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.RULES.INDEX,
