@@ -816,22 +816,19 @@ BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
   });
 };
 
-BG.Methods.getAppTabs = () => {
-  return new Promise((resolve) => {
-    let appTabs = [];
+BG.Methods.getAppTabs = async () => {
+  const webURLs = RQ.Utils.getAllSupportedWebURLs();
+  let appTabs = [];
 
-    RQ.Utils.getAllSupportedWebURLs().forEach((webURL) => {
-      chrome.tabs.query({ url: webURL + "/*" }, (tabs) => {
-        appTabs = [...appTabs, tabs];
-      });
-    });
+  for (const webURL of webURLs) {
+    const tabs = await new Promise((resolve) => chrome.tabs.query({ url: webURL + "/*" }, resolve));
+    appTabs = [...appTabs, ...tabs];
+  }
 
-    if (appTabs.length === 0) {
-      BG.isAppOnline = false;
-    }
-
-    resolve(appTabs);
-  });
+  if (appTabs.length === 0) {
+    BG.isAppOnline = false;
+  }
+  return appTabs;
 };
 
 /**
