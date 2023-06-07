@@ -9,21 +9,36 @@ const { version } = require("./package.json");
 const jsList = require("./jsList.json");
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
 
+const generateUrlPattern = (urlString) => {
+  try {
+    const webUrlObj = new URL(urlString);
+    return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+  } catch (error) {
+    console.error(`Invalid URL: ${urlString}`, error);
+    return null;
+  }
+};
+
+const addUrlPatternsToScripts = (scripts, urls) => {
+  urls.forEach((url) => {
+    const pattern = generateUrlPattern(url);
+    if (pattern) {
+      scripts[0].matches.push(pattern);
+      scripts[1].exclude_matches.push(pattern);
+    }
+  });
+};
+
 const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
 
   manifestJson.version = version;
 
-  const contentScripts = manifestJson.content_scripts;
+  const { content_scripts: contentScripts } = manifestJson;
   contentScripts[0].matches = [];
   contentScripts[1].exclude_matches = [];
 
-  [WEB_URL, ...OTHER_WEB_URLS].forEach((webUrl) => {
-    const webUrlObj = new URL(webUrl);
-    const webUrlPattern = `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
-    contentScripts[0].matches.push(webUrlPattern);
-    contentScripts[1].exclude_matches.push(webUrlPattern);
-  });
+  addUrlPatternsToScripts(contentScripts, [WEB_URL, ...OTHER_WEB_URLS]);
 
   if (env !== "prod") {
     manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
