@@ -8,8 +8,8 @@ const joinPaths = (path1, path2) => {
 /**
  * @description Paths consist of INDEX, RELATIVE and ABSOLUTE paths.
  *
- * - INDEX: Indicates the top-level path eg /rules or /editor.
- * - RELATIVE: Its a combination of INDEX + sub-path eg /rules/editor, and are used for routing purpose.
+ * - INDEX: Indicates the top-level path eg: /rules or /editor.
+ * - RELATIVE: Its a combination of INDEX + sub-path eg: /rules/editor, and are used for routing purpose.
  * - ABSOLUTE: Used for in app navigation and handling redirects.
  */
 const PATHS = {};
@@ -227,15 +227,15 @@ PATHS.MOCK_SERVER.VIEWER.CREATE_TYPE_HTML = joinPaths(PATHS.MOCK_SERVER.VIEWER.C
 
 // Files - List
 PATHS.FILES = {};
-PATHS.FILES.INDEX = "files";
+PATHS.FILES.INDEX = "files-legacy";
 PATHS.FILES.RELATIVE = joinPaths(PATHS.MOCK_SERVER.RELATIVE, PATHS.FILES.INDEX);
 PATHS.FILES.ABSOLUTE = joinPaths(PATHS.MOCK_SERVER.ABSOLUTE, PATHS.FILES.INDEX);
 
 // Files - My Files
 PATHS.FILES.MY_FILES = {};
-PATHS.FILES.MY_FILES.INDEX = "files";
-PATHS.FILES.MY_FILES.RELATIVE = joinPaths(PATHS.MOCK_SERVER.RELATIVE, PATHS.FILES.MY_FILES.INDEX);
-PATHS.FILES.MY_FILES.ABSOLUTE = joinPaths(PATHS.MOCK_SERVER.ABSOLUTE, PATHS.FILES.MY_FILES.INDEX);
+PATHS.FILES.MY_FILES.INDEX = "my-files";
+PATHS.FILES.MY_FILES.RELATIVE = joinPaths(PATHS.FILES.RELATIVE, PATHS.FILES.MY_FILES.INDEX);
+PATHS.FILES.MY_FILES.ABSOLUTE = joinPaths(PATHS.FILES.ABSOLUTE, PATHS.FILES.MY_FILES.INDEX);
 
 // Files - Viewer
 PATHS.FILES.VIEWER = {};
@@ -634,7 +634,7 @@ PATHS.API_CLIENT.ABSOLUTE = joinPaths(PATHS.DASHBOARD, PATHS.API_CLIENT.RELATIVE
 
 // File Server V2
 PATHS.FILE_SERVER_V2 = {};
-PATHS.FILE_SERVER_V2.INDEX = "filesV2";
+PATHS.FILE_SERVER_V2.INDEX = "files";
 PATHS.FILE_SERVER_V2.RELATIVE = joinPaths(PATHS.MOCK_SERVER.RELATIVE, PATHS.FILE_SERVER_V2.INDEX);
 PATHS.FILE_SERVER_V2.ABSOLUTE = joinPaths(PATHS.MOCK_SERVER.ABSOLUTE, PATHS.FILE_SERVER_V2.INDEX);
 
