@@ -20,6 +20,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
+import { WorkspaceOnboarding } from "../../../landing/WorkspaceOnboarding";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -83,7 +84,8 @@ const GettingStarted = () => {
 
   return (
     <>
-      {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+      <WorkspaceOnboarding />
+      {/* {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
         <Row className="getting-started-container">
@@ -149,10 +151,10 @@ const GettingStarted = () => {
                     >
                       Upload rules
                     </RQButton>
-                  </AuthConfirmationPopover>
+                  </AuthConfirmationPopover> */}
 
-                  {/* TODO: make desktop only */}
-                  {isCharlesImportFeatureFlagOn ? (
+      {/* TODO: make desktop only */}
+      {/* {isCharlesImportFeatureFlagOn ? (
                     <RQButton
                       type="default"
                       onClick={() => {
@@ -177,8 +179,8 @@ const GettingStarted = () => {
               ) : null}
             </>
           </Col>
-        </Row>
-      )}
+        </Row> */}
+      {/* )} */}
       {isImportCharlesRulesModalActive ? (
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}

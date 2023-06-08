@@ -36,8 +36,7 @@ const DashboardLayout = () => {
   };
 
   const isSidebarVisible = useMemo(
-    () =>
-      !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen),
+    () => isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen, //TEMP CHANGE
     [pathname, isPersonaRecommendationScreen]
   );
 
