@@ -163,7 +163,7 @@ const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return launchConfig ? <SessionOnboardingView launchConfig={launchConfig} /> : null;
+    return <SessionOnboardingView launchConfig={launchConfig} />;
   }
 };
 
