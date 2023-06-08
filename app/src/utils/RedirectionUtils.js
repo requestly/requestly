@@ -456,6 +456,11 @@ export const redirectToDesktopHomepage = (navigate) => {
   navigate(PATHS.DESKTOP.ABSOLUTE);
 };
 
+// todo @nsr: improve this by adding route argument.
+// This will specify the exact route to navigate to on desktop
+export const redirectToDesktopApp = () => {
+  window.location.href = "requestly://any";
+};
 // Discord Community
 export const redirectToDiscord = (navigate, { newTab = true }) => {
   if (newTab) {
