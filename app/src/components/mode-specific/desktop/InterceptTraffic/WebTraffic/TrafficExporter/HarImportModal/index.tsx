@@ -5,9 +5,12 @@ import {
   trackHarImportButtonClicked,
   trackHarImportCanceled,
   trackHarImportCompleted,
+  trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
+import { saveNetworkSession } from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/actions";
+import { toast } from "utils/Toast";
 
 interface Props {
   onSaved: (sessionId: string) => void;
@@ -18,7 +21,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   const [importedHar, setImportedHar] = useState<Har>();
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
-  const [processingDataToImport, setProcessingDataToImport] = useState(false);
+  const [processingUploadedData, setProcessingUploadedData] = useState(false);
 
   const closeDropZone = useCallback(() => {
     setIsDropZoneVisible(false);
@@ -39,18 +42,28 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   }, [closeDropZone]);
 
   const handleImportedData = useCallback(
-    (data: Har) => {
+    async (data: Har, name: string) => {
       setImportedHar(data);
       trackHarImportCompleted();
-      openSaveModal();
+      if (name) {
+        // just in case the file reader is unable to read the name
+        const id = await saveNetworkSession(name, data);
+        toast.success("Network session successfully saved!");
+        trackNetworkSessionSaved();
+        setProcessingUploadedData(false);
+        onSaved(id);
+      } else {
+        openSaveModal();
+      }
     },
-    [openSaveModal]
+    [onSaved, openSaveModal]
   );
 
   const onDrop = useCallback(
-    (acceptedFiles: any) => {
-      //Ignore other uploaded files
+    (acceptedFiles: File[]) => {
+      //Ignore other uploaded files, just choosing the first one
       const file = acceptedFiles[0];
+      const name = file.name;
 
       const reader = new FileReader();
 
@@ -58,13 +71,12 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
       reader.onerror = () => closeDropZone();
       reader.onload = () => {
         //Render the loader
-        setProcessingDataToImport(true);
+        setProcessingUploadedData(true);
         try {
           const importedHar: Har = JSON.parse(reader.result as string);
-          handleImportedData(importedHar);
-          setProcessingDataToImport(false);
+          handleImportedData(importedHar, name);
         } catch (error) {
-          setProcessingDataToImport(false);
+          setProcessingUploadedData(false);
           alert("Imported file doesn't match the HAR format. Please choose another file.");
           closeDropZone();
         }
@@ -100,11 +112,13 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
           <FilePicker
             onFilesDrop={onDrop}
             loaderMessage="Processing data..."
-            isProcessing={processingDataToImport}
+            isProcessing={processingUploadedData}
             title="Drag and drop your exported sessions file"
           />
         </div>
       </RQModal>
+
+      {/* NO LONGER VISIBLE, still here for some extreme edge case */}
       <SessionSaveModal isVisible={isSaveModalVisible} closeModal={closeSaveModal} har={importedHar} onSave={onSaved} />
     </React.Fragment>
   );
