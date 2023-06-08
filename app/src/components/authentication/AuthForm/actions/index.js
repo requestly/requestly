@@ -21,7 +21,6 @@ import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import Logger from "lib/logger";
 
 const showError = (err) => {
   toast.error(err, { hideProgressBar: true, autoClose: 6000 });
@@ -155,10 +154,8 @@ export const handleResetPasswordOnClick = (event, password, setLoader, navigate,
 };
 
 export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispatch) => {
-  console.log("handleLogoutButtonOnClick invoked");
   try {
     if (window.location.host.includes("app.requestly.io")) {
-      console.log("Resetting posthog");
       try {
         posthog.reset();
       } catch (error) {
@@ -166,19 +163,15 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
       }
     }
     if (!window.uid || !isLocalStoragePresent(appMode)) {
-      console.log("No user found. Signing out");
       return signOut();
     }
 
     if (isWorkspaceMode) {
-      console.log("Clearing workspace in handleLogoutButtonOnClick");
       clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      console.log("Clearing storage in handleLogoutButtonOnClick");
       StorageService(appMode).clearDB();
     }
 
-    console.log("Signing out");
     return signOut();
   } catch (err) {
     return console.log(err);
