@@ -21,6 +21,17 @@
     "isScanned": false,
     "isAvailable": false
   },
+  "existing-arc": {
+    "id": "existing-arc",
+    "type": "browser",
+    "name": "arc",
+    "description": "Existing Profile",
+    "icon": "arc.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
   "fresh-chrome-beta": {
     "id": "fresh-chrome-beta",
     "type": "browser",
