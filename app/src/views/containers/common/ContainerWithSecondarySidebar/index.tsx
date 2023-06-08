@@ -1,15 +1,15 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import "./ContainerWithSecondarySidebar.css";
+import "./containerWithSecondarySidebar.css";
 
 interface Props {
-  children: React.ReactNode;
+  sidebar: React.ReactNode;
 }
 
-export const ContainerWithSecondarySidebar: React.FC<Props> = ({ children }) => {
+export const ContainerWithSecondarySidebar: React.FC<Props> = ({ sidebar }) => {
   return (
     <div className="parent-container">
-      {children}
+      {sidebar}
       <div className="outlet-container">
         <Outlet />
       </div>

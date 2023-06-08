@@ -3,9 +3,5 @@ import { RulesSidebar } from "./RulesSidebar";
 import { ContainerWithSecondarySidebar } from "../common/ContainerWithSecondarySidebar";
 
 export const RulesContainer: React.FC = () => {
-  return (
-    <ContainerWithSecondarySidebar>
-      <RulesSidebar />
-    </ContainerWithSecondarySidebar>
-  );
+  return <ContainerWithSecondarySidebar sidebar={<RulesSidebar />} />;
 };
