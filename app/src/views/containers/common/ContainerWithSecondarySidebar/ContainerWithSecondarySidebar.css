@@ -1,18 +1,15 @@
 .parent-container {
+  height: 100%;
   display: flex;
 }
 
-.parent-container .outlet-container {
-  --outlet-width: calc(100vw - 297px); /* 80px primary + 217px secondary sidebar width = 297px */
-  --main-content-height: calc(100vh - 72px); /* 48px header + 24px footer height  = 72px  */
-
-  overflow: auto;
-  width: var(--outlet-width);
-  max-width: var(--outlet-width);
-  height: var(--main-content-height);
-  max-height: var(--main-content-height);
+.parent-container .secondary-sidebar-container {
+  width: 217px;
+  flex-shrink: 0;
 }
 
-.parent-container .secondary-sidebar-container {
-  max-width: 13.56rem;
+.parent-container .outlet-container {
+  flex-grow: 1;
+  height: 100%;
+  overflow: auto;
 }
