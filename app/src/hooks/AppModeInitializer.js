@@ -24,10 +24,12 @@ import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
+import { useNavigate } from "react-router-dom";
 
 let hasAppModeBeenSet = false;
 
 const AppModeInitializer = () => {
+  const navigate = useNavigate();
   const usePrevious = (value) => {
     const ref = useRef();
     useEffect(() => {
@@ -129,8 +131,12 @@ const AppModeInitializer = () => {
           }
         });
       }
+
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("redirect-from-web-app", (payload) => {
+        navigate(payload);
+      });
     }
-  }, [appMode, isBackgroundProcessActive, dispatch]);
+  }, [appMode, isBackgroundProcessActive, dispatch, navigate]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
