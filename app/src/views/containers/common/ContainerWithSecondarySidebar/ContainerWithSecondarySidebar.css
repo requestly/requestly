@@ -1,0 +1,15 @@
+.parent-container {
+  height: 100%;
+  display: flex;
+}
+
+.parent-container .secondary-sidebar-container {
+  width: 217px;
+  flex-shrink: 0;
+}
+
+.parent-container .outlet-container {
+  flex-grow: 1;
+  height: 100%;
+  overflow: auto;
+}

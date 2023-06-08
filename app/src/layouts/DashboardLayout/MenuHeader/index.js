@@ -20,7 +20,7 @@ import "./MenuHeader.css";
 
 const { Header } = Layout;
 
-const MenuHeader = ({ setVisible, setCollapsed }) => {
+const MenuHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
@@ -43,12 +43,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     return true;
   };
 
-  // Mobile Sidebar
-  // const showDrawer = () => {
-  //   setCollapsed(false);
-  //   setVisible(true);
-  // };
-
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
 
   return showMenuHeader() ? (
@@ -57,7 +51,7 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
             <div className="header-left-section">
-              <Link to={PATHS.HOME.ABSOLUTE}>Home</Link>
+              <Link to={PATHS.RULES.MY_RULES.ABSOLUTE}>Home</Link>
 
               <WorkspaceSelector />
 

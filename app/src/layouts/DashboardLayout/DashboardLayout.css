@@ -15,10 +15,6 @@
   grid-template-columns: 80px 1fr;
 }
 
-/* .app-layout-sidebar-collapsed {
-
-} */
-
 .app-header {
   grid-area: header;
   border-bottom: 1px solid var(--border-dark);
@@ -29,16 +25,20 @@
 }
 
 .app-main-content {
-  --main-content-height: calc(100vh - 4.5rem); /* 48px header + 24px footer height  = 72px = 4.5rem */
-
-  overflow: auto;
   grid-area: main;
-  min-height: var(--main-content-height);
-  max-height: var(--main-content-height);
 }
 
 .app-footer {
   grid-area: footer;
+}
+
+.app-main-content,
+#dashboardMainContent {
+  --main-content-height: calc(100vh - 4.5rem); /* 48px header + 24px footer height  = 72px = 4.5rem */
+
+  overflow: auto;
+  height: var(--main-content-height);
+  max-height: var(--main-content-height);
 }
 
 #requestly-dashboard-layout > .ant-layout {
