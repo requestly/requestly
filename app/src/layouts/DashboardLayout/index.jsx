@@ -26,9 +26,11 @@ const DashboardLayout = () => {
     [pathname, isPersonaRecommendationScreen]
   );
 
+  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
+
   return (
     <>
-      <div className="app-layout app-layout-columns">
+      <div className={`app-layout ${isPricingOrGoodbyePage ? "app-fullscreen-layout" : "app-dashboard-layout"}`}>
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
         <div className="app-sidebar">

@@ -1,9 +1,13 @@
 .app-layout {
   width: 100vw;
   height: 100vh;
-  background-color: var(--body-background);
-
   display: grid;
+  background-color: var(--body-background);
+}
+
+/* normal layout */
+.app-dashboard-layout {
+  grid-template-columns: 80px 1fr;
   grid-template-rows: 3rem 1fr 1.5rem;
   grid-template-areas:
     "header header"
@@ -11,8 +15,18 @@
     "footer footer";
 }
 
-.app-layout-columns {
-  grid-template-columns: 80px 1fr;
+/* fullscreen layout */
+.app-fullscreen-layout {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1.5rem;
+  grid-template-areas:
+    "main"
+    "footer";
+}
+
+.app-fullscreen-layout .app-header,
+.app-fullscreen-layout .app-sidebar {
+  display: none;
 }
 
 .app-header {
