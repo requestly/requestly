@@ -19,26 +19,17 @@ const generateUrlPattern = (urlString) => {
   }
 };
 
-const addUrlPatternsToScripts = (scripts, urls) => {
-  urls.forEach((url) => {
-    const pattern = generateUrlPattern(url);
-    if (pattern) {
-      scripts[0].matches.push(pattern);
-      scripts[1].exclude_matches.push(pattern);
-    }
-  });
-};
-
 const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
 
   manifestJson.version = version;
 
   const { content_scripts: contentScripts } = manifestJson;
-  contentScripts[0].matches = [];
-  contentScripts[1].exclude_matches = [];
 
-  addUrlPatternsToScripts(contentScripts, [WEB_URL, ...OTHER_WEB_URLS]);
+  const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern); // remove null entries
+
+  contentScripts[0].matches = webURLPatterns;
+  contentScripts[1].exclude_matches = webURLPatterns;
 
   if (env !== "prod") {
     manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
