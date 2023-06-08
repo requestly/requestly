@@ -20,7 +20,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
-import { WorkspaceOnboarding } from "../../../landing/WorkspaceOnboarding";
+import { WorkspaceOnboarding } from "./WorkspaceOnboarding";
 
 const { PATHS } = APP_CONSTANTS;
 
