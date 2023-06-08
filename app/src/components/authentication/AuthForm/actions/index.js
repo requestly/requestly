@@ -155,21 +155,26 @@ export const handleResetPasswordOnClick = (event, password, setLoader, navigate,
 };
 
 export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispatch) => {
+  console.log("handleLogoutButtonOnClick invoked");
   try {
     if (window.location.host.includes("app.requestly.io")) {
+      console.log("Resetting posthog");
       posthog.reset();
     }
     if (!window.uid || !isLocalStoragePresent(appMode)) {
+      console.log("No user found. Signing out");
       return signOut();
     }
 
     if (isWorkspaceMode) {
+      console.log("Clearing workspace in handleLogoutButtonOnClick");
       clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      Logger.log("Clearing storage in handleLogoutButtonOnClick");
+      console.log("Clearing storage in handleLogoutButtonOnClick");
       StorageService(appMode).clearDB();
     }
 
+    console.log("Signing out");
     return signOut();
   } catch (err) {
     return Logger.log(err);
