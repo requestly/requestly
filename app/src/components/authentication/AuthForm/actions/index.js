@@ -159,7 +159,11 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
   try {
     if (window.location.host.includes("app.requestly.io")) {
       console.log("Resetting posthog");
-      posthog.reset();
+      try {
+        posthog.reset();
+      } catch (error) {
+        console.log("Error while resetting posthog", error);
+      }
     }
     if (!window.uid || !isLocalStoragePresent(appMode)) {
       console.log("No user found. Signing out");
