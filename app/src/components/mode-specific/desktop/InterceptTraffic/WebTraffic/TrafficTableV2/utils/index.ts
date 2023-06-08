@@ -5,6 +5,7 @@ export const getRequestDomain = (log: any) => {
   return domain;
 };
 
+// todo fix: app name for chromium based browsers is always chrome
 export const getRequestApp = (log: any) => {
   const ua = log?.request?.headers["user-agent"];
   const app = getAppNameFromUA(ua);
