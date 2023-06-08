@@ -1,6 +1,6 @@
 .rules-sidebar-container {
   width: 100%;
-  min-height: calc(100vh - 4.5rem);
+  height: 100%;
   border-right: 1px solid var(--border-dark);
 }
 
