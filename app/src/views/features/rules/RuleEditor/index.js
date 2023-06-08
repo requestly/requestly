@@ -11,15 +11,17 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
-import "./RuleEditor.css";
 import Logger from "lib/logger";
+import "./RuleEditor.css";
+
+const INITIAL_PANE_SIZES = [99, 1];
 
 const RuleEditor = (props) => {
   //Constants
   const { MODE, RULE_TYPE_TO_CREATE } = getModeData(props.location, null);
 
   // Component State
-  const [rulePaneSizes, setRulePaneSizes] = useState([92, 8]);
+  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
 
   const { location } = props;
@@ -43,7 +45,7 @@ const RuleEditor = (props) => {
 
   const expandRulePane = () => setRulePaneSizes([30, 70]);
 
-  const collapseRulesPlane = () => setRulePaneSizes([92, 8]);
+  const collapseRulesPlane = () => setRulePaneSizes(INITIAL_PANE_SIZES);
 
   const renderRuleEditor = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
@@ -74,7 +76,7 @@ const RuleEditor = (props) => {
                 cursor="row-resize"
                 onDragEnd={(paneSizes) => setRulePaneSizes(paneSizes)}
                 style={{
-                  height: location.pathname.includes("/rules/editor") ? "calc(100vh - 72x)" : "91vh",
+                  height: location.pathname.includes("/rules/editor") ? "calc(100vh - 72px)" : "91vh",
                 }}
               >
                 <Row className="overflow-hidden">
