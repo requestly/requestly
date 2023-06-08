@@ -1,13 +1,7 @@
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 // SUB
 const appListJson = require("./sub/appsList.json");
-
-if (!isFeatureCompatible(FEATURES.ARC_BROWSER)) {
-  appListJson["existing-arc"].comingSoon = true;
-}
 
 const INITIAL_STATE = {
   /* User */
