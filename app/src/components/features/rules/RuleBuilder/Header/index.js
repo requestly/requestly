@@ -41,7 +41,6 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
       <Row wrap={false} align="middle" className="rule-editor-row">
         <Col span={8}>
           <Row wrap={false} align="middle">
-            {/* <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} /> */}
             <div className="text-gray rule-editor-header-title">
               {getRuleTitle(currentlySelectedRuleConfig.NAME, mode)}
             </div>
