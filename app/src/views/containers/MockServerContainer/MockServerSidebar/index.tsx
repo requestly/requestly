@@ -5,11 +5,11 @@ import "./MockServerSidebar.css";
 
 const mockServerSubRoutes = [
   {
-    title: "My Mock Servers",
+    title: "My Mock APIs",
     path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
   },
   {
-    title: "My File Servers",
+    title: "My Files",
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
   },
 ];

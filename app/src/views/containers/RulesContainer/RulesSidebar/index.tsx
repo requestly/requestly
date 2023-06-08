@@ -9,7 +9,7 @@ const ruleRoutes = [
     path: PATHS.RULES.MY_RULES.ABSOLUTE,
   },
   {
-    title: "Shared list",
+    title: "Shared lists",
     path: PATHS.SHARED_LISTS.RELATIVE,
   },
   {
