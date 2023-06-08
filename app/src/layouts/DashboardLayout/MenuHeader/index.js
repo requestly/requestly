@@ -1,10 +1,9 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
-import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
@@ -22,30 +21,11 @@ const { Header } = Layout;
 
 const MenuHeader = () => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
-  // const isMyRulesPage = pathname.includes("my-rules");
-  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
-  const editorPaths = [
-    // "/rules/editor",
-    // "/mocks/editor",
-    // "/filesv2/editor",
-    // "/mock-server/viewer",
-    "/pricing",
-    "/invite",
-  ];
-
-  const showMenuHeader = () => {
-    //don't show general app header component for editor screens
-    for (let path of editorPaths) {
-      if (pathname.includes(path)) return false;
-    }
-    return true;
-  };
-
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
 
-  return showMenuHeader() ? (
+  const isPricingOrGoodbyePage = false;
+  return (
     <Header className="layout-header">
       <Row wrap={false} align="middle" className="w-full">
         {!isPricingOrGoodbyePage ? (
@@ -164,7 +144,7 @@ const MenuHeader = () => {
         </Col>
       </Row>
     </Header>
-  ) : null;
+  );
 };
 
 export default MenuHeader;
