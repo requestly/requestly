@@ -1,0 +1,39 @@
+.onboarding-content-wrapper {
+  height: calc(100% - 56px);
+  display: flex;
+}
+
+.onboarding-content-banner,
+.onboarding-action-component {
+  flex: 1;
+  height: 100%;
+  padding: 0 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.onboarding-action-component {
+  background: var(--background-dark);
+}
+.onboarding-content-banner {
+  background: var(--body-background);
+}
+.onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper.signup-modal-hero {
+  max-width: none;
+}
+.onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper {
+  width: 100%;
+}
+.onboarding-action-component .auth-modal {
+  width: 420px;
+  min-width: 420px;
+}
+.onboarding-action-component .auth-modal .login-modal-wrapper {
+  padding: 0;
+}
+
+.onboarding-action-component .auth-modal .ant-col .onboarding-auth-from-wrapper .signup-form-wrapper {
+  width: 420px;
+  max-width: none;
+  padding: 0;
+}
