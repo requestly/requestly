@@ -912,6 +912,7 @@ const RulesTable = ({
     columns.splice(3, 0, {
       title: "Created by",
       align: "center",
+      width: "120px",
       responsive: ["lg"],
       dataIndex: "createdBy",
       valueType: "date",
