@@ -177,6 +177,6 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
     console.log("Signing out");
     return signOut();
   } catch (err) {
-    return Logger.log(err);
+    return console.log(err);
   }
 };
