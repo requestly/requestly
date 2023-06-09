@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -13,6 +13,7 @@ import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
 import { Newbadge } from "components/common/Newbadge";
+import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import "./MenuHeader.css";
@@ -21,11 +22,23 @@ const { Header } = Layout;
 
 const MenuHeader = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
+  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
+  const editorPaths = [
+    // "/rules/editor",
+    // "/mocks/editor",
+    // "/filesv2/editor",
+    // "/mock-server/viewer",
+    "/pricing",
+    "/invite",
+  ];
 
-  const isPricingOrGoodbyePage = false;
-  return (
+  //don't show general app header component for editor screens
+  const showMenuHeader = () => !editorPaths.some((path) => pathname.includes(path));
+
+  return showMenuHeader() ? (
     <Header className="layout-header">
       <Row wrap={false} align="middle" className="w-full">
         {!isPricingOrGoodbyePage ? (
@@ -144,7 +157,7 @@ const MenuHeader = () => {
         </Col>
       </Row>
     </Header>
-  );
+  ) : null;
 };
 
 export default MenuHeader;

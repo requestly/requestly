@@ -1,4 +1,8 @@
 .app-layout {
+  --app-header-height: 48px;
+  --app-footer-height: 24px;
+  --app-sidebar-width: 80px;
+
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -6,36 +10,26 @@
 }
 
 /* normal layout */
-.app-dashboard-layout {
-  grid-template-columns: 80px 1fr;
-  grid-template-rows: 3rem 1fr 1.5rem;
+.app-layout.app-dashboard-layout {
+  grid-template-columns: fit-content(var(--app-sidebar-width)) 1fr;
+  grid-template-rows: fit-content(var(--app-header-height)) 1fr fit-content(var(--app-footer-height));
   grid-template-areas:
     "header header"
     "sidebar main"
     "footer footer";
 }
 
-/* fullscreen layout */
-.app-fullscreen-layout {
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1.5rem;
-  grid-template-areas:
-    "main"
-    "footer";
-}
-
-.app-fullscreen-layout .app-header,
-.app-fullscreen-layout .app-sidebar {
-  display: none;
-}
-
 .app-header {
   grid-area: header;
+  height: 100%;
+  max-height: var(--app-header-height);
   border-bottom: 1px solid var(--border-dark);
 }
 
 .app-sidebar {
   grid-area: sidebar;
+  width: 100%;
+  max-width: var(--app-sidebar-width);
 }
 
 .app-main-content {
@@ -44,15 +38,17 @@
 
 .app-footer {
   grid-area: footer;
+  height: 100%;
+  max-height: var(--app-footer-height);
 }
 
 .app-main-content,
 #dashboardMainContent {
   --main-content-height: calc(100vh - 4.5rem); /* 48px header + 24px footer height  = 72px = 4.5rem */
 
+  height: 100%;
   overflow: auto;
-  height: var(--main-content-height);
-  max-height: var(--main-content-height);
+  /* max-height: var(--main-content-height); */
 }
 
 #requestly-dashboard-layout > .ant-layout {
