@@ -4,6 +4,7 @@
   --text-gray: #b0b0b5;
   --text-dark-gray: #b0b0b5b3;
   --gray-dark: #3b3b3b;
+  --gray-light: #a6a6a6;
   --border: #4f5053;
   --border-dark: #303030;
   --danger: #fc5f5f;
@@ -12,12 +13,12 @@
   --primary: #1e69ff;
   --background: #141414;
   --background-dark: #1c1d21;
-  --layout-component-background: #212121;
-  --component-background: #323337;
-  --component-dark-background: #2c2d31;
-  --input-background: var(--component-dark-background);
-  --component-header-background: var(--component-dark-background);
-  --body-background: #242529;
+  --body-background: #212121;
+  --app-secondary-sidebar-background: #262626;
+  --component-background: #262626;
+  --component-dark-background: var(--body-background);
+  --input-background: #2b2b2b;
+  --component-header-background: #2d2d2d;
   --hover-color: #3c3d42;
   --dropdown-active-border-color: #0361ff;
   --input-hover-border-color: #2051b4;

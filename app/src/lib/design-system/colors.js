@@ -8,10 +8,11 @@ module.exports.colors = {
 
   // others
   border: "#3e4044",
-  background: "#242529",
+  background: "#212121",
   backgroundDark: "#1c1d21",
+  inputBackground: "#2B2B2B",
   componentBackground: "#323337",
-  componentDarkBackground: "#2C2D31",
+  componentDarkBackground: "#212121",
   selectedItemBackground: "#3f4044",
   modalBackdrop: "rgba(13, 13, 16, 0.85)",
 };

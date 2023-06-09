@@ -4,7 +4,6 @@ import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
-import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
@@ -14,6 +13,7 @@ import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
 import { Newbadge } from "components/common/Newbadge";
+import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
 import "./MenuHeader.css";
@@ -24,7 +24,7 @@ const MenuHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
-  // const isMyRulesPage = pathname.includes("my-rules");
+  const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const editorPaths = [
     // "/rules/editor",
@@ -35,15 +35,8 @@ const MenuHeader = () => {
     "/invite",
   ];
 
-  const showMenuHeader = () => {
-    //don't show general app header component for editor screens
-    for (let path of editorPaths) {
-      if (pathname.includes(path)) return false;
-    }
-    return true;
-  };
-
-  const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
+  //don't show general app header component for editor screens
+  const showMenuHeader = () => !editorPaths.some((path) => pathname.includes(path));
 
   return showMenuHeader() ? (
     <Header className="layout-header">

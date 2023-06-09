@@ -1,5 +1,6 @@
 import { Row, Col } from "antd";
 import { RQInput } from "lib/design-system/components";
+import "./delayRow.css";
 
 const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
   const { modifyPairAtGivenPath } = helperFunctions;
@@ -12,7 +13,7 @@ const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled 
           value={pair.delay}
           placeholder="Time in ms"
           disabled={isInputDisabled}
-          className="display-inline-block"
+          className="delay-rule-input display-inline-block"
           addonBefore={<span className="text-gray">DELAY (ms):</span>}
           onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "delay")}
           data-selectionid="delay-value"

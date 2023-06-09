@@ -1,0 +1,24 @@
+.secodary-sidebar-link {
+  width: 100%;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 15px;
+  font-size: 14px;
+  line-height: 16px;
+  padding: 7px 18px;
+  color: var(--gray-light);
+}
+
+.secodary-sidebar-link .icon__wrapper svg {
+  width: 17px;
+  height: 15px;
+}
+
+.secodary-sidebar-link:hover,
+.secodary-sidebar-link:focus,
+.secodary-sidebar-active-link {
+  color: white;
+  background-color: var(--gray-dark);
+  border-radius: var(--border-radius-sm);
+}
