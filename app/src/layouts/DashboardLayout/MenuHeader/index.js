@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -22,6 +22,7 @@ const { Header } = Layout;
 
 const MenuHeader = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
@@ -37,8 +38,7 @@ const MenuHeader = () => {
   //don't show general app header component for editor screens
   const showMenuHeader = () => !editorPaths.some((path) => pathname.includes(path));
 
-  const isPricingOrGoodbyePage = false;
-  return (
+  return showMenuHeader() ? (
     <Header className="layout-header">
       <Row wrap={false} align="middle" className="w-full">
         {!isPricingOrGoodbyePage ? (
@@ -157,7 +157,7 @@ const MenuHeader = () => {
         </Col>
       </Row>
     </Header>
-  );
+  ) : null;
 };
 
 export default MenuHeader;

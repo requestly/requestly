@@ -38,8 +38,6 @@ const DashboardLayout = () => {
     [pathname, isPersonaRecommendationScreen]
   );
 
-  const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
-
   return (
     <>
       <div className="app-layout app-dashboard-layout">
