@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
+// import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
 import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
@@ -109,9 +109,9 @@ const MenuHeader = () => {
               )}
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-              <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
+              {/* <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
                 <RulesSyncToggle />
-              </div>
+              </div> */}
 
               {/* documentation */}
               <Col className="hidden-on-small-screen">
