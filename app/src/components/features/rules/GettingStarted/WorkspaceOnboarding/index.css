@@ -17,6 +17,11 @@
 }
 .onboarding-content-banner {
   background: var(--body-background);
+  position: relative;
+}
+.onboarding-content-banner.flex-start {
+  align-items: initial;
+  justify-content: initial;
 }
 .onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper.signup-modal-hero {
   max-width: none;

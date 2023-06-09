@@ -2,7 +2,7 @@ import { PageConfig, PersonaType, SurveyOptionsConfig } from "./types";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 import { setUserPersona } from "./actions";
 
-import chromeStoreIcon from "../../../assets/img/icons/personaSurvey/webstore.svg";
+import chromeStoreIcon from "assets/img/icons/personaSurvey/webstore.svg";
 import chromeIcon from "assets/img/icons/personaSurvey/chrome.svg";
 import stackOverFlowIcon from "assets/img/icons/personaSurvey/stackoverflow.svg";
 

@@ -2,6 +2,7 @@ import React, { useCallback, useState, useMemo } from "react";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
 import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
+import { GettingStartedWithSurvey } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/GettingStartedWithSurvey";
 import { OnboardingSteps } from "./types";
 
 import "./index.css";
@@ -14,7 +15,7 @@ export const WorkspaceOnboarding: React.FC = () => {
       case OnboardingSteps.AUTH:
         return <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} />;
       case OnboardingSteps.PERSONA_SURVEY:
-        return <>PERSONA SURVEY BANNER WILL COME HERE</>;
+        return <GettingStartedWithSurvey />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
         return <>CREATE OR JOIN WORKSPACE BANNER HERE</>;
     }
@@ -34,7 +35,9 @@ export const WorkspaceOnboarding: React.FC = () => {
     <>
       <FullPageHeader />
       <div className="onboarding-content-wrapper">
-        <div className="onboarding-content-banner">{renderOnboardingBanner()}</div>
+        <div className={`onboarding-content-banner ${step === OnboardingSteps.PERSONA_SURVEY && "flex-start"}`}>
+          {renderOnboardingBanner()}
+        </div>
         <div className="onboarding-action-component">{renderOnboardingActionComponent()}</div>
       </div>
     </>

@@ -3,7 +3,7 @@ import { FaCheck, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
-import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
+import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 // Firebase
 // import firebase from "../../../firebase";
 import firebaseApp from "../../../firebase";

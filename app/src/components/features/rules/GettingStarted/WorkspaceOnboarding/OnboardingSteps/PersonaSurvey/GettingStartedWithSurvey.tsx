@@ -22,8 +22,15 @@ export const GettingStartedWithSurvey = () => {
   }, []);
 
   return (
-    <div className="survey-lottie-animation-container">
-      <div className="survey-lottie-animation" id="PersonaSurvey-welcomeAnimation" />
+    <div className="persona-survey-banner">
+      <div className="survey-banner-title">Welcome to Requestly!</div>
+      <div className="survey-banner-subtitle">
+        Help us personalise your experience by answering the following questionnaire
+      </div>
+      <div className="survey-lottie-animation-container">
+        <div className="survey-lottie-animation" id="PersonaSurvey-welcomeAnimation" />
+      </div>
+      <div className="survey-banner-footer">😄 We are excited to see you here </div>
     </div>
   );
 };
