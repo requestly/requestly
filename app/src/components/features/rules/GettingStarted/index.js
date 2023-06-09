@@ -9,7 +9,12 @@ import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import {
+  getUserAuthDetails,
+  getAppMode,
+  getUserPersonaSurveyDetails,
+  getIsWorkspaceOnboardingCompleted,
+} from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
@@ -32,7 +37,8 @@ const GettingStarted = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
+  // const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
@@ -40,7 +46,7 @@ const GettingStarted = () => {
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
-  const shouldShowPersonaRecommendations = state?.src === "persona_survey_modal" && !userPersona?.isSurveyCompleted;
+  const shouldShowWorkspaceOnboarding = state?.src === "workspace_onboarding" && !isWorkspaceOnboardingCompleted;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -84,9 +90,8 @@ const GettingStarted = () => {
 
   return (
     <>
-      <WorkspaceOnboarding />
-      {/* {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-        <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
+      {shouldShowWorkspaceOnboarding ? (
+        <WorkspaceOnboarding />
       ) : (
         <Row className="getting-started-container">
           <Col
@@ -151,10 +156,10 @@ const GettingStarted = () => {
                     >
                       Upload rules
                     </RQButton>
-                  </AuthConfirmationPopover> */}
+                  </AuthConfirmationPopover>
 
-      {/* TODO: make desktop only */}
-      {/* {isCharlesImportFeatureFlagOn ? (
+                  {/* TODO: make desktop only */}
+                  {isCharlesImportFeatureFlagOn ? (
                     <RQButton
                       type="default"
                       onClick={() => {
@@ -179,8 +184,13 @@ const GettingStarted = () => {
               ) : null}
             </>
           </Col>
-        </Row> */}
-      {/* )} */}
+        </Row>
+      )}
+      {/* {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+        <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
+      ) : (
+       
+     )}  */}
       {isImportCharlesRulesModalActive ? (
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}

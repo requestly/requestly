@@ -32,7 +32,6 @@ const MenuHeader = ({ setVisible, setCollapsed }) => {
     "/mock-server/viewer",
     "/pricing",
     "/invite",
-    "/getting-started", //TEMP CHANGE
   ];
 
   const showMenuHeader = () => {
