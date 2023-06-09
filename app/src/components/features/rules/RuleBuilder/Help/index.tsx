@@ -65,6 +65,19 @@ const ruleTypeToNotionDocIdMap = {
   [RuleType.USERAGENT]: "8522c44d1f1a42e1aad766847f9d4785",
 };
 
+const defaultDocEndpointsMap = {
+  [RuleType.REDIRECT]: "redirect-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.CANCEL]: "cancel-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REPLACE]: "replace-rule-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.HEADERS]: "modify-header-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.QUERYPARAM]: "query-param-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.SCRIPT]: "insert-script-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.RESPONSE]: "modify-response-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REQUEST]: "modify-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.DELAY]: "delay-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.USERAGENT]: "user-agent-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+};
+
 interface HelpProps {
   ruleType: RuleType;
   setShowDocs: (showDocs: boolean) => void;
@@ -125,6 +138,16 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       .then((data) => {
         setNotionPageData(data);
         updateDocTableOfContent(data);
+        console.log({ data });
+      })
+      .catch((error) => {
+        fetch(`https://requestly.dev/api/mockv2/${defaultDocEndpointsMap[ruleType]}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setNotionPageData(data);
+            updateDocTableOfContent(data);
+            console.log({ data });
+          });
       });
   }, [ruleType]);
 
