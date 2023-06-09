@@ -55,7 +55,6 @@ const AuthForm = ({
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
   const dispatch = useDispatch();
-  console.log({ onSignInSuccess });
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
@@ -274,29 +273,6 @@ const AuthForm = ({
   };
 
   const renderBackButton = (action) => {
-    // switch (MODE) {
-    //   case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
-    //   case AUTH_ACTION_LABELS.DO_RESET_PASSWORD:
-    //     return (
-    //       <>
-    //         {!path.includes(PATHS.AUTH.RESET_PASSWORD.RELATIVE) && (
-    //           <button
-    //             className="back-to-login-btn secondary-text cursor-pointer form-elements-margin"
-    //             onClick={() => {
-    //               SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
-    //               setEmail("");
-    //             }}
-    //           >
-    //             <HiArrowLeft />
-    //             Back
-    //           </button>
-    //         )}
-    //       </>
-    //     );
-
-    //   default:
-    //     return null;
-    // }
     return (
       <button className="back-to-login-btn secondary-text cursor-pointer" style={{ padding: 0 }} onClick={action}>
         <HiArrowLeft />
