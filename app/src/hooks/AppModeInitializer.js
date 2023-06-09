@@ -132,7 +132,7 @@ const AppModeInitializer = () => {
         });
       }
 
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("redirect-from-web-app", (payload) => {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
       });
     }
