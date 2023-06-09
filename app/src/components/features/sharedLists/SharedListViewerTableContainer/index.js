@@ -33,7 +33,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
 
-const SharedListViewerTableContainer = ({ rules, groups }) => {
+const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,7 +70,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
   };
 
   const handleImportListOnClick = (_e) => {
-    trackSharedListImportStartedEvent();
+    trackSharedListImportStartedEvent(id);
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
@@ -80,7 +80,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
           newProps: {},
         })
       );
-      trackSharedListImportFailed();
+      trackSharedListImportFailed(id);
       return;
     }
 
@@ -118,7 +118,7 @@ const SharedListViewerTableContainer = ({ rules, groups }) => {
 
       addRulesAndGroupsToStorage(appMode, migratedRules).then(() => {
         toast.info(`Successfully imported rules`);
-        trackSharedListImportCompleted();
+        trackSharedListImportCompleted(id);
         if (isTemplate) {
           trackTemplateImportCompleted(snakeCase("Load Google Analytics in Debug Mode"));
         }
