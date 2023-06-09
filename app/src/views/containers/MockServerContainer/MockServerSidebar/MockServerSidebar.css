@@ -1,5 +1,10 @@
+.mock-server-sidebar-container {
+  background-color: var(--app-secondary-sidebar-background);
+}
+
 .mock-server-sidebar-container ul {
   padding: 1.25rem 10px;
+  background-color: var(--app-secondary-sidebar-background);
 }
 
 .mock-server-sidebar-container ul li .icon__wrapper {

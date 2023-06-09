@@ -1,3 +1,7 @@
+.rules-sidebar-container {
+  background-color: var(--app-secondary-sidebar-background);
+}
+
 .rules-sidebar-container ul {
   padding: 1.25rem 10px;
 }
