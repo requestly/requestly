@@ -120,14 +120,13 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   };
 
   const updateDocTableOfContent = (data: any[]) => {
-    const headers = [];
     if (data) {
-      for (const key in data) {
-        const elem = data[key];
+      const headers = Object.values(data).reduce((acc, elem) => {
         if (elem?.value?.type === "header") {
-          headers.push({ id: elem.value.id, title: elem.value.properties.title[0][0] });
+          acc.push({ id: elem.value.id, title: elem.value.properties.title[0][0] });
         }
-      }
+        return acc;
+      }, []);
       setTableOfContents(headers);
     }
   };
@@ -138,7 +137,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       .then((data) => {
         setNotionPageData(data);
         updateDocTableOfContent(data);
-        console.log({ data });
       })
       .catch((error) => {
         fetch(`https://requestly.dev/api/mockv2/${defaultDocEndpointsMap[ruleType]}`)
@@ -146,7 +144,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
           .then((data) => {
             setNotionPageData(data);
             updateDocTableOfContent(data);
-            console.log({ data });
           });
       });
   }, [ruleType]);
