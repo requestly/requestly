@@ -134,6 +134,7 @@ const AppModeInitializer = () => {
         if (payload?.origin && payload?.origin === "main") {
           trackDesktopMainEvent(payload?.name, payload?.params);
         } else {
+          // todo: need to setup relay for BG renderer events
           trackDesktopBGEvent(payload?.name, payload?.params);
         }
       });
