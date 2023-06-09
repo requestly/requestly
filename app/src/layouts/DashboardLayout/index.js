@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Col, Layout, Row } from "antd";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getIsWorkspaceOnboardingCompleted } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Footer from "../../components/sections/Footer/index";
 import PATHS from "config/constants/sub/paths";
@@ -18,8 +18,8 @@ const DashboardLayout = () => {
   const { pathname } = location;
 
   const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isPersonaRecommendationScreen = userPersona.page === 4 && !userPersona.isSurveyCompleted;
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
+  // const isPersonaRecommendationScreen = userPersona.page === 4 && !userPersona.isSurveyCompleted;
 
   // Component State
   const [visible, setVisible] = useState(false);
@@ -37,8 +37,13 @@ const DashboardLayout = () => {
 
   const isSidebarVisible = useMemo(
     () =>
-      !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen),
-    [pathname, isPersonaRecommendationScreen]
+      !(
+        isPricingPage(pathname) ||
+        isGoodbyePage(pathname) ||
+        isInvitePage(pathname) ||
+        !isWorkspaceOnboardingCompleted
+      ),
+    [pathname, isWorkspaceOnboardingCompleted]
   );
 
   return (
@@ -49,7 +54,7 @@ const DashboardLayout = () => {
         )}
 
         <Layout className="hp-bg-color-dark-90">
-          {!isPersonaRecommendationScreen && <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />}
+          {isWorkspaceOnboardingCompleted && <MenuHeader setVisible={setVisible} setCollapsed={setCollapsed} />}
 
           <Content className="hp-content-main">
             <Row justify="center" style={{ height: "100%" }}>
