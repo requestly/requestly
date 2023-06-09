@@ -11,7 +11,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackPersonaQ1Completed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
-import { QuestionFor } from "./types";
+import { QuestionnaireType } from "./types";
 
 interface FooterProps {
   currentPage: number;
@@ -30,7 +30,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
 
   const handleMoveToNextPage = () => {
     switch (currentQuestionnaire) {
-      case QuestionFor.PERSONA:
+      case QuestionnaireType.PERSONA:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
         break;
@@ -79,7 +79,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
               className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
               onClick={handleMoveToNextPage}
             >
-              {currentQuestionnaire === QuestionFor.PERSONA ? "Get started" : "Continue"}
+              {currentQuestionnaire === QuestionnaireType.PERSONA ? "Get started" : "Continue"}
             </RQButton>
           </Col>
         </Row>

@@ -23,7 +23,7 @@ export interface PageConfig {
    * If skip true then don't show the question in survey
    */
   skip?: boolean;
-  render?: QuestionFor;
+  render?: QuestionnaireType;
 }
 
 export interface SurveyOptionsConfig {
@@ -55,6 +55,6 @@ export enum PersonaType {
   SALES = "Sales",
 }
 
-export enum QuestionFor {
+export enum QuestionnaireType {
   PERSONA = "persona",
 }

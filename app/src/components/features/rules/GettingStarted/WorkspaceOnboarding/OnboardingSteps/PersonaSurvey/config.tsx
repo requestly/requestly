@@ -1,8 +1,8 @@
-import { PageConfig, PersonaType, QuestionFor, SurveyOptionsConfig } from "./types";
+import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig } from "./types";
 import { setUserPersona } from "./actions";
 
-export const OptionsConfig: Record<QuestionFor, SurveyOptionsConfig> = {
-  [QuestionFor.PERSONA]: {
+export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
+  [QuestionnaireType.PERSONA]: {
     key: "persona",
     questionType: "single",
     isActive: ({ key, title }) => key === title,
@@ -45,7 +45,7 @@ export const SurveyConfig: PageConfig[] = [
     pageId: 0,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
-    render: QuestionFor.PERSONA,
+    render: QuestionnaireType.PERSONA,
   },
   // {
   //   pageId: 2,
