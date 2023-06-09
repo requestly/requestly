@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { shuffleOptions } from "./utils";
-import { Option, PageConfig, QuestionFor } from "./types";
+import { Option, PageConfig, QuestionnaireType } from "./types";
 // import { trackPersonaSurveyViewed, trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -20,7 +20,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback }) => {
   const currentPage = userPersona.page;
 
   const shuffledQ1 = useMemo(() => {
-    return shuffleOptions(OptionsConfig[QuestionFor.PERSONA].options);
+    return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
   }, []);
 
   const renderPageHeader = (page: PageConfig) => {
@@ -34,15 +34,15 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback }) => {
     );
   };
 
-  const renderQuestionnaire = (optionSet: QuestionFor) => {
+  const renderQuestionnaire = (optionSet: QuestionnaireType) => {
     switch (optionSet) {
-      case QuestionFor.PERSONA:
+      case QuestionnaireType.PERSONA:
         return renderOptions(shuffledQ1, optionSet);
       default:
         return null;
     }
   };
-  const renderOptions = (options: Option[], optionSet: QuestionFor) => {
+  const renderOptions = (options: Option[], optionSet: QuestionnaireType) => {
     return (
       <>
         <div className="survey-options-container">
@@ -70,11 +70,12 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback }) => {
     );
   };
 
+  useEffect(() => {
+    if (currentPage > SurveyConfig?.length - 1) callback();
+  }, [callback, currentPage]);
+
   return (
-    <div
-      className="persona-survey-container"
-      // maskStyle={{ background: "#0d0d10" }}
-    >
+    <div className="persona-survey-container">
       <div
         className={`rq-modal-content survey-content-wrapper ${
           currentPage === SurveyConfig.length - 1 && "survey-modal-border-radius"
