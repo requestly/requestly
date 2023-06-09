@@ -3,7 +3,7 @@ import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
 import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
 import { GettingStartedWithSurvey } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/GettingStartedWithSurvey";
-import { PersonaSurveyModal } from "./OnboardingSteps/PersonaSurvey";
+import { PersonaSurvey } from "./OnboardingSteps/PersonaSurvey";
 import { OnboardingSteps } from "./types";
 
 import "./index.css";
@@ -27,7 +27,7 @@ export const WorkspaceOnboarding: React.FC = () => {
       case OnboardingSteps.AUTH:
         return <OnboardingAuthForm callback={{ onSignInSuccess: () => setStep(OnboardingSteps.PERSONA_SURVEY) }} />;
       case OnboardingSteps.PERSONA_SURVEY:
-        return <PersonaSurveyModal />;
+        return <PersonaSurvey callback={() => setStep(OnboardingSteps.CREATE_JOIN_WORKSPACE)} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
         return <>CREATE OR JOIN WORKSPACE ACTIONS Here</>;
     }
