@@ -23,7 +23,6 @@ import {
   trackCreateNewWorkspaceClicked,
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getUserAuthDetails } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
@@ -39,6 +38,7 @@ import { getUniqueColorForWorkspace } from "utils/teams";
 import Logger from "lib/logger";
 import { getTeamInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./WorkSpaceSelector.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -74,7 +74,7 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
       handleSidebarCollapsed(false);
-      trackSidebarClicked("workspace");
+      trackTopbarClicked("workspace");
     }
   };
 
