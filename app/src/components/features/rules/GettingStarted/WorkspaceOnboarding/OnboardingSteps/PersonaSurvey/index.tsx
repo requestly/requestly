@@ -11,11 +11,13 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SurveyOption } from "./Option";
 import "./index.css";
 
-export const PersonaSurveyModal: React.FC = () => {
+interface SurveyProps {
+  callback: () => void;
+}
+
+export const PersonaSurvey: React.FC<SurveyProps> = ({ callback }) => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
-
-  console.log({ currentPage });
 
   const shuffledQ1 = useMemo(() => {
     return shuffleOptions(OptionsConfig[QuestionFor.PERSONA].options);
@@ -82,7 +84,7 @@ export const PersonaSurveyModal: React.FC = () => {
           <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page)}</>}</React.Fragment>
         ))}
       </div>
-      <SurveyModalFooter currentPage={currentPage} />
+      <SurveyModalFooter currentPage={currentPage} callback={callback} />
     </div>
   );
 };

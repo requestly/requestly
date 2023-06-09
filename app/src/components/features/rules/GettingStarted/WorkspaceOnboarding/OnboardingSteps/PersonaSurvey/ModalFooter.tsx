@@ -15,9 +15,10 @@ import { QuestionFor } from "./types";
 
 interface FooterProps {
   currentPage: number;
+  callback: () => void;
 }
 
-export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage }) => {
+export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback }) => {
   const dispatch = useDispatch();
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
@@ -60,6 +61,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage }) => {
       // break;
     }
     dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+    if (currentPage === SurveyConfig.length - 1) {
+      dispatch(actions.updateIsPersonaSurveyCompleted(true));
+      callback();
+    }
   };
   return (
     <>
