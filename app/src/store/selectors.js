@@ -238,3 +238,7 @@ export const getNetworkSessionSaveInProgress = (state) => {
 export const getIsNetworkTooltipShown = (state) => {
   return getGlobalState(state).misc.persist?.isNetworkSessionTooltipShown;
 };
+
+export const getIsWorkspaceOnboardingCompleted = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.isOnboardingCompleted;
+};

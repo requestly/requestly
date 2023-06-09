@@ -105,6 +105,9 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
 }
+.display-flex {
+  display: flex;
+}
 
 .display-row-center {
   display: flex;

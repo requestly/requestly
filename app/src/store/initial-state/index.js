@@ -153,6 +153,11 @@ const INITIAL_STATE = {
     deviceId: null,
   },
 
+  workspaceOnboarding: {
+    step: "auth",
+    isOnboardingCompleted: false,
+  },
+
   misc: {
     persist: {
       isRedirectRuleTourCompleted: false,

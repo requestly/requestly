@@ -11,7 +11,12 @@ import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { actions } from "store";
 //UTILS
-import { getActiveModals, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import {
+  getActiveModals,
+  getAppMode,
+  getUserPersonaSurveyDetails,
+  getIsWorkspaceOnboardingCompleted,
+} from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -32,6 +37,7 @@ const DashboardContent = () => {
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -68,11 +74,11 @@ const DashboardContent = () => {
   const prevProps = usePrevious({ location });
 
   useEffect(() => {
-    if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
+    if (!isWorkspaceOnboardingCompleted) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
         state: {
-          src: "persona_survey_modal",
+          src: "workspace_onboarding",
           redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
         },
       });
@@ -189,14 +195,14 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {!userPersona.isSurveyCompleted ? (
+      {/* {!userPersona.isSurveyCompleted ? (
         <PersonaSurveyModal
           isOpen={activeModals.personaSurveyModal.isActive}
           toggle={togglePersonaSurveyModal}
           toggleImportRulesModal={toggleImportRulesModal}
           {...activeModals.personaSurveyModal.props}
         />
-      ) : null}
+      ) : null} */}
 
       {/* ) : null} */}
       {isImportRulesModalActive ? (
