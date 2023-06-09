@@ -1,4 +1,4 @@
-.survey-modal .ant-modal-body .rq-modal-content {
+/* .survey-modal .ant-modal-body .rq-modal-content {
   padding: 40px 20px;
 }
 .survey-modal .skip-recommendation-wrapper {
@@ -71,4 +71,48 @@
 .survey-modal .survey-subtitle-wrapper {
   display: flex;
   justify-content: center;
+}
+
+/* NEW CLASSES */
+.persona-survey-banner {
+  padding-top: 80px;
+}
+.persona-survey-banner .survey-banner-title {
+  font-size: 2.25rem;
+  color: var(--white);
+  font-weight: 500;
+  padding-left: 50px;
+}
+
+.persona-survey-banner .survey-banner-subtitle {
+  max-width: 380px;
+  line-height: 25px;
+  margin-top: 8px;
+  opacity: 0.7;
+  padding-left: 50px;
+}
+.persona-survey-banner .survey-banner-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 9px 1.25rem;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--component-dark-background);
+  color: var(--text-gray);
+  text-align: center;
+}
+.persona-survey-banner .survey-lottie-animation-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 35px;
+  left: 0;
+  right: 0;
+}
+.persona-survey-banner .survey-lottie-animation {
+  width: 80%;
 }
