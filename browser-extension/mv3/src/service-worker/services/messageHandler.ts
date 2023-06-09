@@ -1,15 +1,14 @@
-import config from "common/config";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { initClientHandler } from "./clientHandler";
-import { isExtensionEnabled, toggleExtensionStatus } from "./utils";
+import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import { getTabSession, initSessionRecording, onSessionRecordingStartedNotification } from "./sessionRecording";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
-  chrome.tabs.query({ url: config.WEB_URL + "/*" }, (tabs) => {
+  getAppTabs().then((tabs) => {
     tabs.forEach(({ id }) => {
       chrome.tabs.sendMessage(id, messageObject, callback);
     });
