@@ -10,6 +10,7 @@ module.exports.colors = {
   border: "#3e4044",
   background: "#212121",
   backgroundDark: "#1c1d21",
+  inputBackground: "#2B2B2B",
   componentBackground: "#323337",
   componentDarkBackground: "#2C2D31",
   selectedItemBackground: "#3f4044",
