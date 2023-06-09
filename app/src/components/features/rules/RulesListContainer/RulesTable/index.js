@@ -1257,7 +1257,7 @@ const RulesTable = ({
                     hasPopconfirm: true,
                     buttonText: "Import",
                     authSource: AUTH.SOURCE.UPLOAD_RULES,
-                    icon: <UploadOutlined />,
+                    icon: <DownloadOutlined />,
                     onClickHandler: handleImportRulesOnClick,
                     trackClickEvent: () => {
                       trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
@@ -1269,7 +1269,7 @@ const RulesTable = ({
                     hasPopconfirm: true,
                     buttonText: "Export",
                     authSource: AUTH.SOURCE.EXPORT_RULES,
-                    icon: <DownloadOutlined />,
+                    icon: <UploadOutlined />,
                     onClickHandler: handleExportRulesOnClick,
                   },
                   {
