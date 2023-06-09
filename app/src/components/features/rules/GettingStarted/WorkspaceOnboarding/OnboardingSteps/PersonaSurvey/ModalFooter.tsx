@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
-import { Col } from "antd";
+import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OptionsConfig, SurveyConfig } from "./config";
 import APP_CONSTANTS from "config/constants";
@@ -63,16 +63,21 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage }) => {
   };
   return (
     <>
-      <div className="rq-modal-footer w-full">
-        <Col>
-          <RQButton
-            type="primary"
-            className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
-            onClick={handleMoveToNextPage}
-          >
-            {currentQuestionnaire === QuestionFor.PERSONA ? "Get started" : "Continue"}
-          </RQButton>
-        </Col>
+      <div className="survey-footer w-full">
+        <Row justify="space-between" align="middle">
+          <Col>
+            {currentPage + 1} / {SurveyConfig?.length}
+          </Col>
+          <Col>
+            <RQButton
+              type="primary"
+              className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
+              onClick={handleMoveToNextPage}
+            >
+              {currentQuestionnaire === QuestionFor.PERSONA ? "Get started" : "Continue"}
+            </RQButton>
+          </Col>
+        </Row>
       </div>
     </>
   );
