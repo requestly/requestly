@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
-import { RQModal } from "lib/design-system/components";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { shuffleOptions } from "./utils";
@@ -27,7 +26,7 @@ export const PersonaSurveyModal: React.FC = () => {
       <>
         <div className="text-center white text-bold survey-title">{page.title}</div>
         <div className="w-full survey-subtitle-wrapper">
-          <div className="text-gray text-center survey-sub-title">{page.subTitle}</div>
+          <div className="text-gray text-center mt-8">{page.subTitle}</div>
         </div>
       </>
     );
@@ -70,12 +69,9 @@ export const PersonaSurveyModal: React.FC = () => {
   };
 
   return (
-    <RQModal
-      bodyStyle={{ width: "550px" }}
-      open={true}
-      closable={false}
-      className="survey-modal"
-      maskStyle={{ background: "#0d0d10" }}
+    <div
+      className="persona-survey-container"
+      // maskStyle={{ background: "#0d0d10" }}
     >
       <div
         className={`rq-modal-content survey-content-wrapper ${
@@ -87,6 +83,6 @@ export const PersonaSurveyModal: React.FC = () => {
         ))}
       </div>
       <SurveyModalFooter currentPage={currentPage} />
-    </RQModal>
+    </div>
   );
 };
