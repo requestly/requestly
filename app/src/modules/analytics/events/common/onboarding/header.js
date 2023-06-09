@@ -11,7 +11,7 @@ export const trackHelpdeskClicked = (action) => {
   trackEvent(ONBOARDING.HELPDESK_CLICKED, params);
 };
 
-export const trackDesktopAppPromoClicked = (source) => {
+export const trackTopbarClicked = (source) => {
   const params = { source };
-  trackEvent(ONBOARDING.DESKTOP_APP_PROMO_CLICKED, params);
+  trackEvent(ONBOARDING.TOPBAR_CLICKED, params);
 };

@@ -1,8 +1,9 @@
 import React from "react";
 
-export type PrimarySidebarItem = {
-  title: string;
+export interface PrimarySidebarItem extends Record<string, unknown> {
+  id?: number | string;
   path: string;
+  title: string;
   icon: React.ReactNode;
   display?: boolean;
-};
+}

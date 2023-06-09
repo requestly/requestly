@@ -14,8 +14,7 @@ import PATHS from "config/constants/sub/paths";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
 import { Newbadge } from "components/common/Newbadge";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
-import { trackDesktopAppPromoClicked, trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
-import { trackTutorialsClicked } from "modules/analytics/events/misc/tutorials";
+import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -44,11 +43,18 @@ const MenuHeader = () => {
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
             <div className="header-left-section">
-              <Link to={PATHS.RULES.MY_RULES.ABSOLUTE}>Home</Link>
+              <Link to={PATHS.RULES.MY_RULES.ABSOLUTE} onClick={() => trackTopbarClicked("home")}>
+                Home
+              </Link>
 
               <WorkspaceSelector />
 
-              <a target="_blank" rel="noreferrer" href={LINKS.YOUTUBE_TUTORIALS} onClick={trackTutorialsClicked}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={LINKS.YOUTUBE_TUTORIALS}
+                onClick={() => trackTopbarClicked("tutorials")}
+              >
                 Tutorials
               </a>
 
@@ -56,7 +62,7 @@ const MenuHeader = () => {
                 target="_blank"
                 rel="noreferrer"
                 href={LINKS.REQUESTLY_DESKTOP_APP}
-                onClick={() => trackDesktopAppPromoClicked("topbar")}
+                onClick={() => trackTopbarClicked("desktop_app")}
               >
                 Desktop App <Newbadge />
               </a>
