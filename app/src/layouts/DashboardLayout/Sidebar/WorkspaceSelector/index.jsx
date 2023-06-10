@@ -51,12 +51,12 @@ export const isWorkspacesFeatureEnabled = (email) => {
 const prettifyWorkspaceName = (workspaceName) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
   //   return "Private";
-  return workspaceName;
+  return workspaceName || "Unknown";
 };
 
 const getWorkspaceIcon = (workspaceName) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
-  return workspaceName[0].toUpperCase();
+  return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
 const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, menu }) => {
