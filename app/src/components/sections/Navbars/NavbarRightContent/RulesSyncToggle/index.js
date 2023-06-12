@@ -10,6 +10,9 @@ import { toast } from "../../../../../utils/Toast";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { AUTH } from "modules/analytics/events/common/constants";
 
+/**
+ * @deprecated This component is moved into Settings named as RulesSyncing component
+ */
 const RulesSyncToggle = () => {
   // Global State
   const dispatch = useDispatch();
