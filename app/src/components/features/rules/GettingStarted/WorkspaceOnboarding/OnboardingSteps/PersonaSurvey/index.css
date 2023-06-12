@@ -22,14 +22,13 @@
   padding-top: 80px;
 }
 .persona-survey-banner .survey-banner-title {
-  font-size: 2.25rem;
   color: var(--white);
   font-weight: 500;
   padding-left: 50px;
 }
 
 .persona-survey-banner .survey-banner-subtitle {
-  max-width: 380px;
+  width: 380px;
   line-height: 25px;
   margin-top: 8px;
   opacity: 0.7;
@@ -41,7 +40,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 9px 1.25rem;
+  padding: 9px 20px;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
   border-top: 1px solid var(--border-dark);

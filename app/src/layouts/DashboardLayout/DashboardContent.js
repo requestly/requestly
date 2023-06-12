@@ -22,7 +22,7 @@ import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-import { PersonaSurveyModal } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey";
+// import { PersonaSurveyModal } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 const { PATHS } = APP_CONSTANTS;
@@ -55,9 +55,9 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  const togglePersonaSurveyModal = useCallback(() => {
-    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
-  }, [dispatch]);
+  // const togglePersonaSurveyModal = useCallback(() => {
+  //   dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  // }, [dispatch]);
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);

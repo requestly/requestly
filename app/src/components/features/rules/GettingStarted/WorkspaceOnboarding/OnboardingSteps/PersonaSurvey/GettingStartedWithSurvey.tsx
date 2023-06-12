@@ -3,6 +3,7 @@ import welcomeAnimation from "assets/lottie/welcome.json";
 import lottie from "lottie-web/build/player/lottie_light";
 import Logger from "lib/logger";
 import "./index.css";
+import { Typography } from "antd";
 
 export const GettingStartedWithSurvey = () => {
   useEffect(() => {
@@ -23,10 +24,10 @@ export const GettingStartedWithSurvey = () => {
 
   return (
     <div className="persona-survey-banner">
-      <div className="survey-banner-title">Welcome to Requestly!</div>
-      <div className="survey-banner-subtitle">
+      <Typography.Title className="survey-banner-title">Welcome to Requestly!</Typography.Title>
+      <Typography.Paragraph className="survey-banner-subtitle">
         Help us personalise your experience by answering the following questionnaire
-      </div>
+      </Typography.Paragraph>
       <div className="survey-lottie-animation-container">
         <div className="survey-lottie-animation" id="PersonaSurvey-welcomeAnimation" />
       </div>

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { SurveyModalFooter } from "./ModalFooter";
@@ -70,9 +70,9 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback }) => {
     );
   };
 
-  useEffect(() => {
-    if (currentPage > SurveyConfig?.length - 1) callback();
-  }, [callback, currentPage]);
+  // useEffect(() => {
+  //   if (currentPage > SurveyConfig?.length - 1) callback();
+  // }, [callback, currentPage]);
 
   return (
     <div className="persona-survey-container">
