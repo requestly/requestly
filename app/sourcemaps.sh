@@ -8,4 +8,4 @@ echo "Uploading sourcemaps to sentry with release=${GITHUB_COMMIT_SHA}"
 sentry-cli sourcemaps upload --release=${GITHUB_COMMIT_SHA} ./build
 
 echo "Creating sentry release"
-sentry-cli sourcemaps upload --release=${GITHUB_COMMIT_SHA} ./build
+sentry-cli release new "${GITHUB_COMMIT_SHA}" --finalize
