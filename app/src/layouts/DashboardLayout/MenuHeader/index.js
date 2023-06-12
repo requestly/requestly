@@ -11,8 +11,8 @@ import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import PATHS from "config/constants/sub/paths";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
-import { Newbadge } from "components/common/Newbadge";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
@@ -64,7 +64,7 @@ const MenuHeader = () => {
                 href={LINKS.REQUESTLY_DESKTOP_APP}
                 onClick={() => trackTopbarClicked("desktop_app")}
               >
-                Desktop App <Newbadge />
+                Desktop App <RQBadge badgeText="NEW" />
               </a>
             </div>
           </Col>

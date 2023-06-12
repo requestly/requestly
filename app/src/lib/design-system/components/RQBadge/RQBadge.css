@@ -1,4 +1,4 @@
-.rq-new-badge {
+.rq-badge {
   font-size: 10px;
   font-weight: 500;
   line-height: 12px;
@@ -14,7 +14,7 @@
     linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04));
 }
 
-.rq-new-badge span {
+.rq-badge span {
   background-clip: text;
   background: linear-gradient(90deg, #ffde00 0%, #ff6711 118.62%);
   -webkit-background-clip: text;
