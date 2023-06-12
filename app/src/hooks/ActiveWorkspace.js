@@ -1,4 +1,7 @@
 import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions";
+import { migrateCurrentWorkspacePublicInvite } from "backend/teams";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -68,6 +71,24 @@ const ActiveWorkspace = () => {
     window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true;
     window.workspaceCleanupDone = false;
+  }, [currentlyActiveWorkspace.id]);
+
+  useEffect(() => {
+    if (currentlyActiveWorkspace.id) {
+      const functions = getFunctions();
+      const getTeamPublicInvite = httpsCallable(functions, "invites-getTeamPublicInvite");
+      getTeamPublicInvite({ teamId: currentlyActiveWorkspace.id })
+        .then((res) => {
+          if (res?.data?.success) {
+            if (res?.data?.inviteId && res?.data?.public == null) {
+              migrateCurrentWorkspacePublicInvite(res?.data?.inviteId, true);
+            }
+          }
+        })
+        .catch((err) => {
+          Logger.log("Error in team public link migration:", err);
+        });
+    }
   }, [currentlyActiveWorkspace.id]);
 };
 
