@@ -1,25 +1,22 @@
 import React from "react";
-import { Col, Row, Switch, Tooltip } from "antd";
+import { Col, Row, Switch, SwitchProps, Tooltip } from "antd";
 import "./SettingsItem.css";
 
-interface SettingsItemProps {
+interface SettingsItemProps extends SwitchProps {
   title: string;
   caption?: string;
   isActive: boolean;
-  isDisable?: boolean;
-  isProcessing?: boolean;
   toolTipTitle: React.ReactNode;
-  onClick: (status: boolean) => void;
+  onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const SettingsItem: React.FC<SettingsItemProps> = ({
   title,
   caption,
   isActive,
-  onClick,
+  onChange,
   toolTipTitle = "",
-  isDisable = false,
-  isProcessing = false,
+  ...props
 }) => {
   return (
     <Row align="middle" className="w-full setting-item-container">
@@ -29,7 +26,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
       </Col>
       <Col span={2}>
         <Tooltip title={toolTipTitle}>
-          <Switch checked={isActive} onClick={onClick} disabled={isDisable || isProcessing} />
+          <Switch checked={isActive} onChange={onChange} {...props} />
         </Tooltip>
       </Col>
     </Row>
