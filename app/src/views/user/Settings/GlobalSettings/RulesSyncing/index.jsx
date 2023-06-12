@@ -16,7 +16,7 @@ const RulesSyncing = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [isSyncStatusChangeProcessing, setIsSyncStatusChangeProcessing] = useState(false);
   const isWorkspaceMode = !!currentlyActiveWorkspace?.id;
-  const isUserLoggedIn = user?.loggedIn || user?.details || user?.details?.profile;
+  const isUserLoggedIn = !!(user?.loggedIn || user?.details || user?.details?.profile);
 
   const handleRulesSyncToggle = (status) => {
     if (!user.loggedIn || !user.details || !user.details.profile) {
@@ -49,9 +49,9 @@ const RulesSyncing = () => {
   return (
     <SettingsItem
       isActive={isUserLoggedIn && (isWorkspaceMode || (user?.details?.isSyncEnabled ?? false))}
-      onClick={handleRulesSyncToggle}
-      isDisable={isWorkspaceMode}
-      isProcessing={isSyncStatusChangeProcessing}
+      onChange={handleRulesSyncToggle}
+      disabled={isWorkspaceMode}
+      loading={isSyncStatusChangeProcessing}
       title="Enable syncing"
       toolTipTitle={isWorkspaceMode ? "Syncing is on" : ""}
       caption="Always keep your rules in sync irrespective of the device you use."
