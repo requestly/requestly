@@ -238,3 +238,7 @@ export const getNetworkSessionSaveInProgress = (state) => {
 export const getIsNetworkTooltipShown = (state) => {
   return getGlobalState(state).misc.persist?.isNetworkSessionTooltipShown;
 };
+
+export const getIsSecondarySidebarCollapsed = (state) => {
+  return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
+};

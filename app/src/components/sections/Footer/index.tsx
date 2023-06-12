@@ -1,6 +1,9 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
+import { getIsSecondarySidebarCollapsed } from "store/selectors";
 import { MessageOutlined, NotificationOutlined, PicRightOutlined, ReadOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "react-icons/fa";
 import { redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
@@ -11,13 +14,16 @@ import "./Footer.css";
 
 const { Text } = Typography;
 
-interface Props {
-  handleSecondarySidebarToggle: (e?: React.MouseEvent) => void;
-}
-
-const AppFooter: React.FC<Props> = ({ handleSecondarySidebarToggle = () => {} }) => {
+const AppFooter: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
   const SHOW_YC_BRANDING = false;
+
+  const handleSecondarySidebarToggle = (e: React.MouseEvent) => {
+    dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
+    trackFooterClicked("secondary_sidebar_toggle");
+  };
 
   const renderFooterLinks = () => {
     return (
@@ -81,15 +87,12 @@ const AppFooter: React.FC<Props> = ({ handleSecondarySidebarToggle = () => {} })
       <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between" className="w-full">
           <Col md={12} span={24}>
-            <Tooltip title="Collapse sidebar" placement="topRight">
+            <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
               <Button
                 type="text"
                 icon={<PicRightOutlined />}
                 className="footer-sidebar-toggle-btn"
-                onClick={(e) => {
-                  handleSecondarySidebarToggle();
-                  trackFooterClicked("secondary_sidebar_toggle");
-                }}
+                onClick={handleSecondarySidebarToggle}
               />
             </Tooltip>
           </Col>

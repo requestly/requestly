@@ -21,7 +21,7 @@ export const MockServerSidebar: React.FC = () => {
   const isActiveLink = useCallback((isActive: boolean) => isActive, []);
 
   return (
-    <div className="mock-server-sidebar-container secondary-sidebar-container">
+    <div className="mock-server-sidebar-container">
       <ul>
         {mockServerSubRoutes.map(({ path, title, icon }) => (
           <li key={title}>

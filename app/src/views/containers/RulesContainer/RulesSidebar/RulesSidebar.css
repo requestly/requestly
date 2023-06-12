@@ -1,4 +1,5 @@
 .rules-sidebar-container {
+  height: 100%;
   background-color: var(--app-secondary-sidebar-background);
 }
 

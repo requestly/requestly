@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
@@ -15,10 +15,6 @@ const DashboardLayout = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isPersonaRecommendationScreen = userPersona.page === 4 && !userPersona.isSurveyCompleted;
 
-  // Component State
-  const [visible, setVisible] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-
   const isSidebarVisible = useMemo(
     () =>
       !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen),
@@ -30,11 +26,7 @@ const DashboardLayout = () => {
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
-        <div className="app-sidebar">
-          {isSidebarVisible && (
-            <Sidebar visible={visible} setVisible={setVisible} collapsed={collapsed} setCollapsed={setCollapsed} />
-          )}
-        </div>
+        <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
 
         <div className="app-main-content">
           <DashboardContent />
