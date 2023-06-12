@@ -97,7 +97,7 @@ const ExecutionLogs = () => {
     <>
       <Skeleton loading={isLoading}>
         <Row align="middle" justify="space-between" style={{ paddingBottom: "6px" }}>
-          <Col span={2} xxl={{ pull: 0 }} lg={{ pull: 1 }} sm={{ pull: 2 }}>
+          <Col span={2}>
             <Button onClick={handleRefreshBtnOnClick} type="default" icon={<SyncOutlined />}>
               Refresh
             </Button>
