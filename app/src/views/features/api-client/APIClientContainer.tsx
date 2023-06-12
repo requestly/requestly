@@ -10,6 +10,10 @@ import {
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
 import ImportRequestModal from "./ImportRequestModal";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import "./apiClientContainer.scss";
 
 interface Props {}
@@ -54,19 +58,36 @@ const APIClientContainer: React.FC<Props> = () => {
 
   return (
     <div className="api-client-container">
-      <APIClientSidebar
-        history={history}
-        onSelectionFromHistory={onSelectionFromHistory}
-        clearHistory={clearHistory}
-        onNewClick={onNewClick}
-        onImportClick={onImportClick}
-      />
-      <APIClientView apiEntry={selectedEntry} notifyApiRequestFinished={addToHistory} />
-      <ImportRequestModal
-        isOpen={isImportModalOpen}
-        handleImportRequest={handleImportRequest}
-        onClose={() => setIsImportModalOpen(false)}
-      />
+      {isFeatureCompatible(FEATURES.API_CLIENT) ? (
+        <>
+          <APIClientSidebar
+            history={history}
+            onSelectionFromHistory={onSelectionFromHistory}
+            clearHistory={clearHistory}
+            onNewClick={onNewClick}
+            onImportClick={onImportClick}
+          />
+          <APIClientView apiEntry={selectedEntry} notifyApiRequestFinished={addToHistory} />
+          <ImportRequestModal
+            isOpen={isImportModalOpen}
+            handleImportRequest={handleImportRequest}
+            onClose={() => setIsImportModalOpen(false)}
+          />
+        </>
+      ) : isExtensionInstalled() ? (
+        <InstallExtensionCTA
+          heading={"Get Started"}
+          subHeadingExtension={"You need to be on the latest version of the extension to use API Client."}
+          isUpdateRequired
+          eventPage="api-client"
+        />
+      ) : (
+        <InstallExtensionCTA
+          heading={"Get Started"}
+          subHeadingExtension={"Start testing API endpoints"}
+          eventPage="api-client"
+        />
+      )}
     </div>
   );
 };
