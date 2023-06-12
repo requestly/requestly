@@ -25,7 +25,7 @@ const CreateWorkspace = () => {
     setIsSubmitProcess(true);
     // Create New Team
     const functions = getFunctions();
-    const createTeam = httpsCallable(functions, "createTeam");
+    const createTeam = httpsCallable(functions, "teams-createTeam");
     createTeam({
       teamName: newTeamName,
     })
