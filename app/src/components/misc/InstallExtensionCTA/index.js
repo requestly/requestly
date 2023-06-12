@@ -19,10 +19,11 @@ const InstallExtensionCTA = ({
   heading,
   subHeadingExtension,
   subHeadingMobileDebugger = "Debug Mobile App API Traffic",
-  supportsMobileDevice,
-  supportedBrowsers,
+  supportsMobileDevice = false,
+  supportedBrowsers = null,
   eventPage,
   hasBorder = true,
+  isUpdateRequired = false,
 }) => {
   const navigate = useNavigate();
 
@@ -38,28 +39,17 @@ const InstallExtensionCTA = ({
     let currentBrowserData,
       otherBrowsersArray = [];
 
-    if (supportedBrowsers) {
-      supportedBrowserExtensions.forEach((extensionData) => {
-        if (supportedBrowsers.includes(extensionData.name)) {
-          if (extensionData.name === browserDetected) {
-            currentBrowserData = extensionData;
-          } else {
-            otherBrowsersArray.push(extensionData);
-          }
-        }
-      });
-    } else {
-      supportedBrowserExtensions.forEach((extensionData) => {
+    supportedBrowserExtensions.forEach((extensionData) => {
+      if (!supportedBrowsers || supportedBrowsers.includes(extensionData.name)) {
         if (extensionData.name === browserDetected) {
           currentBrowserData = extensionData;
         } else {
           otherBrowsersArray.push(extensionData);
         }
-      });
-    }
+      }
+    });
 
     setBrowser(currentBrowserData);
-
     setOtherBrowsers(otherBrowsersArray);
   }, [supportedBrowsers]);
 
@@ -79,21 +69,16 @@ const InstallExtensionCTA = ({
             <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h2 className="display-3">{subHeadingExtension}</h2>
               {browser ? (
-                <Space>
-                  <a
-                    href={browser.downloadURL}
-                    target={"_blank"}
-                    rel="noreferrer"
-                    onClick={handleDownloadExtensionClick}
-                  >
-                    <Button type="primary" style={{ fontSize: "16px" }}>
-                      <span style={{ paddingRight: "3px" }}>
-                        <img alt={browser.alt} src={browser.iconURL} height="32px" width="32px" />
+                <a href={browser.downloadURL} target={"_blank"} rel="noreferrer" onClick={handleDownloadExtensionClick}>
+                  <Button type="primary" size="large">
+                    <Space align="center">
+                      <img alt={browser.alt} src={browser.iconURL} height="24" width="24" />
+                      <span>
+                        {isUpdateRequired ? "Update" : "Install"} {browser.name} extension
                       </span>
-                      {`Install ${browser.name} extension`}
-                    </Button>
-                  </a>
-                </Space>
+                    </Space>
+                  </Button>
+                </a>
               ) : (
                 <h4>Current Browser is not supported</h4>
               )}
@@ -105,35 +90,37 @@ const InstallExtensionCTA = ({
               )}
 
               <h4 style={{ marginTop: "8px" }}>
-                Also available for browsers :
+                Also available for browsers:
                 {otherBrowsers.map((item, key) => {
                   return (
                     <a key={key} href={item.downloadURL} rel="noreferrer" style={{ paddingLeft: "5px" }}>
-                      <img src={item.iconURL} alt={item.alt} height="32px" width="32px" />
+                      <img src={item.iconURL} alt={item.alt} height="24" width="24" />
                     </a>
                   );
                 })}
               </h4>
 
-              <Row style={{ textAlign: "center" }} align="center">
-                <Alert
-                  message={
-                    <p style={{ marginBottom: "0px" }}>
-                      Already installed the extension and still seeing this message? Read our{" "}
-                      <AntLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING}
-                      >
-                        Troubleshooting guide
-                      </AntLink>
-                    </p>
-                  }
-                  type="info"
-                  showIcon
-                  style={{ marginTop: "1rem" }}
-                />
-              </Row>
+              {browser && !isUpdateRequired ? (
+                <Row style={{ textAlign: "center" }} align="center">
+                  <Alert
+                    message={
+                      <p style={{ marginBottom: "0px" }}>
+                        Already installed the extension and still seeing this message? Read our{" "}
+                        <AntLink
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING}
+                        >
+                          Troubleshooting guide
+                        </AntLink>
+                      </p>
+                    }
+                    type="info"
+                    showIcon
+                    style={{ marginTop: "1rem" }}
+                  />
+                </Row>
+              ) : null}
             </Jumbotron>
           </Col>
           {supportsMobileDevice && (

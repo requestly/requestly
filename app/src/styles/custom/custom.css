@@ -26,6 +26,10 @@ button.ant-btn {
   justify-content: center;
 }
 
+button.ant-btn-lg {
+  font-size: 16px;
+}
+
 button.ant-input-search-button {
   height: auto;
 }
