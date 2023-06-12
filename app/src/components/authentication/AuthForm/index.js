@@ -14,7 +14,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
 //UTILS
-import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
+// import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
 import { getAuthErrorMessage, AuthTypes } from "../utils";
 
@@ -104,7 +104,7 @@ const AuthForm = ({
       .then((result) => {
         if (result && result.uid) {
           toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
-          syncUserPersona(result.uid, dispatch, userPersona);
+          // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess();
         }
         setActionPending(false);
@@ -127,7 +127,7 @@ const AuthForm = ({
                 toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
                 setEmail("");
                 setPassword("");
-                syncUserPersona(result.user.uid, dispatch, userPersona);
+                // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
                 onSignInSuccess && onSignInSuccess(result.user.uid);
               }
             })
@@ -157,7 +157,7 @@ const AuthForm = ({
           toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
           setEmail("");
           setPassword("");
-          syncUserPersona(result.user.uid, dispatch, userPersona);
+          // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.user.uid);
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
