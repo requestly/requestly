@@ -129,6 +129,7 @@ export const ONBOARDING = {
   HEADER_CLICKED: "header_clicked",
   TOPBAR_CLICKED: "topbar_clicked",
   HELPDESK_CLICKED: "helpdesk_clicked",
+  FOOTER_CLICKED: "footer_clicked",
 };
 
 export const TEAMS = {

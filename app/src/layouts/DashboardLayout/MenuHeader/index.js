@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import { NotificationOutlined, ReadOutlined, SlackOutlined } from "@ant-design/icons";
-import { redirectToSettings, redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
+import RulesSyncToggle from "../../../components/sections/Navbars/NavbarRightContent/RulesSyncToggle";
+import { SlackOutlined } from "@ant-design/icons";
+import { redirectToSettings } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
@@ -108,35 +109,9 @@ const MenuHeader = () => {
               )}
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-              {/* documentation */}
-              <Col className="hidden-on-small-screen">
-                <Tooltip title={<span className="text-gray text-sm">Documentation</span>}>
-                  <Button
-                    type="text"
-                    className="header-icon-btn"
-                    icon={<ReadOutlined />}
-                    onClick={() => {
-                      trackHeaderClicked("documentation");
-                      redirectToUrl(LINKS.REQUESTLY_DOCS, true);
-                    }}
-                  />
-                </Tooltip>
-              </Col>
-
-              {/* product updates */}
-              <Col className="hidden-on-small-screen">
-                <Tooltip title={<span className="text-gray text-sm">Product updates</span>}>
-                  <Button
-                    type="text"
-                    className="header-icon-btn"
-                    icon={<NotificationOutlined />}
-                    onClick={() => {
-                      trackHeaderClicked("product_updates");
-                      redirectToProductUpdates(navigate);
-                    }}
-                  />
-                </Tooltip>
-              </Col>
+              <div className="hidden-on-small-screen" onClick={() => trackHeaderClicked("syncing")}>
+                <RulesSyncToggle />
+              </div>
 
               {/* settings */}
               <Col>

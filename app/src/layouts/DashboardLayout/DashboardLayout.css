@@ -62,10 +62,10 @@
 
 .app-layout .ant-layout-footer {
   height: 1.5rem;
-  font-size: 12px;
+  font-size: 11px;
   display: flex;
   align-items: center;
-  padding: 5px 1.5rem;
+  padding: 0px 2px;
   border-top: 1px solid var(--border-dark);
   background-color: var(--body-background);
 }
