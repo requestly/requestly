@@ -49,7 +49,6 @@
 }
 
 .primary-sidebar-link:hover,
-.primary-sidebar-link:focus,
 .primary-sidebar-active-link {
   cursor: pointer;
   color: var(--white);
