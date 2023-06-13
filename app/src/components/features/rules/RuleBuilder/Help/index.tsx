@@ -66,16 +66,16 @@ const ruleTypeToNotionDocIdMap = {
 };
 
 const defaultDocEndpointsMap = {
-  [RuleType.REDIRECT]: "redirect-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.CANCEL]: "cancel-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.REPLACE]: "replace-rule-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.HEADERS]: "modify-header-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.QUERYPARAM]: "query-param-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.SCRIPT]: "insert-script-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.RESPONSE]: "modify-response-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.REQUEST]: "modify-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.DELAY]: "delay-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
-  [RuleType.USERAGENT]: "user-agent-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REDIRECT]: "https://requestly.dev/api/mockv2/redirect-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.CANCEL]: "https://requestly.dev/api/mockv2/cancel-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REPLACE]: "https://requestly.dev/api/mockv2/replace-rule-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.HEADERS]: "https://requestly.dev/api/mockv2/modify-header-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.QUERYPARAM]: "https://requestly.dev/api/mockv2/query-param-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.SCRIPT]: "https://requestly.dev/api/mockv2/insert-script-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.RESPONSE]: "https://requestly.dev/api/mockv2/modify-response-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REQUEST]: "https://requestly.dev/api/mockv2/modify-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.DELAY]: "https://requestly.dev/api/mockv2/delay-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.USERAGENT]: "https://requestly.dev/api/mockv2/user-agent-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
 };
 
 interface HelpProps {
@@ -139,7 +139,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         updateDocTableOfContent(data);
       })
       .catch((error) => {
-        fetch(`https://requestly.dev/api/mockv2/${defaultDocEndpointsMap[ruleType]}`)
+        fetch(`${defaultDocEndpointsMap[ruleType]}`)
           .then((res) => res.json())
           .then((data) => {
             setNotionPageData(data);
