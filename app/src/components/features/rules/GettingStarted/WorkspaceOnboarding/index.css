@@ -8,26 +8,32 @@
   flex: 1;
   height: 100%;
   padding: 0 16px;
+}
+.onboarding-action-component {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.onboarding-action-component {
   background: var(--background-dark);
 }
 .onboarding-content-banner {
   background: var(--body-background);
   position: relative;
+  padding: 40px 60px;
 }
-.onboarding-content-banner.flex-start {
-  align-items: initial;
-  justify-content: initial;
+.onboarding-content-banner .onboarding-banner-title {
+  font-size: 36px;
+  color: var(--white);
+  font-weight: 500;
+  line-height: 56px;
+  max-width: 580px;
 }
+/* AUTH BANNER */
 .onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper.signup-modal-hero {
   max-width: none;
 }
 .onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper {
   width: 100%;
+  padding: 0;
 }
 .onboarding-action-component .auth-modal {
   width: 420px;

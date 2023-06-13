@@ -10,6 +10,7 @@ import { isEmailVerified } from "utils/AuthUtils";
 import { OnboardingSteps } from "./types";
 import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
+import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Banner";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -21,11 +22,13 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const user = useSelector(getUserAuthDetails);
 
   const handleOnSurveyCompletion = async () => {
-    const isVerified = await isEmailVerified(user?.details?.profile?.uid);
-    console.log({ isVerified });
-    if (isVerified) setStep(OnboardingSteps.CREATE_JOIN_WORKSPACE);
-    //TODO: fix this
-    else setStep(OnboardingSteps.RECOMMENDATIONS);
+    //@ts-ignore
+    isEmailVerified(user?.details?.profile?.uid).then((result) => {
+      console.log({ result });
+      if (result) setStep(OnboardingSteps.CREATE_JOIN_WORKSPACE);
+      //TODO: fix this
+      else setStep(OnboardingSteps.RECOMMENDATIONS);
+    });
   };
 
   const renderOnboardingBanner = useCallback(() => {
@@ -35,7 +38,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       case OnboardingSteps.PERSONA_SURVEY:
         return <GettingStartedWithSurvey />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return <>CREATE OR JOIN WORKSPACE BANNER HERE</>;
+        return <WorkspaceOnboardingBanner />;
     }
   }, [step, currentTestimonialIndex]);
 
@@ -57,9 +60,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         <>
           <FullPageHeader />
           <div className="onboarding-content-wrapper">
-            <div className={`onboarding-content-banner ${step === OnboardingSteps.PERSONA_SURVEY && "flex-start"}`}>
-              {renderOnboardingBanner()}
-            </div>
+            <div className="onboarding-content-banner">{renderOnboardingBanner()}</div>
             <div className="onboarding-action-component">{renderOnboardingActionComponent()}</div>
           </div>
         </>
