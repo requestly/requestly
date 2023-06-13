@@ -150,7 +150,6 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
           heading={""}
           subHeadingExtension={"Auto-record debugging sessions"}
           supportsMobileDevice={false}
-          supportedBrowsers={["Chrome", "Edge"]}
           hasBorder={false}
           eventPage="session_recording_page"
         />
