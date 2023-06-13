@@ -60,7 +60,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
-          <span className="api-client-icon">
+          <span className="icon-with-badge">
             <ApiOutlined /> <RQBadge badgeText="Beta" />
           </span>
         ),
