@@ -13,6 +13,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
@@ -58,7 +59,11 @@ export const PrimarySidebar: React.FC = () => {
         id: 4,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
-        icon: <ApiOutlined />,
+        icon: (
+          <span className="icon-with-badge">
+            <ApiOutlined /> <RQBadge badgeText="Beta" />
+          </span>
+        ),
         display: true,
       },
       {
@@ -84,9 +89,7 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
 
-      <div>
-        <PrimarySidebarLink title="Invite" icon={<InviteIcon />} path={PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE} />
-      </div>
+      <PrimarySidebarLink title="Invite" icon={<InviteIcon />} path={PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE} />
     </div>
   );
 };

@@ -146,6 +146,7 @@ const INITIAL_STATE = {
   },
 
   userPreferences: {
+    isSecondarySidebarCollapsed: false,
     isRedirectRuleTutorialModalShown: false,
   },
 

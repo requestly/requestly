@@ -16,7 +16,6 @@
 }
 
 .secodary-sidebar-link:hover,
-.secodary-sidebar-link:focus,
 .secodary-sidebar-active-link {
   color: white;
   background-color: var(--gray-dark);

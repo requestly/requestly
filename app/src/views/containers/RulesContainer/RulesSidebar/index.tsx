@@ -42,7 +42,7 @@ export const RulesSidebar: React.FC = () => {
   );
 
   return (
-    <div className="rules-sidebar-container secondary-sidebar-container">
+    <div className="rules-sidebar-container">
       <ul>
         {ruleRoutes.map(({ path, title, icon }) => (
           <li key={title}>
