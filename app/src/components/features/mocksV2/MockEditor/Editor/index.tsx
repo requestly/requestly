@@ -2,11 +2,10 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Button, Col, Input, InputNumber, Row, Select } from "antd";
+import { AutoComplete, Button, Col, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CodeEditor from "components/misc/CodeEditor";
-import CopyButton from "components/misc/CopyButton";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
@@ -30,6 +29,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
+import MockEditorEndpoint from "./Endpoint";
 
 interface Props {
   isNew?: boolean;
@@ -281,53 +281,20 @@ const MockEditor: React.FC<Props> = ({
 
   const renderEndpoint = () => {
     return (
-      <Col span={24} className={`meta-data-option ${mockType === MockType.API && "addon-option"}`}>
-        <label htmlFor="endpoint" className="meta-data-option-label">
-          Endpoint
-        </label>
-        <Input
-          ref={endpointRef}
-          required
-          id="endpoint"
-          addonBefore={username ? `https://${username}.requestly.dev/` : "https://requestly.dev/"}
-          type="text"
-          value={endpoint}
-          name="path"
-          onChange={(e) => setEndpoint(e.target.value)}
-          status={errors.endpoint ? "error" : ""}
-          placeholder={errors.endpoint ? errors.endpoint : "Enter endpoint"}
-        />
-        <span className="field-error-prompt">{errors.endpoint ? errors.endpoint : null}</span>
-      </Col>
+      <MockEditorEndpoint
+        isNew={isNew}
+        errors={errors}
+        endpoint={endpoint}
+        setEndpoint={setEndpoint}
+        mockType={mockType}
+        ref={endpointRef}
+      />
     );
-  };
-
-  const renderUrl = () => {
-    return !isNew ? (
-      <Col span={24} className="meta-data-option">
-        <label htmlFor="url" className="meta-data-option-label">
-          URL
-        </label>
-        <Input
-          id="url"
-          addonAfter={<CopyButton title="" copyText={finalUrl} />}
-          type="text"
-          value={finalUrl}
-          name="url"
-          disabled={true}
-        />
-      </Col>
-    ) : null;
   };
 
   const renderMetadataRow = (): any => {
     if (type === MockType.FILE) {
-      return (
-        <Row className="mock-editor-meta-data-row">
-          {renderEndpoint()}
-          {renderUrl()}
-        </Row>
-      );
+      return <Row className="mock-editor-meta-data-row">{renderEndpoint()}</Row>;
     }
     return (
       <>
@@ -337,7 +304,6 @@ const MockEditor: React.FC<Props> = ({
           {renderContentType()}
           {renderLatency()}
           {renderEndpoint()}
-          {renderUrl()}
         </Row>
       </>
     );
@@ -410,7 +376,7 @@ const MockEditor: React.FC<Props> = ({
               isAiResponseActive ? (
                 <Button
                   className="generate-ai-response-button"
-                  type="primary"
+                  type="ghost"
                   onClick={() => {
                     trackAiResponseButtonClicked();
                     setIsAiResponseModalOpen(true);

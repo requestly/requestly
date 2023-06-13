@@ -1,0 +1,11 @@
+.mock-url-addon-after {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10vw;
+}
+
+.mock-url-addon-before {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 25vw;
+}
