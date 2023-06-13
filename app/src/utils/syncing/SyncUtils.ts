@@ -8,7 +8,7 @@ import {
 import {
   trackSyncCompleted,
   trackSyncFailed,
-  trackSyncToggled,
+  // trackSyncToggled,
   trackSyncTriggered,
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
@@ -92,7 +92,7 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
         if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
 
         // Track the event of toggling synchronization
-        trackSyncToggled(uid, state);
+        // trackSyncToggled(uid, state);
 
         // Resolve the promise with true indicating success
         resolve(true);
