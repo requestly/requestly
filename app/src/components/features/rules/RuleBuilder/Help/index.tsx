@@ -65,7 +65,7 @@ const ruleTypeToNotionDocIdMap = {
   [RuleType.USERAGENT]: "8522c44d1f1a42e1aad766847f9d4785",
 };
 
-const defaultDocEndpointsMap = {
+const defaultMockUrls = {
   [RuleType.REDIRECT]: "https://requestly.dev/api/mockv2/redirect-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
   [RuleType.CANCEL]: "https://requestly.dev/api/mockv2/cancel-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
   [RuleType.REPLACE]: "https://requestly.dev/api/mockv2/replace-rule-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
@@ -139,7 +139,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
         updateDocTableOfContent(data);
       })
       .catch((error) => {
-        fetch(`${defaultDocEndpointsMap[ruleType]}`)
+        fetch(`${defaultMockUrls[ruleType]}`)
           .then((res) => res.json())
           .then((data) => {
             setNotionPageData(data);
