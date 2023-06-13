@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
@@ -17,8 +17,14 @@ const { Text } = Typography;
 const AppFooter: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
+  const { pathname } = useLocation();
   const SHOW_YC_BRANDING = false;
+  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
+  const isSidebarToggleAllowed = useMemo(
+    () =>
+      [APP_CONSTANTS.PATHS.RULES.INDEX, APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX].some((path) => pathname.includes(path)),
+    [pathname]
+  );
 
   const handleSecondarySidebarToggle = (e: React.MouseEvent) => {
     dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
@@ -86,16 +92,19 @@ const AppFooter: React.FC = () => {
     <>
       <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between" className="w-full">
-          <Col md={12} span={24}>
-            <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
-              <Button
-                type="text"
-                icon={<PicRightOutlined />}
-                className="footer-sidebar-toggle-btn"
-                onClick={handleSecondarySidebarToggle}
-              />
-            </Tooltip>
-          </Col>
+          {isSidebarToggleAllowed && (
+            <Col md={12} span={24}>
+              <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
+                <Button
+                  type="text"
+                  icon={<PicRightOutlined />}
+                  className="footer-sidebar-toggle-btn"
+                  onClick={handleSecondarySidebarToggle}
+                />
+              </Tooltip>
+            </Col>
+          )}
+
           <Col className="ml-auto">{SHOW_YC_BRANDING ? renderYCBranding() : renderFooterLinks()}</Col>
         </Row>
       </Footer>
