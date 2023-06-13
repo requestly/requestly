@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
@@ -16,15 +17,14 @@ import "./RuleEditor.css";
 
 const INITIAL_PANE_SIZES = [99, 1];
 
-const RuleEditor = (props) => {
-  //Constants
-  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(props.location, null);
+const RuleEditor = () => {
+  const location = useLocation();
+  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
 
   // Component State
   const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
 
-  const { location } = props;
   //Global State
   const appMode = useSelector(getAppMode);
 
@@ -82,7 +82,7 @@ const RuleEditor = (props) => {
                 <Row className="overflow-hidden">
                   <Col span={24}>
                     <ProCard className="rule-editor-procard">
-                      <RuleBuilder location={location} />
+                      <RuleBuilder />
                     </ProCard>
                   </Col>
                 </Row>
@@ -108,7 +108,7 @@ const RuleEditor = (props) => {
     return (
       <>
         <ProCard className="rule-editor-procard">
-          <RuleBuilder location={location} />
+          <RuleBuilder />
         </ProCard>
       </>
     );
