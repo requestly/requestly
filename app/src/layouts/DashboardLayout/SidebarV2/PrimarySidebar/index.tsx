@@ -61,7 +61,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.API_CLIENT.INDEX,
         icon: (
           <span className="icon-with-badge">
-            <ApiOutlined /> <RQBadge badgeText="Beta" />
+            <ApiOutlined /> <RQBadge badgeText="BETA" />
           </span>
         ),
         display: true,
