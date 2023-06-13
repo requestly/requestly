@@ -24,7 +24,7 @@ export const GettingStartedWithSurvey = () => {
 
   return (
     <div className="persona-survey-banner">
-      <Typography.Title className="survey-banner-title">Welcome to Requestly!</Typography.Title>
+      <Typography.Title className="onboarding-banner-title">Welcome to Requestly!</Typography.Title>
       <Typography.Paragraph className="survey-banner-subtitle">
         Help us personalise your experience by answering the following questionnaire
       </Typography.Paragraph>
