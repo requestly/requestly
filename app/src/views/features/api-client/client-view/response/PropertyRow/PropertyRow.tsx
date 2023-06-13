@@ -9,7 +9,7 @@ interface Props {
   className?: string;
 }
 
-const PropertyRow: React.FC<Props> = ({ name, value, actions, className }) => {
+const PropertyRow: React.FC<Props> = ({ name, value, actions, className = "" }) => {
   return (
     <div className={`property-row ${className}`}>
       <Typography.Text type="secondary" className="property-name">
