@@ -26,11 +26,11 @@ export const ruleRoutes: RouteObject[] = [
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
-        element: <RuleEditor location={window.location} />,
+        element: <RuleEditor />,
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
-        element: <RuleEditor location={window.location} />,
+        element: <RuleEditor />,
       },
       {
         path: PATHS.SHARED_LISTS.RELATIVE,
