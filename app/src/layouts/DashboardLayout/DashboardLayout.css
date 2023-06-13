@@ -65,7 +65,7 @@
   font-size: 11px;
   display: flex;
   align-items: center;
-  padding: 0px 2px;
+  padding: 0 2px;
   border-top: 1px solid var(--border-dark);
   background-color: var(--body-background);
 }
