@@ -61,5 +61,5 @@ module.exports.theme = {
   "btn-height-base": "30px",
 
   // Tootltip
-  "@tooltip-bg": colors.border,
+  "@tooltip-bg": colors.darkGray,
 };

@@ -49,7 +49,6 @@
 }
 
 .primary-sidebar-link:hover,
-.primary-sidebar-link:focus,
 .primary-sidebar-active-link {
   cursor: pointer;
   color: var(--white);
@@ -79,7 +78,7 @@
 .primary-sidebar-link .icon-with-badge .rq-badge {
   position: absolute;
   top: -10px;
-  right: -29px;
-  font-size: 9px;
+  right: -30px;
+  font-size: 8px;
   padding: 1px 2px;
 }

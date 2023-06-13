@@ -5,6 +5,7 @@ module.exports.colors = {
   danger: "#fa2828bf",
   textGray: "#B0B0B5",
   link: "#3ba0ff",
+  darkGray: "#3b3b3b",
 
   // others
   border: "#3e4044",

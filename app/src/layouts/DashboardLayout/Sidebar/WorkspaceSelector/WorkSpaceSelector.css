@@ -2,12 +2,15 @@
   height: 3rem; /* height of the header */
 }
 
+.workspace-selector-dropdown .workspace-avatar.ant-avatar {
+  margin-right: 8px;
+}
+
 .active-workspace-name {
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
-  min-width: 17ch;
-  max-width: 17ch;
+  max-width: 20ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -18,8 +21,10 @@
   opacity: 0.7;
 }
 
-.active-workspace-name-down-icon {
+.active-workspace-name-down-icon.anticon {
   font-size: 9px;
+  margin-top: 1px;
+  margin-left: 4px;
 }
 
 .workspace-divider.ant-divider {
@@ -93,7 +98,7 @@
 
 .active-workspace-dropdownItem {
   border-radius: var(--border-radius-sm);
-  background-color: var(--hover-color);
+  background-color: var(--gray-dark);
 }
 
 .join-workspace-menu-dropdown-trigger {
@@ -112,7 +117,7 @@
 }
 
 .join-workspace-menu-dropdown-container.ant-dropdown {
-  left: 340px !important;
+  left: 278px !important;
 }
 
 .join-workspace-invite-count-badge.ant-badge .ant-badge-count {

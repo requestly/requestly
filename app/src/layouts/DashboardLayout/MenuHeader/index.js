@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -9,7 +9,6 @@ import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
-import PATHS from "config/constants/sub/paths";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
@@ -42,10 +41,6 @@ const MenuHeader = () => {
         {!isPricingOrGoodbyePage ? (
           <Col span={8}>
             <div className="header-left-section">
-              <Link to={PATHS.RULES.MY_RULES.ABSOLUTE} onClick={() => trackTopbarClicked("home")}>
-                Home
-              </Link>
-
               <WorkspaceSelector />
 
               <a

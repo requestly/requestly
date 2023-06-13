@@ -15,7 +15,7 @@ export const SecondarySidebarLink: React.FC<Props> = ({ path, title, icon, custo
     <NavLink
       to={path}
       className={({ isActive }) =>
-        `secodary-sidebar-link ${customClass} ${isActiveLink(isActive, path) ? "secodary-sidebar-active-link" : ""}`
+        `secondary-sidebar-link ${customClass} ${isActiveLink(isActive, path) ? "secondary-sidebar-active-link" : ""}`
       }
     >
       {icon ? <span className="icon__wrapper">{icon}</span> : null}
