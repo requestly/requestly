@@ -59,7 +59,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
+const WorkSpaceDropDown = ({ menu }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -73,7 +73,6 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
-      handleSidebarCollapsed(false);
       trackTopbarClicked("workspace");
     }
   };
@@ -86,6 +85,19 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
       onOpenChange={handleWorkspaceDropdownClick}
     >
       <div className="cursor-pointer items-center">
+        <Avatar
+          size={28}
+          shape="square"
+          icon={getWorkspaceIcon(activeWorkspaceName)}
+          className="workspace-avatar"
+          style={{
+            backgroundColor: user.loggedIn
+              ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                ? "#1E69FF"
+                : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
+              : "#ffffff4d",
+          }}
+        />
         <Tooltip
           overlayClassName="workspace-selector-tooltip"
           style={{ top: "35px" }}
@@ -94,8 +106,8 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
           showArrow={false}
           mouseEnterDelay={1}
         >
-          <span className={isCollapsed ? "hidden" : "items-center"}>
-            <span className="active-workspace-name">Workspace {prettifyWorkspaceName(activeWorkspaceName)}</span>
+          <span className="items-center active-workspace-name">
+            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
             <DownOutlined className="active-workspace-name-down-icon" />
           </span>
         </Tooltip>
@@ -104,11 +116,7 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed, menu }) => {
   );
 };
 
-const WorkspaceSelector = ({
-  isCollapsed = false,
-  handleSidebarCollapsed = () => {},
-  handleMobileSidebarClose = () => {},
-}) => {
+const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -210,7 +218,6 @@ const WorkspaceSelector = ({
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
       setIsCreateWorkspaceModalOpen(true);
-      handleMobileSidebarClose?.();
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -309,7 +316,6 @@ const WorkspaceSelector = ({
         }, 2 * 1000);
       }
     );
-    handleMobileSidebarClose?.();
   };
 
   const unauthenticatedUserMenu = (
@@ -523,11 +529,7 @@ const WorkspaceSelector = ({
 
   return (
     <>
-      <WorkSpaceDropDown
-        isCollapsed={isCollapsed}
-        handleSidebarCollapsed={handleSidebarCollapsed}
-        menu={user.loggedIn ? menu : unauthenticatedUserMenu}
-      />
+      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 
