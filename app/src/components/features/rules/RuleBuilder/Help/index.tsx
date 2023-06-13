@@ -65,6 +65,19 @@ const ruleTypeToNotionDocIdMap = {
   [RuleType.USERAGENT]: "8522c44d1f1a42e1aad766847f9d4785",
 };
 
+const defaultMockUrls = {
+  [RuleType.REDIRECT]: "https://requestly.dev/api/mockv2/redirect-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.CANCEL]: "https://requestly.dev/api/mockv2/cancel-url-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REPLACE]: "https://requestly.dev/api/mockv2/replace-rule-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.HEADERS]: "https://requestly.dev/api/mockv2/modify-header-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.QUERYPARAM]: "https://requestly.dev/api/mockv2/query-param-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.SCRIPT]: "https://requestly.dev/api/mockv2/insert-script-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.RESPONSE]: "https://requestly.dev/api/mockv2/modify-response-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.REQUEST]: "https://requestly.dev/api/mockv2/modify-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.DELAY]: "https://requestly.dev/api/mockv2/delay-request-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+  [RuleType.USERAGENT]: "https://requestly.dev/api/mockv2/user-agent-editor-doc?teamId=LmyapmzY39XTFXvua6eX",
+};
+
 interface HelpProps {
   ruleType: RuleType;
   setShowDocs: (showDocs: boolean) => void;
@@ -107,14 +120,13 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
   };
 
   const updateDocTableOfContent = (data: any[]) => {
-    const headers = [];
     if (data) {
-      for (const key in data) {
-        const elem = data[key];
+      const headers = Object.values(data).reduce((acc, elem) => {
         if (elem?.value?.type === "header") {
-          headers.push({ id: elem.value.id, title: elem.value.properties.title[0][0] });
+          acc.push({ id: elem.value.id, title: elem.value.properties.title[0][0] });
         }
-      }
+        return acc;
+      }, []);
       setTableOfContents(headers);
     }
   };
@@ -125,6 +137,14 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       .then((data) => {
         setNotionPageData(data);
         updateDocTableOfContent(data);
+      })
+      .catch((error) => {
+        fetch(`${defaultMockUrls[ruleType]}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setNotionPageData(data);
+            updateDocTableOfContent(data);
+          });
       });
   }, [ruleType]);
 
