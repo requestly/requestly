@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Breadcrumb, BreadcrumbProps } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
-import { capitalize } from "lodash";
+// import { capitalize } from "lodash";
 import "./RQBreadcrumb.css";
 
 export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
@@ -18,7 +18,8 @@ export const RQBreadcrumb: React.FC<BreadcrumbProps> = (props) => {
     }
 
     // TODO: rather derive from the list used in Sidebar
-    return capitalize(path.includes("-") ? path.split("-").join(" ") : path);
+//     return capitalize(path.includes("-") ? path.split("-").join(" ") : path);
+    return path.includes("-") ? path.split("-").join(" ") : path);
   }, []);
 
   const getBreadcrumb = useCallback(
