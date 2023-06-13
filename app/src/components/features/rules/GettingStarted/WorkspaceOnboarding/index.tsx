@@ -11,6 +11,7 @@ import { OnboardingSteps } from "./types";
 import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
 import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Banner";
+import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -26,7 +27,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
       console.log({ result });
       if (result) setStep(OnboardingSteps.CREATE_JOIN_WORKSPACE);
-      //TODO: fix this
       else setStep(OnboardingSteps.RECOMMENDATIONS);
     });
   };
@@ -49,7 +49,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       case OnboardingSteps.PERSONA_SURVEY:
         return <PersonaSurvey callback={handleOnSurveyCompletion} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return <>CREATE OR JOIN WORKSPACE ACTIONS Here</>;
+        return <WorkspaceOnboardingStep />;
     }
   }, [step]);
   return (

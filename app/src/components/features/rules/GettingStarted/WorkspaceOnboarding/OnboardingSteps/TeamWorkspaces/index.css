@@ -1,0 +1,43 @@
+.workspace-onboarding-wrapper {
+  width: 500px;
+  position: relative;
+  padding-bottom: 40px;
+}
+.workspace-onboarding-body {
+  padding: 40px 20px;
+  background: var(--body-background);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  min-height: 480px;
+}
+.workspace-onboarding-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 9px 20px;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--component-dark-background);
+  color: var(--text-gray);
+
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+}
+.workspace-onboarding-wrapper .workspace-onboarding-body .workspace-onboarding-field {
+  box-shadow: var(--input-box-shadow);
+}
+
+.workspace-onboarding-wrapper .workspace-onboarding-body .ant-btn.rq-btn.btn-default {
+  background: transparent;
+}
+.workspace-invite-link {
+  display: flex;
+  gap: 12px;
+}
+.workspace-invite-link .ant-btn.rq-btn.btn-default {
+  height: 40px;
+  align-self: center;
+}
