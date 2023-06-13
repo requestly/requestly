@@ -70,11 +70,6 @@
   background-color: var(--body-background);
 }
 
-.app-layout-footer.ant-layout-footer a:hover,
-.app-layout-footer.ant-layout-footer .ant-typography:hover {
-  opacity: 0.7;
-}
-
 @media screen and (max-width: 768px) {
   #requestly-dashboard-layout .hp-app-layout {
     height: 100%;

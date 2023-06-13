@@ -19,6 +19,10 @@
   border: none;
 }
 
+.app-footer-links .ant-typography:hover {
+  color: var(--white);
+}
+
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn {
   padding: 0;
   cursor: pointer;
@@ -28,7 +32,7 @@
 
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn:hover,
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn:focus {
-  opacity: 0.7;
+  color: var(--white);
   background-color: transparent;
 }
 
