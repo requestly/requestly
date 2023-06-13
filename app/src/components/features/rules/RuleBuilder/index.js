@@ -74,7 +74,7 @@ const RuleBuilder = (props) => {
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const [showDocs, setShowDocs] = useState(true);
+  const [showDocs, setShowDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
   }, [enableDocs, showDocs]);

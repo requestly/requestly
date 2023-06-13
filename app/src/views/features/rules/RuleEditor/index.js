@@ -15,7 +15,7 @@ import RuleEditorSplitPane from "../../../../components/features/rules/RuleEdito
 import Logger from "lib/logger";
 import "./RuleEditor.css";
 
-const INITIAL_PANE_SIZES = [99, 1];
+const INITIAL_PANE_SIZES = [92, 8];
 
 const RuleEditor = () => {
   const location = useLocation();

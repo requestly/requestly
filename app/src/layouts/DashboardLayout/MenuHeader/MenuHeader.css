@@ -6,7 +6,7 @@
   height: 3rem;
   display: flex;
   align-items: center;
-  padding: 9px 20px;
+  padding: 9px 12px;
   border-bottom: 1px solid var(--border-dark);
   background-color: var(--body-background);
 }
@@ -26,7 +26,7 @@
 .header-left-section {
   display: flex;
   align-items: center;
-  column-gap: 1.5rem;
+  column-gap: 1.4rem;
   height: 3rem;
 }
 
