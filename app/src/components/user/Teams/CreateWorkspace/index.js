@@ -12,9 +12,19 @@ import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import Logger from "lib/logger";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { useDispatch } from "react-redux";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
@@ -34,7 +44,24 @@ const CreateWorkspace = () => {
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        redirectToTeam(navigate, teamId);
+        switchWorkspace(
+          {
+            teamId,
+            teamName: newTeamName,
+            teamMembersCount: 1,
+          },
+          dispatch,
+          {
+            isSyncEnabled: user?.details?.isSyncEnabled,
+            isWorkspaceMode,
+          },
+          appMode
+        );
+        redirectToTeam(navigate, teamId, {
+          state: {
+            isNewTeam: true,
+          },
+        });
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })
       .catch((err) => {
