@@ -32,9 +32,7 @@ const DashboardLayout = () => {
           <DashboardContent />
         </div>
 
-        <div className="app-footer">
-          <Footer />
-        </div>
+        <div className="app-footer">{!isPersonaRecommendationScreen && <Footer />}</div>
       </div>
     </>
   );
