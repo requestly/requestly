@@ -2,6 +2,10 @@ import APP_CONSTANTS from "../config/constants";
 
 const { PATHS } = APP_CONSTANTS;
 
+export const joinPaths = (path1 = "", path2 = "") => {
+  return path1.concat(path2?.[0] !== "/" ? "/" + path2 : path2).replace(/\/\//g, "/");
+};
+
 export const getDesktopSignInAuthPath = (authCode, source) => {
   if (!authCode) return PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE;
   return `${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?ot-auth-code=${authCode}&source=${source}`;
