@@ -162,6 +162,10 @@ export const getActiveModals = (state) => {
   return getGlobalState(state)["activeModals"];
 };
 
+export const getHasConnectedApp = (state) => {
+  return getGlobalState(state).misc?.persist?.hasConnectedApp;
+};
+
 export const getMarketplaceRuleStatus = (state) => {
   return getGlobalState(state)["marketplace"]["ruleStatus"];
 };
