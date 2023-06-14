@@ -54,8 +54,8 @@ const RulesBackup = () => {
   return (
     <SettingsItem
       isActive={backupStatus}
-      onClick={handleBackupEnabled}
-      isProcessing={isBackupStatusChangeProcessing}
+      onChange={handleBackupEnabled}
+      loading={isBackupStatusChangeProcessing}
       title="Enable backups"
       caption="Securely backup your rules to Requestly servers so that you don't lose them while switching devices."
     />
