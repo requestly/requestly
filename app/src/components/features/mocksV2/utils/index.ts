@@ -79,26 +79,52 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
   return mockEditorData;
 };
 
-// TODO: This is temporary. Give subdomain to users based on username.
-// Handle rewrites/redirect on cloudfare
-export const generateFinalUrl = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
-  let finalUrl = `https://requestly.dev/api/mockv2/${endpoint}`;
+const generateEndpointPrefix = (username: string = null, teamId?: string) => {
+  let prefix = "";
 
   if (isEnvBeta() || isEnvDevWithBeta()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.beta}/${endpoint}`;
+    prefix = `${APP_CONSTANTS.mock_base_url.beta}/`;
   } else if (isEnvEmulator()) {
-    finalUrl = `${APP_CONSTANTS.mock_base_url.local}/${endpoint}`;
+    prefix = `${APP_CONSTANTS.mock_base_url.local}/`;
   } else {
-    if (username && !teamId) {
-      finalUrl = `https://${username}.requestly.dev/${endpoint}`;
-      return finalUrl;
+    if (teamId) {
+      prefix = `https://requestly.dev/api/mockv2/`;
+    } else if (username) {
+      prefix = `https://${username}.requestly.dev/`;
+    } else {
+      prefix = "https://requestly.dev/api/mockv2/";
     }
   }
 
-  if (teamId) finalUrl += `?teamId=${teamId}`;
-  else finalUrl += `?rq_uid=${uid}`;
+  return prefix;
+};
 
-  return finalUrl;
+const generateEndpointSuffix = (username: string, uid?: string, teamId?: string) => {
+  if (teamId) {
+    return `?teamId=${teamId}`;
+  }
+  // username replacement from subdomain to query param doesn't work in beta and dev
+  else if (username && !(isEnvBeta() || isEnvDevWithBeta() || isEnvEmulator())) {
+    return "";
+  } else {
+    return `?rq_uid=${uid}`;
+  }
+};
+
+export const generateFinalUrlParts = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
+  let prefix = generateEndpointPrefix(username, teamId);
+  let suffix = generateEndpointSuffix(username, uid, teamId);
+
+  return {
+    prefix: prefix,
+    suffix: suffix,
+    endpoint: endpoint,
+    url: prefix + endpoint + suffix,
+  };
+};
+
+export const generateFinalUrl = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
+  return generateFinalUrlParts(endpoint, uid, username, teamId).url;
 };
 
 const getMockEditorDataForFile = (fileType: string, name: string, data: string) => {
