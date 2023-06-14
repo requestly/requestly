@@ -1,4 +1,4 @@
-import { Col, Divider, Input, Row, Space } from "antd";
+import { Col, Input, Row } from "antd";
 import { forwardRef } from "react";
 import { ValidationErrors } from "../../types";
 import { MockType } from "components/features/mocksV2/types";
@@ -7,8 +7,6 @@ import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import CopyButton from "components/misc/CopyButton";
-
-import "./index.css";
 
 interface EndpointProps {
   isNew: boolean;
@@ -25,21 +23,10 @@ const MockEditorEndpoint = forwardRef(({ isNew, errors, mockType, endpoint, setE
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const { prefix, suffix, url } = generateFinalUrlParts(endpoint, uid, username, teamId);
+  const { url } = generateFinalUrlParts(endpoint, uid, username, teamId);
 
   const renderAddonAfter = () => {
-    return (
-      <>
-        {suffix ? (
-          <Space size="small" split={<Divider type="vertical" />}>
-            <div className="mock-url-addon-after">{suffix}</div>
-            <CopyButton title="" copyText={url} disabled={isNew} />
-          </Space>
-        ) : (
-          <CopyButton title="" copyText={url} disabled={isNew} />
-        )}
-      </>
-    );
+    return <CopyButton type="ghost" title="Copy URL" copyText={url} disabled={isNew} />;
   };
 
   return (
@@ -52,7 +39,7 @@ const MockEditorEndpoint = forwardRef(({ isNew, errors, mockType, endpoint, setE
           <Input
             // @ts-ignore
             ref={ref}
-            addonBefore={<div className="mock-url-addon-before">{prefix}</div>}
+            addonBefore="{{requestly_base_url}}/"
             required
             id="endpoint"
             addonAfter={renderAddonAfter()}
@@ -61,7 +48,7 @@ const MockEditorEndpoint = forwardRef(({ isNew, errors, mockType, endpoint, setE
             name="path"
             onChange={(e) => setEndpoint(e.target.value)}
             status={errors.endpoint ? "error" : ""}
-            placeholder={errors.endpoint ? errors.endpoint : "Enter Endpoint"}
+            placeholder={errors.endpoint ? errors.endpoint : "path"}
           />
         </Col>
         {/* <Col flex="0 0 auto">
