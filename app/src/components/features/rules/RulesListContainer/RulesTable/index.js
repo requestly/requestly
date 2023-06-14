@@ -610,7 +610,7 @@ const RulesTable = ({
                   {recordName}
                   {isDesktopOnlyRule(record) && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
                     <InfoTag
-                      title="NOT SUPPORTED"
+                      title="Desktop App Only"
                       description={
                         <>
                           {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
