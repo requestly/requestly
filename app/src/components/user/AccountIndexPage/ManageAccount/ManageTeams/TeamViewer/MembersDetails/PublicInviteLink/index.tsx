@@ -35,6 +35,8 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const user = useSelector(getUserAuthDetails);
   const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
+  const upsertTeamInvite = httpsCallable(functions, "invites-upsertTeamInvite");
+
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
@@ -42,10 +44,10 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const handlePublicInviteCreateClicked = () => {
     trackWorkspaceInviteLinkGenerated(teamId);
     setIsLoading(true);
-    const createTeamInvite = httpsCallable(functions, "invites-createTeamInvite");
-    createTeamInvite({ teamId: teamId, usage: "unlimited" }).then((res: any) => {
+    upsertTeamInvite({ teamId: teamId, publicEnabled: true }).then((res: any) => {
       if (res?.data?.success) {
         setIsInvitePublic(true);
+        setPublicInviteId(res?.data?.inviteId);
       } else {
         toast.error("Only admins can invite people");
       }
@@ -94,12 +96,11 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
-      const setDomainInInvite = httpsCallable(functions, "invites-updateInviteDomains");
-      setDomainInInvite({ teamId, domainEnabled: enabled }).then(() => {
-        setDomainJoiningEnabled(enabled);
+      upsertTeamInvite({ teamId, domainEnabled: enabled }).then((res: any) => {
+        if (res?.data?.success) setDomainJoiningEnabled(enabled);
       });
     },
-    [functions, teamId]
+    [teamId, upsertTeamInvite]
   );
 
   useEffect(() => {
