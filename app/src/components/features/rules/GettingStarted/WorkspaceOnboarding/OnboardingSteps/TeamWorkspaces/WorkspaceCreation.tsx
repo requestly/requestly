@@ -26,8 +26,8 @@ export const CreateWorkspace = () => {
           Email address
         </label>
         <ReactMultiEmail
-          className="mt-8"
-          placeholder="Email Address"
+          className="mt-8 "
+          placeholder="Add multiple email address separated by commas"
           //@ts-ignore
           type="email"
           value={userEmail}
@@ -48,7 +48,7 @@ export const CreateWorkspace = () => {
         <div className="workspace-invite-link">
           <RQInput
             size="small"
-            className="mt-8 workspace-onboarding-field"
+            className="mt-8 workspace-onboarding-field text-white"
             disabled
             value="https://weadjkldjalskjdaksjdakljdakldasdasd ad ad asdasdas asd as adad aa"
           />
