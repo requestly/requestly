@@ -99,7 +99,7 @@ const VirtualTableV2: React.FC<Props> = ({
           type="primary"
           shape="round"
           onClick={scrollToBottom}
-          style={{ position: "absolute", bottom: 0, left: "50%" }}
+          style={{ position: "absolute", bottom: "14px", left: "50%" }}
         >
           <ArrowDownOutlined /> {buttonText}
         </Button>

@@ -4,7 +4,7 @@ import { Tooltip, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 
 interface UserIconProps {
-  uid: string;
+  uid?: string;
 }
 
 export const UserIcon = ({ uid }: UserIconProps) => {

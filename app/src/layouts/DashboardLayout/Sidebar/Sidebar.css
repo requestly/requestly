@@ -1,17 +1,15 @@
 .sidebar.ant-layout-sider {
   top: 0;
   left: 0;
-  height: 100vh;
   position: sticky;
   z-index: 10;
+  height: calc(100vh - 3rem);
 }
 
 .siderbar-header {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 10px 14px;
-  height: 56px;
 }
 
 li.sidebar-horizontal-divider.ant-menu-item-divider {
@@ -34,6 +32,11 @@ li.sidebar-horizontal-divider.ant-menu-item-divider {
   font-size: 13px;
   margin-bottom: 2px;
   border-radius: var(--border-radius-sm);
+}
+
+.sidebar.ant-layout-sider .ant-layout-sider-children > .ant-row {
+  padding-top: 6px;
+  position: relative;
 }
 
 .sidebar.ant-layout-sider .ant-layout-sider-children .ant-menu-item:hover,
@@ -68,13 +71,14 @@ li.sidebar-horizontal-divider.ant-menu-item-divider {
 
 .sidebar-collapse-btn-container {
   position: absolute;
+  top: 3px;
   right: -10px;
   z-index: 200;
-  background-color: var(--component-background);
-  border-radius: 4px;
-  height: 20px;
   width: 20px;
+  height: 20px;
   display: flex;
+  border-radius: 4px;
+  background-color: var(--component-background);
 }
 
 .siderbar-header.sidebar-header-collapsed {
@@ -231,6 +235,7 @@ li.sidebar-horizontal-divider.ant-menu-item-divider {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 4px;
   }
 }
 

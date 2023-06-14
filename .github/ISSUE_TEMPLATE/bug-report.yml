@@ -15,14 +15,16 @@ body:
 
 
         ---
-  - type: textarea
+  - id: issue_description
+    type: textarea
     attributes:
       label: Describe your issue?
       description: |
         Summary of the issue that you are trying to report
     validations:
       required: true
-  - type: textarea
+  - id: steps_to_repro
+    type: textarea
     attributes:
       label: Repro steps
       description: |
@@ -34,7 +36,8 @@ body:
         3. A wild 404 error has appeared.
     validations:
       required: true
-  - type: checkboxes
+  - id: execution_platform
+    type: checkboxes
     attributes:
       label: What Requestly tool were you using?
       options:
@@ -44,7 +47,8 @@ body:
         - label: Selenium
     validations:
       required: true
-  - type: input
+  - id: environment
+    type: input
     attributes:
       label: Your Environment
       description: |
@@ -53,7 +57,8 @@ body:
         e.g. MacOS 12, Chrome 101
     validations:
       required: true
-  - type: input
+  - id: version
+    type: input
     attributes:
       label: Requestly Version
       description: |
