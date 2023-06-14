@@ -58,8 +58,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const handlePublicInviteRevokeClicked = () => {
     trackWorkspaceInviteLinkRevoked(teamId);
     setIsLoading(true);
-    const revokeInvite = httpsCallable(functions, "invites-revokeInvite");
-    revokeInvite({ inviteId: publicInviteId }).then((res: any) => {
+    upsertTeamInvite({ teamId, publicEnabled: false }).then((res: any) => {
       if (res?.data?.success) {
         setIsInvitePublic(false);
         toast.success("Successfully Revoked invite");
