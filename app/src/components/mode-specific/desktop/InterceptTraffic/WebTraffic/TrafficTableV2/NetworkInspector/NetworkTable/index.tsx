@@ -44,7 +44,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "time",
         title: "Time",
         dataIndex: "timestamp",
-        width: "4%",
+        width: "8%",
         render: (timestamp: any) => {
           return new Date(timestamp * 1000).toLocaleTimeString(undefined, {
             hour12: false,
@@ -61,18 +61,18 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "method",
         title: "Method",
         dataIndex: ["request", "method"], // corresponds to request.method
-        width: "4%",
+        width: "8%",
       },
       {
         id: "contentType",
         title: "Content-Type",
         dataIndex: ["response", "contentType"],
-        width: "10%",
+        width: "15%",
       },
       {
         title: "Rules Applied",
         dataIndex: ["actions"],
-        width: "10%",
+        width: "12%",
         responsive: ["xs", "sm"],
         hideColumn: isStaticPreview,
         render: (actions: any) => {
@@ -86,7 +86,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "status",
         title: "Status",
         dataIndex: ["response", "statusCode"],
-        width: "4%",
+        width: "8%",
       },
     ],
     [isStaticPreview]
