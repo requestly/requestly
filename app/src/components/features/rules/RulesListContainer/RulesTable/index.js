@@ -707,7 +707,7 @@ const RulesTable = ({
     {
       title: "Last Modified",
       align: "center",
-      width: 180,
+      width: 150,
       responsive: ["lg"],
       dataIndex: "modificationDate",
       valueType: "date",
@@ -912,7 +912,7 @@ const RulesTable = ({
     columns.splice(3, 0, {
       title: "Created by",
       align: "center",
-      width: "120px",
+      width: "100px",
       responsive: ["lg"],
       dataIndex: "createdBy",
       valueType: "date",
@@ -1100,7 +1100,7 @@ const RulesTable = ({
   return (
     <>
       <ProTable
-        scroll={{ x: 700 }}
+        scroll={{ x: 900 }}
         locale={{
           emptyText: searchValue ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found with given name" />
