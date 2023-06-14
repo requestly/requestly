@@ -1,6 +1,6 @@
 .rq-dropdown {
   padding: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
   background-color: var(--component-background);
 }
