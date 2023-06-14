@@ -4,10 +4,9 @@ import underlineIcon from "../../../../../../../../assets/img/icons/common/under
 
 export const WorkspaceOnboardingBanner = () => {
   const teamBenefits = [
-    "Use Requestly with your colleagues",
-    "Access to Team Workspaces",
-    "Access to Session Recording",
-    "Organization level access controls",
+    "Common Repository of Rules, Mocks & Sessions",
+    "Collaborate with your QAs, Product & Customers faster",
+    "Troubleshoot Issues faster",
   ];
   return (
     <div>

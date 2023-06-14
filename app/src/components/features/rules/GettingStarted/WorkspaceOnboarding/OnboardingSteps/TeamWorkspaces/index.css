@@ -18,12 +18,9 @@
   justify-content: flex-end;
   gap: 4px;
   padding: 9px 20px;
-  border-bottom-left-radius: inherit;
-  border-bottom-right-radius: inherit;
+  color: var(--text-gray);
   border-top: 1px solid var(--border-dark);
   background-color: var(--component-dark-background);
-  color: var(--text-gray);
-
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 .workspace-onboarding-wrapper .workspace-onboarding-body .workspace-onboarding-field {
@@ -39,5 +36,5 @@
 }
 .workspace-invite-link .ant-btn.rq-btn.btn-default {
   height: 40px;
-  align-self: center;
+  align-self: flex-end;
 }
