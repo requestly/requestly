@@ -39,7 +39,7 @@ const MockEditorEndpoint = forwardRef(({ isNew, errors, mockType, endpoint, setE
           <Input
             // @ts-ignore
             ref={ref}
-            addonBefore="{{requestly_base_url}}/"
+            addonBefore="/"
             required
             id="endpoint"
             addonAfter={renderAddonAfter()}
@@ -51,9 +51,6 @@ const MockEditorEndpoint = forwardRef(({ isNew, errors, mockType, endpoint, setE
             placeholder={errors.endpoint ? errors.endpoint : "path"}
           />
         </Col>
-        {/* <Col flex="0 0 auto">
-          <CopyButton size="large" title="" copyText={url} disabled={isNew}/>
-        </Col> */}
       </Row>
       <span className="field-error-prompt">{errors.endpoint ? errors.endpoint : null}</span>
     </Col>

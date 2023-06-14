@@ -18,7 +18,7 @@ import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
 import "./index.css";
 import {
   trackAiResponseButtonClicked,
@@ -119,6 +119,9 @@ const MockEditor: React.FC<Props> = ({
       headersDict = {};
     }
 
+    const cleanedEndpoint = cleanupEndpoint(endpoint);
+    setEndpoint(cleanedEndpoint);
+
     const tempMockData: MockEditorDataSchema = {
       id: id,
       type: type,
@@ -127,7 +130,7 @@ const MockEditor: React.FC<Props> = ({
       desc: desc,
       method: method as RequestMethod,
       latency: latency,
-      endpoint: endpoint,
+      endpoint: cleanedEndpoint,
       statusCode: statusCode,
       contentType: contentType,
       headers: headersDict,
