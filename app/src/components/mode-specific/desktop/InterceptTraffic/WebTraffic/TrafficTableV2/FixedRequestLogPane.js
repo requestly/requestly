@@ -1,27 +1,15 @@
-import React, { useState } from "react";
-import { Badge, Space, Divider, Typography, Row, Col } from "antd";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { Badge, Space, Divider, Typography, Row, Col, Button } from "antd";
 import { Navigation } from "@devtools-ds/navigation";
 import { Table } from "@devtools-ds/table";
 import { CloseOutlined } from "@ant-design/icons";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
-import CopyButton from "components/misc/CopyButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./FixedRequestLogPane.css";
 import JSONPreview from "./Preview/JsonPreviewV2";
 
 const { Text } = Typography;
-
-const CopyCurlButton = ({ requestShellCurl }) => {
-  if (!requestShellCurl) {
-    return null;
-  }
-  return (
-    <Space>
-      <CopyButton title="Copy cURL" copyText={requestShellCurl} />
-    </Space>
-  );
-};
 
 const Header = (props) => {
   return (
@@ -42,19 +30,62 @@ const Header = (props) => {
   );
 };
 
-const LogPane = (props) => {
-  const log_id = props.log_id;
-  const query_params = props.data.query_params;
-  const request_data = props.data;
-  const headers = props.data.headers;
-  const body = props.data && props.data.body;
-  const title = props.title;
-  const requestState = props.requestState;
-  const timestamp = props.timestamp;
+const BodyTabView = ({ body, requestState, timestamp }) => {
+  const [bodyToDisplay, setBodyToDisplay] = useState();
 
-  const timePassedInSeconds = (new Date() - new Date(timestamp * 1000)) / 1000;
+  const isBodyLoading = useMemo(() => {
+    // Hacky fix: Some logs never get a response
+    const timePassedInMillis = Date.now() - timestamp * 1000;
+    return requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInMillis < 15000;
+  }, [requestState, timestamp]);
 
+  useLayoutEffect(() => {
+    if (body && body.length > 1000) {
+      setBodyToDisplay(body.substring(0, 1000));
+    } else {
+      setBodyToDisplay(body);
+    }
+  }, [body]);
+
+  const onExpandMoreClick = useCallback(() => {
+    setBodyToDisplay(body);
+  }, [body]);
+
+  return (
+    <div
+      style={{
+        overflowY: "auto",
+        height: "100%",
+        color: "#ffffffd9",
+        padding: "0.8rem",
+      }}
+    >
+      {bodyToDisplay ? (
+        <>
+          <Text>{bodyToDisplay}</Text>
+          {bodyToDisplay.length < body?.length ? (
+            <Button type="link" onClick={onExpandMoreClick} style={{ padding: 0, height: "auto" }}>
+              ... See more
+            </Button>
+          ) : null}
+        </>
+      ) : isBodyLoading ? (
+        <Text type="secondary" italic>
+          Loading Body...
+        </Text>
+      ) : (
+        <Text type="secondary" italic>
+          No body available
+        </Text>
+      )}
+    </div>
+  );
+};
+
+const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
+  const { query_params, headers, body } = request_data;
+
   const tabs = [
     {
       header: (
@@ -111,24 +142,7 @@ const LogPane = (props) => {
     },
     {
       header: <Navigation.Tab id="Body">Body</Navigation.Tab>,
-      body: (
-        <div
-          style={{
-            overflowY: "auto",
-            height: "100%",
-            color: "#ffffffd9",
-            padding: "0.8rem",
-          }}
-        >
-          {body ? (
-            body
-          ) : requestState === GLOBAL_CONSTANTS.REQUEST_STATE.LOADING && timePassedInSeconds < 15 ? ( // Hacky fix: Some logs never get a response
-            <h3>Loading Body...</h3>
-          ) : (
-            <h3>The request has no body available</h3>
-          )}
-        </div>
-      ),
+      body: <BodyTabView body={body} requestState={requestState} timestamp={timestamp} />,
     },
     {
       header: <Navigation.Tab id="Preview">Preview</Navigation.Tab>,
@@ -141,13 +155,7 @@ const LogPane = (props) => {
   ];
 
   return (
-    <Navigation
-      className="navigation request-log-pane"
-      index={currentTabIndex}
-      onChange={(index) => {
-        setCurrentTabIndex(index);
-      }}
-    >
+    <Navigation className="navigation request-log-pane" index={currentTabIndex} onChange={setCurrentTabIndex}>
       <Navigation.Controls>
         <Navigation.TabList>{tabs.map((tab, idx) => tab?.header)}</Navigation.TabList>
       </Navigation.Controls>
