@@ -30,5 +30,5 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
 };
 
 export const updateHasConnectedApp = (prevState, action) => {
-  prevState.hasConnectedApp = action.payload;
+  prevState.misc.persist.hasConnectedApp = action.payload;
 };

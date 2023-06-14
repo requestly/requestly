@@ -10,8 +10,6 @@ const INITIAL_STATE = {
     details: null,
   },
 
-  hasConnectedApp: false,
-
   userPersona: {
     page: 0,
     persona: "",
@@ -162,6 +160,8 @@ const INITIAL_STATE = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+
+      hasConnectedApp: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,

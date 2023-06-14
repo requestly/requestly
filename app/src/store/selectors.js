@@ -163,7 +163,7 @@ export const getActiveModals = (state) => {
 };
 
 export const getHasConnectedApp = (state) => {
-  return getGlobalState(state)["hasConnectedApp"];
+  return getGlobalState(state).misc?.persist?.hasConnectedApp;
 };
 
 export const getMarketplaceRuleStatus = (state) => {
