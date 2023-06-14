@@ -1,0 +1,41 @@
+.app-footer-links {
+  display: flex;
+  align-items: center;
+}
+
+.app-footer-links .ant-typography {
+  column-gap: 3px;
+  align-items: center;
+  display: inline-flex;
+  color: var(--gray-light);
+}
+
+.app-footer-links .ant-typography {
+  padding: 0 14px;
+  border-right: 1px solid var(--border-dark);
+}
+
+.app-footer-links .ant-typography:last-child {
+  border: none;
+}
+
+.app-footer-links .ant-typography:hover {
+  color: var(--white);
+}
+
+.app-layout-footer .footer-sidebar-toggle-btn.ant-btn {
+  padding: 0;
+  cursor: pointer;
+  height: inherit;
+  color: var(--gray-light);
+}
+
+.app-layout-footer .footer-sidebar-toggle-btn.ant-btn:hover,
+.app-layout-footer .footer-sidebar-toggle-btn.ant-btn:focus {
+  color: var(--white);
+  background-color: transparent;
+}
+
+.app-layout-footer .footer-sidebar-toggle-btn svg {
+  font-size: 11px;
+}

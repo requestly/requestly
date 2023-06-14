@@ -47,5 +47,5 @@
 /* tabs content */
 .manage-workspace-tabs .ant-tabs-content {
   overflow: auto;
-  height: calc(100vh - 200px);
+  height: 100%;
 }

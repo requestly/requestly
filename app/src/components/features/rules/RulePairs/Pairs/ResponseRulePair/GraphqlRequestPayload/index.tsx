@@ -134,7 +134,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           type="text"
           autoComplete="off"
           placeholder="Key e.g. operationName"
-          className="graphql-operation-type-input"
+          className="graphql-operation-key-input"
           value={gqlOperationFilter.key}
           onChange={handleRequestPayloadKeyChange}
         />
@@ -143,7 +143,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           type="text"
           autoComplete="off"
           placeholder="value e.g. getUsers"
-          className="graphql-operation-type-name"
+          className="graphql-operation-name-input"
           value={gqlOperationFilter.value}
           onChange={handleRequestPayloadValueChange}
         />

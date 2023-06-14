@@ -69,12 +69,7 @@ const App = () => {
       <ConfigProvider locale={enUS}>
         <GrowthBookProvider growthbook={growthbook}>
           <LocalUserAttributesHelperComponent />
-          <div
-            id="requestly-dashboard-layout"
-            style={{
-              height: "100vh",
-            }}
-          >
+          <div id="requestly-dashboard-layout">
             <CommandBar />
             {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
               <FullScreenLayout />

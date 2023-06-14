@@ -8,6 +8,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import ConsoleLogger from "./ConsoleLogger";
 import DataCollection from "./DataCollection";
+import RulesSyncing from "./RulesSyncing";
 
 const GlobalSettings = ({ appMode }) => {
   const user = useSelector(getUserAuthDetails);
@@ -38,16 +39,12 @@ const GlobalSettings = ({ appMode }) => {
   return (
     <>
       <div className="settings-header header">⚙️ Global Settings</div>
+      <p className="text-gray text-sm settings-caption">
+        Please enable the following settings to get the best experience
+      </p>
       <div>
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && (
-          <>
-            <p className="text-gray text-sm settings-caption">
-              Please enable the following settings to get the best experience
-            </p>
-            <ConsoleLogger isCompatible={isCompatible} />
-          </>
-        )}
-
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ConsoleLogger isCompatible={isCompatible} />}
+        <RulesSyncing />
         {user?.loggedIn ? <DataCollection /> : null}
       </div>
     </>
