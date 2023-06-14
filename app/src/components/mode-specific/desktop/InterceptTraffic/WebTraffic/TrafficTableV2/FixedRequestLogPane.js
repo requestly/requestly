@@ -89,7 +89,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
   const tabs = [
     {
       header: (
-        <Navigation.Tab id={title}>
+        <Navigation.Tab id={title} key="details">
           <span style={{ fontWeight: "500" }}>{title + " Details"} </span>
         </Navigation.Tab>
       ),
@@ -100,7 +100,11 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
     },
     {
-      header: <Navigation.Tab id="Headers">Headers</Navigation.Tab>,
+      header: (
+        <Navigation.Tab id="Headers" key="headers">
+          Headers
+        </Navigation.Tab>
+      ),
       body: (
         <div style={{ overflowY: "auto", height: "100%", padding: "0.8rem" }}>
           <Table className="log-table">
@@ -130,7 +134,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
     },
     {
       header: (
-        <Navigation.Tab id="Payload" style={title === "Request" ? {} : { display: "none" }}>
+        <Navigation.Tab id="Payload" key="payload" style={title === "Request" ? {} : { display: "none" }}>
           Payload
         </Navigation.Tab>
       ),
@@ -141,11 +145,19 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
     },
     {
-      header: <Navigation.Tab id="Body">Body</Navigation.Tab>,
+      header: (
+        <Navigation.Tab id="Body" key="body">
+          Body
+        </Navigation.Tab>
+      ),
       body: <BodyTabView body={body} requestState={requestState} timestamp={timestamp} />,
     },
     {
-      header: <Navigation.Tab id="Preview">Preview</Navigation.Tab>,
+      header: (
+        <Navigation.Tab id="Preview" key="preview">
+          Preview
+        </Navigation.Tab>
+      ),
       body: (
         <div className="navigation-panel-wrapper">
           <JSONPreview logId={log_id} payload={body} />
@@ -161,14 +173,18 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       </Navigation.Controls>
       <Navigation.Panels>
         {tabs.map((tab, idx) => {
-          return <Navigation.Panel id={idx}>{currentTabIndex === idx ? tab?.body : null}</Navigation.Panel>;
+          return (
+            <Navigation.Panel id={idx} key={idx}>
+              {currentTabIndex === idx ? tab?.body : null}
+            </Navigation.Panel>
+          );
         })}
       </Navigation.Panels>
     </Navigation>
   );
 };
 
-const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleClosePane, visibility }) => {
+const FixedRequestLogPane = ({ selectedRequestData, upsertRequestAction, handleClosePane, visibility }) => {
   return (
     visibility && (
       <div className="request-log-main-wrapper">
@@ -211,4 +227,4 @@ const RequestlogPane = ({ selectedRequestData, upsertRequestAction, handleCloseP
   );
 };
 
-export default RequestlogPane;
+export default FixedRequestLogPane;

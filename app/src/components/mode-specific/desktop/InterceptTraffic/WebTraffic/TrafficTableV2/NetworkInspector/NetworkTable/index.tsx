@@ -70,6 +70,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         width: "15%",
       },
       {
+        id: "rulesApplied",
         title: "Rules Applied",
         dataIndex: ["actions"],
         width: "12%",
