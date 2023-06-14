@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card } from "reactstrap";
-import { Typography } from "antd";
 import { Button, Col as AntCol, Row as AntRow, Descriptions, Badge, Space } from "antd";
 // UTILS
 import {
@@ -11,20 +10,13 @@ import {
   redirectToPricingPlans,
 } from "../../../../../..//utils/RedirectionUtils";
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
-import APP_CONSTANTS from "config/constants";
-import MoveToProfessionalModal from "components/payments/MoveToProfessionalModal";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
-
-const { Link } = Typography;
 
 const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
   const isUserPremium = user.details?.isPremium;
-
-  // Component State
-  const [isMoveToProfessionalModalVisible, setIsMoveToProfessionalModalVisible] = useState(false);
 
   const navigate = useNavigate();
   const { validFrom, validTill, status, type, planName } = subscriptionDetails;
@@ -74,12 +66,6 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
                 </Descriptions.Item>
                 <Descriptions.Item label="Plan" className="primary-card github-like-border">
                   {getPrettyPlanName(planName)}
-                  {planName && planName.includes(APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC) ? (
-                    <>
-                      {" "}
-                      <Link onClick={() => setIsMoveToProfessionalModalVisible(true)}>(Click to upgrade)</Link>{" "}
-                    </>
-                  ) : null}
                 </Descriptions.Item>
                 <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
                   {new Date(validTill).toDateString()}
@@ -89,11 +75,6 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
           </AntRow>
         </Card>
       </Col>
-
-      <MoveToProfessionalModal
-        isOpen={isMoveToProfessionalModalVisible}
-        toggle={() => setIsMoveToProfessionalModalVisible(!isMoveToProfessionalModalVisible)}
-      />
     </Row>
   );
 };
