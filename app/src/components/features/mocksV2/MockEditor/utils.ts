@@ -1,5 +1,11 @@
 import { FileType } from "../types";
 
+// Remove leading & trailing slash
+export const cleanupEndpoint = (endpoint: string) => {
+  let cleanedEndpoint = endpoint.replace(/^\/+|\/+$/g, "");
+  return cleanedEndpoint;
+};
+
 export const validateEndpoint = (endpoint: string) => {
   if (!endpoint) {
     return "Endpoint is required";
@@ -7,6 +13,10 @@ export const validateEndpoint = (endpoint: string) => {
 
   if (endpoint.startsWith("/")) {
     return "Endpoint cannot start with '/'";
+  }
+
+  if (endpoint.endsWith("/")) {
+    return "Endpoint cannot end with '/'";
   }
 
   const pattern = /^[A-Za-z0-9_.\-/]+$/;
