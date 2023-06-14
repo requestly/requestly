@@ -35,7 +35,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const user = useSelector(getUserAuthDetails);
   const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
-  const upsertTeamInvite = httpsCallable(functions, "invites-upsertTeamInvite");
+  const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -44,7 +44,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const handlePublicInviteCreateClicked = () => {
     trackWorkspaceInviteLinkGenerated(teamId);
     setIsLoading(true);
-    upsertTeamInvite({ teamId: teamId, publicEnabled: true }).then((res: any) => {
+    upsertTeamCommonInvite({ teamId: teamId, publicEnabled: true }).then((res: any) => {
       if (res?.data?.success) {
         setIsInvitePublic(true);
         setPublicInviteId(res?.data?.inviteId);
@@ -58,7 +58,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const handlePublicInviteRevokeClicked = () => {
     trackWorkspaceInviteLinkRevoked(teamId);
     setIsLoading(true);
-    upsertTeamInvite({ teamId, publicEnabled: false }).then((res: any) => {
+    upsertTeamCommonInvite({ teamId, publicEnabled: false }).then((res: any) => {
       if (res?.data?.success) {
         setIsInvitePublic(false);
         toast.success("Successfully Revoked invite");
@@ -95,11 +95,11 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
-      upsertTeamInvite({ teamId, domainEnabled: enabled }).then((res: any) => {
+      upsertTeamCommonInvite({ teamId, domainEnabled: enabled }).then((res: any) => {
         if (res?.data?.success) setDomainJoiningEnabled(enabled);
       });
     },
-    [teamId, upsertTeamInvite]
+    [teamId, upsertTeamCommonInvite]
   );
 
   useEffect(() => {
