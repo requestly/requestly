@@ -28,7 +28,7 @@ module.exports.theme = {
   "@input-color": colors.white,
   "@input-icon-color": colors.textGray,
   "@input-border-color": colors.border,
-  "@input-bg": colors.componentDarkBackground,
+  "@input-bg": colors.inputBackground,
   "@input-placeholder-color": colors.textGray,
   "@input-height-lg": "38px",
 
@@ -61,5 +61,5 @@ module.exports.theme = {
   "btn-height-base": "30px",
 
   // Tootltip
-  "@tooltip-bg": colors.border,
+  "@tooltip-bg": colors.darkGray,
 };

@@ -18,7 +18,7 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
         <AutoComplete
           showSearch={true}
           size="large"
-          style={{ width: "100%" }}
+          className="response-status-code-select"
           placeholder="Returns original code if left empty"
           disabled={isInputDisabled}
           value={statusCode || undefined}

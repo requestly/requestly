@@ -1,6 +1,8 @@
 .rule-editor-header.ant-layout-header {
   display: flex;
   align-items: center;
+  background-color: var(--body-background);
+  border-bottom: 1px solid var(--border-dark);
 }
 
 .rule-editor-row.ant-row {

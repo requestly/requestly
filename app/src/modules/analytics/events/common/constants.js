@@ -127,7 +127,9 @@ export const ONBOARDING = {
   INSTALL_EXTENSION_LINK_CLICKED: "install_extension_link_clicked",
   SIDEBAR_CLICKED: "sidebar_clicked",
   HEADER_CLICKED: "header_clicked",
+  TOPBAR_CLICKED: "topbar_clicked",
   HELPDESK_CLICKED: "helpdesk_clicked",
+  FOOTER_CLICKED: "footer_clicked",
 };
 
 export const TEAMS = {
