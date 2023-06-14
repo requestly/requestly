@@ -499,7 +499,7 @@ const CurrentTrafficTable = ({
 
   return (
     <>
-      <Row wrap={false}>
+      <Row wrap={false} className="traffic-table-container-row">
         {isStaticPreview ? null : (
           <Col
             flex="197px"
@@ -517,7 +517,7 @@ const CurrentTrafficTable = ({
             />
           </Col>
         )}
-        <Col flex="auto">
+        <Col flex="auto" className="traffic-table-content">
           <Row align={"middle"}>
             <ActionHeader
               deviceId={deviceId}

@@ -39,7 +39,7 @@ const ruleInfoDialog = (ruleType: string, appMode: string): void => {
 
   notification.open({
     message: <MessageComponent ruleType={ruleType} />,
-    top: 60,
+    top: 110,
     className: "rule-info-dialog-box",
     duration: 0,
     closeIcon: <></>,

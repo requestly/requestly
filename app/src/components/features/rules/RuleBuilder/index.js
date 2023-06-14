@@ -45,12 +45,12 @@ import "./RuleBuilder.css";
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
 const RuleBuilder = (props) => {
-  //Constants
-  const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(props.location, props.isSharedListViewRule);
+  const location = useLocation();
   const navigate = useNavigate();
+  const { state } = location;
+  const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
   //Global State
-  const { state } = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
@@ -74,7 +74,7 @@ const RuleBuilder = (props) => {
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const [showDocs, setShowDocs] = useState(true);
+  const [showDocs, setShowDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
   }, [enableDocs, showDocs]);
@@ -173,7 +173,7 @@ const RuleBuilder = (props) => {
     stableSetCurrentlySelectedRuleConfig,
     props.rule,
     appMode,
-    props.location,
+    location,
   ]);
 
   //If "all rules" are not already there in state, fetch them.
@@ -232,15 +232,14 @@ const RuleBuilder = (props) => {
     // https://stackoverflow.com/questions/39288915/detect-previous-path-in-react-router
     // prevPath will be sent by ProLayout navigation menu item
     if (
-      props &&
-      props.location &&
-      props.location.pathname.includes("/rules/editor/create/") &&
-      props.location.state &&
-      props.location.state.prevPath &&
-      props.location.state.prevPath.includes("/rules/editor/edit/")
+      location &&
+      location.pathname.includes("/rules/editor/create/") &&
+      location.state &&
+      location.state.prevPath &&
+      location.state.prevPath.includes("/rules/editor/edit/")
     )
       cleanup(dispatch);
-  }, [dispatch, props]);
+  }, [dispatch, location]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -278,7 +277,7 @@ const RuleBuilder = (props) => {
       {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
         <Header
           mode={MODE}
-          location={props.location}
+          location={location}
           currentlySelectedRuleData={currentlySelectedRuleData}
           currentlySelectedRuleConfig={currentlySelectedRuleConfig}
         />

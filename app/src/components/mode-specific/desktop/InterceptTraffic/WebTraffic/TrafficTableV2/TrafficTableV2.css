@@ -1,16 +1,18 @@
+.traffic-table-container-row {
+  height: 100%;
+}
+
 .traffic-table-sidebar {
-  margin-top: -24px;
-  margin-left: -24px;
   overflow: auto;
   padding-bottom: 1rem;
-  height: calc(100vh - 57px);
   border-right: 1px solid var(--border-dark);
+  height: calc(100vh - 4.5rem);
 }
 
 .traffic-table-sidebar,
 .traffic-table-sidebar .ant-menu.ant-menu-dark,
 .traffic-table-sidebar .ant-menu.ant-menu-dark ul.ant-menu-sub {
-  background-color: var(--body-background);
+  background-color: var(--app-secondary-sidebar-background);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {
@@ -111,13 +113,19 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
   font-size: 12px;
 }
+
+.traffic-table-content {
+  padding-top: 24px;
+  padding-right: 24px;
+}
+
 .hide-traffic-table-split-gutter .traffic-table-split-container .gutter.gutter-vertical {
   height: 0 !important;
   transition: none;
 }
 
 .traffic-table-split-container {
-  height: calc(100vh - 130px);
+  height: calc(100vh - 140px);
 }
 
 .traffic-table-split-container .gutter-vertical,

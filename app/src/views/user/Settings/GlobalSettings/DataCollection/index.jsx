@@ -24,7 +24,7 @@ const DataCollection = () => {
     <>
       <SettingsItem
         isActive={dataCollectionStatus === "enabled"}
-        onClick={handleChange}
+        onChange={handleChange}
         title="Help improve Requestly"
         caption="Anonymous usage data helps the Requestly team prioritize fixes and features."
       />
