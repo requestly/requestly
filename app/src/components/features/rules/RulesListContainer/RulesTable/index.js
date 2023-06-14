@@ -920,7 +920,7 @@ const RulesTable = ({
         if (record.objectType && record.objectType === "group") {
           return null;
         }
-        const uid = record.createdBy ? record.createdBy : record.lastModifiedBy;
+        const uid = record.createdBy ?? null;
         if (currentlyActiveWorkspace?.id) {
           return <UserIcon uid={uid} />;
         } else return null;

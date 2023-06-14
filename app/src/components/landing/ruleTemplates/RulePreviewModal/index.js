@@ -35,7 +35,6 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
         return;
       }
     }
-    const lastModifiedBy = Date.now();
     const modificationDate = Date.now();
 
     const ruleToSave = {
@@ -43,7 +42,6 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       id: `${ruleObj.ruleDefinition.ruleType}_${generateObjectId()}`,
       createdBy,
       currentOwner,
-      lastModifiedBy,
       modificationDate,
     };
 
