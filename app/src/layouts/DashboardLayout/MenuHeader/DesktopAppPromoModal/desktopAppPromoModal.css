@@ -1,0 +1,80 @@
+.desktop-app-promo-modal.ant-modal {
+  padding: 0;
+  border: 2px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.desktop-app-promo-modal .ant-modal-content {
+  width: 100%;
+  min-height: 532px;
+  padding: 88px 0 81px 20px;
+  background-color: #111213;
+}
+
+.desktop-app-promo-modal .ant-modal-content .ant-modal-body {
+  display: flex;
+  align-items: center;
+
+  /* flex-wrap: nowrap; */
+}
+
+.desktop-app-promo-modal .left-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 50%;
+  flex-shrink: 0;
+}
+
+.desktop-app-promo-modal .left-section .header {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 53px;
+  text-align: center;
+  color: var(--white);
+  margin-top: 38px;
+}
+
+.desktop-app-promo-modal .left-section .header .desktop-underline {
+  position: relative;
+}
+
+.desktop-app-promo-modal .left-section .header .desktop-underline svg {
+  position: absolute;
+  left: -7px;
+  bottom: -9px;
+  z-index: 1;
+}
+
+.desktop-app-promo-modal .left-section .caption {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+  margin: 12px 0 40px 0;
+  color: var(--gray-light);
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn {
+  height: 32px;
+  max-width: 261px;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 158px 22px 158px;
+}
+
+.desktop-app-promo-modal .left-section .view-all-platforms-link {
+  margin-bottom: 41px;
+}
+
+.desktop-app-promo-modal .right-section {
+  width: 50%;
+  position: relative;
+}
+
+.desktop-app-promo-modal .right-section svg {
+  position: absolute;
+  transform: translate(10px, -50%);
+  z-index: 1;
+}

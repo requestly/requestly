@@ -43,6 +43,11 @@
   color: var(--white);
 }
 
+.header-left-section .desktop-app-promo-btn.ant-btn:hover,
+.header-left-section .desktop-app-promo-btn.ant-btn:focus {
+  background-color: transparent;
+}
+
 .header-middle-section {
   margin: 8px;
   font-size: 13px;
