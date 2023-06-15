@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
-import { Button, Col, Form, Input, Row } from "antd";
+import { Button, Col, Form, Input, Row, Typography } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -96,15 +96,12 @@ const CreateWorkspace = () => {
       <ProCard className="primary-card github-like-border">
         <Row align="middle" justify="center">
           <Col span={10} align="center">
-            <h1>Create a Team Workspace</h1>
-            <br />
-
             <Row>
               <Col className="hp-text-center" span={24}>
+                <Typography.Title level={2}>Create a Workspace</Typography.Title>
                 <center>
-                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "45vh" }} />
+                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "35vh" }} />
                 </center>
-
                 <Form
                   layout="vertical"
                   name="basic"
@@ -113,7 +110,7 @@ const CreateWorkspace = () => {
                   onFinishFailed={onFinishFailed}
                 >
                   <Form.Item
-                    label="Name your Workspace:"
+                    label="Name your workspace"
                     name="workspaceName"
                     className="hp-mb-16 hp-text-left"
                     rules={[
