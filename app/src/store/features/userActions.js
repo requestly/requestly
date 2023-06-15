@@ -90,3 +90,7 @@ export const updateNetworkSessionSaveInProgress = (prevState, action) => {
 export const updateNetworkSessionTooltipShown = (prevState) => {
   prevState.misc.persist.isNetworkSessionTooltipShown = true;
 };
+
+export const updateIsWorkspaceOnboardingCompleted = (prevState) => {
+  prevState.workspaceOnboarding.isOnboardingCompleted = true;
+};

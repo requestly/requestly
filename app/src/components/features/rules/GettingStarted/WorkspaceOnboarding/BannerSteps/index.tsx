@@ -22,10 +22,14 @@ export const OnboardingBannerSteps: React.FC<Props> = ({ step }) => {
     <div className="onboarding-banner-steps-container">
       {Object.entries(onboardingSteps).map(([step, index]) => {
         return (
-          <div
-            key={index}
-            className={`onboarding-banner-step-bar ${index <= currentStep && "onboarding-banner-step-bar-active"}`}
-          ></div>
+          <>
+            {index === 3 ? null : (
+              <div
+                key={index}
+                className={`onboarding-banner-step-bar ${index <= currentStep && "onboarding-banner-step-bar-active"}`}
+              ></div>
+            )}
+          </>
         );
       })}
     </div>

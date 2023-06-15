@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Typography, Switch, Divider } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { CopyOutlined } from "@ant-design/icons";
+import { actions } from "store";
 import "./index.css";
+import { WorkspaceStepFooter } from "./Footer";
 
 export const CreateWorkspace = () => {
   const [userEmail, setUserEmail] = useState([]);
+  const dispatch = useDispatch();
   return (
     <>
       <div className="header text-center ">Invite teammates</div>
@@ -63,12 +67,10 @@ export const CreateWorkspace = () => {
         <Typography.Text className="text-gray">Anyone with requestly.io can join the workspace</Typography.Text>
         <Switch defaultChecked />
       </div>
-      <div className="workspace-onboarding-footer">
-        <RQButton type="text"> Skip for now</RQButton>
-        <RQButton type="primary" className="text-bold">
-          Send invitations
-        </RQButton>
-      </div>
+      <WorkspaceStepFooter
+        onSkip={() => dispatch(actions.updateIsWorkspaceOnboardingCompleted())}
+        onContinue={() => {}}
+      />
     </>
   );
 };
