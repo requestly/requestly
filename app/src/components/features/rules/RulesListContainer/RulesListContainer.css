@@ -1,5 +1,6 @@
 .rules-list-container.ant-pro-card {
-  min-height: calc(100vh - 144px); /* height of navbar + footer = 144px */
+  min-height: 100%;
+  min-width: 900px;
 }
 
 .rules-list-container .ant-pro-card-body {

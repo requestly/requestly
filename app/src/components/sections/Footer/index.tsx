@@ -93,7 +93,7 @@ const AppFooter: React.FC = () => {
       <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between" className="w-full">
           {isSidebarToggleAllowed && (
-            <Col md={12} span={24}>
+            <Col>
               <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
                 <Button
                   type="text"
