@@ -591,7 +591,7 @@ const CurrentTrafficTable = ({
               </Row>
             </div>
           )}
-          <div className={!isPreviewOpen && "hide-traffic-table-split-gutter"}>
+          <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>
             <Split
               sizes={rulePaneSizes}
               minSize={[75, 0]}
