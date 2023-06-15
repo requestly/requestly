@@ -16,7 +16,7 @@ const RequestPayloadPreview = ({ query_params, body }) => {
         accordion
         bordered={false}
         defaultActiveKey={["1"]}
-        expandIconPosition="left"
+        expandIconPosition="start"
         className="payload-preview-collapse"
       >
         {query_params ? (
