@@ -7,7 +7,6 @@ import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/M
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { CopyOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast";
-import { WorkspaceStepFooter } from "./Footer";
 import { OnboardingSteps } from "../../types";
 import { actions } from "store";
 import "./index.css";
@@ -38,7 +37,6 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
       role: makeUserAdmin ? "admin" : "write",
     })
       .then((res: any) => {
-        console.log({ res });
         if (res?.data?.success) {
           toast.success("Sent invites successfully");
           setIsProcessing(false);
@@ -126,11 +124,18 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
         <Typography.Text className="text-gray">Anyone with requestly.io can join the workspace</Typography.Text>
         <Switch defaultChecked />
       </div>
-      <WorkspaceStepFooter
-        onSkip={() => dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS))}
-        onContinue={handleAddMembers}
-        isProcessing={isProcessing}
-      />
+
+      <div className="workspace-onboarding-footer">
+        <RQButton
+          type="text"
+          onClick={() => dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS))}
+        >
+          Skip for now
+        </RQButton>
+        <RQButton type="primary" className="text-bold" onClick={handleAddMembers} loading={isProcessing}>
+          Send invitations
+        </RQButton>
+      </div>
     </>
   );
 };
