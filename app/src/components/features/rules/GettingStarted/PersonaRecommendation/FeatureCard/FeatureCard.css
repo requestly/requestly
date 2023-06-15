@@ -9,7 +9,7 @@
 .feature-card:hover,
 .feature-card:focus {
   cursor: pointer;
-  background-color: #292a2e;
+  background-color: #3b3b3b6b;
   transition: background-color 0.2s;
 }
 
@@ -33,7 +33,7 @@
   border-radius: 50%;
   z-index: 1;
   transform: scale(0);
-  background-color: #292a2e;
+  background-color: #3b3b3b6b;
   transition: transform 0.2s;
 }
 
