@@ -11,7 +11,7 @@ export const trackHelpdeskClicked = (action) => {
   trackEvent(ONBOARDING.HELPDESK_CLICKED, params);
 };
 
-export const trackTopbarClicked = (source) => {
-  const params = { source };
+export const trackTopbarClicked = (action) => {
+  const params = { action };
   trackEvent(ONBOARDING.TOPBAR_CLICKED, params);
 };
