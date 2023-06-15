@@ -18,13 +18,9 @@
   margin-top: 20px;
   margin-left: 8px;
 }
-.persona-survey-banner {
-  padding-top: 80px;
-}
 .persona-survey-banner .survey-banner-title {
   color: var(--white);
   font-weight: 500;
-  padding-left: 50px;
 }
 
 .persona-survey-banner .survey-banner-subtitle {
@@ -32,7 +28,6 @@
   line-height: 25px;
   margin-top: 8px;
   opacity: 0.7;
-  padding-left: 50px;
 }
 .persona-survey-banner .survey-banner-footer,
 .persona-survey-container .survey-footer {
