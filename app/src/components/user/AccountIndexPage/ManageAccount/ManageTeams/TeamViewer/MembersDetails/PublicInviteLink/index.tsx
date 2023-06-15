@@ -15,7 +15,7 @@ import {
   trackWorkspaceInviteLinkGenerated,
   trackWorkspaceInviteLinkRevoked,
 } from "modules/analytics/events/features/teams";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 
 interface Props {
   teamId: string;
@@ -41,7 +41,9 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
     user?.details?.profile?.email,
   ]);
 
-  const handlePublicInviteCreateClicked = () => {
+  const isBusinessEmail = useMemo(() => isCompanyEmail(user?.details?.profile?.email), [user?.details?.profile?.email]);
+
+  const handlePublicInviteCreateClicked = useCallback(() => {
     trackWorkspaceInviteLinkGenerated(teamId);
     setIsLoading(true);
     upsertTeamCommonInvite({ teamId: teamId, publicEnabled: true }).then((res: any) => {
@@ -53,9 +55,9 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
       }
       setIsLoading(false);
     });
-  };
+  }, [teamId, upsertTeamCommonInvite]);
 
-  const handlePublicInviteRevokeClicked = () => {
+  const handlePublicInviteRevokeClicked = useCallback(() => {
     trackWorkspaceInviteLinkRevoked(teamId);
     setIsLoading(true);
     upsertTeamCommonInvite({ teamId, publicEnabled: false }).then((res: any) => {
@@ -67,7 +69,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
       }
       setIsLoading(false);
     });
-  };
+  }, [teamId, upsertTeamCommonInvite]);
 
   const generateInviteLinkFromId = (inviteId: any) => {
     return `${window.location.origin}/invite/${inviteId}`;
@@ -159,10 +161,13 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
         </Row>
       ) : null}
 
-      <Space className="mt-8">
-        <Typography.Text type="secondary">{`Anyone with ${userEmailDomain} can join this workspace`}</Typography.Text>
-        <Switch checked={domainJoiningEnabled} size="small" onChange={handleDomainToggle} />
-      </Space>
+      {isBusinessEmail ? (
+        <Space className="mt-8">
+          <Typography.Text type="secondary">{`Anyone with ${userEmailDomain} can join this workspace`}</Typography.Text>
+          <Switch checked={domainJoiningEnabled} size="small" onChange={handleDomainToggle} />
+        </Space>
+      ) : null}
+
       <Divider className="manage-workspace-divider" />
     </>
   );
