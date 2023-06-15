@@ -83,8 +83,13 @@ export function createLogsHar(logs: Log[]) {
 export const convertHarJsonToRQLogs = (har: Har): Log[] => {
   const res: Log[] = har?.log?.entries?.map((entry) => {
     const requestHeaders: Record<string, string> = {};
+    const requestQueryParams: Record<string, string> = {};
     entry.request.headers.forEach((headerObj) => {
       requestHeaders[headerObj.name] = headerObj.value;
+    });
+
+    entry.request.queryString.forEach((queryObject) => {
+      requestQueryParams[queryObject.name] = queryObject.value;
     });
 
     const responseHeaders: Record<string, string> = {};
@@ -105,6 +110,7 @@ export const convertHarJsonToRQLogs = (har: Har): Log[] => {
         port: url.port, //Change to port
         headers: requestHeaders,
         body: entry.request.postData?.text,
+        queryParams: requestQueryParams,
       },
       response: {
         statusCode: entry.response.status,

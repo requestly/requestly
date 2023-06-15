@@ -2,15 +2,16 @@ import { Collapse, Typography } from "antd";
 
 const { Text } = Typography;
 
-const RequestPayloadPreview = ({ query_params, body }) => {
-  try {
-    query_params = JSON.parse(query_params);
-  } catch {
-    // This is just a check, server will always send json string
-    query_params = { raw_query_params: query_params };
+const RequestPayloadPreview = ({ queryParams, body }) => {
+  if (typeof queryParams == "string") {
+    try {
+      queryParams = JSON.parse(queryParams);
+    } catch {
+      queryParams = { raw_query_params: queryParams };
+    }
   }
 
-  if (query_params || body) {
+  if (queryParams || body) {
     return (
       <Collapse
         accordion
@@ -19,12 +20,12 @@ const RequestPayloadPreview = ({ query_params, body }) => {
         expandIconPosition="start"
         className="payload-preview-collapse"
       >
-        {query_params ? (
+        {queryParams ? (
           <Collapse.Panel key="1" header="Query String Parameters">
-            {Object.keys(query_params).map((key, index) => {
+            {Object.keys(queryParams).map((key, index) => {
               return (
                 <Text key={index}>
-                  <Text strong>{key}</Text> : {query_params[key]}
+                  <Text strong>{key}</Text> : {queryParams[key]}
                 </Text>
               );
             })}

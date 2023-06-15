@@ -101,6 +101,7 @@ interface LogRequest {
   port: string;
   headers: HeaderMap;
   body: any;
+  queryParams: QueryMap;
 }
 
 interface LogResponse {
@@ -111,3 +112,4 @@ interface LogResponse {
 }
 
 export type HeaderMap = Record<string, string>; // {[name] : value}
+export type QueryMap = Record<string, string>;
