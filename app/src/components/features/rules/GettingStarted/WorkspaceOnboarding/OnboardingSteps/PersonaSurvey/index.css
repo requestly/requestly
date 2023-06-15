@@ -3,7 +3,7 @@
   min-height: 480px;
   background: var(--body-background);
   border-radius: var(--border-radius-md);
-  /* padding: 40px 20px; */
+  padding: 40px 20px;
   position: relative;
 }
 .persona-survey-container .survey-title {
