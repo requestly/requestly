@@ -34,6 +34,7 @@
   font-size: 13px;
   text-align: left;
   color: var(--white);
+  flex-shrink: 0;
 }
 
 .header-left-section a:hover,
@@ -166,12 +167,20 @@
   margin-top: -2px;
 }
 
-@media screen and (max-width: 1280px) {
-  .header-left-section > a {
+@media screen and (max-width: 1300px) {
+  .desktop .header-left-section > a {
     display: none;
   }
+}
 
+@media screen and (max-width: 1028px) {
   .header-middle-section {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .extension .header-left-section > a {
     display: none;
   }
 }
