@@ -60,14 +60,16 @@ const MenuHeader = () => {
                 Tutorials
               </a>
 
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={LINKS.REQUESTLY_DESKTOP_APP}
-                onClick={() => trackTopbarClicked("desktop_app")}
-              >
-                Desktop App <RQBadge badgeText="NEW" />
-              </a>
+              {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={LINKS.REQUESTLY_DESKTOP_APP}
+                  onClick={() => trackTopbarClicked("desktop_app")}
+                >
+                  Desktop App <RQBadge badgeText="NEW" />
+                </a>
+              )}
             </div>
           </Col>
         ) : null}
