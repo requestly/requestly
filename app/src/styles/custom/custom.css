@@ -587,7 +587,7 @@ button.ant-input-search-button {
 div.react-multi-email {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
-  background-color: var(--component-background);
+  background-color: var(--component-dark-background);
 }
 
 div.react-multi-email:hover {
@@ -598,13 +598,13 @@ div.react-multi-email:hover {
 
 div.react-multi-email > input {
   color: var(--white);
-  background-color: var(--component-background);
+  background-color: var(--component-dark-background);
 }
 
 div.react-multi-email.focused {
   border: 1px solid var(--primary);
   box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
-  background-color: var(--component-background);
+  background-color: var(--component-dark-background);
 }
 
 div.react-multi-email .multi-email-tag {

@@ -91,7 +91,7 @@ const GettingStarted = () => {
   return (
     <>
       {shouldShowWorkspaceOnboarding ? (
-        <WorkspaceOnboarding />
+        <WorkspaceOnboarding handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
         <Row className="getting-started-container">
           <Col
