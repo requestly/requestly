@@ -43,7 +43,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
           state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
       { replace: true }
     );
-    dispatch(actions.updateIsPersonaSurveyCompleted(true));
+    dispatch(actions.updateIsWorkspaceOnboardingCompleted());
   };
 
   const handleViewAllOptionsClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -88,7 +88,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             title="You need to sign up to upload rules"
             callback={() => {
               handleUploadRulesClick();
-              dispatch(actions.updateIsPersonaSurveyCompleted(true));
+              dispatch(actions.updateIsWorkspaceOnboardingCompleted());
             }}
             source={AUTH.SOURCE.UPLOAD_RULES}
           >

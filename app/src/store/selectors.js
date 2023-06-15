@@ -242,3 +242,7 @@ export const getIsNetworkTooltipShown = (state) => {
 export const getIsWorkspaceOnboardingCompleted = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.isOnboardingCompleted;
 };
+
+export const getWorkspaceOnboardingStep = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.step;
+};

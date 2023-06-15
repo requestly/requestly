@@ -94,3 +94,7 @@ export const updateNetworkSessionTooltipShown = (prevState) => {
 export const updateIsWorkspaceOnboardingCompleted = (prevState) => {
   prevState.workspaceOnboarding.isOnboardingCompleted = true;
 };
+
+export const updateWorkspaceOnboardingStep = (prevState, action) => {
+  prevState.workspaceOnboarding.step = action.payload;
+};
