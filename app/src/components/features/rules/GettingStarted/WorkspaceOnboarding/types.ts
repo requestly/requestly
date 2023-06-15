@@ -4,3 +4,7 @@ export enum OnboardingSteps {
   CREATE_JOIN_WORKSPACE = "create_join_workspace",
   RECOMMENDATIONS = "recommendations",
 }
+export interface NewTeamData {
+  id: string;
+  inviteId: string;
+}
