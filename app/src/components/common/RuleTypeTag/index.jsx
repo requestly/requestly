@@ -5,9 +5,11 @@ import RuleIcon from "../RuleIcon";
 import "./RuleTypeTag.css";
 
 const RuleTypeTag = ({ ruleType, title }) => {
+  const ruleTitle = title ?? APP_CONSTANTS.RULE_TYPES_CONFIG[ruleType]?.NAME;
+
   return (
-    <Tag className="rule-type-tag" icon={<RuleIcon ruleType={ruleType} />}>
-      <span className="rule-type-tag-name">{title ?? APP_CONSTANTS.RULE_TYPES_CONFIG[ruleType]?.NAME}</span>
+    <Tag title={ruleTitle} className="rule-type-tag" icon={<RuleIcon ruleType={ruleType} />}>
+      <span className="rule-type-tag-name">{ruleTitle}</span>
     </Tag>
   );
 };
