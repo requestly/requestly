@@ -100,6 +100,13 @@ const LINKS = {
   DEMO_VIDEOS: {
     TEAM_WORKSPACES: "https://www.youtube.com/watch?v=aooZB0eWAbU",
   },
+
+  // Desktop App download linkss
+  DOWNLOAD_DESKTOP_APP: {
+    MACOS: "https://bit.ly/rq-mac",
+    WINDOWS: "https://bit.ly/rq-windows",
+    LINUX: "https://bit.ly/rq-linux",
+  },
 };
 
 export default LINKS;

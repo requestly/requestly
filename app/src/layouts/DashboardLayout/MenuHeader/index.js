@@ -40,9 +40,13 @@ const MenuHeader = () => {
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
 
+  const handleDesktopAppPromoClicked = useCallback(() => {
+    setIsDesktopAppPromoModalOpen(true);
+    trackTopbarClicked("desktop_app");
+  }, []);
+
   const handleDesktopAppPromoModalClose = useCallback(() => {
     setIsDesktopAppPromoModalOpen(false);
-    trackTopbarClicked("desktop_app");
   }, []);
 
   //don't show general app header component for editor screens
@@ -71,11 +75,7 @@ const MenuHeader = () => {
 
               {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
                 <>
-                  <Button
-                    type="text"
-                    className="desktop-app-promo-btn"
-                    onClick={() => setIsDesktopAppPromoModalOpen(true)}
-                  >
+                  <Button type="text" className="desktop-app-promo-btn" onClick={handleDesktopAppPromoClicked}>
                     Desktop App <RQBadge badgeText="NEW" />
                   </Button>
 

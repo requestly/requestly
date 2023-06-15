@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { RQModal } from "lib/design-system/components";
 import LINKS from "config/constants/sub/links";
+import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
-import { AppleFilled } from "@ant-design/icons";
+import { AppleFilled, WindowsFilled } from "@ant-design/icons";
+import { capitalize } from "lodash";
 import { ReactComponent as DesktopBanner } from "./desktop-banner.svg";
 import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
+import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./desktopAppPromoModal.css";
+
+enum OS {
+  MAC = "Mac OS",
+  WINDOWS = "Windows",
+}
 
 interface DesktopAppPromoModalProps {
   open: boolean;
@@ -13,9 +21,40 @@ interface DesktopAppPromoModalProps {
 }
 
 export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open, onCancel }) => {
+  const downloadLinkInfo = useMemo(() => {
+    const ua = new UAParser(window.navigator.userAgent);
+    const os = ua.getOS();
+
+    switch (os.name) {
+      case OS.MAC:
+        return {
+          os: "mac",
+          icon: <AppleFilled />,
+          link: LINKS.DOWNLOAD_DESKTOP_APP.MACOS,
+        };
+
+      case OS.WINDOWS:
+        return {
+          os: "windows",
+          icon: <WindowsFilled />,
+          link: LINKS.DOWNLOAD_DESKTOP_APP.WINDOWS,
+        };
+
+      default:
+        return {
+          os: "linux",
+          // TODO: change icon
+          icon: <WindowsFilled />,
+          link: LINKS.DOWNLOAD_DESKTOP_APP.LINUX,
+        };
+    }
+  }, []);
+
   return (
     <RQModal className="desktop-app-promo-modal" width={"995px"} open={open} destroyOnClose={true} onCancel={onCancel}>
       <div className="left-section">
+        {/* <div className="pink-gradient"></div>
+        <div className="blue-gradient"></div> */}
         <h1 className="header">
           Requestly is more <br />
           powerful on{" "}
@@ -27,8 +66,16 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
           Inpect and modify HTTP(S) traffic from any browser, <br />
           desktop apps & mobile apps
         </div>
-        <Button className="download-btn" icon={<AppleFilled />} type="primary" block>
-          Download for Mac
+
+        <Button
+          block
+          type="primary"
+          href={downloadLinkInfo.link}
+          icon={downloadLinkInfo.icon}
+          className="download-btn"
+          onClick={() => trackDesktopAppPromoClicked("topbar", `download_${downloadLinkInfo.os}`)}
+        >
+          Download for {`${capitalize(downloadLinkInfo.os)}`}
         </Button>
         <a
           className="view-all-platforms-link"

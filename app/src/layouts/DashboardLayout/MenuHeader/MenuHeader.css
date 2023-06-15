@@ -43,9 +43,13 @@
   color: var(--white);
 }
 
-.header-left-section .desktop-app-promo-btn.ant-btn:hover,
-.header-left-section .desktop-app-promo-btn.ant-btn:focus {
+.header-left-section .desktop-app-promo-btn.ant-btn {
+  padding: 0;
   background-color: transparent;
+}
+
+.header-left-section .desktop-app-promo-btn.ant-btn:hover {
+  opacity: 0.7;
 }
 
 .header-middle-section {
