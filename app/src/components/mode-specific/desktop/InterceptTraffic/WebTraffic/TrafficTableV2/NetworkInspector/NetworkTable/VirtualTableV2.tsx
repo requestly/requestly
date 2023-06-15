@@ -1,5 +1,5 @@
 import { Table } from "@devtools-ds/table";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ContextMenu } from "../ContextMenu";
 import { ITEM_SIZE } from ".";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -10,50 +10,21 @@ import { ArrowDownOutlined } from "@ant-design/icons";
 
 interface Props {
   logs: any;
-  renderHeader: any;
+  header: React.ReactNode;
   renderLogRow: any;
   selectedRowData: any;
   onReplayRequest: () => void;
 }
 
-const VirtualTableV2: React.FC<Props> = ({
-  logs = [],
-  renderHeader,
-  renderLogRow,
-  selectedRowData,
-  onReplayRequest,
-}) => {
+const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, selectedRowData, onReplayRequest }) => {
   const [selected, setSelected] = useState(null);
-  const [lastKnowBottomIndex, setLastKnownBottomIndex] = useState(null);
+  const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
-
   const mounted = useRef(false);
   const parentRef = useRef(null);
 
-  const rowVirtualizer = useVirtualizer({
-    // Hack to fix initial mounting lag when given large count @wrongsahil
-    count: mounted.current ? logs.length : 100,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => ITEM_SIZE,
-    onChange: (virtualizer) => {
-      requestAnimationFrame(() => {
-        setIsScrollToBottomEnabled(isListAtBottom());
-        if (isListAtBottom()) {
-          const items = virtualizer.getVirtualItems();
-          setLastKnownBottomIndex(items?.[items.length - 1]?.index);
-        }
-      });
-    },
-    // overscan: 15,
-  });
-
-  // https://github.com/bvaughn/react-window/issues/60#issuecomment-781540658
-  const items = rowVirtualizer.getVirtualItems();
-  const paddingTop = items.length > 0 ? items[0].start : 0;
-  const paddingBottom = items.length > 0 ? rowVirtualizer.getTotalSize() - items[items.length - 1].end : 0;
-
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
-  const isListAtBottom = () => {
+  const isListAtBottom = useCallback(() => {
     const LIST_AT_BOTTOM_THRESHOLD = 30;
     const scrollElem = parentRef?.current;
 
@@ -67,7 +38,30 @@ const VirtualTableV2: React.FC<Props> = ({
     }
 
     return false;
-  };
+  }, []);
+
+  const rowVirtualizer = useVirtualizer({
+    // Hack to fix initial mounting lag when given large count @wrongsahil
+    count: mounted.current ? logs.length : 100,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ITEM_SIZE,
+    onChange: (virtualizer) => {
+      requestAnimationFrame(() => {
+        const isScrollToBottomEnabled = isListAtBottom();
+        setIsScrollToBottomEnabled(isScrollToBottomEnabled);
+        if (isScrollToBottomEnabled) {
+          const items = virtualizer.getVirtualItems();
+          setLastKnownBottomIndex(items?.[items.length - 1]?.index);
+        }
+      });
+    },
+    // overscan: 15,
+  });
+
+  // https://github.com/bvaughn/react-window/issues/60#issuecomment-781540658
+  const items = rowVirtualizer.getVirtualItems();
+  const paddingTop = items.length > 0 ? items[0].start : 0;
+  const paddingBottom = items.length > 0 ? rowVirtualizer.getTotalSize() - items[items.length - 1].end : 0;
 
   const scrollToBottom = useCallback(() => {
     if (logs.length > 0) rowVirtualizer.scrollToIndex(logs.length - 1, { align: "start" });
@@ -80,7 +74,7 @@ const VirtualTableV2: React.FC<Props> = ({
     }
   }, [scrollToBottom, isScrollToBottomEnabled]);
 
-  const renderNewLogsButton = useCallback(() => {
+  const newLogsButton = useMemo(() => {
     if (isScrollToBottomEnabled) {
       return null;
     }
@@ -88,8 +82,8 @@ const VirtualTableV2: React.FC<Props> = ({
     let buttonText = "New Logs";
 
     let newLogsCount = 0;
-    if (lastKnowBottomIndex) {
-      newLogsCount = (logs.length > 0 ? logs.length - 1 : logs.length) - lastKnowBottomIndex;
+    if (lastKnownBottomIndex) {
+      newLogsCount = (logs.length > 0 ? logs.length - 1 : logs.length) - lastKnownBottomIndex;
       buttonText = newLogsCount > 1 ? `${newLogsCount} new logs` : "1 new log";
     }
 
@@ -107,7 +101,7 @@ const VirtualTableV2: React.FC<Props> = ({
     }
 
     return null;
-  }, [isScrollToBottomEnabled, lastKnowBottomIndex, logs.length, scrollToBottom]);
+  }, [isScrollToBottomEnabled, lastKnownBottomIndex, logs.length, scrollToBottom]);
 
   // IMP: Keep this in the end to wait for other useEffects to run first
   useEffect(() => {
@@ -141,20 +135,20 @@ const VirtualTableV2: React.FC<Props> = ({
           }}
           onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
         >
-          {renderHeader()}
+          {header}
           <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
-            <Table.Body id="vtbody" style={{}}>
+            <Table.Body id="vtbody">
               {/* Hack to fix alternate colors flickering due to virtualization*/}
-              {rowVirtualizer.getVirtualItems()?.[0]?.index % 2 === 0 ? null : <tr></tr>}
+              {items[0]?.index % 2 === 0 ? null : <tr></tr>}
 
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              {items.map((virtualRow) => {
                 const log = logs[virtualRow.index];
                 return renderLogRow(log, virtualRow.index);
               })}
             </Table.Body>
           </ContextMenu>
         </Table>
-        {renderNewLogsButton()}
+        {newLogsButton}
       </div>
     </>
   );
