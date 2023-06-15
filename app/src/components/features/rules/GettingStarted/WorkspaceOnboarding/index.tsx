@@ -12,6 +12,7 @@ import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
 import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Banner";
 import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
+import { OnboardingBannerSteps } from "./BannerSteps";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -60,7 +61,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         <>
           <FullPageHeader />
           <div className="onboarding-content-wrapper">
-            <div className="onboarding-content-banner">{renderOnboardingBanner()}</div>
+            <div className="onboarding-content-banner">
+              <OnboardingBannerSteps step={step} />
+              {renderOnboardingBanner()}
+            </div>
             <div className="onboarding-action-component">{renderOnboardingActionComponent()}</div>
           </div>
         </>
