@@ -60,11 +60,11 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
       // });
       // break;
     }
-    dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+
     if (currentPage === SurveyConfig.length - 1) {
       // dispatch(actions.updateIsPersonaSurveyCompleted(true));
       callback();
-    }
+    } else dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
   };
   return (
     <>
