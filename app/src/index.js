@@ -24,7 +24,12 @@ root.render(
   <BrowserRouter>
     <Provider store={reduxStore}>
       <PersistGate loading={null} persistor={persistor}>
-        <Sentry.ErrorBoundary fallback={<PageError />}>
+        <Sentry.ErrorBoundary
+          fallback={({ error, componentStack, resetError }) => {
+            return <PageError error={error} componentStack={componentStack} resetError={resetError} />;
+          }}
+          showDialog
+        >
           <App />
         </Sentry.ErrorBoundary>
       </PersistGate>
