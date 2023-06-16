@@ -7,14 +7,14 @@
 .desktop-app-promo-modal .ant-modal-content {
   width: 100%;
   min-height: 532px;
-  padding: 88px 0 81px 20px;
   background-color: #111213;
-  overflow: hidden;
 }
 
-.desktop-app-promo-modal .ant-modal-content .ant-modal-body {
+.rq-modal.ant-modal.desktop-app-promo-modal .ant-modal-content .ant-modal-body {
   display: flex;
   align-items: center;
+  overflow: hidden;
+  padding: 88px 0 81px 20px;
 }
 
 .desktop-app-promo-modal .left-section {
@@ -90,6 +90,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .desktop-app-promo-modal .left-section .download-btn.ant-btn span:last-child {
@@ -110,6 +111,7 @@
 }
 
 .desktop-app-promo-modal .left-section .view-all-platforms-link {
+  z-index: 1;
   margin-bottom: 41px;
   color: var(--primary);
 }
