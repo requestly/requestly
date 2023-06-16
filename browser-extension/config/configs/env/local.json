@@ -1,5 +1,5 @@
 {
   "WEB_URL": "http://localhost:3000",
-  "OTHER_WEB_URLS": ["https://beta.requestly.io"],
+  "OTHER_WEB_URLS": ["https://beta.requestly.io", "https://beta.requestly.com"],
   "logLevel": "debug"
 }
