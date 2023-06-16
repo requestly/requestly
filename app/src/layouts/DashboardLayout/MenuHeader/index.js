@@ -21,15 +21,7 @@ import "./MenuHeader.css";
 
 const { Header } = Layout;
 
-// hide top header on this paths
-const EDITOR_PATHS = [
-  // "/rules/editor",
-  // "/mocks/editor",
-  // "/filesv2/editor",
-  // "/mock-server/viewer",
-  "/pricing",
-  "/invite",
-];
+const PATHS_WITHOUT_HEADER = ["/pricing", "/invite"];
 
 const MenuHeader = () => {
   const navigate = useNavigate();
@@ -50,7 +42,7 @@ const MenuHeader = () => {
   }, []);
 
   //don't show general app header component for editor screens
-  const showMenuHeader = () => !EDITOR_PATHS.some((path) => pathname.includes(path));
+  const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
 
   return showMenuHeader() ? (
     <Header className="layout-header">
