@@ -5,7 +5,7 @@ const CloseConfirmModal = (props) => {
   return (
     <Modal
       className="modal-dialog-centered "
-      visible={props.isOpen}
+      open={props.isOpen}
       onCancel={props.toggle}
       footer={
         <Button color="primary" type="button" onClick={props.action}>

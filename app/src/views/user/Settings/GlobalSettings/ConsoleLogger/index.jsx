@@ -33,7 +33,7 @@ const ConsoleLogger = ({ isCompatible }) => {
   return isCompatible ? (
     <SettingsItem
       isActive={consoleLoggerStatus}
-      onClick={handleConsoleLoggerStatus}
+      onChange={handleConsoleLoggerStatus}
       title="Enable console logs"
       caption="You may enable logging to log rules applied by Requestly on the page in your developer console."
     />

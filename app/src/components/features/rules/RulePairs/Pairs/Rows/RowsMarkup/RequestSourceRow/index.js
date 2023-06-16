@@ -111,7 +111,11 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     >
       <Col className="shrink-0">
         <RQDropdown overlay={renderSourceKeys} disabled={isInputDisabled}>
-          <Text strong className="ant-dropdown-link cursor-pointer uppercase" onClick={(e) => e.preventDefault()}>
+          <Text
+            strong
+            className="rule-pair-source-dropdown cursor-pointer uppercase"
+            onClick={(e) => e.preventDefault()}
+          >
             {pair.source.key} {!isInputDisabled && <DownOutlined />}
           </Text>
         </RQDropdown>
@@ -120,7 +124,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         <RQDropdown overlay={renderSourceOperators} disabled={isInputDisabled}>
           <Text
             strong
-            className="ant-dropdown-link cursor-pointer"
+            className="rule-pair-source-dropdown cursor-pointer"
             onClick={(e) => e.preventDefault()}
             style={{ textTransform: "capitalize" }}
           >

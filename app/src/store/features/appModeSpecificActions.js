@@ -28,3 +28,7 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
 
   prevState.desktopSpecificDetails.appsList[appId][property] = value;
 };
+
+export const updateHasConnectedApp = (prevState, action) => {
+  prevState.misc.persist.hasConnectedApp = action.payload;
+};

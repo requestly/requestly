@@ -1,0 +1,8 @@
+.rules-sidebar-container {
+  height: 100%;
+  background-color: var(--app-secondary-sidebar-background);
+}
+
+.rules-sidebar-container ul {
+  padding: 10px 10px 1.25rem 10px;
+}

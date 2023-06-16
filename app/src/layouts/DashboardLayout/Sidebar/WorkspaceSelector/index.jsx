@@ -17,13 +17,12 @@ import {
   showSwitchWorkspaceSuccessToast,
   switchWorkspace,
 } from "actions/TeamWorkspaceActions";
-import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Row, Spin, Tag, Tooltip } from "antd";
+import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
   trackCreateNewWorkspaceClicked,
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getUserAuthDetails } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
@@ -39,6 +38,7 @@ import { getUniqueColorForWorkspace } from "utils/teams";
 import Logger from "lib/logger";
 import { getTeamInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./WorkSpaceSelector.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -51,15 +51,15 @@ export const isWorkspacesFeatureEnabled = (email) => {
 const prettifyWorkspaceName = (workspaceName) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
   //   return "Private";
-  return workspaceName;
+  return workspaceName || "Unknown";
 };
 
 const getWorkspaceIcon = (workspaceName) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
-  return workspaceName[0].toUpperCase();
+  return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, menu }) => {
+const WorkSpaceDropDown = ({ menu }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -73,55 +73,50 @@ const WorkSpaceDropDown = ({ isCollapsed, handleSidebarCollapsed = () => {}, men
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
-      handleSidebarCollapsed(false);
-      trackSidebarClicked("workspace");
+      trackTopbarClicked("workspace");
     }
   };
 
   return (
-    <Row align="middle" justify="center">
-      <Dropdown
-        overlay={menu}
-        trigger={["click"]}
-        className="workspace-dropdown"
-        onOpenChange={handleWorkspaceDropdownClick}
-      >
-        <div className="cursor-pointer items-center">
-          <Avatar
-            size={28}
-            shape="square"
-            icon={getWorkspaceIcon(activeWorkspaceName)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: user.loggedIn
-                ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                  ? "#1E69FF"
-                  : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
-                : "#ffffff4d",
-            }}
-          />
-          <Tooltip
-            overlayClassName="workspace-selector-tooltip"
-            style={{
-              top: "35px",
-            }}
-            title={prettifyWorkspaceName(activeWorkspaceName)}
-            placement={"bottomRight"}
-            showArrow={false}
-            mouseEnterDelay={1}
-          >
-            <span className={isCollapsed ? "hidden" : "items-center"}>
-              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-              <DownOutlined className="active-workspace-name-down-icon" />
-            </span>
-          </Tooltip>
-        </div>
-      </Dropdown>
-    </Row>
+    <Dropdown
+      overlay={menu}
+      trigger={["click"]}
+      className="workspace-selector-dropdown"
+      onOpenChange={handleWorkspaceDropdownClick}
+    >
+      <div className="cursor-pointer items-center">
+        <Avatar
+          size={28}
+          shape="square"
+          icon={getWorkspaceIcon(activeWorkspaceName)}
+          className="workspace-avatar"
+          style={{
+            backgroundColor: user.loggedIn
+              ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                ? "#1E69FF"
+                : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
+              : "#ffffff4d",
+          }}
+        />
+        <Tooltip
+          overlayClassName="workspace-selector-tooltip"
+          style={{ top: "35px" }}
+          title={prettifyWorkspaceName(activeWorkspaceName)}
+          placement={"bottomRight"}
+          showArrow={false}
+          mouseEnterDelay={1}
+        >
+          <span className="items-center active-workspace-name">
+            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+            <DownOutlined className="active-workspace-name-down-icon" />
+          </span>
+        </Tooltip>
+      </div>
+    </Dropdown>
   );
 };
 
-const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSidebarClose }) => {
+const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -223,7 +218,6 @@ const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSi
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
       setIsCreateWorkspaceModalOpen(true);
-      handleMobileSidebarClose?.();
     } else {
       promptUserSignupModal(() => {
         setIsCreateWorkspaceModalOpen(true);
@@ -322,7 +316,6 @@ const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSi
         }, 2 * 1000);
       }
     );
-    handleMobileSidebarClose?.();
   };
 
   const unauthenticatedUserMenu = (
@@ -536,11 +529,7 @@ const WorkspaceSelector = ({ isCollapsed, handleSidebarCollapsed, handleMobileSi
 
   return (
     <>
-      <WorkSpaceDropDown
-        isCollapsed={isCollapsed}
-        handleSidebarCollapsed={handleSidebarCollapsed}
-        menu={user.loggedIn ? menu : unauthenticatedUserMenu}
-      />
+      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 

@@ -1,0 +1,64 @@
+.app-layout {
+  --app-header-height: 48px;
+  --app-footer-height: 24px;
+  --app-sidebar-width: 80px;
+
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  background-color: var(--body-background);
+}
+
+.app-layout.app-dashboard-layout {
+  grid-template-columns: fit-content(var(--app-sidebar-width)) 1fr;
+  grid-template-rows: fit-content(var(--app-header-height)) 1fr fit-content(var(--app-footer-height));
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+}
+
+.app-header {
+  grid-area: header;
+  height: 100%;
+  max-height: var(--app-header-height);
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.app-sidebar {
+  grid-area: sidebar;
+  width: 100%;
+  max-width: var(--app-sidebar-width);
+}
+
+.app-main-content {
+  grid-area: main;
+}
+
+.app-footer {
+  grid-area: footer;
+  height: 100%;
+  max-height: var(--app-footer-height);
+}
+
+.app-main-content,
+#dashboardMainContent {
+  height: 100%;
+  overflow: auto;
+}
+
+.app-layout .ant-layout-footer {
+  height: 1.5rem;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+}
+
+@media screen and (max-width: 768px) {
+  #requestly-dashboard-layout .hidden-on-small-screen {
+    display: none;
+  }
+}

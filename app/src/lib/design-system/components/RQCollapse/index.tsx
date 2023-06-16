@@ -6,7 +6,7 @@ export const RQCollapse = (props: CollapseProps) => {
   return (
     <Collapse
       bordered={false}
-      expandIconPosition="right"
+      expandIconPosition="end"
       expandIcon={({ isActive }) => (
         <DownArrow
           style={{

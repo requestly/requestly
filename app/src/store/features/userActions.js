@@ -20,6 +20,11 @@ export const updateUserPreferences = (prevState, action) => {
   prevState.userPreferences[action.payload.key] = action.payload.value;
 };
 
+export const updateSecondarySidebarCollapse = (prevState, action) => {
+  const isCollapsed = prevState.userPreferences.isSecondarySidebarCollapsed;
+  prevState.userPreferences.isSecondarySidebarCollapsed = action.payload ?? !isCollapsed;
+};
+
 export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };

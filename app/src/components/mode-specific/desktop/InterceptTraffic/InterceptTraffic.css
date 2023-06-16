@@ -1,3 +1,7 @@
+.web-traffic-pro-card > .ant-pro-card-body {
+  padding: 0;
+}
+
 .web-traffic-pro-card.ant-pro-card,
 .web-traffic-pro-card.ant-pro-card .ant-pro-card-body {
   padding-bottom: 0px;

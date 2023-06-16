@@ -150,7 +150,6 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
           heading={""}
           subHeadingExtension={"Auto-record debugging sessions"}
           supportsMobileDevice={false}
-          supportedBrowsers={["Chrome", "Edge"]}
           hasBorder={false}
           eventPage="session_recording_page"
         />
@@ -163,7 +162,7 @@ const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return launchConfig ? <SessionOnboardingView launchConfig={launchConfig} /> : null;
+    return <SessionOnboardingView launchConfig={launchConfig} />;
   }
 };
 

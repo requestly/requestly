@@ -13,6 +13,11 @@
   color: var(--text-gray);
 }
 
-.graphql-operation-type-input.ant-input {
+.graphql-operation-key-input.ant-input {
   margin-right: 5px;
+}
+
+.graphql-operation-key-input.ant-input,
+.graphql-operation-name-input.ant-input {
+  background-color: var(--component-dark-background);
 }
