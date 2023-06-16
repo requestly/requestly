@@ -54,6 +54,7 @@ const Workspace: React.FC<{ team: TeamWorkspace }> = ({ team }) => {
           }
         }
         setIsJoining(false);
+        dispatch(actions.updateIsWorkspaceOnboardingCompleted());
       })
       .catch((err) => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
