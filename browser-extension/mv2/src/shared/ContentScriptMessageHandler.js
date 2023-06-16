@@ -7,7 +7,6 @@ RQ.ContentScriptMessageHandler = {
   constants: {
     CONTENT_SCRIPT: "content_script",
     PAGE_SCRIPT: "page_script",
-    DOMAIN: RQ.configs.WEB_URL,
     SOURCE_FIELD: "source",
     ACTION_USER_LOGGED_IN: "user:loggedIn",
   },
@@ -48,7 +47,7 @@ RQ.ContentScriptMessageHandler = {
     this.registerCallback(message, callback);
 
     message[this.constants.SOURCE_FIELD] = this.getSource();
-    window.postMessage(message, this.constants.DOMAIN);
+    window.postMessage(message, window.origin);
   },
 
   sendResponse: function (originalEventData, response) {
@@ -59,13 +58,13 @@ RQ.ContentScriptMessageHandler = {
     };
 
     message[this.constants.SOURCE_FIELD] = this.constants.CONTENT_SCRIPT;
-    window.postMessage(message, this.constants.DOMAIN);
+    window.postMessage(message, window.origin);
   },
 
   handleMessageReceived: function (event) {
     const that = this;
 
-    if (event && event.origin !== RQ.configs.WEB_URL) {
+    if (event && !RQ.Utils.isAppURL(event.origin)) {
       if (RQ.configs.logLevel === "debug") {
         console.log("Ignoring message from the following domain", event.origin, event.data);
       }

@@ -11,7 +11,7 @@ import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "
 import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
-import LoadingModal from "../../../../../../../layouts/DashboardLayout/Sidebar/WorkspaceSelector/LoadingModal";
+import LoadingModal from "../../../../../../../layouts/DashboardLayout/MenuHeader/WorkspaceSelector/LoadingModal";
 import { toast } from "utils/Toast";
 import { trackWorkspaceDeleted, trackWorkspaceDeleteClicked } from "modules/analytics/events/common/teams";
 import "./TeamSettings.css";

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
-import { Button, Col, Form, Input, Row } from "antd";
+import { Button, Col, Form, Input, Row, Typography } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -12,9 +12,19 @@ import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import Logger from "lib/logger";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { useDispatch } from "react-redux";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
@@ -34,7 +44,24 @@ const CreateWorkspace = () => {
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        redirectToTeam(navigate, teamId);
+        switchWorkspace(
+          {
+            teamId,
+            teamName: newTeamName,
+            teamMembersCount: 1,
+          },
+          dispatch,
+          {
+            isSyncEnabled: user?.details?.isSyncEnabled,
+            isWorkspaceMode,
+          },
+          appMode
+        );
+        redirectToTeam(navigate, teamId, {
+          state: {
+            isNewTeam: true,
+          },
+        });
         trackNewTeamCreateSuccess(teamId, newTeamName);
       })
       .catch((err) => {
@@ -69,15 +96,12 @@ const CreateWorkspace = () => {
       <ProCard className="primary-card github-like-border">
         <Row align="middle" justify="center">
           <Col span={10} align="center">
-            <h1>Create a Team Workspace</h1>
-            <br />
-
             <Row>
               <Col className="hp-text-center" span={24}>
+                <Typography.Title level={2}>Create a Workspace</Typography.Title>
                 <center>
-                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "45vh" }} />
+                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "35vh" }} />
                 </center>
-
                 <Form
                   layout="vertical"
                   name="basic"
@@ -86,7 +110,7 @@ const CreateWorkspace = () => {
                   onFinishFailed={onFinishFailed}
                 >
                   <Form.Item
-                    label="Name your Workspace:"
+                    label="Name your workspace"
                     name="workspaceName"
                     className="hp-mb-16 hp-text-left"
                     rules={[
