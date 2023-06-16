@@ -3,7 +3,7 @@ import firebaseApp from "../../firebase";
 import { InviteStatus, InviteType, TeamInvite } from "types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 
-export const getTeamInvites = async (email: string): Promise<TeamInvite[] | null> => {
+export const getPendingInvites = async (email: string): Promise<TeamInvite[] | null> => {
   const db = getFirestore(firebaseApp);
   const invitesRef = collection(db, "invites");
   const inviteQuery = query(

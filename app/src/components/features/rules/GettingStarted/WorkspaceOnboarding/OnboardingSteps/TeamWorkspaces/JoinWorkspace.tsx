@@ -75,14 +75,19 @@ const Workspace: React.FC<{ team: TeamWorkspace }> = ({ team }) => {
   );
 };
 
-export const JoinWorkspace: React.FC<{ availableTeams: TeamWorkspace[] }> = ({ availableTeams }) => {
+export const JoinWorkspace: React.FC<{ availableTeams: TeamWorkspace[]; isPendingInvite: boolean }> = ({
+  availableTeams,
+  isPendingInvite,
+}) => {
   const dispatch = useDispatch();
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   return (
     <>
-      <div className="header text-center ">We found your team on Requestly</div>
+      <div className="header text-center ">
+        {isPendingInvite ? "You have invitation to join workspace" : "We found your team on Requestly"}
+      </div>
       <div className="display-row-center mt-20">
         <div className="text-gray text-center" style={{ width: "380px" }}>
           Join your teams workspace and get access to shared rules, mock APIs & session replays.
