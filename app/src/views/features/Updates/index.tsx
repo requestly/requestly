@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Col, Divider, Row, Typography } from "antd";
-import changeLogs from "./changeLogs";
+import changeLogs, { VERSION_NEXT } from "./changeLogs";
 import { getExtensionVersion } from "actions/ExtensionActions";
 import * as semver from "semver";
 
@@ -10,7 +10,7 @@ const VersionedChangelogs: React.FC = () => {
   return (
     <>
       {changeLogs.map((changeLog) => {
-        if (semver.lte(changeLog.version, currentRequestlyVersion)) {
+        if (changeLog.version !== VERSION_NEXT && semver.lte(changeLog.version, currentRequestlyVersion)) {
           return (
             <div key={changeLog.version}>
               <Typography.Title level={4} style={{ margin: 0 }}>
