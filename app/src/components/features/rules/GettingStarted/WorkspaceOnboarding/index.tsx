@@ -15,7 +15,7 @@ import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Bann
 import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
 import { OnboardingBannerSteps } from "./BannerSteps";
 import { actions } from "store";
-import { getPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
+import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
 import Logger from "lib/logger";
 
 interface OnboardingProps {
@@ -27,7 +27,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const step = useSelector(getWorkspaceOnboardingStep);
   const [createdTeamData, setCreatedTeamData] = useState(null);
   const [availableTeams, setAvailableTeams] = useState([]);
-  const [pendingInvites, setPendingInvites] = useState([]);
+  const [pendingTeams, setPendingTeams] = useState([]);
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
@@ -35,7 +35,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
   const handleOnSurveyCompletion = useCallback(async () => {
-    if (pendingInvites.length === 0) {
+    if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
           availableTeams.length === 0 &&
@@ -52,8 +52,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
       });
+    } else {
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [availableTeams.length, createTeam, dispatch, pendingInvites.length, user?.details?.profile?.uid]);
+  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile?.uid]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
@@ -67,16 +69,16 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [step, currentTestimonialIndex]);
 
   useEffect(() => {
-    getPendingInvites(user?.details?.profile?.email)
-      .then(setPendingInvites)
+    getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)
+      .then(setPendingTeams)
       .catch((e) => Logger.log("Not able to fetch team invites!"));
-  }, [user?.details?.profile?.email]);
+  }, [user?.details?.profile]);
 
   useEffect(() => {
-    if (pendingInvites.length === 0) {
+    if (pendingTeams.length === 0) {
       getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then(setAvailableTeams);
     }
-  }, [pendingInvites.length, user?.details?.profile]);
+  }, [pendingTeams.length, user?.details?.profile]);
 
   const renderOnboardingActionComponent = useCallback(() => {
     switch (step) {
@@ -94,12 +96,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         return (
           <WorkspaceOnboardingStep
             createdTeamData={createdTeamData}
-            availableTeams={pendingInvites.length ? pendingInvites : availableTeams}
-            isPendingInvite={pendingInvites.length > 0}
+            availableTeams={pendingTeams.length ? pendingTeams : availableTeams}
+            isPendingInvite={pendingTeams.length > 0}
           />
         );
     }
-  }, [step, handleOnSurveyCompletion, createdTeamData, pendingInvites, availableTeams, dispatch]);
+  }, [step, handleOnSurveyCompletion, createdTeamData, pendingTeams, availableTeams, dispatch]);
   return (
     <>
       {step === OnboardingSteps.RECOMMENDATIONS ? (

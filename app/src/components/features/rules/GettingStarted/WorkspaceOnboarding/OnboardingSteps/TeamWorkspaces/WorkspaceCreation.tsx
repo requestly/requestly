@@ -10,26 +10,33 @@ import { toast } from "utils/Toast";
 import { OnboardingSteps } from "../../types";
 import { actions } from "store";
 import "./index.css";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { redirectToTeam } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   createdTeamData: { teamId: string; inviteId: string } | null;
 }
 export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const functions = getFunctions();
 
   const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
   const user = useSelector(getUserAuthDetails);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const appMode = useSelector(getAppMode);
 
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<string>("Copy");
-  const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(false);
+  const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
   // const [newTeamData, setNewTeamData] = useState(null);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
@@ -53,11 +60,25 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Sent invites successfully");
-          setIsProcessing(false);
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-        } else {
-          setIsProcessing(false);
         }
+        setIsProcessing(false);
+        switchWorkspace(
+          {
+            teamId: createdTeamData.teamId,
+            teamMembersCount: 1,
+          },
+          dispatch,
+          {
+            isWorkspaceMode,
+          },
+          appMode
+        );
+        redirectToTeam(navigate, createdTeamData.teamId, {
+          state: {
+            isNewTeam: true,
+          },
+        });
       })
       .catch((err) => {
         toast.error("Error while creating invitations. Make sure you are an admin");
