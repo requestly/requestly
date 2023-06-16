@@ -74,7 +74,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
                   trackDownloadNetworkSessionClicked(ActionSource.Preview);
                 }}
               >
-                Export as HAR
+                Download HAR
               </Button>
             </Space>
           </div>
