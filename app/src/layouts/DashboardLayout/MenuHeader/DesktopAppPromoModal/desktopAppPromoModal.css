@@ -122,11 +122,10 @@
 
 .desktop-app-promo-modal .right-section {
   width: 50%;
-  position: relative;
+  display: inline-flex;
 }
 
-.desktop-app-promo-modal .right-section svg {
-  position: absolute;
-  transform: translate(10px, -50%);
-  z-index: 1;
+.desktop-app-promo-modal .right-section img {
+  margin-left: auto;
+  max-inline-size: 100%;
 }
