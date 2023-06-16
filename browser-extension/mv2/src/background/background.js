@@ -778,23 +778,26 @@ BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
       console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
     };
 
-  chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, function (tabs) {
-    // Send message to each opened tab which matches the url
-    for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
-      chrome.tabs.sendMessage(tabs[tabIndex].id, messageObject, callback);
-    }
+  BG.Methods.getAppTabs().then((tabs) => {
+    tabs.forEach((tab) => {
+      chrome.tabs.sendMessage(tab.id, messageObject, callback);
+    });
   });
 };
 
-BG.Methods.getAppTabs = () => {
-  return new Promise((resolve) => {
-    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
-      if (tabs.length === 0) {
-        BG.isAppOnline = false;
-      }
-      resolve(tabs);
-    });
-  });
+BG.Methods.getAppTabs = async () => {
+  const webURLs = RQ.Utils.getAllSupportedWebURLs();
+  let appTabs = [];
+
+  for (const webURL of webURLs) {
+    const tabs = await new Promise((resolve) => chrome.tabs.query({ url: webURL + "/*" }, resolve));
+    appTabs = [...appTabs, ...tabs];
+  }
+
+  if (appTabs.length === 0) {
+    BG.isAppOnline = false;
+  }
+  return appTabs;
 };
 
 /**
