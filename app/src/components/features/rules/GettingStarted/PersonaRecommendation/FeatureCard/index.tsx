@@ -17,6 +17,8 @@ export const FeatureCard: React.FC<Feature> = ({ icon, title, subTitle, link }) 
     (e: React.MouseEvent<HTMLElement>) => {
       trackPersonaRecommendationSelected(snakeCase(title));
       dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      dispatch(actions.updateIsPersonaSurveyCompleted(true));
+
       navigate(link, { replace: true });
     },
     [title, link, navigate, dispatch]

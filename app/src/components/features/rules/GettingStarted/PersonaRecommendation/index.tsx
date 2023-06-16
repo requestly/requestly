@@ -44,6 +44,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
       { replace: true }
     );
     dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    dispatch(actions.updateIsPersonaSurveyCompleted(true));
   };
 
   const handleViewAllOptionsClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -89,6 +90,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             callback={() => {
               handleUploadRulesClick();
               dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+              dispatch(actions.updateIsPersonaSurveyCompleted(true));
             }}
             source={AUTH.SOURCE.UPLOAD_RULES}
           >

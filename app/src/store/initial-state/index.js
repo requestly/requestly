@@ -96,7 +96,7 @@ const INITIAL_STATE = {
       props: {},
     },
     personaSurveyModal: {
-      isActive: false,
+      isActive: true,
       props: {},
     },
     ruleEditorModal: {

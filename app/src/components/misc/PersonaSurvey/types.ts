@@ -23,7 +23,7 @@ export interface PageConfig {
    * If skip true then don't show the question in survey
    */
   skip?: boolean;
-  render?: QuestionnaireType;
+  render?: QuestionnaireType | (() => ReactNode);
 }
 
 export interface SurveyOptionsConfig {
