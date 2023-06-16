@@ -4,7 +4,6 @@ import LINKS from "config/constants/sub/links";
 import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
 import { AppleFilled, WindowsFilled } from "@ant-design/icons";
-import { capitalize } from "lodash";
 import { ReactComponent as DesktopBanner } from "./desktop-banner.svg";
 import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
 import { ReactComponent as LinuxIcon } from "./linux.svg";
@@ -30,6 +29,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
       case OS.MAC:
         return {
           os: "mac",
+          displayName: "Mac",
           icon: <AppleFilled />,
           link: LINKS.DOWNLOAD_DESKTOP_APP.MACOS,
         };
@@ -37,6 +37,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
       case OS.WINDOWS:
         return {
           os: "windows",
+          displayName: "Windows",
           icon: <WindowsFilled />,
           link: LINKS.DOWNLOAD_DESKTOP_APP.WINDOWS,
         };
@@ -44,6 +45,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
       default:
         return {
           os: "linux",
+          displayName: "Linux",
           icon: <LinuxIcon />,
           link: LINKS.DOWNLOAD_DESKTOP_APP.LINUX,
         };
@@ -73,7 +75,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
           className="download-btn"
           onClick={() => trackDesktopAppPromoClicked("topbar", `download_${downloadLinkInfo.os}`)}
         >
-          Download for {`${capitalize(downloadLinkInfo.os)}`}
+          Download for {downloadLinkInfo.displayName}
         </Button>
         <a
           target="_blank"
