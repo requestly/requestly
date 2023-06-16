@@ -403,7 +403,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus = responseModification.statusCode || this.status || 200;
+        const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
         const responseStatusText = responseModification.statusText || this.statusText;
 
         Object.defineProperty(this, "status", {
@@ -755,7 +755,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
     });
 
     // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-    const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status || 200);
+    const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status) || 200;
     const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
 
     return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
