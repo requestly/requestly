@@ -22,15 +22,18 @@ import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-// import { PersonaSurveyModal } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey";
+import { PersonaSurvey } from "components/misc/PersonaSurvey";
+import { RQModal } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   //Global state
   const dispatch = useDispatch();
@@ -55,9 +58,9 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  // const togglePersonaSurveyModal = useCallback(() => {
-  //   dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
-  // }, [dispatch]);
+  const togglePersonaSurveyModal = useCallback(() => {
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  }, [dispatch]);
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -72,18 +75,6 @@ const DashboardContent = () => {
   };
 
   const prevProps = usePrevious({ location });
-
-  useEffect(() => {
-    if (!isWorkspaceOnboardingCompleted) {
-      navigate(PATHS.GETTING_STARTED, {
-        replace: true,
-        state: {
-          src: "workspace_onboarding",
-          redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-        },
-      });
-    }
-  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
@@ -195,14 +186,19 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {/* {!userPersona.isSurveyCompleted ? (
-        <PersonaSurveyModal
-          isOpen={activeModals.personaSurveyModal.isActive}
-          toggle={togglePersonaSurveyModal}
-          toggleImportRulesModal={toggleImportRulesModal}
+      {!userPersona.isSurveyCompleted && appOnboardingExp === "control" ? (
+        <RQModal
+          open={activeModals.personaSurveyModal.isActive}
+          centered
+          closable={false}
+          className="survey-modal"
+          bodyStyle={{ width: "550px" }}
+          maskStyle={{ background: "#0D0D10" }}
           {...activeModals.personaSurveyModal.props}
-        />
-      ) : null} */}
+        >
+          <PersonaSurvey isSurveyModal={true} />
+        </RQModal>
+      ) : null}
 
       {/* ) : null} */}
       {isImportRulesModalActive ? (
