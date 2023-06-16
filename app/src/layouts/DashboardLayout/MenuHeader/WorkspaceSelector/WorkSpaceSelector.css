@@ -10,7 +10,7 @@
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
-  max-width: 20ch;
+  max-width: 25ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -117,7 +117,7 @@
 }
 
 .join-workspace-menu-dropdown-container.ant-dropdown {
-  left: 278px !important;
+  left: 268px !important;
 }
 
 .join-workspace-invite-count-badge.ant-badge .ant-badge-count {

@@ -16,8 +16,7 @@ const ruleInfoBannerContent: Record<string, { title: string; description: string
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
   if (!(ruleType in ruleInfoBannerContent)) return null;
   // if appMode is not present in <ruleInfoBannerContent> then show for all app modes
-  if (ruleInfoBannerContent[ruleType].appMode?.length > 0 && !ruleInfoBannerContent[ruleType].appMode.includes(appMode))
-    return null;
+  if (!ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode)) return null;
 
   return (
     <Row className="rule-info-banner-container">

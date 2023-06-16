@@ -17,13 +17,22 @@ export const formatDate = (dateInMillis: number, format: string): string => {
   return "";
 };
 
+export const getAllSupportedWebURLs = () => {
+  const webURLsSet = new Set([config.WEB_URL, ...config.OTHER_WEB_URLS]);
+  return [...webURLsSet];
+};
+
+export const isAppURL = (url: string) => {
+  return getAllSupportedWebURLs().some((webURL) => webURL.includes(url));
+};
+
 export const isBlacklistedURL = (url: string): boolean => {
   const blacklistedSources: UrlSource[] = [
-    {
+    ...getAllSupportedWebURLs().map((webUrl) => ({
       key: SourceKey.URL,
       operator: SourceOperator.CONTAINS,
-      value: config.WEB_URL,
-    },
+      value: webUrl,
+    })),
     {
       key: SourceKey.URL,
       operator: SourceOperator.CONTAINS,

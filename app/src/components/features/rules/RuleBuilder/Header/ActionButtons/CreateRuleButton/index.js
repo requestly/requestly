@@ -32,6 +32,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { fixRuleRegexSourceFormat } from "utils/rules/misc";
 import "../RuleEditorActionButtons.css";
 
+// This is also the save rule button
 const CreateRuleButton = ({
   location,
   isDisabled = false,
@@ -61,7 +62,7 @@ const CreateRuleButton = ({
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
   const handleBtnOnClick = async () => {
-    const createdBy = user?.details?.profile?.uid || null;
+    const createdBy = currentlySelectedRuleData?.createdBy || user?.details?.profile?.uid || null;
     const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
 

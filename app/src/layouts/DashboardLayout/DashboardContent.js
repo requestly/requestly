@@ -71,7 +71,11 @@ const DashboardContent = () => {
   }, [appMode, location, navigate]);
 
   useEffect(() => {
-    if (userPersona.page === 4 && userPersona.isSurveyCompleted === false) {
+    if (
+      userPersona.page === 4 &&
+      userPersona.isSurveyCompleted === false &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+    ) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
         state: {
@@ -80,7 +84,7 @@ const DashboardContent = () => {
         },
       });
     }
-  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted]);
+  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted, appMode]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
