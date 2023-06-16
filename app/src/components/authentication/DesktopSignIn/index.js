@@ -29,6 +29,7 @@ import {
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { trackLoginAttemptedEvent, trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import Logger from "lib/logger";
+import { redirectToDesktopApp } from "utils/RedirectionUtils";
 
 const DesktopSignIn = () => {
   //Component State
@@ -78,6 +79,7 @@ const DesktopSignIn = () => {
             });
           }
           // window.close();
+          redirectToDesktopApp();
         })
         .catch((err) => {
           setIsError(true);

@@ -146,6 +146,7 @@ const INITIAL_STATE = {
   },
 
   userPreferences: {
+    isSecondarySidebarCollapsed: false,
     isRedirectRuleTutorialModalShown: false,
   },
 
@@ -165,6 +166,8 @@ const INITIAL_STATE = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+
+      hasConnectedApp: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,

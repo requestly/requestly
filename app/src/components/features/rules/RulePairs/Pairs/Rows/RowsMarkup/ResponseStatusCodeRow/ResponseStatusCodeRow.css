@@ -2,13 +2,22 @@
   position: relative;
 }
 
+.response-status-code-select.ant-select.ant-select-auto-complete {
+  width: 100%;
+  background-color: var(--component-dark-background);
+}
+
+.response-status-code-select.ant-select.ant-select-auto-complete .ant-select-selector {
+  background-color: var(--component-dark-background);
+}
+
 .response-status-code-select-icon {
   position: absolute;
   right: 10px;
   bottom: 9px;
   padding: 0 5px;
   color: var(--text-dark-gray);
-  background-color: var(--input-background);
+  background-color: var(--component-dark-background);
 }
 
 .response-status-code-label {

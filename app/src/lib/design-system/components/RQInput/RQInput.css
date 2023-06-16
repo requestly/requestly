@@ -1,5 +1,5 @@
 .rq-input .ant-input-wrapper {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
   background-color: var(--component-header-background);
 }

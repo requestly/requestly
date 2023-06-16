@@ -32,7 +32,6 @@ import {
 } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
-import { addToApolloSequence } from "backend/sessionRecording/addToApolloSequence";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 //@ts-ignore
@@ -71,8 +70,6 @@ const DraftSessionViewer: React.FC = () => {
 
   useEffect(() => {
     trackDraftSessionViewed();
-
-    addToApolloSequence(user?.details?.profile?.email);
 
     setIsLoading(true);
     if (tabId === "mock") {
@@ -240,7 +237,7 @@ const DraftSessionViewer: React.FC = () => {
   return isLoading ? (
     <PageLoader message="Loading session details..." />
   ) : loadingError ? (
-    <PageError />
+    <PageError error="Session Recording Loading Error" />
   ) : (
     <div className="session-viewer-page">
       <div className="session-viewer-header">
