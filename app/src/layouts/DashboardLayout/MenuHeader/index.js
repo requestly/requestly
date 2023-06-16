@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
+import { getAppMode } from "store/selectors";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import { SlackOutlined } from "@ant-design/icons";
@@ -11,35 +13,46 @@ import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
+import { DesktopAppPromoModal } from "./DesktopAppPromoModal";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
 
+const PATHS_WITHOUT_HEADER = ["/pricing", "/invite"];
+
 const MenuHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const appMode = useSelector(getAppMode);
+  const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const randomNumberBetween1And2 = Math.floor(Math.random() * 2) + 1;
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
-  const editorPaths = [
-    // "/rules/editor",
-    // "/mocks/editor",
-    // "/filesv2/editor",
-    // "/mock-server/viewer",
-    "/pricing",
-    "/invite",
-  ];
+
+  const handleDesktopAppPromoClicked = useCallback(() => {
+    setIsDesktopAppPromoModalOpen(true);
+    trackTopbarClicked("desktop_app");
+  }, []);
+
+  const handleDesktopAppPromoModalClose = useCallback(() => {
+    setIsDesktopAppPromoModalOpen(false);
+  }, []);
 
   //don't show general app header component for editor screens
-  const showMenuHeader = () => !editorPaths.some((path) => pathname.includes(path));
+  const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
 
   return showMenuHeader() ? (
     <Header className="layout-header">
       <Row wrap={false} align="middle" className="w-full">
         {!isPricingOrGoodbyePage ? (
-          <Col span={8}>
+          <Col
+            span={9}
+            flex="1 0 auto"
+            className={appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? "extension" : "desktop"}
+          >
             <div className="header-left-section">
               <WorkspaceSelector />
 
@@ -52,23 +65,27 @@ const MenuHeader = () => {
                 Tutorials
               </a>
 
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={LINKS.REQUESTLY_DESKTOP_APP}
-                onClick={() => trackTopbarClicked("desktop_app")}
-              >
-                Desktop App <RQBadge badgeText="NEW" />
-              </a>
+              {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+                <>
+                  <Button type="text" className="desktop-app-promo-btn" onClick={handleDesktopAppPromoClicked}>
+                    Desktop App <RQBadge badgeText="NEW" />
+                  </Button>
+
+                  <DesktopAppPromoModal open={isDesktopAppPromoModalOpen} onCancel={handleDesktopAppPromoModalClose} />
+                </>
+              )}
             </div>
           </Col>
         ) : null}
 
-        <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 7 : 9) : 9}>
-          <div className="header-middle-section hidden-on-small-screen">
-            <HeaderText />
-          </div>
-        </Col>
+        {appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION && (
+          <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 10 : 10) : 10}>
+            <div className="header-middle-section">
+              <HeaderText />
+            </div>
+          </Col>
+        )}
+
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
