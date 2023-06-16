@@ -1,6 +1,6 @@
 import React from "react";
 import { PrimarySidebar } from "./PrimarySidebar";
-import "./SidebarV2.css";
+import "./Sidebar.css";
 
 export const Sidebar: React.FC = () => {
   return (
