@@ -1,4 +1,5 @@
 {
   "WEB_URL": "https://beta.requestly.io",
+  "OTHER_WEB_URLS": ["https://beta.requestly.com"],
   "logLevel": "debug"
 }

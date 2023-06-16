@@ -1,6 +1,7 @@
 import { ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { updateActivationStatus } from "./contextMenu";
+import { getAllSupportedWebURLs } from "../../utils";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (code: string, executeAfterPageLoad = false): void => {
@@ -126,4 +127,16 @@ export const toggleExtensionStatus = async () => {
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
 
   return updatedStatus;
+};
+
+export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
+  const webURLs = getAllSupportedWebURLs();
+  let appTabs: chrome.tabs.Tab[] = [];
+
+  for (const webURL of webURLs) {
+    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
+    appTabs = [...appTabs, ...tabs];
+  }
+
+  return appTabs;
 };
