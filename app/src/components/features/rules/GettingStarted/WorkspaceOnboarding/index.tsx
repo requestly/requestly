@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails, getWorkspaceOnboardingStep } from "store/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -15,6 +15,8 @@ import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Bann
 import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
 import { OnboardingBannerSteps } from "./BannerSteps";
 import { actions } from "store";
+import { getPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
+import Logger from "lib/logger";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -24,27 +26,34 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const dispatch = useDispatch();
   const step = useSelector(getWorkspaceOnboardingStep);
   const [createdTeamData, setCreatedTeamData] = useState(null);
+  const [availableTeams, setAvailableTeams] = useState([]);
+  const [pendingInvites, setPendingInvites] = useState([]);
+
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
+
   const user = useSelector(getUserAuthDetails);
   const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
   const handleOnSurveyCompletion = useCallback(async () => {
-    //@ts-ignore
-    isEmailVerified(user?.details?.profile?.uid).then((result) => {
-      if (result) {
-        // TODO: ADD CHECK HERE IF USER HAS ANY INVITES OR DOMAIN WORKSPACES
-        createTeam({
-          teamName: "MY NEW WORKSPACE",
-          generatePublicLink: true,
-        }).then((response: any) => {
-          setCreatedTeamData(response?.data);
+    if (pendingInvites.length === 0) {
+      isEmailVerified(user?.details?.profile?.uid).then((result) => {
+        if (result) {
+          availableTeams.length === 0 &&
+            createTeam({
+              teamName: "MY NEW WORKSPACE",
+              generatePublicLink: true,
+            }).then((response: any) => {
+              setCreatedTeamData(response?.data);
+            });
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
           }, 50);
-        });
-      } else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-    });
-  }, [createTeam, dispatch, user?.details?.profile?.uid]);
+        } else {
+          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+        }
+      });
+    }
+  }, [availableTeams.length, createTeam, dispatch, pendingInvites.length, user?.details?.profile?.uid]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
@@ -56,6 +65,18 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         return <WorkspaceOnboardingBanner />;
     }
   }, [step, currentTestimonialIndex]);
+
+  useEffect(() => {
+    getPendingInvites(user?.details?.profile?.email)
+      .then(setPendingInvites)
+      .catch((e) => Logger.log("Not able to fetch team invites!"));
+  }, [user?.details?.profile?.email]);
+
+  useEffect(() => {
+    if (pendingInvites.length === 0) {
+      getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then(setAvailableTeams);
+    }
+  }, [pendingInvites.length, user?.details?.profile]);
 
   const renderOnboardingActionComponent = useCallback(() => {
     switch (step) {
@@ -70,9 +91,15 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       case OnboardingSteps.PERSONA_SURVEY:
         return <PersonaSurvey callback={handleOnSurveyCompletion} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return <WorkspaceOnboardingStep createdTeamData={createdTeamData} />;
+        return (
+          <WorkspaceOnboardingStep
+            createdTeamData={createdTeamData}
+            availableTeams={pendingInvites.length ? pendingInvites : availableTeams}
+            isPendingInvite={pendingInvites.length > 0}
+          />
+        );
     }
-  }, [step, createdTeamData, dispatch, handleOnSurveyCompletion]);
+  }, [step, handleOnSurveyCompletion, createdTeamData, pendingInvites, availableTeams, dispatch]);
   return (
     <>
       {step === OnboardingSteps.RECOMMENDATIONS ? (
