@@ -51,10 +51,8 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
   }, []);
 
   return (
-    <RQModal className="desktop-app-promo-modal" width={"995px"} open={open} destroyOnClose={true} onCancel={onCancel}>
+    <RQModal centered open={open} width={"995px"} onCancel={onCancel} className="desktop-app-promo-modal">
       <div className="left-section">
-        {/* <div className="pink-gradient"></div>
-        <div className="blue-gradient"></div> */}
         <h1 className="header">
           Requestly is more <br />
           powerful on{" "}
@@ -81,7 +79,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
           target="_blank"
           rel="noreferrer"
           className="view-all-platforms-link"
-          href={LINKS.REQUESTLY_DESKTOP_APP}
+          href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
           onClick={() => trackDesktopAppPromoClicked("topbar", "view_more_options")}
         >
           View all platforms
