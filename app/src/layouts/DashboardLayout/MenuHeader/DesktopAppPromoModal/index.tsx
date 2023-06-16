@@ -7,6 +7,7 @@ import { AppleFilled, WindowsFilled } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { ReactComponent as DesktopBanner } from "./desktop-banner.svg";
 import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
+import { ReactComponent as LinuxIcon } from "./linux.svg";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./desktopAppPromoModal.css";
 
@@ -43,8 +44,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
       default:
         return {
           os: "linux",
-          // TODO: change icon
-          icon: <WindowsFilled />,
+          icon: <LinuxIcon />,
           link: LINKS.DOWNLOAD_DESKTOP_APP.LINUX,
         };
     }
@@ -78,10 +78,11 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
           Download for {`${capitalize(downloadLinkInfo.os)}`}
         </Button>
         <a
+          target="_blank"
+          rel="noreferrer"
           className="view-all-platforms-link"
           href={LINKS.REQUESTLY_DESKTOP_APP}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={() => trackDesktopAppPromoClicked("topbar", "view_more_options")}
         >
           View all platforms
         </a>

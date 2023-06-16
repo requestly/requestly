@@ -88,16 +88,26 @@
   justify-content: center;
 }
 
-.desktop-app-promo-modal .left-section .download-btn.ant-btn span {
+.desktop-app-promo-modal .left-section .download-btn.ant-btn span:last-child {
   margin-top: 2px;
+  margin-left: 7px;
 }
 
-.desktop-app-promo-modal .left-section .download-btn.ant-btn span.anticon {
-  margin-top: 5px;
+.desktop-app-promo-modal .left-section .download-btn.ant-btn .anticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--white);
 }
 
 .desktop-app-promo-modal .left-section .view-all-platforms-link {
   margin-bottom: 41px;
+  color: var(--primary);
 }
 
 .desktop-app-promo-modal .right-section {
