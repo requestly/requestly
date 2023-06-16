@@ -25,6 +25,11 @@ import { useLocation } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
+import { StorageService } from "init";
+import APP_CONSTANTS from "config/constants";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 
 interface Props {
@@ -47,6 +52,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
+  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
+      StorageService(appMode)
+        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
+        .then((value) => {
+          if (value) {
+            setIsExtensionEnabled(value.isExtensionEnabled);
+          } else {
+            setIsExtensionEnabled(true);
+          }
+        });
+    }
+  }, [appMode]);
 
   useEffect(() => {
     if (apiEntry) {
@@ -235,7 +255,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  return (
+  return isExtensionEnabled ? (
     <div className="api-client-view">
       <Skeleton loading={isAnimating} active>
         <div className="api-client-header">
@@ -308,6 +328,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
         </Split>
       </Skeleton>
     </div>
+  ) : (
+    <ExtensionDeactivationMessage />
   );
 };
 

@@ -610,7 +610,7 @@ const RulesTable = ({
                   {recordName}
                   {isDesktopOnlyRule(record) && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
                     <InfoTag
-                      title="NOT SUPPORTED"
+                      title="Desktop App Only"
                       description={
                         <>
                           {getPrettyDesktopRuleTooltipTitle(record.ruleType)}{" "}
@@ -707,7 +707,7 @@ const RulesTable = ({
     {
       title: "Last Modified",
       align: "center",
-      width: 180,
+      width: 150,
       responsive: ["lg"],
       dataIndex: "modificationDate",
       valueType: "date",
@@ -912,6 +912,7 @@ const RulesTable = ({
     columns.splice(3, 0, {
       title: "Created by",
       align: "center",
+      width: "100px",
       responsive: ["lg"],
       dataIndex: "createdBy",
       valueType: "date",
@@ -919,7 +920,7 @@ const RulesTable = ({
         if (record.objectType && record.objectType === "group") {
           return null;
         }
-        const uid = record.createdBy ? record.createdBy : record.lastModifiedBy;
+        const uid = record.createdBy ?? null;
         if (currentlyActiveWorkspace?.id) {
           return <UserIcon uid={uid} />;
         } else return null;
@@ -1099,7 +1100,7 @@ const RulesTable = ({
   return (
     <>
       <ProTable
-        scroll={{ x: 700 }}
+        scroll={{ x: 900 }}
         locale={{
           emptyText: searchValue ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found with given name" />
@@ -1196,7 +1197,7 @@ const RulesTable = ({
                   <Button
                     shape={isScreenSmall ? "circle" : null}
                     onClick={user?.details?.isLoggedIn && handleExportRulesOnClick}
-                    icon={<DownloadOutlined />}
+                    icon={<UploadOutlined />}
                   >
                     {isScreenSmall ? null : "Export"}
                   </Button>
@@ -1256,7 +1257,7 @@ const RulesTable = ({
                     hasPopconfirm: true,
                     buttonText: "Import",
                     authSource: AUTH.SOURCE.UPLOAD_RULES,
-                    icon: <UploadOutlined />,
+                    icon: <DownloadOutlined />,
                     onClickHandler: handleImportRulesOnClick,
                     trackClickEvent: () => {
                       trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
@@ -1268,7 +1269,7 @@ const RulesTable = ({
                     hasPopconfirm: true,
                     buttonText: "Export",
                     authSource: AUTH.SOURCE.EXPORT_RULES,
-                    icon: <DownloadOutlined />,
+                    icon: <UploadOutlined />,
                     onClickHandler: handleExportRulesOnClick,
                   },
                   {

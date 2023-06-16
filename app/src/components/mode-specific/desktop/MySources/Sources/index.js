@@ -108,6 +108,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 value: true,
               })
             );
+            dispatch(actions.updateHasConnectedApp(true));
             trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId));
             toggle();
 

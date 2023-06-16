@@ -1,11 +1,11 @@
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
 import { reduxStore } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
-import { ErrorBoundary } from "components/common/ErrorBoundary";
 import App from "./App";
 
 import "./init";
@@ -24,9 +24,14 @@ root.render(
   <BrowserRouter>
     <Provider store={reduxStore}>
       <PersistGate loading={null} persistor={persistor}>
-        <ErrorBoundary fallback={<PageError />}>
+        <Sentry.ErrorBoundary
+          fallback={({ error, componentStack, resetError }) => {
+            return <PageError error={error} componentStack={componentStack} resetError={resetError} />;
+          }}
+          showDialog
+        >
           <App />
-        </ErrorBoundary>
+        </Sentry.ErrorBoundary>
       </PersistGate>
     </Provider>
   </BrowserRouter>

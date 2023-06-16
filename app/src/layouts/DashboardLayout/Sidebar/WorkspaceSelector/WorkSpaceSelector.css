@@ -1,17 +1,30 @@
+.workspace-selector-dropdown {
+  height: 3rem; /* height of the header */
+}
+
+.workspace-selector-dropdown .workspace-avatar.ant-avatar {
+  margin-right: 8px;
+}
+
 .active-workspace-name {
-  margin-left: 8px;
-  margin-right: 5px;
   display: inline-block;
   font-size: 13px;
   font-weight: 500;
-  max-width: 16ch;
+  max-width: 25ch;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.active-workspace-name-down-icon {
+.active-workspace-name:hover,
+.active-workspace-name:focus {
+  opacity: 0.7;
+}
+
+.active-workspace-name-down-icon.anticon {
   font-size: 9px;
+  margin-top: 1px;
+  margin-left: 4px;
 }
 
 .workspace-divider.ant-divider {
@@ -85,7 +98,7 @@
 
 .active-workspace-dropdownItem {
   border-radius: var(--border-radius-sm);
-  background-color: var(--hover-color);
+  background-color: var(--gray-dark);
 }
 
 .join-workspace-menu-dropdown-trigger {
@@ -104,7 +117,7 @@
 }
 
 .join-workspace-menu-dropdown-container.ant-dropdown {
-  left: 274px !important;
+  left: 268px !important;
 }
 
 .join-workspace-invite-count-badge.ant-badge .ant-badge-count {
@@ -128,9 +141,7 @@
   padding: 8px;
 }
 
-.workspace-selector-tooltip.ant-tooltip
-  .ant-tooltip-content
-  .ant-tooltip-inner {
+.workspace-selector-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
   color: var(--text-gray);
   background-color: var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -141,9 +152,7 @@
   padding-top: 7px;
 }
 
-.ant-dropdown-menu-item
-  .ant-dropdown-menu-title-content
-  span.join-existing-workspace-menu-item {
+.ant-dropdown-menu-item .ant-dropdown-menu-title-content span.join-existing-workspace-menu-item {
   display: flex;
   align-items: center;
   justify-content: space-between;

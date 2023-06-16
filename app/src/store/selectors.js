@@ -162,6 +162,10 @@ export const getActiveModals = (state) => {
   return getGlobalState(state)["activeModals"];
 };
 
+export const getHasConnectedApp = (state) => {
+  return getGlobalState(state).misc?.persist?.hasConnectedApp;
+};
+
 export const getMarketplaceRuleStatus = (state) => {
   return getGlobalState(state)["marketplace"]["ruleStatus"];
 };
@@ -245,4 +249,7 @@ export const getIsWorkspaceOnboardingCompleted = (state) => {
 
 export const getWorkspaceOnboardingStep = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.step;
+};
+export const getIsSecondarySidebarCollapsed = (state) => {
+  return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
 };

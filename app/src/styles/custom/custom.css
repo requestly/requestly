@@ -3,6 +3,7 @@
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -23,6 +24,10 @@ button.ant-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+button.ant-btn-lg {
+  font-size: 16px;
 }
 
 button.ant-input-search-button {

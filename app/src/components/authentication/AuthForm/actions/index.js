@@ -21,7 +21,6 @@ import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import Logger from "lib/logger";
 
 const showError = (err) => {
   toast.error(err, { hideProgressBar: true, autoClose: 6000 });
@@ -157,7 +156,11 @@ export const handleResetPasswordOnClick = (event, password, setLoader, navigate,
 export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispatch) => {
   try {
     if (window.location.host.includes("app.requestly.io")) {
-      posthog.reset();
+      try {
+        posthog.reset();
+      } catch (error) {
+        console.log("Error while resetting posthog", error);
+      }
     }
     if (!window.uid || !isLocalStoragePresent(appMode)) {
       return signOut();
@@ -166,12 +169,11 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
     if (isWorkspaceMode) {
       clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      Logger.log("Clearing storage in handleLogoutButtonOnClick");
       StorageService(appMode).clearDB();
     }
 
     return signOut();
   } catch (err) {
-    return Logger.log(err);
+    return console.log(err);
   }
 };

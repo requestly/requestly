@@ -1,0 +1,18 @@
+.mock-server-sidebar-container {
+  height: 100%;
+  background-color: var(--app-secondary-sidebar-background);
+}
+
+.mock-server-sidebar-container ul {
+  padding: 10px 10px 1.25rem 10px;
+  background-color: var(--app-secondary-sidebar-background);
+}
+
+.mock-server-sidebar-container ul li .icon__wrapper {
+  padding: 0;
+}
+
+.mock-server-sidebar-container ul li .icon__wrapper svg {
+  width: 18px;
+  height: 18px;
+}
