@@ -17,6 +17,7 @@ import { OnboardingBannerSteps } from "./BannerSteps";
 import { actions } from "store";
 import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
 import Logger from "lib/logger";
+import { Team } from "types";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -26,8 +27,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const dispatch = useDispatch();
   const step = useSelector(getWorkspaceOnboardingStep);
   const [createdTeamData, setCreatedTeamData] = useState(null);
-  const [availableTeams, setAvailableTeams] = useState([]);
-  const [pendingTeams, setPendingTeams] = useState([]);
+  const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
+  const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
@@ -70,13 +71,15 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
 
   useEffect(() => {
     getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)
-      .then(setPendingTeams)
+      .then((teams: Team[]) => setPendingTeams(teams))
       .catch((e) => Logger.log("Not able to fetch team invites!"));
   }, [user?.details?.profile]);
 
   useEffect(() => {
     if (pendingTeams.length === 0) {
-      getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then(setAvailableTeams);
+      getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then((teams: Team[]) =>
+        setAvailableTeams(teams)
+      );
     }
   }, [pendingTeams.length, user?.details?.profile]);
 
