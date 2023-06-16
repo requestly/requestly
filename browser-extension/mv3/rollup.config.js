@@ -3,10 +3,20 @@ import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import { version } from "./package.json";
-import { browser, WEB_URL } from "../config/dist/config.build.json";
+import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.json";
 
 const OUTPUT_DIR = "dist";
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
+
+const generateUrlPattern = (urlString) => {
+  try {
+    const webUrlObj = new URL(urlString);
+    return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+  } catch (error) {
+    console.error(`Invalid URL: ${urlString}`, error);
+    return null;
+  }
+};
 
 const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
@@ -14,11 +24,12 @@ const processManifest = (content) => {
   manifestJson.version = version;
   manifestJson.version_name = `${version} (MV3)`;
 
-  const contentScripts = manifestJson.content_scripts;
-  const webUrl = new URL(WEB_URL);
-  const webUrlPattern = `${webUrl.protocol}//${webUrl.hostname}/*`;
-  contentScripts[0].matches = [webUrlPattern];
-  contentScripts[1].exclude_matches = [webUrlPattern];
+  const { content_scripts: contentScripts } = manifestJson;
+
+  const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern); // remove null entries
+
+  contentScripts[0].matches = webURLPatterns;
+  contentScripts[1].exclude_matches = webURLPatterns;
 
   if (!isProductionBuildMode) {
     manifestJson.commands = {

@@ -359,3 +359,12 @@ RQ.Utils.fireAjax = (requestURL, async) => {
     request.send();
   });
 };
+
+RQ.Utils.getAllSupportedWebURLs = () => {
+  const webURLsSet = new Set([RQ.configs.WEB_URL, ...RQ.configs.OTHER_WEB_URLS]);
+  return [...webURLsSet];
+};
+
+RQ.Utils.isAppURL = (url) => {
+  return RQ.Utils.getAllSupportedWebURLs().some((webURL) => webURL.includes(url));
+};

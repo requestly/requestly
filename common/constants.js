@@ -32,7 +32,7 @@ CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
  * We are calling them as BLACK_LIST_DOMAINS
  * however the usage is code is as the URL containing these substrings, We don't touch those requests
  */
-CONSTANTS.BLACK_LIST_DOMAINS = ["requestly.in", "requestly.io", "rq.in", "rq.io", "__rq"];
+CONSTANTS.BLACK_LIST_DOMAINS = ["requestly.in", "requestly.io", "requestly.com", "rq.in", "rq.io", "__rq"];
 
 CONSTANTS.OBJECT_TYPES = {
   GROUP: "group",

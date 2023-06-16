@@ -99,7 +99,7 @@ RuleMatcher.matchUrlWithRuleSource = function (sourceObject, url, requestUrlTabI
     value = sourceObject.value,
     blackListedDomains = RQ.BLACK_LIST_DOMAINS || [];
 
-  if (window.tabService.getTabUrl(requestUrlTabId)?.includes(RQ.configs.WEB_URL)) {
+  if (RQ.Utils.isAppURL(window.tabService.getTabUrl(requestUrlTabId))) {
     return null;
   }
 

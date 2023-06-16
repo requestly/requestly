@@ -4,21 +4,32 @@
  * [3]: http://gruntjs.com/configuring-tasks#files
  **/
 
-const { env, browser, WEB_URL } = require("../config/dist/config.build.json");
+const { env, browser, WEB_URL, OTHER_WEB_URLS } = require("../config/dist/config.build.json");
 const { version } = require("./package.json");
 const jsList = require("./jsList.json");
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
+
+const generateUrlPattern = (urlString) => {
+  try {
+    const webUrlObj = new URL(urlString);
+    return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+  } catch (error) {
+    console.error(`Invalid URL: ${urlString}`, error);
+    return null;
+  }
+};
 
 const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
 
   manifestJson.version = version;
 
-  const contentScripts = manifestJson.content_scripts;
-  const webUrl = new URL(WEB_URL);
-  const webUrlPattern = `${webUrl.protocol}//${webUrl.hostname}/*`;
-  contentScripts[0].matches = [webUrlPattern];
-  contentScripts[1].exclude_matches = [webUrlPattern];
+  const { content_scripts: contentScripts } = manifestJson;
+
+  const webURLPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern); // remove null entries
+
+  contentScripts[0].matches = webURLPatterns;
+  contentScripts[1].exclude_matches = webURLPatterns;
 
   if (env !== "prod") {
     manifestJson.description = `[${env.toUpperCase()}] ${manifestJson.description}`;
