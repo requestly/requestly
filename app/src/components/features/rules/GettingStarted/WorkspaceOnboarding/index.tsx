@@ -8,6 +8,7 @@ import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
 import { GettingStartedWithSurvey } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/GettingStartedWithSurvey";
 import { PersonaSurvey } from "./OnboardingSteps/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
+import { getBusinessDomain } from "./utils";
 import { OnboardingSteps } from "./types";
 import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
@@ -33,15 +34,18 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
       if (result) {
         // TODO: ADD CHECK HERE IF USER HAS ANY INVITES OR DOMAIN WORKSPACES
-        createTeam({
-          teamName: "MY NEW WORKSPACE",
-          generatePublicLink: true,
-        }).then((response: any) => {
-          setCreatedTeamData(response?.data);
-          setTimeout(() => {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
-          }, 50);
-        });
+        const domain = getBusinessDomain(user);
+        if (domain) {
+          createTeam({
+            teamName: domain,
+            generatePublicLink: true,
+          }).then((response: any) => {
+            setCreatedTeamData(response?.data);
+            setTimeout(() => {
+              dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+            }, 50);
+          });
+        } else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       } else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     });
   }, [createTeam, dispatch, user?.details?.profile?.uid]);
