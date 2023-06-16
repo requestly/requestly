@@ -12,7 +12,7 @@ import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import { RQBadge } from "lib/design-system/components/RQBadge";
-import WorkspaceSelector from "../Sidebar/WorkspaceSelector";
+import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { DesktopAppPromoModal } from "./DesktopAppPromoModal";

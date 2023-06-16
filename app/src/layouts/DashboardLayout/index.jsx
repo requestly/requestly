@@ -5,10 +5,10 @@ import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
-import { Sidebar } from "./SidebarV2";
+import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
-import "./DashboardLayout.css";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
