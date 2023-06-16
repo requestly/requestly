@@ -38,7 +38,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
   const handleFinishClick = (details) => {
     setIsLoading(true);
     const newTeamName = details.workspaceName;
-    const createTeam = httpsCallable(getFunctions(), "createTeam");
+    const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
     createTeam({
       teamName: newTeamName,

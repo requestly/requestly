@@ -2,7 +2,11 @@
   padding: 4px;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-header-background);
+  background-color: var(--component-dark-background);
+}
+
+.rule-pair-source-dropdown {
+  background-color: var(--input-background);
 }
 
 .rules-pair-content-header .rules-pair-input,

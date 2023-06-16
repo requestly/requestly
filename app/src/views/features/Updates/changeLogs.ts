@@ -1,6 +1,17 @@
 import { VersionedChangeLogs } from "./types";
 
+export const VERSION_NEXT = "next";
+
 const changeLogs: VersionedChangeLogs[] = [
+  {
+    version: VERSION_NEXT,
+    logs: [
+      {
+        title: "Bug fix: Status code in Modify API Response rule resolves to a string instead of number",
+        link: "https://github.com/requestly/requestly/issues/722",
+      },
+    ],
+  },
   {
     version: "23.6.7",
     logs: [

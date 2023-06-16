@@ -1,6 +1,8 @@
 .mock-editor-layout-header.ant-layout-header {
   display: flex;
   align-items: center;
+  border-bottom: 1px solid var(--border-dark);
+  background-color: var(--body-background);
 }
 
 .mock-editor-layout-header .ant-row {
@@ -12,17 +14,21 @@
 .mock-editor-layout-header .header-left-section {
   display: flex;
 }
+
 .mock-editor-layout-header .header-right-section {
   display: flex;
   gap: 12px;
 }
+
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only svg {
   color: var(--text-gray);
   transition: 0.2s ease-in-out;
 }
+
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only:hover svg {
   color: var(--white);
 }
+
 .mock-editor-layout-header .header-right-section .ant-btn {
   font-weight: 500;
 }
