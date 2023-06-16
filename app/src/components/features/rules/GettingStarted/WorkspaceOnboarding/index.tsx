@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails, getWorkspaceOnboardingStep } from "store/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -15,6 +15,7 @@ import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Bann
 import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
 import { OnboardingBannerSteps } from "./BannerSteps";
 import { actions } from "store";
+import { getTeamsWithSameDomainEnabled } from "backend/teams";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -24,27 +25,36 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const dispatch = useDispatch();
   const step = useSelector(getWorkspaceOnboardingStep);
   const [createdTeamData, setCreatedTeamData] = useState(null);
+  const [availableTeams, setAvailableTeams] = useState([]);
+
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
+
   const user = useSelector(getUserAuthDetails);
   const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
+  useEffect(() => {
+    getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then(setAvailableTeams);
+  }, [user?.details?.profile]);
+
   const handleOnSurveyCompletion = useCallback(async () => {
-    //@ts-ignore
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
       if (result) {
         // TODO: ADD CHECK HERE IF USER HAS ANY INVITES OR DOMAIN WORKSPACES
-        createTeam({
-          teamName: "MY NEW WORKSPACE",
-          generatePublicLink: true,
-        }).then((response: any) => {
-          setCreatedTeamData(response?.data);
-          setTimeout(() => {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
-          }, 50);
-        });
-      } else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+        availableTeams.length === 0 &&
+          createTeam({
+            teamName: "MY NEW WORKSPACE",
+            generatePublicLink: true,
+          }).then((response: any) => {
+            setCreatedTeamData(response?.data);
+          });
+        setTimeout(() => {
+          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+        }, 50);
+      } else {
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+      }
     });
-  }, [createTeam, dispatch, user?.details?.profile?.uid]);
+  }, [availableTeams, createTeam, dispatch, user?.details?.profile?.uid]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
@@ -70,9 +80,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       case OnboardingSteps.PERSONA_SURVEY:
         return <PersonaSurvey callback={handleOnSurveyCompletion} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return <WorkspaceOnboardingStep createdTeamData={createdTeamData} />;
+        return <WorkspaceOnboardingStep createdTeamData={createdTeamData} availableTeams={availableTeams} />;
     }
-  }, [step, createdTeamData, dispatch, handleOnSurveyCompletion]);
+  }, [step, handleOnSurveyCompletion, createdTeamData, availableTeams, dispatch]);
   return (
     <>
       {step === OnboardingSteps.RECOMMENDATIONS ? (

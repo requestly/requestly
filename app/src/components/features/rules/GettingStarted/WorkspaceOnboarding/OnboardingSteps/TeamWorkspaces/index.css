@@ -43,6 +43,7 @@
   padding: 12px 16px;
   align-items: center;
   border-radius: var(--border-radius-sm);
+  margin: 8px 0;
 }
 .onboarding-workspace-card .workspace-avatar {
   margin-right: 8px;

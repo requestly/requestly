@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
@@ -10,20 +10,34 @@ import { toast } from "utils/Toast";
 import { OnboardingSteps } from "../../types";
 import { actions } from "store";
 import "./index.css";
+import { getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 interface Props {
   createdTeamData: { teamId: string; inviteId: string } | null;
 }
 export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
-  const [userEmail, setUserEmail] = useState<string[]>([]);
+  const dispatch = useDispatch();
+  const functions = getFunctions();
+
+  const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
+
+  const user = useSelector(getUserAuthDetails);
+
+  const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<string>("Copy");
+  const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(false);
   // const [newTeamData, setNewTeamData] = useState(null);
-  const dispatch = useDispatch();
+
+  const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
+    user?.details?.profile?.email,
+  ]);
 
   const handleAddMembers = () => {
-    if (!userEmail || !userEmail.length) {
+    if (!inviteEmails || !inviteEmails.length) {
       toast.warn("Please add members email to invite them");
       return;
     }
@@ -33,7 +47,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
 
     createTeamInvites({
       teamId: createdTeamData?.teamId,
-      emails: userEmail,
+      emails: inviteEmails,
       role: makeUserAdmin ? "admin" : "write",
     })
       .then((res: any) => {
@@ -57,6 +71,21 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
       setCopiedText("Copy");
     }, 500);
   };
+
+  const handleDomainToggle = useCallback(
+    (enabled: boolean) => {
+      upsertTeamCommonInvite({ teamId: createdTeamData.teamId, domainEnabled: enabled }).then((res: any) => {
+        if (res?.data?.success) {
+          setDomainJoiningEnabled(enabled);
+        }
+      });
+    },
+    [createdTeamData.teamId, upsertTeamCommonInvite]
+  );
+
+  useEffect(() => {
+    upsertTeamCommonInvite({ teamId: createdTeamData.teamId, domainEnabled: true });
+  }, [createdTeamData.teamId, upsertTeamCommonInvite]);
 
   return (
     <>
@@ -82,8 +111,8 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           placeholder="Add multiple email address separated by commas"
           //@ts-ignore
           type="email"
-          value={userEmail}
-          onChange={setUserEmail}
+          value={inviteEmails}
+          onChange={setInviteEmails}
           validateEmail={validateEmail}
           getLabel={(email, index, removeEmail) => (
             <div data-tag key={index} className="multi-email-tag">
@@ -121,8 +150,8 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
       )}
       <Divider />
       <div className="mt-20 space-between">
-        <Typography.Text className="text-gray">Anyone with requestly.io can join the workspace</Typography.Text>
-        <Switch defaultChecked />
+        <Typography.Text className="text-gray">Anyone with {userEmailDomain} can join the workspace</Typography.Text>
+        <Switch checked={domainJoiningEnabled} onChange={handleDomainToggle} />
       </div>
 
       <div className="workspace-onboarding-footer">
