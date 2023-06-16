@@ -52,7 +52,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
   }, []);
 
   return (
-    <RQModal centered open={true} width={"995px"} onCancel={onCancel} className="desktop-app-promo-modal">
+    <RQModal centered open={open} width={"995px"} onCancel={onCancel} className="desktop-app-promo-modal">
       <div className="left-section">
         <h1 className="header">
           Requestly is more <br />
