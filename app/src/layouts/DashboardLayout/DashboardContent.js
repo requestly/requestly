@@ -5,8 +5,8 @@ import { routes } from "routes";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
 import APP_CONSTANTS from "config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { actions } from "store";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import {
   getActiveModals,
@@ -92,7 +92,14 @@ const DashboardContent = () => {
         },
       });
     }
-  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted, appMode]);
+  }, [
+    navigate,
+    location.state?.redirectTo,
+    userPersona.page,
+    userPersona.isSurveyCompleted,
+    appMode,
+    isWorkspaceOnboardingCompleted,
+  ]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {

@@ -20,7 +20,7 @@ const TRACKING = APP_CONSTANTS.GA_EVENTS;
  * Email verified bool is taken from firebase database instead of data provided by firebase auth api
  * This is done to consider accounts before implementing email verification as email verified
  * @param {string} userId - user Id
- * @returns {boolean} - whether account has received verification link
+ * @returns {Promise<boolean>} - whether account has received verification link
  */
 export const isEmailVerified = (userId) => {
   if (!userId) return Promise.resolve(false);

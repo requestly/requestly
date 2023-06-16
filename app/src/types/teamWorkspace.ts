@@ -3,6 +3,8 @@ import { Invite } from "./invite";
 export interface TeamWorkspace {
   id: string;
   name: string;
+  accessCount?: number;
+  inviteId: string;
 }
 
 export enum TeamRole {

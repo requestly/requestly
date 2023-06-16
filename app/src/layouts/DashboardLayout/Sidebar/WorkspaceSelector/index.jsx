@@ -36,7 +36,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import Logger from "lib/logger";
-import { getTeamInvites } from "backend/teams";
+import { getPendingInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./WorkSpaceSelector.css";
@@ -145,7 +145,7 @@ const WorkspaceSelector = () => {
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getTeamInvites(loggedInUserEmail)
+    getPendingInvites(loggedInUserEmail)
       .then(setTeamInvites)
       .catch((e) => Logger.log("Not able to fetch team invites!"));
   }, [user.loggedIn, loggedInUserEmail]);
