@@ -1197,7 +1197,7 @@ const RulesTable = ({
                   <Button
                     shape={isScreenSmall ? "circle" : null}
                     onClick={user?.details?.isLoggedIn && handleExportRulesOnClick}
-                    icon={<DownloadOutlined />}
+                    icon={<UploadOutlined />}
                   >
                     {isScreenSmall ? null : "Export"}
                   </Button>
