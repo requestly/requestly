@@ -19,7 +19,7 @@ import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  createdTeamData: { teamId: string; inviteId: string } | null;
+  createdTeamData: { teamId: string; inviteId: string; name: string } | null;
 }
 export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
   const dispatch = useDispatch();
@@ -120,7 +120,8 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           size="small"
           placeholder="Workspace name"
           className="mt-8 workspace-onboarding-field"
-          defaultValue="MY NEW WORKSPACE"
+          defaultValue={createdTeamData.name}
+          disabled
         />
       </div>
       <div className="mt-20">
