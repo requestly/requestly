@@ -6,6 +6,7 @@ import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
 import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import {
   getActiveModals,
@@ -71,6 +72,17 @@ const DashboardContent = () => {
   const prevProps = usePrevious({ location });
 
   useEffect(() => {
+    if (PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
+    }
+  }, [appMode, location, navigate]);
+
+  useEffect(() => {
+    // if (
+    //   userPersona.page === 4 &&
+    //   userPersona.isSurveyCompleted === false &&
+    //   appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+    // )
     if (!isWorkspaceOnboardingCompleted) {
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
