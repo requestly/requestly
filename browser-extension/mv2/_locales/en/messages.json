@@ -4,7 +4,7 @@
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "Build, Test & Debug 10x faster with API Client, Mock Server, Intercept & Modify HTTPs Requests/Response & Session Recording.",
+    "message": "Build, Test & Debug web applications 10x faster with API Client, Mock Server, Intercept & Modify HTTP Requests & Session Recording.",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {

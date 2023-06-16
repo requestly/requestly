@@ -1,6 +1,7 @@
 import config from "common/config";
 import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
 import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
+import { isAppURL } from "../../utils";
 
 interface ContentScriptMessage {
   action: string;
@@ -16,7 +17,6 @@ let requestId = 1;
 const constants = {
   CONTENT_SCRIPT: "content_script",
   PAGE_SCRIPT: "page_script",
-  DOMAIN: config.WEB_URL,
   SOURCE_FIELD: "source",
   ACTION_USER_LOGGED_IN: "user:loggedIn",
 };
@@ -56,7 +56,7 @@ export const sendExtensionMessage = (message: ContentScriptMessage, callback?: M
   }
 
   message[constants.SOURCE_FIELD] = constants.CONTENT_SCRIPT;
-  window.postMessage(message, constants.DOMAIN);
+  window.postMessage(message, window.origin);
 };
 
 const sendResponse = (originalEventData: ContentScriptMessage, response?: unknown): void => {
@@ -71,7 +71,7 @@ export const initMessageHandler = () => {
   window.addEventListener(
     "message",
     async (event: MessageEvent): Promise<void> => {
-      if (event && event.origin !== config.WEB_URL) {
+      if (event && !isAppURL(event.origin)) {
         if (config.logLevel === "debug") {
           console.log("Ignoring message from the following domain", event.origin, event.data);
         }

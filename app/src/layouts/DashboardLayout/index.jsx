@@ -2,18 +2,21 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
-import { Sidebar } from "./SidebarV2";
+import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
   const { pathname } = location;
+  const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isPersonaRecommendationScreen = userPersona.page === 4 && !userPersona.isSurveyCompleted;
+  const isPersonaRecommendationScreen =
+    userPersona.page === 4 && !userPersona.isSurveyCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const isSidebarVisible = useMemo(
     () =>
@@ -32,9 +35,7 @@ const DashboardLayout = () => {
           <DashboardContent />
         </div>
 
-        <div className="app-footer">
-          <Footer />
-        </div>
+        <div className="app-footer">{!isPersonaRecommendationScreen && <Footer />}</div>
       </div>
     </>
   );
