@@ -7,6 +7,21 @@ export interface TeamWorkspace {
   inviteId: string;
 }
 
+export interface Team {
+  name: string;
+  accessCount: number;
+  access: string[];
+  admins: string[];
+  adminCount: number;
+  members: {
+    [ownerId: string]: {
+      role: TeamRole;
+    };
+  };
+  owner: string;
+  inviteId?: string;
+}
+
 export enum TeamRole {
   admin = "admin",
   write = "write",
