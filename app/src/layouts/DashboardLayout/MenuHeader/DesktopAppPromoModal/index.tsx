@@ -4,7 +4,6 @@ import LINKS from "config/constants/sub/links";
 import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
 import { AppleFilled, WindowsFilled } from "@ant-design/icons";
-import { ReactComponent as DesktopBanner } from "./desktop-banner.svg";
 import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
 import { ReactComponent as LinuxIcon } from "./linux.svg";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
@@ -88,7 +87,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
         </a>
       </div>
       <div className="right-section">
-        <DesktopBanner />
+        <img width={480} height={360} alt="Desktop banner" src="/assets/img/banners/desktop-promo.png" />
       </div>
     </RQModal>
   );
