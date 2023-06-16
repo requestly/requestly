@@ -18,6 +18,7 @@ import { actions } from "store";
 import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
 import Logger from "lib/logger";
 import { Team } from "types";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -30,21 +31,26 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
 
-  const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
-
   const user = useSelector(getUserAuthDetails);
   const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
+
+  const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
+  const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
+    user?.details?.profile?.email,
+  ]);
 
   const handleOnSurveyCompletion = useCallback(async () => {
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
+          const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
+
           availableTeams.length === 0 &&
             createTeam({
-              teamName: "MY NEW WORKSPACE",
+              teamName: newTeamName,
               generatePublicLink: true,
             }).then((response: any) => {
-              setCreatedTeamData(response?.data);
+              setCreatedTeamData({ name: newTeamName, ...response?.data });
             });
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
@@ -56,7 +62,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile?.uid]);
+  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile?.uid, userEmailDomain]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
