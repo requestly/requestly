@@ -1,12 +1,11 @@
-import EMAIL_DOMAINS from "config/constants/sub/email-domains";
+import PATHS from "config/constants/sub/paths";
+import { getAndUpdateInstallationDate } from "utils/Misc";
 
-export const getBusinessDomain = (user: any) => {
-  const email = user?.details?.profile?.email;
-  const domain = email.split("@")[1];
+export const shouldShowWorkspaceOnboarding = async (appMode: string) => {
+  // Don't show persona survey on Browser if user is authenticating from desktop app
+  if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE)) return false;
 
-  if (EMAIL_DOMAINS.PERSONAL.includes(domain)) {
-    return null;
-  } else {
-    return domain;
-  }
+  const installDate = await getAndUpdateInstallationDate(appMode, false, false);
+  if (new Date(installDate) >= new Date("2023-06-19")) return true;
+  else return false;
 };

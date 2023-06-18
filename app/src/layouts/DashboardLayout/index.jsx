@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
+import { shouldShowWorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding/utils";
 import { getAppMode, getUserPersonaSurveyDetails, getIsWorkspaceOnboardingCompleted } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
@@ -15,14 +16,20 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { pathname } = location;
+  const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
-  const isWorkspaceOnboardingScreen = !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding";
+  const isWorkspaceOnboardingScreen =
+    !isWorkspaceOnboardingCompleted &&
+    appOnboardingExp === "workspace_onboarding" &&
+    state?.src === "workspace_onboarding";
   const isPersonaRecommendationScreen =
-    userPersona.page === 2 && !userPersona.isSurveyCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+    userPersona.page === 2 &&
+    !userPersona.isSurveyCompleted &&
+    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+    state?.src === "persona_survey_modal";
 
   const isSidebarVisible = useMemo(
     () =>
@@ -36,22 +43,26 @@ const DashboardLayout = () => {
     [pathname, isPersonaRecommendationScreen, isWorkspaceOnboardingScreen]
   );
   useEffect(() => {
-    if (!isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
-      console.log("WORKSPACE", appOnboardingExp);
-      navigate(PATHS.GETTING_STARTED, {
-        replace: true,
-        state: {
-          src: "workspace_onboarding",
-          redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-        },
-      });
-    }
+    shouldShowWorkspaceOnboarding(appMode).then((result) => {
+      if (result && !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
+        navigate(PATHS.GETTING_STARTED, {
+          replace: true,
+          state: {
+            src: "workspace_onboarding",
+            redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
+          },
+        });
+      }
+    });
+  }, [navigate, location.state?.redirectTo, appOnboardingExp, isWorkspaceOnboardingCompleted, appMode]);
+
+  useEffect(() => {
     if (
+      userPersona.page === 2 &&
       !userPersona.isSurveyCompleted &&
       appOnboardingExp !== "workspace_onboarding" &&
       appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
     ) {
-      console.log("PERSONA", appOnboardingExp);
       navigate(PATHS.GETTING_STARTED, {
         replace: true,
         state: {
@@ -62,11 +73,10 @@ const DashboardLayout = () => {
     }
   }, [
     navigate,
-    location.state?.redirectTo,
-    userPersona.page,
     userPersona.isSurveyCompleted,
+    userPersona.page,
+    location.state?.redirectTo,
     appOnboardingExp,
-    isWorkspaceOnboardingCompleted,
     appMode,
   ]);
 
