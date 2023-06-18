@@ -8,20 +8,17 @@ import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
-import {
-  getActiveModals,
-  getAppMode,
-  getUserPersonaSurveyDetails,
-  getIsWorkspaceOnboardingCompleted,
-} from "store/selectors";
+import { getActiveModals, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-// import { PersonaSurveyModal } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey";
+import { PersonaSurvey } from "components/misc/PersonaSurvey";
+import { RQModal } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -29,13 +26,13 @@ const DashboardContent = () => {
   const navigate = useNavigate();
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
+  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   //Global state
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -53,9 +50,6 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  // const togglePersonaSurveyModal = useCallback(() => {
-  //   dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
-  // }, [dispatch]);
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -76,30 +70,6 @@ const DashboardContent = () => {
       navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
     }
   }, [appMode, location, navigate]);
-
-  useEffect(() => {
-    // if (
-    //   userPersona.page === 4 &&
-    //   userPersona.isSurveyCompleted === false &&
-    //   appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-    // )
-    if (!isWorkspaceOnboardingCompleted) {
-      navigate(PATHS.GETTING_STARTED, {
-        replace: true,
-        state: {
-          src: "workspace_onboarding",
-          redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-        },
-      });
-    }
-  }, [
-    navigate,
-    location.state?.redirectTo,
-    userPersona.page,
-    userPersona.isSurveyCompleted,
-    appMode,
-    isWorkspaceOnboardingCompleted,
-  ]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
@@ -156,14 +126,19 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {/* {!userPersona.isSurveyCompleted ? (
-        <PersonaSurveyModal
-          isOpen={activeModals.personaSurveyModal.isActive}
-          toggle={togglePersonaSurveyModal}
-          toggleImportRulesModal={toggleImportRulesModal}
+      {userPersona.page !== 2 && appOnboardingExp !== "workspace_onboarding" ? (
+        <RQModal
+          open={true}
+          centered
+          closable={false}
+          className="survey-modal"
+          bodyStyle={{ width: "550px" }}
+          maskStyle={{ background: "#0D0D10" }}
           {...activeModals.personaSurveyModal.props}
-        />
-      ) : null} */}
+        >
+          <PersonaSurvey isSurveyModal={true} />
+        </RQModal>
+      ) : null}
 
       {/* ) : null} */}
       {isImportRulesModalActive ? (

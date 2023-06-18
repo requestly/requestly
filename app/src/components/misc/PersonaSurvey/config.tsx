@@ -1,5 +1,6 @@
 import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig } from "./types";
 import { setUserPersona } from "./actions";
+import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 
 export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
   [QuestionnaireType.PERSONA]: {
@@ -43,6 +44,12 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
 export const SurveyConfig: PageConfig[] = [
   {
     pageId: 0,
+    title: "Welcome to Requestly!",
+    subTitle: "Help us personalizse your experience by answering the following questionnaire",
+    render: () => <GettingStartedWithSurvey />,
+  },
+  {
+    pageId: 1,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
     render: QuestionnaireType.PERSONA,

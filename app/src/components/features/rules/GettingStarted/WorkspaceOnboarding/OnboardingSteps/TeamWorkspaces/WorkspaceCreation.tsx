@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 
 interface Props {
-  createdTeamData: { teamId: string; inviteId: string } | null;
+  createdTeamData: { teamId: string; inviteId: string; teamName: string } | null;
 }
 export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
   const dispatch = useDispatch();
@@ -99,7 +99,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           size="small"
           placeholder="Workspace name"
           className="mt-8 workspace-onboarding-field"
-          defaultValue="MY NEW WORKSPACE"
+          defaultValue={createdTeamData.teamName ?? "MY NEW WORKSPACE"}
         />
       </div>
       <div className="mt-20">
