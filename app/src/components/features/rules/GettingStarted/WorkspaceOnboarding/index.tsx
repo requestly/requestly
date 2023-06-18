@@ -9,6 +9,7 @@ import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
 import { GettingStartedWithSurvey } from "./OnboardingSteps/PersonaSurvey/SurveyBanner";
 import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
+import { getSignupDate } from "utils/Misc";
 import { OnboardingSteps } from "./types";
 import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
@@ -41,12 +42,20 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     user?.details?.profile?.email,
   ]);
 
+  const handleAuthCompletion = useCallback(() => {
+    getSignupDate(window.uid).then((signup_date) => {
+      if (new Date() > new Date(signup_date)) {
+        dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      }
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+    });
+  }, [dispatch]);
+
   const handleOnSurveyCompletion = useCallback(async () => {
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
           const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
-
           availableTeams.length === 0 &&
             createTeam({
               teamName: newTeamName,
@@ -103,7 +112,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         return (
           <OnboardingAuthForm
             callback={{
-              onSignInSuccess: () => dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY)),
+              onSignInSuccess: handleAuthCompletion,
             }}
           />
         );
@@ -118,7 +127,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           />
         );
     }
-  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, dispatch]);
+  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
   return (
     <>
       {step === OnboardingSteps.RECOMMENDATIONS ? (
