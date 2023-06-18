@@ -65,3 +65,27 @@
 .persona-survey-banner .survey-lottie-animation {
   width: 80%;
 }
+.persona-survey-container .skip-recommendation-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: -30px;
+  margin-left: 10px;
+  width: 100%;
+  color: var(--text-gray);
+}
+.persona-survey-container .skip-recommendation-btn {
+  color: var(--white);
+  padding: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.persona-survey-container .skip-recommendation-btn.persona-login-btn {
+  text-decoration: underline;
+}
+.persona-survey-container .skip-recommendation-btn.persona-login-btn:hover {
+  text-decoration: underline;
+}
+.persona-survey-container .skip-recommendation-btn:hover {
+  color: var(--white);
+}

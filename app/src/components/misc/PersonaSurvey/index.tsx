@@ -7,11 +7,14 @@ import { SurveyConfig, OptionsConfig } from "./config";
 import { shuffleOptions, shouldShowPersonaSurvey } from "./utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, PageConfig, QuestionnaireType } from "./types";
-// import { trackPersonaSurveyViewed, trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaSurveyViewed, trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SurveyOption } from "./Option";
+import { RQButton } from "lib/design-system/components";
 import "./index.css";
+import APP_CONSTANTS from "config/constants";
+import { AUTH } from "modules/analytics/events/common/constants";
 
 interface SurveyProps {
   callback?: () => void;
@@ -28,9 +31,44 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
     return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
   }, []);
 
+  const SkippableButton = () => {
+    switch (currentPage) {
+      case 0:
+        return (
+          <div className="skip-recommendation-wrapper">
+            Existing user?
+            <RQButton
+              className="skip-recommendation-btn persona-login-btn"
+              type="link"
+              onClick={() => {
+                trackPersonaSurveySignInClicked();
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newProps: {
+                      callback: () => {
+                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                      },
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+                    },
+                  })
+                );
+              }}
+            >
+              Sign in
+            </RQButton>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   const renderPageHeader = (page: PageConfig) => {
     return (
       <>
+        <SkippableButton />
         <div className="text-center white text-bold survey-title">{page.title}</div>
         <div className="w-full survey-subtitle-wrapper">
           <div className="text-gray text-center mt-8">{page.subTitle}</div>
@@ -86,9 +124,11 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
       shouldShowPersonaSurvey(appMode).then((result) => {
         if (result) {
           if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            if (currentPage === 0) trackPersonaSurveyViewed();
             dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
           } else {
             if (isExtensionInstalled()) {
+              if (currentPage === 0) trackPersonaSurveyViewed();
               const isRecommendationScreen = currentPage === 2;
               console.log({ isRecommendationScreen });
               dispatch(

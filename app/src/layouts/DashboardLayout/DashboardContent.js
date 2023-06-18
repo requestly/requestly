@@ -8,7 +8,7 @@ import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
-import { getActiveModals, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getActiveModals, getAppMode, getUserPersonaSurveyDetails, getUserAuthDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -26,11 +26,12 @@ const DashboardContent = () => {
   const navigate = useNavigate();
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
-  // const appOnboardingExp = useFeatureValue("app_onboarding", null);
-  const appOnboardingExp = "workspace_onboarding";
+  const appOnboardingExp = useFeatureValue("app_onboarding", null);
+  // const appOnboardingExp = "workspace_onboarding";
 
   //Global state
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -127,7 +128,7 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {userPersona.page !== 2 && appOnboardingExp !== "workspace_onboarding" ? (
+      {userPersona.page !== 2 && appOnboardingExp !== "workspace_onboarding" && !user?.loggedIn ? (
         <RQModal
           open={true}
           centered
