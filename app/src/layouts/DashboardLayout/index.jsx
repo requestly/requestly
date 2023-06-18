@@ -20,11 +20,13 @@ const DashboardLayout = () => {
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
-  const appOnboardingExp = useFeatureValue("app_onboarding", null);
+  // const appOnboardingExp = useFeatureValue("app_onboarding", null);
+  const appOnboardingExp = "workspace_onboarding";
   const isWorkspaceOnboardingScreen =
     !isWorkspaceOnboardingCompleted &&
     appOnboardingExp === "workspace_onboarding" &&
     state?.src === "workspace_onboarding";
+
   const isPersonaRecommendationScreen =
     userPersona.page === 2 &&
     !userPersona.isSurveyCompleted &&

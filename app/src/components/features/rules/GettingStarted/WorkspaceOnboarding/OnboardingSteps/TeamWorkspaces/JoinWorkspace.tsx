@@ -13,6 +13,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -76,17 +77,16 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   );
 };
 
-export const JoinWorkspace: React.FC<{ availableTeams: Team[]; isPendingInvite: boolean }> = ({
-  availableTeams,
-  isPendingInvite,
-}) => {
+export const JoinWorkspace: React.FC<{
+  availableTeams: Team[];
+  isPendingInvite: boolean;
+  createNewTeam: () => void;
+}> = ({ availableTeams, isPendingInvite, createNewTeam }) => {
   const dispatch = useDispatch();
-
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   return (
     <>
-      <div className="header text-center ">
+      <div className="header text-center">
         {isPendingInvite ? "You have invitation to join workspace" : "We found your team on Requestly"}
       </div>
       <div className="display-row-center mt-20">
@@ -104,15 +104,7 @@ export const JoinWorkspace: React.FC<{ availableTeams: Team[]; isPendingInvite: 
         <RQButton type="text" onClick={() => dispatch(actions.updateIsWorkspaceOnboardingCompleted())}>
           Skip for now
         </RQButton>
-        <RQButton
-          type="default"
-          className="text-bold"
-          onClick={() => {
-            setIsProcessing(true);
-          }}
-          loading={isProcessing}
-          icon={<PlusOutlined />}
-        >
+        <RQButton type="default" className="text-bold" onClick={createNewTeam} icon={<PlusOutlined />}>
           Create new workspace
         </RQButton>
       </div>
