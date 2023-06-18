@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails, getWorkspaceOnboardingStep } from "store/selectors";
+import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -26,12 +27,13 @@ interface OnboardingProps {
 
 export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRulesModalClick }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+  const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const [createdTeamData, setCreatedTeamData] = useState(null);
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
 
-  const user = useSelector(getUserAuthDetails);
   const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
@@ -88,6 +90,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       );
     }
   }, [pendingTeams.length, user?.details?.profile]);
+
+  useEffect(() => {
+    if (user?.loggedIn && currentTeams?.length) {
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    }
+  }, [dispatch, user?.loggedIn, currentTeams?.length]);
 
   const renderOnboardingActionComponent = useCallback(() => {
     switch (step) {
