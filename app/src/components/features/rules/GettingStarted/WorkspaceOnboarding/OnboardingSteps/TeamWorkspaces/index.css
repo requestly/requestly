@@ -20,7 +20,7 @@
   padding: 9px 20px;
   color: var(--text-gray);
   border-top: 1px solid var(--border-dark);
-  background-color: var(--component-dark-background);
+  background-color: var(--component-background);
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 .workspace-onboarding-wrapper .workspace-onboarding-body .workspace-onboarding-field {

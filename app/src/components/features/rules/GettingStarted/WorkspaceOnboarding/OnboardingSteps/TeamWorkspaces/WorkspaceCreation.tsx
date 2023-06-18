@@ -7,9 +7,8 @@ import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/M
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { CopyOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast";
-import { OnboardingSteps } from "../../types";
+import { NewTeamData, OnboardingSteps } from "../../types";
 import { actions } from "store";
-import "./index.css";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
@@ -17,11 +16,12 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 interface Props {
-  createdTeamData: { teamId: string; inviteId: string; name: string } | null;
+  defaultTeamData: NewTeamData | null;
 }
-export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
+export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const functions = getFunctions();
@@ -36,14 +36,27 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<string>("Copy");
+  const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
   // const [newTeamData, setNewTeamData] = useState(null);
+
+  console.log({ defaultTeamData });
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
 
-  const handleAddMembers = () => {
+  const handleCreateNewTeam = () => {
+    setIsProcessing(true);
+    const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
+    createTeam({
+      teamName: newWorkspaceName,
+    }).then((response: any) => {
+      handleAddMembers(newWorkspaceName, response?.data?.teamId);
+    });
+  };
+
+  const handleAddMembers = (newTeamName?: string, newTeamId?: string) => {
     if (!inviteEmails || !inviteEmails.length) {
       toast.warn("Please add members email to invite them");
       return;
@@ -53,7 +66,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
 
     createTeamInvites({
-      teamId: createdTeamData?.teamId,
+      teamId: defaultTeamData?.teamId ?? newTeamId,
       emails: inviteEmails,
       role: makeUserAdmin ? "admin" : "write",
     })
@@ -65,7 +78,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
         setIsProcessing(false);
         switchWorkspace(
           {
-            teamId: createdTeamData.teamId,
+            teamId: defaultTeamData?.teamId ?? newTeamId,
             teamMembersCount: 1,
           },
           dispatch,
@@ -74,7 +87,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           },
           appMode
         );
-        redirectToTeam(navigate, createdTeamData.teamId, {
+        redirectToTeam(navigate, defaultTeamData?.teamId ?? newTeamId, {
           state: {
             isNewTeam: true,
           },
@@ -87,7 +100,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
 
   const handleOnCopy = () => {
     setCopiedText("Copied");
-    navigator.clipboard.writeText(`htts://requestly.io/${createdTeamData?.inviteId}`); //copy to clipboard
+    navigator.clipboard.writeText(`htts://requestly.io/${defaultTeamData?.inviteId}`);
     setTimeout(() => {
       setCopiedText("Copy");
     }, 500);
@@ -95,18 +108,22 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
-      upsertTeamCommonInvite({ teamId: createdTeamData.teamId, domainEnabled: enabled }).then((res: any) => {
-        if (res?.data?.success) {
-          setDomainJoiningEnabled(enabled);
-        }
-      });
+      if (defaultTeamData) {
+        upsertTeamCommonInvite({ teamId: defaultTeamData?.teamId, domainEnabled: enabled }).then((res: any) => {
+          if (res?.data?.success) {
+            setDomainJoiningEnabled(enabled);
+          }
+        });
+      }
     },
-    [createdTeamData.teamId, upsertTeamCommonInvite]
+    [defaultTeamData, upsertTeamCommonInvite]
   );
 
   useEffect(() => {
-    upsertTeamCommonInvite({ teamId: createdTeamData.teamId, domainEnabled: true });
-  }, [createdTeamData.teamId, upsertTeamCommonInvite]);
+    if (defaultTeamData) {
+      upsertTeamCommonInvite({ teamId: defaultTeamData?.teamId, domainEnabled: true });
+    }
+  }, [defaultTeamData, upsertTeamCommonInvite]);
 
   return (
     <>
@@ -120,8 +137,10 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           size="small"
           placeholder="Workspace name"
           className="mt-8 workspace-onboarding-field"
-          defaultValue={createdTeamData.name}
-          disabled
+          defaultValue={defaultTeamData?.name ?? "My new team"}
+          disabled={defaultTeamData ? true : false}
+          value={defaultTeamData?.name ?? newWorkspaceName}
+          onChange={(e) => setNewWorkspaceName(e.target.value)}
         />
       </div>
       <div className="mt-20">
@@ -153,7 +172,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           />
         </Row>
       </div>
-      {createdTeamData && (
+      {defaultTeamData && (
         <div className="mt-20">
           <div className="text-bold text-white">Invite link</div>
           <div className="workspace-invite-link">
@@ -161,7 +180,7 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
               size="small"
               className="mt-8 workspace-onboarding-field text-white"
               disabled
-              value={`https://requestly.io/invite/${createdTeamData?.inviteId}`}
+              value={`https://requestly.io/invite/${defaultTeamData?.inviteId}`}
             />
             <RQButton type="default" onClick={handleOnCopy}>
               <CopyOutlined />
@@ -170,11 +189,17 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
           </div>
         </div>
       )}
-      <Divider />
-      <div className="mt-20 space-between">
-        <Typography.Text className="text-gray">Anyone with {userEmailDomain} can join the workspace</Typography.Text>
-        <Switch checked={domainJoiningEnabled} onChange={handleDomainToggle} />
-      </div>
+      {defaultTeamData && (
+        <>
+          <Divider />
+          <div className="mt-20 space-between">
+            <Typography.Text className="text-gray">
+              Anyone with {userEmailDomain} can join the workspace
+            </Typography.Text>
+            <Switch checked={domainJoiningEnabled} onChange={handleDomainToggle} />
+          </div>
+        </>
+      )}
 
       <div className="workspace-onboarding-footer">
         <RQButton
@@ -183,8 +208,15 @@ export const CreateWorkspace: React.FC<Props> = ({ createdTeamData }) => {
         >
           Skip for now
         </RQButton>
-        <RQButton type="primary" className="text-bold" onClick={handleAddMembers} loading={isProcessing}>
-          Send invitations
+        <RQButton
+          type="primary"
+          className="text-bold"
+          onClick={() => {
+            defaultTeamData ? handleAddMembers() : handleCreateNewTeam();
+          }}
+          loading={isProcessing}
+        >
+          {defaultTeamData ? "Send invitations" : "Create workspace"}
         </RQButton>
       </div>
     </>

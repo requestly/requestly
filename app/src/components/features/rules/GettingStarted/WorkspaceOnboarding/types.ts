@@ -7,4 +7,6 @@ export enum OnboardingSteps {
 export interface NewTeamData {
   id: string;
   inviteId: string;
+  teamId: string;
+  name: string;
 }
