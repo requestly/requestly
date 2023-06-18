@@ -4,7 +4,7 @@ import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
 import { actions } from "store";
-import { TeamWorkspace } from "types";
+import { Team } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -14,7 +14,7 @@ import { getAppMode } from "store/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 
-const Workspace: React.FC<{ team: TeamWorkspace }> = ({ team }) => {
+const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -76,7 +76,7 @@ const Workspace: React.FC<{ team: TeamWorkspace }> = ({ team }) => {
   );
 };
 
-export const JoinWorkspace: React.FC<{ availableTeams: TeamWorkspace[]; isPendingInvite: boolean }> = ({
+export const JoinWorkspace: React.FC<{ availableTeams: Team[]; isPendingInvite: boolean }> = ({
   availableTeams,
   isPendingInvite,
 }) => {

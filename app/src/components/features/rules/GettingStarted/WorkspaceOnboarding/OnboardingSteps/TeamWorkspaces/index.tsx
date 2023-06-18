@@ -2,11 +2,11 @@ import React from "react";
 import { CreateWorkspace } from "./WorkspaceCreation";
 import { JoinWorkspace } from "./JoinWorkspace";
 import "./index.css";
-import { TeamWorkspace } from "types";
+import { Team } from "types";
 
 interface WorkspaceOnboardingStepProps {
   createdTeamData: any;
-  availableTeams: TeamWorkspace[];
+  availableTeams: Team[];
   isPendingInvite: boolean;
 }
 

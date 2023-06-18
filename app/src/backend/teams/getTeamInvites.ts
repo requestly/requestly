@@ -4,6 +4,10 @@ import { InviteStatus, InviteType, TeamInvite } from "types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 
 export const getPendingInvites = async (email: string): Promise<TeamInvite[] | null> => {
+  if (!email) {
+    return null;
+  }
+
   const db = getFirestore(firebaseApp);
   const invitesRef = collection(db, "invites");
   const inviteQuery = query(
@@ -21,6 +25,16 @@ export const getPendingInvites = async (email: string): Promise<TeamInvite[] | n
         return { ...doc.data(), id: doc?.id } as TeamInvite;
       })
     : [];
+};
+
+export const getTeamsWithPendingInvites = async (email: string, currentUserId: string) => {
+  const pendingInvites = await getPendingInvites(email);
+
+  const teamIds = pendingInvites.map((invite) => {
+    return invite.metadata.teamId as string;
+  });
+
+  return await getNotJoinedTeams(teamIds, currentUserId);
 };
 
 export const getTeamsWithSameDomainEnabled = async (email: string, currentUserId: string) => {
@@ -43,10 +57,10 @@ export const getTeamsWithSameDomainEnabled = async (email: string, currentUserId
     return doc.data().metadata.teamId as string;
   });
 
-  return await getSameDomainEnabledTeamsToJoin(teamIds, currentUserId);
+  return await getNotJoinedTeams(teamIds, currentUserId);
 };
 
-const getSameDomainEnabledTeamsToJoin = async (teamIds: string[], userId: string) => {
+const getNotJoinedTeams = async (teamIds: string[], userId: string) => {
   if (teamIds.length === 0) {
     return [];
   }
