@@ -5,8 +5,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
 import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
-import { GettingStartedWithSurvey } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/GettingStartedWithSurvey";
-import { PersonaSurvey } from "./OnboardingSteps/PersonaSurvey";
+import { GettingStartedWithSurvey } from "./OnboardingSteps/PersonaSurvey/SurveyBanner";
+import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
 import { OnboardingSteps } from "./types";
 import "./index.css";
@@ -89,7 +89,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           />
         );
       case OnboardingSteps.PERSONA_SURVEY:
-        return <PersonaSurvey callback={handleOnSurveyCompletion} />;
+        return <PersonaSurvey callback={handleOnSurveyCompletion} isSurveyModal={false} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
         return (
           <WorkspaceOnboardingStep

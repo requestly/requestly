@@ -37,7 +37,7 @@ const GettingStarted = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  // const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -47,6 +47,7 @@ const GettingStarted = () => {
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
   const isUserLoggedIn = user.loggedIn;
   const shouldShowWorkspaceOnboarding = state?.src === "workspace_onboarding" && !isWorkspaceOnboardingCompleted;
+  const shouldShowRecommendationScreen = state?.src === "persona_survey_modal" && !userPersona.isSurveyCompleted;
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -88,104 +89,109 @@ const GettingStarted = () => {
     }
   }, []);
 
+  console.log({ shouldShowRecommendationScreen, shouldShowWorkspaceOnboarding });
+
+  if (shouldShowWorkspaceOnboarding) {
+    return <WorkspaceOnboarding handleUploadRulesClick={handleUploadRulesClick} />;
+  }
+  if (shouldShowRecommendationScreen) {
+    return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
+  }
+
   return (
     <>
-      {shouldShowWorkspaceOnboarding ? (
-        <WorkspaceOnboarding handleUploadRulesClick={handleUploadRulesClick} />
-      ) : (
-        <Row className="getting-started-container">
-          <Col
-            offset={1}
-            span={22}
-            md={{
-              span: 20,
-              offset: 2,
-            }}
-            lg={{
-              span: 18,
-              offset: 3,
-            }}
-            xl={{
-              span: 14,
-              offset: 5,
-            }}
-          >
-            <>
-              <div className="getting-started-header-container">
-                <p className="text-gray getting-started-header">
-                  <span className="text-bold">👋 Welcome to Requestly!!</span> Here's a quick overview of what you can
-                  do with Requestly.
-                </p>
-              </div>
+      <Row className="getting-started-container">
+        <Col
+          offset={1}
+          span={22}
+          md={{
+            span: 20,
+            offset: 2,
+          }}
+          lg={{
+            span: 18,
+            offset: 3,
+          }}
+          xl={{
+            span: 14,
+            offset: 5,
+          }}
+        >
+          <>
+            <div className="getting-started-header-container">
+              <p className="text-gray getting-started-header">
+                <span className="text-bold">👋 Welcome to Requestly!!</span> Here's a quick overview of what you can do
+                with Requestly.
+              </p>
+            </div>
 
-              <div>
-                <div className="getting-started-video-container">
-                  <video
-                    src="https://dhuecxx44iqxd.cloudfront.net/demo/Getting-Started-vid.mp4"
-                    playsInline
-                    controls
-                    ref={gettingStartedVideo}
-                    preload="auto"
-                  />
-                </div>
+            <div>
+              <div className="getting-started-video-container">
+                <video
+                  src="https://dhuecxx44iqxd.cloudfront.net/demo/Getting-Started-vid.mp4"
+                  playsInline
+                  controls
+                  ref={gettingStartedVideo}
+                  preload="auto"
+                />
               </div>
+            </div>
 
-              <div className="getting-started-actions">
-                <p className="text-gray getting-started-subtitle">
-                  Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
-                </p>
-                <div className="getting-started-btns-wrapper">
-                  <Button
-                    type="primary"
-                    onClick={handleCreateMyFirstRuleClick}
-                    className="getting-started-create-rule-btn"
+            <div className="getting-started-actions">
+              <p className="text-gray getting-started-subtitle">
+                Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
+              </p>
+              <div className="getting-started-btns-wrapper">
+                <Button
+                  type="primary"
+                  onClick={handleCreateMyFirstRuleClick}
+                  className="getting-started-create-rule-btn"
+                >
+                  Create your first rule
+                </Button>
+                <AuthConfirmationPopover
+                  title="You need to sign up to upload rules"
+                  callback={handleUploadRulesClick}
+                  source={AUTH.SOURCE.UPLOAD_RULES}
+                >
+                  <RQButton
+                    type="default"
+                    onClick={() => {
+                      trackUploadRulesButtonClicked(AUTH.SOURCE.GETTING_STARTED);
+                      user?.details?.isLoggedIn && handleUploadRulesClick();
+                    }}
                   >
-                    Create your first rule
-                  </Button>
-                  <AuthConfirmationPopover
-                    title="You need to sign up to upload rules"
-                    callback={handleUploadRulesClick}
-                    source={AUTH.SOURCE.UPLOAD_RULES}
+                    Upload rules
+                  </RQButton>
+                </AuthConfirmationPopover>
+
+                {/* TODO: make desktop only */}
+                {isCharlesImportFeatureFlagOn ? (
+                  <RQButton
+                    type="default"
+                    onClick={() => {
+                      toggleImportCharlesRulesModal();
+                      trackCharlesSettingsImportStarted(AUTH.SOURCE.GETTING_STARTED);
+                    }}
                   >
-                    <RQButton
-                      type="default"
-                      onClick={() => {
-                        trackUploadRulesButtonClicked(AUTH.SOURCE.GETTING_STARTED);
-                        user?.details?.isLoggedIn && handleUploadRulesClick();
-                      }}
-                    >
-                      Upload rules
-                    </RQButton>
-                  </AuthConfirmationPopover>
-
-                  {/* TODO: make desktop only */}
-                  {isCharlesImportFeatureFlagOn ? (
-                    <RQButton
-                      type="default"
-                      onClick={() => {
-                        toggleImportCharlesRulesModal();
-                        trackCharlesSettingsImportStarted(AUTH.SOURCE.GETTING_STARTED);
-                      }}
-                    >
-                      Import settings from Charles Proxy
-                    </RQButton>
-                  ) : null}
-                </div>
+                    Import settings from Charles Proxy
+                  </RQButton>
+                ) : null}
               </div>
+            </div>
 
-              {showExistingRulesBanner ? (
-                <p className="text-gray">
-                  👉 If you have existing rules, please{" "}
-                  <button onClick={handleLoginOnClick} className="getting-started-signin-link">
-                    Sign in
-                  </button>{" "}
-                  to access them.
-                </p>
-              ) : null}
-            </>
-          </Col>
-        </Row>
-      )}
+            {showExistingRulesBanner ? (
+              <p className="text-gray">
+                👉 If you have existing rules, please{" "}
+                <button onClick={handleLoginOnClick} className="getting-started-signin-link">
+                  Sign in
+                </button>{" "}
+                to access them.
+              </p>
+            ) : null}
+          </>
+        </Col>
+      </Row>
       {/* {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
