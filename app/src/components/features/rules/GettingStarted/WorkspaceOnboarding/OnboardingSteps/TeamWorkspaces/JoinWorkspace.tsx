@@ -13,7 +13,6 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import "./index.css";
 
 const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   const dispatch = useDispatch();

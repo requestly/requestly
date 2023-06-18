@@ -16,7 +16,6 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import "./index.css";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
