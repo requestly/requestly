@@ -62,9 +62,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [appMode, dispatch, hasConnectedApps]);
 
   const handleAuthCompletion = useCallback(
-    (uid: string) => {
-      //TODO: if login then skip onboarding
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+    (isNewUser: boolean) => {
+      if (isNewUser) dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+      else dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     },
     [dispatch]
   );
@@ -116,7 +116,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           <div>
             <OnboardingAuthForm
               callback={{
-                onSignInSuccess: (uid) => handleAuthCompletion(uid),
+                onSignInSuccess: (uid, isNewUser) => handleAuthCompletion(isNewUser),
               }}
             />
             <div className="display-row-center mt-20">
