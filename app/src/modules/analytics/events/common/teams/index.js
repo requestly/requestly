@@ -82,7 +82,7 @@ export const trackCreateNewTeamClicked = (source) => {
 
 export const trackWorkspaceInviteLinkCopied = (source) => {
   const params = { source };
-  trackEvent(TEAMS.WORKSPACE_INVITE_LINK_COPIED);
+  trackEvent(TEAMS.WORKSPACE_INVITE_LINK_COPIED, params);
 };
 
 export const trackOnboardingWorkspaceSkip = () => {
@@ -91,15 +91,15 @@ export const trackOnboardingWorkspaceSkip = () => {
 
 export const trackCreateNewWorkspace = (source) => {
   const params = { source };
-  trackEvent(TEAMS.CREATE_NEW_WORKSPACE);
+  trackEvent(TEAMS.CREATE_NEW_WORKSPACE, params);
 };
 
 export const trackTeamMemberAdded = (source) => {
   const params = { source };
-  trackEvent(TEAMS.TEAM_MEMBER_ADDED);
+  trackEvent(TEAMS.TEAM_MEMBER_ADDED, params);
 };
 
 export const trackWorkspaceInviteAccepted = (source, domain) => {
   const params = { source, domain };
-  trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED);
+  trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED, params);
 };
