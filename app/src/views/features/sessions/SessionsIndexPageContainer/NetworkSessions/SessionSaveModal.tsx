@@ -6,7 +6,7 @@ import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffi
 import React, { useCallback, useState } from "react";
 import { toast } from "utils/Toast";
 import { saveNetworkSession } from "./actions";
-import PATHS from "config/constants/sub/paths";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import {
   trackNetworkSessionSaveCanceled,
   trackNetworkSessionSaved,
@@ -36,18 +36,18 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
       toast.success({
         key: "view_network_session",
         content: (
-          <span>
-            Network session saved successfully.{" "}
+          <Space size={14}>
+            <span>Network session saved successfully. </span>
             <span
               className="text-primary cursor-pointer"
               onClick={() => {
-                navigate(`${PATHS.SESSIONS.NETWORK.RELATIVE}/${id}`);
+                redirectToNetworkSession(navigate, id);
                 toast.hide("view_network_session");
               }}
             >
-              View
+              View session
             </span>
-          </span>
+          </Space>
         ),
       });
     }
