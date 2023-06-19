@@ -21,13 +21,13 @@ import { RQButton } from "lib/design-system/components";
 import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
 import { OnboardingSteps } from "./types";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { actions } from "store";
 import { Team } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import EMAIL_DOMAINS from "config/constants/sub/email-domains";
 import "./index.css";
+import { capitalize } from "lodash";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -79,11 +79,11 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
-          if (EMAIL_DOMAINS.PERSONAL.includes(userEmailDomain)) {
+          if (!isCompanyEmail(user?.details?.profile?.email)) {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
             return;
           }
-          const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
+          const newTeamName = `${capitalize(userEmailDomain?.split(".")?.[0]) ?? "my-team"}`;
           availableTeams.length === 0 &&
             createTeam({
               teamName: newTeamName,
@@ -102,7 +102,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile?.uid, userEmailDomain]);
+  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile, userEmailDomain]);
 
   useEffect(() => {
     if (workspaceOnboardingTeamDetails) {
