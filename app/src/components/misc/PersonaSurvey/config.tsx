@@ -45,7 +45,7 @@ export const SurveyConfig: PageConfig[] = [
   {
     pageId: 0,
     title: "Welcome to Requestly!",
-    subTitle: "Help us personalizse your experience by answering the following questionnaire",
+    subTitle: "Help us personaligse your experience by answering the following questionnaire",
     render: () => <GettingStartedWithSurvey />,
   },
   {
