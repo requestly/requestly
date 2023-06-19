@@ -54,6 +54,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   ]);
 
   const handleCreateNewTeam = () => {
+    trackCreateNewWorkspace("onboarding");
     setIsProcessing(true);
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     createTeam({
@@ -83,7 +84,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
-        trackCreateNewWorkspace("onboarding");
         switchWorkspace(
           {
             teamId: defaultTeamData?.teamId ?? newTeamId,
