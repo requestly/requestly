@@ -36,9 +36,9 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
               {
-                teamId: res?.data?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.data?.invite?.metadata?.teamName,
-                teamMembersCount: 1,
+                teamId: team.id,
+                teamName: team.name,
+                teamMembersCount: team.accessCount,
               },
               dispatch,
               {
