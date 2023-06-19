@@ -4,6 +4,7 @@ import { JoinWorkspace } from "./JoinWorkspace";
 import "./index.css";
 import { Team } from "types";
 import { NewTeamData } from "../../types";
+import SpinnerCard from "components/misc/SpinnerCard";
 
 interface WorkspaceOnboardingStepProps {
   defaultTeamData: NewTeamData | null;
@@ -28,7 +29,9 @@ export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = (
             isPendingInvite={isPendingInvite}
             createNewTeam={() => setCreatNewTeam(true)}
           />
-        ) : null}
+        ) : (
+          <SpinnerCard />
+        )}
       </div>
     </div>
   );
