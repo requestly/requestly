@@ -27,7 +27,6 @@ const DashboardContent = () => {
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
-  // const appOnboardingExp = "workspace_onboarding";
 
   //Global state
   const dispatch = useDispatch();

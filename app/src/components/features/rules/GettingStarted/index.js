@@ -91,8 +91,6 @@ const GettingStarted = () => {
     }
   }, []);
 
-  console.log({ shouldShowRecommendationScreen, shouldShowWorkspaceOnboarding });
-
   if (shouldShowWorkspaceOnboarding) {
     return <WorkspaceOnboarding handleUploadRulesClick={handleUploadRulesClick} />;
   }
