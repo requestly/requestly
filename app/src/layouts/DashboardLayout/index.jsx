@@ -7,11 +7,12 @@ import { shouldShowWorkspaceOnboarding } from "components/features/rules/Getting
 import { getAppMode, getUserPersonaSurveyDetails, getIsWorkspaceOnboardingCompleted } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
-import { Sidebar } from "./SidebarV2";
+import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import "./DashboardLayout.css";
 import PATHS from "config/constants/sub/paths";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
