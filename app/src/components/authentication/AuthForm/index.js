@@ -273,7 +273,7 @@ const AuthForm = ({
     }
   };
 
-  const renderBackButton = (action) => {
+  const BackButton = ({ action }) => {
     return (
       <button className="back-to-login-btn secondary-text cursor-pointer" style={{ padding: 0 }} onClick={action}>
         <HiArrowLeft />
@@ -425,7 +425,7 @@ const AuthForm = ({
   const renderEmailAuthSecondStep = () => {
     return (
       <>
-        {renderBackButton(() => setShowEmailSecondStep(false))}
+        <BackButton action={() => setShowEmailSecondStep(false)} />
         {renderEmailField()}
         {MODE === AUTH_ACTION_LABELS.SIGN_UP && <div className="mt-20 w-full">{renderNameField()}</div>}
         {renderPasswordField()}
@@ -572,10 +572,12 @@ const AuthForm = ({
           <Row className="auth-wrapper mt-1">
             {!path.includes(PATHS.AUTH.RESET_PASSWORD.RELATIVE) && (
               <>
-                {renderBackButton(() => {
-                  SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
-                  setEmail("");
-                })}
+                <BackButton
+                  action={() => {
+                    SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
+                    setEmail("");
+                  }}
+                />
               </>
             )}
             <div className="w-full mt-20">{renderEmailField()}</div>
