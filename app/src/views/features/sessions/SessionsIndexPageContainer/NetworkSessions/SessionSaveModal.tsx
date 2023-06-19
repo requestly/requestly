@@ -33,17 +33,23 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     if (onSave) {
       onSave(id);
     } else {
-      toast.success(
-        <span>
-          Network session saved successfully.{" "}
-          <span
-            className="text-primary cursor-pointer"
-            onClick={() => navigate(`${PATHS.SESSIONS.NETWORK.RELATIVE}/${id}`)}
-          >
-            View
+      toast.success({
+        key: "view_network_session",
+        content: (
+          <span>
+            Network session saved successfully.{" "}
+            <span
+              className="text-primary cursor-pointer"
+              onClick={() => {
+                navigate(`${PATHS.SESSIONS.NETWORK.RELATIVE}/${id}`);
+                toast.hide("view_network_session");
+              }}
+            >
+              View
+            </span>
           </span>
-        </span>
-      );
+        ),
+      });
     }
     setName("");
     if (!networkSessionTooltipShown) {
