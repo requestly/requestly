@@ -6,6 +6,7 @@ import { toast } from "utils/Toast";
 import { Typography, Row, Col, Modal } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
+import { isEmailValid } from "utils/FormattingHelper";
 
 //IMAGES
 import GoogleIcon from "../../../assets/img/icons/common/google.svg";
@@ -483,7 +484,10 @@ const AuthForm = ({
                         <RQButton
                           type="primary"
                           className="w-full text-bold mt-20"
-                          onClick={() => setShowEmailSecondStep(true)}
+                          onClick={() => {
+                            if (isEmailValid(email)) setShowEmailSecondStep(true);
+                            else toast.error("Please enter a valid email address");
+                          }}
                         >
                           Continue with email
                         </RQButton>
@@ -545,7 +549,10 @@ const AuthForm = ({
                   <RQButton
                     type="primary"
                     className="w-full text-bold mt-20"
-                    onClick={() => setShowEmailSecondStep(true)}
+                    onClick={() => {
+                      if (isEmailValid(email)) setShowEmailSecondStep(true);
+                      else toast.error("Please enter a valid email address");
+                    }}
                   >
                     Continue with email
                   </RQButton>
