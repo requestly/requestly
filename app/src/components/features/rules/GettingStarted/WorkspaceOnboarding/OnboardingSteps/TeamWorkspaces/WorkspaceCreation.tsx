@@ -39,8 +39,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
   // const [newTeamData, setNewTeamData] = useState(null);
 
-  console.log({ defaultTeamData });
-
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);

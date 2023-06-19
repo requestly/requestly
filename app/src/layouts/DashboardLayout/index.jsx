@@ -21,7 +21,7 @@ const DashboardLayout = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
-  // const appOnboardingExp = "workspace_onboarding";
+
   const isWorkspaceOnboardingScreen =
     !isWorkspaceOnboardingCompleted &&
     appOnboardingExp === "workspace_onboarding" &&

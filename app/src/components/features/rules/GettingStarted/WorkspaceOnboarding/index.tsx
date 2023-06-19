@@ -46,7 +46,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const handleAuthCompletion = useCallback(() => {
     getSignupDate(window.uid).then((signup_date) => {
       if (new Date() > new Date(signup_date)) {
-        console.log(new Date(), new Date(signup_date), "DATES");
         dispatch(actions.updateIsWorkspaceOnboardingCompleted());
       }
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
