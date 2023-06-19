@@ -28,6 +28,7 @@ import Logger from "lib/logger";
 import { Team } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import EMAIL_DOMAINS from "config/constants/sub/email-domains";
 import "./index.css";
 
 interface OnboardingProps {
@@ -72,6 +73,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
+          if (EMAIL_DOMAINS.PERSONAL.includes(userEmailDomain)) {
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            return;
+          }
           const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
           availableTeams.length === 0 &&
             createTeam({
