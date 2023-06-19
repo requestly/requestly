@@ -128,7 +128,10 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {userPersona.page !== 2 && appOnboardingExp !== "workspace_onboarding" && !user?.loggedIn ? (
+      {userPersona.page !== 2 &&
+      !userPersona.isSurveyCompleted &&
+      appOnboardingExp !== "workspace_onboarding" &&
+      !user?.loggedIn ? (
         <RQModal
           open={true}
           centered
