@@ -7,15 +7,17 @@ import "./ruleInfoBanner.css";
 
 const ruleInfoBannerContent: Record<string, { title: string; description: string; appMode?: string[] }> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.DELAY]: {
+    appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
     title: "Delay is capped automatically to avoid browsing performance degradation.",
     description: `For XHR/Fetch, max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_XHR}ms & for other resources (JS, CSS, Images etc), max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_NON_XHR}ms.`,
   },
 };
 
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
-  // if (!(ruleType in ruleInfoBannerContent)) return null;
-  // if appMode is not present in <ruleInfoBannerContent> then show for all app modes
-  // if (!ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode)) return null;
+  if (!(ruleType in ruleInfoBannerContent)) return null;
+
+  // if appMode is not present in ruleInfoBannerContent then show for all app modes
+  if (!ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode)) return null;
 
   return (
     <Row className="rule-info-banner-container">
