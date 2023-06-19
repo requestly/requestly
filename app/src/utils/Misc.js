@@ -62,6 +62,7 @@ export const getAndUpdateInstallationDate = async (appMode, doUpdate, isUserLogg
     } else {
       // User is not logged in - return/set date in local storage
       const localInstallationDate = getLocalInstallationDate(attrName, doUpdate, appMode);
+      submitAttrUtil(attrName, localInstallationDate);
       resolve(localInstallationDate);
     }
   });
