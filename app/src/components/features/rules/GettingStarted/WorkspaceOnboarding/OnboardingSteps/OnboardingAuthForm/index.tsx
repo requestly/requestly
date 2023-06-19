@@ -3,7 +3,7 @@ import AuthForm from "components/authentication/AuthForm";
 import APP_CONSTANTS from "config/constants";
 
 interface FormProps {
-  callback: { onSignInSuccess: () => void };
+  callback: { onSignInSuccess: (uid: string) => void };
 }
 
 export const OnboardingAuthForm: React.FC<FormProps> = ({ callback }) => {

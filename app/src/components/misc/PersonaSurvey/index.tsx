@@ -130,7 +130,6 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
             if (isExtensionInstalled()) {
               if (currentPage === 0) trackPersonaSurveyViewed();
               const isRecommendationScreen = currentPage === 2;
-              console.log({ isRecommendationScreen });
               dispatch(
                 actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen })
               );

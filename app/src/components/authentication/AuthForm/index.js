@@ -106,7 +106,7 @@ const AuthForm = ({
         if (result && result.uid) {
           toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
-          onSignInSuccess && onSignInSuccess();
+          onSignInSuccess && onSignInSuccess(result.uid);
         }
         setActionPending(false);
       })

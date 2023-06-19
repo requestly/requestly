@@ -14,7 +14,6 @@ import { OnboardingBannerSteps } from "./BannerSteps";
 import { RQButton } from "lib/design-system/components";
 import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
-import { getSignupDate } from "utils/Misc";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { actions } from "store";
@@ -43,14 +42,13 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     user?.details?.profile?.email,
   ]);
 
-  const handleAuthCompletion = useCallback(() => {
-    getSignupDate(window.uid).then((signup_date) => {
-      if (new Date() > new Date(signup_date)) {
-        dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-      }
+  const handleAuthCompletion = useCallback(
+    (uid: string) => {
+      //TODO: if login then skip onboarding
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
-    });
-  }, [dispatch]);
+    },
+    [dispatch]
+  );
 
   const handleOnSurveyCompletion = useCallback(async () => {
     if (pendingTeams.length === 0) {
@@ -94,7 +92,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           <div>
             <OnboardingAuthForm
               callback={{
-                onSignInSuccess: handleAuthCompletion,
+                onSignInSuccess: (uid) => handleAuthCompletion(uid),
               }}
             />
             <div className="display-row-center mt-20">
@@ -119,7 +117,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           />
         );
     }
-  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
+  }, [dispatch, step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
 
   useEffect(() => {
     getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)
