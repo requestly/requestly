@@ -7,11 +7,12 @@ import { shouldShowWorkspaceOnboarding } from "components/features/rules/Getting
 import { getAppMode, getUserPersonaSurveyDetails, getIsWorkspaceOnboardingCompleted } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
-import { Sidebar } from "./SidebarV2";
+import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import "./DashboardLayout.css";
 import PATHS from "config/constants/sub/paths";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -22,16 +23,22 @@ const DashboardLayout = () => {
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
-  const isWorkspaceOnboardingScreen =
-    !isWorkspaceOnboardingCompleted &&
-    appOnboardingExp === "workspace_onboarding" &&
-    state?.src === "workspace_onboarding";
+  const isWorkspaceOnboardingScreen = useMemo(
+    () =>
+      !isWorkspaceOnboardingCompleted &&
+      appOnboardingExp === "workspace_onboarding" &&
+      state?.src === "workspace_onboarding",
+    [appOnboardingExp, isWorkspaceOnboardingCompleted, state?.src]
+  );
 
-  const isPersonaRecommendationScreen =
-    userPersona.page === 2 &&
-    !userPersona.isSurveyCompleted &&
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-    state?.src === "persona_survey_modal";
+  const isPersonaRecommendationScreen = useMemo(
+    () =>
+      userPersona.page === 2 &&
+      !userPersona.isSurveyCompleted &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      state?.src === "persona_survey_modal",
+    [appMode, state?.src, userPersona.isSurveyCompleted, userPersona.page]
+  );
 
   const isSidebarVisible = useMemo(
     () =>
@@ -44,18 +51,21 @@ const DashboardLayout = () => {
       ),
     [pathname, isPersonaRecommendationScreen, isWorkspaceOnboardingScreen]
   );
+
   useEffect(() => {
-    shouldShowWorkspaceOnboarding(appMode).then((result) => {
-      if (result && !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
-        navigate(PATHS.GETTING_STARTED, {
-          replace: true,
-          state: {
-            src: "workspace_onboarding",
-            redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-          },
-        });
-      }
-    });
+    if (appOnboardingExp && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      shouldShowWorkspaceOnboarding(appMode).then((result) => {
+        if (result && !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
+          navigate(PATHS.GETTING_STARTED, {
+            replace: true,
+            state: {
+              src: "workspace_onboarding",
+              redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
+            },
+          });
+        }
+      });
+    }
   }, [navigate, location.state?.redirectTo, appOnboardingExp, isWorkspaceOnboardingCompleted, appMode]);
 
   useEffect(() => {

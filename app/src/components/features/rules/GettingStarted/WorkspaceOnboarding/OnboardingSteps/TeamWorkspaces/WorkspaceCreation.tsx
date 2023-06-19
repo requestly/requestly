@@ -14,8 +14,6 @@ import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { redirectToTeam } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 import {
   trackWorkspaceInviteLinkCopied,
   trackOnboardingWorkspaceSkip,
@@ -28,10 +26,16 @@ interface Props {
 }
 export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const functions = getFunctions();
 
-  const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
+  const upsertTeamCommonInvite = useMemo(
+    () =>
+      httpsCallable<{ teamId: string; domainEnabled: boolean }, { succes: true }>(
+        functions,
+        "invites-upsertTeamCommonInvite"
+      ),
+    [functions]
+  );
 
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -91,14 +95,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           },
           appMode
         );
-        redirectToTeam(navigate, defaultTeamData?.teamId ?? newTeamId, {
-          state: {
-            isNewTeam: true,
-          },
-        });
       })
       .catch((err) => {
-        toast.error("Error while creating invitations. Make sure you are an admin");
+        toast.error("Error while sending invitations");
       });
   };
 

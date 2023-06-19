@@ -1,6 +1,12 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getWorkspaceOnboardingStep, getHasConnectedApp, getAppMode } from "store/selectors";
+import {
+  getUserAuthDetails,
+  getWorkspaceOnboardingStep,
+  getHasConnectedApp,
+  getAppMode,
+  getWorkspaceOnboardingTeamDetails,
+} from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
@@ -22,6 +28,7 @@ import Logger from "lib/logger";
 import { Team } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import EMAIL_DOMAINS from "config/constants/sub/email-domains";
 import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
 
@@ -36,6 +43,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const hasConnectedApps = useSelector(getHasConnectedApp);
+  const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
+
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
@@ -54,9 +63,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [appMode, dispatch, hasConnectedApps]);
 
   const handleAuthCompletion = useCallback(
-    (uid: string) => {
-      //TODO: if login then skip onboarding
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+    (isNewUser: boolean) => {
+      if (isNewUser) dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+      else dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     },
     [dispatch]
   );
@@ -65,6 +74,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
+          if (EMAIL_DOMAINS.PERSONAL.includes(userEmailDomain)) {
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            return;
+          }
           const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
           availableTeams.length === 0 &&
             createTeam({
@@ -72,6 +85,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
               generatePublicLink: true,
             }).then((response: any) => {
               setDefaultTeamData({ name: newTeamName, ...response?.data });
+              dispatch(actions.updateWorkspaceOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
             });
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
@@ -103,7 +117,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           <div>
             <OnboardingAuthForm
               callback={{
-                onSignInSuccess: (uid) => handleAuthCompletion(uid),
+                onSignInSuccess: (uid, isNewUser) => handleAuthCompletion(isNewUser),
               }}
             />
             <div className="display-row-center mt-20">
@@ -132,6 +146,13 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         );
     }
   }, [dispatch, step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
+
+  useEffect(() => {
+    if (workspaceOnboardingTeamDetails) {
+      setDefaultTeamData(workspaceOnboardingTeamDetails);
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+    }
+  }, [dispatch, workspaceOnboardingTeamDetails]);
 
   useEffect(() => {
     getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)

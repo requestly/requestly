@@ -103,3 +103,7 @@ export const updateIsWorkspaceOnboardingCompleted = (prevState) => {
 export const updateWorkspaceOnboardingStep = (prevState, action) => {
   prevState.workspaceOnboarding.step = action.payload;
 };
+
+export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
+  prevState.workspaceOnboarding.workspace = action.payload;
+};
