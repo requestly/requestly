@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getWorkspaceOnboardingStep } from "store/selectors";
+import { getUserAuthDetails, getWorkspaceOnboardingStep, getHasConnectedApp, getAppMode } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
@@ -20,6 +20,8 @@ import { actions } from "store";
 import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
 import Logger from "lib/logger";
 import { Team } from "types";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 
 interface OnboardingProps {
@@ -29,8 +31,10 @@ interface OnboardingProps {
 export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRulesModalClick }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
+  const hasConnectedApps = useSelector(getHasConnectedApp);
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
@@ -41,6 +45,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
+
+  const handleOnboardingCompletion = useCallback(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !hasConnectedApps) {
+      dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
+    }
+  }, [appMode, dispatch, hasConnectedApps]);
 
   const handleAuthCompletion = useCallback(
     (uid: string) => {
@@ -138,6 +148,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     }
   }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
+
+  useEffect(() => {
+    return () => {
+      handleOnboardingCompletion();
+    };
+  }, [handleOnboardingCompletion]);
 
   return (
     <>
