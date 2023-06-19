@@ -1,7 +1,6 @@
 import React from "react";
 import { Alert, Col, Row, Typography } from "antd";
-//@ts-ignore
-import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
+import { InfoCircleOutlined } from "@ant-design/icons";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./ruleInfoBanner.css";
@@ -14,9 +13,9 @@ const ruleInfoBannerContent: Record<string, { title: string; description: string
 };
 
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
-  if (!(ruleType in ruleInfoBannerContent)) return null;
+  // if (!(ruleType in ruleInfoBannerContent)) return null;
   // if appMode is not present in <ruleInfoBannerContent> then show for all app modes
-  if (!ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode)) return null;
+  // if (!ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode)) return null;
 
   return (
     <Row className="rule-info-banner-container">
@@ -36,7 +35,7 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
           }
           icon={
             <div className="rule-info-banner-icon">
-              <QuestionMarkIcon />
+              <InfoCircleOutlined />
             </div>
           }
           showIcon
