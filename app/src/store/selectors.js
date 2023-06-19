@@ -254,3 +254,7 @@ export const getWorkspaceOnboardingStep = (state) => {
 export const getIsSecondarySidebarCollapsed = (state) => {
   return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
 };
+
+export const getWorkspaceOnboardingTeamDetails = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.workspace;
+};

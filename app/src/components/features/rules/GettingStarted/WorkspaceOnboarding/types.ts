@@ -5,7 +5,6 @@ export enum OnboardingSteps {
   RECOMMENDATIONS = "recommendations",
 }
 export interface NewTeamData {
-  id: string;
   inviteId: string;
   teamId: string;
   name: string;
