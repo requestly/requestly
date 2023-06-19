@@ -32,7 +32,6 @@ export const PrimarySidebar: React.FC = () => {
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
 
-    console.log({ appMode, showTooltipForSessionIcon, isSavingNetworkSession });
     const items = [
       {
         id: 0,

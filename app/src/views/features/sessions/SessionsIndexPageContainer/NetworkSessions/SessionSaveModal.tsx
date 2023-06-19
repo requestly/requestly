@@ -1,10 +1,12 @@
 import { Input, Button, Row, Space } from "antd";
+import { useNavigate } from "react-router-dom";
 import { RQModal } from "lib/design-system/components";
 import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 // import { saveRecording } from "./actions"; // takes har and name
 import React, { useCallback, useState } from "react";
 import { toast } from "utils/Toast";
 import { saveNetworkSession } from "./actions";
+import PATHS from "config/constants/sub/paths";
 import {
   trackNetworkSessionSaveCanceled,
   trackNetworkSessionSaved,
@@ -21,10 +23,9 @@ interface Props {
 }
 
 const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const networkSessionTooltipShown = useSelector(getIsNetworkTooltipShown);
-
   const [name, setName] = useState<string>("");
 
   const handleSaveRecording = useCallback(async () => {
@@ -32,7 +33,17 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     if (onSave) {
       onSave(id);
     } else {
-      toast.success("Network session successfully saved!");
+      toast.success(
+        <span>
+          Network session saved successfully.{" "}
+          <span
+            className="text-primary cursor-pointer"
+            onClick={() => navigate(`${PATHS.SESSIONS.NETWORK.RELATIVE}/${id}`)}
+          >
+            View
+          </span>
+        </span>
+      );
     }
     setName("");
     if (!networkSessionTooltipShown) {
@@ -44,7 +55,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     }
     trackNetworkSessionSaved();
     closeModal();
-  }, [closeModal, dispatch, har, name, networkSessionTooltipShown, onSave]);
+  }, [closeModal, dispatch, navigate, har, name, networkSessionTooltipShown, onSave]);
 
   return (
     <RQModal
