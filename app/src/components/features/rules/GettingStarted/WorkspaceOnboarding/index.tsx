@@ -1,6 +1,12 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getWorkspaceOnboardingStep, getHasConnectedApp, getAppMode } from "store/selectors";
+import {
+  getUserAuthDetails,
+  getWorkspaceOnboardingStep,
+  getHasConnectedApp,
+  getAppMode,
+  getWorkspaceOnboardingTeamDetails,
+} from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
@@ -35,6 +41,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const hasConnectedApps = useSelector(getHasConnectedApp);
+  const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
+
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
@@ -71,6 +79,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
               generatePublicLink: true,
             }).then((response: any) => {
               setDefaultTeamData({ name: newTeamName, ...response?.data });
+              dispatch(actions.updateWorkspaceOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
             });
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
@@ -128,6 +137,13 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         );
     }
   }, [dispatch, step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
+
+  useEffect(() => {
+    if (workspaceOnboardingTeamDetails) {
+      setDefaultTeamData(workspaceOnboardingTeamDetails);
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+    }
+  }, [dispatch, workspaceOnboardingTeamDetails]);
 
   useEffect(() => {
     getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)

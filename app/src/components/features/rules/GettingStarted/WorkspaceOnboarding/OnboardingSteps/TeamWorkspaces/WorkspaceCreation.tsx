@@ -25,7 +25,14 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const navigate = useNavigate();
   const functions = getFunctions();
 
-  const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
+  const upsertTeamCommonInvite = useMemo(
+    () =>
+      httpsCallable<{ teamId: string; domainEnabled: boolean }, { succes: true }>(
+        functions,
+        "invites-upsertTeamCommonInvite"
+      ),
+    [functions]
+  );
 
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
