@@ -16,6 +16,12 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import {
+  trackWorkspaceInviteLinkCopied,
+  trackOnboardingWorkspaceSkip,
+  trackTeamMemberAdded,
+  trackCreateNewWorkspace,
+} from "modules/analytics/events/common/teams";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -73,6 +79,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
+        trackCreateNewWorkspace("onboarding");
         switchWorkspace(
           {
             teamId: defaultTeamData?.teamId ?? newTeamId,
@@ -101,6 +108,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     setTimeout(() => {
       setCopiedText("Copy");
     }, 500);
+    trackWorkspaceInviteLinkCopied("onboarding");
   };
 
   const handleDomainToggle = useCallback(
@@ -150,7 +158,10 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           //@ts-ignore
           type="email"
           value={inviteEmails}
-          onChange={setInviteEmails}
+          onChange={(email) => {
+            setInviteEmails(email);
+            trackTeamMemberAdded("onboarding");
+          }}
           validateEmail={validateEmail}
           getLabel={(email, index, removeEmail) => (
             <div data-tag key={index} className="multi-email-tag">
@@ -201,7 +212,10 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       <div className="workspace-onboarding-footer">
         <RQButton
           type="text"
-          onClick={() => dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS))}
+          onClick={() => {
+            trackOnboardingWorkspaceSkip();
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+          }}
         >
           Skip for now
         </RQButton>
