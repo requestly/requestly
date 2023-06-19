@@ -402,7 +402,7 @@ const AuthForm = ({
         return (
           <Row className={`${MODE !== AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD && "form-elements-margin"} w-full`}>
             <label htmlFor="email" className="text-bold auth-modal-input-label">
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Enter you work email" : "Email"}
+              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Enter your work email" : "Email"}
             </label>
             <RQInput
               id="email"
