@@ -7,20 +7,21 @@ import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
 import { OnboardingAuthForm } from "./OnboardingSteps/OnboardingAuthForm";
 import { GettingStartedWithSurvey } from "./OnboardingSteps/PersonaSurvey/SurveyBanner";
-import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
-import { isEmailVerified } from "utils/AuthUtils";
-import { getSignupDate } from "utils/Misc";
-import { OnboardingSteps } from "./types";
-import "./index.css";
 import PersonaRecommendation from "../PersonaRecommendation";
 import { WorkspaceOnboardingBanner } from "./OnboardingSteps/TeamWorkspaces/Banner";
 import { WorkspaceOnboardingStep } from "./OnboardingSteps/TeamWorkspaces";
 import { OnboardingBannerSteps } from "./BannerSteps";
+import { RQButton } from "lib/design-system/components";
+import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
+import { isEmailVerified } from "utils/AuthUtils";
+import { getSignupDate } from "utils/Misc";
+import { OnboardingSteps } from "./types";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { actions } from "store";
 import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
 import Logger from "lib/logger";
 import { Team } from "types";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import "./index.css";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -45,6 +46,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const handleAuthCompletion = useCallback(() => {
     getSignupDate(window.uid).then((signup_date) => {
       if (new Date() > new Date(signup_date)) {
+        console.log(new Date(), new Date(signup_date), "DATES");
         dispatch(actions.updateIsWorkspaceOnboardingCompleted());
       }
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
@@ -86,6 +88,40 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     }
   }, [step, currentTestimonialIndex]);
 
+  const renderOnboardingActionComponent = useCallback(() => {
+    switch (step) {
+      case OnboardingSteps.AUTH:
+        return (
+          <div>
+            <OnboardingAuthForm
+              callback={{
+                onSignInSuccess: handleAuthCompletion,
+              }}
+            />
+            <div className="display-row-center mt-20">
+              <RQButton
+                className="display-block text-gray m-auto"
+                type="text"
+                onClick={() => dispatch(actions.updateIsWorkspaceOnboardingCompleted())}
+              >
+                Skip for now
+              </RQButton>
+            </div>
+          </div>
+        );
+      case OnboardingSteps.PERSONA_SURVEY:
+        return <PersonaSurvey callback={handleOnSurveyCompletion} isSurveyModal={false} />;
+      case OnboardingSteps.CREATE_JOIN_WORKSPACE:
+        return (
+          <WorkspaceOnboardingStep
+            defaultTeamData={defaultTeamData}
+            availableTeams={pendingTeams.length ? pendingTeams : availableTeams}
+            isPendingInvite={pendingTeams.length > 0}
+          />
+        );
+    }
+  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
+
   useEffect(() => {
     getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)
       .then((teams: Team[]) => setPendingTeams(teams))
@@ -106,28 +142,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     }
   }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
 
-  const renderOnboardingActionComponent = useCallback(() => {
-    switch (step) {
-      case OnboardingSteps.AUTH:
-        return (
-          <OnboardingAuthForm
-            callback={{
-              onSignInSuccess: handleAuthCompletion,
-            }}
-          />
-        );
-      case OnboardingSteps.PERSONA_SURVEY:
-        return <PersonaSurvey callback={handleOnSurveyCompletion} isSurveyModal={false} />;
-      case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return (
-          <WorkspaceOnboardingStep
-            defaultTeamData={defaultTeamData}
-            availableTeams={pendingTeams.length ? pendingTeams : availableTeams}
-            isPendingInvite={pendingTeams.length > 0}
-          />
-        );
-    }
-  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
   return (
     <>
       {step === OnboardingSteps.RECOMMENDATIONS ? (
