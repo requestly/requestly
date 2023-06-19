@@ -106,7 +106,7 @@ const AuthForm = ({
         if (result && result.uid) {
           toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
-          onSignInSuccess && onSignInSuccess(result.uid);
+          onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
         setActionPending(false);
       })
@@ -129,7 +129,7 @@ const AuthForm = ({
                 setEmail("");
                 setPassword("");
                 // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-                onSignInSuccess && onSignInSuccess(result.user.uid);
+                onSignInSuccess && onSignInSuccess(result.user.uid, true);
               }
             })
             .catch(({ errorCode }) => {
@@ -159,7 +159,7 @@ const AuthForm = ({
           setEmail("");
           setPassword("");
           // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-          onSignInSuccess && onSignInSuccess(result.user.uid);
+          onSignInSuccess && onSignInSuccess(result.user.uid, false);
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
           setActionPending(true);

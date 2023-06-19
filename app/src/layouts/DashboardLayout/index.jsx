@@ -53,7 +53,7 @@ const DashboardLayout = () => {
   );
 
   useEffect(() => {
-    if (appOnboardingExp !== null) {
+    if (appOnboardingExp && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       shouldShowWorkspaceOnboarding(appMode).then((result) => {
         if (result && !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
           navigate(PATHS.GETTING_STARTED, {
