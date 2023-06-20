@@ -46,6 +46,7 @@ const DeleteRulesModal = (props) => {
           });
         } else {
           toast.info(`Could not delete rule, please try again later.`);
+          setAreRulesMovingToTrash(false);
           reject();
         }
       });
