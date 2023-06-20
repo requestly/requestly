@@ -83,3 +83,7 @@ toast.loading = (messageText, duration, notifyOtherTabs) => {
     });
   }
 };
+
+toast.hide = (key) => {
+  message.destroy(key);
+};
