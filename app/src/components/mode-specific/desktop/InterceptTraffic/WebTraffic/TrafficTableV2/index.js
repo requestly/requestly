@@ -35,8 +35,9 @@ import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
-import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { RESOURCE_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { doesContentTypeMatchResourceFilter } from "./utils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -239,7 +240,7 @@ const CurrentTrafficTable = ({
       }
       if (
         trafficTableFilters.contentType.length > 0 &&
-        !trafficTableFilters.contentType.includes(log?.response?.contentType)
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, trafficTableFilters.contentType)
       ) {
         return false;
       }
@@ -569,13 +570,13 @@ const CurrentTrafficTable = ({
                   />
                   <LogFilter
                     filterId="filter-resource-type"
-                    filterLabel="Content type"
-                    filterPlaceholder="Filter by content type"
-                    options={CONTENT_TYPE_OPTIONS}
+                    filterLabel="Resource type"
+                    filterPlaceholder="Filter by resource type"
+                    options={RESOURCE_TYPE_OPTIONS}
                     value={trafficTableFilters.contentType}
                     handleFilterChange={(options) => {
                       dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
-                      trackTrafficTableFilterApplied("content_type", options, options?.length);
+                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
                     }}
                   />
                 </section>
