@@ -167,7 +167,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               size="small"
               className="mt-8 workspace-onboarding-field text-white"
               disabled
-              value={`https://requestly.io/invite/${defaultTeamData?.inviteId}`}
+              value={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
             />
             {/* <RQButton type="default" onClick={handleOnCopy}>
               <CopyOutlined />
@@ -177,7 +177,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               size="middle"
               type="default"
               title="Copy"
-              copyText={`https://requestly.io/${defaultTeamData?.inviteId}`}
+              copyText={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
             />
           </div>
         </div>
