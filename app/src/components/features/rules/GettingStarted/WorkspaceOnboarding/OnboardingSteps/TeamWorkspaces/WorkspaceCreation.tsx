@@ -1,24 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import CopyButton from "components/misc/CopyButton";
 import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/common/MemberRoleDropdown";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
-import { CopyOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast";
-import { NewTeamData, OnboardingSteps } from "../../types";
-import { actions } from "store";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import {
   trackWorkspaceInviteLinkCopied,
   trackOnboardingWorkspaceSkip,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
+import { actions } from "store";
+import { NewTeamData, OnboardingSteps } from "../../types";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -43,10 +43,8 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [copiedText, setCopiedText] = useState<string>("Copy");
   const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
-  // const [newTeamData, setNewTeamData] = useState(null);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -79,7 +77,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     })
       .then((res: any) => {
         if (res?.data?.success) {
-          toast.success("Sent invites successfully");
+          toast.success("Invite sent successfully");
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
@@ -98,15 +96,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       .catch((err) => {
         toast.error("Error while sending invitations");
       });
-  };
-
-  const handleOnCopy = () => {
-    setCopiedText("Copied");
-    navigator.clipboard.writeText(`htts://requestly.io/${defaultTeamData?.inviteId}`);
-    setTimeout(() => {
-      setCopiedText("Copy");
-    }, 500);
-    trackWorkspaceInviteLinkCopied("onboarding");
   };
 
   const handleDomainToggle = useCallback(
@@ -185,12 +174,15 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               size="small"
               className="mt-8 workspace-onboarding-field text-white"
               disabled
-              value={`https://requestly.io/invite/${defaultTeamData?.inviteId}`}
+              value={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
             />
-            <RQButton type="default" onClick={handleOnCopy}>
-              <CopyOutlined />
-              {copiedText}
-            </RQButton>
+            <CopyButton
+              size="middle"
+              type="default"
+              title="Copy"
+              copyText={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
+              trackCopiedEvent={() => trackWorkspaceInviteLinkCopied("onboarding")}
+            />
           </div>
         </div>
       )}

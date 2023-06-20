@@ -9,8 +9,8 @@ import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
+import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { redirectToTeam } from "utils/RedirectionUtils";
 import { trackOnboardingWorkspaceSkip, trackWorkspaceInviteAccepted } from "modules/analytics/events/common/teams";
 import { Team } from "types";
 
@@ -47,11 +47,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
               },
               appMode
             );
-            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
-              state: {
-                isNewTeam: false,
-              },
-            });
+            redirectToRules(navigate);
           }
         }
         setIsJoining(false);
@@ -64,7 +60,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   };
 
   return (
-    <div className="space-between onboarding-workspace-card">
+    <div className="onboarding-workspace-card">
       <div className="display-flex">
         <Avatar
           size={28}
