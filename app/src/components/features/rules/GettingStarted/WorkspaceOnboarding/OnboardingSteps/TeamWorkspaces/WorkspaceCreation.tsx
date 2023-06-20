@@ -169,10 +169,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               disabled
               value={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
             />
-            {/* <RQButton type="default" onClick={handleOnCopy}>
-              <CopyOutlined />
-              {copiedText}
-            </RQButton> */}
             <CopyButton
               size="middle"
               type="default"

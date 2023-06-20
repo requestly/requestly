@@ -134,12 +134,9 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {userPersona.page !== 2 &&
-      !userPersona.isSurveyCompleted &&
-      (appOnboardingExp === "control" || appOnboardingExp === "") &&
-      !user?.loggedIn ? (
+      {userPersona.page !== 2 && !userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
         <RQModal
-          open={true}
+          open={activeModals.personaSurveyModal.isActive}
           centered
           closable={false}
           className="survey-modal"
