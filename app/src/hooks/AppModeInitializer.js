@@ -130,7 +130,7 @@ const AppModeInitializer = () => {
           }
         });
       }
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("desktop-event", (payload) => {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
         if (payload?.origin && payload?.origin === "main") {
           trackDesktopMainEvent(payload?.name, payload?.params);
         } else {
