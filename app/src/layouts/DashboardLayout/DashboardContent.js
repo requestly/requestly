@@ -8,13 +8,7 @@ import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
-import {
-  getActiveModals,
-  getAppMode,
-  getUserPersonaSurveyDetails,
-  getUserAuthDetails,
-  getIsWorkspaceOnboardingCompleted,
-} from "store/selectors";
+import { getActiveModals, getAppMode, getUserPersonaSurveyDetails, getUserAuthDetails } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -37,7 +31,6 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -127,7 +120,7 @@ const DashboardContent = () => {
           {...activeModals.syncConsentModal.props}
         />
       ) : null}
-      {activeModals.connectedAppsModal.isActive && (userPersona.isSurveyCompleted || isWorkspaceOnboardingCompleted) ? (
+      {activeModals.connectedAppsModal.isActive && userPersona.isSurveyCompleted ? (
         <ConnectedAppsModal
           isOpen={activeModals.connectedAppsModal.isActive}
           toggle={toggleConnectedAppsModal}
