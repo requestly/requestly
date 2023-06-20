@@ -94,7 +94,7 @@ const SharedListViewerIndexPage = () => {
           </Col>
         </Row>
       ) : sharedListPresent && !isEmpty(rulesFromSharedList) ? (
-        <SharedListViewerTableContainer rules={rulesFromSharedList} groups={groupsFromSharedList} />
+        <SharedListViewerTableContainer id={sharedListId} rules={rulesFromSharedList} groups={groupsFromSharedList} />
       ) : (
         <Row className="sharedList-viewer-error-wrapper" type="flex" align="middle" justify="center">
           <Col className="sharedList-viewer-error-message">

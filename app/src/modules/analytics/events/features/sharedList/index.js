@@ -18,20 +18,20 @@ export const trackSharedListLimitReachedEvent = (num) => {
   trackEvent(SHARED_LIST.LIMIT_REACHED, params);
 };
 
-export const trackSharedListImportStartedEvent = () => {
-  const params = {};
+export const trackSharedListImportStartedEvent = (id) => {
+  const params = { id };
   trackRQLastActivity(SHARED_LIST.IMPORT_STARTED);
   trackEvent(SHARED_LIST.IMPORT_STARTED, params);
 };
-export const trackSharedListImportFailed = () => {
-  const params = {};
+export const trackSharedListImportFailed = (id) => {
+  const params = { id };
   trackRQLastActivity(SHARED_LIST.IMPORT_FAILED);
   trackEvent(SHARED_LIST.IMPORT_FAILED, params);
 };
-export const trackSharedListImportCompleted = () => {
-  const params = {};
+export const trackSharedListImportCompleted = (id) => {
+  const params = { id };
   trackRQLastActivity(SHARED_LIST.IMPORT_COMPLETED);
-  trackEvent(SHARED_LIST.IMPORT_COMPLETED, params);
+  trackEvent(SHARED_LIST.IMPORT_COMPLETED, params); // add session id
 };
 
 export const trackSharedListUrlCopied = (source) => {
