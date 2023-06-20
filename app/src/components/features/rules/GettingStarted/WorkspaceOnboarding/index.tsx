@@ -21,15 +21,13 @@ import { RQButton } from "lib/design-system/components";
 import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
 import { OnboardingSteps } from "./types";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { actions } from "store";
-import { getTeamsWithPendingInvites, getTeamsWithSameDomainEnabled } from "backend/teams";
-import Logger from "lib/logger";
 import { Team } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import EMAIL_DOMAINS from "config/constants/sub/email-domains";
 import "./index.css";
+import { capitalize } from "lodash";
 
 interface OnboardingProps {
   handleUploadRulesModalClick: () => void;
@@ -48,7 +46,15 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
   const [pendingTeams, setPendingTeams] = useState<Team[]>([]);
 
-  const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
+  const createTeam = useMemo(
+    () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
+    []
+  );
+  const getSameDomainTeams = useMemo(() => httpsCallable(getFunctions(), "teams-getSameDomainTeams"), []);
+  const getTeamsWithPendingInvites = useMemo(
+    () => httpsCallable(getFunctions(), "teams-getTeamsWithPendingInvites"),
+    []
+  );
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
@@ -73,11 +79,11 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     if (pendingTeams.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
-          if (EMAIL_DOMAINS.PERSONAL.includes(userEmailDomain)) {
+          if (!isCompanyEmail(user?.details?.profile?.email)) {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
             return;
           }
-          const newTeamName = `${userEmailDomain?.split(".")?.[0] ?? "my-team"}`;
+          const newTeamName = `${capitalize(userEmailDomain?.split(".")?.[0]) ?? "my-team"}`;
           availableTeams.length === 0 &&
             createTeam({
               teamName: newTeamName,
@@ -96,7 +102,44 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile?.uid, userEmailDomain]);
+  }, [availableTeams.length, createTeam, dispatch, pendingTeams.length, user?.details?.profile, userEmailDomain]);
+
+  useEffect(() => {
+    if (workspaceOnboardingTeamDetails) {
+      setDefaultTeamData(workspaceOnboardingTeamDetails);
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+    }
+  }, [dispatch, workspaceOnboardingTeamDetails]);
+
+  useEffect(() => {
+    getTeamsWithPendingInvites()
+      .then((res: any) => {
+        setPendingTeams(res.data?.teams ?? []);
+      })
+      .catch((e) => setPendingTeams([]));
+  }, [getTeamsWithPendingInvites, user.details]);
+
+  useEffect(() => {
+    if (pendingTeams.length === 0) {
+      getSameDomainTeams()
+        .then((res: any) => {
+          setAvailableTeams(res.data?.teams ?? []);
+        })
+        .catch(() => setAvailableTeams([]));
+    }
+  }, [getSameDomainTeams, pendingTeams.length, user.details]);
+
+  useEffect(() => {
+    if (user?.loggedIn && step === OnboardingSteps.AUTH && currentTeams?.length) {
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    }
+  }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
+
+  useEffect(() => {
+    return () => {
+      handleOnboardingCompletion();
+    };
+  }, [handleOnboardingCompletion]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
@@ -142,39 +185,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
         );
     }
   }, [dispatch, step, handleOnSurveyCompletion, defaultTeamData, pendingTeams, availableTeams, handleAuthCompletion]);
-
-  useEffect(() => {
-    if (workspaceOnboardingTeamDetails) {
-      setDefaultTeamData(workspaceOnboardingTeamDetails);
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
-    }
-  }, [dispatch, workspaceOnboardingTeamDetails]);
-
-  useEffect(() => {
-    getTeamsWithPendingInvites(user?.details?.profile?.email, user?.details?.profile?.uid)
-      .then((teams: Team[]) => setPendingTeams(teams))
-      .catch((e) => Logger.log("Not able to fetch team invites!"));
-  }, [user?.details?.profile]);
-
-  useEffect(() => {
-    if (pendingTeams.length === 0) {
-      getTeamsWithSameDomainEnabled(user?.details?.profile?.email, user?.details?.profile?.uid).then((teams: Team[]) =>
-        setAvailableTeams(teams)
-      );
-    }
-  }, [pendingTeams.length, user?.details?.profile]);
-
-  useEffect(() => {
-    if (user?.loggedIn && step === OnboardingSteps.AUTH && currentTeams?.length) {
-      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-    }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
-
-  useEffect(() => {
-    return () => {
-      handleOnboardingCompletion();
-    };
-  }, [handleOnboardingCompletion]);
 
   return (
     <>

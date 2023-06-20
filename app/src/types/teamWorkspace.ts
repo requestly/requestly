@@ -8,6 +8,7 @@ export interface TeamWorkspace {
 }
 
 export interface Team {
+  id?: string;
   name: string;
   accessCount: number;
   access: string[];
