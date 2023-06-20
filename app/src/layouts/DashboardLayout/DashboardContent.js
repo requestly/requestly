@@ -136,7 +136,7 @@ const DashboardContent = () => {
       ) : null}
       {userPersona.page !== 2 &&
       !userPersona.isSurveyCompleted &&
-      appOnboardingExp !== "workspace_onboarding" &&
+      (appOnboardingExp === "control" || appOnboardingExp === "") &&
       !user?.loggedIn ? (
         <RQModal
           open={true}
