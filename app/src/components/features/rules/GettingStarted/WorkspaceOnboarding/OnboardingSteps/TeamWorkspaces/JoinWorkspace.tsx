@@ -37,9 +37,9 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
               {
-                teamId: res?.data?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.data?.invite?.metadata?.teamName,
-                teamMembersCount: 1,
+                teamId: team.id,
+                teamName: team.name,
+                teamMembersCount: team.accessCount,
               },
               dispatch,
               {
@@ -66,10 +66,15 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   return (
     <div className="space-between onboarding-workspace-card">
       <div className="display-flex">
-        <Avatar size={28} shape="square" className="workspace-avatar" icon={<>{team.name.charAt(0)}</>} />
+        <Avatar
+          size={28}
+          shape="square"
+          className="workspace-avatar"
+          icon={<>{team.name.charAt(0)?.toUpperCase()}</>}
+        />
         <span className="text-bold onboarding-workspace-card-name">{team.name}</span>
       </div>
-      <div className="text-gray">{team.accessCount}</div>
+      <div className="text-gray">{`${team.accessCount} members`}</div>
       <RQButton loading={isJoining} className="text-bold" type="primary" onClick={handleJoinWorkspace}>
         {isJoining ? "Joining" : "Join"}
       </RQButton>

@@ -36,8 +36,9 @@ const DashboardLayout = () => {
       userPersona.page === 2 &&
       !userPersona.isSurveyCompleted &&
       appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      (appOnboardingExp === "control" || appOnboardingExp === "") &&
       state?.src === "persona_survey_modal",
-    [appMode, state?.src, userPersona.isSurveyCompleted, userPersona.page]
+    [appMode, state?.src, userPersona.isSurveyCompleted, userPersona.page, appOnboardingExp]
   );
 
   const isSidebarVisible = useMemo(
@@ -53,7 +54,7 @@ const DashboardLayout = () => {
   );
 
   useEffect(() => {
-    if (appOnboardingExp && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       shouldShowWorkspaceOnboarding(appMode).then((result) => {
         if (result && !isWorkspaceOnboardingCompleted && appOnboardingExp === "workspace_onboarding") {
           navigate(PATHS.GETTING_STARTED, {
@@ -72,7 +73,7 @@ const DashboardLayout = () => {
     if (
       userPersona.page === 2 &&
       !userPersona.isSurveyCompleted &&
-      appOnboardingExp !== "workspace_onboarding" &&
+      (appOnboardingExp === "control" || appOnboardingExp === "") &&
       appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
     ) {
       navigate(PATHS.GETTING_STARTED, {

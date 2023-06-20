@@ -6,4 +6,5 @@ export interface PrimarySidebarItem extends Record<string, unknown> {
   title: string;
   icon: React.ReactNode;
   display?: boolean;
+  feature?: string;
 }
