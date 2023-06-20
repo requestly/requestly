@@ -13,6 +13,7 @@ import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRule
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import * as Sentry from "@sentry/react";
 
 // Adds single record to trash
 export const addRecordToTrash = async (uid, record) => {
@@ -58,6 +59,7 @@ export const addRecordsToTrash = async (uid, records) => {
 
     return { success: true };
   } catch (error) {
+    Sentry.captureException(new Error(`Trash Error. ${error.toString()}`));
     return { success: false };
   }
 };
