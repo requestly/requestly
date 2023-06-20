@@ -84,6 +84,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           dispatch,
           {
             isWorkspaceMode,
+            isSyncEnabled: true,
           },
           appMode
         );

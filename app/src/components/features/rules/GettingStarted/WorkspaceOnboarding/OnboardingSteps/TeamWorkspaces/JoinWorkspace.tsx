@@ -43,6 +43,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
               dispatch,
               {
                 isWorkspaceMode,
+                isSyncEnabled: true,
               },
               appMode
             );
