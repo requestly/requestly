@@ -40,7 +40,7 @@
 }
 .workspace-onboarding-wrapper .workspace-onboarding-body .onboarding-workspace-card {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 0.5fr;
+  grid-template-columns: 1.3fr 1.2fr 0.5fr;
   align-items: center;
   border: 1px solid var(--border-dark);
   padding: 12px 14px;

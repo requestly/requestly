@@ -1,15 +1,12 @@
 import React, { useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
+import { getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
-import { shuffleOptions, shouldShowPersonaSurvey } from "./utils";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { shuffleOptions } from "./utils";
 import { Option, PageConfig, QuestionnaireType } from "./types";
-import { trackPersonaSurveyViewed, trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
 import { SurveyOption } from "./Option";
 import { RQButton } from "lib/design-system/components";
 import "./index.css";
@@ -23,7 +20,6 @@ interface SurveyProps {
 
 export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }) => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = userPersona.page;
 
@@ -118,27 +114,6 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
       dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
     }
   }, [currentPage, dispatch, isSurveyModal]);
-
-  useEffect(() => {
-    if (isSurveyModal) {
-      shouldShowPersonaSurvey(appMode).then((result) => {
-        if (result) {
-          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-            if (currentPage === 0) trackPersonaSurveyViewed();
-            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
-          } else {
-            if (isExtensionInstalled()) {
-              if (currentPage === 0) trackPersonaSurveyViewed();
-              const isRecommendationScreen = currentPage === 2;
-              dispatch(
-                actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen })
-              );
-            }
-          }
-        }
-      });
-    }
-  }, [appMode, currentPage, dispatch, isSurveyModal]);
 
   return (
     <div className="persona-survey-container">

@@ -45,7 +45,12 @@ const GettingStarted = () => {
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
-  const shouldShowWorkspaceOnboarding = state?.src === "workspace_onboarding" && !isWorkspaceOnboardingCompleted;
+
+  const shouldShowWorkspaceOnboarding =
+    state?.src === "workspace_onboarding" &&
+    !isWorkspaceOnboardingCompleted &&
+    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
   const shouldShowRecommendationScreen =
     state?.src === "persona_survey_modal" &&
     !userPersona.isSurveyCompleted &&
