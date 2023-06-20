@@ -69,7 +69,7 @@ const CreateRuleButton = ({
     //Pre-validation regex fix
     const fixedRuleData = fixRuleRegexSourceFormat(dispatch, currentlySelectedRuleData);
     //Validation
-    const ruleValidation = validateRule(fixedRuleData, dispatch);
+    const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
     if (ruleValidation.result) {
       saveRule(appMode, {
         ...fixedRuleData,
