@@ -89,16 +89,6 @@ export const trackOnboardingWorkspaceSkip = () => {
   trackEvent(TEAMS.ONBOARDING_WORKSPACE_SKIP);
 };
 
-export const trackCreateNewWorkspace = (source) => {
-  const params = { source };
-  trackEvent(TEAMS.CREATE_NEW_WORKSPACE, params);
-};
-
-export const trackTeamMemberAdded = (source) => {
-  const params = { source };
-  trackEvent(TEAMS.TEAM_MEMBER_ADDED, params);
-};
-
 export const trackWorkspaceInviteAccepted = (source, domain) => {
   const params = { source, domain };
   trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED, params);

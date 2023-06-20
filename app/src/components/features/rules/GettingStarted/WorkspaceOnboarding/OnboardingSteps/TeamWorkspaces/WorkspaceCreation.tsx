@@ -17,8 +17,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import {
   trackWorkspaceInviteLinkCopied,
   trackOnboardingWorkspaceSkip,
-  trackTeamMemberAdded,
-  trackCreateNewWorkspace,
+  trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
 
 interface Props {
@@ -54,7 +53,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   ]);
 
   const handleCreateNewTeam = () => {
-    trackCreateNewWorkspace("onboarding");
+    trackCreateNewTeamClicked("onboarding");
     setIsProcessing(true);
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     createTeam({
@@ -159,7 +158,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           value={inviteEmails}
           onChange={(email) => {
             setInviteEmails(email);
-            trackTeamMemberAdded("onboarding");
           }}
           validateEmail={validateEmail}
           getLabel={(email, index, removeEmail) => (

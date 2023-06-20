@@ -155,8 +155,6 @@ export const TEAMS = {
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
   ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
   WORKSPACE_INVITE_ACCEPTED: "workspace_invite_accepted",
-  TEAM_MEMBER_ADDED: "team_member_added",
-  CREATE_NEW_WORKSPACE: "create_new_workspace",
 };
 
 export const TRAFFIC_TABLE = {
