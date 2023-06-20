@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import CopyButton from "components/misc/CopyButton";
 import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/common/MemberRoleDropdown";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
-import { CopyOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast";
-import { NewTeamData, OnboardingSteps } from "../../types";
-import { actions } from "store";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { useSelector } from "react-redux";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { actions } from "store";
+import { NewTeamData, OnboardingSteps } from "../../types";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -38,7 +38,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [copiedText, setCopiedText] = useState<string>("Copy");
   const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
   // const [newTeamData, setNewTeamData] = useState(null);
@@ -92,14 +91,6 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       .catch((err) => {
         toast.error("Error while sending invitations");
       });
-  };
-
-  const handleOnCopy = () => {
-    setCopiedText("Copied");
-    navigator.clipboard.writeText(`htts://requestly.io/${defaultTeamData?.inviteId}`);
-    setTimeout(() => {
-      setCopiedText("Copy");
-    }, 500);
   };
 
   const handleDomainToggle = useCallback(
@@ -178,10 +169,16 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               disabled
               value={`https://requestly.io/invite/${defaultTeamData?.inviteId}`}
             />
-            <RQButton type="default" onClick={handleOnCopy}>
+            {/* <RQButton type="default" onClick={handleOnCopy}>
               <CopyOutlined />
               {copiedText}
-            </RQButton>
+            </RQButton> */}
+            <CopyButton
+              size="middle"
+              type="default"
+              title="Copy"
+              copyText={`https://requestly.io/${defaultTeamData?.inviteId}`}
+            />
           </div>
         </div>
       )}
