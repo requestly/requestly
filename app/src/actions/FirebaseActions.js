@@ -373,7 +373,6 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
       const credential = await signInWithCustomToken(auth, authToken);
       // Remove auth code from db as we no longer need it
       remove(oneTimeCodeRef);
-      let is_new_user = getAdditionalUserInfo(credential) || false;
 
       //Return the firebase user object
       resolve(credential.user);
