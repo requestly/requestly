@@ -15,6 +15,7 @@ import {
   trackWorkspaceInviteLinkGenerated,
   trackWorkspaceInviteLinkRevoked,
 } from "modules/analytics/events/features/teams";
+import { trackWorkspaceInviteLinkCopied } from "modules/analytics/events/common/teams";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 
 interface Props {
@@ -156,7 +157,13 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
             />
           </Col>
           <Col flex="0 0 auto">
-            <CopyButton size="middle" type="primary" title="Copy" copyText={generateInviteLinkFromId(publicInviteId)} />
+            <CopyButton
+              size="middle"
+              type="primary"
+              title="Copy"
+              copyText={generateInviteLinkFromId(publicInviteId)}
+              trackCopiedEvent={() => trackWorkspaceInviteLinkCopied("workspace_settings")}
+            />
           </Col>
         </Row>
       ) : null}

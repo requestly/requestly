@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getAppMode } from "store/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { actions } from "store";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
-import { actions } from "store";
 import { TeamInviteMetadata } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode } from "store/selectors";
 import { redirectToRules } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { trackOnboardingWorkspaceSkip, trackWorkspaceInviteAccepted } from "modules/analytics/events/common/teams";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -32,6 +32,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully accepted invite");
+          trackWorkspaceInviteAccepted("onboarding", team.name);
 
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
@@ -102,7 +103,13 @@ export const JoinWorkspace: React.FC<{
       </div>
 
       <div className="workspace-onboarding-footer">
-        <RQButton type="text" onClick={() => dispatch(actions.updateIsWorkspaceOnboardingCompleted())}>
+        <RQButton
+          type="text"
+          onClick={() => {
+            trackOnboardingWorkspaceSkip();
+            dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+          }}
+        >
           Skip for now
         </RQButton>
         <RQButton type="default" className="text-bold" onClick={createNewTeam} icon={<PlusOutlined />}>

@@ -27,6 +27,7 @@ import { Invite } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
+import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
 import { capitalize } from "lodash";
 
 interface OnboardingProps {
@@ -159,7 +160,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
               <RQButton
                 className="display-block text-gray m-auto"
                 type="text"
-                onClick={() => dispatch(actions.updateIsWorkspaceOnboardingCompleted())}
+                onClick={() => {
+                  trackOnboardingWorkspaceSkip();
+                  dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+                }}
               >
                 Skip for now
               </RQButton>
