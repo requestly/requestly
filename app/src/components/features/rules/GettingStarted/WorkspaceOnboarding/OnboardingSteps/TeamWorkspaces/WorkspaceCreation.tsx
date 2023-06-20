@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -11,7 +12,11 @@ import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/M
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import {
+  trackWorkspaceInviteLinkCopied,
+  trackOnboardingWorkspaceSkip,
+  trackCreateNewTeamClicked,
+} from "modules/analytics/events/common/teams";
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
 
@@ -40,13 +45,13 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
-  // const [newTeamData, setNewTeamData] = useState(null);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
 
   const handleCreateNewTeam = () => {
+    trackCreateNewTeamClicked("onboarding");
     setIsProcessing(true);
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     createTeam({
@@ -141,7 +146,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           //@ts-ignore
           type="email"
           value={inviteEmails}
-          onChange={setInviteEmails}
+          onChange={(email) => {
+            setInviteEmails(email);
+          }}
           validateEmail={validateEmail}
           getLabel={(email, index, removeEmail) => (
             <div data-tag key={index} className="multi-email-tag">
@@ -175,6 +182,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               type="default"
               title="Copy"
               copyText={`${window.location.origin}/invite/${defaultTeamData?.inviteId}`}
+              trackCopiedEvent={() => trackWorkspaceInviteLinkCopied("onboarding")}
             />
           </div>
         </div>
@@ -194,7 +202,10 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       <div className="workspace-onboarding-footer">
         <RQButton
           type="text"
-          onClick={() => dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS))}
+          onClick={() => {
+            trackOnboardingWorkspaceSkip();
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+          }}
         >
           Skip for now
         </RQButton>
