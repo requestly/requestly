@@ -35,3 +35,16 @@ export const getAppNameFromUA = (userAgent: any) => {
   }
   return appName;
 };
+
+type STATUS_CODE_LABEL = "1xx" | "2xx" | "3xx" | "4xx" | "5xx";
+
+export const doesStatusCodeMatchLabels = (code: number = 0, labels: STATUS_CODE_LABEL[]) => {
+  if (!code) return false; // some logs don't have status codes
+
+  return labels.some((label) => {
+    const statusCodeClass = parseInt(label.charAt(0));
+    const lowerLimit = statusCodeClass * 100;
+    const upperLimit = lowerLimit + 100;
+    return lowerLimit <= code && code < upperLimit;
+  });
+};
