@@ -1,23 +1,30 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { CreateWorkspace } from "./WorkspaceCreation";
 import { JoinWorkspace } from "./JoinWorkspace";
 import "./index.css";
-import { Team } from "types";
+import { Invite, InviteUsage, TeamInviteMetadata } from "types";
 import { NewTeamData } from "../../types";
 import SpinnerCard from "components/misc/SpinnerCard";
+import { getUniqueTeamsFromInvites } from "utils/teams";
 
 interface WorkspaceOnboardingStepProps {
   defaultTeamData: NewTeamData | null;
-  availableTeams: Team[];
-  isPendingInvite: boolean;
+  pendingInvites: Invite[];
 }
 
 export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = ({
   defaultTeamData,
-  availableTeams,
-  isPendingInvite,
+  pendingInvites,
 }) => {
   const [createNewTeam, setCreatNewTeam] = useState<boolean>(false);
+
+  const isPendingInvite = useMemo(() => pendingInvites.some((invite) => invite.usage === InviteUsage.once), [
+    pendingInvites,
+  ]);
+  const availableTeams: TeamInviteMetadata[] = useMemo(() => {
+    return getUniqueTeamsFromInvites(pendingInvites);
+  }, [pendingInvites]);
+
   return (
     <div className="workspace-onboarding-wrapper">
       <div className="workspace-onboarding-body">
