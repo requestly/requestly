@@ -8,7 +8,7 @@ import "./ruleInfoBanner.css";
 const ruleInfoBannerContent: Record<string, { title: string; description: string; appMode?: string[] }> = {
   [GLOBAL_CONSTANTS.RULE_TYPES.DELAY]: {
     appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
-    title: "Delay is capped automatically to avoid browsing performance degradation.",
+    title: "On extension delay is capped automatically to avoid browsing performance degradation.",
     description: `For XHR/Fetch, max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_XHR}ms & for other resources (JS, CSS, Images etc), max delay is ${GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_NON_XHR}ms.`,
   },
 };
