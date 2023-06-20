@@ -11,7 +11,7 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
-import { redirectToTeam } from "utils/RedirectionUtils";
+import { redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 
 const Workspace: React.FC<{ team: Team }> = ({ team }) => {
@@ -46,11 +46,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
               },
               appMode
             );
-            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
-              state: {
-                isNewTeam: false,
-              },
-            });
+            redirectToRules(navigate);
           }
         }
         setIsJoining(false);
