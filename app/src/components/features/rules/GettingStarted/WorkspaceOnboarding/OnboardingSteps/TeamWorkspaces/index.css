@@ -39,9 +39,11 @@
   align-self: flex-end;
 }
 .workspace-onboarding-wrapper .workspace-onboarding-body .onboarding-workspace-card {
-  border: 1px solid var(--border-dark);
-  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.5fr;
   align-items: center;
+  border: 1px solid var(--border-dark);
+  padding: 12px 14px;
   border-radius: var(--border-radius-sm);
   margin: 8px 0;
 }

@@ -59,7 +59,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
   };
 
   return (
-    <div className="space-between onboarding-workspace-card">
+    <div className="onboarding-workspace-card">
       <div className="display-flex">
         <Avatar
           size={28}
