@@ -7,14 +7,14 @@ import { actions } from "store";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
+import { TeamInviteMetadata } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { trackOnboardingWorkspaceSkip, trackWorkspaceInviteAccepted } from "modules/analytics/events/common/teams";
-import { Team } from "types";
 
-const Workspace: React.FC<{ team: Team }> = ({ team }) => {
+const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -37,13 +37,14 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
               {
-                teamId: team.id,
-                teamName: team.name,
+                teamId: team.teamId,
+                teamName: team.teamName,
                 teamMembersCount: team.accessCount,
               },
               dispatch,
               {
                 isWorkspaceMode,
+                isSyncEnabled: true,
               },
               appMode
             );
@@ -66,11 +67,11 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
           size={28}
           shape="square"
           className="workspace-avatar"
-          icon={<>{team.name.charAt(0)?.toUpperCase()}</>}
+          icon={<>{team?.teamName?.charAt(0)?.toUpperCase()}</>}
         />
-        <span className="text-bold onboarding-workspace-card-name">{team.name}</span>
+        <span className="text-bold onboarding-workspace-card-name">{team?.teamName}</span>
       </div>
-      <div className="text-gray">{`${team.accessCount} members`}</div>
+      <div className="text-gray">{`${team.teamAccessCount} members`}</div>
       <RQButton loading={isJoining} className="text-bold" type="primary" onClick={handleJoinWorkspace}>
         {isJoining ? "Joining" : "Join"}
       </RQButton>
@@ -79,7 +80,7 @@ const Workspace: React.FC<{ team: Team }> = ({ team }) => {
 };
 
 export const JoinWorkspace: React.FC<{
-  availableTeams: Team[];
+  availableTeams: TeamInviteMetadata[];
   isPendingInvite: boolean;
   createNewTeam: () => void;
 }> = ({ availableTeams, isPendingInvite, createNewTeam }) => {
