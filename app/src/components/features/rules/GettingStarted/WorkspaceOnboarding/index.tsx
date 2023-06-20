@@ -130,7 +130,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [getSameDomainTeams, pendingTeams.length, user.details]);
 
   useEffect(() => {
-    if (user?.loggedIn && step === OnboardingSteps.AUTH && currentTeams?.length) {
+    if (user?.loggedIn && step === OnboardingSteps.AUTH) {
       dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     }
   }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
