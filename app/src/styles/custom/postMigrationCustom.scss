@@ -1,9 +1,11 @@
 .network-table-wrapper-override {
+  height: 100%;
   border-style: none !important;
 
   .ant-pro-card-body {
     padding-right: 0;
   }
+
   .ant-pro-card-body > div > div > div {
     overflow: auto !important;
   }

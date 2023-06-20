@@ -1,0 +1,131 @@
+.desktop-app-promo-modal.ant-modal {
+  padding: 0;
+  border: 2px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+}
+
+.desktop-app-promo-modal .ant-modal-content {
+  width: 100%;
+  min-height: 532px;
+  background-color: #111213;
+}
+
+.rq-modal.ant-modal.desktop-app-promo-modal .ant-modal-content .ant-modal-body {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 88px 0 81px 20px;
+}
+
+.desktop-app-promo-modal .left-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.desktop-app-promo-modal .left-section::before {
+  content: "";
+  position: absolute;
+  width: 512px;
+  height: 512px;
+  top: -280px;
+  right: 150px;
+  background: radial-gradient(50% 50% at 50% 50%, #e0255a 0%, rgba(196, 36, 130, 0.02) 100%);
+  opacity: 0.08;
+  filter: blur(64px);
+}
+
+.desktop-app-promo-modal .left-section::after {
+  content: "";
+  position: absolute;
+  width: 581px;
+  height: 581px;
+  left: -20px;
+  top: 102px;
+  background: radial-gradient(50% 50% at 48.86% 60.67%, #1e69ff 0%, rgba(30, 105, 255, 0) 100%);
+  opacity: 0.08;
+  filter: blur(64px);
+}
+
+.desktop-app-promo-modal .left-section .header {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 53px;
+  text-align: center;
+  color: var(--white);
+  margin-top: 38px;
+  mix-blend-mode: screen;
+}
+
+.desktop-app-promo-modal .left-section .header .desktop-underline {
+  position: relative;
+}
+
+.desktop-app-promo-modal .left-section .header .desktop-underline svg {
+  position: absolute;
+  left: -7px;
+  bottom: -9px;
+  z-index: 1;
+}
+
+.desktop-app-promo-modal .left-section .caption {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+  margin: 12px 0 40px 0;
+  color: var(--gray-light);
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn {
+  height: 32px;
+  max-width: 261px;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 158px 22px 158px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn span:last-child {
+  margin-top: 2px;
+  margin-left: 7px;
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn .anticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-app-promo-modal .left-section .download-btn.ant-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--white);
+}
+
+.desktop-app-promo-modal .left-section .view-all-platforms-link {
+  z-index: 1;
+  margin-bottom: 41px;
+  color: var(--primary);
+}
+
+.desktop-app-promo-modal .left-section .view-all-platforms-link:hover {
+  text-decoration: underline;
+}
+
+.desktop-app-promo-modal .right-section {
+  width: 50%;
+  display: inline-flex;
+}
+
+.desktop-app-promo-modal .right-section img {
+  margin-left: auto;
+  max-inline-size: 100%;
+}

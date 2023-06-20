@@ -28,4 +28,6 @@ export interface Invite {
   updatedTs: number;
   expireTs: number;
   lastEmailTs?: number | null;
+  public: boolean;
+  domains?: string[];
 }

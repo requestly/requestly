@@ -97,6 +97,33 @@
         "code",
         "projectManagement"
       ]
+    },
+    {
+      "login": "ncharanaraj",
+      "name": "Charanaraj N",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43924299?v=4",
+      "profile": "https://github.com/ncharanaraj",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Muhammad-Daniyal-Jawad1",
+      "name": "Muhammad-Daniyal-Jawad1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130592856?v=4",
+      "profile": "https://github.com/Muhammad-Daniyal-Jawad1",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "npiyush97",
+      "name": "PIYUSH NEGI",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43876655?v=4",
+      "profile": "https://piyush-web-app.web.app/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

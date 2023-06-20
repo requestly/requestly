@@ -549,12 +549,7 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
 };
 
 BG.Methods.onBeforeRequest = (details) => {
-  const isResponseBodyModified = BG.Methods.overrideResponse(details);
-
-  // If the response is modified then do not allow redirects
-  if (!isResponseBodyModified) {
-    return BG.Methods.modifyUrl(details);
-  }
+  return BG.Methods.modifyUrl(details);
 };
 
 BG.Methods.modifyRequestHeadersListener = function (details) {
@@ -571,32 +566,6 @@ BG.Methods.onHeadersReceived = function (details) {
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
   }
-};
-
-BG.Methods.overrideResponse = function (details) {
-  if (BG.Methods.isNonBrowserTab(details.tabId) || details.type !== "xmlhttprequest") {
-    return false;
-  }
-
-  const responseRules = BG.Methods.getMatchingRules(details.url, RQ.RULE_TYPES.RESPONSE, details);
-
-  if (responseRules.length > 0) {
-    const finalResponseRule = responseRules[responseRules.length - 1]; // last overridden response is final
-
-    chrome.tabs.sendMessage(
-      details.tabId,
-      {
-        action: RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE,
-        url: details.url,
-        rule: finalResponseRule,
-      },
-      { frameId: details.frameId }
-    );
-
-    return true;
-  }
-
-  return false;
 };
 
 BG.Methods.getRulesAndGroups = function () {
@@ -809,23 +778,26 @@ BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
       console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
     };
 
-  chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, function (tabs) {
-    // Send message to each opened tab which matches the url
-    for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
-      chrome.tabs.sendMessage(tabs[tabIndex].id, messageObject, callback);
-    }
+  BG.Methods.getAppTabs().then((tabs) => {
+    tabs.forEach((tab) => {
+      chrome.tabs.sendMessage(tab.id, messageObject, callback);
+    });
   });
 };
 
-BG.Methods.getAppTabs = () => {
-  return new Promise((resolve) => {
-    chrome.tabs.query({ url: RQ.configs.WEB_URL + "/*" }, (tabs) => {
-      if (tabs.length === 0) {
-        BG.isAppOnline = false;
-      }
-      resolve(tabs);
-    });
-  });
+BG.Methods.getAppTabs = async () => {
+  const webURLs = RQ.Utils.getAllSupportedWebURLs();
+  let appTabs = [];
+
+  for (const webURL of webURLs) {
+    const tabs = await new Promise((resolve) => chrome.tabs.query({ url: webURL + "/*" }, resolve));
+    appTabs = [...appTabs, ...tabs];
+  }
+
+  if (appTabs.length === 0) {
+    BG.isAppOnline = false;
+  }
+  return appTabs;
 };
 
 /**

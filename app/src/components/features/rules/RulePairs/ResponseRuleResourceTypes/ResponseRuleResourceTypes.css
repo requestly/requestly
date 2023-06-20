@@ -29,7 +29,7 @@
   color: var(--white);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
-  background-color: var(--component-dark-background);
+  background-color: var(--component-header-background);
 }
 
 .resource-types-radio-group {
@@ -59,17 +59,13 @@
   margin-left: 5px;
 }
 
-.response-rule-resource-type-tooltip.ant-tooltip
-  .ant-tooltip-content
-  .ant-tooltip-inner {
+.response-rule-resource-type-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
   color: var(--text-gray);
   background-color: var(--border-dark);
   border-radius: var(--border-radius-sm);
 }
 
-.response-rule-resource-type-tooltip.ant-tooltip
-  .ant-tooltip-content
-  .ant-tooltip-arrow {
+.response-rule-resource-type-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-arrow {
   display: none;
 }
 

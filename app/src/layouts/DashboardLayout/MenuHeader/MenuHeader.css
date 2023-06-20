@@ -1,13 +1,18 @@
 .layout-header.ant-layout-header {
-  height: 56px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border-dark);
-  background-color: var(--body-background);
   position: sticky;
   top: 0;
   right: 0;
   z-index: 1;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+}
+
+.layout-header.ant-layout-header .ant-row {
+  height: 3rem;
 }
 
 .layout-header .ant-divider.ant-divider-horizontal {
@@ -21,16 +26,39 @@
 .header-left-section {
   display: flex;
   align-items: center;
-  column-gap: 6px;
-  margin-left: 8px;
+  column-gap: 1.4rem;
+  height: 3rem;
+}
+
+.header-left-section a {
+  font-size: 13px;
+  text-align: left;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.header-left-section a:hover,
+.header-left-section a:focus {
+  opacity: 0.7;
+  color: var(--white);
+}
+
+.header-left-section .desktop-app-promo-btn.ant-btn {
+  padding: 0;
+  background-color: transparent;
+}
+
+.header-left-section .desktop-app-promo-btn.ant-btn:hover {
+  opacity: 0.7;
 }
 
 .header-middle-section {
+  margin: 8px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 8px;
-  font-size: 13px;
+  height: 3rem;
 }
 
 .header-middle-section > div {
@@ -134,7 +162,7 @@
 }
 
 .header-vertical-divider.ant-divider-vertical {
-  height: 60px;
+  height: 3rem;
   margin-right: 12px;
   margin-left: 16px;
 }
@@ -146,4 +174,22 @@
 
 .header-profile-dropdown-trigger.ant-avatar {
   margin-top: -2px;
+}
+
+@media screen and (max-width: 1300px) {
+  .desktop .header-left-section > a {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1028px) {
+  .header-middle-section {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .extension .header-left-section > a {
+    display: none;
+  }
 }

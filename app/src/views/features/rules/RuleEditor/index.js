@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
@@ -11,18 +12,19 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
-import "./RuleEditor.css";
 import Logger from "lib/logger";
+import "./RuleEditor.css";
 
-const RuleEditor = (props) => {
-  //Constants
-  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(props.location, null);
+const INITIAL_PANE_SIZES = [92, 8];
+
+const RuleEditor = () => {
+  const location = useLocation();
+  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
 
   // Component State
-  const [rulePaneSizes, setRulePaneSizes] = useState([92, 8]);
+  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
 
-  const { location } = props;
   //Global State
   const appMode = useSelector(getAppMode);
 
@@ -43,7 +45,7 @@ const RuleEditor = (props) => {
 
   const expandRulePane = () => setRulePaneSizes([30, 70]);
 
-  const collapseRulesPlane = () => setRulePaneSizes([92, 8]);
+  const collapseRulesPlane = () => setRulePaneSizes(INITIAL_PANE_SIZES);
 
   const renderRuleEditor = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
@@ -74,13 +76,13 @@ const RuleEditor = (props) => {
                 cursor="row-resize"
                 onDragEnd={(paneSizes) => setRulePaneSizes(paneSizes)}
                 style={{
-                  height: location.pathname.includes("/rules/editor") ? "100vh" : "91vh",
+                  height: location.pathname.includes("/rules/editor") ? "calc(100vh - 72px)" : "91vh",
                 }}
               >
                 <Row className="overflow-hidden">
                   <Col span={24}>
                     <ProCard className="rule-editor-procard">
-                      <RuleBuilder location={location} />
+                      <RuleBuilder />
                     </ProCard>
                   </Col>
                 </Row>
@@ -106,7 +108,7 @@ const RuleEditor = (props) => {
     return (
       <>
         <ProCard className="rule-editor-procard">
-          <RuleBuilder location={location} />
+          <RuleBuilder />
         </ProCard>
       </>
     );

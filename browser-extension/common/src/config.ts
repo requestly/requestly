@@ -7,6 +7,7 @@ export interface ExtensionConfig {
   contextMenuContexts: chrome.contextMenus.ContextType[];
   env: "local" | "beta" | "prod";
   WEB_URL: string;
+  OTHER_WEB_URLS?: string[];
   logLevel: "debug" | "info";
 }
 
