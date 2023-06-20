@@ -23,7 +23,7 @@ import { isEmailVerified } from "utils/AuthUtils";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { actions } from "store";
-import { Team } from "types";
+import { Invite } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
@@ -43,19 +43,18 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
-  const [availableTeams, setAvailableTeams] = useState<Team[]>([]);
-  const [isPendingInvitePresent, setIsPendingInvitePresent] = useState<boolean>(false);
+  const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
-  const getTeamsWithPendingInvites = useMemo(
+  const getPendingInvites = useMemo(
     () =>
-      httpsCallable<
-        { email: boolean; domain: boolean },
-        { teams: Team[]; success: boolean; isPendingInvitePresent?: boolean }
-      >(getFunctions(), "teams-getTeamsWithPendingInvites"),
+      httpsCallable<{ email: boolean; domain: boolean }, { pendingInvites: Invite[]; success: boolean }>(
+        getFunctions(),
+        "teams-getPendingTeamInvites"
+      ),
     []
   );
 
@@ -79,7 +78,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   );
 
   const handleOnSurveyCompletion = useCallback(async () => {
-    if (availableTeams.length === 0) {
+    if (pendingInvites.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
         if (result) {
           if (!isCompanyEmail(user?.details?.profile?.email)) {
@@ -106,7 +105,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [availableTeams.length, createTeam, dispatch, user?.details?.profile, userEmailDomain]);
+  }, [pendingInvites.length, createTeam, dispatch, user?.details?.profile, userEmailDomain]);
 
   useEffect(() => {
     if (workspaceOnboardingTeamDetails) {
@@ -116,13 +115,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [dispatch, workspaceOnboardingTeamDetails]);
 
   useEffect(() => {
-    getTeamsWithPendingInvites({ email: true, domain: true })
+    getPendingInvites({ email: true, domain: true })
       .then((res) => {
-        setAvailableTeams(res.data?.teams ?? []);
-        setIsPendingInvitePresent(res.data?.isPendingInvitePresent);
+        setPendingInvites(res?.data?.pendingInvites ?? []);
       })
-      .catch((e) => setAvailableTeams([]));
-  }, [getTeamsWithPendingInvites, user.details]);
+      .catch((e) => setPendingInvites([]));
+  }, [getPendingInvites, user.details]);
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
@@ -171,23 +169,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       case OnboardingSteps.PERSONA_SURVEY:
         return <PersonaSurvey callback={handleOnSurveyCompletion} isSurveyModal={false} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return (
-          <WorkspaceOnboardingStep
-            defaultTeamData={defaultTeamData}
-            availableTeams={availableTeams}
-            isPendingInvite={isPendingInvitePresent}
-          />
-        );
+        return <WorkspaceOnboardingStep defaultTeamData={defaultTeamData} pendingInvites={pendingInvites} />;
     }
-  }, [
-    step,
-    handleOnSurveyCompletion,
-    defaultTeamData,
-    availableTeams,
-    isPendingInvitePresent,
-    handleAuthCompletion,
-    dispatch,
-  ]);
+  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingInvites, handleAuthCompletion, dispatch]);
 
   return (
     <>
