@@ -549,12 +549,7 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
 };
 
 BG.Methods.onBeforeRequest = (details) => {
-  const isResponseBodyModified = BG.Methods.overrideResponse(details);
-
-  // If the response is modified then do not allow redirects
-  if (!isResponseBodyModified) {
-    return BG.Methods.modifyUrl(details);
-  }
+  return BG.Methods.modifyUrl(details);
 };
 
 BG.Methods.modifyRequestHeadersListener = function (details) {
@@ -571,32 +566,6 @@ BG.Methods.onHeadersReceived = function (details) {
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
   }
-};
-
-BG.Methods.overrideResponse = function (details) {
-  if (BG.Methods.isNonBrowserTab(details.tabId) || details.type !== "xmlhttprequest") {
-    return false;
-  }
-
-  const responseRules = BG.Methods.getMatchingRules(details.url, RQ.RULE_TYPES.RESPONSE, details);
-
-  if (responseRules.length > 0) {
-    const finalResponseRule = responseRules[responseRules.length - 1]; // last overridden response is final
-
-    chrome.tabs.sendMessage(
-      details.tabId,
-      {
-        action: RQ.CLIENT_MESSAGES.OVERRIDE_RESPONSE,
-        url: details.url,
-        rule: finalResponseRule,
-      },
-      { frameId: details.frameId }
-    );
-
-    return true;
-  }
-
-  return false;
 };
 
 BG.Methods.getRulesAndGroups = function () {
