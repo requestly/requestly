@@ -72,7 +72,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     })
       .then((res: any) => {
         if (res?.data?.success) {
-          toast.success("Sent invites successfully");
+          toast.success("Invite sent successfully");
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
