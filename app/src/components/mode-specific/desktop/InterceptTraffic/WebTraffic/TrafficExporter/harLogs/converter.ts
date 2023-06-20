@@ -22,6 +22,9 @@ const convertLogToHarEntry = (log: Log) => {
     method: log.request.method,
     queryString: [],
     url: log.url,
+    postData: {
+      text: log.request.body,
+    },
     headers: createHarHeaders(log.request.headers),
   };
   const harResponse: HarResponse = {
