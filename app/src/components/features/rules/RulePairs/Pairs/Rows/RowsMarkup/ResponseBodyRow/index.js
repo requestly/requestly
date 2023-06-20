@@ -70,7 +70,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
     modifyPairAtGivenPath(null, pairIndex, `response.type`, GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE, [
       {
         path: `response.value`,
-        value: `file://${selectedFile}`,
+        value: selectedFile,
+        // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
+        // value: `file://${selectedFile}`,
       },
     ]);
   };
