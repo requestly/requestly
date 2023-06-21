@@ -102,7 +102,7 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
@@ -123,7 +123,7 @@ const AuthForm = ({
           handleEmailSignIn(email, password, true, eventSource)
             .then(({ result }) => {
               if (result.user.uid) {
-                toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
                 setEmail("");
                 setPassword("");
                 // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
@@ -153,7 +153,7 @@ const AuthForm = ({
     handleEmailSignIn(email, password, false, eventSource)
       .then(({ result }) => {
         if (result.user.uid) {
-          toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
           setEmail("");
           setPassword("");
           // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
