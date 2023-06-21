@@ -1,9 +1,9 @@
 import { saveAs } from "file-saver";
 
 import { createLogsHar } from "./converter";
-import { Har, Log } from "./types";
+import { Har, RQNetworkLog } from "./types";
 
-export function downloadLogs(logs: Log[]) {
+export function downloadLogs(logs: RQNetworkLog[]) {
   const harLogs = createLogsHar(logs);
   const jsonBlob = new Blob([JSON.stringify(harLogs, null, 2)], { type: "application/json" });
 
