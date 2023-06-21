@@ -18,7 +18,7 @@ export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = (
 }) => {
   const [createNewTeam, setCreatNewTeam] = useState<boolean>(false);
 
-  const isPendingInvite = useMemo(() => pendingInvites.some((invite) => invite.usage === InviteUsage.once), [
+  const isPendingInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
     pendingInvites,
   ]);
   const availableTeams: TeamInviteMetadata[] = useMemo(() => {
