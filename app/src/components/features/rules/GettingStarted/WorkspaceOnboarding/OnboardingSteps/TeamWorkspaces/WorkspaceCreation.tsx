@@ -19,6 +19,7 @@ import {
 } from "modules/analytics/events/common/teams";
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
+import { renameWorkspace } from "backend/workspace";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -43,7 +44,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
+  const [newWorkspaceName, setNewWorkspaceName] = useState<string>(defaultTeamData?.name ?? "My new team");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
@@ -61,12 +62,19 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     });
   };
 
-  const handleAddMembers = (newTeamName?: string, newTeamId?: string) => {
+  const handleAddMembers = (newWorkspaceName?: string, newTeamId?: string) => {
+    if (!newWorkspaceName) {
+      toast.warn("Please enter the workspace name");
+      return;
+    }
+
     if (!inviteEmails || !inviteEmails.length) {
       toast.warn("Please add members email to invite them");
       return;
     }
     setIsProcessing(true);
+
+    renameWorkspace(defaultTeamData?.teamId ?? newTeamId, newWorkspaceName);
 
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
 
@@ -137,9 +145,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           size="small"
           placeholder="Workspace name"
           className="mt-8 workspace-onboarding-field"
-          defaultValue={defaultTeamData?.name ?? "My new team"}
-          disabled={defaultTeamData ? true : false}
-          value={defaultTeamData?.name ?? newWorkspaceName}
+          value={newWorkspaceName}
           onChange={(e) => setNewWorkspaceName(e.target.value)}
         />
       </div>
@@ -220,7 +226,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           type="primary"
           className="text-bold"
           onClick={() => {
-            defaultTeamData ? handleAddMembers() : handleCreateNewTeam();
+            defaultTeamData ? handleAddMembers(newWorkspaceName) : handleCreateNewTeam();
           }}
           loading={isProcessing}
         >
