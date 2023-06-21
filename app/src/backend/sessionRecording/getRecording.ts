@@ -24,7 +24,7 @@ const hasRecordingAccess = (
   if (recording.visibility === "only-me" && uid === recording.ownerId) return true;
 
   // TODO: We should ideally keep uids here instead of keeping emails.
-  if (recording.accessEmails.includes(email)) return true;
+  if (recording.accessEmails.includes(email) || uid === recording.ownerId) return true;
 
   return false;
 };
