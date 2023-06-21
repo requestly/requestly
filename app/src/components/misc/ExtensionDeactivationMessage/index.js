@@ -1,28 +1,26 @@
 import React from "react";
-import { Row, Col } from "antd";
-import ProCard from "@ant-design/pro-card";
-import activateRequestly from "assets/img/screenshots/activate_requestly.png";
-import Jumbotron from "components/bootstrap-legacy/jumbotron";
+import { Row } from "antd";
+import resumeRequestly from "assets/img/screenshots/resume_requestly.png";
+import { WarningOutlined } from "@ant-design/icons";
+import "./extensionDeactivationMessage.css";
 
 const ExtensionDeactivationMessage = () => {
   return (
-    <>
-      <ProCard className="primary-card github-like-border">
-        <Row style={{ textAlign: "center" }} align="center">
-          <Col span={24}>
-            <Jumbotron className="text-center">
-              <h1 className="display-3">Extension is deactivated</h1>
-              <p className="lead">
-                Please activate the extension by right clicking on it and selecting{" "}
-                <span style={{ cursor: "auto", fontWeight: "bold" }}>Activate Requestly</span> option and then reload
-                this page.
-              </p>
-              <img style={{ maxWidth: "40vh" }} src={activateRequestly} alt="activate requestly" />
-            </Jumbotron>
-          </Col>
-        </Row>
-      </ProCard>
-    </>
+    <Row className="extension-deactivation-msg-container" align="center" justify="center">
+      <div>
+        <h1>
+          <WarningOutlined /> Extension is paused
+        </h1>
+        <ol start="0">
+          <li>Please resume the extension by following below steps:</li>
+          <li>Open extension popup by clicking on Requestly icon on the browser's toolbar.</li>
+          <li>Hover over the dropdown menu on the popup that says "Requestly paused".</li>
+          <li>Click on "Resume requestly" to resume Requestly again.</li>
+        </ol>
+
+        <img width={628} height={235} src={resumeRequestly} alt="resume requestly" />
+      </div>
+    </Row>
   );
 };
 
