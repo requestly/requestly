@@ -120,12 +120,10 @@ const SavedSessionViewer: React.FC = () => {
       })
       .catch((err) => {
         switch (err.name) {
-          case "PermissionDenied":
-            setShowPermissionError(true);
-            break;
           case "NotFound":
             setShowNotFoundError(true);
             break;
+          case "PermissionDenied":
           default:
             setShowPermissionError(true);
         }
