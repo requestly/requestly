@@ -7,8 +7,12 @@ export const getUniqueColorForWorkspace = (teamId: string, teamName: string) => 
 
 // email invites are given priority over domain invites
 export const getUniqueTeamsFromInvites = (pendingInvites: Invite[]): TeamInviteMetadata[] => {
+  if (!pendingInvites) {
+    return [];
+  }
+
   const teamsMap: Record<string, TeamInviteMetadata> = {};
-  pendingInvites.forEach((invite: any) => {
+  pendingInvites?.forEach((invite: any) => {
     const teamId = invite?.metadata?.teamId;
     if (!teamsMap[teamId]) {
       teamsMap[teamId] = invite.metadata;
