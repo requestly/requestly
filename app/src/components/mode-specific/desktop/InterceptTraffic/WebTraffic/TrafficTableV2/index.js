@@ -212,15 +212,16 @@ const CurrentTrafficTable = ({
       let includeLog = true;
 
       if (trafficTableFilters.search.term) {
-        const searchTerm = trafficTableFilters.search.term;
+        const searchTerm = trafficTableFilters.search.term.toLowerCase();
+        const logUrl = log.url.toLowerCase();
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (trafficTableFilters.search.regex) {
             reg = new RegExp(searchTerm);
-            includeLog = log.url.match(reg);
+            includeLog = logUrl.match(reg);
           } else {
-            includeLog = log.url.includes(searchTerm);
+            includeLog = logUrl.includes(searchTerm);
           }
         } catch (err) {
           Logger.log(err);
