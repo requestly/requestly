@@ -119,9 +119,16 @@ const SavedSessionViewer: React.FC = () => {
         setIsFetching(false);
       })
       .catch((err) => {
-        err.name === "PermissionDenied" && setShowPermissionError(true);
-
-        err.name === "NotFound" && setShowNotFoundError(true);
+        switch (err.name) {
+          case "PermissionDenied":
+            setShowPermissionError(true);
+            break;
+          case "NotFound":
+            setShowNotFoundError(true);
+            break;
+          default:
+            setShowPermissionError(true);
+        }
       });
   }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
