@@ -11,6 +11,7 @@ import {
   signInWithEmailLink as signInWithEmailLinkFirebaseLib,
   getAdditionalUserInfo,
   signInWithEmailAndPassword,
+  signInWithCredential,
   updateProfile,
   sendPasswordResetEmail,
   verifyPasswordResetCode,
@@ -300,6 +301,20 @@ export function resetPassword(oobCode, password) {
     });
 }
 
+export const handleOnetapSignIn = ({ credential }) => {
+  const auth = getAuth(firebaseApp);
+  const OAuthCredential = GoogleAuthProvider.credential(credential);
+  console.log("OAuthCredential", OAuthCredential);
+
+  signInWithCredential(auth, OAuthCredential)
+    .then((result) => {
+      console.log("NEW", result);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
 export async function googleSignIn(callback, MODE, source) {
   const provider = new GoogleAuthProvider();
   provider.addScope("profile");
@@ -307,6 +322,7 @@ export async function googleSignIn(callback, MODE, source) {
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
     .then((result) => {
+      console.log("OLD", { result });
       let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
       let uid = result?.user?.uid || null;
       let email = result?.user?.email || null;
