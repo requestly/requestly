@@ -44,7 +44,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
-  const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
@@ -79,9 +79,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   );
 
   const handleOnSurveyCompletion = useCallback(async () => {
-    if (pendingInvites.length === 0) {
+    if (pendingInvites !== null && pendingInvites.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
-        if (result) {
+        if (!result) {
           if (!isCompanyEmail(user?.details?.profile?.email)) {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
             return;
@@ -106,7 +106,14 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
-  }, [pendingInvites.length, createTeam, dispatch, user?.details?.profile, userEmailDomain]);
+  }, [
+    pendingInvites,
+    user?.details?.profile?.uid,
+    user?.details?.profile?.email,
+    userEmailDomain,
+    createTeam,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (workspaceOnboardingTeamDetails) {
@@ -116,12 +123,16 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [dispatch, workspaceOnboardingTeamDetails]);
 
   useEffect(() => {
-    getPendingInvites({ email: true, domain: true })
-      .then((res) => {
-        setPendingInvites(res?.data?.pendingInvites ?? []);
-      })
-      .catch((e) => setPendingInvites([]));
-  }, [getPendingInvites, user.details]);
+    if (user?.loggedIn) {
+      getPendingInvites({ email: true, domain: true })
+        .then((res) => {
+          setPendingInvites(res?.data?.pendingInvites ?? []);
+        })
+        .catch((e) => {
+          setPendingInvites([]);
+        });
+    }
+  }, [getPendingInvites, user?.loggedIn]);
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
