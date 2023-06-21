@@ -8,7 +8,13 @@ import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
-import { getActiveModals, getAppMode, getUserPersonaSurveyDetails, getUserAuthDetails } from "store/selectors";
+import {
+  getActiveModals,
+  getAppMode,
+  getUserPersonaSurveyDetails,
+  getUserAuthDetails,
+  getIsWorkspaceOnboardingCompleted,
+} from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -19,6 +25,7 @@ import { RQModal } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -34,6 +41,7 @@ const DashboardContent = () => {
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -50,6 +58,9 @@ const DashboardContent = () => {
   };
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
+  };
+  const toggleWorkspaceOnboardingModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
   };
 
   const toggleImportRulesModal = () => {
@@ -127,7 +138,7 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {userPersona.page !== 2 && !userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
+      {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
         <RQModal
           open={activeModals.personaSurveyModal.isActive}
           centered
@@ -141,7 +152,15 @@ const DashboardContent = () => {
         </RQModal>
       ) : null}
 
-      {/* ) : null} */}
+      {appOnboardingExp === "workspace_onboarding" &&
+      !isWorkspaceOnboardingCompleted &&
+      !userPersona.isSurveyCompleted ? (
+        <WorkspaceOnboarding
+          isOpen={activeModals.workspaceOnboardingModal.isActive}
+          handleUploadRulesModalClick={toggleImportRulesModal}
+        />
+      ) : null}
+
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}

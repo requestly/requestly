@@ -2,19 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ImportRulesModal from "../ImportRulesModal";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import {
-  getUserAuthDetails,
-  getAppMode,
-  getUserPersonaSurveyDetails,
-  getIsWorkspaceOnboardingCompleted,
-} from "store/selectors";
+import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
@@ -25,7 +20,6 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
-import { WorkspaceOnboarding } from "./WorkspaceOnboarding";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -38,23 +32,19 @@ const GettingStarted = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
+  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
-
-  const shouldShowWorkspaceOnboarding =
-    state?.src === "workspace_onboarding" &&
-    !isWorkspaceOnboardingCompleted &&
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const shouldShowRecommendationScreen =
     state?.src === "persona_survey_modal" &&
     !userPersona.isSurveyCompleted &&
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+    appOnboardingExp === "control";
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -96,9 +86,6 @@ const GettingStarted = () => {
     }
   }, []);
 
-  if (shouldShowWorkspaceOnboarding) {
-    return <WorkspaceOnboarding handleUploadRulesClick={handleUploadRulesClick} />;
-  }
   if (shouldShowRecommendationScreen) {
     return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
   }

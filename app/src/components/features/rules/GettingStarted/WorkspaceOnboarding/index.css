@@ -1,3 +1,13 @@
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal,
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal .ant-modal-content {
+  width: 100%;
+  height: 100%;
+}
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal .ant-modal-content .ant-modal-body {
+  padding: 0;
+  height: 100%;
+}
+
 .onboarding-content-wrapper {
   height: calc(100% - 56px);
   display: flex;
