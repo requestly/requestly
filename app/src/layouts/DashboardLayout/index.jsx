@@ -37,7 +37,7 @@ const DashboardLayout = () => {
           <DashboardContent />
         </div>
 
-        <div className="app-footer">{!showPersonaOnboarding && <Footer />}</div>
+        <div className="app-footer">{!showPersonaOnboarding && !showWorkspaceOnboarding && <Footer />}</div>
       </div>
     </>
   );
