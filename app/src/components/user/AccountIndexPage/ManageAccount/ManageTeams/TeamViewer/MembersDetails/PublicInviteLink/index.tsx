@@ -98,9 +98,18 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
-      upsertTeamCommonInvite({ teamId, domainEnabled: enabled }).then((res: any) => {
-        if (res?.data?.success) setDomainJoiningEnabled(enabled);
-      });
+      setDomainJoiningEnabled(enabled);
+      upsertTeamCommonInvite({ teamId, domainEnabled: enabled })
+        .then((res: any) => {
+          if (!res?.data?.success) {
+            setDomainJoiningEnabled(!enabled);
+            toast.error("Couldn't update this setting. Please contact support.");
+          }
+        })
+        .catch(() => {
+          setDomainJoiningEnabled(!enabled);
+          toast.error("Couldn't update this setting. Please contact support.");
+        });
     },
     [teamId, upsertTeamCommonInvite]
   );

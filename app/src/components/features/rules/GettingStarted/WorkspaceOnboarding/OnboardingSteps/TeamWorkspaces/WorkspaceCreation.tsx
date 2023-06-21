@@ -102,11 +102,18 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
       if (defaultTeamData) {
-        upsertTeamCommonInvite({ teamId: defaultTeamData?.teamId, domainEnabled: enabled }).then((res: any) => {
-          if (res?.data?.success) {
-            setDomainJoiningEnabled(enabled);
-          }
-        });
+        setDomainJoiningEnabled(enabled);
+        upsertTeamCommonInvite({ teamId: defaultTeamData?.teamId, domainEnabled: enabled })
+          .then((res: any) => {
+            if (!res?.data?.success) {
+              setDomainJoiningEnabled(!enabled);
+              toast.error("Couldn't update this setting. Please contact support.");
+            }
+          })
+          .catch(() => {
+            setDomainJoiningEnabled(!enabled);
+            toast.error("Couldn't update this setting. Please contact support.");
+          });
       }
     },
     [defaultTeamData, upsertTeamCommonInvite]
