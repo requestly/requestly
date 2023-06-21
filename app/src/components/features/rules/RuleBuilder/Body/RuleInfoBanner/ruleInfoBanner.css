@@ -4,19 +4,35 @@
 
 .rule-info-banner.ant-alert {
   padding: 8px;
-  background-color: rgba(var(--danger-rgb), 0.03);
-  border: 1px dashed rgb(var(--danger-rgb));
+  background-color: rgba(30, 105, 255, 0.05);
+  border: 1px dashed var(--primary);
   border-radius: var(--border-radius-sm);
+}
+
+.rule-info-banner.ant-alert a {
+  --link-color: #4c88ff;
+  color: var(--link-color);
+}
+
+.rule-info-banner.ant-alert a:hover,
+.rule-info-banner.ant-alert a:focus {
+  color: var(--link-color);
+  text-decoration: underline;
 }
 
 .rule-info-banner.ant-alert .rule-info-banner-icon {
   color: var(--text-gray);
-  padding-bottom: 20px;
+  margin-bottom: auto;
 }
 
 .rule-info-banner.ant-alert .rule-info-banner-icon svg {
   height: 13px;
   width: 13px;
+}
+
+.rule-info-banner.ant-alert .ant-alert-close-icon {
+  margin-bottom: auto;
+  margin-top: 4px;
 }
 
 .rule-info-banner .rule-info-banner-text {

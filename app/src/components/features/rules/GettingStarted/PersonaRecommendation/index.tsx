@@ -65,9 +65,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             <div key={section}>
               <div className="section-header">{section}</div>
               <div className="section-row">
-                {features.map((feature) => (
-                  <FeatureCard {...feature} key={feature.title} />
-                ))}
+                {features.map((feature) => (feature.disabled ? null : <FeatureCard {...feature} key={feature.id} />))}
               </div>
             </div>
           ))}
@@ -82,7 +80,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
         )}
 
         <div className="persona-recommendation-footer">
-          <div className="upload-rule-message">or If you have existing rule, click here to upload them. </div>
+          <div className="upload-rule-message">or if you have existing rules, click below to upload them. </div>
 
           <AuthConfirmationPopover
             title="You need to sign up to upload rules"
