@@ -76,7 +76,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "contentType",
         title: "Content-Type",
         dataIndex: ["response", "contentType"],
-        width: "15%",
+        width: "16%",
       },
       {
         id: "rulesApplied",
@@ -96,7 +96,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "status",
         title: "Status",
         dataIndex: ["response", "statusCode"],
-        width: "8%",
+        width: "7%",
       },
     ],
     [isStaticPreview]
@@ -111,7 +111,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
               return null;
             }
             return (
-              <Table.HeadCell key={column.id} style={{ width: column.width }}>
+              <Table.HeadCell title={column.title} key={column.id} style={{ width: column.width }}>
                 {column.title}
               </Table.HeadCell>
             );
@@ -143,7 +143,11 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
             }
             const columnData = _.get(log, getColumnKey(column?.dataIndex));
 
-            return <Table.Cell key={column.id}>{column?.render ? column.render(columnData) : columnData}</Table.Cell>;
+            return (
+              <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
+                {column?.render ? column.render(columnData) : columnData}
+              </Table.Cell>
+            );
           })}
         </Table.Row>
       );
