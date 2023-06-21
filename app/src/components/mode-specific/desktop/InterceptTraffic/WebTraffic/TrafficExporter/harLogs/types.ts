@@ -80,7 +80,7 @@ interface HarMapEntry {
 }
 
 /* RQ LOG */
-export interface Log {
+export interface RQNetworkLog {
   id: string;
   timestamp: number;
   url: string;
