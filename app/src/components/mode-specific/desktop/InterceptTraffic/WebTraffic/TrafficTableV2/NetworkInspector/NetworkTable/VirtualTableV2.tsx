@@ -132,6 +132,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
           selected={selected}
           onSelected={(id: string) => {
             setSelected(id);
+            setIsScrollToBottomEnabled(false); // Disable autoscroll when row is selected
           }}
           onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
         >
