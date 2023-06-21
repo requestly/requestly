@@ -21,6 +21,10 @@ RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
 };
 
 RQ.RuleExecutionHandler.setup = () => {
+  if (window !== window.top) {
+    return;
+  }
+
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED:
