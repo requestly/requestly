@@ -24,6 +24,7 @@ import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
+import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
 
 let hasAppModeBeenSet = false;
@@ -132,6 +133,14 @@ const AppModeInitializer = () => {
           }
         });
       }
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
+        if (payload?.origin && payload?.origin === "main") {
+          trackDesktopMainEvent(payload?.name, payload?.params);
+        } else {
+          // todo: need to setup relay for BG renderer events
+          trackDesktopBGEvent(payload?.name, payload?.params);
+        }
+      });
 
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
