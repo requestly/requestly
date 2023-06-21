@@ -38,10 +38,7 @@ const ConfigurationModal = ({ config, isModalVisible, handleSaveConfig, handleCa
     const initialCustomPageSources = [{ ...emptyPageSourceData }];
 
     if (isModalVisible) {
-      if (
-        !config.pageSources ||
-        (config.pageSources.length === 1 && isEqual(config.pageSources[0], allPagesSourceData))
-      ) {
+      if (config.pageSources.length === 1 && isEqual(config.pageSources[0], allPagesSourceData)) {
         setPageSourceType(PAGE_SOURCES_TYPE.ALL_PAGES);
         setCustomPageSources(initialCustomPageSources);
       } else if (config.pageSources.length > 0) {
