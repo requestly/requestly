@@ -26,6 +26,7 @@ const RequestPayloadPreview = ({ queryParams, body }) => {
               return (
                 <Text key={index}>
                   <Text strong>{key}</Text> : {queryParams[key]}
+                  <br />
                 </Text>
               );
             })}
