@@ -429,7 +429,7 @@ const AuthForm = ({
                 </InputGroupText>
               </InputGroupAddon> */}
             <label htmlFor="password" className="text-bold auth-modal-input-label">
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Choose password" : "Password"}
+              Password
             </label>
             <RQInput
               id="password"
