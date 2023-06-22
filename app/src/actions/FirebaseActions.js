@@ -308,10 +308,43 @@ export const handleOnetapSignIn = ({ credential }) => {
 
   signInWithCredential(auth, OAuthCredential)
     .then((result) => {
-      console.log("NEW", result);
+      let uid = result?.user?.uid || null;
+      let email = result?.user?.email || null;
+      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
+      if (is_new_user) {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.GMAIL,
+          source: "one_tap_prompt",
+        });
+        trackSignupSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GMAIL,
+          email,
+          uid,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source: "one_tap_prompt",
+        });
+      } else {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.GMAIL,
+          source: "one_tap_prompt",
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GMAIL,
+          uid,
+          email,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
+          source: "one_tap_prompt",
+        });
+      }
     })
-    .catch((e) => {
-      console.log(e);
+    .catch((err) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.GMAIL,
+        error_message: err.message,
+        source: "one_tap_prompt",
+      });
     });
 };
 
