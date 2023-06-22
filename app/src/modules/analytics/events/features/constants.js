@@ -158,6 +158,7 @@ export const TEAMS = {
   WORKSPACE_INVITE_SCREEN_ERROR: "workspace_invite_screen_error",
   WORKSPACE_JOINING_MODAL_OPENED: "workspace_joining_modal_opened",
   WORKSPACE_JOIN_CLICKED: "workspace_join_clicked",
+  WORKSPACE_ONBOARDING_VIEWED: "workspace_onboarding_viewed",
 };
 
 export const TRASH = {

@@ -107,6 +107,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    workspaceOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
