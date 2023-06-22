@@ -19,7 +19,7 @@ const RequestPayloadPreview = ({ queryParams, body }) => {
       >
         {queryParams ? (
           <Collapse.Panel key="1" header="Query String Parameters">
-            {queryParams.map((query, index) => {
+            {queryParams?.map((query, index) => {
               return (
                 <Text key={index}>
                   <Text strong>{query.name}</Text> : {query.value}
