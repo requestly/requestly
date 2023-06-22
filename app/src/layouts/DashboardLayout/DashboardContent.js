@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, useNavigate, useRoutes } from "react-router-dom";
 import { routes } from "routes";
@@ -58,9 +58,9 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  const toggleWorkspaceOnboardingModal = () => {
+  const toggleWorkspaceOnboardingModal = useCallback(() => {
     dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
-  };
+  }, [dispatch]);
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);

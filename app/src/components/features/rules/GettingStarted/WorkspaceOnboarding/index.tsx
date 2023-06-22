@@ -162,7 +162,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     return () => {
       toggle();
     };
-  }, []);
+  }, [toggle]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
