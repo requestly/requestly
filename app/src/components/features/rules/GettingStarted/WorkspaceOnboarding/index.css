@@ -8,6 +8,10 @@
   height: 100%;
 }
 
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal.ant-modal {
+  max-width: none;
+}
+
 .onboarding-content-wrapper {
   height: calc(100% - 56px);
   display: flex;
