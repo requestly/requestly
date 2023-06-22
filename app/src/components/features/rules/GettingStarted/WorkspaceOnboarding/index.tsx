@@ -31,6 +31,7 @@ import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
 import { capitalize } from "lodash";
 import { Modal } from "antd";
+import { trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -142,6 +143,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result && isExtensionInstalled()) {
+          trackWorkspaceOnboardingViewed();
           dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
         }
       });

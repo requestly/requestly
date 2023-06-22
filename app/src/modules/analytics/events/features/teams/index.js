@@ -50,3 +50,7 @@ export const trackWorkspaceJoinClicked = (team_id, source) => {
   const params = { team_id, source };
   trackEvent(TEAMS.WORKSPACE_JOIN_CLICKED, params);
 };
+
+export const trackWorkspaceOnboardingViewed = () => {
+  trackEvent(TEAMS.WORKSPACE_ONBOARDING_VIEWED);
+};

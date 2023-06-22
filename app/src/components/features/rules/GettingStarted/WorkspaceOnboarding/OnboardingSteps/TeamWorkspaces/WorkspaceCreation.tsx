@@ -20,6 +20,7 @@ import {
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
 import { renameWorkspace } from "backend/workspace";
+import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -86,6 +87,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Invite sent successfully");
+          trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin);
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
