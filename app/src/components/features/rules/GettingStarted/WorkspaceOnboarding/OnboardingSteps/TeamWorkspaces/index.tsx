@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { Skeleton } from "antd";
 import { CreateWorkspace } from "./WorkspaceCreation";
 import { JoinWorkspace } from "./JoinWorkspace";
 import "./index.css";
 import { Invite, InviteUsage, TeamInviteMetadata } from "types";
 import { NewTeamData } from "../../types";
-import SpinnerCard from "components/misc/SpinnerCard";
 import { getUniqueTeamsFromInvites } from "utils/teams";
 
 interface WorkspaceOnboardingStepProps {
@@ -37,7 +37,7 @@ export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = (
             createNewTeam={() => setCreatNewTeam(true)}
           />
         ) : (
-          <SpinnerCard />
+          <Skeleton />
         )}
       </div>
     </div>

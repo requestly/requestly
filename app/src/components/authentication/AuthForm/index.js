@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { Typography, Row, Col, Modal } from "antd";
+import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
 import { isEmailValid } from "utils/FormattingHelper";
