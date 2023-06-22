@@ -44,7 +44,7 @@
 .app-main-content,
 #dashboardMainContent {
   height: 100%;
-  overflow: auto;
+  overflow: auto !important;
 }
 
 .app-layout .ant-layout-footer {
