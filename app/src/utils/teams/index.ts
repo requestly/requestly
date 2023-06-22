@@ -15,9 +15,9 @@ export const getUniqueTeamsFromInvites = (pendingInvites: Invite[]): TeamInviteM
   pendingInvites?.forEach((invite: any) => {
     const teamId = invite?.metadata?.teamId;
     if (!teamsMap[teamId]) {
-      teamsMap[teamId] = invite.metadata;
+      teamsMap[teamId] = { ...invite.metadata };
     } else if (invite.email !== null) {
-      teamsMap[teamId] = invite.metadata;
+      teamsMap[teamId] = { ...invite.metadata };
     }
     teamsMap[teamId].inviteId = invite.id;
   });
