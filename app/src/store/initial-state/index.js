@@ -157,7 +157,7 @@ const INITIAL_STATE = {
   workspaceOnboarding: {
     step: "auth",
     isOnboardingCompleted: false,
-    workspace: null,
+    workspace: {},
   },
 
   misc: {
