@@ -72,17 +72,6 @@ const AuthForm = ({
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
-  const showVerifyEmailMessage = () => {
-    Modal.info({
-      title: "Verify email",
-      content: (
-        <Typography.Text>
-          Please click on the link that has just been sent to your email account to verify your email.
-        </Typography.Text>
-      ),
-    });
-  };
-
   useEffect(() => {
     // Updating reference code from query parameters
     let queryParams = getQueryParamsAsMap();
@@ -121,7 +110,6 @@ const AuthForm = ({
     handleEmailSignUp(name, email, password, referralCode, eventSource)
       .then(({ status, errorCode }) => {
         if (status) {
-          showVerifyEmailMessage();
           handleEmailSignIn(email, password, true, eventSource)
             .then(({ result }) => {
               if (result.user.uid) {
