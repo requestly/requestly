@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
@@ -34,7 +34,7 @@ import {
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode, getUserPersonaSurveyDetails } from "../../../store/selectors";
+import { getAppMode } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
@@ -55,11 +55,9 @@ const AuthForm = ({
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
-  const dispatch = useDispatch();
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const path = window.location.pathname;
   const [actionPending, setActionPending] = useState(false);
   const [name, setName] = useState("");
@@ -93,7 +91,7 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
@@ -113,7 +111,7 @@ const AuthForm = ({
           handleEmailSignIn(email, password, true, eventSource)
             .then(({ result }) => {
               if (result.user.uid) {
-                toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
                 setEmail("");
                 setPassword("");
                 // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
@@ -143,7 +141,7 @@ const AuthForm = ({
     handleEmailSignIn(email, password, false, eventSource)
       .then(({ result }) => {
         if (result.user.uid) {
-          toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
           setEmail("");
           setPassword("");
           // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED

@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   getUserAuthDetails,
   getWorkspaceOnboardingStep,
-  getHasConnectedApp,
   getAppMode,
   getWorkspaceOnboardingTeamDetails,
 } from "store/selectors";
@@ -20,6 +19,8 @@ import { OnboardingBannerSteps } from "./BannerSteps";
 import { RQButton } from "lib/design-system/components";
 import { PersonaSurvey } from "../../../../misc/PersonaSurvey";
 import { isEmailVerified } from "utils/AuthUtils";
+import { shouldShowOnboarding } from "components/misc/PersonaSurvey/utils";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { actions } from "store";
@@ -29,18 +30,21 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
 import { capitalize } from "lodash";
+import { Modal } from "antd";
+import { trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 
 interface OnboardingProps {
+  isOpen: boolean;
   handleUploadRulesModalClick: () => void;
+  toggle: () => void;
 }
 
-export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRulesModalClick }) => {
+export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleUploadRulesModalClick, toggle }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
-  const hasConnectedApps = useSelector(getHasConnectedApp);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
@@ -64,12 +68,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
     user?.details?.profile?.email,
   ]);
 
-  const handleOnboardingCompletion = useCallback(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !hasConnectedApps) {
-      dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
-    }
-  }, [appMode, dispatch, hasConnectedApps]);
-
   const handleAuthCompletion = useCallback(
     (isNewUser: boolean) => {
       if (isNewUser) dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
@@ -81,7 +79,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   const handleOnSurveyCompletion = useCallback(async () => {
     if (pendingInvites !== null && pendingInvites.length === 0) {
       isEmailVerified(user?.details?.profile?.uid).then((result) => {
-        if (!result) {
+        if (result) {
           if (!isCompanyEmail(user?.details?.profile?.email)) {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
             return;
@@ -148,10 +146,21 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
 
   useEffect(() => {
+    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      shouldShowOnboarding(appMode).then((result) => {
+        if (result && isExtensionInstalled()) {
+          trackWorkspaceOnboardingViewed();
+          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
+        }
+      });
+    }
+  }, [appMode, dispatch]);
+
+  useEffect(() => {
     return () => {
-      handleOnboardingCompletion();
+      toggle();
     };
-  }, [handleOnboardingCompletion]);
+  }, []);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
@@ -196,7 +205,15 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   }, [step, handleOnSurveyCompletion, defaultTeamData, pendingInvites, handleAuthCompletion, dispatch]);
 
   return (
-    <>
+    <Modal
+      open={isOpen}
+      centered
+      footer={null}
+      closable={false}
+      width="100%"
+      wrapClassName="onboarding-workspace-modal-wrapper"
+      className="workspace-onboarding-modal"
+    >
       {step === OnboardingSteps.RECOMMENDATIONS ? (
         <PersonaRecommendation isUserLoggedIn={user?.loggedIn} handleUploadRulesClick={handleUploadRulesModalClick} />
       ) : (
@@ -211,6 +228,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
           </div>
         </>
       )}
-    </>
+    </Modal>
   );
 };
