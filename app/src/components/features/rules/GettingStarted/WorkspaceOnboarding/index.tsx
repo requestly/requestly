@@ -116,14 +116,16 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   ]);
 
   useEffect(() => {
-    if (workspaceOnboardingTeamDetails.createdTeam) {
-      setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
-    } else if (workspaceOnboardingTeamDetails.pendingInvites) {
-      setPendingInvites(workspaceOnboardingTeamDetails.pendingInvites);
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+    if (step === OnboardingSteps.CREATE_JOIN_WORKSPACE) {
+      if (workspaceOnboardingTeamDetails.createdTeam) {
+        setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      } else if (workspaceOnboardingTeamDetails.pendingInvites?.length > 0) {
+        setPendingInvites(workspaceOnboardingTeamDetails.pendingInvites);
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      }
     }
-  }, [dispatch, workspaceOnboardingTeamDetails]);
+  }, [dispatch, step, workspaceOnboardingTeamDetails]);
 
   useEffect(() => {
     if (user?.loggedIn) {
