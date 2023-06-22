@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
@@ -8,8 +8,8 @@ import { shouldShowOnboarding, shuffleOptions } from "./utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, PageConfig, QuestionnaireType } from "./types";
 import { SurveyOption } from "./Option";
-import { RQButton } from "lib/design-system/components";
-import { trackPersonaSurveySignInClicked } from "modules/analytics/events/misc/personaSurvey";
+import { RQButton, RQModal } from "lib/design-system/components";
+import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
@@ -19,9 +19,10 @@ import "./index.css";
 interface SurveyProps {
   callback?: () => void;
   isSurveyModal: boolean;
+  isOpen?: boolean;
 }
 
-export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }) => {
+export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -31,7 +32,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
     return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
   }, []);
 
-  const SkippableButton = () => {
+  const SkippableButton = useCallback(() => {
     switch (currentPage) {
       case 0:
         return (
@@ -63,28 +64,35 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
       default:
         return null;
     }
-  };
+  }, [currentPage, dispatch]);
 
-  const renderPageHeader = (page: PageConfig) => {
-    return (
-      <>
-        <SkippableButton />
-        <div className="text-center white text-bold survey-title">{page.title}</div>
-        <div className="w-full survey-subtitle-wrapper">
-          <div className="text-gray text-center mt-8">{page.subTitle}</div>
-        </div>
-      </>
-    );
-  };
+  const renderPageHeader = useCallback(
+    (page: PageConfig) => {
+      return (
+        <>
+          <SkippableButton />
+          <div className="text-center white text-bold survey-title">{page.title}</div>
+          <div className="w-full survey-subtitle-wrapper">
+            <div className="text-gray text-center mt-8">{page.subTitle}</div>
+          </div>
+        </>
+      );
+    },
+    [SkippableButton]
+  );
 
-  const renderQuestionnaire = (optionSet: QuestionnaireType) => {
-    switch (optionSet) {
-      case QuestionnaireType.PERSONA:
-        return renderOptions(shuffledQ1, optionSet);
-      default:
-        return null;
-    }
-  };
+  const renderQuestionnaire = useCallback(
+    (optionSet: QuestionnaireType) => {
+      switch (optionSet) {
+        case QuestionnaireType.PERSONA:
+          return renderOptions(shuffledQ1, optionSet);
+        default:
+          return null;
+      }
+    },
+    [shuffledQ1]
+  );
+
   const renderOptions = (options: Option[], optionSet: QuestionnaireType) => {
     return (
       <>
@@ -104,14 +112,17 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
     );
   };
 
-  const renderPage = (page: PageConfig) => {
-    return (
-      <>
-        {renderPageHeader(page)}
-        <>{typeof page.render === "function" ? page.render() : renderQuestionnaire(page.render)}</>
-      </>
-    );
-  };
+  const renderPage = useCallback(
+    (page: PageConfig) => {
+      return (
+        <>
+          {renderPageHeader(page)}
+          <>{typeof page.render === "function" ? page.render() : renderQuestionnaire(page.render)}</>
+        </>
+      );
+    },
+    [renderPageHeader, renderQuestionnaire]
+  );
 
   useEffect(() => {
     if (SurveyConfig[currentPage]?.skip || (!isSurveyModal && currentPage === 0)) {
@@ -120,30 +131,66 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal }
   }, [currentPage, dispatch, isSurveyModal]);
 
   useEffect(() => {
-    shouldShowOnboarding(appMode).then((result) => {
-      if (result) {
-        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
-        } else {
-          if (isExtensionInstalled()) {
-            const isRecommendationScreen = currentPage === 2;
-            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen }));
+    if (isSurveyModal) {
+      shouldShowOnboarding(appMode).then((result) => {
+        if (result) {
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
+          } else {
+            if (isExtensionInstalled()) {
+              const isRecommendationScreen = currentPage === 2;
+              dispatch(
+                actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen })
+              );
+            }
           }
         }
-      }
-    });
-  }, [appMode, currentPage, dispatch]);
+      });
+    }
+  }, [appMode, currentPage, dispatch, isSurveyModal]);
+
+  useEffect(() => {
+    if (currentPage === 0) {
+      shouldShowOnboarding(appMode).then((result) => {
+        if (result) {
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            trackPersonaSurveyViewed();
+          } else if (isExtensionInstalled()) {
+            trackPersonaSurveyViewed();
+          }
+        }
+      });
+    }
+  }, [appMode, currentPage]);
+
+  const renderSurveyPages = useCallback(() => {
+    return SurveyConfig.filter((config) => !config.skip).map((page, index) => (
+      <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page)}</>}</React.Fragment>
+    ));
+  }, [currentPage, renderPage]);
 
   return (
-    <div className="persona-survey-container">
-      <div
-        className={`survey-content-wrapper ${currentPage === SurveyConfig.length - 1 && "survey-modal-border-radius"}`}
-      >
-        {SurveyConfig.filter((config) => !config.skip).map((page: PageConfig, index) => (
-          <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page)}</>}</React.Fragment>
-        ))}
-      </div>
-      <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
-    </div>
+    <>
+      {isSurveyModal ? (
+        <RQModal
+          open={isOpen}
+          centered
+          closable={false}
+          className="survey-modal"
+          bodyStyle={{ width: "550px" }}
+          maskStyle={{ background: "#0D0D10" }}
+        >
+          <div className="persona-survey-container">
+            {renderSurveyPages()}
+            <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
+          </div>
+        </RQModal>
+      ) : (
+        <div className="persona-survey-container">
+          {renderSurveyPages()}
+          <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
+        </div>
+      )}
+    </>
   );
 };

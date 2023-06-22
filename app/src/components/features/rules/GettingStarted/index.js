@@ -86,6 +86,17 @@ const GettingStarted = () => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   if (
+  //     appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+  //     !userPersona.isSurveyCompleted &&
+  //     userPersona.page >= 2 &&
+  //     state?.src === "persona_survey_modal"
+  //   ) {
+  //     dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
+  //   }
+  // }, [dispatch, appMode, userPersona?.isSurveyCompleted, userPersona?.page, state?.src]);
+
   if (shouldShowRecommendationScreen) {
     return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
   }

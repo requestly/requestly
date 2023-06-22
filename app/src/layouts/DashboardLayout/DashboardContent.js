@@ -21,7 +21,6 @@ import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExp
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
-import { RQModal } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -131,7 +130,7 @@ const DashboardContent = () => {
           {...activeModals.syncConsentModal.props}
         />
       ) : null}
-      {activeModals.connectedAppsModal.isActive && userPersona.isSurveyCompleted ? (
+      {activeModals.connectedAppsModal.isActive ? (
         <ConnectedAppsModal
           isOpen={activeModals.connectedAppsModal.isActive}
           toggle={toggleConnectedAppsModal}
@@ -139,17 +138,7 @@ const DashboardContent = () => {
         />
       ) : null}
       {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
-        <RQModal
-          open={activeModals.personaSurveyModal.isActive}
-          centered
-          closable={false}
-          className="survey-modal"
-          bodyStyle={{ width: "550px" }}
-          maskStyle={{ background: "#0D0D10" }}
-          {...activeModals.personaSurveyModal.props}
-        >
-          <PersonaSurvey isSurveyModal={true} />
-        </RQModal>
+        <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
       ) : null}
 
       {appOnboardingExp === "workspace_onboarding" &&
@@ -158,6 +147,7 @@ const DashboardContent = () => {
         <WorkspaceOnboarding
           isOpen={activeModals.workspaceOnboardingModal.isActive}
           handleUploadRulesModalClick={toggleImportRulesModal}
+          toggle={toggleWorkspaceOnboardingModal}
         />
       ) : null}
 

@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   getUserAuthDetails,
   getWorkspaceOnboardingStep,
-  getHasConnectedApp,
   getAppMode,
   getWorkspaceOnboardingTeamDetails,
 } from "store/selectors";
@@ -36,15 +35,15 @@ import { Modal } from "antd";
 interface OnboardingProps {
   isOpen: boolean;
   handleUploadRulesModalClick: () => void;
+  toggle: () => void;
 }
 
-export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleUploadRulesModalClick }) => {
+export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleUploadRulesModalClick, toggle }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
-  const hasConnectedApps = useSelector(getHasConnectedApp);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
@@ -67,12 +66,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
-
-  const handleOnboardingCompletion = useCallback(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !hasConnectedApps) {
-      dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
-    }
-  }, [appMode, dispatch, hasConnectedApps]);
 
   const handleAuthCompletion = useCallback(
     (isNewUser: boolean) => {
@@ -157,9 +150,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
 
   useEffect(() => {
     return () => {
-      handleOnboardingCompletion();
+      toggle();
     };
-  }, [handleOnboardingCompletion]);
+  }, []);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
