@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 //Components
 import MigrationCheckModal from "../../../misc/MigrationCheckModal";
@@ -16,7 +16,6 @@ import { submitAttrUtil } from "../../../../utils/AnalyticsUtils";
 import {
   getAllRules,
   getAppMode,
-  getIsRefreshRulesPending,
   getIsHardRefreshRulesPending,
   getIsRulesListLoading,
   getAllGroups,
@@ -39,7 +38,7 @@ const RulesIndexPage = () => {
     const ref = useRef();
     useEffect(() => {
       ref.current = value;
-    });
+    }, [value]);
     return ref.current;
   };
 
@@ -47,53 +46,41 @@ const RulesIndexPage = () => {
   const dispatch = useDispatch();
   const rules = useSelector(getAllRules);
   const groups = useSelector(getAllGroups);
-  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isRulesListLoading = useSelector(getIsRulesListLoading);
 
   //Component State
-  const [fetchRulesAndGroupsComplete, setFetchRulesAndGroupsComplete] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
-
-  const stableDispatch = useCallback(dispatch, [dispatch]);
-
-  const hasIsRulesListRefreshPendingChanged = useHasChanged(isRulesListRefreshPending);
+  const [isSyncAndRecordsLoading, setIsSyncAndRecordsLoading] = useState(false);
   const hasIsRulesListHardRefreshPendingChanged = useHasChanged(isRulesListHardRefreshPending);
 
   useEffect(() => {
     if (hasIsRulesListHardRefreshPendingChanged) setIsTableLoading(true);
+
+    if (isRulesListLoading) setIsSyncAndRecordsLoading(true);
+
     Logger.log("Reading storage in RulesIndexPage useEffect");
     const groupsPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
     Logger.log("Reading storage in RulesIndexPage useEffect");
     const rulesPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
+
     Promise.all([groupsPromise, rulesPromise]).then(async (data) => {
       const groups = data[0];
       const rules = data[1];
 
       const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-      if (isGroupsSanitizationPassedResult.success === false) {
-        // Sanitization has updated the storage! but we dont need to fetch again as we have the updated copy
-        stableDispatch(
-          actions.updateRulesAndGroups({
-            rules: isGroupsSanitizationPassedResult.updatedRules,
-            groups,
-          })
-        );
-      } else {
-        // Sanitization required doing nothing, so continue as it is
-        stableDispatch(
-          actions.updateRulesAndGroups({
-            rules: isGroupsSanitizationPassedResult.updatedRules,
-            groups,
-          })
-        );
-      }
+      dispatch(
+        actions.updateRulesAndGroups({
+          rules: isGroupsSanitizationPassedResult.updatedRules,
+          groups,
+        })
+      );
 
-      if (!fetchRulesAndGroupsComplete) setFetchRulesAndGroupsComplete(true);
       setIsTableLoading(false);
+      if (!isRulesListLoading) setIsSyncAndRecordsLoading(false);
 
       const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
 
@@ -113,14 +100,7 @@ const RulesIndexPage = () => {
         groups.filter((group) => group.status === GLOBAL_CONSTANTS.GROUP_STATUS.ACTIVE).length
       );
     });
-  }, [
-    stableDispatch,
-    isRulesListRefreshPending,
-    appMode,
-    fetchRulesAndGroupsComplete,
-    hasIsRulesListRefreshPendingChanged,
-    hasIsRulesListHardRefreshPendingChanged,
-  ]);
+  }, [appMode, dispatch, isRulesListLoading, hasIsRulesListHardRefreshPendingChanged]);
 
   const CreateFirstRule = () => {
     if (isWorkspaceMode) return <CreateTeamRuleCTA />;
@@ -131,16 +111,14 @@ const RulesIndexPage = () => {
     <React.Fragment>
       <MigrationCheckModal />
       <StorageMigrationCheckModal />
-      {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
-        rules?.length > 0 || groups?.length > 0 ? (
-          <RulesListContainer isTableLoading={isTableLoading} />
-        ) : (
-          <CreateFirstRule />
-        )
-      ) : (
+      {isRulesListLoading || isSyncAndRecordsLoading ? (
         <>
           <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
         </>
+      ) : rules?.length > 0 || groups?.length > 0 ? (
+        <RulesListContainer isTableLoading={isTableLoading} />
+      ) : (
+        <CreateFirstRule />
       )}
     </React.Fragment>
   );
