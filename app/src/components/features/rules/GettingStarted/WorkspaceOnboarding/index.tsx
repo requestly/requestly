@@ -93,7 +93,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
             generatePublicLink: true,
           }).then((response: any) => {
             setDefaultTeamData({ name: newTeamName, ...response?.data });
-            dispatch(actions.updateWorkspaceOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
+            dispatch(
+              actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
+            );
           });
 
           setTimeout(() => {
@@ -116,8 +118,11 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
   ]);
 
   useEffect(() => {
-    if (workspaceOnboardingTeamDetails) {
-      setDefaultTeamData(workspaceOnboardingTeamDetails);
+    if (workspaceOnboardingTeamDetails.createdTeam) {
+      setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+    } else if (workspaceOnboardingTeamDetails.pendingInvites) {
+      setPendingInvites(workspaceOnboardingTeamDetails.pendingInvites);
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     }
   }, [dispatch, workspaceOnboardingTeamDetails]);
@@ -127,12 +132,13 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ handleUploadRul
       getPendingInvites({ email: true, domain: true })
         .then((res) => {
           setPendingInvites(res?.data?.pendingInvites ?? []);
+          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.data?.pendingInvites }));
         })
         .catch((e) => {
           setPendingInvites([]);
         });
     }
-  }, [getPendingInvites, user?.loggedIn]);
+  }, [dispatch, getPendingInvites, user?.loggedIn]);
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {

@@ -58,7 +58,12 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     createTeam({
       teamName: newWorkspaceName,
     }).then((response: any) => {
-      handleAddMembers(newWorkspaceName, response?.data?.teamId);
+      if (inviteEmails?.length) {
+        handleAddMembers(newWorkspaceName, response?.data?.teamId);
+      } else {
+        setIsProcessing(false);
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+      }
     });
   };
 
