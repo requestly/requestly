@@ -140,7 +140,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          <RequestPayloadPreview queryParams={queryParams || {}} body={body} />
+          <RequestPayloadPreview queryParams={queryParams || []} body={body} />
         </div>
       ),
     },

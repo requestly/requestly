@@ -101,7 +101,7 @@ interface LogRequest {
   port: string;
   headers: HeaderMap;
   body: any;
-  queryParams: QueryMap;
+  queryParams: HarMapEntry[];
 }
 
 interface LogResponse {

@@ -4,11 +4,8 @@ const { Text } = Typography;
 
 const RequestPayloadPreview = ({ queryParams, body }) => {
   if (typeof queryParams == "string") {
-    try {
-      queryParams = JSON.parse(queryParams);
-    } catch {
-      queryParams = { raw_query_params: queryParams };
-    }
+    // keeping for backward compatibility
+    queryParams = [];
   }
 
   if (queryParams || body) {
@@ -22,10 +19,10 @@ const RequestPayloadPreview = ({ queryParams, body }) => {
       >
         {queryParams ? (
           <Collapse.Panel key="1" header="Query String Parameters">
-            {Object.keys(queryParams).map((key, index) => {
+            {queryParams.map((query, index) => {
               return (
                 <Text key={index}>
-                  <Text strong>{key}</Text> : {queryParams[key]}
+                  <Text strong>{query.name}</Text> : {query.value}
                   <br />
                 </Text>
               );
