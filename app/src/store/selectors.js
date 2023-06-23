@@ -243,6 +243,18 @@ export const getIsNetworkTooltipShown = (state) => {
   return getGlobalState(state).misc.persist?.isNetworkSessionTooltipShown;
 };
 
+export const getIsWorkspaceOnboardingCompleted = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.isOnboardingCompleted;
+};
+
+export const getWorkspaceOnboardingStep = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.step;
+};
+
 export const getIsSecondarySidebarCollapsed = (state) => {
   return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
+};
+
+export const getWorkspaceOnboardingTeamDetails = (state) => {
+  return getGlobalState(state)?.workspaceOnboarding?.workspace;
 };

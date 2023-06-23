@@ -31,9 +31,12 @@ export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSync
       if (!isSyncEnabled) {
         const message = "Turn on syncing?";
         const confirmationResponse = window.confirm(message);
-        if (confirmationResponse !== true) return;
-        needToMergeRecords = true;
-        setSyncState(window.uid, true, appMode);
+        if (confirmationResponse !== true) {
+          needToMergeRecords = false;
+        } else {
+          needToMergeRecords = true;
+          setSyncState(window.uid, true, appMode);
+        }
       }
     }
   }

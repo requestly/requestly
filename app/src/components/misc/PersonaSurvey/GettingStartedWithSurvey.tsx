@@ -20,7 +20,6 @@ export const GettingStartedWithSurvey = () => {
       autoplay: true, // boolean
     });
   }, []);
-
   return (
     <div className="survey-lottie-animation-container">
       <div className="survey-lottie-animation" id="PersonaSurvey-welcomeAnimation" />

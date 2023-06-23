@@ -43,7 +43,7 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
     for (const email of userEmail) {
       if (!isEmail(email)) {
         toast.warn(`${email} is not a valid email`);
-        trackAddTeamMemberFailure(teamId, userEmail, "invalid_email");
+        trackAddTeamMemberFailure(teamId, userEmail, "invalid_email", "add_member_modal");
         return;
       }
     }
@@ -61,7 +61,7 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
         if (res?.data?.success) {
           toast.success("Sent invites successfully");
           callback?.();
-          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin);
+          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin, "add_member_modal");
           setIsProcessing(false);
           handleModalClose();
         } else {
@@ -69,13 +69,13 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
           callback?.();
           setInviteErrors([...inviteErrors]);
           setInviteErrorModalActive(true);
-          trackAddTeamMemberFailure(teamId, userEmail, null);
+          trackAddTeamMemberFailure(teamId, userEmail, null, "add_member_modal");
           setIsProcessing(false);
         }
       })
       .catch((err) => {
         toast.error("Error while creating invitations. Make sure you are an admin");
-        trackAddTeamMemberFailure(teamId, userEmail, null);
+        trackAddTeamMemberFailure(teamId, userEmail, null, "add_member_modal");
       });
   };
 

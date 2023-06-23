@@ -183,6 +183,28 @@
     "isScanned": false,
     "isAvailable": false
   },
+  "fresh-opera-gx": {
+    "id": "fresh-opera-gx",
+    "type": "browser",
+    "name": "Opera GX",
+    "description": "New Profile",
+    "icon": "opera-gx.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "fresh-opera-crypto": {
+    "id": "fresh-opera-crypto",
+    "type": "browser",
+    "name": "Opera Crypto",
+    "description": "New Profile",
+    "icon": "opera-crypto.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
   "fresh-firefox": {
     "id": "fresh-firefox",
     "type": "browser",

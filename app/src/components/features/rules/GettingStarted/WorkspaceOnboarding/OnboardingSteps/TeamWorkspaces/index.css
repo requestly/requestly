@@ -1,0 +1,57 @@
+.workspace-onboarding-wrapper {
+  width: 500px;
+  position: relative;
+  padding-bottom: 40px;
+}
+.workspace-onboarding-body {
+  padding: 40px 20px;
+  background: var(--body-background);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  min-height: 480px;
+  border: 1px solid var(--border-dark);
+}
+.workspace-onboarding-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 9px 20px;
+  color: var(--text-gray);
+  border: 1px solid var(--border-dark);
+  background-color: var(--component-background);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+}
+.workspace-onboarding-wrapper .workspace-onboarding-body .workspace-onboarding-field {
+  box-shadow: var(--input-box-shadow);
+}
+
+.workspace-onboarding-wrapper .workspace-onboarding-body .ant-btn.rq-btn.btn-default {
+  background: transparent;
+}
+.workspace-invite-link {
+  display: flex;
+  gap: 12px;
+}
+.workspace-invite-link .ant-btn.rq-btn.btn-default {
+  height: 40px;
+  align-self: flex-end;
+}
+.workspace-onboarding-wrapper .workspace-onboarding-body .onboarding-workspace-card {
+  display: grid;
+  grid-template-columns: 1.3fr 1.2fr 0.5fr;
+  align-items: center;
+  border: 1px solid var(--border-dark);
+  padding: 12px 14px;
+  border-radius: var(--border-radius-sm);
+  margin: 8px 0;
+}
+.onboarding-workspace-card .workspace-avatar {
+  margin-right: 8px;
+}
+
+.onboarding-workspace-card .onboarding-workspace-card-name {
+  align-self: center;
+}

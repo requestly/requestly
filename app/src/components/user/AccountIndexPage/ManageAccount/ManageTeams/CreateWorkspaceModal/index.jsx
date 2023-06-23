@@ -67,7 +67,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
           },
         });
         handleModalClose();
-        trackNewTeamCreateSuccess(teamId, newTeamName);
+        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
       })
       .catch((err) => {
         toast.error("Unable to Create Team");

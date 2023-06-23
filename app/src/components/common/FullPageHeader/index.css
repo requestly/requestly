@@ -1,0 +1,10 @@
+.full-page-navbar {
+  display: flex;
+  align-items: center;
+  background: var(--body-background) !important;
+  border-bottom: 1px solid var(--border-dark);
+}
+.full-page-navbar .logo {
+  width: 100px;
+  cursor: pointer;
+}

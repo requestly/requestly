@@ -15,14 +15,6 @@ export interface Option {
   icon?: string | ReactNode;
 }
 
-export interface Conditional {
-  condition: (answer: string) => boolean;
-  options: Option[];
-}
-interface renderProps {
-  toggleImportRulesModal?: () => void;
-  persona?: string;
-}
 export interface PageConfig {
   pageId: number;
   title: string;
@@ -31,7 +23,7 @@ export interface PageConfig {
    * If skip true then don't show the question in survey
    */
   skip?: boolean;
-  render?: number | ((props: renderProps) => ReactNode);
+  render?: QuestionnaireType | (() => ReactNode);
 }
 
 export interface SurveyOptionsConfig {
@@ -53,14 +45,6 @@ export interface ActiveProps {
   optionType?: "select" | "other";
 }
 
-export interface Feature {
-  id: string;
-  title: string;
-  icon: () => ReactNode | ReactNode;
-  description: string;
-  action: (navigate: any) => void;
-}
-
 export enum PersonaType {
   FRONTEND = "Front-end developer",
   BACKEND = "Back-end developer",
@@ -69,4 +53,8 @@ export enum PersonaType {
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
   SALES = "Sales",
+}
+
+export enum QuestionnaireType {
+  PERSONA = "persona",
 }

@@ -1,118 +1,95 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { SurveyConfig, OptionsConfig } from "./config";
-// import { getFormattedUserUseCases } from "./utils";
+import { OptionsConfig, SurveyConfig } from "./config";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import PATHS from "config/constants/sub/paths";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import {
-  trackPersonaQ1Completed,
-  // trackPersonaQ2Completed,
-  trackPersonaQ3Completed,
-  trackPersonaQuestionnaireStarted,
-} from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaQ1Completed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
+import { QuestionnaireType } from "./types";
+import PATHS from "config/constants/sub/paths";
 
 interface FooterProps {
-  page: number;
+  currentPage: number;
+  callback: () => void;
+  isSurveyModal: boolean;
 }
 
-export const SurveyModalFooter: React.FC<FooterProps> = ({ page }) => {
+export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback, isSurveyModal }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const surveyLength = SurveyConfig.length;
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appMode = useSelector(getAppMode);
+  const currentQuestionnaire = SurveyConfig[currentPage]?.render;
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = () => {
-    if (page === 0) return false;
-    if (userPersona[OptionsConfig[page]?.key]?.length) return false;
+    if (currentPage === 0) return false;
+    if (userPersona[OptionsConfig[currentQuestionnaire as QuestionnaireType]?.key]?.length) return false;
     return true;
   };
 
-  const renderModalLeftSection = () => {
-    if (page === 0) {
-      return (
-        <>
-          <span className="survey-modal-emoji">😁</span> We are excited to see you here
-        </>
-      );
-    } else return null;
-
-    // if (page > 0 && page <= surveyLength - 2) {
-    //   return (
-    //     <>
-    //       {page}/{surveyLength - 2}
-    //     </>
-    //   );
-    // } else return null;
-  };
-
   const handleMoveToNextPage = () => {
-    switch (page) {
-      case 0:
-        trackPersonaQuestionnaireStarted();
-        break;
-      case 1:
+    switch (currentQuestionnaire) {
+      case QuestionnaireType.PERSONA:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
-        break;
-      //   case 2:
-      //     trackPersonaQ2Completed(getFormattedUserUseCases(userPersona.useCases));
-      //     submitAttrUtil(
-      //       APP_CONSTANTS.GA_EVENTS.ATTR.USE_CASES,
-      //       getFormattedUserUseCases(userPersona.useCases)
-      //     );
-      //     break;
-      case 3:
-        trackPersonaQ3Completed(userPersona.referralChannel);
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.REFERRAL_CHANNEL, userPersona.referralChannel);
-        if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          //don't show recommendation screen for shared list users or desktop users
-          dispatch(actions.updateIsPersonaSurveyCompleted(true));
-          return;
+        if (isSurveyModal) {
+          if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+            //don’t show recommendation screen for shared list users or desktop users
+            dispatch(actions.updateIsPersonaSurveyCompleted(true));
+            return;
+          }
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
+          navigate(PATHS.GETTING_STARTED, {
+            replace: true,
+            state: {
+              src: "persona_survey_modal",
+              redirectTo: window.location.pathname,
+            },
+          });
         }
-
-        dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
-        navigate(PATHS.GETTING_STARTED, {
-          replace: true,
-          state: {
-            src: "persona_survey_modal",
-            redirectTo: location.pathname,
-          },
-        });
         break;
     }
-    dispatch(actions.updatePersonaSurveyPage(page + 1));
+    if (isSurveyModal || currentPage !== SurveyConfig.length - 1) {
+      dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+    } else {
+      callback?.();
+    }
   };
 
   return (
     <>
-      {page !== surveyLength && (
-        <div className="rq-modal-footer w-full">
-          <Row justify="space-between" align="middle" className="w-full">
-            <Col className="text-gray">{renderModalLeftSection()}</Col>
-            <Col>
-              <RQButton
-                type="primary"
-                className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
-                onClick={handleMoveToNextPage}
-              >
-                {page === 3 ? "Get started" : "Continue"}
-              </RQButton>
-            </Col>
-          </Row>
-        </div>
-      )}
+      <div className="survey-footer w-full">
+        <Row justify="space-between" align="middle">
+          <Col>
+            {isSurveyModal && currentPage === 0 ? (
+              <>
+                <span className="survey-modal-emoji">😁</span> We are excited to see you here
+              </>
+            ) : (
+              <>
+                {currentPage} / {SurveyConfig?.length - 1}
+              </>
+            )}
+          </Col>
+          <Col>
+            <RQButton
+              type="primary"
+              className={`text-bold ${disableContinue() && "survey-disable-continue"}`}
+              onClick={handleMoveToNextPage}
+            >
+              {currentQuestionnaire === QuestionnaireType.PERSONA ? "Get started" : "Continue"}
+            </RQButton>
+          </Col>
+        </Row>
+      </div>
     </>
   );
 };

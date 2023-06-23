@@ -4,8 +4,8 @@ import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
-import { getUniqueColorForWorkspace } from "utils/teams";
-import { TeamInvite } from "types";
+import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { TeamInvite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import "./JoinWorkspaceModal.css";
 
@@ -23,7 +23,6 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   handleCreateNewWorkspaceClick,
 }) => {
   const navigate = useNavigate();
-
   const handleJoinClick = (teamId: string, inviteId: string) => {
     handleModalClose();
     navigate(`/invite/${inviteId}`);
@@ -39,23 +38,23 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
 
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
-            {teamInvites.map(({ id, metadata }) => (
-              <li key={id}>
+            {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata) => (
+              <li key={team.inviteId}>
                 <Row wrap={false} align="middle" justify="space-between" className="w-full team-invite-row">
                   <Col>
                     <Avatar
                       size={28}
                       shape="square"
                       className="workspace-avatar"
-                      icon={metadata.teamName?.[0]?.toUpperCase() ?? "W"}
+                      icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
                       style={{
-                        backgroundColor: `${getUniqueColorForWorkspace(metadata.teamId, metadata.teamName)}`,
+                        backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
                       }}
                     />
-                    <div>{metadata.teamName}</div>
+                    <div>{team.teamName}</div>
                   </Col>
 
-                  <Button type="primary" onClick={() => handleJoinClick(metadata.teamId, id)}>
+                  <Button type="primary" onClick={() => handleJoinClick(team.teamId, team.inviteId)}>
                     Join
                   </Button>
                 </Row>

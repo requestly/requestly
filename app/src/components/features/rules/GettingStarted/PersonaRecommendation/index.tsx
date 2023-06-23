@@ -43,6 +43,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
           state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
       { replace: true }
     );
+    dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
   };
 
@@ -86,6 +87,7 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             title="You need to sign up to upload rules"
             callback={() => {
               handleUploadRulesClick();
+              dispatch(actions.updateIsWorkspaceOnboardingCompleted());
               dispatch(actions.updateIsPersonaSurveyCompleted(true));
             }}
             source={AUTH.SOURCE.UPLOAD_RULES}
