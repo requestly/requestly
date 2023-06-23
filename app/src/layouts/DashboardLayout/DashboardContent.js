@@ -5,17 +5,26 @@ import { routes } from "routes";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
 import APP_CONSTANTS from "config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { actions } from "store";
-import { getActiveModals, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+//UTILS
+import {
+  getActiveModals,
+  getAppMode,
+  getUserPersonaSurveyDetails,
+  getUserAuthDetails,
+  getIsWorkspaceOnboardingCompleted,
+} from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
-import { PersonaSurveyModal } from "components/misc/PersonaSurvey";
+import { PersonaSurvey } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -23,12 +32,15 @@ const DashboardContent = () => {
   const navigate = useNavigate();
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
+  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   //Global state
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -46,8 +58,8 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  const togglePersonaSurveyModal = useCallback(() => {
-    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal" }));
+  const toggleWorkspaceOnboardingModal = useCallback(() => {
+    dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
   }, [dispatch]);
 
   const toggleImportRulesModal = () => {
@@ -69,22 +81,6 @@ const DashboardContent = () => {
       navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
     }
   }, [appMode, location, navigate]);
-
-  useEffect(() => {
-    if (
-      userPersona.page === 4 &&
-      userPersona.isSurveyCompleted === false &&
-      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-    ) {
-      navigate(PATHS.GETTING_STARTED, {
-        replace: true,
-        state: {
-          src: "persona_survey_modal",
-          redirectTo: location.state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-        },
-      });
-    }
-  }, [navigate, location.state?.redirectTo, userPersona.page, userPersona.isSurveyCompleted, appMode]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
@@ -141,16 +137,20 @@ const DashboardContent = () => {
           {...activeModals.connectedAppsModal.props}
         />
       ) : null}
-      {!userPersona.isSurveyCompleted ? (
-        <PersonaSurveyModal
-          isOpen={activeModals.personaSurveyModal.isActive}
-          toggle={togglePersonaSurveyModal}
-          toggleImportRulesModal={toggleImportRulesModal}
-          {...activeModals.personaSurveyModal.props}
+      {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
+        <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
+      ) : null}
+
+      {appOnboardingExp === "workspace_onboarding" &&
+      !isWorkspaceOnboardingCompleted &&
+      !userPersona.isSurveyCompleted ? (
+        <WorkspaceOnboarding
+          isOpen={activeModals.workspaceOnboardingModal.isActive}
+          handleUploadRulesModalClick={toggleImportRulesModal}
+          toggle={toggleWorkspaceOnboardingModal}
         />
       ) : null}
 
-      {/* ) : null} */}
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}

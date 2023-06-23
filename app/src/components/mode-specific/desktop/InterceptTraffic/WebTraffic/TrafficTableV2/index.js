@@ -34,9 +34,10 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
-import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { doesStatusCodeMatchLabels } from "./utils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -212,15 +213,16 @@ const CurrentTrafficTable = ({
       let includeLog = true;
 
       if (trafficTableFilters.search.term) {
-        const searchTerm = trafficTableFilters.search.term;
+        const searchTerm = trafficTableFilters.search.term.toLowerCase();
+        const logUrl = log.url.toLowerCase();
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
           if (trafficTableFilters.search.regex) {
             reg = new RegExp(searchTerm);
-            includeLog = log.url.match(reg);
+            includeLog = logUrl.match(reg);
           } else {
-            includeLog = log.url.includes(searchTerm);
+            includeLog = logUrl.includes(searchTerm);
           }
         } catch (err) {
           Logger.log(err);
@@ -233,7 +235,7 @@ const CurrentTrafficTable = ({
 
       if (
         trafficTableFilters.statusCode.length > 0 &&
-        !trafficTableFilters.statusCode.includes(log?.response?.statusCode?.toString())
+        !doesStatusCodeMatchLabels(log?.response?.statusCode, trafficTableFilters.statusCode)
       ) {
         return false;
       }
@@ -560,7 +562,7 @@ const CurrentTrafficTable = ({
                     filterId="filter-status-code"
                     filterLabel="Status code"
                     filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_ONLY_OPTIONS}
+                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
                     value={trafficTableFilters.statusCode}
                     handleFilterChange={(options) => {
                       dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));

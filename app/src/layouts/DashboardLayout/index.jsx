@@ -2,21 +2,28 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./DashboardLayout.css";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const DashboardLayout = () => {
   const location = useLocation();
-  const { pathname } = location;
+  const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isPersonaRecommendationScreen =
-    userPersona.page === 4 && !userPersona.isSurveyCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
+  const isPersonaRecommendationScreen = useMemo(
+    () =>
+      userPersona.page === 2 &&
+      !userPersona.isSurveyCompleted &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      state?.src === "persona_survey_modal",
+    [appMode, userPersona?.page, userPersona?.isSurveyCompleted, state?.src]
+  );
 
   const isSidebarVisible = useMemo(
     () =>

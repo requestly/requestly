@@ -11,6 +11,7 @@ const CopyButton = ({
   type = "text",
   size = "small",
   disabled = false,
+  trackCopiedEvent = null,
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
@@ -23,6 +24,7 @@ const CopyButton = ({
           e.stopPropagation();
           navigator.clipboard.writeText(copyText);
           setCopyClicked(true);
+          trackCopiedEvent?.();
           setTimeout(() => setCopyClicked(false), 500);
         }}
         disabled={disabled}

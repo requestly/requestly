@@ -84,7 +84,7 @@ const BodyTabView = ({ body, requestState, timestamp }) => {
 
 const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
-  const { query_params, headers, body } = request_data;
+  const { queryParams, headers, body } = request_data;
 
   const tabs = [
     {
@@ -140,7 +140,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          <RequestPayloadPreview query_params={query_params} body={body} />
+          <RequestPayloadPreview queryParams={queryParams || []} body={body} />
         </div>
       ),
     },

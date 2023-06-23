@@ -11,7 +11,7 @@ import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/W
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { toast } from "utils/Toast";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   ActionSource,
   trackDeleteNetworkSessionCanceled,
@@ -131,10 +131,18 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
     },
   ];
 
+  const sortedNetworkSessions = useMemo(() => {
+    return networkSessionsMetadata.sort((s1, s2) => {
+      if (s1.ts < s2.ts) return 1;
+      if (s1.ts > s2.ts) return -1;
+      return 0;
+    });
+  }, [networkSessionsMetadata]);
+
   return (
     <ProCard className="primary-card github-like-border network-session-table-container" title={null}>
       <ProTable
-        dataSource={networkSessionsMetadata}
+        dataSource={sortedNetworkSessions}
         scroll={{ x: 700 }}
         columns={columns}
         rowKey="id"

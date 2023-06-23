@@ -2,24 +2,24 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { actions } from "store";
-import { snakeCase } from "lodash";
 import { Feature } from "../types";
 import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
 import "./FeatureCard.css";
 
-export const FeatureCard: React.FC<Feature> = ({ icon, title, subTitle, link }) => {
+export const FeatureCard: React.FC<Feature> = ({ id, icon, title, subTitle, link }) => {
   const Icon = icon;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      trackPersonaRecommendationSelected(snakeCase(title));
+      trackPersonaRecommendationSelected(id);
       dispatch(actions.updateIsPersonaSurveyCompleted(true));
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
       navigate(link, { replace: true });
     },
-    [title, link, navigate, dispatch]
+    [id, dispatch, navigate, link]
   );
 
   return (

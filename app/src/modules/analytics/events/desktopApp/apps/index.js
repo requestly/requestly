@@ -26,6 +26,11 @@ export const trackConnectAppsClicked = (source) => {
   trackEvent(APPS.CONNECT_APPS_CLICKED, params);
 };
 
+export const trackConnectAppsViewed = (source) => {
+  const params = { source };
+  trackEvent(APPS.CONNECT_APPS_VIEWED, params);
+};
+
 export const trackSystemWideConnected = (source) => {
   const params = { source };
   trackEvent(APPS.SYSTEMWIDE_CONNECTED, params);

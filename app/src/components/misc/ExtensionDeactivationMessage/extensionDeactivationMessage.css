@@ -1,0 +1,32 @@
+.extension-deactivation-msg-container {
+  margin-top: 30px;
+}
+
+.extension-deactivation-msg-container > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.extension-deactivation-msg-container li {
+  list-style-type: decimal;
+}
+
+.extension-deactivation-msg-container li:first-child {
+  list-style: none;
+  font-size: 1rem;
+  margin-left: -14px;
+  margin-bottom: 8px;
+}
+
+.extension-deactivation-msg-container img {
+  margin-top: 1rem;
+  width: 628px;
+  height: 235px;
+  max-inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+  object-position: top;
+}
