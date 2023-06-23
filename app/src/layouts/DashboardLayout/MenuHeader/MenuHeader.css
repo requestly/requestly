@@ -51,6 +51,7 @@
 }
 
 .header-left-section .desktop-app-promo-btn.ant-btn:hover {
+  transition: none;
   background-color: var(--hover-background-color);
 }
 
