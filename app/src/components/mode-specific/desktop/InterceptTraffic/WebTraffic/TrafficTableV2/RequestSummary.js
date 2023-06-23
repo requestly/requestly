@@ -1,6 +1,6 @@
 import { Table } from "@devtools-ds/table";
 
-const exclude_keys = ["headers", "body"];
+const exclude_keys = ["headers", "body", "queryParams"];
 
 const renderSummaryTable = (request_data) => {
   return (
