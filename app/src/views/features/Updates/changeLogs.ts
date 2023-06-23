@@ -5,10 +5,21 @@ export const VERSION_NEXT = "next";
 const changeLogs: VersionedChangeLogs[] = [
   {
     version: VERSION_NEXT,
+    logs: [],
+  },
+  {
+    version: "23.6.23",
     logs: [
+      {
+        title: "Ability to modify two GQL responses with different operations simultaneously",
+        link: "https://github.com/requestly/requestly/issues/289",
+      },
       {
         title: "Bug fix: Status code in Modify API Response rule resolves to a string instead of number",
         link: "https://github.com/requestly/requestly/issues/722",
+      },
+      {
+        title: "Bug fix: Executed Rules tab in extension popup lists fewer rules than executed",
       },
     ],
   },
