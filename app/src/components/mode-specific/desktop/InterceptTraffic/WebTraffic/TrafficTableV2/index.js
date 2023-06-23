@@ -204,8 +204,9 @@ const CurrentTrafficTable = ({
   }, [isStaticPreview]);
 
   const activeFiltersCount = useMemo(
-    () => [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.contentType].length,
-    [trafficTableFilters.method, trafficTableFilters.contentType, trafficTableFilters.statusCode]
+    () =>
+      [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.resourceType].length,
+    [trafficTableFilters.method, trafficTableFilters.resourceType, trafficTableFilters.statusCode]
   );
 
   const filterLog = useCallback(
@@ -240,8 +241,8 @@ const CurrentTrafficTable = ({
         return false;
       }
       if (
-        trafficTableFilters.contentType.length > 0 &&
-        !doesContentTypeMatchResourceFilter(log?.response?.contentType, trafficTableFilters.contentType)
+        trafficTableFilters.resourceType.length > 0 &&
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, trafficTableFilters.resourceType)
       ) {
         return false;
       }
@@ -273,7 +274,7 @@ const CurrentTrafficTable = ({
       trafficTableFilters.app,
       trafficTableFilters.domain,
       trafficTableFilters.method,
-      trafficTableFilters.contentType,
+      trafficTableFilters.resourceType,
       trafficTableFilters.search.regex,
       trafficTableFilters.search.term,
       trafficTableFilters.statusCode,
@@ -574,9 +575,9 @@ const CurrentTrafficTable = ({
                     filterLabel="Resource type"
                     filterPlaceholder="Filter by resource type"
                     options={RESOURCE_FILTER_OPTIONS}
-                    value={trafficTableFilters.contentType}
+                    value={trafficTableFilters.resourceType}
                     handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
+                      dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
                       trackTrafficTableFilterApplied("resource_type", options, options?.length);
                     }}
                   />
