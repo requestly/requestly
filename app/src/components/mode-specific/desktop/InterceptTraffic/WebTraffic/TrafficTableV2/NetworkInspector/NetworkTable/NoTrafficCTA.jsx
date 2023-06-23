@@ -39,7 +39,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         actions.toggleActiveModal({
           modalName: "connectedAppsModal",
           newValue: true,
-          newProps: props,
+          newProps: { ...props, source: "traffic_table" },
         })
       );
       trackConnectAppsClicked("traffic_table");

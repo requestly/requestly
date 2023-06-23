@@ -51,7 +51,7 @@ const DesktopAppProxyInfo = () => {
       actions.toggleActiveModal({
         modalName: "connectedAppsModal",
         newValue: true,
-        newProps: {},
+        newProps: { source: "app_header" },
       })
     );
     trackConnectAppsClicked("app_header");
