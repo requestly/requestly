@@ -1,4 +1,3 @@
-import { RESOURCE_TO_CONTENT_TYPES_MAP } from "config/constants/sub/contentType";
 import parser from "ua-parser-js";
 
 export const getRequestDomain = (log: any) => {
@@ -35,17 +34,4 @@ export const getAppNameFromUA = (userAgent: any) => {
     appName = browser.name;
   }
   return appName;
-};
-
-export const doesContentTypeMatchResourceFilter = (
-  contentTypeHeaderVal: string,
-  resources: (keyof typeof RESOURCE_TO_CONTENT_TYPES_MAP)[]
-) => {
-  if (!contentTypeHeaderVal) return false;
-
-  const contentType = contentTypeHeaderVal.split(";")[0]; // ignoring encoding
-
-  return resources.some((resource) => {
-    return RESOURCE_TO_CONTENT_TYPES_MAP[resource]?.includes(contentType);
-  });
 };

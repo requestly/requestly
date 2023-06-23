@@ -35,9 +35,8 @@ import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
-import { RESOURCE_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import { doesContentTypeMatchResourceFilter } from "./utils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -572,7 +571,7 @@ const CurrentTrafficTable = ({
                     filterId="filter-resource-type"
                     filterLabel="Resource type"
                     filterPlaceholder="Filter by resource type"
-                    options={RESOURCE_TYPE_OPTIONS}
+                    options={RESOURCE_FILTER_OPTIONS}
                     value={trafficTableFilters.contentType}
                     handleFilterChange={(options) => {
                       dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
