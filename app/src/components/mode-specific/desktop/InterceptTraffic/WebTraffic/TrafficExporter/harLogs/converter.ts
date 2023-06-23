@@ -20,7 +20,7 @@ const convertLogToHarEntry = (log: RQNetworkLog) => {
     httpVersion: "HTTP/1.1",
     cookies: [],
     method: log.request.method,
-    queryString: [],
+    queryString: log.request.queryParams,
     url: log.url,
     postData: {
       text: log.request.body,
@@ -108,6 +108,7 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
         port: url.port, //Change to port
         headers: requestHeaders,
         body: entry.request.postData?.text,
+        queryParams: entry.request.queryString,
       },
       response: {
         statusCode: entry.response.status,

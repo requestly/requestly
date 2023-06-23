@@ -1,7 +1,71 @@
-.survey-modal .ant-modal-body .rq-modal-content {
+.persona-survey-container {
+  width: 550px;
+  min-height: 480px;
+  background: var(--body-background);
+  border-radius: var(--border-radius-md);
   padding: 40px 20px;
+  position: relative;
 }
-.survey-modal .skip-recommendation-wrapper {
+.persona-survey-container .survey-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.persona-survey-container .survey-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  margin-left: 8px;
+}
+.persona-survey-banner .survey-banner-title {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.persona-survey-banner .survey-banner-subtitle {
+  width: 380px;
+  line-height: 25px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+.persona-survey-banner .survey-banner-footer,
+.persona-survey-container .survey-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 9px 20px;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--component-dark-background);
+  color: var(--text-gray);
+}
+.persona-survey-banner .survey-banner-footer {
+  text-align: center;
+}
+.persona-survey-container .survey-footer {
+  margin-top: 40px;
+}
+.persona-survey-container .survey-footer .survey-disable-continue {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.persona-survey-banner .survey-lottie-animation-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 35px;
+  left: 0;
+  right: 0;
+}
+.persona-survey-banner .survey-lottie-animation {
+  width: 80%;
+}
+.persona-survey-container .skip-recommendation-wrapper {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -10,65 +74,18 @@
   width: 100%;
   color: var(--text-gray);
 }
-
-.survey-modal .skip-recommendation-btn {
+.persona-survey-container .skip-recommendation-btn {
   color: var(--white);
   padding: 5px;
   font-weight: 500;
   cursor: pointer;
 }
-.survey-modal .skip-recommendation-btn.persona-login-btn {
+.persona-survey-container .skip-recommendation-btn.persona-login-btn {
   text-decoration: underline;
 }
-.survey-modal .skip-recommendation-btn.persona-login-btn:hover {
+.persona-survey-container .skip-recommendation-btn.persona-login-btn:hover {
   text-decoration: underline;
 }
-.survey-modal .skip-recommendation-btn:hover {
+.persona-survey-container .skip-recommendation-btn:hover {
   color: var(--white);
-}
-.survey-modal .survey-modal-border-radius {
-  border-radius: var(--border-radius-md);
-}
-.survey-modal .survey-title {
-  font-size: 1.5rem;
-}
-.survey-modal .survey-sub-title {
-  max-width: 380px;
-  line-height: 25px;
-  margin-top: 8px;
-  opacity: 0.7;
-}
-
-.survey-modal .survey-lottie-animation-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.survey-modal .survey-lottie-animation {
-  width: 80%;
-  margin-bottom: -43px;
-}
-.survey-modal .survey-options-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 20px;
-  margin-left: 8px;
-}
-.survey-modal .survey-disable-continue {
-  opacity: 0.4;
-  pointer-events: none;
-  cursor: not-allowed;
-}
-.survey-modal .survey-modal-emoji {
-  font-size: 1.1rem;
-  position: relative;
-  top: 2px;
-}
-.survey-modal .survey-modal-emoji.emoji-gap {
-  margin-right: 8px;
-}
-.survey-modal .survey-subtitle-wrapper {
-  display: flex;
-  justify-content: center;
 }

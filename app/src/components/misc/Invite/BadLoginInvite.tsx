@@ -32,7 +32,7 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
             callback: () => {
               // setVisible(false);
             },
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
           },
         })
       );
@@ -67,13 +67,13 @@ const BadLoginInvite = ({ inviteId, ownerName, workspaceName, invitedEmail }: Pr
                 To accept the invitation, please login as <b>{invitedEmail}</b>
               </>
             ) : (
-              <>To accept the invitation, please login first.</>
+              <>To accept the invitation, please signup.</>
             )}
           </p>
         </div>
         <div className="invite-footer">
           <RQButton className="invite-button" type="primary" size="middle" onClick={() => openAuthModal()}>
-            Log in
+            Sign up
           </RQButton>
         </div>
       </Col>

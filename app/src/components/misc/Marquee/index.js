@@ -21,7 +21,7 @@ export const CompanyMarquee = () => {
 
   return (
     <div className="marquee-container">
-      <Marquee gradientWidth={200} gradientColor={["36", "37", "41"]} className="marquee">
+      <Marquee gradientWidth={200} gradientColor={["33", "33", "37"]} className="marquee">
         {companies.map((company, index) => {
           return (
             <img

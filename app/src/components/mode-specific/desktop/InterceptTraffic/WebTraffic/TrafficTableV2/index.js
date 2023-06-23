@@ -34,9 +34,10 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
-import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { doesStatusCodeMatchLabels } from "./utils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -234,7 +235,7 @@ const CurrentTrafficTable = ({
 
       if (
         trafficTableFilters.statusCode.length > 0 &&
-        !trafficTableFilters.statusCode.includes(log?.response?.statusCode?.toString())
+        !doesStatusCodeMatchLabels(log?.response?.statusCode, trafficTableFilters.statusCode)
       ) {
         return false;
       }
@@ -561,7 +562,7 @@ const CurrentTrafficTable = ({
                     filterId="filter-status-code"
                     filterLabel="Status code"
                     filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_ONLY_OPTIONS}
+                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
                     value={trafficTableFilters.statusCode}
                     handleFilterChange={(options) => {
                       dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
