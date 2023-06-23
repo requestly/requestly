@@ -1,6 +1,7 @@
 import { Modal } from "antd";
 import React, { useMemo } from "react";
 import {
+  filterHeadersToImport,
   generateKeyValuePairsFromJson,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
@@ -38,12 +39,17 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
 
     entry.request.url = urlObj.toString();
     entry.request.queryParams = generateKeyValuePairsFromJson(searchParams);
-    entry.request.headers = generateKeyValuePairsFromJson(request.headers);
-    entry.request.method = request.method || RequestMethod.GET;
+    entry.request.headers = filterHeadersToImport(generateKeyValuePairsFromJson(request.headers));
+    entry.request.method = (request.method as RequestMethod) || RequestMethod.GET;
     entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
 
     if (typeof request.body === "string") {
       entry.request.body = request.body;
+
+      if (entry.request.contentType === RequestContentType.FORM) {
+        const searchParams = new URLSearchParams(request.body);
+        entry.request.body = generateKeyValuePairsFromJson(Object.fromEntries(searchParams));
+      }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {
         entry.request.contentType = RequestContentType.FORM;

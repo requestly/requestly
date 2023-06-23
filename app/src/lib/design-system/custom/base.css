@@ -105,6 +105,9 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
 }
+.display-flex {
+  display: flex;
+}
 
 .display-row-center {
   display: flex;
@@ -119,6 +122,11 @@
 .items-center {
   display: flex;
   align-items: center;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
 }
 
 .w-full {

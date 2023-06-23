@@ -14,7 +14,7 @@ import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
-  const { pathname } = location;
+  const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -25,8 +25,14 @@ const DashboardLayout = () => {
     callback: handleOnetapSignIn,
   });
 
-  const isPersonaRecommendationScreen =
-    userPersona.page === 4 && !userPersona.isSurveyCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isPersonaRecommendationScreen = useMemo(
+    () =>
+      userPersona.page === 2 &&
+      !userPersona.isSurveyCompleted &&
+      appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      state?.src === "persona_survey_modal",
+    [appMode, userPersona?.page, userPersona?.isSurveyCompleted, state?.src]
+  );
 
   const isSidebarVisible = useMemo(
     () =>

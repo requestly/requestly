@@ -6,7 +6,7 @@ import {
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
-import { Log } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
+import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
 import { Button, Space, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined } from "@ant-design/icons";
@@ -23,7 +23,7 @@ import {
 
 const NetworkSessionViewer: React.FC<{}> = () => {
   const { id } = useParams();
-  const [recordedLogs, setRecordedLogs] = useState<Log[] | null>(null);
+  const [recordedLogs, setRecordedLogs] = useState<RQNetworkLog[] | null>(null);
   const [sessionName, setSessionName] = useState("");
 
   const navigate = useNavigate();

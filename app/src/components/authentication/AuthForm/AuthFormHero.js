@@ -57,9 +57,9 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
 
   return (
     <Col span={13} className="signup-modal-section-wrapper signup-modal-hero">
-      <Typography.Text type="primary" className="signup-modal-hero-title text-bold w-full">
+      <Typography.Title type="primary" className="signup-modal-hero-title w-full text-bold">
         Speed up your web development, testing & debugging process 🚀
-      </Typography.Text>
+      </Typography.Title>
       <div className="work-email-wrapper">
         <Typography.Text type="primary" className="text-bold header">
           Use{" "}
