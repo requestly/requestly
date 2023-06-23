@@ -13,6 +13,7 @@ import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { trackOnboardingWorkspaceSkip, trackWorkspaceInviteAccepted } from "modules/analytics/events/common/teams";
+import { OnboardingSteps } from "../../types";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -106,7 +107,7 @@ export const JoinWorkspace: React.FC<{
         <RQButton
           type="text"
           onClick={() => {
-            trackOnboardingWorkspaceSkip();
+            trackOnboardingWorkspaceSkip(OnboardingSteps.CREATE_JOIN_WORKSPACE);
             dispatch(actions.updateIsWorkspaceOnboardingCompleted());
           }}
         >

@@ -12,15 +12,19 @@ import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/M
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { renameWorkspace } from "backend/workspace";
 import {
   trackWorkspaceInviteLinkCopied,
   trackOnboardingWorkspaceSkip,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
+import {
+  trackAddTeamMemberFailure,
+  trackAddTeamMemberSuccess,
+  trackNewTeamCreateSuccess,
+} from "modules/analytics/events/features/teams";
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
-import { renameWorkspace } from "backend/workspace";
-import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -65,6 +69,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         setIsProcessing(false);
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       }
+      trackNewTeamCreateSuccess(response?.data?.teamId, newWorkspaceName, "onboarding");
     });
   };
 
@@ -92,7 +97,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Invite sent successfully");
-          trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin);
+          trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin, "onboarding");
           dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         }
         setIsProcessing(false);
@@ -111,6 +116,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       })
       .catch((err) => {
         toast.error("Error while sending invitations");
+        trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
       });
   };
 
@@ -223,7 +229,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         <RQButton
           type="text"
           onClick={() => {
-            trackOnboardingWorkspaceSkip();
+            trackOnboardingWorkspaceSkip(OnboardingSteps.CREATE_JOIN_WORKSPACE);
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }}
         >
