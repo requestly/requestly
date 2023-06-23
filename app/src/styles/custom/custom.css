@@ -626,3 +626,10 @@ div.react-multi-email .multi-email-tag {
   border-radius: var(--border-radius-sm);
   background-color: var(--component-background);
 }
+
+.records-table.ant-pro-table .ant-table-tbody tr td a:hover,
+.records-table.ant-pro-table .ant-table-tbody tr td a span:hover,
+.records-table.ant-table-wrapper .ant-table-tbody tr td a:hover {
+  color: var(--link-color);
+  text-decoration: underline;
+}
