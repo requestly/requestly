@@ -108,7 +108,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       trafficTableFilters.search.term.length ||
       Object.values({
         ...trafficTableFilters.method,
-        ...trafficTableFilters.contentType,
+        ...trafficTableFilters.resourceType,
         ...trafficTableFilters.statusCode,
       }).some((prop) => prop.length > 0)
     ) {
