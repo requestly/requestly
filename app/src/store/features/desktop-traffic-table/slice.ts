@@ -20,7 +20,7 @@ interface SearchFilters {
 interface TrafficTableFilters {
   statusCode: string[];
   method: string[];
-  contentType: string[];
+  resourceType: string[];
   app: string[];
   domain: string[];
   search: SearchFilters;
@@ -43,7 +43,7 @@ const initialState: DesktopTrafficTableState = {
   filters: {
     statusCode: [],
     method: [],
-    contentType: [],
+    resourceType: [],
     app: [],
     domain: [],
     search: {
@@ -116,7 +116,7 @@ const slice = createSlice({
       state.filters = {
         ...state.filters,
         method: initialState.filters.method,
-        contentType: initialState.filters.contentType,
+        resourceType: initialState.filters.resourceType,
         statusCode: initialState.filters.statusCode,
       };
     },
