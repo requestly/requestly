@@ -138,6 +138,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       });
     }
 
+    if (!log.requestShellCurl) {
+      menuItems.splice(0, 1);
+    }
+
     return menuItems;
   }, [log, onReplayRequest, handleOnClick]);
 
