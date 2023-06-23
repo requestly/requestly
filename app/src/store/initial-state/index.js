@@ -107,6 +107,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    workspaceOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -152,6 +156,12 @@ const INITIAL_STATE = {
 
   userAttributes: {
     deviceId: null,
+  },
+
+  workspaceOnboarding: {
+    step: "auth",
+    isOnboardingCompleted: false,
+    workspace: {},
   },
 
   misc: {
