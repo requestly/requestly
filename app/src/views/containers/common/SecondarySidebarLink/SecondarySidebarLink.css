@@ -23,5 +23,5 @@
 
 .secondary-sidebar-link:hover {
   color: white;
-  background-color: #3b3b3b74;
+  background-color: var(--hover-background-color);
 }
