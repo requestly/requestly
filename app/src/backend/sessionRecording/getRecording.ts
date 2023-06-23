@@ -12,23 +12,6 @@ const isOwner = (recording: SessionRecording, uid: string) => {
   return false;
 };
 
-const hasRecordingAccess = (
-  recording: SessionRecording,
-  uid: string, // usrId or ownerId
-  email: string
-): boolean => {
-  if (recording.visibility === "public") return true;
-
-  if (!uid) return false;
-
-  if (recording.visibility === "only-me" && uid === recording.ownerId) return true;
-
-  // TODO: We should ideally keep uids here instead of keeping emails.
-  if (recording.accessEmails.includes(email)) return true;
-
-  return false;
-};
-
 const fetchRecordingEvents = async (filePath: string) => {
   if (filePath) return await getFile(filePath);
 
@@ -63,16 +46,6 @@ export const getRecording = async (
     events: null,
   };
 
-  let events: any = null;
-
-  if (hasRecordingAccess(data, ownerId, email)) {
-    events = await fetchRecordingEvents(data?.eventsFilePath);
-  } else {
-    const err = new Error("You do not have permission to access this recording");
-    err.name = "PermissionDenied";
-    throw err;
-  }
-
-  response.events = events;
+  response.events = await fetchRecordingEvents(data?.eventsFilePath);
   return response;
 };
