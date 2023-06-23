@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Modal } from "antd";
 import {
   getUserAuthDetails,
   getWorkspaceOnboardingStep,
@@ -29,9 +30,8 @@ import { Invite } from "types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
+import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
-import { Modal } from "antd";
-import { trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -94,6 +94,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
             dispatch(
               actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
             );
+            trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
           });
 
           setTimeout(() => {
@@ -190,7 +191,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
                 className="display-block text-gray m-auto"
                 type="text"
                 onClick={() => {
-                  trackOnboardingWorkspaceSkip();
+                  trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
                   dispatch(actions.updateIsWorkspaceOnboardingCompleted());
                 }}
               >

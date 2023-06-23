@@ -8,6 +8,7 @@
   background: var(--body-background);
   border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
   min-height: 480px;
+  border: 1px solid var(--border-dark);
 }
 .workspace-onboarding-footer {
   position: absolute;
@@ -19,7 +20,7 @@
   gap: 4px;
   padding: 9px 20px;
   color: var(--text-gray);
-  border-top: 1px solid var(--border-dark);
+  border: 1px solid var(--border-dark);
   background-color: var(--component-background);
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
