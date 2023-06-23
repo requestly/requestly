@@ -352,7 +352,7 @@ export async function googleSignIn(callback, MODE, source) {
 
       callback && callback.call(null, true);
 
-      return authData;
+      return { ...authData, isNewUser: is_new_user };
     })
     .catch((err) => {
       trackLoginFailedEvent({

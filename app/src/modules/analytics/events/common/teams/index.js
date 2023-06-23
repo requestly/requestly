@@ -79,3 +79,18 @@ export const trackCreateNewTeamClicked = (source) => {
   const params = { source };
   trackEvent(TEAMS.CREATE_NEW_TEAM_CLICKED, params);
 };
+
+export const trackWorkspaceInviteLinkCopied = (source) => {
+  const params = { source };
+  trackEvent(TEAMS.WORKSPACE_INVITE_LINK_COPIED, params);
+};
+
+export const trackOnboardingWorkspaceSkip = (step) => {
+  const params = { step };
+  trackEvent(TEAMS.ONBOARDING_WORKSPACE_SKIP, params);
+};
+
+export const trackWorkspaceInviteAccepted = (source, domain) => {
+  const params = { source, domain };
+  trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED, params);
+};

@@ -1,9 +1,4 @@
-.survey-modal.ant-modal {
-  min-width: 550px !important;
-  width: 550px !important;
-}
-
-.survey-modal .survey-option {
+.persona-survey-container .survey-option {
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
   background: var(--body-background);
@@ -13,35 +8,35 @@
   gap: 6px;
   transition: 0.2s ease-in-out;
 }
-.survey-modal .survey-option:not(.outline-active-option):hover {
+.persona-survey-container .survey-option:not(.outline-active-option):hover {
   border: 1px solid #4f5257;
 }
-.survey-modal .survey-option.survey-select {
+.persona-survey-container .survey-option.survey-select {
   cursor: pointer;
   width: 48%;
   justify-content: space-between;
   align-items: center;
 }
-.survey-modal .survey-option.survey-text {
+.persona-survey-container .survey-option.survey-text {
   width: 98%;
 }
-.survey-modal .survey-option.survey-text input.ant-input {
+.persona-survey-container .survey-option.survey-text input.ant-input {
   padding: 0;
 }
-.survey-modal .survey-option-title {
-  font-size: 13px;
+.persona-survey-container .survey-option-title {
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.survey-modal .survey-text-prefix,
-.survey-modal .survey-text-suffix {
+.persona-survey-container .survey-text-prefix,
+.persona-survey-container .survey-text-suffix {
   align-self: center;
 }
-.survey-modal .outline-active-option {
+.persona-survey-container .outline-active-option {
   border: 1px solid var(--primary);
   background: var(--component-background);
 }
-.survey-modal .hide-option-checkbox {
+.persona-survey-container .hide-option-checkbox {
   visibility: hidden;
 }
