@@ -7,7 +7,7 @@ const RESOURCE_SUBSTR = {
   media: ["video/", "audio/"],
   form: "form",
   font: "font",
-  misc: "", // none the above
+  misc: "", // none of the above
 };
 
 interface FilterOption {
@@ -15,10 +15,12 @@ interface FilterOption {
   value: keyof typeof RESOURCE_SUBSTR;
 }
 
+const MISC_FILTER_KEY = "misc";
+
 // because we wanted to control the order of filter options
 export const RESOURCE_FILTER_OPTIONS: FilterOption[] = [
   {
-    label: "HTML Document",
+    label: "HTML",
     value: "html",
   },
   {
@@ -26,7 +28,7 @@ export const RESOURCE_FILTER_OPTIONS: FilterOption[] = [
     value: "json",
   },
   {
-    label: "JAVASCRIPT",
+    label: "JavaScript",
     value: "js",
   },
   {
@@ -51,12 +53,12 @@ export const RESOURCE_FILTER_OPTIONS: FilterOption[] = [
   },
   {
     label: "Others",
-    value: "misc",
+    value: MISC_FILTER_KEY,
   },
 ];
 
 function doesFilterMatchContentType(filter: FilterOption["value"], contentType: string): boolean {
-  if (filter === "misc") {
+  if (filter === MISC_FILTER_KEY) {
     const allFiltersExceptMISC = RESOURCE_FILTER_OPTIONS.slice(0, RESOURCE_FILTER_OPTIONS.length - 1).map(
       (option) => option.value
     );
@@ -79,8 +81,7 @@ export function doesContentTypeMatchResourceFilter(
   selectedFilters: FilterOption["value"][]
 ): boolean {
   if (!contentTypeHeader) {
-    if (selectedFilters.find((filter) => filter === "misc")) return true;
-    else return false;
+    return selectedFilters.includes(MISC_FILTER_KEY);
   }
 
   return selectedFilters.some((filter) => {
