@@ -19,6 +19,7 @@ import {
   getIsHardRefreshRulesPending,
   getIsRulesListLoading,
   getAllGroups,
+  getIsRefreshRulesPending,
 } from "../../../../store/selectors";
 import { isGroupsSanitizationPassed } from "./actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -46,6 +47,7 @@ const RulesIndexPage = () => {
   const dispatch = useDispatch();
   const rules = useSelector(getAllRules);
   const groups = useSelector(getAllGroups);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -54,6 +56,7 @@ const RulesIndexPage = () => {
   //Component State
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [isSyncAndRecordsLoading, setIsSyncAndRecordsLoading] = useState(false);
+  const hasIsRulesListRefreshPendingChanged = useHasChanged(isRulesListRefreshPending);
   const hasIsRulesListHardRefreshPendingChanged = useHasChanged(isRulesListHardRefreshPending);
 
   useEffect(() => {
@@ -100,7 +103,13 @@ const RulesIndexPage = () => {
         groups.filter((group) => group.status === GLOBAL_CONSTANTS.GROUP_STATUS.ACTIVE).length
       );
     });
-  }, [appMode, dispatch, isRulesListLoading, hasIsRulesListHardRefreshPendingChanged]);
+  }, [
+    appMode,
+    dispatch,
+    isRulesListLoading,
+    hasIsRulesListRefreshPendingChanged,
+    hasIsRulesListHardRefreshPendingChanged,
+  ]);
 
   const CreateFirstRule = () => {
     if (isWorkspaceMode) return <CreateTeamRuleCTA />;
