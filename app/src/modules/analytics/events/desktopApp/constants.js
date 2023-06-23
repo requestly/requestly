@@ -14,6 +14,7 @@ export const APPS = {
   APP_SETUP_INSTRUCTIONS_VIEWED: "app_setup_instructions_viewed",
   CONNECT_APPS_CATEGORY_SWITCHED: "connect_apps_category_switched",
   CONNECT_APPS_CLICKED: "connect_apps_clicked",
+  CONNECT_APPS_VIEWED: "connect_apps_viewed",
   CONNECT_APPS_MODAL_CLOSED: "connect_apps_modal_closed",
   SYSTEMWIDE_CONNECTED: "system_wide_connected",
 };
