@@ -1,4 +1,4 @@
-import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, Log } from "./types";
+import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,7 +13,7 @@ const createHarHeaders = (headersObject: HeaderMap) => {
   return headers;
 };
 
-const convertLogToHarEntry = (log: Log) => {
+const convertLogToHarEntry = (log: RQNetworkLog) => {
   const harRequest: HarRequest = {
     bodySize: -1,
     headersSize: -1,
@@ -22,6 +22,9 @@ const convertLogToHarEntry = (log: Log) => {
     method: log.request.method,
     queryString: [],
     url: log.url,
+    postData: {
+      text: log.request.body,
+    },
     headers: createHarHeaders(log.request.headers),
   };
   const harResponse: HarResponse = {
@@ -56,7 +59,7 @@ const convertLogToHarEntry = (log: Log) => {
   return entry;
 };
 
-export function createLogsHar(logs: Log[]) {
+export function createLogsHar(logs: RQNetworkLog[]) {
   const logEntries = logs.map((log) => {
     return convertLogToHarEntry(log);
   });
@@ -80,8 +83,8 @@ export function createLogsHar(logs: Log[]) {
  * - importing har that was exported from RQ
  * - importing any random (but valid) har file too!
  */
-export const convertHarJsonToRQLogs = (har: Har): Log[] => {
-  const res: Log[] = har?.log?.entries?.map((entry) => {
+export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
+  const res: RQNetworkLog[] = har?.log?.entries?.map((entry) => {
     const requestHeaders: Record<string, string> = {};
     entry.request.headers.forEach((headerObj) => {
       requestHeaders[headerObj.name] = headerObj.value;
@@ -94,7 +97,7 @@ export const convertHarJsonToRQLogs = (har: Har): Log[] => {
 
     const url = new URL(entry.request.url);
 
-    const rqLog: Log = {
+    const rqLog: RQNetworkLog = {
       id: entry?._RQDetails?.id || uuidv4(),
       timestamp: new Date(entry.startedDateTime).getTime() / 1000,
       url: url.toString(),

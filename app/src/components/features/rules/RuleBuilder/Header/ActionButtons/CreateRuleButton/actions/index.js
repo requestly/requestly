@@ -8,7 +8,7 @@ import { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
 
-export const validateRule = (rule, dispatch) => {
+export const validateRule = (rule, dispatch, appMode) => {
   let output;
   if (isEmpty(rule.name)) {
     dispatch(
@@ -334,11 +334,13 @@ export const validateRule = (rule, dispatch) => {
       }
       // Delay between 1 & 5000
       else if (
-        !inRange(
-          parseInt(delay),
-          GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MIN_DELAY_VALUE,
-          GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_NON_XHR + 1
-        )
+        parseInt(delay) === 0 ||
+        (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+          !inRange(
+            parseInt(delay),
+            GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MIN_DELAY_VALUE,
+            GLOBAL_CONSTANTS.DELAY_REQUEST_CONSTANTS.MAX_DELAY_VALUE_NON_XHR + 1
+          ))
       ) {
         output = {
           result: false,

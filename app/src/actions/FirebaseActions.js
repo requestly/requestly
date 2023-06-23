@@ -58,6 +58,11 @@ import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { DB_UTILS } from "@requestly/rq-common";
+import {
+  trackLogoutAttempted,
+  trackLogoutFailed,
+  trackLogoutSuccess,
+} from "modules/analytics/events/common/auth/logout";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -532,7 +537,13 @@ export function removeValueAsPromise(pathArray) {
   return new Promise((resolve) => removeValue(pathArray, resolve));
 }
 
-export function signOut() {
+export async function signOut() {
+  trackLogoutAttempted();
   const auth = getAuth(firebaseApp);
-  return signOutFirebaseFunction(auth);
+  try {
+    await signOutFirebaseFunction(auth);
+    trackLogoutSuccess();
+  } catch {
+    trackLogoutFailed();
+  }
 }

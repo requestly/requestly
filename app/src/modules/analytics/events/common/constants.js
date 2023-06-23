@@ -12,6 +12,12 @@ export const AUTH = {
     FAILED: "login_failed",
   },
 
+  LOGOUT: {
+    ATTEMPTED: "logout_attempted",
+    SUCCESS: "logout_success",
+    FAILED: "logout_failed",
+  },
+
   RESET_PASSWORD: {
     ATTEMPTED: "reset_password_attempted",
     SUCCESS: "reset_password_success",

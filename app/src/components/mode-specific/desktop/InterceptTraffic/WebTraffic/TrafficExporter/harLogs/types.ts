@@ -55,7 +55,7 @@ export interface HarResponse {
 }
 
 interface HarRequestPostData {
-  mimeType: string;
+  mimeType?: string; // required in spec. optional here because we don't sniff mime type
   text: string;
   params?: any;
   comment?: string;
@@ -80,7 +80,7 @@ interface HarMapEntry {
 }
 
 /* RQ LOG */
-export interface Log {
+export interface RQNetworkLog {
   id: string;
   timestamp: number;
   url: string;
