@@ -1,9 +1,11 @@
 // Open terminal and type `node --print "http.STATUS_CODES"` to get all codes
+// Extra codes added from -- https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 export const statusCodes = {
   100: "Continue",
   101: "Switching Protocols",
   102: "Processing",
   103: "Early Hints",
+
   200: "OK",
   201: "Created",
   202: "Accepted",
@@ -14,6 +16,7 @@ export const statusCodes = {
   207: "Multi-Status",
   208: "Already Reported",
   226: "IM Used",
+
   300: "Multiple Choices",
   301: "Moved Permanently",
   302: "Found",
@@ -22,6 +25,7 @@ export const statusCodes = {
   305: "Use Proxy",
   307: "Temporary Redirect",
   308: "Permanent Redirect",
+
   400: "Bad Request",
   401: "Unauthorized",
   402: "Payment Required",
@@ -41,6 +45,7 @@ export const statusCodes = {
   416: "Range Not Satisfiable",
   417: "Expectation Failed",
   418: "I'm a Teapot",
+  419: "Page Expired", // Specific to php Laravel
   421: "Misdirected Request",
   422: "Unprocessable Entity",
   423: "Locked",
@@ -51,6 +56,14 @@ export const statusCodes = {
   429: "Too Many Requests",
   431: "Request Header Fields Too Large",
   451: "Unavailable For Legal Reasons",
+  // NGINX 4xx responses
+  444: "No Response",
+  494: "Request header too large",
+  495: "SSL Certificate Error",
+  496: "SSL Certificate Required",
+  497: "HTTP Request Sent to HTTPS Port",
+  499: "Client Closed Request",
+
   500: "Internal Server Error",
   501: "Not Implemented",
   502: "Bad Gateway",
@@ -63,6 +76,15 @@ export const statusCodes = {
   509: "Bandwidth Limit Exceeded",
   510: "Not Extended",
   511: "Network Authentication Required",
+  // Cloudflare errros
+  520: "Web Server Returned an Unknown Error",
+  521: "Web Server Is Down",
+  522: "Connection Timed Out",
+  523: "Origin Is Unreachable",
+  524: "A Timeout Occurred",
+  525: "SSL Handshake Failed",
+  526: "Invalid SSL Certificate",
+  527: "Railgun Error",
 };
 
 const statusCodesGroupedByCategory = {
@@ -108,5 +130,12 @@ export const STATUS_CODE_ONLY_OPTIONS = Object.values(statusCodesGroupedByCatego
     options: codes.map((code) => {
       return { value: code, label: code, id: code };
     }),
+  };
+});
+
+export const STATUS_CODE_LABEL_ONLY_OPTIONS = Object.values(statusCodesGroupedByCategory).map(({ label }) => {
+  return {
+    label,
+    value: label,
   };
 });
