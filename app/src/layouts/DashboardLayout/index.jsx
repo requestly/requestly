@@ -9,7 +9,6 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
-import { handleOnetapSignIn } from "actions/FirebaseActions";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
@@ -18,12 +17,9 @@ const DashboardLayout = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  useGoogleOneTapLogin({
-    client_id: "553216647714-b34rhgl06o7vokpebigjttrgebmm495h.apps.googleusercontent.com", //client ID of rq-beta,
-    disabled: user?.loggedIn,
-    prompt_parent_id: "one-tap-container",
-    callback: handleOnetapSignIn,
-  });
+  const { promptOneTapOnLoad } = useGoogleOneTapLogin();
+
+  promptOneTapOnLoad();
 
   const isPersonaRecommendationScreen = useMemo(
     () =>
