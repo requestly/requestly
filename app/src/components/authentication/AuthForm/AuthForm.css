@@ -1,5 +1,4 @@
 .signup-modal-section-wrapper {
-  background: #1c1d21;
   padding: 32px;
   width: 55%;
 }
@@ -7,6 +6,7 @@
   padding: 40px;
 }
 .signup-form-wrapper {
+  background: var(--background);
   padding: 40px 50px;
   border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
 }
@@ -14,9 +14,10 @@
   background: var(--body-background);
   border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
 }
-.signup-modal-hero-title {
+.signup-modal-hero .signup-modal-hero-title {
   font-size: 2.25rem;
   line-height: 56px;
+  font-weight: 500;
 }
 .work-email-wrapper {
   margin: 2.37rem 0;

@@ -119,7 +119,7 @@ const TemplatesIndexPage = () => {
             rule={ruleToViewInModal}
           />
         ) : null}
-        <Table columns={columns} dataSource={filteredRuleTemplates} pagination={false} />
+        <Table columns={columns} dataSource={filteredRuleTemplates} pagination={false} className="records-table" />
       </ProCard>
     </React.Fragment>
   );

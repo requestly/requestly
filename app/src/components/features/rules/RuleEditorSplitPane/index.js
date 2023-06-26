@@ -7,6 +7,7 @@ import { isExtensionVersionCompatible } from "../../../../actions/ExtensionActio
 import APP_CONSTANTS from "../../../../config/constants";
 import PremiumRequiredCTA from "../../../payments/PremiumRequiredCTA";
 import { trackRuleSimulatorTried } from "modules/analytics/events/common/rules";
+import "./ruleEditorSplitPane.css";
 const { TabPane } = Tabs;
 
 const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapseRulesPlane, ruleType }) => {
@@ -34,6 +35,7 @@ const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapse
         type="card"
         size="middle"
         tabBarGutter={4}
+        className="rule-simulator-tabs"
         style={{ marginTop: "8px" }}
         onTabClick={(key) => {
           expandRulePane();

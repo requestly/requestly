@@ -190,6 +190,7 @@ const RecordingsList = ({
   return (
     <ProCard className="primary-card github-like-border rules-table-container" title={null}>
       <ProTable
+        className="records-table"
         loading={isTableLoading}
         dataSource={filteredRecordings}
         scroll={{ x: 700 }}

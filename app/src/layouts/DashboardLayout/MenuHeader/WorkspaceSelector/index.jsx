@@ -35,11 +35,10 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
-import Logger from "lib/logger";
-import { getTeamInvites } from "backend/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./WorkSpaceSelector.css";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -86,7 +85,7 @@ const WorkSpaceDropDown = ({ menu }) => {
     >
       <div className="cursor-pointer items-center">
         <Avatar
-          size={28}
+          size={26}
           shape="square"
           icon={getWorkspaceIcon(activeWorkspaceName)}
           className="workspace-avatar"
@@ -104,7 +103,7 @@ const WorkSpaceDropDown = ({ menu }) => {
           title={prettifyWorkspaceName(activeWorkspaceName)}
           placement={"bottomRight"}
           showArrow={false}
-          mouseEnterDelay={1}
+          mouseEnterDelay={2}
         >
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
@@ -142,13 +141,17 @@ const WorkspaceSelector = () => {
   const [teamInvites, setTeamInvites] = useState([]);
   const loggedInUserEmail = user?.details?.profile?.email;
 
+  const getPendingInvites = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingTeamInvites"), []);
+
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getTeamInvites(loggedInUserEmail)
-      .then(setTeamInvites)
-      .catch((e) => Logger.log("Not able to fetch team invites!"));
-  }, [user.loggedIn, loggedInUserEmail]);
+    getPendingInvites({ email: true })
+      .then((res) => {
+        setTeamInvites(res?.data?.pendingInvites ?? []);
+      })
+      .catch((e) => setTeamInvites([]));
+  }, [user.loggedIn, loggedInUserEmail, getPendingInvites]);
 
   useEffect(() => {
     if (availableTeams?.length > 0) {

@@ -1,24 +1,17 @@
 import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { multipleChoiceOption, Option, UserPersona } from "./types";
+import { Option, UserPersona } from "./types";
 import { getValueAsPromise, setValue } from "actions/FirebaseActions";
 import PATHS from "config/constants/sub/paths";
 
-export const shouldShowPersonaSurvey = async (appMode: string) => {
+export const shouldShowOnboarding = async (appMode: string) => {
   // Don't show persona survey on Browser if user is authenticating from desktop app
-  if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE)) return false;
+  if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) || window.location.href.includes("/invite"))
+    return false;
 
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
   if (new Date(installDate) >= new Date("2023-03-06")) return true;
   else return false;
-};
-
-export const getFormattedUserUseCases = (useCases: multipleChoiceOption[]) => {
-  const result = useCases.map((useCase: multipleChoiceOption) => {
-    if (useCase.optionType === "other") return "OTHER:" + useCase.value;
-    else return useCase.value;
-  });
-  return result;
 };
 
 export const shuffleOptions = (options: Option[]) => {

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { Typography, Row, Col, Modal } from "antd";
+import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
+import { isEmailValid } from "utils/FormattingHelper";
 
 //IMAGES
 import GoogleIcon from "../../../assets/img/icons/common/google.svg";
@@ -14,7 +15,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
 //UTILS
-import { syncUserPersona } from "components/misc/PersonaSurvey/utils";
+// import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
 import { getAuthErrorMessage, AuthTypes } from "../utils";
 
@@ -33,7 +34,7 @@ import {
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode, getUserPersonaSurveyDetails } from "../../../store/selectors";
+import { getAppMode } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
@@ -45,42 +46,29 @@ const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const AuthForm = ({
   setAuthMode: SET_MODE,
   authMode: MODE,
-  setPopoverVisible: SET_POPOVER,
-  src,
-  userActionMessage,
+  setPopoverVisible: SET_POPOVER = () => {},
   eventSource,
   callbacks,
+  isOnboardingForm,
 }) => {
   const navigate = useNavigate();
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
-  const dispatch = useDispatch();
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const path = window.location.pathname;
   const [actionPending, setActionPending] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState();
+  const [showEmailSecondStep, setShowEmailSecondStep] = useState(false);
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
 
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
-
-  const showVerifyEmailMessage = () => {
-    Modal.info({
-      title: "Verify email",
-      content: (
-        <Typography.Text>
-          Please click on the link that has just been sent to your email account to verify your email.
-        </Typography.Text>
-      ),
-    });
-  };
 
   useEffect(() => {
     // Updating reference code from query parameters
@@ -103,9 +91,9 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
-          syncUserPersona(result.uid, dispatch, userPersona);
-          onSignInSuccess && onSignInSuccess();
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
+          onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
         setActionPending(false);
       })
@@ -120,15 +108,14 @@ const AuthForm = ({
     handleEmailSignUp(name, email, password, referralCode, eventSource)
       .then(({ status, errorCode }) => {
         if (status) {
-          showVerifyEmailMessage();
           handleEmailSignIn(email, password, true, eventSource)
             .then(({ result }) => {
               if (result.user.uid) {
-                toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
                 setEmail("");
                 setPassword("");
-                syncUserPersona(result.user.uid, dispatch, userPersona);
-                onSignInSuccess && onSignInSuccess(result.user.uid);
+                // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+                onSignInSuccess && onSignInSuccess(result.user.uid, true);
               }
             })
             .catch(({ errorCode }) => {
@@ -154,11 +141,11 @@ const AuthForm = ({
     handleEmailSignIn(email, password, false, eventSource)
       .then(({ result }) => {
         if (result.user.uid) {
-          toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
           setEmail("");
           setPassword("");
-          syncUserPersona(result.user.uid, dispatch, userPersona);
-          onSignInSuccess && onSignInSuccess(result.user.uid);
+          // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+          onSignInSuccess && onSignInSuccess(result.user.uid, false);
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
           setActionPending(true);
@@ -272,96 +259,15 @@ const AuthForm = ({
     }
   };
 
-  const BackToLogin = () => {
-    switch (MODE) {
-      case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
-      case AUTH_ACTION_LABELS.DO_RESET_PASSWORD:
-        return (
-          <>
-            {!path.includes(PATHS.AUTH.RESET_PASSWORD.RELATIVE) && (
-              <button
-                className="back-to-login-btn secondary-text cursor-pointer form-elements-margin"
-                onClick={() => {
-                  SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
-                  setEmail("");
-                }}
-              >
-                <HiArrowLeft />
-                Back
-              </button>
-            )}
-          </>
-        );
-
-      default:
-        return null;
-    }
+  const BackButton = ({ action }) => {
+    return (
+      <button className="back-to-login-btn secondary-text cursor-pointer" style={{ padding: 0 }} onClick={action}>
+        <HiArrowLeft />
+        Back
+      </button>
+    );
   };
 
-  // const renderRememberMeCheckbox = () => {
-  //   switch (MODE) {
-  //     case AUTH_ACTION_LABELS.LOG_IN:
-  //       return (
-  //         <div className="auth-modal-checkbox">
-  //           <input
-  //             className="checkbox"
-  //             id=" customCheckLogin"
-  //             type="checkbox"
-  //             defaultChecked
-  //           />
-  //           <label className="custom-control-label" htmlFor=" customCheckLogin">
-  //             <span className="text-muted">Remember me</span>
-  //           </label>
-  //         </div>
-  //       );
-
-  //     default:
-  //       return null;
-  //   }
-  // };
-
-  // const renderEmailOptin = () => {
-  //   switch (MODE) {
-  //     case AUTH_ACTION_LABELS.SIGN_UP:
-  //       return (
-  //         <div className="auth-modal-checkbox">
-  //           <input
-  //             className="checkbox"
-  //             id="emailOptin"
-  //             type="checkbox"
-  //             defaultChecked={emailOptin}
-  //             onChange={() => setEmailOptin(!emailOptin)}
-  //           />
-  //           <label className="custom-control-label" htmlFor="emailOptin">
-  //             <span className="text-muted">
-  //               Send me updates with tailored offers, feature releases and
-  //               product launches
-  //             </span>
-  //           </label>
-  //           <br />
-  //           <br />
-  //         </div>
-  //       );
-
-  //     default:
-  //       return null;
-  //   }
-  // };
-  // const onTabChange = (clickedTab) => {
-  //   switch (clickedTab) {
-  //     default:
-  //     case AUTH_ACTION_LABELS.LOG_IN: {
-  //       SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
-  //       SET_POPOVER(true);
-  //       break;
-  //     }
-  //     case AUTH_ACTION_LABELS.SIGN_UP: {
-  //       SET_MODE(AUTH_ACTION_LABELS.SIGN_UP);
-  //       SET_POPOVER(true);
-  //       break;
-  //     }
-  //   }
-  // };
   const renderRightFooterLink = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.LOG_IN:
@@ -429,7 +335,7 @@ const AuthForm = ({
                 </InputGroupText>
               </InputGroupAddon> */}
             <label htmlFor="password" className="text-bold auth-modal-input-label">
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Choose password" : "Password"}
+              Password
             </label>
             <RQInput
               id="password"
@@ -482,7 +388,7 @@ const AuthForm = ({
         return (
           <Row className={`${MODE !== AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD && "form-elements-margin"} w-full`}>
             <label htmlFor="email" className="text-bold auth-modal-input-label">
-              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Work Email" : "Email"}
+              {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Enter your work email" : "Email"}
             </label>
             <RQInput
               id="email"
@@ -501,55 +407,18 @@ const AuthForm = ({
         );
     }
   };
-  // const renderReferralMessage = () => {
-  //   return (
-  //     <div className="text-center text-muted mb-4 text-green">
-  //       <small>Yay! Referral Code applied successfully!</small> <br />
-  //       <small>
-  //         <b>Sign up with work email</b> to get Free Requestly Premium
-  //       </small>
-  //     </div>
-  //   );
-  // };
 
-  // const renderDivider = () => {
-  //   switch (MODE) {
-  //     case AUTH_ACTION_LABELS.SIGN_UP:
-  //       return (
-  //         <div
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             marginBottom: "1.5rem",
-  //           }}
-  //         >
-  //           <div style={{ borderBottom: "1px solid #92a1b1", width: "100%" }} />
-  //           <span style={{ padding: "10px", minWidth: "fit-content" }}>
-  //             or Sign up using your Email
-  //           </span>
-  //           <div style={{ borderBottom: "1px solid #92a1b1", width: "100%" }} />
-  //         </div>
-  //       );
-  //     case AUTH_ACTION_LABELS.LOG_IN:
-  //       return (
-  //         <div
-  //           style={{
-  //             display: "flex",
-  //             alignItems: "center",
-  //             marginBottom: "1.5rem",
-  //           }}
-  //         >
-  //           <div style={{ borderBottom: "1px solid #92a1b1", width: "100%" }} />
-  //           <span style={{ padding: "10px", minWidth: "fit-content" }}>
-  //             or Sign in with Email
-  //           </span>
-  //           <div style={{ borderBottom: "1px solid #92a1b1", width: "100%" }} />
-  //         </div>
-  //       );
-  //     default:
-  //       return null;
-  //   }
-  // };
+  const renderEmailAuthSecondStep = () => {
+    return (
+      <>
+        <BackButton action={() => setShowEmailSecondStep(false)} />
+        {renderEmailField()}
+        {MODE === AUTH_ACTION_LABELS.SIGN_UP && <div className="mt-20 w-full">{renderNameField()}</div>}
+        {renderPasswordField()}
+        <FormSubmitButton />
+      </>
+    );
+  };
 
   const onSignInClick = () => {
     SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
@@ -557,6 +426,7 @@ const AuthForm = ({
     setEmail("");
     setName("");
     setPassword("");
+    setShowEmailSecondStep(false);
   };
 
   const onCreateAccountClick = () => {
@@ -564,14 +434,16 @@ const AuthForm = ({
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
+    setShowEmailSecondStep(false);
   };
 
   return (
     <Row className="bg-secondary shadow border-0 auth-modal">
       {MODE === AUTH_ACTION_LABELS.SIGN_UP ? (
         <Col span={24}>
-          <Row>
-            <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} />
+          <div className={!isOnboardingForm ? "display-flex" : "onboarding-auth-from-wrapper"}>
+            {!isOnboardingForm && <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} />}
+
             <Col span={11} className="signup-modal-section-wrapper signup-form-wrapper">
               <Typography.Text type="primary" className="text-bold w-full header">
                 Create your Requestly account
@@ -583,14 +455,41 @@ const AuthForm = ({
                   Sign in
                 </RQButton>
               </Row>
-
               <Row className="auth-wrapper mt-1">
-                {renderNameField()}
-                {renderEmailField()}
-                {renderPasswordField()}
-                <FormSubmitButton />
-                <div className="auth-modal-divider w-full">or</div>
-                <SocialAuthButtons />
+                {isOnboardingForm ? (
+                  <>
+                    {showEmailSecondStep ? (
+                      <>{renderEmailAuthSecondStep()}</>
+                    ) : (
+                      <>
+                        <SocialAuthButtons />
+                        <div className="auth-modal-divider w-full" style={{ marginBottom: 0 }}>
+                          or sign up through email
+                        </div>
+                        {renderEmailField()}
+                        <RQButton
+                          type="primary"
+                          className="w-full text-bold mt-20"
+                          onClick={() => {
+                            if (isEmailValid(email)) setShowEmailSecondStep(true);
+                            else toast.error("Please enter a valid email address");
+                          }}
+                        >
+                          Continue with email
+                        </RQButton>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {renderNameField()}
+                    {renderEmailField()}
+                    {renderPasswordField()}
+                    <FormSubmitButton />
+                    <div className="auth-modal-divider w-full">or</div>
+                    <SocialAuthButtons />
+                  </>
+                )}
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
                   <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
@@ -604,7 +503,7 @@ const AuthForm = ({
                 </Typography.Text>
               </Row>
             </Col>
-          </Row>
+          </div>
         </Col>
       ) : MODE === AUTH_ACTION_LABELS.LOG_IN ? (
         <Col span={24} className="login-modal-wrapper">
@@ -618,11 +517,34 @@ const AuthForm = ({
             </RQButton>
           </Row>
           <Row className="auth-wrapper mt-1">
-            <SocialAuthButtons />
-            <div className="auth-modal-divider w-full mb-0">or</div>
-            {renderEmailField()}
-            {renderPasswordField()}
-            <FormSubmitButton />
+            {showEmailSecondStep ? (
+              <>{renderEmailAuthSecondStep()}</>
+            ) : (
+              <>
+                <SocialAuthButtons />
+                <div className="auth-modal-divider w-full mb-0" style={{ marginBottom: "-20px" }}>
+                  or sign in with email
+                </div>
+                {renderEmailField()}
+                {!isOnboardingForm ? (
+                  <>
+                    {renderPasswordField()}
+                    <FormSubmitButton />
+                  </>
+                ) : (
+                  <RQButton
+                    type="primary"
+                    className="w-full text-bold mt-20"
+                    onClick={() => {
+                      if (isEmailValid(email)) setShowEmailSecondStep(true);
+                      else toast.error("Please enter a valid email address");
+                    }}
+                  >
+                    Continue with email
+                  </RQButton>
+                )}
+              </>
+            )}
           </Row>
         </Col>
       ) : (
@@ -634,10 +556,19 @@ const AuthForm = ({
             <InfoMessage />
           </Row>
           <Row className="auth-wrapper mt-1">
-            {renderEmailField()}
+            {!path.includes(PATHS.AUTH.RESET_PASSWORD.RELATIVE) && (
+              <>
+                <BackButton
+                  action={() => {
+                    SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
+                    setEmail("");
+                  }}
+                />
+              </>
+            )}
+            <div className="w-full mt-20">{renderEmailField()}</div>
             {renderPasswordField()}
             <FormSubmitButton />
-            <BackToLogin />
           </Row>
         </Col>
       )}
