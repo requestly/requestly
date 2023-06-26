@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getUserAuthDetails, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
@@ -15,7 +15,6 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 

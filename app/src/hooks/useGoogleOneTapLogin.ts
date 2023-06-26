@@ -21,20 +21,6 @@ interface CredentialResponse {
   client_id: string;
 }
 
-// interface IdConfiguration {
-//   client_id: string;
-//   auto_select?: boolean;
-//   callback?: (response: CredentialResponse) => any;
-//   native_callback?: (response: CredentialResponse) => any;
-//   cancel_on_tap_outside?: boolean;
-//   prompt_parent_id?: string;
-//   nonce?: string;
-//   context?: string;
-//   state_cookie_domain?: string;
-//   allowed_parent_origin?: string;
-//   intermediate_iframe_close_callback?: string;
-// }
-
 export const useGoogleOneTapLogin = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [loggedInUsingOneTap, setIsLoggedInUsingOneTap] = useState<boolean>(false);
@@ -58,7 +44,6 @@ export const useGoogleOneTapLogin = () => {
   }, [user?.loggedIn]);
 
   const listener = useEffect(() => {
-    console.log("PROMPT");
     if (script === "ready" && !config.disabled) {
       window.google.accounts.id.initialize({ ...config });
       window.google.accounts.id.prompt((notification: any) => {
