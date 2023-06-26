@@ -366,5 +366,5 @@ RQ.Utils.getAllSupportedWebURLs = () => {
 };
 
 RQ.Utils.isAppURL = (url) => {
-  return RQ.Utils.getAllSupportedWebURLs().some((webURL) => webURL.includes(url));
+  return RQ.Utils.getAllSupportedWebURLs().some((webURL) => url.includes(webURL));
 };
