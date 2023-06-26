@@ -4,15 +4,14 @@
 
 .btn-default.ant-btn-default {
   color: var(--white);
-  border: 1px solid var(--border);
-  background-color: var(--component-background);
+  border: none !important;
 }
 
 .btn-default.ant-btn-default:hover,
 .btn-default.ant-btn-default:focus {
+  box-shadow: none;
   color: var(--white);
-  border: 1px solid #5f6164;
-  background-color: var(--component-background);
+  background-color: var(--hover-color);
 }
 
 .btn-icon-only.ant-btn {

@@ -85,7 +85,7 @@ const WorkSpaceDropDown = ({ menu }) => {
     >
       <div className="cursor-pointer items-center">
         <Avatar
-          size={28}
+          size={26}
           shape="square"
           icon={getWorkspaceIcon(activeWorkspaceName)}
           className="workspace-avatar"
@@ -103,7 +103,7 @@ const WorkSpaceDropDown = ({ menu }) => {
           title={prettifyWorkspaceName(activeWorkspaceName)}
           placement={"bottomRight"}
           showArrow={false}
-          mouseEnterDelay={1}
+          mouseEnterDelay={2}
         >
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
