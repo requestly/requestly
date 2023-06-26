@@ -21,6 +21,7 @@ import {
   trackSystemWideConnected,
   trackAppSetupInstructionsViewed,
   trackConnectAppsModalClosed,
+  trackConnectAppsViewed,
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
@@ -54,6 +55,10 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const getAppName = (appId) => appsListRef.current[appId]?.name;
   const getAppCount = useCallback(() => getConnectedAppsCount(appsListArray), [appsListArray]);
   const getAppType = (appId) => appsListRef.current[appId]?.type;
+
+  useEffect(() => {
+    trackConnectAppsViewed(props.source);
+  }, [props.source]);
 
   useEffect(() => {
     appsListRef.current = appsList;

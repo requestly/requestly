@@ -34,9 +34,10 @@ import {
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
 import { createLogsHar } from "../TrafficExporter/harLogs/converter";
-import { STATUS_CODE_ONLY_OPTIONS } from "config/constants/sub/statusCode";
-import { CONTENT_TYPE_OPTIONS } from "config/constants/sub/contentType";
+import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
+import { doesStatusCodeMatchLabels } from "./utils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -203,8 +204,9 @@ const CurrentTrafficTable = ({
   }, [isStaticPreview]);
 
   const activeFiltersCount = useMemo(
-    () => [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.contentType].length,
-    [trafficTableFilters.method, trafficTableFilters.contentType, trafficTableFilters.statusCode]
+    () =>
+      [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.resourceType].length,
+    [trafficTableFilters.method, trafficTableFilters.resourceType, trafficTableFilters.statusCode]
   );
 
   const filterLog = useCallback(
@@ -234,13 +236,13 @@ const CurrentTrafficTable = ({
 
       if (
         trafficTableFilters.statusCode.length > 0 &&
-        !trafficTableFilters.statusCode.includes(log?.response?.statusCode?.toString())
+        !doesStatusCodeMatchLabels(log?.response?.statusCode, trafficTableFilters.statusCode)
       ) {
         return false;
       }
       if (
-        trafficTableFilters.contentType.length > 0 &&
-        !trafficTableFilters.contentType.includes(log?.response?.contentType)
+        trafficTableFilters.resourceType.length > 0 &&
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, trafficTableFilters.resourceType)
       ) {
         return false;
       }
@@ -272,7 +274,7 @@ const CurrentTrafficTable = ({
       trafficTableFilters.app,
       trafficTableFilters.domain,
       trafficTableFilters.method,
-      trafficTableFilters.contentType,
+      trafficTableFilters.resourceType,
       trafficTableFilters.search.regex,
       trafficTableFilters.search.term,
       trafficTableFilters.statusCode,
@@ -561,7 +563,7 @@ const CurrentTrafficTable = ({
                     filterId="filter-status-code"
                     filterLabel="Status code"
                     filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_ONLY_OPTIONS}
+                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
                     value={trafficTableFilters.statusCode}
                     handleFilterChange={(options) => {
                       dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
@@ -570,13 +572,13 @@ const CurrentTrafficTable = ({
                   />
                   <LogFilter
                     filterId="filter-resource-type"
-                    filterLabel="Content type"
-                    filterPlaceholder="Filter by content type"
-                    options={CONTENT_TYPE_OPTIONS}
-                    value={trafficTableFilters.contentType}
+                    filterLabel="Resource type"
+                    filterPlaceholder="Filter by resource type"
+                    options={RESOURCE_FILTER_OPTIONS}
+                    value={trafficTableFilters.resourceType}
                     handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ contentType: options }));
-                      trackTrafficTableFilterApplied("content_type", options, options?.length);
+                      dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
                     }}
                   />
                 </section>

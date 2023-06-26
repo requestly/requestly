@@ -1,0 +1,65 @@
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal,
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal .ant-modal-content {
+  width: 100%;
+  height: 100%;
+}
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal .ant-modal-content .ant-modal-body {
+  padding: 0;
+  height: 100%;
+}
+
+.onboarding-workspace-modal-wrapper .workspace-onboarding-modal.ant-modal {
+  max-width: none;
+}
+
+.onboarding-content-wrapper {
+  height: calc(100% - 56px);
+  display: flex;
+}
+
+.onboarding-content-banner,
+.onboarding-action-component {
+  flex: 1;
+  height: 100%;
+  padding: 0 16px;
+}
+.onboarding-action-component {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #19191d;
+}
+.onboarding-content-banner {
+  background: var(--body-background);
+  position: relative;
+  padding: 40px 60px;
+}
+.onboarding-content-banner .onboarding-banner-title {
+  font-size: 36px;
+  color: var(--white);
+  font-weight: 500;
+  line-height: 56px;
+  max-width: 580px;
+}
+/* AUTH BANNER */
+.onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper.signup-modal-hero {
+  max-width: none;
+}
+.onboarding-content-banner .ant-col.ant-col-13.signup-modal-section-wrapper {
+  width: 100%;
+  padding: 0;
+}
+.onboarding-action-component .auth-modal {
+  width: 420px;
+  min-width: 420px;
+}
+.onboarding-action-component .auth-modal .login-modal-wrapper {
+  padding: 0;
+}
+
+.onboarding-action-component .auth-modal .ant-col .onboarding-auth-from-wrapper .signup-form-wrapper {
+  width: 420px;
+  max-width: none;
+  padding: 0;
+  background: none;
+}

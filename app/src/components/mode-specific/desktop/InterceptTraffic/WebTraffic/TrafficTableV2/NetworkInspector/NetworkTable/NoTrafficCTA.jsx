@@ -39,7 +39,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         actions.toggleActiveModal({
           modalName: "connectedAppsModal",
           newValue: true,
-          newProps: props,
+          newProps: { ...props, source: "traffic_table" },
         })
       );
       trackConnectAppsClicked("traffic_table");
@@ -108,7 +108,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       trafficTableFilters.search.term.length ||
       Object.values({
         ...trafficTableFilters.method,
-        ...trafficTableFilters.contentType,
+        ...trafficTableFilters.resourceType,
         ...trafficTableFilters.statusCode,
       }).some((prop) => prop.length > 0)
     ) {
