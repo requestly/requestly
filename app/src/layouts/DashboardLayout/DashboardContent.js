@@ -115,8 +115,6 @@ const DashboardContent = () => {
           open={activeModals.extensionModal.isActive}
           onCancel={() => toggleExtensionModal()}
           eventPage="dashboard_content"
-          heading="Browser Extension Required"
-          subHeading="Please install Requestly Browser Extension to use Marketplace Rules and start intercepting HTTP requests"
           {...activeModals.extensionModal.props}
         />
       ) : null}
