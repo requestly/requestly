@@ -5,6 +5,7 @@ import UAParser from "ua-parser-js";
 import { supportedBrowserExtensions } from "./supportedBrowserExtensions";
 import LINKS from "config/constants/sub/links";
 import APP_CONSTANTS from "../../../config/constants";
+import { InstallExtensionContent } from "./type";
 import {
   trackViewAllPlatformsClicked,
   trackExtensionInstallationButtonClicked,
@@ -13,15 +14,17 @@ import "./installExtensionCTA.css";
 
 const { Link: AntLink, Text } = Typography;
 
-const InstallExtensionCTA = ({
-  heading,
+const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   eventPage,
-  subHeading,
   supportedBrowsers = null,
   isUpdateRequired = false,
+  heading = "Install Browser extension to start modifying network requests",
+  subHeading = "Requestly lets developers Modify Headers, Redirect URLs, Switch Hosts, Delay Network requests easily. Private and secure, works locally on your browser.",
 }) => {
-  const [browser, setBrowser] = useState();
   const [reloadPage, setReloadPage] = useState(false);
+  const [browser, setBrowser] = useState<
+    { downloadURL: string; name: string; iconURL: string; alt: string } | undefined
+  >();
 
   useEffect(() => {
     const parser = new UAParser();
@@ -31,6 +34,7 @@ const InstallExtensionCTA = ({
     let currentBrowserData;
 
     supportedBrowserExtensions.forEach((extensionData) => {
+      // @ts-ignore
       if (!supportedBrowsers || supportedBrowsers.includes(extensionData.name)) {
         if (extensionData.name === browserDetected) {
           currentBrowserData = extensionData;
@@ -68,7 +72,7 @@ const InstallExtensionCTA = ({
           </Space>
         </a>
       ) : (
-        <h4>Current Browser is not supported</h4>
+        <h4 className="browser-not-supported-msg">Current Browser is not supported</h4>
       )}
 
       <a
@@ -88,7 +92,7 @@ const InstallExtensionCTA = ({
       )}
 
       {browser && !isUpdateRequired ? (
-        <Row style={{ textAlign: "center" }} align="center">
+        <Row style={{ textAlign: "center" }}>
           <Alert
             message={
               <p style={{ marginBottom: "0px" }}>

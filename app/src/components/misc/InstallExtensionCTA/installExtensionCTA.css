@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin: 3.25rem auto;
+  padding: 3.25rem;
 }
 
 .install-extension-container .heading {
@@ -14,13 +14,13 @@
   font-weight: 600;
   line-height: 3.75rem;
   margin-bottom: 17px;
-  max-width: 33ch;
+  max-width: 36ch;
 }
 
 .install-extension-container .sub-heading {
   text-align: center;
   font-size: 1.125rem;
-  max-width: 66ch;
+  max-width: 71ch;
   line-height: 31px;
   color: var(--gray-light);
   margin-bottom: 2.875rem;
@@ -49,4 +49,8 @@
 
 .install-extension-container .view-all-platforms-link:hover {
   text-decoration: underline;
+}
+
+.browser-not-supported-msg {
+  font-size: 1.5rem;
 }
