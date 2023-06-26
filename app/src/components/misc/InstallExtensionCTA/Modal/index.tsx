@@ -1,15 +1,16 @@
 import React from "react";
 import { ModalProps } from "antd";
 import { RQModal } from "lib/design-system/components";
-import ExtensionDeactivationMessage from "../ExtensionDeactivationMessage";
-import InstallExtensionCTA from "./index";
-import { InstallExtensionCTA as InstallExtensionCTAInterface } from "./type";
+import ExtensionDeactivationMessage from "../../ExtensionDeactivationMessage";
+import InstallExtensionCTA from "../index";
+import { InstallExtensionContent } from "../type";
+import "./installExtensionModal.css";
 
-interface Props extends ModalProps, InstallExtensionCTAInterface {
+interface Props extends ModalProps, InstallExtensionContent {
   /**
    * If true then modal will render <ExtensionDeactivationMessage/> component
    */
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const InstallExtensionModal: React.FC<Props> = ({
@@ -18,13 +19,18 @@ const InstallExtensionModal: React.FC<Props> = ({
   heading,
   subHeading,
   eventPage,
-  width = "70%",
+  disabled = false,
   ...props
 }) => {
-  const { disabled = false } = props;
-
   return (
-    <RQModal centered open={open} maskClosable={false} onCancel={onCancel} width={width}>
+    <RQModal
+      centered
+      open={open}
+      maskClosable={false}
+      onCancel={onCancel}
+      width={"995px"}
+      className="install-extension-modal-container"
+    >
       {disabled ? (
         <ExtensionDeactivationMessage />
       ) : (
