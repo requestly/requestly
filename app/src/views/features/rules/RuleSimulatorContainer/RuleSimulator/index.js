@@ -249,7 +249,7 @@ const RuleSimulator = () => {
             <Col span={2}>
               <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                 <Tooltip placement="bottomLeft" title={"Test this rule"}>
-                  <Button type="secondary" onClick={doSimulate}>
+                  <Button type="default" onClick={doSimulate}>
                     Test rule
                   </Button>
                 </Tooltip>

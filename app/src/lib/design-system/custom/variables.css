@@ -11,6 +11,7 @@
   --danger-rgb: 252, 95, 95;
   --success: #069d4f;
   --primary: #1e69ff;
+  --link-color: #3ba0ff;
   --background: #141414;
   --background-dark: #1c1d21;
   --body-background: #212121;
@@ -19,7 +20,7 @@
   --component-dark-background: var(--body-background);
   --input-background: #2b2b2b;
   --component-header-background: #2d2d2d;
-  --hover-color: #3c3d42;
+  --hover-color: #3b3b3b74;
   --dropdown-active-border-color: #0361ff;
   --input-hover-border-color: #2051b4;
   --input-focus-border-color: #1e69ff;
