@@ -3,6 +3,7 @@ import { useScript } from "./useScript";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
+import { trackOneTapPromptVisible } from "modules/analytics/events/common/auth/oneTapPrompt";
 
 //google signIn client libary for fetching user cred
 const googleSignInScriptURL: string = "https://accounts.google.com/gsi/client";
@@ -60,7 +61,11 @@ export const useGoogleOneTapLogin = () => {
     console.log("PROMPT");
     if (script === "ready" && !config.disabled) {
       window.google.accounts.id.initialize({ ...config });
-      window.google.accounts.id.prompt();
+      window.google.accounts.id.prompt((notification: any) => {
+        if (notification.isDisplayed()) {
+          trackOneTapPromptVisible();
+        }
+      });
     }
   }, [script, config]);
 
