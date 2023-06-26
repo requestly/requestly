@@ -42,7 +42,7 @@
 
 .header-left-section a:hover {
   color: var(--white);
-  background-color: var(--hover-background-color);
+  background-color: var(--hover-color);
 }
 
 .header-left-section .desktop-app-promo-btn.ant-btn {
@@ -52,7 +52,7 @@
 
 .header-left-section .desktop-app-promo-btn.ant-btn:hover {
   transition: none;
-  background-color: var(--hover-background-color);
+  background-color: var(--hover-color);
 }
 
 .header-middle-section {

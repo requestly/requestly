@@ -5,7 +5,7 @@
 }
 
 .workspace-selector-dropdown:hover {
-  background-color: var(--hover-background-color);
+  background-color: var(--hover-color);
 }
 
 .workspace-selector-dropdown .workspace-avatar.ant-avatar {
