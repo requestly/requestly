@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Row, Col, Button, Space, Typography } from "antd";
+import { Row, Space, Typography } from "antd";
 import { Alert } from "antd";
 import UAParser from "ua-parser-js";
 import { supportedBrowserExtensions } from "./supportedBrowserExtensions";
 import LINKS from "config/constants/sub/links";
 import APP_CONSTANTS from "../../../config/constants";
 import {
-  trackExtensionInstallationButtonClicked,
   trackViewAllPlatformsClicked,
+  trackExtensionInstallationButtonClicked,
 } from "modules/analytics/events/common/onboarding/index";
 import "./installExtensionCTA.css";
 
 const { Link: AntLink, Text } = Typography;
-const { PATHS } = APP_CONSTANTS;
 
 const InstallExtensionCTA = ({
   heading,
@@ -22,10 +20,7 @@ const InstallExtensionCTA = ({
   supportedBrowsers = null,
   isUpdateRequired = false,
 }) => {
-  const navigate = useNavigate();
-
   const [browser, setBrowser] = useState();
-  const [otherBrowsers, setOtherBrowsers] = useState([]);
   const [reloadPage, setReloadPage] = useState(false);
 
   useEffect(() => {
@@ -33,21 +28,17 @@ const InstallExtensionCTA = ({
     parser.setUA(window.navigator.userAgent);
     const result = parser.getResult();
     const browserDetected = result.browser.name;
-    let currentBrowserData,
-      otherBrowsersArray = [];
+    let currentBrowserData;
 
     supportedBrowserExtensions.forEach((extensionData) => {
       if (!supportedBrowsers || supportedBrowsers.includes(extensionData.name)) {
         if (extensionData.name === browserDetected) {
           currentBrowserData = extensionData;
-        } else {
-          otherBrowsersArray.push(extensionData);
         }
       }
     });
 
     setBrowser(currentBrowserData);
-    setOtherBrowsers(otherBrowsersArray);
   }, [supportedBrowsers]);
 
   const handleDownloadExtensionClick = () => {
