@@ -1101,6 +1101,7 @@ const RulesTable = ({
     <>
       <ProTable
         scroll={{ x: 900 }}
+        className="records-table"
         locale={{
           emptyText: searchValue ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found with given name" />
@@ -1334,7 +1335,7 @@ const RulesTable = ({
                             source={authSource}
                           >
                             <Button
-                              type={type}
+                              type={type || "default"}
                               shape={isScreenSmall ? shape : null}
                               onClick={() => {
                                 trackClickEvent();

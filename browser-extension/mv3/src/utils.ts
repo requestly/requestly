@@ -23,7 +23,7 @@ export const getAllSupportedWebURLs = () => {
 };
 
 export const isAppURL = (url: string) => {
-  return getAllSupportedWebURLs().some((webURL) => webURL.includes(url));
+  return getAllSupportedWebURLs().some((webURL) => url.includes(webURL));
 };
 
 export const isBlacklistedURL = (url: string): boolean => {

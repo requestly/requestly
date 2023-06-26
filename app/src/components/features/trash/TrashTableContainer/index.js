@@ -234,6 +234,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
           dateFormatter={false}
           columns={columns}
           rowSelection={rowSelection}
+          className="records-table"
           tableAlertRender={(_) => {
             return (
               <span>{`${_.selectedRowKeys.length} ${_.selectedRowKeys.length > 1 ? "Rules" : "Rule"} selected`}</span>

@@ -61,8 +61,6 @@ button.ant-input-search-button {
 
 /* spinner & skeleton */
 .spinner-card {
-  /* 64px is height of header */
-  height: calc(100vh - 64px);
   padding: 24px;
   display: flex;
   align-items: center;
@@ -627,4 +625,18 @@ div.react-multi-email .multi-email-tag {
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
   background-color: var(--component-background);
+}
+
+.records-table.ant-pro-table .ant-table-tbody tr td a:hover,
+.records-table.ant-pro-table .ant-table-tbody tr td a span:hover,
+.records-table.ant-table-wrapper .ant-table-tbody tr td a:hover {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.ant-btn.ant-btn-default:focus,
+.ant-btn.ant-btn-default:hover {
+  color: var(--white);
+  border: 1px solid #343434;
+  background-color: var(--hover-color);
 }
