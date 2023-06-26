@@ -1,13 +1,11 @@
-.ant-dropdown-menu
-  .ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item {
+.ant-dropdown-menu .ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item {
   display: flex;
   align-items: center;
   margin: 0 8px;
   padding: 10px 8px;
 }
 
-.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item
-  .rule-type-icon {
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item .rule-type-icon {
   padding: 1px;
 }
 
@@ -39,7 +37,7 @@
 }
 
 .rule-name-col a span {
-  color: var(--link);
+  color: var(--link-color);
   transition: color 0.1s;
   display: inline-flex;
   align-items: center;

@@ -24,32 +24,35 @@
 }
 
 .header-left-section {
+  height: 3rem;
   display: flex;
   align-items: center;
-  column-gap: 1.4rem;
-  height: 3rem;
+  column-gap: 2px;
 }
 
 .header-left-section a {
-  font-size: 13px;
-  text-align: left;
-  color: var(--white);
+  height: 30px;
   flex-shrink: 0;
+  font-size: 13px;
+  line-height: 22px;
+  padding: 4px 11px;
+  color: var(--white);
+  border-radius: var(--border-radius-sm);
 }
 
-.header-left-section a:hover,
-.header-left-section a:focus {
-  opacity: 0.7;
+.header-left-section a:hover {
   color: var(--white);
+  background-color: var(--hover-color);
 }
 
 .header-left-section .desktop-app-promo-btn.ant-btn {
-  padding: 0;
+  padding: 4px 11px;
   background-color: transparent;
 }
 
 .header-left-section .desktop-app-promo-btn.ant-btn:hover {
-  opacity: 0.7;
+  transition: none;
+  background-color: var(--hover-color);
 }
 
 .header-middle-section {
