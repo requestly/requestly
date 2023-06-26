@@ -301,61 +301,10 @@ export function resetPassword(oobCode, password) {
     });
 }
 
-// export const handleOnetapSignIn = async ({ credential }) => {
-//   const auth = getAuth(firebaseApp);
-//   const OAuthCredential = GoogleAuthProvider.credential(credential);
-//   console.log("OAuthCredential", OAuthCredential);
-
-//   await signInWithCredential(auth, OAuthCredential)
-//     .then((result) => {
-//       let uid = result?.user?.uid || null;
-//       let email = result?.user?.email || null;
-//       let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
-//       if (is_new_user) {
-//         console.log("t", { is_new_user });
-//         trackSignUpAttemptedEvent({
-//           auth_provider: AUTH_PROVIDERS.GMAIL,
-//           source: "one_tap_prompt",
-//         });
-//         trackSignupSuccessEvent({
-//           auth_provider: AUTH_PROVIDERS.GMAIL,
-//           email,
-//           uid,
-//           email_type: getEmailType(email),
-//           domain: email.split("@")[1],
-//           source: "one_tap_prompt",
-//         });
-//         return { is_new_user };
-//       } else {
-//         trackLoginAttemptedEvent({
-//           auth_provider: AUTH_PROVIDERS.GMAIL,
-//           source: "one_tap_prompt",
-//         });
-//         trackLoginSuccessEvent({
-//           auth_provider: AUTH_PROVIDERS.GMAIL,
-//           uid,
-//           email,
-//           email_type: getEmailType(email),
-//           domain: email.split("@")[1],
-//           source: "one_tap_prompt",
-//         });
-//       }
-//     })
-//     .catch((err) => {
-//       trackLoginFailedEvent({
-//         auth_provider: AUTH_PROVIDERS.GMAIL,
-//         error_message: err.message,
-//         source: "one_tap_prompt",
-//       });
-//       throw err;
-//     });
-// };
-
 export const handleOnetapSignIn = async ({ credential }) => {
   try {
     const auth = getAuth(firebaseApp);
     const OAuthCredential = GoogleAuthProvider.credential(credential);
-    console.log("OAuthCredential", OAuthCredential);
 
     const result = await signInWithCredential(auth, OAuthCredential);
     const uid = result?.user?.uid || null;
@@ -399,7 +348,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
       error_message: err.message,
       source: "one_tap_prompt",
     });
-    throw err; // Rethrow the error to handle it outside the function if needed
+    throw err;
   }
 };
 
@@ -410,7 +359,6 @@ export async function googleSignIn(callback, MODE, source) {
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
     .then((result) => {
-      console.log("OLD", { result });
       let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
       let uid = result?.user?.uid || null;
       let email = result?.user?.email || null;
