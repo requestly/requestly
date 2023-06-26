@@ -1335,7 +1335,7 @@ const RulesTable = ({
                             source={authSource}
                           >
                             <Button
-                              type={type}
+                              type={type || "default"}
                               shape={isScreenSmall ? shape : null}
                               onClick={() => {
                                 trackClickEvent();

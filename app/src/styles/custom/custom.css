@@ -633,3 +633,10 @@ div.react-multi-email .multi-email-tag {
   color: var(--link-color);
   text-decoration: underline;
 }
+
+.ant-btn.ant-btn-default:focus,
+.ant-btn.ant-btn-default:hover {
+  color: var(--white);
+  border: 1px solid #343434;
+  background-color: var(--hover-color);
+}
