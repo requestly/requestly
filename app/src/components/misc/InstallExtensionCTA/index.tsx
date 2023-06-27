@@ -23,7 +23,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   heading = HEADING,
   subHeading = SUBHEADING,
 }) => {
-  const [reloadPage, setReloadPage] = useState(false);
+  const [isReloadPagePromptVisible, setIsReloadPagePromptVisible] = useState(false);
   const [browser, setBrowser] = useState<
     { downloadURL: string; name: string; iconURL: string; alt: string } | undefined
   >();
@@ -48,7 +48,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   }, [supportedBrowsers]);
 
   const handleDownloadExtensionClick = () => {
-    setReloadPage(true);
+    setIsReloadPagePromptVisible(true);
     trackExtensionInstallationButtonClicked(eventPage);
   };
 
@@ -61,7 +61,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
       {browser ? (
         <a
           rel="noreferrer"
-          target={"_blank"}
+          target="_blank"
           href={browser.downloadURL}
           className="install-extension-link"
           onClick={handleDownloadExtensionClick}
@@ -87,7 +87,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
         All other platforms/browsers
       </a>
 
-      {reloadPage && (
+      {isReloadPagePromptVisible && (
         <p style={{ marginTop: "20px" }}>
           <Typography.Text keyboard>
             NOTE: After installation, please reload this page to use the feature.
