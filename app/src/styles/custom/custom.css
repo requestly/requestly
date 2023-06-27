@@ -634,8 +634,8 @@ div.react-multi-email .multi-email-tag {
   text-decoration: underline;
 }
 
-.ant-btn.ant-btn-default:focus,
-.ant-btn.ant-btn-default:hover {
+.ant-btn.ant-btn-default:focus:not(.ant-btn-icon-only),
+.ant-btn.ant-btn-default:hover:not(.ant-btn-icon-only) {
   color: var(--white);
   border: 1px solid #343434;
   background-color: var(--hover-color);
