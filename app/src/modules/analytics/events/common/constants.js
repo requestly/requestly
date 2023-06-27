@@ -131,6 +131,7 @@ export const GROUPS = {
 
 export const ONBOARDING = {
   INSTALL_EXTENSION_LINK_CLICKED: "install_extension_link_clicked",
+  VIEW_ALL_PLATFORMS_CLICKED: "view_all_platforms_clicked",
   SIDEBAR_CLICKED: "sidebar_clicked",
   HEADER_CLICKED: "header_clicked",
   TOPBAR_CLICKED: "topbar_clicked",
