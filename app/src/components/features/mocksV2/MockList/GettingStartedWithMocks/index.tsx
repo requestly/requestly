@@ -107,7 +107,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
                 className="upload-btn"
                 onClick={() => user?.loggedIn && handleUploadAction()}
               >
-                <span>Upload file</span>
+                <span>Upload {mockType === MockType.FILE ? "File" : "JSON"}</span>
               </RQButton>
             </AuthConfirmationPopover>
             <AuthConfirmationPopover

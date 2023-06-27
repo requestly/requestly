@@ -130,6 +130,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
               showLoader
               isHoverEffect
               placement="bottomLeft"
+              isCurrentUserAdmin={isLoggedInUserAdmin}
               isAdmin={member.isAdmin}
               isLoggedInUserAdmin={isLoggedInUserAdmin}
               inviteId={member?.inviteId}
