@@ -243,12 +243,13 @@ export const validateRule = (rule, dispatch, appMode) => {
       // graphql operation data shouldn't be empty
       else if (
         pair.response?.resourceType === ResponseRuleResourceType.GRAPHQL_API &&
-        Object.keys(pair.source?.filters?.[0]?.requestPayload ?? {}).length < 2
+        !isEmpty(pair.source?.filters?.[0]?.requestPayload) &&
+        (!pair.source.filters[0].requestPayload.key || !pair.source.filters[0].requestPayload.value)
       ) {
         output = {
           result: false,
           message: `Please enter both key and value for GraphQL operation`,
-          error: "missing source",
+          error: "incomplete source filter",
         };
       }
       //file selection shouldn't be empty
