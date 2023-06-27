@@ -3,4 +3,12 @@ export const TOUR_TYPES = {
   TRAFFIC_TABLE: "isTrafficTableTourCompleted",
   CONNECTED_APPS: "isConnectedAppsTourCompleted",
   RULE_EDITOR: "isRuleEditorTourCompleted",
+  MISCELLANEOUS: "isMiscTourCompleted",
+};
+
+export const MISC_TOURS = {
+  APP_ENGAGEMENT: {
+    FIRST_RULE: "first_rule",
+    FIFTH_RULE: "fifth_rule",
+  },
 };

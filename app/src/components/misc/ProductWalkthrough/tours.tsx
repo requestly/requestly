@@ -4,6 +4,7 @@ import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
+import { MISC_TOURS } from "./constants";
 
 const tourTooltipPresets = {
   disableBeacon: true,
@@ -324,6 +325,17 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 7,
       disableOverlayClose: false,
+    },
+  ],
+  [MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-editor-status-toggle"),
+      title: "Activate/Deactivate rule easily",
+      content: "You can switch off the rule in case the rule is not in use.",
+      placement: "bottom",
+      spotlightPadding: 0,
+      offset: 6,
     },
   ],
 };
