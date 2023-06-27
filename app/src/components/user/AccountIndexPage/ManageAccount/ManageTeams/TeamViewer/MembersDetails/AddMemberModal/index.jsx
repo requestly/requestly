@@ -95,7 +95,6 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
           </div>
           <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-          <label className="text-bold text-sm add-member-modal-email-label">Email address</label>
           <ReactMultiEmail
             className="members-email-input"
             placeholder="Email Address"

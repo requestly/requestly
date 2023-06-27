@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Modal } from "antd";
+import { Button, Col, Modal, Row, Space, Typography } from "antd";
 import { StorageService } from "../../../../init";
 import { getAppMode, getGroupwiseRulesToPopulate, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
@@ -149,38 +149,31 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
   if (!groupData) return null;
 
   return (
-    <Modal
-      className="modal-dialog-centered modal-danger"
-      open={isOpen}
-      contentClassName="bg-gradient-danger bg-gradient-blue"
-      title="Delete Group"
-      confirmLoading={loadingSomething}
-      onCancel={toggle}
-      footer={null}
-    >
-      <div className="modal-body">
-        <div className="py-3 text-center">
-          <h3 className="heading">This group contains one or more rules</h3>
-        </div>
-      </div>
+    <Modal open={isOpen} title="Delete Group" confirmLoading={loadingSomething} onCancel={toggle} footer={null}>
+      <Row>
+        <Col>
+          <Typography.Title level={5}>This group contains one or more rules</Typography.Title>
+        </Col>
+      </Row>
       <br />
-      <div className="modal-footer" style={{ textAlign: "right" }}>
-        <Button
-          style={{ marginRight: "1rem" }}
-          className="btn-white ml-auto"
-          color="link"
-          type="danger"
-          key="back"
-          onClick={deleteRulesAndThenGroup}
-          loading={loadingSomething}
-          icon={<DeleteOutlined />}
-        >
-          Delete rules
-        </Button>
-        <Button type="default" data-dismiss="modal" key="submit" loading={loadingSomething} onClick={moveToUngrouped}>
-          Keep the rules
-        </Button>
-      </div>
+      <Row>
+        <Col span={24} align="end">
+          <Space>
+            <Button
+              color="secondary"
+              data-dismiss="modal"
+              type="button"
+              onClick={moveToUngrouped}
+              loading={loadingSomething}
+            >
+              Keep the rules
+            </Button>
+            <Button type="danger" loading={loadingSomething} data-dismiss="modal" onClick={deleteRulesAndThenGroup}>
+              <DeleteOutlined /> Delete rules
+            </Button>
+          </Space>
+        </Col>
+      </Row>
     </Modal>
   );
 };
