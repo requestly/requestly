@@ -4,7 +4,8 @@
 
 .btn-default.ant-btn-default {
   color: var(--white);
-  border: none !important;
+  border: 1px solid var(--border);
+  background-color: var(--component-background);
 }
 
 .btn-default.ant-btn-default:hover,
