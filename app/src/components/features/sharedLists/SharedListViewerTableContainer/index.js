@@ -77,7 +77,9 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
         actions.toggleActiveModal({
           modalName: "extensionModal",
           newValue: true,
-          newProps: {},
+          newProps: {
+            eventPage: "shared_list",
+          },
         })
       );
       trackSharedListImportFailed(id);

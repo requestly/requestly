@@ -1,10 +1,9 @@
 import { CheckOutlined, YoutubeFilled } from "@ant-design/icons";
-import { Button, Divider, Typography, Modal } from "antd";
+import { Button, Divider, Typography } from "antd";
 import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import TutorialButton from "./TutorialButton";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import InstallExtensionCTA from "../../../../../components/misc/InstallExtensionCTA";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { getUserAuthDetails } from "store/selectors";
 import { AUTH } from "modules/analytics/events/common/constants.js";
@@ -12,6 +11,8 @@ import { trackInstallExtensionDialogShown } from "modules/analytics/events/featu
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
+
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   return (
     <div>
@@ -138,22 +139,14 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
           <CheckItem label="Strict Privacy" />
         </div>
       </Typography.Text>
-      <Modal
+
+      <InstallExtensionModal
         open={isInstallExtensionModalVisible}
-        width="60%"
-        bodyStyle={{ padding: 12 }}
-        maskClosable={false}
-        footer={null}
         onCancel={closeModal}
-      >
-        <InstallExtensionCTA
-          heading={""}
-          subHeadingExtension={"Auto-record debugging sessions"}
-          supportsMobileDevice={false}
-          hasBorder={false}
-          eventPage="session_recording_page"
-        />
-      </Modal>
+        heading="Install Browser extension to record sessions for faster debugging and bug reporting"
+        subHeading="Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser."
+        eventPage="session_recording_page"
+      />
     </div>
   );
 };
