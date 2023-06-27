@@ -101,13 +101,14 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
             message={
               <p style={{ marginBottom: "0px" }}>
                 Already installed the extension and still seeing this message? Read our{" "}
-                <Typography.Link
+                <a
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noreferrer"
+                  className="troubleshooting-guide-link"
                   href={APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING}
                 >
                   Troubleshooting guide
-                </Typography.Link>
+                </a>
               </p>
             }
             type="info"
