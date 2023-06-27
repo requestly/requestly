@@ -6,6 +6,7 @@ import APP_CONSTANTS from "../../../../../config/constants";
 import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-rules-pairs";
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
+import { runRuleMigrations } from "utils/rules/migrateHeaderRulesToV2";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -89,11 +90,9 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
   });
 };
 
-// maybe here
-
 export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
-  const rules = data.rules.filter((object) => isObjectValid(object));
+  const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
 
   // setNewCreationDate(rules);
