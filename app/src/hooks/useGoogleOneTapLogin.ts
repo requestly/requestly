@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useScript } from "./useScript";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
 import { trackOneTapPromptVisible } from "modules/analytics/events/common/auth/oneTapPrompt";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 //google signIn client libary for fetching user cred
 const googleSignInScriptURL: string = "https://accounts.google.com/gsi/client";
@@ -26,6 +28,7 @@ export const useGoogleOneTapLogin = () => {
   const [loggedInUsingOneTap, setIsLoggedInUsingOneTap] = useState<boolean>(false);
   const script = useScript(googleSignInScriptURL);
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
 
   const handleSignIn = async (credential: CredentialResponse) => {
     handleOnetapSignIn(credential).then((res) => {
@@ -39,11 +42,11 @@ export const useGoogleOneTapLogin = () => {
       client_id: window.location.host.includes("app.requestly.io")
         ? "911299702852-u365fa2rdf8g64q144gtccna87rmd8ji.apps.googleusercontent.com"
         : "553216647714-b34rhgl06o7vokpebigjttrgebmm495h.apps.googleusercontent.com",
-      disabled: user?.loggedIn,
+      disabled: user?.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       prompt_parent_id: "one-tap-container",
       callback: handleSignIn,
     };
-  }, [user?.loggedIn]);
+  }, [user?.loggedIn, appMode]);
 
   const listener = useEffect(() => {
     if (script === "ready" && !config.disabled) {
