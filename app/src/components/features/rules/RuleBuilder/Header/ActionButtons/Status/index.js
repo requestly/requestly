@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { setCurrentlySelectedRule } from "../../../actions";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import APP_CONSTANTS from "../../../../../../../config/constants";
@@ -31,6 +32,7 @@ const Status = ({ location, isRuleEditorModal }) => {
   const userAttributes = useSelector(getUserAttributes);
   const appMode = useSelector(getAppMode);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
+  const groupingAndRuleActivationExp = useFeatureValue("grouping_and_rule_activation", null);
 
   const isDisabled =
     currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
@@ -101,10 +103,15 @@ const Status = ({ location, isRuleEditorModal }) => {
   }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus, planNameFromState]);
 
   useEffect(() => {
-    if (location.pathname.indexOf("create") === -1 && !userAttributes?.num_rules && !isMiscTourCompleted?.firstRule) {
+    if (
+      location.pathname.indexOf("create") === -1 &&
+      !userAttributes?.num_rules &&
+      !isMiscTourCompleted?.firstRule &&
+      groupingAndRuleActivationExp === "variant1"
+    ) {
       setStartWalkthrough(true);
     }
-  }, [location.pathname, userAttributes?.num_rules, isMiscTourCompleted?.firstRule]);
+  }, [location.pathname, userAttributes?.num_rules, isMiscTourCompleted?.firstRule, groupingAndRuleActivationExp]);
 
   const isChecked = isRuleCurrentlyActive();
 
@@ -113,7 +120,6 @@ const Status = ({ location, isRuleEditorModal }) => {
       <ProductWalkthrough
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
         startWalkthrough={startWalkthrough}
-        // context={currentlySelectedRuleData}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
         }
