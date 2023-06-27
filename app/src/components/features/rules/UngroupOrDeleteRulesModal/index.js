@@ -155,6 +155,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
           <Typography.Title level={5}>This group contains one or more rules</Typography.Title>
         </Col>
       </Row>
+      <br />
       <Row>
         <Col span={24} align="end">
           <Space>
