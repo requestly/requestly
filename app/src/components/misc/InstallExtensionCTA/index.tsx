@@ -12,14 +12,16 @@ import {
 } from "modules/analytics/events/common/onboarding/index";
 import "./installExtensionCTA.css";
 
-const { Link: AntLink, Text } = Typography;
+const HEADING = "Install Browser extension to start modifying network requests";
+const SUBHEADING =
+  "Requestly lets developers Modify Headers, Redirect URLs, Switch Hosts, Delay Network requests easily. Private and secure, works locally on your browser.";
 
 const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   eventPage,
   supportedBrowsers = null,
   isUpdateRequired = false,
-  heading = "Install Browser extension to start modifying network requests",
-  subHeading = "Requestly lets developers Modify Headers, Redirect URLs, Switch Hosts, Delay Network requests easily. Private and secure, works locally on your browser.",
+  heading = HEADING,
+  subHeading = SUBHEADING,
 }) => {
   const [reloadPage, setReloadPage] = useState(false);
   const [browser, setBrowser] = useState<
@@ -87,7 +89,9 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
 
       {reloadPage && (
         <p style={{ marginTop: "20px" }}>
-          <Text keyboard>NOTE: After installation, please reload this page to use the feature.</Text>
+          <Typography.Text keyboard>
+            NOTE: After installation, please reload this page to use the feature.
+          </Typography.Text>
         </p>
       )}
 
@@ -97,13 +101,13 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
             message={
               <p style={{ marginBottom: "0px" }}>
                 Already installed the extension and still seeing this message? Read our{" "}
-                <AntLink
+                <Typography.Link
                   target="_blank"
                   rel="noopener noreferrer"
                   href={APP_CONSTANTS.LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING}
                 >
                   Troubleshooting guide
-                </AntLink>
+                </Typography.Link>
               </p>
             }
             type="info"
