@@ -1073,9 +1073,62 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
   }
 
   if (window.tabService.getData(tabId, "recordSession") === true) {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () =>
-      window.tabService.removeData(tabId, "recordSession")
-    );
+    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () => {
+      window.tabService.removeData(tabId, "recordSession");
+      const _function = (() => {
+        const body = document.body;
+        const host = document.createElement("div");
+        host.setAttribute("style", "position:absolute;z-index:10;width:100%");
+
+        const shadow = host.attachShadow({ mode: "closed" });
+
+        const container = document.createElement("div");
+        container.setAttribute("class", "container");
+        const heading = document.createElement("div");
+        heading.setAttribute("class", "heading");
+        heading.textContent = "Requestly is now recording all activity on this tab!";
+        const subtitle = document.createElement("div");
+        subtitle.setAttribute("class", "subtitle");
+        subtitle.textContent =
+          "You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.";
+
+        container.appendChild(heading);
+        container.appendChild(subtitle);
+
+        const style = document.createElement("style");
+        style.textContent = `.container{
+          background-color:#295FF6;
+          border-radius:8px;
+          padding: 16px 24px;
+          margin:16px;
+          width:30vw;
+          right:0;
+          position:absolute;
+          display:flex;
+          flex-direction:column;
+          color: #FFF;
+          font-family: Roboto;
+          font-weight: 600;
+          line-height: 150%;
+        }
+
+        .heading{
+          font-size:16px;
+        }
+
+        .subtitle{
+          font-size:13px;
+        }`;
+        shadow.appendChild(style);
+        shadow.appendChild(container);
+
+        // const body = document.body;
+        body.insertBefore(host, body.firstChild);
+        console.log("!!!debug", "shadow::", shadow);
+      }).toString();
+      console.log("!!!debug", "function::", _function);
+      chrome.tabs.executeScript(tabId, { code: `(${_function})()` });
+    });
   }
 };
 
