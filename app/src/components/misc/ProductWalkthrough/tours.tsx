@@ -313,6 +313,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Right-click to modify request, copy cURL and more. Try it now!",
       content: null,
       placement: "bottom",
+      showNext: false,
     },
   ],
   [FEATURES.CONNECTED_APPS]: [
@@ -325,6 +326,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 7,
       disableOverlayClose: false,
+      showNext: false,
     },
   ],
   [MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE]: [
@@ -336,6 +338,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 0,
       offset: 6,
+      customNextButtonText: "Got it!",
     },
   ],
   [MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE]: [
@@ -346,7 +349,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       content: "Organize your rules into logical groups and enable/disable in one go!",
       placement: "bottom",
       spotlightPadding: 0,
-      // offset: 6,
+      customNextButtonText: "Got it!",
     },
   ],
 };
