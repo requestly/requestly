@@ -31,6 +31,8 @@ import {
   getRulesSelection,
   getRulesToPopulate,
   getUserAuthDetails,
+  getUserAttributes,
+  getIsMiscTourCompleted,
 } from "store/selectors";
 import { Typography, Tag } from "antd";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -49,6 +51,7 @@ import { StorageService } from "init";
 import { toast } from "utils/Toast.js";
 import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
 import { InfoTag } from "components/misc/InfoTag";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -73,6 +76,7 @@ import RuleTypeTag from "components/common/RuleTypeTag";
 import "./rulesTable.css";
 import Logger from "lib/logger";
 import LINKS from "config/constants/sub/links";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 
 //Lodash
 const set = require("lodash/set");
@@ -143,10 +147,12 @@ const RulesTable = ({
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
+  const [startWalkthrough, setStartWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -159,6 +165,7 @@ const RulesTable = ({
   const rulesSelection = useSelector(getRulesSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const selectedRules = getSelectedRules(rulesSelection);
 
@@ -1097,8 +1104,21 @@ const RulesTable = ({
     ),
     [handleNewRuleOnClick]
   );
+
+  useEffect(() => {
+    if (!userAttributes?.num_groups && userAttributes?.num_rules === 5 && !isMiscTourCompleted?.fifthRule) {
+      setStartWalkthrough(true);
+    }
+  }, [userAttributes?.num_groups, userAttributes?.num_rules, isMiscTourCompleted?.fifthRule]);
   return (
     <>
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE}
+        startWalkthrough={startWalkthrough}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "fifthRule" }))
+        }
+      />
       <ProTable
         scroll={{ x: 900 }}
         className="records-table"
@@ -1285,6 +1305,7 @@ const RulesTable = ({
                   {
                     shape: "circle",
                     isTooltipShown: true,
+                    tourId: "rule-table-create-group-btn",
                     buttonText: "New Group",
                     icon: <GroupOutlined />,
                     onClickHandler: handleNewGroupOnClick,
@@ -1312,6 +1333,7 @@ const RulesTable = ({
                     onClickHandler,
                     isDropdown = false,
                     hasPopconfirm = false,
+                    tourId = null,
                     trackClickEvent = () => {},
                     overlay,
                   }) => (
@@ -1342,6 +1364,7 @@ const RulesTable = ({
                                 hasPopconfirm ? user?.details?.isLoggedIn && onClickHandler() : onClickHandler();
                               }}
                               icon={icon}
+                              data-tour-id={tourId}
                             >
                               {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
                             </Button>

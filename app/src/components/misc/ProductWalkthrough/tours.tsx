@@ -338,4 +338,15 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 6,
     },
   ],
+  [MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-table-create-group-btn"),
+      title: "Create groups for the rules",
+      content: "Organize your rules into logical groups and enable/disable in one go!",
+      placement: "bottom",
+      spotlightPadding: 0,
+      // offset: 6,
+    },
+  ],
 };
