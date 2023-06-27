@@ -7,6 +7,7 @@ import { toast } from "utils/Toast";
 
 interface PendingMemberRoleDropwdownProps extends DropDownProps {
   isAdmin: boolean;
+  isCurrentUserAdmin: boolean;
   isHoverEffect?: boolean;
   showLoader?: boolean;
   isLoggedInUserAdmin?: boolean;
@@ -17,6 +18,7 @@ interface PendingMemberRoleDropwdownProps extends DropDownProps {
 const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
   isAdmin,
   showLoader,
+  isCurrentUserAdmin,
   isHoverEffect = false,
   isLoggedInUserAdmin = false,
   inviteId,
@@ -50,14 +52,18 @@ const PendingMemberRoleDropwdown: React.FC<PendingMemberRoleDropwdownProps> = ({
   const items = useMemo(
     () => (
       <Menu className="dropdown-menu">
-        <Menu.Item key="remove" onClick={() => stableHandleRevokeInvite()}>
-          <Typography.Text type="danger" className="remove-user-menu-item-text">
+        <Menu.Item key="remove" onClick={() => stableHandleRevokeInvite()} disabled={!isCurrentUserAdmin}>
+          <Typography.Text
+            className="remove-user-menu-item-text"
+            type={isCurrentUserAdmin ? "danger" : null}
+            disabled={!isCurrentUserAdmin}
+          >
             Revoke Invite
           </Typography.Text>
         </Menu.Item>
       </Menu>
     ),
-    [stableHandleRevokeInvite]
+    [stableHandleRevokeInvite, isCurrentUserAdmin]
   );
 
   return (
