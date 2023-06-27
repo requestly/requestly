@@ -89,14 +89,7 @@ const TrashIndexPage = () => {
   }
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
-    return (
-      <InstallExtensionCTA
-        heading={"Get Started"}
-        subHeadingExtension={"Start intercepting HTTP requests"}
-        supportsMobileDevice={false}
-        eventPage="trash_page"
-      />
-    );
+    return <InstallExtensionCTA eventPage="trash_page" />;
   }
 
   if (isWorkspaceMode) return <TeamFeatureComingSoon title="Trash" />;
