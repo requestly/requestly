@@ -1035,7 +1035,6 @@ BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
-  chrome.tabs.onUpdated.removeListener(BG.Methods.startRecordingOnUrlListener);
 };
 
 BG.Methods.onAppLoadedNotification = () => {
@@ -1083,20 +1082,6 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
 BG.Methods.startRecordingOnUrl = (url) => {
   chrome.tabs.create({ url }, (tab) => {
     window.tabService.setData(tab.id, "recordSession", true);
-  });
-};
-
-BG.Methods.startRecordingOnUrlListener = (tabId, changeInfo, shouldListen) => {
-  if (shouldListen && changeInfo.status === "complete") {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING });
-  }
-};
-
-BG.Methods.startRecordingOnUrl = (url) => {
-  chrome.tabs.create({ url }, (tab) => {
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo) =>
-      BG.Methods.startRecordingOnUrlListener(tab.id, changeInfo, tabId === tab.id)
-    );
   });
 };
 
