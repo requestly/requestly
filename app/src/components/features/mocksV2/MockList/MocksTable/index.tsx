@@ -335,7 +335,7 @@ const MocksTable: React.FC<Props> = ({
                       onClick={() => user?.details?.isLoggedIn && handleUploadAction()}
                       icon={<CloudUploadOutlined />}
                     >
-                      Upload
+                      Upload {mockType === MockType.FILE ? "File" : "JSON"}
                     </RQButton>
                   </AuthConfirmationPopover>
                 ) : null}
