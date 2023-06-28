@@ -46,6 +46,9 @@ export const AUTH = {
   AUTH_MODAL: {
     SHOWN: "auth_modal_shown",
   },
+  AUTH_ONE_TAP_PROMPT: {
+    VISIBLE: "auth_one_tap_prompt_visible",
+  },
 
   SOURCE: {
     NAVBAR: "navbar",
