@@ -106,3 +106,10 @@ export function getAPIResponse(apiRequest) {
     apiRequest,
   });
 }
+
+export function startRecordingOnUrl(url) {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.START_RECORDING_ON_URL,
+    url,
+  });
+}
