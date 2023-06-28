@@ -6,6 +6,7 @@ import {
   getWorkspaceOnboardingStep,
   getAppMode,
   getWorkspaceOnboardingTeamDetails,
+  getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -46,6 +47,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
@@ -164,6 +166,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       toggle();
     };
   }, [toggle]);
+
+  useEffect(() => {
+    if (userPersona?.page > 2) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+  }, [dispatch, userPersona?.page]);
 
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
