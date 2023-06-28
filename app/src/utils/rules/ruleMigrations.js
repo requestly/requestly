@@ -1,5 +1,4 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { setSourceFilterFormatOfRulePairs } from "./setSourceFilterFormat";
 
 const migrateHeaderRuleToV2 = (rule) => {
   if (rule.ruleType !== GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
@@ -53,16 +52,17 @@ const migrateHeaderRuleToV2 = (rule) => {
   return rule;
 };
 
-export const migrateHeaderRulesToV2 = (rules) => {
-  return rules.map((rule) => migrateHeaderRuleToV2(rule));
+const setSourceFilterFormatOfSingleRulePairs = (rule) => {
+  // Check if its an object
+  if (rule.pairs[0].source.filters && !Array.isArray(rule.pairs[0].source.filters)) {
+    rule.pairs[0].source.filters = [rule.pairs[0].source.filters];
+  }
+  return rule;
 };
 
 export const runRuleMigrations = (rules) => {
-  // headers migration
-  let result = migrateHeaderRuleToV2(rules);
-
-  // source filter migration
-  result = setSourceFilterFormatOfRulePairs(result);
-
-  return result;
+  return rules.map((rule) => {
+    let temp = migrateHeaderRuleToV2(rule);
+    return setSourceFilterFormatOfSingleRulePairs(temp);
+  });
 };
