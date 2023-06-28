@@ -1020,10 +1020,29 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
 BG.Methods.getSessionRecordingConfig = async (url) => {
   const sessionRecordingConfig = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG);
+  const isAutoRecordingActive = sessionRecordingConfig?.autoRecording?.isActive;
   const pageSources = sessionRecordingConfig?.pageSources || [];
+
+  if ("autoRecording" in sessionRecordingConfig) {
+    // no pages
+    if (!sessionRecordingConfig?.autoRecording.isActive) {
+      return null;
+    } else if (sessionRecordingConfig?.autoRecording.mode === "allPages") {
+      pageSources.push({
+        value: "*",
+        key: "Url",
+        isActive: true,
+        operator: "Wildcard_Matches",
+      });
+    }
+  }
+
   const shouldRecord =
     BG.statusSettings.isExtensionEnabled &&
-    pageSources.some((pageSource) => RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null);
+    (isAutoRecordingActive ?? true) &&
+    pageSources
+      .filter((source) => source.isActive ?? true) // if isActive not present in source, then is default active
+      .some((pageSource) => RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null);
 
   return shouldRecord ? sessionRecordingConfig : null;
 };
