@@ -1010,6 +1010,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED:
         BG.Methods.onAppLoadedNotification();
         break;
+
+      case RQ.EXTENSION_MESSAGES.START_RECORDING_ON_URL:
+        BG.Methods.startRecordingOnUrl(message.url);
+        break;
     }
   });
 };
@@ -1067,6 +1071,18 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
       () => window.tabService.removeData(tabId, "appliedRuleDetails")
     );
   }
+
+  if (window.tabService.getData(tabId, "recordSession") === true) {
+    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () =>
+      window.tabService.removeData(tabId, "recordSession")
+    );
+  }
+};
+
+BG.Methods.startRecordingOnUrl = (url) => {
+  chrome.tabs.create({ url }, (tab) => {
+    window.tabService.setData(tab.id, "recordSession", true);
+  });
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {

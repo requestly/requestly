@@ -9,7 +9,7 @@ import PinButton from "./ActionButtons/PinButton";
 import EditorGroupDropdown from "./EditorGroupDropdown";
 import CloseButton from "./ActionButtons/CloseButton";
 import RuleOptions from "./RuleOptions";
-import { capitalize } from "lodash";
+import { capitalize, replace } from "lodash";
 import "./RuleEditorHeader.css";
 
 const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
@@ -17,7 +17,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
   const getRuleTitle = (name, mode) => {
-    return `${capitalize(name)} / ${capitalize(mode)} ${mode === "create" ? "new rule" : "rule"}`;
+    return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${mode === "create" ? "new rule" : "rule"}`;
   };
 
   // If user directly lands on rule editor, it ensures that

@@ -150,6 +150,7 @@ RQ.ContentScriptMessageHandler = {
           RQ.EXTENSION_MESSAGES.GET_TAB_SESSION,
           RQ.EXTENSION_MESSAGES.GET_API_RESPONSE,
           RQ.EXTENSION_MESSAGES.NOTIFY_APP_LOADED,
+          RQ.EXTENSION_MESSAGES.START_RECORDING_ON_URL,
         ].includes(event.data.action)
       ) {
         this.delegateMessageToBackground(event.data);
