@@ -79,10 +79,8 @@ const RulesIndexView = () => {
       )
     ) : showInstallExtensionCTA ? (
       <InstallExtensionCTA
-        heading={"Get Started"}
-        subHeadingExtension={"Start intercepting HTTP requests"}
-        contentMobileDebugger={"Extension not required"}
-        supportsMobileDevice={true}
+        heading="Install Browser extension to start modifying network requests"
+        subHeading="Requestly lets developers Modify Headers, Redirect URLs, Switch Hosts, Delay Network requests easily. Private and secure, works locally on your browser."
         eventPage="rules_page"
       />
     ) : (

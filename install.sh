@@ -7,11 +7,6 @@ set -e
 rm -rf node_modules
 npm install
 
-npm -g config set user root
-
-echo -e "\n***** Installing build tools *****"
-npm install -g firebase-tools
-
 echo -e "\n***** Installing React app dependencies *****"
 # Install dependencies for react app
 cd app

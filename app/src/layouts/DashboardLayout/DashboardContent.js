@@ -16,7 +16,6 @@ import {
   getIsWorkspaceOnboardingCompleted,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
-import ExtensionModal from "components/user/ExtensionModal/index.js";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
@@ -25,6 +24,7 @@ import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
+import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -111,9 +111,10 @@ const DashboardContent = () => {
         />
       ) : null}
       {activeModals.extensionModal.isActive ? (
-        <ExtensionModal
-          isOpen={activeModals.extensionModal.isActive}
-          toggle={() => toggleExtensionModal()}
+        <InstallExtensionModal
+          open={activeModals.extensionModal.isActive}
+          onCancel={() => toggleExtensionModal()}
+          eventPage="dashboard_content"
           {...activeModals.extensionModal.props}
         />
       ) : null}

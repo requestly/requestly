@@ -1,0 +1,21 @@
+.rename-group-modal {
+  .rq-modal.ant-modal .ant-modal-header {
+    display: block;
+  }
+
+  .rq-modal.ant-modal .ant-modal-close {
+    top: 0;
+    right: 0;
+  }
+  .rename-group-modal-content {
+    padding: 20px;
+    background: var(--body-background);
+    overflow: auto;
+    border-radius: var(--border-radius-md);
+
+    .rename-group-modal-footer {
+      justify-content: end;
+      margin-top: 16px;
+    }
+  }
+}
