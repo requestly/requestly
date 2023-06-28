@@ -143,7 +143,6 @@ CONSTANTS.EXTENSION_MESSAGES = {
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
-  START_RECORDING_ON_URL: "startRecordingOnUrl",
 };
 
 CONSTANTS.HEADERS_TARGET = {
