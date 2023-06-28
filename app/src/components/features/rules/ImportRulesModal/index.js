@@ -8,9 +8,6 @@ import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules }
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
-import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
-import FEATURES from "../../../../config/constants/sub/features";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
@@ -140,11 +137,7 @@ const ImportRulesModal = (props) => {
 
   const doImportRules = (natureOfImport) => {
     setIsImporting(true);
-    const migratedDataToImport = isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)
-      ? migrateHeaderRulesToV2(dataToImport)
-      : dataToImport;
-
-    addRulesAndGroupsToStorage(appMode, migratedDataToImport)
+    addRulesAndGroupsToStorage(appMode, dataToImport)
       .then(async () => {
         dispatch(
           actions.updateRefreshPendingStatus({

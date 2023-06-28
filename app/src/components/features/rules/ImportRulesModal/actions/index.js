@@ -6,7 +6,7 @@ import APP_CONSTANTS from "../../../../../config/constants";
 import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-rules-pairs";
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
-import { runRuleMigrations } from "utils/rules/migrateHeaderRulesToV2";
+import { runRuleMigrations } from "utils/rules/ruleMigrations";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
