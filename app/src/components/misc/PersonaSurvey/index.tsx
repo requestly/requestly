@@ -163,6 +163,10 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     }
   }, [appMode, currentPage]);
 
+  useEffect(() => {
+    if (userPersona?.page > 2) dispatch(actions.updateIsPersonaSurveyCompleted(true));
+  }, [dispatch, userPersona?.page]);
+
   const renderSurveyPages = useCallback(() => {
     return SurveyConfig.filter((config) => !config.skip).map((page, index) => (
       <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page)}</>}</React.Fragment>
