@@ -38,7 +38,6 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { capitalize } from "lodash";
 
 const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 
@@ -110,7 +109,7 @@ const DraftSessionViewer: React.FC = () => {
   }, [dispatch, tabId, user?.details?.profile?.email]);
 
   const generateDraftSessionTitle = (url: string) => {
-    const host = capitalize(new URL(url).host.split(".")[0]);
+    const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
     const date = new Date();
     const month = date.toLocaleString("default", { month: "short" });
     const time = date
@@ -121,7 +120,7 @@ const DraftSessionViewer: React.FC = () => {
       })
       .replace(/\s/g, "");
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
-    return `${host}@${formattedDate}-${time}`;
+    return `${hostname}@${formattedDate}-${time}`;
   };
 
   const getSessionEventsToSave = useCallback(
