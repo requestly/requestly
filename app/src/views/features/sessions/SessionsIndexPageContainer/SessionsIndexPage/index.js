@@ -32,8 +32,6 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import Logger from "lib/logger";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
-import { startRecordingOnUrl } from "actions/ExtensionActions";
-import { IoRecordingOutline } from "react-icons/io5";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -169,17 +167,10 @@ const SessionsIndexPage = () => {
   );
 
   const ConfigureButton = () => (
-    <>
-      <Button type="primary" onClick={() => startRecordingOnUrl("https://github.com")} icon={<IoRecordingOutline />}>
-        Record
-      </Button>
-      <Button type="primary" onClick={openConfigModal} icon={<SettingOutlined />}>
-        Configure
-        {config.pageSources?.length ? (
-          <Badge count={config.pageSources?.length} style={{ marginLeft: "10px" }} />
-        ) : null}
-      </Button>
-    </>
+    <Button type="primary" onClick={openConfigModal} icon={<SettingOutlined />}>
+      Configure
+      {config.pageSources?.length ? <Badge count={config.pageSources?.length} style={{ marginLeft: "10px" }} /> : null}
+    </Button>
   );
 
   useEffect(() => {
