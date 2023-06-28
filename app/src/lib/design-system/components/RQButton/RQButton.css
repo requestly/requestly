@@ -2,7 +2,7 @@
   opacity: 0.6;
 }
 
-.btn-default.ant-btn-default {
+.btn-default.ant-btn-default:not(.btn-icon-only) {
   color: var(--white);
   border: 1px solid var(--border);
   background-color: var(--component-background);
@@ -10,9 +10,9 @@
 
 .btn-default.ant-btn-default:hover,
 .btn-default.ant-btn-default:focus {
+  box-shadow: none;
   color: var(--white);
-  border: 1px solid #5f6164;
-  background-color: var(--component-background);
+  background-color: var(--hover-color);
 }
 
 .btn-icon-only.ant-btn {
@@ -20,7 +20,6 @@
   font-size: 13px;
   color: var(--text-gray);
   border-radius: var(--border-radius-sm);
-  background-color: transparent;
 }
 
 .btn-icon-only.ant-btn svg {
@@ -30,5 +29,5 @@
 .btn-icon-only.ant-btn:hover,
 .btn-icon-only.ant-btn:focus {
   border: none;
-  background-color: var(--component-background);
+  background-color: var(--hover-color);
 }

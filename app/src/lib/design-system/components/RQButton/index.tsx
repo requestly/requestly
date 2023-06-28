@@ -18,6 +18,7 @@ export const RQButton: React.FC<RQButtonProps> = (props) => {
 
   return (
     <Button
+      type="default"
       {...filteredProps}
       className={`rq-btn ${props.type === "default" ? "btn-default" : ""} ${props.iconOnly ? "btn-icon-only" : ""} ${
         props?.className ?? ""

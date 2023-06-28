@@ -84,7 +84,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
     const key = e.target.value;
 
-    if (key === "") {
+    if (key === "" && gqlOperationFilter.value === "") {
       clearRequestPayload();
     }
 
@@ -99,7 +99,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
     const value = e.target.value;
 
-    if (value === "") {
+    if (value === "" && gqlOperationFilter.key === "") {
       clearRequestPayload();
     }
 

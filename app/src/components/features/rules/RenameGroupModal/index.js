@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Button, Input } from "antd";
-import { Modal } from "antd";
+import { Row, Button, Input, Space, Modal } from "antd";
 import { toast } from "utils/Toast.js";
-//ICONS
-import { FaSpinner } from "react-icons/fa";
 //SUB COMPONENTS
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //SERVICES
@@ -13,6 +10,8 @@ import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
+
+import "./index.scss";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
@@ -32,26 +31,22 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
 
   const renderRenameGroupFeature = () => {
     return (
-      <React.Fragment>
-        <div className="modal-body one-padding-top zero-padding-bottom">
-          {/* <Row className="one-padding-bottom  my-auto"> */}
-          {/* <Col className="my-auto" style={{ fontSize: "0.9em" }}> */}
-          <Input
-            className="has-dark-text"
-            placeholder="New Group Name"
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-          />
-          {/* </Col> */}
-          {/* </Row> */}
-        </div>
-        <br />
-        <div className="modal-footer ">
-          <Button color="primary" type="button" onClick={handleSaveRuleNameOnClick}>
-            {isSavingGroup ? <FaSpinner className="icon-spin" /> : "Save"}
-          </Button>
-        </div>
-      </React.Fragment>
+      <div className="rename-group-modal-content">
+        <Row>
+          <Input placeholder="New Group Name" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
+        </Row>
+
+        <Row className="rename-group-modal-footer">
+          <Space>
+            <Button key="cancel" onClick={toggle}>
+              Cancel
+            </Button>
+            <Button key="save" type="primary" onClick={handleSaveRuleNameOnClick} loading={isSavingGroup}>
+              Save
+            </Button>
+          </Space>
+        </Row>
+      </div>
     );
   };
 
@@ -119,12 +114,12 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
 
   return (
     <Modal
-      className="modal-dialog-centered "
-      visible={isOpen}
-      onCancel={toggle}
+      className="rq-modal modal-dialog-centered"
       footer={null}
+      open={isOpen}
+      onCancel={toggle}
       title="Rename Group"
-      style={{ textAlign: "center" }}
+      wrapClassName="rename-group-modal"
     >
       {isLoading ? renderLoader() : renderRenameGroupFeature()}
     </Modal>

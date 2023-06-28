@@ -76,16 +76,16 @@ const APIClientContainer: React.FC<Props> = () => {
         </>
       ) : isExtensionInstalled() ? (
         <InstallExtensionCTA
-          heading={"Get Started"}
-          subHeadingExtension={"You need to be on the latest version of the extension to use API Client."}
+          heading="Get Started"
+          subHeading="You need to be on the latest version of the extension to use API Client."
           isUpdateRequired
-          eventPage="api-client"
+          eventPage="api_client"
         />
       ) : (
         <InstallExtensionCTA
-          heading={"Get Started"}
-          subHeadingExtension={"Start testing API endpoints"}
-          eventPage="api-client"
+          heading="Install Browser extension to test API end points"
+          subHeading="Test and debug API easily with Requestly API Client. Private and secure, works locally on your browser."
+          eventPage="api_client"
         />
       )}
     </div>
