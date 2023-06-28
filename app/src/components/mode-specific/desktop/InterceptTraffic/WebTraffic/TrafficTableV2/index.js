@@ -283,10 +283,13 @@ const CurrentTrafficTable = ({
 
   const getRequestLogs = useCallback(
     (desc = true) => {
-      let logs = isStaticPreview ? propLogs : newLogs;
+      let logs = newLogs;
+      if (propLogs?.length > 0) {
+        logs = propLogs;
+      }
       return logs;
     },
-    [isStaticPreview, newLogs, propLogs]
+    [newLogs, propLogs]
   );
 
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
