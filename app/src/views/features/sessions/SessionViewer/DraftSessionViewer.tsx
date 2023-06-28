@@ -38,6 +38,7 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { capitalize } from "lodash";
 
 const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 
@@ -95,7 +96,7 @@ const DraftSessionViewer: React.FC = () => {
             dispatch(
               sessionRecordingActions.setSessionRecording({
                 sessionAttributes: tabSession.attributes,
-                name: "Session-" + Date.now(),
+                name: generateDraftSessionTitle(tabSession.attributes?.url),
               })
             );
 
@@ -107,6 +108,21 @@ const DraftSessionViewer: React.FC = () => {
       });
     }
   }, [dispatch, tabId, user?.details?.profile?.email]);
+
+  const generateDraftSessionTitle = (url: string) => {
+    const host = capitalize(new URL(url).host.split(".")[0]);
+    const date = new Date();
+    const month = date.toLocaleString("default", { month: "short" });
+    const time = date
+      .toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })
+      .replace(/\s/g, "");
+    const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
+    return `${host}@${formattedDate}-${time}`;
+  };
 
   const getSessionEventsToSave = useCallback(
     (options: RecordingOptions): RQSessionEvents => {
