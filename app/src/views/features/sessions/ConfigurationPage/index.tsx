@@ -9,7 +9,7 @@ import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { SourceKey, SourceOperator } from "types";
 import { AutoRecordingMode, SessionRecordingConfig } from "../types";
-import "./configurations.css";
+import "./configuration.css";
 
 // @ts-ignore
 const emptyPageSourceData = {
@@ -29,7 +29,7 @@ type ParentContext<T = SessionRecordingConfig> = {
   handleSaveConfig: (config: T, showToast?: boolean) => void;
 };
 
-const ConfigurationsPage: React.FC = () => {
+const ConfigurationPage: React.FC = () => {
   const { config, handleSaveConfig } = useOutletContext<ParentContext>();
   const { pageSources = [], autoRecording } = config;
 
@@ -357,4 +357,4 @@ const ConfigurationsPage: React.FC = () => {
   );
 };
 
-export default ConfigurationsPage;
+export default ConfigurationPage;
