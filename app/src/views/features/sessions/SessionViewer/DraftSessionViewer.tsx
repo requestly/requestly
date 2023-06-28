@@ -1,8 +1,9 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Checkbox, Col, Input, Modal, Row, Space, Tooltip, Typography } from "antd";
+import { Button, Checkbox, Col, Modal, Row, Space, Tooltip } from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
+import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
@@ -13,7 +14,7 @@ import mockSession from "./mockData/mockSession";
 import { compressEvents, filterOutConsoleLogs, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import {
   trackDraftSessionDiscarded,
-  trackDraftSessionNamed,
+  // trackDraftSessionNamed,
   trackDraftSessionSaved,
   trackDraftSessionSaveFailed,
   trackDraftSessionViewed,
@@ -38,6 +39,7 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 
 const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 
@@ -207,12 +209,12 @@ const DraftSessionViewer: React.FC = () => {
     getRecordingOptionsToSave,
   ]);
 
-  const handleNameChangeEvent = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      dispatch(sessionRecordingActions.setName(event.target.value));
-    },
-    [dispatch]
-  );
+  // const handleNameChangeEvent = useCallback(
+  //   (event: ChangeEvent<HTMLInputElement>) => {
+  //     dispatch(sessionRecordingActions.setName(event.target.value));
+  //   },
+  //   [dispatch]
+  // );
 
   const confirmDiscard = () => {
     Modal.confirm({
@@ -241,14 +243,15 @@ const DraftSessionViewer: React.FC = () => {
   ) : (
     <div className="session-viewer-page">
       <div className="session-viewer-header">
-        <Typography.Title level={3} className="session-recording-name">
-          {sessionRecordingName || "New Session"} (draft)
-        </Typography.Title>
+        <SessionViewerTitle />
+
         <div className="session-viewer-actions">
-          <Button onClick={confirmDiscard}>Discard</Button>
-          <Button type="primary" icon={<SaveOutlined />} onClick={() => setIsSaveModalVisible(true)}>
+          <RQButton type="default" onClick={confirmDiscard}>
+            Discard
+          </RQButton>
+          <RQButton type="primary" icon={<SaveOutlined />} onClick={() => setIsSaveModalVisible(true)}>
             Save Session
-          </Button>
+          </RQButton>
           <Modal
             title="Save Session"
             open={isSaveModalVisible}
@@ -261,15 +264,6 @@ const DraftSessionViewer: React.FC = () => {
             confirmLoading={isSaving}
           >
             <Space direction="vertical">
-              <Row>
-                <p>Session Name:</p>
-                <Input
-                  status={!sessionRecordingName ? "error" : ""}
-                  value={sessionRecordingName}
-                  onChange={handleNameChangeEvent}
-                  onBlur={trackDraftSessionNamed}
-                />
-              </Row>
               <Row>
                 <Col>
                   <p>Information to include in session:</p>
@@ -300,6 +294,7 @@ const DraftSessionViewer: React.FC = () => {
           </Modal>
         </div>
       </div>
+      {/* </div> */}
       <SessionDetails key={tabId} />
     </div>
   );
