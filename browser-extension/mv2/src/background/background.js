@@ -1072,16 +1072,16 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
     );
   }
 
-  if (window.tabService.getData(tabId, "recordTab") === true) {
+  if (window.tabService.getData(tabId, "recordSession") === true) {
     chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () =>
-      window.tabService.removeData(tabId, "recordTab")
+      window.tabService.removeData(tabId, "recordSession")
     );
   }
 };
 
 BG.Methods.startRecordingOnUrl = (url) => {
   chrome.tabs.create({ url }, (tab) => {
-    window.tabService.setData(tab.id, "recordTab", true);
+    window.tabService.setData(tab.id, "recordSession", true);
   });
 };
 
