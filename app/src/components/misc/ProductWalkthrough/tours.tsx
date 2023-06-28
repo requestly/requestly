@@ -332,12 +332,12 @@ export const productTours: Record<string, CustomSteps[]> = {
   [MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE]: [
     {
       ...tourTooltipPresets,
-      target: getTourTarget("rule-editor-status-toggle"),
+      target: getTourTarget("rule-table-switch-status"),
       title: "Activate/Deactivate rule easily",
       content: "You can switch off the rule in case the rule is not in use.",
       placement: "bottom",
       spotlightPadding: 0,
-      offset: 6,
+      offset: 20,
       customNextButtonText: "Got it!",
     },
   ],

@@ -148,7 +148,8 @@ const RulesTable = ({
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
+  const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
+  const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
@@ -677,7 +678,7 @@ const RulesTable = ({
       dataIndex: "status",
       align: "center",
       width: 80,
-      render: (_, record) => {
+      render: (_, record, index) => {
         if (record.objectType && record.objectType === "group") {
           if (isStatusEnabled && record.id !== UNGROUPED_GROUP_ID) {
             if (isEditingEnabled) {
@@ -707,6 +708,7 @@ const RulesTable = ({
               disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
               checked={checkIfRuleIsActive(record)}
               onClick={(_, event) => toggleRuleStatus(event, record)}
+              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
             />
           );
         }
@@ -1108,27 +1110,33 @@ const RulesTable = ({
   );
 
   useEffect(() => {
-    if (
-      !userAttributes?.num_groups &&
-      userAttributes?.num_rules === 5 &&
-      !isMiscTourCompleted?.fifthRule &&
-      groupingAndRuleActivationExp === "variant1"
-    ) {
-      setStartWalkthrough(true);
+    if (groupingAndRuleActivationExp === "variant1") {
+      if (!isMiscTourCompleted?.firstRule && userAttributes?.num_rules === 1) setStartFirstRuleWalkthrough(true);
+      if (!isMiscTourCompleted?.fifthRule && !userAttributes?.num_groups && userAttributes?.num_rules === 5)
+        setStartFifthRuleWalkthrough(true);
     }
   }, [
+    isMiscTourCompleted?.fifthRule,
+    isMiscTourCompleted?.firstRule,
     userAttributes?.num_groups,
     userAttributes?.num_rules,
-    isMiscTourCompleted?.fifthRule,
     groupingAndRuleActivationExp,
   ]);
+
   return (
     <>
       <ProductWalkthrough
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE}
-        startWalkthrough={startWalkthrough}
+        startWalkthrough={startFifthRuleWalkthrough}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "fifthRule" }))
+        }
+      />
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
+        startWalkthrough={startFirstRuleWalkthrough}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
         }
       />
       <ProTable

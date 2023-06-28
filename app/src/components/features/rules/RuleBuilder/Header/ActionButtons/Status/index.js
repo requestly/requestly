@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { setCurrentlySelectedRule } from "../../../actions";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
   getAllRules,
   getAppMode,
   getCurrentlySelectedRuleData,
   getUserAuthDetails,
-  getUserAttributes,
-  getIsMiscTourCompleted,
 } from "../../../../../../../store/selectors";
-import { actions } from "store";
 import FEATURES from "config/constants/sub/features";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
@@ -29,10 +23,7 @@ const Status = ({ location, isRuleEditorModal }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const appMode = useSelector(getAppMode);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const groupingAndRuleActivationExp = useFeatureValue("grouping_and_rule_activation", null);
 
   const isDisabled =
     currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
@@ -40,7 +31,6 @@ const Status = ({ location, isRuleEditorModal }) => {
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
 
   // fetch planName from global state
   const planNameFromState = user.details?.planDetails?.planName || APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
@@ -102,47 +92,27 @@ const Status = ({ location, isRuleEditorModal }) => {
     }
   }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus, planNameFromState]);
 
-  useEffect(() => {
-    if (
-      location.pathname.indexOf("create") === -1 &&
-      !userAttributes?.num_rules &&
-      !isMiscTourCompleted?.firstRule &&
-      groupingAndRuleActivationExp === "variant1"
-    ) {
-      setStartWalkthrough(true);
-    }
-  }, [location.pathname, userAttributes?.num_rules, isMiscTourCompleted?.firstRule, groupingAndRuleActivationExp]);
-
   const isChecked = isRuleCurrentlyActive();
 
   return (
-    <>
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
-        startWalkthrough={startWalkthrough}
-        onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
-        }
+    <div className="display-row-center ml-2 rule-editor-header-switch" data-tour-id="rule-editor-status-toggle">
+      <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
+      <Switch
+        size="small"
+        className="ml-3"
+        checked={isChecked}
+        onChange={toggleRuleStatus}
+        disabled={isDisabled}
+        onClick={() => {
+          trackRuleEditorHeaderClicked(
+            "toggle_status",
+            currentlySelectedRuleData.ruleType,
+            location.pathname.indexOf("create") !== -1 ? "create" : "edit",
+            isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
+          );
+        }}
       />
-      <div className="display-row-center ml-2 rule-editor-header-switch" data-tour-id="rule-editor-status-toggle">
-        <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
-        <Switch
-          size="small"
-          className="ml-3"
-          checked={isChecked}
-          onChange={toggleRuleStatus}
-          disabled={isDisabled}
-          onClick={() => {
-            trackRuleEditorHeaderClicked(
-              "toggle_status",
-              currentlySelectedRuleData.ruleType,
-              location.pathname.indexOf("create") !== -1 ? "create" : "edit",
-              isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
-            );
-          }}
-        />
-      </div>
-    </>
+    </div>
   );
 };
 
