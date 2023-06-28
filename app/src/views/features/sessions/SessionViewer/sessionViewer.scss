@@ -21,19 +21,48 @@
       iframe {
         background: white;
       }
+      .rr-player .rr-player_frame {
+        width: auto;
+      }
     }
 
     .session-recording-properties {
-      width: 300px;
+      width: 400px;
       overflow: auto;
       min-height: 100%;
 
-      > div {
+      & > div {
         height: auto;
       }
+      & .ant-input,
+      & .ant-input-number-input {
+        box-shadow: var(--input-box-shadow);
+        background: var(--component-dark-background);
+      }
 
-      .session-property-label {
-        font-weight: bold;
+      & .session-property-label {
+        margin-bottom: 4px;
+      }
+      &.ant-pro-card.primary-card {
+        background: none !important;
+        border: none;
+
+        .ant-pro-card-body {
+          padding: 0;
+        }
+      }
+      & .ant-pro-card-body .session-start-time-input-wrapper {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+
+        & .ant-input-number-group-wrapper {
+          width: 100%;
+
+          & .ant-input-number-wrapper .ant-input-number-group-addon {
+            background: var(--component-dark-background);
+          }
+        }
       }
     }
   }
@@ -42,7 +71,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
 
     .session-recording-name {
       line-height: 40px;
@@ -56,7 +84,11 @@
       column-gap: 10px;
 
       button {
-        height: 40px;
+        height: 32px;
+      }
+      .session-viewer-save-action-btn svg {
+        width: 16px;
+        height: 16px;
       }
     }
   }
@@ -219,6 +251,30 @@
       }
     }
   }
+  .session-properties-wrapper {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .ant-input-group-wrapper {
+      width: auto;
+    }
+
+    .session-page-url-property .ant-input-wrapper .ant-input {
+      width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-duration-property .ant-input-wrapper .ant-input {
+      width: 75px;
+    }
+
+    .session-recorded-at-property .ant-input-wrapper .ant-input {
+      width: 155px;
+    }
+  }
 }
 
 .session-viewer-more-actions {
@@ -255,25 +311,28 @@ body.dark {
     }
 
     .ant-pro-card,
-    .ant-pro-card-body,
-    .rr-player,
-    .rr-controller {
-      background: #1c2128 !important;
+    .rr-player {
+      background: #14141466 !important;
     }
 
     .rr-player {
       overflow: hidden;
+      padding-top: 10px;
+    }
+
+    .rr-controller {
+      background: transparent;
     }
 
     .rr-player,
     .ant-pro-card {
-      border: 1px solid #303030;
-      border-radius: 5px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--border-radius-sm);
       box-sizing: content-box;
     }
 
     .ant-input-number-group-addon {
-      color: #ffffff;
+      color: var(--white);
       border-color: #313a46;
       background-color: #313a46;
     }

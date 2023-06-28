@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Checkbox, Col, Modal, Row, Space, Tooltip } from "antd";
+import { Checkbox, Col, Modal, Row, Space, Tooltip } from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
@@ -244,13 +244,17 @@ const DraftSessionViewer: React.FC = () => {
     <div className="session-viewer-page">
       <div className="session-viewer-header">
         <SessionViewerTitle />
-
         <div className="session-viewer-actions">
           <RQButton type="default" onClick={confirmDiscard}>
             Discard
           </RQButton>
-          <RQButton type="primary" icon={<SaveOutlined />} onClick={() => setIsSaveModalVisible(true)}>
-            Save Session
+          <RQButton
+            className="text-bold session-viewer-save-action-btn"
+            type="primary"
+            icon={<SaveOutlined />}
+            onClick={() => setIsSaveModalVisible(true)}
+          >
+            Save Recording
           </RQButton>
           <Modal
             title="Save Session"
@@ -294,7 +298,6 @@ const DraftSessionViewer: React.FC = () => {
           </Modal>
         </div>
       </div>
-      {/* </div> */}
       <SessionDetails key={tabId} />
     </div>
   );

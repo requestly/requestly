@@ -18,7 +18,9 @@ import {
 import { useSelector } from "react-redux";
 import { cloneDeep } from "lodash";
 import { getConsoleLogs } from "./sessionEventsUtils";
+import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 const SessionDetails: React.FC = () => {
   const attributes = useSelector(getSessionRecordingAttributes);
@@ -163,7 +165,21 @@ const SessionDetails: React.FC = () => {
 
   return (
     <>
-      <Input readOnly addonBefore="Page URL" value={attributes.url} />
+      <div className="session-properties-wrapper">
+        <Input readOnly addonBefore="Page URL" value={attributes?.url} className="session-page-url-property" />
+        <Input
+          readOnly
+          addonBefore="Duration"
+          value={msToHoursMinutesAndSeconds(attributes?.duration)}
+          className="session-duration-property"
+        />
+        <Input
+          readOnly
+          addonBefore="Recorded at"
+          value={epochToDateAndTimeString(attributes?.startTime)}
+          className="session-recorded-at-property"
+        />
+      </div>
       <div className="session-recording-player-row">
         <div className="session-recording-player-container" ref={playerContainer} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
