@@ -14,12 +14,16 @@ export const SessionViewerTitle: React.FC = () => {
   const sessionRecordingName = useSelector(getSessionRecordingName);
   const recordingId = useSelector(getSessionRecordingId);
   const [isTitleEditable, setIsTitleEditable] = useState<boolean>(false);
+  const [hasTitleChanged, setHasTitleChanged] = useState<boolean>(false);
 
   const handleOnNameInputBlur = () => {
     setIsTitleEditable(false);
-    if (recordingId) {
+    if (recordingId && hasTitleChanged) {
       updateSessionName(user?.details?.profile?.uid, recordingId, sessionRecordingName);
     }
+    setTimeout(() => {
+      setHasTitleChanged(false);
+    }, 100);
   };
 
   return (
@@ -34,7 +38,10 @@ export const SessionViewerTitle: React.FC = () => {
               bordered={false}
               spellCheck={false}
               value={sessionRecordingName}
-              onChange={(e) => dispatch(sessionRecordingActions.setName(e.target.value))}
+              onChange={(e) => {
+                dispatch(sessionRecordingActions.setName(e.target.value));
+                setHasTitleChanged(true);
+              }}
               placeholder="Enter session Title"
               onPressEnter={handleOnNameInputBlur}
             />

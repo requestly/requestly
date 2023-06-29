@@ -64,6 +64,11 @@
           }
         }
       }
+      .readonly-session-description {
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius-sm);
+        padding: 1rem;
+      }
     }
   }
 
@@ -298,6 +303,7 @@
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
 
     & .ant-input-group-wrapper {
       width: auto;
@@ -414,6 +420,8 @@ body.dark {
   .session-viewer-page {
     .session-viewer-header {
       flex-direction: column;
+      align-items: flex-start;
+      row-gap: 10px;
     }
 
     .session-recording-player-row {
@@ -431,43 +439,8 @@ body.dark {
   }
 }
 
-.session-title-name .session-title-name-wrapper {
-  width: 100%;
-}
-.editor-title-container .session-title-name {
-  min-height: 33px;
-}
-
-.session-title-name .session-title-name-wrapper .ant-input {
-  font-size: 1.25rem;
-  max-width: 600px;
-  padding: 0;
-  border-radius: 0;
-  transition: 0.05s ease-in-out;
-}
-.session-title-name .session-title-name-wrapper .ant-input {
-  max-width: 450px;
-}
-
-.session-title-name .ant-input:focus {
-  border-bottom: 1px solid var(--primary);
-}
-.session-title-name .session-title {
-  display: flex;
-  gap: 4px;
-  width: 460px;
-}
-.session-title-name .session-title svg {
-  align-self: center;
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-  min-width: 16px;
-  color: var(--gray-light);
-}
-.session-title-name .ant-input,
-.session-title-name .session-title {
-  color: var(--white);
-  font-size: 1.25rem;
-  font-weight: 500;
+@media screen and (max-width: 520px) {
+  .session-viewer-page .session-properties-wrapper .session-page-url-property .ant-input-wrapper .ant-input {
+    width: 100px;
+  }
 }

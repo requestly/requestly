@@ -90,7 +90,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
         </>
       )}
 
-      <p className="mt-20 session-property-label text-gray">Description</p>
+      <p className={`${!isReadOnly ? "mt-20" : null} session-property-label text-gray`}>Description</p>
       {!isReadOnly ? (
         <Input.TextArea
           rows={7}
@@ -101,9 +101,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
           style={{ wordBreak: "break-word", resize: "none" }}
         />
       ) : (
-        sessionDescription && (
-          <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{sessionDescription}</span>
-        )
+        sessionDescription && <div className="readonly-session-description">{sessionDescription}</div>
       )}
     </ProCard>
   );
