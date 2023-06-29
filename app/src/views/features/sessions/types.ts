@@ -6,6 +6,7 @@ export enum AutoRecordingMode {
 }
 
 export type PageSource = {
+  id?: string;
   key: SourceKey;
   value: string;
   isActive?: boolean;
