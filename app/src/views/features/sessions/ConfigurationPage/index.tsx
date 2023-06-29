@@ -1,21 +1,24 @@
-import React, { useCallback, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
-import { Button, Col, Input, Radio, RadioChangeEvent, Row, Select, Space, Switch, Table } from "antd";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
+import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
+import { PageSourceRow } from "./PageSourceRow";
 import { SourceKey, SourceOperator } from "types";
-import { AutoRecordingMode, SessionRecordingConfig } from "../types";
-import "./configuration.css";
+import { AutoRecordingMode, PageSource, SessionRecordingConfig } from "../types";
+import { generateObjectId } from "utils/FormattingHelper";
+import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import "./configurationPage.css";
 
-// @ts-ignore
-const emptyPageSourceData = {
+const emptyPageSourceData: PageSource = {
   value: "",
   key: SourceKey.URL,
   operator: SourceOperator.CONTAINS,
+  isActive: true,
 };
 
 const allPagesSourceData = {
@@ -30,16 +33,18 @@ type ParentContext<T = SessionRecordingConfig> = {
 };
 
 const ConfigurationPage: React.FC = () => {
+  const navigate = useNavigate();
   const { config, handleSaveConfig } = useOutletContext<ParentContext>();
   const { pageSources = [], autoRecording } = config;
+  const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
 
-  // console.log({ config: autoRecording?.mode });
+  console.log({ receivedConfig: config });
 
-  // migrate legacy configs
+  // one time migration for legacy configs
   useEffect(() => {
-    if (config.autoRecording) return;
+    if (Object.keys(config).length === 0 || config.autoRecording) return;
 
-    console.log("running...", config);
+    console.log("migration running...");
     const autoRecordingConfig: SessionRecordingConfig["autoRecording"] = {
       isActive: false,
       mode: AutoRecordingMode.ALL_PAGES,
@@ -56,183 +61,37 @@ const ConfigurationPage: React.FC = () => {
       autoRecordingConfig.mode = AutoRecordingMode.ALL_PAGES;
     }
 
-    handleSaveConfig(
-      {
-        ...config,
-        maxDuration: 5,
-        pageSources: config?.pageSources ?? [],
-        autoRecording: autoRecordingConfig,
-      },
-      false
-    );
+    const migratedConfig = {
+      ...config,
+      maxDuration: 5,
+      autoRecording: autoRecordingConfig,
+      pageSources: config?.pageSources.map((source) => ({ ...source, id: generateObjectId(), isActive: true })) ?? [],
+    };
+
+    console.log("migration running...", migratedConfig);
+
+    handleSaveConfig(migratedConfig, false);
   }, [config, handleSaveConfig]);
 
-  // this function will be modified after UI is done
-  const setPageSourceValue = useCallback(
-    (index: number, key: string, value: string) => {
-      const updatedPageSources = config?.pageSources?.map((source, sourceIndex) =>
-        index === sourceIndex ? { ...source, [key]: value } : source
-      );
+  console.log({ pageSources });
 
-      handleSaveConfig(
-        {
-          ...config,
-          pageSources: updatedPageSources,
-        },
-        false
-      );
-    },
-    [config, handleSaveConfig]
-  );
+  const handleAddNewPageSourceClick = useCallback((e?: unknown) => {
+    setShowNewPageSource(true);
+  }, []);
 
-  const removePageSource = useCallback(
-    (index: number) => {
-      const filteredPageSources = config?.pageSources?.filter((source, sourceIndex) => index !== sourceIndex);
+  // useEffect(() => {
+  //   if (pageSources.length > 0) return;
 
-      handleSaveConfig(
-        {
-          ...config,
-          pageSources: filteredPageSources,
-        },
-        false
-      );
-    },
-    [config, handleSaveConfig]
-  );
+  //   if (autoRecording?.mode !== AutoRecordingMode.CUSTOM) return;
 
-  const getPageSourcesValueBasedOnType = useCallback(
-    (mode: AutoRecordingMode) => {
-      switch (mode) {
-        case AutoRecordingMode.ALL_PAGES:
-          return [allPagesSourceData];
-
-        case AutoRecordingMode.CUSTOM:
-          return config?.pageSources;
-
-        default:
-          return [];
-      }
-    },
-    [config?.pageSources]
-  );
-
-  const savePageSource = () => {
-    if (
-      config?.autoRecording?.mode === AutoRecordingMode.CUSTOM &&
-      config?.pageSources.some((source) => source?.value?.length === 0)
-    ) {
-      toast.warn("Please provide page source value");
-      return;
-    }
-
-    console.log("save....");
-    handleSaveConfig({
-      ...config,
-      pageSources: getPageSourcesValueBasedOnType(config?.autoRecording?.mode),
-    });
-  };
-
-  const addEmptyPageSource = () => {
-    // setCustomPageSources((prevPageSources) => [{ ...emptyPageSourceData }, ...prevPageSources]);
-  };
-
-  const pageSourceColumns = [
-    {
-      title: "Key",
-      dataIndex: "key",
-      key: "key",
-      render: (text: string, _: unknown, index: number) => (
-        <Select
-          style={{ width: "100%", padding: "8px" }}
-          value={text}
-          size="small"
-          className="recording-config"
-          onChange={(value) => {
-            setPageSourceValue(index, "key", value);
-          }}
-        >
-          {[
-            GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
-            GLOBAL_CONSTANTS.URL_COMPONENTS.HOST,
-            GLOBAL_CONSTANTS.URL_COMPONENTS.PATH,
-          ].map((value) => {
-            return (
-              <Select.Option key={value} value={value}>
-                {value}
-              </Select.Option>
-            );
-          })}
-        </Select>
-      ),
-    },
-    {
-      title: "Operator",
-      dataIndex: "operator",
-      key: "operator",
-      render: (text: string, _: unknown, index: number) => {
-        return (
-          <Select
-            value={text}
-            size="small"
-            style={{ width: "100%" }}
-            className="recording-config"
-            onChange={(value) => {
-              setPageSourceValue(index, "operator", value);
-            }}
-          >
-            {Object.keys(GLOBAL_CONSTANTS.RULE_OPERATORS).map((key) => {
-              return (
-                <Select.Option key={key} value={GLOBAL_CONSTANTS.RULE_OPERATORS[key]}>
-                  {key}
-                </Select.Option>
-              );
-            })}
-          </Select>
-        );
-      },
-    },
-    {
-      title: "Value",
-      dataIndex: "value",
-      key: "value",
-      render: (text: string, _: unknown, index: number) => {
-        return (
-          <Input
-            size="small"
-            value={text}
-            data-index={index}
-            className="recording-config"
-            onChange={(e) => {
-              setPageSourceValue(index, "value", e.target.value);
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: "Actions",
-      render: (text: string, record: unknown, index: number) => {
-        return <Button size="small" icon={<DeleteOutlined />} onClick={() => removePageSource(index)} />;
-      },
-    },
-    {
-      title: "Actions",
-      render: () => {
-        return (
-          <Button size="small" type="primary" onClick={() => savePageSource()}>
-            Save
-          </Button>
-        );
-      },
-    },
-  ];
-
-  console.log({ switch: autoRecording?.isActive });
+  //   if (pageSources.length === 0) {
+  //     handleAddNewPageSourceClick();
+  //     setEditPageSourceId(0);
+  //   }
+  // }, [autoRecording?.mode, pageSources.length, handleAddNewPageSourceClick]);
 
   const handleAutoRecordingToggle = useCallback(
     (status: boolean) => {
-      console.log({ status });
-
       handleSaveConfig(
         {
           ...config,
@@ -265,6 +124,59 @@ const ConfigurationPage: React.FC = () => {
     [config, handleSaveConfig]
   );
 
+  const handleSavePageSourceDetails = useCallback(
+    (sourceDetails: PageSource, isCreateMode?: boolean) => {
+      const updatedPageSources = isCreateMode
+        ? [...(config.pageSources ?? []), { id: generateObjectId(), ...sourceDetails }]
+        : config.pageSources?.map((source) =>
+            source.id === sourceDetails.id ? { ...source, ...sourceDetails } : source
+          ) ?? [];
+
+      handleSaveConfig({ ...config, pageSources: updatedPageSources }, false);
+
+      if (isCreateMode) {
+        setShowNewPageSource(false);
+      }
+
+      toast.success(`Successfully saved page source!`);
+    },
+    [config, handleSaveConfig]
+  );
+
+  const handlePageSourceStatusToggle = useCallback(
+    (id: string, status: boolean) => {
+      handleSaveConfig(
+        {
+          ...config,
+          pageSources: config.pageSources?.map((source) =>
+            id === source.id ? { ...source, isActive: status } : source
+          ),
+        },
+        false
+      );
+    },
+    [config, handleSaveConfig]
+  );
+
+  const handleDeletePageSource = useCallback(
+    (id: string) => {
+      handleSaveConfig(
+        {
+          ...config,
+          pageSources: config.pageSources?.filter((source) => id !== source.id),
+        },
+        false
+      );
+
+      toast.success(`Page source deleted successfully!`);
+    },
+    [config, handleSaveConfig]
+  );
+
+  if (!isExtensionInstalled()) {
+    return <InstallExtensionCTA eventPage="session_configuration" />;
+  }
+
   return (
     <Row className="sessions-configuration-container">
       <Col
@@ -275,10 +187,12 @@ const ConfigurationPage: React.FC = () => {
         xl={{ offset: 4, span: 16 }}
         flex="1 1 820px"
       >
-        {/* TODO: add a back button */}
-        <div className="header">Session Recording Settings</div>
+        <div className="header">
+          <Button type="default" icon={<LeftOutlined />} onClick={() => redirectToSessionRecordingHome(navigate)} />
+          <span>Session Recording Settings</span>
+        </div>
 
-        <div className="automatic-recording">
+        <div className="automatic-recording-container">
           <div className="automatic-recording-details">
             <div className="heading">Automatic recording</div>
             <div className="caption">Adjust the automatic recording rules</div>
@@ -304,51 +218,57 @@ const ConfigurationPage: React.FC = () => {
                 />
               </Col>
 
-              <Col span={10}>
+              {/* <Col span={10}>
                 <Row>
-                  {/* TODO: update link */}
                   <a href="/" target="_blank" rel="noreferrer" className="learn-more-link ml-auto">
                     Recording all pages is safe & secure
                   </a>
                 </Row>
-              </Col>
+              </Col> */}
             </Row>
-            <div>
+            <div className="specific-page-mode-container">
               <ConfigurationRadioItem
                 value={AutoRecordingMode.CUSTOM}
                 title="Specific pages"
                 caption="Start recording automatically when you visit websites or URLs below."
               />
-              <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                <div>
-                  <div>
-                    <span>Page URLs where session should be recorded:</span>
-                  </div>
-                  {autoRecording?.mode === AutoRecordingMode.CUSTOM ? (
-                    <>
-                      <Button
-                        size="small"
-                        type="link"
-                        icon={<PlusOutlined />}
-                        onClick={addEmptyPageSource}
-                        style={{ margin: "10px 0 10px -8px" }}
-                      >
-                        Add page source
-                      </Button>
-                      {pageSources?.length ? (
-                        <Table
-                          rowKey={(_, i) => i}
-                          columns={pageSourceColumns}
-                          dataSource={config?.pageSources}
-                          pagination={false}
-                          showHeader={false}
-                          bordered={false}
-                        />
-                      ) : null}
-                    </>
-                  ) : null}
-                </div>
-              </Space>
+
+              <div className="page-source-list">
+                {config.pageSources?.length > 0
+                  ? config.pageSources?.map((source) => (
+                      <PageSourceRow
+                        key={source.id}
+                        source={source}
+                        disabled={!autoRecording?.isActive ?? false}
+                        handleSavePageSourceDetails={handleSavePageSourceDetails}
+                        handlePageSourceStatusToggle={handlePageSourceStatusToggle}
+                        handleDeletePageSource={handleDeletePageSource}
+                      />
+                    ))
+                  : null}
+
+                {showNewPageSource ? (
+                  <PageSourceRow
+                    source={{ ...emptyPageSourceData }}
+                    openInCreateMode={true}
+                    disabled={!autoRecording?.isActive ?? false}
+                    handleSavePageSourceDetails={handleSavePageSourceDetails}
+                    handlePageSourceStatusToggle={handlePageSourceStatusToggle}
+                    handleDeletePageSource={handleDeletePageSource}
+                  />
+                ) : (
+                  <Button
+                    block
+                    disabled={!autoRecording?.isActive ?? false}
+                    type="dashed"
+                    icon={<PlusOutlined />}
+                    className="add-new-source-btn"
+                    onClick={handleAddNewPageSourceClick}
+                  >
+                    Add page source
+                  </Button>
+                )}
+              </div>
             </div>
           </Radio.Group>
         </div>
