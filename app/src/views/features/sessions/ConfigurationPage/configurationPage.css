@@ -26,3 +26,57 @@
   padding-left: 0;
   padding-right: 0;
 }
+
+.sessions-configuration-container {
+  margin-top: 2.5rem;
+}
+
+.sessions-configuration-container .header {
+  margin-bottom: 2rem;
+}
+
+.automatic-recording-details .heading {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--white);
+}
+
+.automatic-recording-details .caption {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.automatic-recording-switch {
+  margin: 1rem 0;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+  color: var(--text-gray);
+}
+
+.automatic-recording-switch > span {
+  font-size: 13px;
+}
+
+.automatic-recording-radio-group.ant-radio-group {
+  display: block;
+  font-size: 13px;
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-background);
+}
+
+.automatic-recording-radio-group.ant-radio-group > *:not(:last-child) {
+  border-bottom: 1px solid var(--body-background);
+}
+
+.automatic-recording-radio-group .learn-more-link {
+  padding: 1rem;
+  font-size: 11px;
+  margin-left: auto;
+  color: var(--link-color);
+}
+
+.automatic-recording-radio-group .learn-more-link:hover {
+  text-decoration: underline;
+}
