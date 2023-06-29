@@ -61,6 +61,14 @@ const DraftSessionViewer: React.FC = () => {
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
+  const generateDraftSessionTitle = useCallback((url: string) => {
+    const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
+    const date = new Date();
+    const month = date.toLocaleString("default", { month: "short" });
+    const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
+    return `${hostname}@${formattedDate}`;
+  }, []);
+
   useEffect(
     () => () => {
       dispatch(sessionRecordingActions.resetState());
@@ -95,7 +103,7 @@ const DraftSessionViewer: React.FC = () => {
             dispatch(
               sessionRecordingActions.setSessionRecording({
                 sessionAttributes: tabSession.attributes,
-                name: "Session-" + Date.now(),
+                name: generateDraftSessionTitle(tabSession.attributes?.url),
               })
             );
 
@@ -106,7 +114,7 @@ const DraftSessionViewer: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
   const getSessionEventsToSave = useCallback(
     (options: RecordingOptions): RQSessionEvents => {
