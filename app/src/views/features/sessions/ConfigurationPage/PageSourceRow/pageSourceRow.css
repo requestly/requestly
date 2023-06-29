@@ -1,0 +1,31 @@
+.page-source-row {
+  padding: 1rem;
+  margin: 0 0 1rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  background-color: var(--body-background);
+}
+
+.page-source-row:nth-last-child(2) {
+  margin-bottom: 0;
+}
+
+.page-source-row .source-label {
+  font-size: 14px;
+  color: var(--white);
+  max-width: 68ch;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-source-row .action-btns-container {
+  column-gap: 8px;
+}
+
+.page-source-row .action-btns-container .page-source-switch {
+  min-width: 5.12rem;
+}
+
+.page-source-row .action-btns-container .page-source-switch span.label {
+  padding-right: 6px;
+}
