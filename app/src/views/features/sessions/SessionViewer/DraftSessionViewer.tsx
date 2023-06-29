@@ -112,15 +112,8 @@ const DraftSessionViewer: React.FC = () => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
     const date = new Date();
     const month = date.toLocaleString("default", { month: "short" });
-    const time = date
-      .toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })
-      .replace(/\s/g, "");
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
-    return `${hostname}@${formattedDate}-${time}`;
+    return `${hostname}@${formattedDate}`;
   };
 
   const getSessionEventsToSave = useCallback(
