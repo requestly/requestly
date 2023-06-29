@@ -17,7 +17,6 @@ export const SessionViewerTitle: React.FC = () => {
         {sessionRecordingName?.length === 0 || isTitleEditable ? (
           <div className="session-title-name-wrapper">
             <Input
-              data-tour-id="rule-editor-title"
               autoFocus={true}
               onFocus={() => setIsTitleEditable(true)}
               onBlur={() => setIsTitleEditable(false)}

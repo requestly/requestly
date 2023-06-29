@@ -10,6 +10,7 @@ import EnvironmentDetailsPanel from "./EnvironmentDetailsPanel";
 import { ApiOutlined, CodeOutlined, ProfileOutlined } from "@ant-design/icons";
 import { ConsoleLog, NetworkLog } from "./types";
 import SessionPropertiesPanel from "./SessionPropertiesPanel";
+import CopyButton from "components/misc/CopyButton";
 import {
   getSessionRecordingAttributes,
   getSessionRecordingEvents,
@@ -166,7 +167,13 @@ const SessionDetails: React.FC = () => {
   return (
     <>
       <div className="session-properties-wrapper">
-        <Input readOnly addonBefore="Page URL" value={attributes?.url} className="session-page-url-property" />
+        <Input
+          readOnly
+          addonBefore="Page URL"
+          value={attributes?.url}
+          className="session-page-url-property"
+          suffix={<CopyButton showIcon={true} copyText={attributes?.url} title="" />}
+        />
         <Input
           readOnly
           addonBefore="Duration"

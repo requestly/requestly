@@ -301,6 +301,10 @@
 
     & .ant-input-group-wrapper {
       width: auto;
+
+      .ant-input-affix-wrapper {
+        background: var(--component-background);
+      }
     }
     & .ant-input-group-addon {
       background: var(--component-background);
