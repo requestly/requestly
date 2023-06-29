@@ -312,7 +312,10 @@ body.dark {
 
     .ant-pro-card,
     .rr-player {
-      background: #14141466 !important;
+      background: var(--component-background) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius-sm);
+      box-sizing: content-box;
     }
 
     .rr-player {
@@ -322,13 +325,6 @@ body.dark {
 
     .rr-controller {
       background: transparent;
-    }
-
-    .rr-player,
-    .ant-pro-card {
-      border: 1px solid var(--border-dark);
-      border-radius: var(--border-radius-sm);
-      box-sizing: content-box;
     }
 
     .ant-input-number-group-addon {
