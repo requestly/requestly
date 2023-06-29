@@ -5,6 +5,7 @@ import { RQButton } from "lib/design-system/components";
 import { capitalize } from "lodash";
 import { SourceKey, SourceOperator } from "types";
 import { PageSource } from "../../types";
+import { toast } from "utils/Toast";
 import "./pageSourceRow.css";
 
 interface Props {
@@ -121,6 +122,11 @@ export const PageSourceRow: React.FC<Props> = React.memo(
           disabled={disabled}
           className="save-btn"
           onClick={() => {
+            if (pageSourceDetails.value.length === 0) {
+              toast.warn("Please provide page source value");
+              return;
+            }
+
             handleSavePageSourceDetails(pageSourceDetails, openInCreateMode);
             setIsEditMode(false);
           }}
