@@ -34,6 +34,7 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { getOwnerId } from "backend/utils";
 import { startRecordingOnUrl } from "actions/ExtensionActions";
 import { IoRecordingOutline } from "react-icons/io5";
+import Search from "antd/lib/input/Search";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -170,7 +171,8 @@ const SessionsIndexPage = () => {
 
   const ConfigureButton = () => (
     <>
-      <Button type="primary" onClick={() => startRecordingOnUrl("https://github.com")} icon={<IoRecordingOutline />}>
+      <Search onSearch={(value) => startRecordingOnUrl("https://" + value)} />
+      <Button type="primary" onClick={() => startRecordingOnUrl("https://youtube.com")} icon={<IoRecordingOutline />}>
         Record
       </Button>
       <Button type="primary" onClick={openConfigModal} icon={<SettingOutlined />}>
