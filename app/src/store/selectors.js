@@ -231,6 +231,10 @@ export const getIsRuleEditorTourCompleted = (state) => {
   );
 };
 
+export const getIsMiscTourCompleted = (state) => {
+  return getGlobalState(state).misc.persist?.isMiscTourCompleted;
+};
+
 export const getIsConnectedAppsTourCompleted = (state) => {
   return getGlobalState(state).misc.persist?.isConnectedAppsTourCompleted;
 };

@@ -4,6 +4,7 @@ import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
+import { MISC_TOURS } from "./constants";
 
 const tourTooltipPresets = {
   disableBeacon: true,
@@ -312,6 +313,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Right-click to modify request, copy cURL and more. Try it now!",
       content: null,
       placement: "bottom",
+      showNext: false,
     },
   ],
   [FEATURES.CONNECTED_APPS]: [
@@ -324,6 +326,30 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 7,
       disableOverlayClose: false,
+      showNext: false,
+    },
+  ],
+  [MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-table-switch-status"),
+      title: "Activate/Deactivate rule easily",
+      content: "You can switch off the rule in case the rule is not in use.",
+      placement: "bottom",
+      spotlightPadding: 0,
+      offset: 20,
+      customNextButtonText: "Got it!",
+    },
+  ],
+  [MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget("rule-table-create-group-btn"),
+      title: "Create groups for the rules",
+      content: "Organize your rules into logical groups and enable/disable in one go!",
+      placement: "bottom",
+      spotlightPadding: 0,
+      customNextButtonText: "Got it!",
     },
   ],
 };

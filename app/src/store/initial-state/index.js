@@ -171,6 +171,10 @@ const INITIAL_STATE = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      isMiscTourCompleted: {
+        firstRule: false,
+        fifthRule: false,
+      },
 
       hasConnectedApp: false,
     },
