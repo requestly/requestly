@@ -95,7 +95,7 @@ const Status = ({ location, isRuleEditorModal }) => {
   const isChecked = isRuleCurrentlyActive();
 
   return (
-    <div className="display-row-center ml-2 rule-editor-header-switch">
+    <div className="display-row-center ml-2 rule-editor-header-switch" data-tour-id="rule-editor-status-toggle">
       <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
       <Switch
         size="small"

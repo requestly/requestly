@@ -37,25 +37,24 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
       <div className="title white">{step.title}</div>
       <div className="text-gray tour-tooltip-content">{step.content}</div>
       <div className="tour-tooltip-buttons-container">
-        {size > 1 && (
-          <Button
-            type="default"
-            ref={nextButtonRef}
-            className="tour-tooltip-next-btn"
-            style={{ visibility: step.showNext ? "visible" : "hidden" }}
-            // used closeProps because primary props takes away the focus from input boxes when tooltip appears
-            {...closeProps}
-            disabled={step.disableNext?.(context)}
-          >
-            {isLastStep ? (
+        <Button
+          type="default"
+          ref={nextButtonRef}
+          className="tour-tooltip-next-btn"
+          style={{ visibility: step.showNext ? "visible" : "hidden" }}
+          // used closeProps because primary props takes away the focus from input boxes when tooltip appears
+          {...closeProps}
+          disabled={step.disableNext?.(context)}
+        >
+          {step?.customNextButtonText ??
+            (isLastStep ? (
               "Finish"
             ) : (
               <>
                 Next <img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />
               </>
-            )}
-          </Button>
-        )}
+            ))}
+        </Button>
       </div>
     </div>
   );
