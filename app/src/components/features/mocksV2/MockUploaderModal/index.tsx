@@ -13,6 +13,7 @@ import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "
 import { toast } from "utils/Toast";
 import { MockType, RQMockSchema } from "../types";
 import { createMockFromUploadedFile } from "../utils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const { Dragger } = Upload;
 
@@ -25,12 +26,14 @@ interface Props {
 const MockUploaderModal: React.FC<Props> = ({ visible, toggleModalVisibility, mockType }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
 
   const navigate = useNavigate();
 
   const handleFileSelection = async (uploadOptions: any) => {
     toast.loading(`Creating Mock from file ${uploadOptions.file.name}`);
-    await createMockFromUploadedFile(uid, uploadOptions.file)
+    await createMockFromUploadedFile(uid, uploadOptions.file, teamId)
       .then((mock: RQMockSchema) => {
         toast.success("Mock Created Successfully");
         uploadOptions.onSuccess("OK");
