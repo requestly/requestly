@@ -111,6 +111,6 @@ export default [
       file: `${OUTPUT_DIR}/lib/customElements.js`,
       format: "iife",
     },
-    plugins: [...commonPlugins],
+    plugins: [...commonPlugins, postcss({ inject: false })],
   },
 ];
