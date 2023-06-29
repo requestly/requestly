@@ -12,7 +12,7 @@
 .page-source-row .source-label {
   font-size: 14px;
   color: var(--white);
-  max-width: 68ch;
+  max-width: 76ch;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
