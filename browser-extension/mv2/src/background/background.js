@@ -1041,7 +1041,7 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
     BG.statusSettings.isExtensionEnabled &&
     (isAutoRecordingActive ?? true) &&
     pageSources
-      .filter((source) => source.isActive ?? true) // if isActive not present in source, then is default active
+      .filter((source) => source.isActive ?? true) // if isActive not present then its default active
       .some((pageSource) => RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null);
 
   return shouldRecord ? sessionRecordingConfig : null;
