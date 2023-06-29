@@ -31,16 +31,16 @@
       overflow: auto;
       min-height: 100%;
 
-      & > div {
+      > div {
         height: auto;
       }
-      & .ant-input,
-      & .ant-input-number-input {
+      .ant-input,
+      .ant-input-number-input {
         box-shadow: var(--input-box-shadow);
         background: var(--component-dark-background);
       }
 
-      & .session-property-label {
+      .session-property-label {
         margin-bottom: 4px;
       }
       &.ant-pro-card.primary-card {
@@ -51,22 +51,24 @@
           padding: 0;
         }
       }
-      & .ant-pro-card-body .session-start-time-input-wrapper {
+      .ant-pro-card-body .session-start-time-input-wrapper {
         display: flex;
         align-items: center;
         column-gap: 10px;
 
-        & .ant-input-number-group-wrapper {
+        .ant-input-number-group-wrapper {
           width: 100%;
 
-          & .ant-input-number-wrapper .ant-input-number-group-addon {
+          .ant-input-number-wrapper .ant-input-number-group-addon {
             background: var(--component-dark-background);
           }
         }
       }
       .readonly-session-description {
         border: 1px solid var(--border);
+        box-shadow: var(--input-box-shadow);
         border-radius: var(--border-radius-sm);
+        background: var(--component-background);
         padding: 1rem;
       }
     }
