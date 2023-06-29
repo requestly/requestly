@@ -1244,14 +1244,18 @@ const RulesTable = ({
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
-              <Tooltip title={isScreenSmall ? (user.loggedIn ? "Move to Trash" : "Delete Permanently") : null}>
+              <Tooltip
+                title={
+                  isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
+                }
+              >
                 <Button
                   danger
                   shape={isScreenSmall ? "circle" : null}
                   onClick={handleDeleteRulesOnClick}
                   icon={<DeleteOutlined />}
                 >
-                  {isScreenSmall ? null : user.loggedIn ? "Move to Trash" : "Delete Permanently"}
+                  {isScreenSmall ? null : user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently"}
                 </Button>
               </Tooltip>
             </Space>
