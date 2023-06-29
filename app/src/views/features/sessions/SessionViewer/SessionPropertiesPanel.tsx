@@ -68,9 +68,8 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   return (
     <ProCard className="session-recording-properties primary-card">
       {!isReadOnly && (
-        // <SessionProperty label="Start time offset">
         <>
-          <p className="session-property-label">Start time offset</p>
+          <p className="session-property-label text-gray">Start time offset</p>
           <div className="session-start-time-input-wrapper">
             <InputNumber
               addonAfter="seconds"
@@ -87,10 +86,9 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
             </Button>
           </div> */}
         </>
-        // </SessionProperty>
       )}
 
-      <p className="mt-20 session-property-label ">Description</p>
+      <p className="mt-20 session-property-label text-gray">Description</p>
       {!isReadOnly ? (
         <Input.TextArea
           rows={7}

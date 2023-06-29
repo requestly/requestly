@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Dropdown, Menu, Modal, Space, Typography } from "antd";
-import { DeleteOutlined, ExclamationCircleOutlined, MoreOutlined } from "@ant-design/icons";
+import { Modal, Space, Typography } from "antd";
+import { RQButton } from "lib/design-system/components";
+import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
@@ -26,6 +27,7 @@ import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -71,17 +73,6 @@ const SavedSessionViewer: React.FC = () => {
       },
     });
   }, [id, eventsFilePath, navigateToList]);
-
-  const sessionActionsDropdownMenu = useMemo(
-    () => (
-      <Menu className="session-viewer-more-actions">
-        <Menu.Item key="delete" className="more-action" onClick={confirmDeleteAction}>
-          <DeleteOutlined className="more-action-icon" /> Delete Recording
-        </Menu.Item>
-      </Menu>
-    ),
-    [confirmDeleteAction]
-  );
 
   useEffect(
     () => () => {
@@ -139,23 +130,18 @@ const SavedSessionViewer: React.FC = () => {
     <>
       <div className="session-viewer-page">
         <div className="session-viewer-header">
-          <div
-            style={{
-              display: "flex",
-              columnGap: "10px",
-            }}
-          >
+          {isRequestedByOwner ? (
+            <SessionViewerTitle />
+          ) : (
             <Typography.Title level={3} className="session-recording-name">
               {name}
             </Typography.Title>
-          </div>
+          )}
           {isRequestedByOwner ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
-                <Dropdown overlay={sessionActionsDropdownMenu} trigger={["click"]}>
-                  <Button icon={<MoreOutlined />} onClick={(e) => e.preventDefault()} />
-                </Dropdown>
+                <RQButton type="default" icon={<DeleteOutlined />} onClick={confirmDeleteAction} />
               </Space>
             </div>
           ) : null}

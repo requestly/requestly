@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getSessionRecordingName } from "store/features/session-recording/selectors";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { Typography, Input } from "antd";
 import { BiPencil } from "react-icons/bi";
-import "./index.css";
+import "./sessionViewer.scss";
 
 export const SessionViewerTitle: React.FC = () => {
+  const dispatch = useDispatch();
   const sessionRecordingName = useSelector(getSessionRecordingName);
   const [isTitleEditable, setIsTitleEditable] = useState<boolean>(false);
-  const [sessionTitle, setSessionTitle] = useState<string>(sessionRecordingName);
 
   return (
     <div className="w-full">
       <div className="session-title-name">
-        {sessionTitle.length === 0 || isTitleEditable ? (
+        {sessionRecordingName?.length === 0 || isTitleEditable ? (
           <div className="session-title-name-wrapper">
             <Input
               data-tour-id="rule-editor-title"
@@ -22,8 +23,8 @@ export const SessionViewerTitle: React.FC = () => {
               onBlur={() => setIsTitleEditable(false)}
               bordered={false}
               spellCheck={false}
-              value={sessionTitle}
-              onChange={(e) => setSessionTitle(e.target.value)}
+              value={sessionRecordingName}
+              onChange={(e) => dispatch(sessionRecordingActions.setName(e.target.value))}
               placeholder="Enter session Title"
               onPressEnter={() => setIsTitleEditable(false)}
             />
@@ -36,7 +37,7 @@ export const SessionViewerTitle: React.FC = () => {
                 setIsTitleEditable(true);
               }}
             >
-              {sessionTitle ? sessionTitle : "Enter session Title"}
+              {sessionRecordingName ? sessionRecordingName : "Enter session Title"}
             </Typography.Text>
             <BiPencil onClick={() => setIsTitleEditable(true)} />
           </div>
