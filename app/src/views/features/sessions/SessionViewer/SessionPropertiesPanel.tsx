@@ -65,6 +65,8 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
     [dispatch]
   );
 
+  if (isReadOnly && !sessionDescription) return null;
+
   return (
     <ProCard className="session-recording-properties primary-card">
       {!isReadOnly && (

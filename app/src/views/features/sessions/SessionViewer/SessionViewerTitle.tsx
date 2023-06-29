@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getSessionRecordingName } from "store/features/session-recording/selectors";
+import { getUserAuthDetails } from "store/selectors";
+import { getSessionRecordingName, getSessionRecordingId } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { Typography, Input } from "antd";
 import { BiPencil } from "react-icons/bi";
 import "./sessionViewer.scss";
+import { updateSessionName } from "../api";
 
 export const SessionViewerTitle: React.FC = () => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const sessionRecordingName = useSelector(getSessionRecordingName);
+  const recordingId = useSelector(getSessionRecordingId);
   const [isTitleEditable, setIsTitleEditable] = useState<boolean>(false);
+
+  const handleOnNameInputBlur = () => {
+    setIsTitleEditable(false);
+    if (recordingId) {
+      updateSessionName(user?.details?.profile?.uid, recordingId, sessionRecordingName);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -19,13 +30,13 @@ export const SessionViewerTitle: React.FC = () => {
             <Input
               autoFocus={true}
               onFocus={() => setIsTitleEditable(true)}
-              onBlur={() => setIsTitleEditable(false)}
+              onBlur={handleOnNameInputBlur}
               bordered={false}
               spellCheck={false}
               value={sessionRecordingName}
               onChange={(e) => dispatch(sessionRecordingActions.setName(e.target.value))}
               placeholder="Enter session Title"
-              onPressEnter={() => setIsTitleEditable(false)}
+              onPressEnter={handleOnNameInputBlur}
             />
           </div>
         ) : (
