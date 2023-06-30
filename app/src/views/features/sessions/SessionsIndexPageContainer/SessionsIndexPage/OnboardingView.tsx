@@ -8,7 +8,14 @@ import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import "./index.scss";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackInstallExtensionDialogShown,
+  trackOnboardingToSettingsNavigate,
+  trackOnboardingYTVideoClicked,
+  trackStartRecordingOnExternalTarget,
+  trackStartRecordingWithURLClicked,
+  trackTriedRecordingForInvalidURL,
+} from "modules/analytics/events/features/sessionRecording";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import TutorialButton from "./TutorialButton";
@@ -178,14 +185,14 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
   }, []);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
-    // todo: add event
+    trackStartRecordingWithURLClicked();
     if (isExtensionInstalled()) {
       const urlToRecord = inputRef?.current.input.value;
       if (isValidUrl(urlToRecord)) {
-        // todo: add event
+        trackStartRecordingOnExternalTarget(urlToRecord);
         return startRecordingOnUrl(urlToRecord);
       } else {
-        // todo: add event
+        trackTriedRecordingForInvalidURL(urlToRecord);
         toast.warn("Please enter a valid URL");
       }
     } else {
@@ -194,7 +201,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
   }, [openInstallExtensionModal]);
 
   const handleSettingsNavigation = useCallback(() => {
-    // todo: add event
+    trackOnboardingToSettingsNavigate();
     navigateToSessionSettings();
   }, []);
 
@@ -248,7 +255,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
               preload="auto"
             />
           </Row>
-          <Row align="middle" justify="center">
+          <Row align="middle" justify="center" onClick={trackOnboardingYTVideoClicked}>
             <a href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74" target="__blank">
               <Row justify="center" align="middle">
                 <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
@@ -282,7 +289,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
 };
 
 const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL);
+  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL) || true;
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {

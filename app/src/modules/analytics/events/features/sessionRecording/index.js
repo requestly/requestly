@@ -85,3 +85,14 @@ export const trackSampleSessionClicked = (log_type) => {
     log_type,
   });
 };
+
+/* ONBOARDING */
+export const trackOnboardingYTVideoClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.youtube_link_clicked);
+export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
+export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
+export const trackStartRecordingOnExternalTarget = (url) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.navigate_to_target_website, { url });
+};
+export const trackTriedRecordingForInvalidURL = (url) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.invalid_recording_url, { url });
+};
