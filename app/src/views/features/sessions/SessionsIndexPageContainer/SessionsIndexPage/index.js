@@ -50,8 +50,6 @@ const SessionsIndexPage = () => {
     return prevVal !== val;
   };
 
-  // Global State
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
