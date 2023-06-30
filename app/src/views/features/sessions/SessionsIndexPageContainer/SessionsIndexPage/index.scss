@@ -1,0 +1,45 @@
+.onboarding-content-container {
+  margin-left: 3rem;
+  margin-right: 3rem;
+  margin-top: 2rem;
+
+  .banner-title {
+    font-size: 24px;
+  }
+
+  .banner-text-container {
+    padding-right: 10rem;
+    padding-left: 2rem;
+
+    .banner-text {
+      font-size: 14px;
+    }
+
+    .record-label {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .input-container {
+      input {
+        height: 30px;
+      }
+    }
+
+    .start-btn-container {
+      padding-left: 0.7rem;
+      text-align: center;
+      align-items: middle;
+
+      button {
+        height: 30px;
+      }
+    }
+  }
+  .demo-video {
+    width: 70%;
+  }
+  .settings-icon {
+    cursor: pointer;
+  }
+}

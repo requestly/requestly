@@ -1,6 +1,6 @@
 import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
-import { Button, Divider, Input, Row, Col, Typography } from "antd";
-import React, { useState, useCallback } from "react";
+import { Button, Divider, Input, Row, Col, Typography, InputRef } from "antd";
+import React, { useState, useCallback, useRef } from "react";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
@@ -9,12 +9,14 @@ import "./index.scss";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import TutorialButton from "./TutorialButton";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { isValidUrl } from "utils/FormattingHelper";
+import { toast } from "utils/Toast";
 
 const { Text, Title } = Typography;
 
@@ -40,8 +42,8 @@ interface OnboardingProps extends SessionOnboardProps {
 }
 
 function navigateToSessionSettings() {
-  /* dummy */
   // todo: redirect to settings page and add event
+  console.info("todo: will add navigation once settings page is deployed");
 }
 
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
@@ -161,8 +163,8 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig 
   );
 };
 
-const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
-  const user = useSelector(getUserAuthDetails);
+const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
+  const inputRef = useRef<InputRef>();
 
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
 
@@ -176,9 +178,25 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
   }, []);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
-    // todo: change from launchConfig to setting url as session config
-    return user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig() : openInstallExtensionModal()) : null;
-  }, [launchConfig, openInstallExtensionModal, user?.details?.isLoggedIn]);
+    // todo: add event
+    if (isExtensionInstalled()) {
+      const urlToRecord = inputRef?.current.input.value;
+      if (isValidUrl(urlToRecord)) {
+        // todo: add event
+        return startRecordingOnUrl(urlToRecord);
+      } else {
+        // todo: add event
+        toast.warn("Please enter a valid URL");
+      }
+    } else {
+      openInstallExtensionModal();
+    }
+  }, [openInstallExtensionModal]);
+
+  const handleSettingsNavigation = useCallback(() => {
+    // todo: add event
+    navigateToSessionSettings();
+  }, []);
 
   return (
     <div className="onboarding-content-container">
@@ -207,7 +225,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
           </Row>
           <Row>
             <Col span={15} className="input-container">
-              <Input placeholder="Enter the URL you want to record" />
+              <Input ref={inputRef} placeholder="Enter the URL you want to record" />
             </Col>
             <Col span={3} className="start-btn-container">
               <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
@@ -218,11 +236,11 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
           </Row>
         </Col>
         <Col span={13}>
-          <Row justify="end" align="middle" className="settings-icon" onClick={navigateToSessionSettings}>
+          <Row justify="end" align="middle" className="settings-icon" onClick={handleSettingsNavigation}>
             <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
           </Row>
           <Row justify="center">
-            <video // todo: replace with gif
+            <video // todo: replace with main gif
               className="demo-video"
               src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
               playsInline
