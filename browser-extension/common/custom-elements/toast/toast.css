@@ -5,6 +5,7 @@
   margin: 16px;
   width: 30vw;
   right: 0;
+  top: 0;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -51,4 +52,5 @@
   height: 20px;
   width: 20px;
   background: #2a2a2a;
+  border-radius: 4px;
 }
