@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -31,29 +33,31 @@ import {
   getRulesSelection,
   getRulesToPopulate,
   getUserAuthDetails,
+  getUserAttributes,
+  getIsMiscTourCompleted,
 } from "store/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
-import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import Text from "antd/lib/typography/Text";
 import { getSelectedRules, unselectAllRules } from "../../actions";
+import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
 import { actions } from "store";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { compareRuleByModificationDate, isDesktopOnlyRule } from "utils/rules/misc";
+import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
+import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import SharedListRuleViewerModal from "../../SharedListRuleViewerModal";
 import { isEmpty } from "lodash";
 import moment from "moment";
-import ReactHoverObserver from "react-hover-observer";
-import Text from "antd/lib/typography/Text";
 import { StorageService } from "init";
 import { toast } from "utils/Toast.js";
-import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
 import { InfoTag } from "components/misc/InfoTag";
+import ReactHoverObserver from "react-hover-observer";
+import { UserIcon } from "components/common/UserIcon";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import { UserIcon } from "components/common/UserIcon";
-import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
 import UngroupOrDeleteRulesModal from "../../UngroupOrDeleteRulesModal";
@@ -66,13 +70,14 @@ import {
   trackRulePinToggled,
   trackRulesUngrouped,
 } from "modules/analytics/events/common/rules";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
-import "./rulesTable.css";
-import Logger from "lib/logger";
 import LINKS from "config/constants/sub/links";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import Logger from "lib/logger";
+import "./rulesTable.css";
 
 //Lodash
 const set = require("lodash/set");
@@ -143,10 +148,13 @@ const RulesTable = ({
   const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
+  const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
+  const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -159,6 +167,8 @@ const RulesTable = ({
   const rulesSelection = useSelector(getRulesSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
+  const groupingAndRuleActivationExp = useFeatureValue("grouping_and_rule_activation", null);
 
   const selectedRules = getSelectedRules(rulesSelection);
 
@@ -668,7 +678,7 @@ const RulesTable = ({
       dataIndex: "status",
       align: "center",
       width: 80,
-      render: (_, record) => {
+      render: (_, record, index) => {
         if (record.objectType && record.objectType === "group") {
           if (isStatusEnabled && record.id !== UNGROUPED_GROUP_ID) {
             if (isEditingEnabled) {
@@ -698,6 +708,7 @@ const RulesTable = ({
               disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
               checked={checkIfRuleIsActive(record)}
               onClick={(_, event) => toggleRuleStatus(event, record)}
+              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
             />
           );
         }
@@ -1097,8 +1108,37 @@ const RulesTable = ({
     ),
     [handleNewRuleOnClick]
   );
+
+  useEffect(() => {
+    if (groupingAndRuleActivationExp === "variant1") {
+      if (!isMiscTourCompleted?.firstRule && userAttributes?.num_rules === 1) setStartFirstRuleWalkthrough(true);
+      if (!isMiscTourCompleted?.fifthRule && !userAttributes?.num_groups && userAttributes?.num_rules === 5)
+        setStartFifthRuleWalkthrough(true);
+    }
+  }, [
+    isMiscTourCompleted?.fifthRule,
+    isMiscTourCompleted?.firstRule,
+    userAttributes?.num_groups,
+    userAttributes?.num_rules,
+    groupingAndRuleActivationExp,
+  ]);
+
   return (
     <>
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE}
+        startWalkthrough={startFifthRuleWalkthrough}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "fifthRule" }))
+        }
+      />
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
+        startWalkthrough={startFirstRuleWalkthrough}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
+        }
+      />
       <ProTable
         scroll={{ x: 900 }}
         className="records-table"
@@ -1204,14 +1244,18 @@ const RulesTable = ({
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
-              <Tooltip title={isScreenSmall ? (user.loggedIn ? "Move to Trash" : "Delete Permanently") : null}>
+              <Tooltip
+                title={
+                  isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
+                }
+              >
                 <Button
                   danger
                   shape={isScreenSmall ? "circle" : null}
                   onClick={handleDeleteRulesOnClick}
                   icon={<DeleteOutlined />}
                 >
-                  {isScreenSmall ? null : user.loggedIn ? "Move to Trash" : "Delete Permanently"}
+                  {isScreenSmall ? null : user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently"}
                 </Button>
               </Tooltip>
             </Space>
@@ -1285,6 +1329,7 @@ const RulesTable = ({
                   {
                     shape: "circle",
                     isTooltipShown: true,
+                    tourId: "rule-table-create-group-btn",
                     buttonText: "New Group",
                     icon: <GroupOutlined />,
                     onClickHandler: handleNewGroupOnClick,
@@ -1312,6 +1357,7 @@ const RulesTable = ({
                     onClickHandler,
                     isDropdown = false,
                     hasPopconfirm = false,
+                    tourId = null,
                     trackClickEvent = () => {},
                     overlay,
                   }) => (
@@ -1342,6 +1388,7 @@ const RulesTable = ({
                                 hasPopconfirm ? user?.details?.isLoggedIn && onClickHandler() : onClickHandler();
                               }}
                               icon={icon}
+                              data-tour-id={tourId}
                             >
                               {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
                             </Button>
