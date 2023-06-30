@@ -30,6 +30,10 @@ interface OnboardingProps extends SessionOnboardProps {
   type?: OnboardingTypes;
 }
 
+function navigateToSessionSettings() {
+  /* dummy */
+}
+
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   const navigate = useNavigate();
   const stableNavigate = useCallback(
@@ -83,22 +87,21 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
   return (
     <div className="onboarding-content-container">
       <Row justify="space-between">
-        <Col>
-          <Title level={2}>Record &amp; replay your first browsing sessions</Title>
-        </Col>
-        <Col>
-          <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={12} className="banner-text-container">
+        <Col span={11} className="banner-text-container">
+          <Title level={2} className="banner-title">
+            Record &amp; replay your first browsing sessions
+          </Title>
           <Row>
             <Text type="secondary" className="banner-text">
               <div>
                 Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
-                <Text strong>network</Text> and <Text strong>environment data</Text>
+                <Text strong>network</Text> &
               </div>
-              <div> automatically on your device for sharing and debugging</div>
+              <div>
+                {" "}
+                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+              </div>
+              <div> debugging </div>
             </Text>
           </Row>
           <Row className="record-label">
@@ -107,20 +110,23 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
             </Text>
           </Row>
           <Row>
-            <Col span={18}>
+            <Col span={15} className="input-container">
               <Input placeholder="Enter the URL you want to record" />
             </Col>
-            <Col span={6} className="start-btn-container">
-              <Button size="large" type="primary">
+            <Col span={3} className="start-btn-container">
+              <Button size="middle" type="primary">
                 {" "}
                 Start Recording
               </Button>
             </Col>
           </Row>
         </Col>
-        <Col span={12}>
+        <Col span={13}>
+          <Row justify="end" align="middle" className="settings-icon" onClick={navigateToSessionSettings}>
+            <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+          </Row>
           <Row justify="center">
-            <video
+            <video // todo: replace with gif
               className="demo-video"
               src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
               playsInline
@@ -129,12 +135,15 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
             />
           </Row>
           <Row align="middle" justify="center">
-            <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
-            <Text underline>Watch it in action</Text>
+            <a href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74" target="__blank">
+              <Row justify="center" align="middle">
+                <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
+                <Text underline>Watch it in action</Text>
+              </Row>
+            </a>
           </Row>
         </Col>
       </Row>
-
       <Divider />
       <Row>
         <Col span={24}>
