@@ -61,7 +61,9 @@ export const PageSourceRow: React.FC<Props> = React.memo(
 
     return !isEditMode && !openInCreateMode ? (
       <Row align="middle" justify="space-between" wrap={false} className="page-source-row">
-        <Col className="source-label">{getPageSourceLabel(source)}</Col>
+        <Col className="source-label" style={{ color: disabled ? "var(--text-gray)" : "var(--white)" }}>
+          {getPageSourceLabel(source)}
+        </Col>
         <Col className="ml-auto">
           <Row wrap={false} align="middle" className="action-btns-container">
             <div className="page-source-switch">
