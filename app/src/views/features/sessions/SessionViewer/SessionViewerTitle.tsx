@@ -5,9 +5,9 @@ import { getSessionRecordingName, getSessionRecordingId } from "store/features/s
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { Typography, Input } from "antd";
 import { BiPencil } from "react-icons/bi";
-import "./sessionViewer.scss";
 import { updateSessionName } from "../api";
 import { trackDraftSessionNamed } from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 export const SessionViewerTitle: React.FC = () => {
   const dispatch = useDispatch();

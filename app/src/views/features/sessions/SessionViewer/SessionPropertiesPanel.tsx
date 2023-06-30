@@ -1,8 +1,10 @@
 import ProCard from "@ant-design/pro-card";
 import { InputNumber, Input, Tooltip } from "antd";
+import { AimOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import {
   getIsReadOnly,
   getSessionRecordingAttributes,
@@ -13,8 +15,6 @@ import {
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateStartTimeOffset, updateDescription } from "../api";
 import debounce from "lodash/debounce";
-import { AimOutlined } from "@ant-design/icons";
-import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
   getCurrentTimeOffset: () => number;

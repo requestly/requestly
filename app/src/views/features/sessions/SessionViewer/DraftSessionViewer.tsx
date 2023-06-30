@@ -5,20 +5,13 @@ import { Checkbox, Col, Modal, Row, Space, Tooltip } from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
-import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import { compressEvents, filterOutConsoleLogs, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
-import {
-  trackDraftSessionDiscarded,
-  trackDraftSessionSaved,
-  trackDraftSessionSaveFailed,
-  trackDraftSessionViewed,
-  trackSessionRecordingFailed,
-} from "modules/analytics/events/features/sessionRecording";
 import PageLoader from "components/misc/PageLoader";
 import { getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
@@ -38,7 +31,14 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { SessionViewerTitle } from "./SessionViewerTitle";
+import {
+  trackDraftSessionDiscarded,
+  trackDraftSessionSaved,
+  trackDraftSessionSaveFailed,
+  trackDraftSessionViewed,
+  trackSessionRecordingFailed,
+} from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Modal, Space, Typography, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import {
@@ -9,19 +10,12 @@ import {
   CloseOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "./sessionEventsUtils";
-import {
-  trackSavedSessionViewedFromApp,
-  trackSavedSessionViewedFromLink,
-} from "modules/analytics/events/features/sessionRecording";
 import ShareButton from "../ShareButton";
-import PATHS from "config/constants/sub/paths";
 import PageLoader from "components/misc/PageLoader";
-import { deleteRecording } from "../api";
 import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import {
@@ -32,9 +26,15 @@ import {
 import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
+import { deleteRecording } from "../api";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { SessionViewerTitle } from "./SessionViewerTitle";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import PATHS from "config/constants/sub/paths";
+import {
+  trackSavedSessionViewedFromApp,
+  trackSavedSessionViewedFromLink,
+} from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 interface NavigationState {
   fromApp?: boolean;
