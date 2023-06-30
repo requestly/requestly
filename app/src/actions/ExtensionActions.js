@@ -108,6 +108,7 @@ export function getAPIResponse(apiRequest) {
 }
 
 export function startRecordingOnUrl(url) {
+  // use this
   return sendMessage({
     action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.START_RECORDING_ON_URL,
     url,

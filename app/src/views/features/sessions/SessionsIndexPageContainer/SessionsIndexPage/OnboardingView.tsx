@@ -10,6 +10,11 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
 import { isExtensionInstalled } from "actions/ExtensionActions";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import TutorialButton from "./TutorialButton";
+import { AUTH } from "modules/analytics/events/common/constants";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { Text, Title } = Typography;
 
@@ -78,6 +83,80 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
           <CheckItem label="Strict Privacy" />
         </div>
       </Text>
+    </div>
+  );
+};
+
+const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
+  const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
+  const openInstallExtensionModal = useCallback(() => {
+    setIsInstallExtensionModalVisible(true);
+    trackInstallExtensionDialogShown();
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsInstallExtensionModalVisible(false);
+  }, []);
+
+  const user = useSelector(getUserAuthDetails);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        textAlign: "center",
+        height: "100%",
+        margin: "30px",
+      }}
+    >
+      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
+      <Typography.Text type="secondary">
+        <div>Record your browsing sessions on specified domains (or webpages)</div>
+        <div>and Share with others for offline review or debugging.</div>
+      </Typography.Text>
+      <div>
+        <AuthConfirmationPopover
+          title="You need to sign up to configure webpages"
+          callback={isExtensionInstalled() ? launchConfig : openInstallExtensionModal}
+          source={AUTH.SOURCE.SESSION_RECORDING}
+        >
+          <Button
+            type="primary"
+            onClick={
+              user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig : openInstallExtensionModal) : null
+            }
+            style={{ margin: "24px" }}
+          >
+            Configure webpages
+          </Button>
+        </AuthConfirmationPopover>
+        <TutorialButton>
+          See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
+        </TutorialButton>
+      </div>
+      <Divider />
+      <Typography.Text type="secondary">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-evenly",
+            fontWeight: "bold",
+          }}
+        >
+          <CheckItem label="Faster Debugging" />
+          <CheckItem label="No need to reproduce" />
+          <CheckItem label="Strict Privacy" />
+        </div>
+      </Typography.Text>
+
+      <InstallExtensionModal
+        open={isInstallExtensionModalVisible}
+        onCancel={closeModal}
+        heading="Install Browser extension to record sessions for faster debugging and bug reporting"
+        subHeading="Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser."
+        eventPage="session_recording_page"
+      />
     </div>
   );
 };
@@ -185,10 +264,15 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
 };
 
 const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
+  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL);
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return <SessionOnboardingView launchConfig={launchConfig} />;
+    return shownNewOnboarding ? (
+      <SessionOnboardingView launchConfig={launchConfig} />
+    ) : (
+      <OldSessionOnboardingView launchConfig={launchConfig} />
+    );
   }
 };
 
