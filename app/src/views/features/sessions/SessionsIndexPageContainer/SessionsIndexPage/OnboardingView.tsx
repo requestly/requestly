@@ -6,6 +6,10 @@ import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import "./index.scss";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 
 const { Text, Title } = Typography;
 
@@ -32,6 +36,7 @@ interface OnboardingProps extends SessionOnboardProps {
 
 function navigateToSessionSettings() {
   /* dummy */
+  // todo: redirect to settings page and add event
 }
 
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
@@ -78,11 +83,23 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
 };
 
 const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
+  const user = useSelector(getUserAuthDetails);
+
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
+
+  const openInstallExtensionModal = useCallback(() => {
+    setIsInstallExtensionModalVisible(true);
+    trackInstallExtensionDialogShown({ src: "sessions_home_page" });
+  }, []);
 
   const closeModal = useCallback(() => {
     setIsInstallExtensionModalVisible(false);
   }, []);
+
+  const handleStartRecordingBtnClicked = useCallback(() => {
+    // todo: change from launchConfig to setting url as session config
+    return user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig() : openInstallExtensionModal()) : null;
+  }, [launchConfig, openInstallExtensionModal, user?.details?.isLoggedIn]);
 
   return (
     <div className="onboarding-content-container">
@@ -114,7 +131,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
               <Input placeholder="Enter the URL you want to record" />
             </Col>
             <Col span={3} className="start-btn-container">
-              <Button size="middle" type="primary">
+              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
                 {" "}
                 Start Recording
               </Button>
