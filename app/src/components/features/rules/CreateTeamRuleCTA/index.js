@@ -13,7 +13,7 @@ import { redirectToTeam } from "utils/RedirectionUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import lottie from "lottie-web/build/player/lottie_light";
-// import teamSolvingPuzzle from "assets/lottie/team-solving-puzzle.json";
+import teamSolvingPuzzle from "assets/lottie/team-solving-puzzle.json";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
 
@@ -43,7 +43,7 @@ const CreateTeamRuleCTA = () => {
     lottie.loadAnimation({
       name: "CreateTeamRuleCTA-teamSolvingPuzzle",
       container: document.querySelector("#CreateTeamRuleCTA-teamSolvingPuzzle"),
-      animationData: {},
+      animationData: teamSolvingPuzzle,
       renderer: "svg", // "canvas", "html"
       loop: true, // boolean
       autoplay: true, // boolean
