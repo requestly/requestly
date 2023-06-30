@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal, Space, Typography } from "antd";
+import { Modal, Space, Typography, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import {
   DeleteOutlined,
@@ -34,6 +34,7 @@ import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { SessionViewerTitle } from "./SessionViewerTitle";
+import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -177,6 +178,20 @@ const SavedSessionViewer: React.FC = () => {
       <div className="session-viewer-page">
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt togglePrompt={toggleOnboardingPrompt} />}
         <div className="session-viewer-header">
+          <Tooltip
+            open={showOnboardingPrompt}
+            title="View all recordings"
+            placement="bottom"
+            color="var(--primary)"
+            zIndex={100}
+          >
+            <RQButton
+              type="default"
+              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              onClick={() => redirectToSessionRecordingHome(navigate)}
+              className="back-button"
+            />
+          </Tooltip>
           {isRequestedByOwner ? (
             <SessionViewerTitle />
           ) : (

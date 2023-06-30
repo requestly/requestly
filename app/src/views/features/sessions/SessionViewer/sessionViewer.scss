@@ -79,6 +79,14 @@
     justify-content: space-between;
     align-items: center;
 
+    .back-button {
+      margin-right: 8px;
+      padding: 10px;
+    }
+    .ant-toolip {
+      z-index: 100;
+    }
+
     .session-title-name {
       .session-title-name-wrapper {
         width: 100%;

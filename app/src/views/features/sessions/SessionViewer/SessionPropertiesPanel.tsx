@@ -1,5 +1,6 @@
 import ProCard from "@ant-design/pro-card";
-import { InputNumber, Input } from "antd";
+import { InputNumber, Input, Tooltip } from "antd";
+import { RQButton } from "lib/design-system/components";
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,8 +13,7 @@ import {
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateStartTimeOffset, updateDescription } from "../api";
 import debounce from "lodash/debounce";
-// import { AimOutlined } from "@ant-design/icons";
-// import InfoIcon from "components/misc/InfoIcon";
+import { AimOutlined } from "@ant-design/icons";
 import { getUserAuthDetails } from "store/selectors";
 
 interface Props {
@@ -80,13 +80,16 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
               value={startTimeOffset}
               onChange={onStartTimeOffsetChange}
             />
-            {/* <InfoIcon text={`By default, video will start playing at this time.`} /> */}
           </div>
-          {/* <div>
-            <Button type="link" icon={<AimOutlined />} onClick={() => onStartTimeOffsetChange(getCurrentTimeOffset())}>
+          <Tooltip title="By default, video will start playing at this time." placement="right" mouseEnterDelay={0.8}>
+            <RQButton
+              type="link"
+              icon={<AimOutlined />}
+              onClick={() => onStartTimeOffsetChange(getCurrentTimeOffset())}
+            >
               Select current player time
-            </Button>
-          </div> */}
+            </RQButton>
+          </Tooltip>
         </>
       )}
 
