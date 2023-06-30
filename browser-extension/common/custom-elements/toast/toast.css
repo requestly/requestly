@@ -10,8 +10,6 @@
   flex-direction: column;
   color: #fff;
   font-family: Roboto;
-  font-weight: 600;
-  line-height: 150%;
   transform: translateX(calc(100% + 20px));
   transition: all 0.5s cubic-bezier(0.3, -0.1, 1, 1);
 }
@@ -23,6 +21,8 @@
 #heading {
   font-size: 16px;
   margin: 4px 0;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 #subheading-container {
@@ -30,9 +30,13 @@
   flex-direction: row;
 }
 
+#heading-container {
+  display: flex;
+  flex-direction: row;
+}
+
 #subheading {
   font-size: 13px;
-  margin: 4px 0;
   line-height: 1.4;
 }
 
