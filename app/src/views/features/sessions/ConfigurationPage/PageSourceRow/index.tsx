@@ -58,10 +58,8 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     );
 
     return !isEditMode && !openInCreateMode ? (
-      <Row align="middle" justify="space-between" className="page-source-row">
-        <Col>
-          <span className="source-label">{source.value}</span>
-        </Col>
+      <Row align="middle" justify="space-between" wrap={false} className="page-source-row">
+        <Col className="source-label">{source.value}</Col>
         <Col className="ml-auto">
           <Row wrap={false} align="middle" className="action-btns-container">
             <div className="page-source-switch">

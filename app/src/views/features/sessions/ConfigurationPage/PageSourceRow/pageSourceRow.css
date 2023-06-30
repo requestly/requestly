@@ -11,11 +11,12 @@
 
 .page-source-row .source-label {
   font-size: 14px;
-  color: var(--white);
-  max-width: 76ch;
+  max-width: 80ch;
   display: block;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
+  color: var(--white);
 }
 
 .page-source-input-container {
@@ -63,9 +64,15 @@
 }
 
 .page-source-row .action-btns-container .page-source-switch {
+  flex-shrink: 0;
+  margin-left: 4px;
   min-width: 5.12rem;
 }
 
 .page-source-row .action-btns-container .page-source-switch span.label {
   padding-right: 6px;
+}
+
+.page-source-row .action-btns-container .ant-btn-icon-only.rq-btn {
+  flex-shrink: 0;
 }
