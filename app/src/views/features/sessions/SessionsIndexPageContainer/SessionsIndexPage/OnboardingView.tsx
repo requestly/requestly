@@ -1,17 +1,13 @@
-import { CheckOutlined, YoutubeFilled } from "@ant-design/icons";
-import { Button, Divider, Typography } from "antd";
+import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
+import { Button, Divider, Input, Row, Col, Typography } from "antd";
 import React, { useState, useCallback } from "react";
-import { useSelector } from "react-redux";
-import TutorialButton from "./TutorialButton";
-import { isExtensionInstalled } from "actions/ExtensionActions";
-import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import { getUserAuthDetails } from "store/selectors";
-import { AUTH } from "modules/analytics/events/common/constants.js";
-import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/sessionRecording";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
+import "./index.scss";
+
+const { Text, Title } = Typography;
 
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   return (
@@ -52,15 +48,15 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
         margin: "30px",
       }}
     >
-      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
-      <Typography.Text type="secondary">
+      <Title level={1}>Record &amp; Replay your browsing sessions</Title>
+      <Text type="secondary">
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
-      </Typography.Text>
+      </Text>
       <div>
         <HarImportModal onSaved={stableNavigate} />
       </div>
       <Divider />
-      <Typography.Text type="secondary">
+      <Text type="secondary">
         <div
           style={{
             display: "flex",
@@ -72,74 +68,85 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
           <CheckItem label="No need to reproduce" />
           <CheckItem label="Strict Privacy" />
         </div>
-      </Typography.Text>
+      </Text>
     </div>
   );
 };
 
 const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
-  const openInstallExtensionModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(true);
-    trackInstallExtensionDialogShown();
-  }, []);
 
   const closeModal = useCallback(() => {
     setIsInstallExtensionModalVisible(false);
   }, []);
 
-  const user = useSelector(getUserAuthDetails);
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        textAlign: "center",
-        height: "100%",
-        margin: "30px",
-      }}
-    >
-      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
-      <Typography.Text type="secondary">
-        <div>Record your browsing sessions on specified domains (or webpages)</div>
-        <div>and Share with others for offline review or debugging.</div>
-      </Typography.Text>
-      <div>
-        <AuthConfirmationPopover
-          title="You need to sign up to configure webpages"
-          callback={isExtensionInstalled() ? launchConfig : openInstallExtensionModal}
-          source={AUTH.SOURCE.SESSION_RECORDING}
-        >
-          <Button
-            type="primary"
-            onClick={
-              user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig : openInstallExtensionModal) : null
-            }
-            style={{ margin: "24px" }}
-          >
-            Configure webpages
-          </Button>
-        </AuthConfirmationPopover>
-        <TutorialButton>
-          See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
-        </TutorialButton>
-      </div>
-      <Divider />
-      <Typography.Text type="secondary">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            fontWeight: "bold",
-          }}
-        >
-          <CheckItem label="Faster Debugging" />
-          <CheckItem label="No need to reproduce" />
-          <CheckItem label="Strict Privacy" />
-        </div>
-      </Typography.Text>
+    <div className="onboarding-content-container">
+      <Row justify="space-between">
+        <Col>
+          <Title level={2}>Record &amp; replay your first browsing sessions</Title>
+        </Col>
+        <Col>
+          <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={12} className="banner-text-container">
+          <Row>
+            <Text type="secondary" className="banner-text">
+              <div>
+                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                <Text strong>network</Text> and <Text strong>environment data</Text>
+              </div>
+              <div> automatically on your device for sharing and debugging</div>
+            </Text>
+          </Row>
+          <Row className="record-label">
+            <Text type="secondary" className="banner-text">
+              Record your first session
+            </Text>
+          </Row>
+          <Row>
+            <Col span={18}>
+              <Input placeholder="Enter the URL you want to record" />
+            </Col>
+            <Col span={6} className="start-btn-container">
+              <Button size="large" type="primary">
+                {" "}
+                Start Recording
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+        <Col span={12}>
+          <Row justify="center">
+            <video
+              className="demo-video"
+              src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
+              playsInline
+              controls
+              preload="auto"
+            />
+          </Row>
+          <Row align="middle" justify="center">
+            <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
+            <Text underline>Watch it in action</Text>
+          </Row>
+        </Col>
+      </Row>
 
+      <Divider />
+      <Row>
+        <Col span={24}>
+          <Text type="secondary">
+            <Row justify="space-evenly">
+              <CheckItem label="Automatically record specified website or all activity" />
+              <CheckItem label="All recordings are saved locally until saved or shared" />
+              <CheckItem label="View network, console and environment details synced to video" />
+            </Row>
+          </Text>
+        </Col>
+      </Row>
       <InstallExtensionModal
         open={isInstallExtensionModalVisible}
         onCancel={closeModal}
