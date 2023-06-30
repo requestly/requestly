@@ -26,7 +26,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     handlePageSourceStatusToggle,
     handleDeletePageSource,
   }) => {
-    const [isEditMode, setIsEditMode] = useState(openInCreateMode ?? false);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [pageSourceDetails, setPageSourceDetails] = useState<PageSource>({
       value: "",
       isActive: false,
@@ -44,7 +44,20 @@ export const PageSourceRow: React.FC<Props> = React.memo(
       setPageSourceDetails((prevSource) => ({ ...prevSource, [key]: value }));
     }, []);
 
-    return !isEditMode ? (
+    const handleSaveClick = useCallback(
+      (e: unknown) => {
+        if (pageSourceDetails.value.length === 0) {
+          toast.warn("Please provide page source value!");
+          return;
+        }
+
+        handleSavePageSourceDetails(pageSourceDetails, openInCreateMode);
+        setIsEditMode(false);
+      },
+      [pageSourceDetails, openInCreateMode, handleSavePageSourceDetails]
+    );
+
+    return !isEditMode && !openInCreateMode ? (
       <Row align="middle" justify="space-between" className="page-source-row">
         <Col>
           <span className="source-label">{source.value}</span>
@@ -117,20 +130,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
           placeholder="Enter url here or leave this field empty to apply rule to all url's..."
         />
 
-        <Button
-          type="primary"
-          disabled={disabled}
-          className="save-btn"
-          onClick={() => {
-            if (pageSourceDetails.value.length === 0) {
-              toast.warn("Please provide page source value");
-              return;
-            }
-
-            handleSavePageSourceDetails(pageSourceDetails, openInCreateMode);
-            setIsEditMode(false);
-          }}
-        >
+        <Button type="primary" disabled={disabled} className="save-btn" onClick={handleSaveClick}>
           Save
         </Button>
       </Row>
