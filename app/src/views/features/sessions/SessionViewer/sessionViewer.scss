@@ -337,6 +337,60 @@
       background: var(--component-background);
     }
   }
+  .session-onboarding-toast {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1rem;
+    padding: 12px 16px;
+
+    .display-flex {
+      gap: 8px;
+    }
+
+    &-check-icon {
+      align-self: center;
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+    &-message {
+      color: var(--white);
+
+      > p {
+        margin-bottom: 0;
+      }
+    }
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    &-close-icon {
+      color: var(--text-gray);
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+    &-settings-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--white);
+      font-weight: 500;
+
+      & span:not(.anticon) {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 .session-viewer-more-actions {

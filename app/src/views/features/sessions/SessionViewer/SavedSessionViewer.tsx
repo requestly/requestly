@@ -2,8 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
 import { RQSessionEvents } from "@requestly/web-sdk";
@@ -16,7 +22,7 @@ import ShareButton from "../ShareButton";
 import PATHS from "config/constants/sub/paths";
 import PageLoader from "components/misc/PageLoader";
 import { deleteRecording } from "../api";
-import { getAuthInitialization, getUserAuthDetails } from "store/selectors";
+import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import {
   getIsRequestedByOwner,
@@ -33,6 +39,34 @@ interface NavigationState {
   fromApp?: boolean;
   viewAfterSave?: boolean;
 }
+interface SessionCreatedOnboardingToastProps {
+  togglePrompt: () => void;
+}
+
+const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingToastProps> = ({ togglePrompt }) => {
+  return (
+    <div className="session-onboarding-toast">
+      <div className="display-flex">
+        <CheckOutlined width={32} height={32} className="session-onboarding-toast-check-icon" />
+        <div className="session-onboarding-toast-message">
+          <p>
+            <strong>Congratulations!</strong> you have just saved your first recording.
+          </p>
+          <p>
+            You can now create a rule to <strong>automatically start recording</strong> when you visit a site.
+          </p>
+        </div>
+      </div>
+      <div className="session-onboarding-toast-actions">
+        <Link to={"#"} className="session-onboarding-toast-settings-link">
+          <SettingOutlined />
+          <span>Open settings</span>
+        </Link>
+        <CloseOutlined className="session-onboarding-toast-close-icon" onClick={togglePrompt} />
+      </div>
+    </div>
+  );
+};
 
 const SavedSessionViewer: React.FC = () => {
   const { id } = useParams();
@@ -45,9 +79,11 @@ const SavedSessionViewer: React.FC = () => {
   const name = useSelector(getSessionRecordingName);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
+  const userAttributes = useSelector(getUserAttributes);
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
@@ -73,6 +109,12 @@ const SavedSessionViewer: React.FC = () => {
       },
     });
   }, [id, eventsFilePath, navigateToList]);
+
+  useEffect(() => {
+    if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
+      setShowOnboardingPrompt(true);
+    }
+  }, [location.state, userAttributes?.num_sessions]);
 
   useEffect(
     () => () => {
@@ -121,6 +163,10 @@ const SavedSessionViewer: React.FC = () => {
       });
   }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
+  const toggleOnboardingPrompt = () => {
+    setShowOnboardingPrompt((prev) => !prev);
+  };
+
   if (showPermissionError) return <PermissionError />;
   if (showNotFoundError) return <NotFoundError />;
 
@@ -129,6 +175,7 @@ const SavedSessionViewer: React.FC = () => {
   ) : (
     <>
       <div className="session-viewer-page">
+        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt togglePrompt={toggleOnboardingPrompt} />}
         <div className="session-viewer-header">
           {isRequestedByOwner ? (
             <SessionViewerTitle />
