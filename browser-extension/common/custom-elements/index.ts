@@ -1,3 +1,3 @@
-import { defineRQToast } from "./toast";
+import { registerRQToast } from "./toast";
 
-defineRQToast();
+registerRQToast();

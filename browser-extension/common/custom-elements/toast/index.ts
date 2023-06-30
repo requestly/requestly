@@ -46,6 +46,6 @@ class RQToast extends HTMLElement {
   }
 }
 
-export const defineRQToast = () => {
+export const registerRQToast = () => {
   customElements.get("rq-toast") ?? customElements.define("rq-toast", RQToast);
 };
