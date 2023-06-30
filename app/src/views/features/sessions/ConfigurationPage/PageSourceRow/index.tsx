@@ -120,6 +120,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
         </Select>
 
         <Input
+          autoFocus
           type="text"
           disabled={disabled}
           className="page-source-input"
