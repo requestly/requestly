@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
+import { getAppMode } from "store/selectors";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./PageSourceRow";
@@ -13,6 +15,15 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import APP_CONSTANTS from "config/constants";
+import Logger from "lib/logger";
+import { StorageService } from "init";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./configurationPage.css";
 
 const emptyPageSourceData: PageSource = {
@@ -28,46 +39,89 @@ const allPagesSourceData = {
   operator: SourceOperator.WILDCARD_MATCHES,
 };
 
-type ParentContext<T = SessionRecordingConfig> = {
-  config: T;
-  handleSaveConfig: (config: T, showToast?: boolean) => void;
+const defaultSessionRecordingConfig: SessionRecordingConfig = {
+  maxDuration: 5,
+  pageSources: [],
+  autoRecording: {
+    isActive: true,
+    mode: AutoRecordingMode.ALL_PAGES,
+  },
 };
 
 const ConfigurationPage: React.FC = () => {
   const navigate = useNavigate();
-  const { config, handleSaveConfig } = useOutletContext<ParentContext>();
-  const { autoRecording } = config;
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
+  const { autoRecording } = config;
 
-  // one time migration for legacy configs
+  const handleSaveConfig = useCallback(
+    async (newConfig: SessionRecordingConfig, showToast = true) => {
+      Logger.log("Writing storage in handleSaveConfig");
+      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
+      setConfig(newConfig);
+
+      if (showToast) {
+        toast.success("Saved configuration successfully.");
+      }
+
+      trackConfigurationSaved({
+        pageSources: newConfig.pageSources?.length ?? 0,
+        maxDuration: newConfig.maxDuration,
+      });
+    },
+    [appMode]
+  );
+
   useEffect(() => {
-    if (Object.keys(config).length === 0 || config.autoRecording) return;
+    Logger.log("Reading storage in SessionsIndexPage");
+    StorageService(appMode)
+      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+      .then((config) => {
+        if (!config) return defaultSessionRecordingConfig;
 
-    const autoRecordingConfig: SessionRecordingConfig["autoRecording"] = {
-      isActive: false,
-      mode: AutoRecordingMode.ALL_PAGES,
-    };
+        if (config.autoRecording) return config; // config already migrated
 
-    const pageSourcesLength = config?.pageSources?.length ?? 0;
-    if (pageSourcesLength === 0) {
-      autoRecordingConfig.isActive = false;
-    } else if (pageSourcesLength > 1) {
-      autoRecordingConfig.isActive = true;
-      autoRecordingConfig.mode = AutoRecordingMode.CUSTOM;
-    } else if (pageSourcesLength === 1 && isEqual(config.pageSources?.[0], allPagesSourceData)) {
-      autoRecordingConfig.isActive = true;
-      autoRecordingConfig.mode = AutoRecordingMode.ALL_PAGES;
+        const autoRecordingConfig: SessionRecordingConfig["autoRecording"] = {
+          isActive: false,
+          mode: AutoRecordingMode.ALL_PAGES,
+        };
+
+        const pageSourcesLength = config?.pageSources?.length ?? 0;
+
+        if (pageSourcesLength === 0) {
+          autoRecordingConfig.isActive = false;
+        } else if (pageSourcesLength > 1) {
+          autoRecordingConfig.isActive = true;
+          autoRecordingConfig.mode = AutoRecordingMode.CUSTOM;
+        } else if (pageSourcesLength === 1 && isEqual(config?.pageSources?.[0], allPagesSourceData)) {
+          autoRecordingConfig.isActive = true;
+          autoRecordingConfig.mode = AutoRecordingMode.ALL_PAGES;
+        }
+
+        const migratedConfig = {
+          ...config,
+          maxDuration: 5,
+          autoRecording: autoRecordingConfig,
+          pageSources:
+            config?.pageSources?.map((source: PageSource) => ({ ...source, id: generateObjectId(), isActive: true })) ??
+            [],
+        };
+
+        return migratedConfig;
+      })
+      .then((config) => setConfig(config));
+  }, [appMode]);
+
+  useEffect(() => {
+    console.log("submit attribute....");
+    if (!isWorkspaceMode) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
+  }, [config?.pageSources?.length, isWorkspaceMode]);
 
-    const migratedConfig = {
-      ...config,
-      maxDuration: 5,
-      autoRecording: autoRecordingConfig,
-      pageSources: config?.pageSources.map((source) => ({ ...source, id: generateObjectId(), isActive: true })) ?? [],
-    };
-
-    handleSaveConfig(migratedConfig, false);
-  }, [config, handleSaveConfig]);
+  console.log({ config });
 
   const handleAutoRecordingToggle = useCallback(
     (status: boolean) => {
@@ -238,7 +292,7 @@ const ConfigurationPage: React.FC = () => {
                     ))
                   : null}
 
-                {showNewPageSource || config.pageSources?.length === 0 ? (
+                {showNewPageSource || config.pageSources === undefined || config.pageSources?.length === 0 ? (
                   <PageSourceRow
                     source={{ ...emptyPageSourceData }}
                     openInCreateMode={true}
@@ -268,4 +322,6 @@ const ConfigurationPage: React.FC = () => {
   );
 };
 
-export default ConfigurationPage;
+// @ts-ignore
+const ProtectedConfigurationPage = () => <ProtectedRoute component={ConfigurationPage} />;
+export default ProtectedConfigurationPage;

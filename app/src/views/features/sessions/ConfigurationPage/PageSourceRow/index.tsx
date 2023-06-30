@@ -29,7 +29,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     const [isEditMode, setIsEditMode] = useState(false);
     const [pageSourceDetails, setPageSourceDetails] = useState<PageSource>({
       value: "",
-      isActive: false,
+      isActive: true,
       key: SourceKey.URL,
       operator: SourceOperator.CONTAINS,
     });
