@@ -15,6 +15,7 @@ interface Props {
   handleDeletePageSource: (id: string) => void;
   handlePageSourceStatusToggle: (id: string, status: boolean) => void;
   handleSavePageSourceDetails: (source: PageSource, isCreateMode: boolean) => void;
+  getPageSourceLabel: (source: PageSource) => string;
 }
 
 export const PageSourceRow: React.FC<Props> = React.memo(
@@ -25,6 +26,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     handleSavePageSourceDetails,
     handlePageSourceStatusToggle,
     handleDeletePageSource,
+    getPageSourceLabel,
   }) => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [pageSourceDetails, setPageSourceDetails] = useState<PageSource>({
@@ -59,7 +61,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
 
     return !isEditMode && !openInCreateMode ? (
       <Row align="middle" justify="space-between" wrap={false} className="page-source-row">
-        <Col className="source-label">{source.value}</Col>
+        <Col className="source-label">{getPageSourceLabel(source)}</Col>
         <Col className="ml-auto">
           <Row wrap={false} align="middle" className="action-btns-container">
             <div className="page-source-switch">

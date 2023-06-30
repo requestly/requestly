@@ -5,7 +5,7 @@ import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
 import { getAppMode } from "store/selectors";
-import { isEqual } from "lodash";
+import { capitalize, isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./PageSourceRow";
 import { SourceKey, SourceOperator } from "types";
@@ -55,6 +55,18 @@ const ConfigurationPage: React.FC = () => {
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
+
+  const getPageSourceLabel = useCallback((source: PageSource): string => {
+    const capitalizeSourceKey = capitalize(source.key);
+
+    if (source.operator === SourceOperator.MATCHES) {
+      return `${capitalizeSourceKey} matches regex ${source.value}`;
+    } else if (source.operator === SourceOperator.WILDCARD_MATCHES) {
+      return `${capitalizeSourceKey} matches wildcard ${source.value}`;
+    } else {
+      return `${capitalizeSourceKey} ${source.operator.toLocaleLowerCase()} ${source.value}`;
+    }
+  }, []);
 
   const handleSaveConfig = useCallback(
     async (newConfig: SessionRecordingConfig, showToast = true) => {
@@ -286,6 +298,7 @@ const ConfigurationPage: React.FC = () => {
                         handleSavePageSourceDetails={handleSavePageSourceDetails}
                         handlePageSourceStatusToggle={handlePageSourceStatusToggle}
                         handleDeletePageSource={handleDeletePageSource}
+                        getPageSourceLabel={getPageSourceLabel}
                       />
                     ))
                   : null}
@@ -298,6 +311,7 @@ const ConfigurationPage: React.FC = () => {
                     handleSavePageSourceDetails={handleSavePageSourceDetails}
                     handlePageSourceStatusToggle={handlePageSourceStatusToggle}
                     handleDeletePageSource={handleDeletePageSource}
+                    getPageSourceLabel={getPageSourceLabel}
                   />
                 ) : (
                   <Button
