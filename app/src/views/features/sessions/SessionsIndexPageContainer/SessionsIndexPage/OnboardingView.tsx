@@ -289,6 +289,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
 };
 
 const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
+  // todo: remove hard coded value once actual compatibility version has been set
   const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL) || true;
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
