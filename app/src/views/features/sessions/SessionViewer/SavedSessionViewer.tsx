@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal, Space, Typography, Tooltip } from "antd";
+import { Modal, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import {
   DeleteOutlined,
@@ -179,20 +179,12 @@ const SavedSessionViewer: React.FC = () => {
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt togglePrompt={toggleOnboardingPrompt} />}
         <div className="session-viewer-header">
           <div className="display-row-center">
-            <Tooltip
-              open={showOnboardingPrompt}
-              title="View all recordings"
-              placement="bottom"
-              color="var(--primary)"
-              zIndex={100}
-            >
-              <RQButton
-                type="default"
-                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-                onClick={() => redirectToSessionRecordingHome(navigate)}
-                className="back-button"
-              />
-            </Tooltip>
+            <RQButton
+              type="default"
+              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              onClick={() => redirectToSessionRecordingHome(navigate)}
+              className="back-button"
+            />
             {isRequestedByOwner ? (
               <SessionViewerTitle />
             ) : (
