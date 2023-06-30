@@ -9,7 +9,7 @@ export const shouldShowOnboarding = async (appMode: string) => {
   if (
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
     window.location.href.includes("/invite") ||
-    window.location.href.includes("/sessions/saved")
+    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE)
   )
     return false;
 

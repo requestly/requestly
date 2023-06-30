@@ -80,7 +80,7 @@
     align-items: center;
 
     .back-button {
-      margin-right: 8px;
+      margin-right: 1rem;
       padding: 10px;
     }
     .ant-toolip {
@@ -345,7 +345,7 @@
       background: var(--component-background);
     }
   }
-  .session-onboarding-toast {
+  .session-onboarding-prompt {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -381,10 +381,14 @@
 
     &-close-icon {
       color: var(--text-gray);
+      transition: 0.2s ease-in-out;
 
       svg {
         width: 16px;
         height: 16px;
+      }
+      &:hover {
+        color: var(--white);
       }
     }
     &-settings-link {

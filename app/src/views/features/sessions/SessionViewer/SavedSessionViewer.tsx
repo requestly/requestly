@@ -40,16 +40,16 @@ interface NavigationState {
   fromApp?: boolean;
   viewAfterSave?: boolean;
 }
-interface SessionCreatedOnboardingToastProps {
+interface SessionCreatedOnboardingPromptProps {
   togglePrompt: () => void;
 }
 
-const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingToastProps> = ({ togglePrompt }) => {
+const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ togglePrompt }) => {
   return (
-    <div className="session-onboarding-toast">
+    <div className="session-onboarding-prompt">
       <div className="display-flex">
-        <CheckOutlined width={32} height={32} className="session-onboarding-toast-check-icon" />
-        <div className="session-onboarding-toast-message">
+        <CheckOutlined width={32} height={32} className="session-onboarding-prompt-check-icon" />
+        <div className="session-onboarding-prompt-message">
           <p>
             <strong>Congratulations!</strong> you have just saved your first recording.
           </p>
@@ -58,12 +58,12 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingToastProp
           </p>
         </div>
       </div>
-      <div className="session-onboarding-toast-actions">
-        <Link to={"#"} className="session-onboarding-toast-settings-link">
+      <div className="session-onboarding-prompt-actions">
+        <Link to="/sessions/configuration" className="session-onboarding-prompt-settings-link">
           <SettingOutlined />
           <span>Open settings</span>
         </Link>
-        <CloseOutlined className="session-onboarding-toast-close-icon" onClick={togglePrompt} />
+        <CloseOutlined className="session-onboarding-prompt-close-icon" onClick={togglePrompt} />
       </div>
     </div>
   );
@@ -178,27 +178,29 @@ const SavedSessionViewer: React.FC = () => {
       <div className="session-viewer-page">
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt togglePrompt={toggleOnboardingPrompt} />}
         <div className="session-viewer-header">
-          <Tooltip
-            open={showOnboardingPrompt}
-            title="View all recordings"
-            placement="bottom"
-            color="var(--primary)"
-            zIndex={100}
-          >
-            <RQButton
-              type="default"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate)}
-              className="back-button"
-            />
-          </Tooltip>
-          {isRequestedByOwner ? (
-            <SessionViewerTitle />
-          ) : (
-            <Typography.Title level={3} className="session-recording-name">
-              {name}
-            </Typography.Title>
-          )}
+          <div className="display-row-center">
+            <Tooltip
+              open={showOnboardingPrompt}
+              title="View all recordings"
+              placement="bottom"
+              color="var(--primary)"
+              zIndex={100}
+            >
+              <RQButton
+                type="default"
+                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                onClick={() => redirectToSessionRecordingHome(navigate)}
+                className="back-button"
+              />
+            </Tooltip>
+            {isRequestedByOwner ? (
+              <SessionViewerTitle />
+            ) : (
+              <Typography.Title level={3} className="session-recording-name">
+                {name}
+              </Typography.Title>
+            )}
+          </div>
           {isRequestedByOwner ? (
             <div className="session-viewer-actions">
               <Space>

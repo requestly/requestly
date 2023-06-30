@@ -167,25 +167,31 @@ const SessionDetails: React.FC = () => {
   return (
     <>
       <div className="session-properties-wrapper">
-        <Input
-          readOnly
-          addonBefore="Page URL"
-          value={attributes?.url}
-          className="session-page-url-property"
-          suffix={<CopyButton showIcon={true} copyText={attributes?.url} title="" />}
-        />
-        <Input
-          readOnly
-          addonBefore="Duration"
-          value={msToHoursMinutesAndSeconds(attributes?.duration)}
-          className="session-duration-property"
-        />
-        <Input
-          readOnly
-          addonBefore="Recorded at"
-          value={epochToDateAndTimeString(attributes?.startTime)}
-          className="session-recorded-at-property"
-        />
+        {attributes?.url && (
+          <Input
+            readOnly
+            addonBefore="Page URL"
+            value={attributes?.url}
+            className="session-page-url-property"
+            suffix={<CopyButton showIcon={true} copyText={attributes?.url} title="" />}
+          />
+        )}
+        {events?.rrweb?.length && attributes?.duration && (
+          <Input
+            readOnly
+            addonBefore="Duration"
+            value={msToHoursMinutesAndSeconds(attributes?.duration)}
+            className="session-duration-property"
+          />
+        )}
+        {attributes?.startTime && (
+          <Input
+            readOnly
+            addonBefore="Recorded at"
+            value={epochToDateAndTimeString(attributes?.startTime)}
+            className="session-recorded-at-property"
+          />
+        )}
       </div>
       <div className="session-recording-player-row">
         <div className="session-recording-player-container" ref={playerContainer} />

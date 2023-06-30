@@ -14,7 +14,6 @@ import mockSession from "./mockData/mockSession";
 import { compressEvents, filterOutConsoleLogs, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import {
   trackDraftSessionDiscarded,
-  // trackDraftSessionNamed,
   trackDraftSessionSaved,
   trackDraftSessionSaveFailed,
   trackDraftSessionViewed,
@@ -216,13 +215,6 @@ const DraftSessionViewer: React.FC = () => {
     getSessionEventsToSave,
     getRecordingOptionsToSave,
   ]);
-
-  // const handleNameChangeEvent = useCallback(
-  //   (event: ChangeEvent<HTMLInputElement>) => {
-  //     dispatch(sessionRecordingActions.setName(event.target.value));
-  //   },
-  //   [dispatch]
-  // );
 
   const confirmDiscard = () => {
     Modal.confirm({

@@ -7,6 +7,7 @@ import { Typography, Input } from "antd";
 import { BiPencil } from "react-icons/bi";
 import "./sessionViewer.scss";
 import { updateSessionName } from "../api";
+import { trackDraftSessionNamed } from "modules/analytics/events/features/sessionRecording";
 
 export const SessionViewerTitle: React.FC = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export const SessionViewerTitle: React.FC = () => {
     setIsTitleEditable(false);
     if (recordingId && hasTitleChanged) {
       updateSessionName(user?.details?.profile?.uid, recordingId, sessionRecordingName);
-    }
+    } else trackDraftSessionNamed();
     setTimeout(() => {
       setHasTitleChanged(false);
     }, 100);
