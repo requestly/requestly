@@ -36,10 +36,8 @@ type ParentContext<T = SessionRecordingConfig> = {
 const ConfigurationPage: React.FC = () => {
   const navigate = useNavigate();
   const { config, handleSaveConfig } = useOutletContext<ParentContext>();
-  const { pageSources = [], autoRecording } = config;
+  const { autoRecording } = config;
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
-
-  console.log({ receivedConfig: config });
 
   // one time migration for legacy configs
   useEffect(() => {
@@ -68,27 +66,8 @@ const ConfigurationPage: React.FC = () => {
       pageSources: config?.pageSources.map((source) => ({ ...source, id: generateObjectId(), isActive: true })) ?? [],
     };
 
-    console.log("migration running...", migratedConfig);
-
     handleSaveConfig(migratedConfig, false);
   }, [config, handleSaveConfig]);
-
-  console.log({ pageSources });
-
-  const handleAddNewPageSourceClick = useCallback((e?: unknown) => {
-    setShowNewPageSource(true);
-  }, []);
-
-  // useEffect(() => {
-  //   if (pageSources.length > 0) return;
-
-  //   if (autoRecording?.mode !== AutoRecordingMode.CUSTOM) return;
-
-  //   if (pageSources.length === 0) {
-  //     handleAddNewPageSourceClick();
-  //     setEditPageSourceId(0);
-  //   }
-  // }, [autoRecording?.mode, pageSources.length, handleAddNewPageSourceClick]);
 
   const handleAutoRecordingToggle = useCallback(
     (status: boolean) => {
@@ -123,6 +102,10 @@ const ConfigurationPage: React.FC = () => {
     },
     [config, handleSaveConfig]
   );
+
+  const handleAddNewPageSourceClick = useCallback((e?: unknown) => {
+    setShowNewPageSource(true);
+  }, []);
 
   const handleSavePageSourceDetails = useCallback(
     (sourceDetails: PageSource, isCreateMode?: boolean) => {
