@@ -14,8 +14,8 @@ export type PageSource = {
 };
 
 export type SessionRecordingConfig = {
-  maxDuration: number;
-  pageSources: PageSource[];
+  maxDuration?: number;
+  pageSources?: PageSource[];
   autoRecording?: {
     isActive: boolean;
     mode: AutoRecordingMode;
