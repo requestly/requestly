@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
-import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
@@ -10,6 +10,7 @@ import { SourceKey, SourceOperator } from "types";
 import { AutoRecordingMode, PageSource, SessionRecordingConfig } from "../types";
 import { generateObjectId } from "utils/FormattingHelper";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { RQButton } from "lib/design-system/components";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import "./configurationPage.css";
@@ -44,7 +45,6 @@ const ConfigurationPage: React.FC = () => {
   useEffect(() => {
     if (Object.keys(config).length === 0 || config.autoRecording) return;
 
-    console.log("migration running...");
     const autoRecordingConfig: SessionRecordingConfig["autoRecording"] = {
       isActive: false,
       mode: AutoRecordingMode.ALL_PAGES,
@@ -177,6 +177,9 @@ const ConfigurationPage: React.FC = () => {
     return <InstallExtensionCTA eventPage="session_configuration" />;
   }
 
+  const isPageSourcesDisabled =
+    (!autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
+
   return (
     <Row className="sessions-configuration-container">
       <Col
@@ -188,7 +191,12 @@ const ConfigurationPage: React.FC = () => {
         flex="1 1 820px"
       >
         <div className="header">
-          <Button type="default" icon={<LeftOutlined />} onClick={() => redirectToSessionRecordingHome(navigate)} />
+          <RQButton
+            iconOnly
+            type="default"
+            icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+            onClick={() => redirectToSessionRecordingHome(navigate)}
+          />
           <span>Session Recording Settings</span>
         </div>
 
@@ -239,7 +247,7 @@ const ConfigurationPage: React.FC = () => {
                       <PageSourceRow
                         key={source.id}
                         source={source}
-                        disabled={!autoRecording?.isActive ?? false}
+                        disabled={isPageSourcesDisabled}
                         handleSavePageSourceDetails={handleSavePageSourceDetails}
                         handlePageSourceStatusToggle={handlePageSourceStatusToggle}
                         handleDeletePageSource={handleDeletePageSource}
@@ -247,11 +255,11 @@ const ConfigurationPage: React.FC = () => {
                     ))
                   : null}
 
-                {showNewPageSource ? (
+                {showNewPageSource || config.pageSources?.length === 0 ? (
                   <PageSourceRow
                     source={{ ...emptyPageSourceData }}
                     openInCreateMode={true}
-                    disabled={!autoRecording?.isActive ?? false}
+                    disabled={isPageSourcesDisabled}
                     handleSavePageSourceDetails={handleSavePageSourceDetails}
                     handlePageSourceStatusToggle={handlePageSourceStatusToggle}
                     handleDeletePageSource={handleDeletePageSource}
