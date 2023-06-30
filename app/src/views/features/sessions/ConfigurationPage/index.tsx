@@ -67,8 +67,9 @@ const ConfigurationPage: React.FC = () => {
       }
 
       trackConfigurationSaved({
-        pageSources: newConfig.pageSources?.length ?? 0,
-        maxDuration: newConfig.maxDuration,
+        maxDuration: newConfig?.maxDuration,
+        pageSources: newConfig?.pageSources?.length ?? 0,
+        autoRecordingMode: newConfig?.autoRecording?.mode,
       });
     },
     [appMode]
@@ -79,7 +80,7 @@ const ConfigurationPage: React.FC = () => {
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
       .then((config) => {
-        if (!config) return defaultSessionRecordingConfig;
+        if (!config || Object.keys(config).length === 0) return defaultSessionRecordingConfig;
 
         if (config.autoRecording) return config; // config already migrated
 
@@ -111,17 +112,14 @@ const ConfigurationPage: React.FC = () => {
 
         return migratedConfig;
       })
-      .then((config) => setConfig(config));
+      .then((config) => setConfig(config || {}));
   }, [appMode]);
 
   useEffect(() => {
-    console.log("submit attribute....");
     if (!isWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
   }, [config?.pageSources?.length, isWorkspaceMode]);
-
-  console.log({ config });
 
   const handleAutoRecordingToggle = useCallback(
     (status: boolean) => {
