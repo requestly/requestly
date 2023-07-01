@@ -612,7 +612,9 @@ const RulesTable = ({
               }}
             >
               <Link
+                href="/"
                 onClick={(e) => {
+                  e.preventDefault();
                   handleRuleNameOnClick(e, record);
                 }}
               >
