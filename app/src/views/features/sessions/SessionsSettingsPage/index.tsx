@@ -269,7 +269,7 @@ const SessionsSettingsPage: React.FC = () => {
             className="automatic-recording-radio-group"
           >
             <Row align="bottom" justify="space-between">
-              <Col span={14}>
+              <Col span={24}>
                 <SessionSettingsRadioItem
                   value={AutoRecordingMode.ALL_PAGES}
                   title="All pages"

@@ -1,4 +1,5 @@
 .session-settings-radio-item.ant-radio-wrapper {
+  width: 100%;
   display: block;
   margin-right: 0;
   padding: 1rem 1.25rem;
