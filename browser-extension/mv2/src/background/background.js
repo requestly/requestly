@@ -1077,7 +1077,7 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
       window.tabService.removeData(tabId, "recordSession");
       BG.Methods.showToast(
         tabId,
-        "Requestly is now recording all activity on this tab!",
+        "Requestly is recording session on this tab!",
         "You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.",
         "resources/images/128x128.png"
       );
