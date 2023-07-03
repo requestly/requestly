@@ -175,6 +175,7 @@ const SavedSessionViewer: React.FC = () => {
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
             <RQButton
+              iconOnly
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
               onClick={() => redirectToSessionRecordingHome(navigate)}
