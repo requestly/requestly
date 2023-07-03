@@ -3,11 +3,18 @@ import PATHS from "config/constants/sub/paths";
 import SessionsHomeView from "views/features/sessions";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
+import ConfigurationPage from "views/features/sessions/ConfigurationPage";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const sessionRoutes: RouteObject[] = [
   {
     path: PATHS.SESSIONS.INDEX,
     element: <SessionsHomeView />,
+  },
+  {
+    path: PATHS.SESSIONS.SETTINGS.RELATIVE,
+    // @ts-ignore
+    element: <ProtectedRoute component={ConfigurationPage} />,
   },
   {
     path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
