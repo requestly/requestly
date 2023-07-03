@@ -9,7 +9,7 @@ export type PageSource = {
   id?: string;
   key: SourceKey;
   value: string;
-  isActive?: boolean;
+  isActive: boolean;
   operator: SourceOperator;
 };
 
