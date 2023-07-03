@@ -10,7 +10,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
 // TODO: remove fallback after extension release
-const isNewSessionsSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_RECORDING_SETTINGS_PAGE) || false;
+const isNewSessionsSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_RECORDING_SETTINGS_PAGE);
 
 export const sessionRoutes: RouteObject[] = [
   {
