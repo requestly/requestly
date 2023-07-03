@@ -85,6 +85,7 @@ const SessionsSettingsPage: React.FC = () => {
         maxDuration: newConfig?.maxDuration,
         pageSources: newConfig?.pageSources?.length ?? 0,
         autoRecordingMode: newConfig?.autoRecording?.mode,
+        isAutoRecordingActive: newConfig?.autoRecording?.isActive,
       });
     },
     [appMode]
