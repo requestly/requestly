@@ -160,7 +160,7 @@ const SavedSessionViewer: React.FC = () => {
   }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
   const hideOnboardingPrompt = () => {
-    setShowOnboardingPrompt((prev) => !prev);
+    setShowOnboardingPrompt(false);
   };
 
   if (showPermissionError) return <PermissionError />;

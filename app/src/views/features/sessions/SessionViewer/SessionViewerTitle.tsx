@@ -19,58 +19,54 @@ export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({ isReadOn
   const sessionRecordingName = useSelector(getSessionRecordingName);
   const recordingId = useSelector(getSessionRecordingId);
   const [isTitleEditable, setIsTitleEditable] = useState<boolean>(false);
-  const [hasTitleChanged, setHasTitleChanged] = useState<boolean>(false);
+  const [sessionTitle, setSessionTitle] = useState<string>(sessionRecordingName);
 
   const handleOnNameInputBlur = () => {
     setIsTitleEditable(false);
-    if (recordingId && hasTitleChanged && sessionRecordingName?.length) {
-      updateSessionName(user?.details?.profile?.uid, recordingId, sessionRecordingName);
-    } else trackDraftSessionNamed();
-    setTimeout(() => {
-      setHasTitleChanged(false);
-    }, 100);
+    if (recordingId) {
+      if (sessionTitle.length && sessionTitle !== sessionRecordingName) {
+        dispatch(sessionRecordingActions.setName(sessionTitle));
+        updateSessionName(user?.details?.profile?.uid, recordingId, sessionTitle);
+      } else {
+        setSessionTitle(sessionRecordingName);
+      }
+    } else {
+      if (!sessionTitle.length) setSessionTitle(sessionRecordingName);
+      else dispatch(sessionRecordingActions.setName(sessionTitle));
+      trackDraftSessionNamed();
+    }
   };
 
   return (
     <div className="w-full">
       <div className="session-title-name">
-        {isReadOnly ? (
-          <Typography.Title level={4} className="session-recording-name">
-            {sessionRecordingName}
-          </Typography.Title>
+        {isTitleEditable ? (
+          <div className="session-title-name-wrapper">
+            <Input
+              autoFocus={true}
+              onFocus={() => setIsTitleEditable(true)}
+              onBlur={handleOnNameInputBlur}
+              bordered={false}
+              spellCheck={false}
+              value={sessionTitle}
+              onChange={(e) => setSessionTitle(e.target.value)}
+              placeholder="Enter session name"
+              onPressEnter={handleOnNameInputBlur}
+            />
+          </div>
         ) : (
-          <>
-            {sessionRecordingName?.length === 0 || isTitleEditable ? (
-              <div className="session-title-name-wrapper">
-                <Input
-                  autoFocus={true}
-                  onFocus={() => setIsTitleEditable(true)}
-                  onBlur={handleOnNameInputBlur}
-                  bordered={false}
-                  spellCheck={false}
-                  value={sessionRecordingName}
-                  onChange={(e) => {
-                    dispatch(sessionRecordingActions.setName(e.target.value));
-                    setHasTitleChanged(true);
-                  }}
-                  placeholder="Enter session name"
-                  onPressEnter={handleOnNameInputBlur}
-                />
-              </div>
+          <div className="session-title">
+            {isReadOnly ? (
+              <Typography.Text ellipsis={true}>{sessionRecordingName}</Typography.Text>
             ) : (
-              <div className="session-title">
-                <Typography.Text
-                  ellipsis={true}
-                  onClick={() => {
-                    setIsTitleEditable(true);
-                  }}
-                >
+              <>
+                <Typography.Text ellipsis={true} onClick={() => setIsTitleEditable(true)}>
                   {sessionRecordingName ? sessionRecordingName : "Enter session name"}
                 </Typography.Text>
                 <BiPencil onClick={() => setIsTitleEditable(true)} />
-              </div>
+              </>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
