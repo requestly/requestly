@@ -9,7 +9,6 @@ import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
-import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./CreateWorkspaceModal.css";
 import Logger from "lib/logger";
@@ -147,10 +146,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
         </div>
 
         {/* footer */}
-        <Row align="middle" justify="space-between" className="rq-modal-footer">
-          <Col>
-            <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
-          </Col>
+        <Row align="middle" justify="end" className="rq-modal-footer">
           <Col>
             <Button
               type="primary"
