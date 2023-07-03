@@ -22,7 +22,7 @@ import Logger from "lib/logger";
 import { StorageService } from "init";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
+import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettingsPage.css";
 
 const emptyPageSourceData: PageSource = {
@@ -65,6 +65,10 @@ const SessionsSettingsPage: React.FC = () => {
     } else {
       return `${capitalizeSourceKey} ${source.operator.toLocaleLowerCase()} ${source.value}`;
     }
+  }, []);
+
+  useEffect(() => {
+    trackConfigurationOpened();
   }, []);
 
   const handleSaveConfig = useCallback(
@@ -220,7 +224,7 @@ const SessionsSettingsPage: React.FC = () => {
   );
 
   if (!isExtensionInstalled()) {
-    return <InstallExtensionCTA eventPage="session_configuration" />;
+    return <InstallExtensionCTA eventPage="session_settings" />;
   }
 
   const isPageSourcesDisabled =
