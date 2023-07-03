@@ -21,7 +21,6 @@ import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettingsPage.css";
@@ -334,6 +333,4 @@ const SessionsSettingsPage: React.FC = () => {
   );
 };
 
-// @ts-ignore
-const ProtectedSessionsSettingsPage = () => <ProtectedRoute component={SessionsSettingsPage} />;
-export default ProtectedSessionsSettingsPage;
+export default SessionsSettingsPage;
