@@ -6,8 +6,11 @@ import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageConta
 import ConfigurationPage from "views/features/sessions/ConfigurationPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import SessionsSettingsPage from "views/features/sessions/SessionsSettingsPage";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
-const isCompatible = true;
+// TODO: remove fallback after extension release
+const isNewSessionsSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_RECORDING_SETTINGS_PAGE) || false;
 
 export const sessionRoutes: RouteObject[] = [
   {
@@ -16,8 +19,10 @@ export const sessionRoutes: RouteObject[] = [
   },
   {
     path: PATHS.SESSIONS.SETTINGS.RELATIVE,
-    // @ts-ignore
-    element: <ProtectedRoute component={isCompatible ? SessionsSettingsPage : ConfigurationPage} />,
+    element: (
+      // @ts-ignore
+      <ProtectedRoute component={isNewSessionsSettingsPageCompatible ? SessionsSettingsPage : ConfigurationPage} />
+    ),
   },
   {
     path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
