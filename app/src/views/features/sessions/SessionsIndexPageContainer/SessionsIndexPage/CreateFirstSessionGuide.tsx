@@ -4,10 +4,10 @@ import { Button, Steps, Typography } from "antd";
 import TutorialButton from "./TutorialButton";
 
 interface Props {
-  launchConfig: () => void;
+  redirectToSettingsPage: () => void;
 }
 
-const CreateSessionGuide: React.FC<Props> = ({ launchConfig }) => {
+const CreateSessionGuide: React.FC<Props> = ({ redirectToSettingsPage }) => {
   return (
     <div
       style={{
@@ -42,7 +42,7 @@ const CreateSessionGuide: React.FC<Props> = ({ launchConfig }) => {
               title="Configure pages"
               description={
                 <>
-                  <Button type="link" onClick={launchConfig}>
+                  <Button type="link" onClick={redirectToSettingsPage}>
                     Edit the configuration
                   </Button>
                 </>
