@@ -9,7 +9,7 @@
 #container {
   background-color: #295ff6;
   border-radius: 8px;
-  padding: 16px 24px;
+  padding: 12px 24px;
   margin: 16px;
   width: 30vw;
   right: 0;
@@ -42,6 +42,17 @@
 #heading-container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+}
+
+#heading-container div {
+  display: flex;
+  flex-direction: row;
+}
+
+#close-icon {
+  align-self: center;
+  cursor: pointer;
 }
 
 #subheading {
