@@ -55,7 +55,7 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptPro
         </div>
       </div>
       <div className="session-onboarding-prompt-actions">
-        <Link to="/sessions/configuration" className="session-onboarding-prompt-settings-link">
+        <Link to={PATHS.SESSIONS.SETTINGS.RELATIVE} className="session-onboarding-prompt-settings-link">
           <SettingOutlined />
           <span>Open settings</span>
         </Link>
