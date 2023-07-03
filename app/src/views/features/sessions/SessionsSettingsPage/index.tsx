@@ -78,7 +78,7 @@ const SessionsSettingsPage: React.FC = () => {
       setConfig(newConfig);
 
       if (showToast) {
-        toast.success("Saved configuration successfully.");
+        toast.success("Settings saved successfully.");
       }
 
       trackConfigurationSaved({
