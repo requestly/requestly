@@ -130,7 +130,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
           className="page-source-input"
           value={pageSourceDetails.value}
           onChange={(e) => handlePageSourceDetailsChange("value", e.target.value)}
-          placeholder="Enter url here or leave this field empty to apply rule to all url's..."
+          placeholder="Please enter the url here"
         />
 
         <Button type="primary" disabled={disabled} className="save-btn" onClick={handleSaveClick}>
