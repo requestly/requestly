@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SettingOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast";
 import { Badge, Button } from "antd";
-import ConfigurationModal from "../../ConfigurationModal";
+import ConfigurationPage from "../../ConfigurationPage";
 import { StorageService } from "../../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
@@ -208,7 +208,7 @@ const SessionsIndexPage = () => {
 
   return (
     <>
-      <ConfigurationModal
+      <ConfigurationPage
         config={config}
         isModalVisible={isConfigModalVisible}
         handleSaveConfig={handleSaveConfig}

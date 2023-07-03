@@ -23,7 +23,7 @@ const PAGE_SOURCES_TYPE = {
   NO_PAGES: "no-pages",
 };
 
-const ConfigurationModal = ({ config, isModalVisible, handleSaveConfig, handleCancelModal }) => {
+const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCancelModal }) => {
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
@@ -263,4 +263,4 @@ const ConfigurationModal = ({ config, isModalVisible, handleSaveConfig, handleCa
   );
 };
 
-export default ConfigurationModal;
+export default ConfigurationPage;
