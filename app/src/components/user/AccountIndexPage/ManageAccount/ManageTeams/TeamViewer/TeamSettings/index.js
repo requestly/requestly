@@ -7,7 +7,6 @@ import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToRules, redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
 import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
-import LearnMoreAboutWorkspace from "../common/LearnMoreAboutWorkspace";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import LoadingModal from "../../../../../../../layouts/DashboardLayout/MenuHeader/WorkspaceSelector/LoadingModal";
@@ -142,11 +141,6 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
           </>
         ) : (
           <>
-            <Row align="middle" justify="space-between">
-              <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
-            </Row>
-
-            <div className="title team-settings-title">Workspace settings</div>
             <form onSubmit={handleTeamRename} className="team-settings-form">
               <div className="team-settings-form-item">
                 <label htmlFor="name" className="team-settings-name-input-label">
