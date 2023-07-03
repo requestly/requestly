@@ -5,7 +5,7 @@ import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
 import { getAppMode } from "store/selectors";
-import { capitalize, isEqual } from "lodash";
+import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./PageSourceRow";
 import { SourceKey, SourceOperator } from "types";
@@ -56,14 +56,14 @@ const SessionsSettingsPage: React.FC = () => {
   const { autoRecording } = config;
 
   const getPageSourceLabel = useCallback((source: PageSource): string => {
-    const capitalizeSourceKey = capitalize(source.key);
+    const upperCasedSourceKey = source.key.toUpperCase();
 
     if (source.operator === SourceOperator.MATCHES) {
-      return `${capitalizeSourceKey} matches regex ${source.value}`;
+      return `${upperCasedSourceKey} matches regex ${source.value}`;
     } else if (source.operator === SourceOperator.WILDCARD_MATCHES) {
-      return `${capitalizeSourceKey} matches wildcard ${source.value}`;
+      return `${upperCasedSourceKey} matches wildcard ${source.value}`;
     } else {
-      return `${capitalizeSourceKey} ${source.operator.toLocaleLowerCase()} ${source.value}`;
+      return `${upperCasedSourceKey} ${source.operator.toLocaleLowerCase()} ${source.value}`;
     }
   }, []);
 
