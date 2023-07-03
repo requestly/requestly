@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
-import { Badge, Button } from "antd";
+import { Button } from "antd";
 import { StorageService } from "../../../../../init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
@@ -149,7 +149,6 @@ const SessionsIndexPage = () => {
   const ConfigureButton = () => (
     <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
       Settings
-      {config.pageSources?.length ? <Badge count={config.pageSources?.length} style={{ marginLeft: "10px" }} /> : null}
     </Button>
   );
 
