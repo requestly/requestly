@@ -1,4 +1,4 @@
-.configuration-radio-item.ant-radio-wrapper {
+.session-settings-radio-item.ant-radio-wrapper {
   display: block;
   margin-right: 0;
   padding: 1rem 1.25rem;
@@ -6,25 +6,25 @@
   flex-wrap: nowrap;
 }
 
-.configuration-radio-item.ant-radio-wrapper .ant-radio {
+.session-settings-radio-item.ant-radio-wrapper .ant-radio {
   margin-bottom: -1px;
 }
 
-.configuration-radio-item.ant-radio-wrapper .info {
+.session-settings-radio-item.ant-radio-wrapper .info {
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
   row-gap: 2px;
 }
 
-.configuration-radio-item.ant-radio-wrapper .info .title {
+.session-settings-radio-item.ant-radio-wrapper .info .title {
   font-size: 13px;
   font-weight: 500;
   color: var(--white);
   line-height: unset;
 }
 
-.configuration-radio-item.ant-radio-wrapper .info .caption {
+.session-settings-radio-item.ant-radio-wrapper .info .caption {
   font-size: 12px;
   color: var(--text-gray);
   line-height: unset;

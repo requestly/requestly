@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { ConfigurationRadioItem } from "./ConfigurationRadioItem";
+import { SessionSettingsRadioItem } from "./SessionSettingsRadioItem";
 import { getAppMode } from "store/selectors";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
@@ -232,7 +232,7 @@ const SessionsSettingsPage: React.FC = () => {
     (!autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
 
   return (
-    <Row className="sessions-configuration-container">
+    <Row className="session-settings-container">
       <Col
         xs={{ offset: 1, span: 22 }}
         sm={{ offset: 1, span: 22 }}
@@ -270,7 +270,7 @@ const SessionsSettingsPage: React.FC = () => {
           >
             <Row align="bottom" justify="space-between">
               <Col span={14}>
-                <ConfigurationRadioItem
+                <SessionSettingsRadioItem
                   value={AutoRecordingMode.ALL_PAGES}
                   title="All pages"
                   caption="Save up to last 5 minutes of activity on any tab."
@@ -286,7 +286,7 @@ const SessionsSettingsPage: React.FC = () => {
               </Col> */}
             </Row>
             <div className="specific-page-mode-container">
-              <ConfigurationRadioItem
+              <SessionSettingsRadioItem
                 value={AutoRecordingMode.CUSTOM}
                 title="Specific pages"
                 caption="Start recording automatically when you visit websites or URLs below."

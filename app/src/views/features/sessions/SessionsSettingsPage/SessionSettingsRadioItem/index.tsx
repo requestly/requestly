@@ -1,6 +1,6 @@
 import React from "react";
 import { Radio, RadioProps } from "antd";
-import "./configurationRadioItem.css";
+import "./sessionSettingsRadioItem.css";
 
 interface Props extends RadioProps {
   title: string;
@@ -8,9 +8,9 @@ interface Props extends RadioProps {
   value: string;
 }
 
-export const ConfigurationRadioItem: React.FC<Props> = ({ value, title, caption, disabled = false }) => {
+export const SessionSettingsRadioItem: React.FC<Props> = ({ value, title, caption, disabled = false }) => {
   return (
-    <Radio disabled={disabled} value={value} className="configuration-radio-item">
+    <Radio disabled={disabled} value={value} className="session-settings-radio-item">
       <span className="info">
         <span className="title">{title}</span>
         <span className="caption">{caption}</span>

@@ -1,15 +1,15 @@
-.sessions-configuration-container {
+.session-settings-container {
   margin-top: 2.5rem;
 }
 
-.sessions-configuration-container .header {
+.session-settings-container .header {
   margin-bottom: 2rem;
   display: inline-flex;
   align-items: center;
   column-gap: 5px;
 }
 
-.sessions-configuration-container .header .anticon {
+.session-settings-container .header .anticon {
   font-size: 14px;
 }
 
@@ -63,7 +63,7 @@
   text-decoration: underline;
 }
 
-.sessions-configuration-container .page-source-list {
+.session-settings-container .page-source-list {
   margin: 0 20px;
 }
 
