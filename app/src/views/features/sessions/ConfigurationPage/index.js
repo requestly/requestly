@@ -232,7 +232,7 @@ const ConfigurationPage = () => {
       >
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <div>
-            <Row className="w-full" wrap={false} align="middle" justify="space-between">
+            <Row className="w-full header-container" wrap={false} align="middle" justify="space-between">
               <div className="header">
                 <RQButton
                   iconOnly

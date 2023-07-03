@@ -2,8 +2,11 @@
   margin-top: 2.5rem;
 }
 
-.configuration-container .header {
+.configuration-container .header-container {
   margin-bottom: 2rem;
+}
+
+.configuration-container .header {
   display: inline-flex;
   align-items: center;
   column-gap: 5px;
