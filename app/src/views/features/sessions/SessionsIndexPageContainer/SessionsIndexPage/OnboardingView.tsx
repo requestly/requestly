@@ -187,7 +187,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
   const handleStartRecordingBtnClicked = useCallback(() => {
     trackStartRecordingWithURLClicked();
     if (isExtensionInstalled()) {
-      const urlToRecord = inputRef?.current.input.value;
+      const urlToRecord = sanitize(inputRef?.current.input.value);
       if (isValidUrl(urlToRecord)) {
         trackStartRecordingOnExternalTarget(urlToRecord);
         return startRecordingOnUrl(urlToRecord);
@@ -198,6 +198,16 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
     } else {
       openInstallExtensionModal();
     }
+
+    function sanitize(url: string) {
+      let sanitizedURL = url.trim();
+      if (sanitizedURL && !sanitizedURL.startsWith("http://") && !sanitizedURL.startsWith("https://")) {
+        sanitizedURL = "https://" + sanitizedURL;
+        inputRef.current.input.value = sanitizedURL;
+        return sanitizedURL;
+      }
+      return sanitizedURL;
+    }
   }, [openInstallExtensionModal]);
 
   const handleSettingsNavigation = useCallback(() => {
@@ -207,76 +217,88 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
 
   return (
     <div className="onboarding-content-container">
-      <Row justify="space-between">
-        <Col span={11} className="banner-text-container">
-          <Title level={2} className="banner-title">
-            Record &amp; replay your first browsing sessions
-          </Title>
-          <Row>
-            <Text type="secondary" className="banner-text">
-              <div>
-                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
-                <Text strong>network</Text> &
-              </div>
-              <div>
-                {" "}
-                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
-              </div>
-              <div> debugging </div>
-            </Text>
-          </Row>
-          <Row className="record-label">
-            <Text type="secondary" className="banner-text">
-              Record your first session
-            </Text>
-          </Row>
-          <Row>
-            <Col span={15} className="input-container">
-              <Input ref={inputRef} placeholder="Enter the URL you want to record" />
-            </Col>
-            <Col span={3} className="start-btn-container">
-              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                {" "}
-                Start Recording
-              </Button>
-            </Col>
-          </Row>
-        </Col>
-        <Col span={13}>
-          <Row justify="end" align="middle" className="settings-icon" onClick={handleSettingsNavigation}>
-            <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-          </Row>
-          <Row justify="center">
-            <video // todo: replace with main gif
-              className="demo-video"
-              src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
-              playsInline
-              controls
-              preload="auto"
-            />
-          </Row>
-          <Row align="middle" justify="center" onClick={trackOnboardingYTVideoClicked}>
-            <a href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74" target="__blank">
-              <Row justify="center" align="middle">
-                <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
-                <Text underline>Watch it in action</Text>
-              </Row>
-            </a>
-          </Row>
-        </Col>
-      </Row>
-      <Divider />
-      <Row>
-        <Col span={24}>
-          <Text type="secondary">
-            <Row justify="space-evenly">
-              <CheckItem label="Automatically record specified website or all activity" />
-              <CheckItem label="All recordings are saved locally until saved or shared" />
-              <CheckItem label="View network, console and environment details synced to video" />
+      <div className="onboarding-banner">
+        <Row className="banner-header" justify="space-between">
+          <Col>
+            <Title className="banner-title">Record &amp; replay your first browsing sessions</Title>
+          </Col>
+          <Col className="settings-btn">
+            <Button onClick={handleSettingsNavigation}>
+              <SettingOutlined /> &nbsp; <Text>Settings</Text>
+            </Button>
+          </Col>
+        </Row>
+        <Row justify="space-between">
+          <Col span={11} className="banner-text-container">
+            <Row className="banner-description">
+              <Text type="secondary" className="banner-text">
+                <div>
+                  Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                  <Text strong>network</Text> &
+                </div>
+                <div>
+                  {" "}
+                  <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+                </div>
+                <div> debugging </div>
+              </Text>
             </Row>
-          </Text>
-        </Col>
-      </Row>
+            <Row className="record-label">
+              <Text type="secondary" className="banner-text">
+                Record your first session
+              </Text>
+            </Row>
+            <Row>
+              <Col span={15} className="input-container">
+                <Input ref={inputRef} placeholder="Enter the URL you want to record" />
+              </Col>
+              <Col span={3} className="start-btn-container">
+                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                  {" "}
+                  Start Recording
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+          <Col span={13} className="right-col">
+            <Row justify="end">
+              <video // todo: replace with main gif
+                className="demo-video"
+                src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
+                playsInline
+                controls
+                preload="auto"
+              />
+            </Row>
+            <Row onClick={trackOnboardingYTVideoClicked}>
+              <a
+                href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
+                target="__blank"
+                className="yt-cta-container"
+              >
+                <Row justify="end" align="middle" className="yt-cta">
+                  <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
+                  <Text underline>Watch it in action</Text>
+                </Row>
+              </a>
+            </Row>
+          </Col>
+        </Row>
+      </div>
+      <div className="onboarding-footer">
+        <Divider />
+        <Row>
+          <Col span={24}>
+            <Text type="secondary">
+              <Row justify="space-evenly">
+                <CheckItem label="Automatically record specified website or all activity" />
+                <CheckItem label="All recordings are saved locally until saved or shared" />
+                <CheckItem label="View network, console and environment details synced to video" />
+              </Row>
+            </Text>
+          </Col>
+        </Row>
+      </div>
       <InstallExtensionModal
         open={isInstallExtensionModalVisible}
         onCancel={closeModal}

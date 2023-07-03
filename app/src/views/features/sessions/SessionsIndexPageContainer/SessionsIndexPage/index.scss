@@ -1,45 +1,74 @@
 .onboarding-content-container {
-  margin-left: 3rem;
-  margin-right: 3rem;
-  margin-top: 2rem;
+  margin-left: 3.5rem;
+  margin-right: 3.5rem;
+  margin-top: 2.5rem;
 
-  .banner-title {
-    font-size: 24px;
-  }
+  .onboarding-banner {
+    margin-right: 3rem;
+    margin-left: 3rem;
 
-  .banner-text-container {
-    padding-right: 10rem;
-    padding-left: 2rem;
+    .banner-header {
+      width: 100%;
+      margin-bottom: 0.5rem;
 
-    .banner-text {
-      font-size: 14px;
-    }
-
-    .record-label {
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-    }
-
-    .input-container {
-      input {
-        height: 30px;
+      .banner-title {
+        font-size: 1.8rem;
+        vertical-align: bottom;
+      }
+      .settings-btn {
+        display: flex;
+        align-items: flex-start;
       }
     }
 
-    .start-btn-container {
-      padding-left: 0.7rem;
-      text-align: center;
-      align-items: middle;
+    .banner-text-container {
+      .banner-text {
+        font-size: 1rem;
+      }
+      .banner-description {
+        margin-bottom: 1rem;
+      }
 
-      button {
-        height: 30px;
+      .record-label {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+      }
+
+      .input-container {
+        input {
+          height: 30px;
+        }
+      }
+
+      .start-btn-container {
+        padding-left: 0.7rem;
+        text-align: center;
+        align-items: middle;
+
+        button {
+          height: 30px;
+        }
+      }
+    }
+
+    .right-col {
+      .demo-video {
+        width: 70%;
+      }
+      .yt-cta-container {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        width: 100%;
+        .yt-cta {
+          width: 70%;
+          display: flex;
+          justify-content: center;
+        }
       }
     }
   }
-  .demo-video {
-    width: 70%;
-  }
-  .settings-icon {
-    cursor: pointer;
+  .onboarding-footer {
+    margin-top: 3rem;
   }
 }
