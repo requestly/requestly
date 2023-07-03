@@ -42,7 +42,7 @@ const defaultSessionRecordingConfig: SessionRecordingConfig = {
   maxDuration: 5,
   pageSources: [],
   autoRecording: {
-    isActive: true,
+    isActive: false,
     mode: AutoRecordingMode.ALL_PAGES,
   },
 };
