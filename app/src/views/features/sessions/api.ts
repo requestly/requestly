@@ -86,7 +86,7 @@ export const updateDescription = async (userId: string, id: string, description:
 export const updateSessionName = async (userId: string, id: string, name: string) => {
   try {
     await updateSessionRecordingProperties(userId, id, { name });
-    toast.success("Session title updated successfully");
+    toast.success("Session name updated successfully");
     trackSessionRecordingNameUpdated();
   } catch (error) {
     toast.error("Something went wrong!");

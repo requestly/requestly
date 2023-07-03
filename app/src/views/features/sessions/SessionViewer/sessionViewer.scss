@@ -80,11 +80,10 @@
     align-items: center;
 
     .back-button {
-      margin-right: 1rem;
-      padding: 10px;
-    }
-    .ant-toolip {
-      z-index: 100;
+      margin-right: 8px;
+      padding: 8px;
+      border: none;
+      background: transparent;
     }
 
     .session-title-name {
@@ -117,8 +116,8 @@
         svg {
           align-self: center;
           cursor: pointer;
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           min-width: 16px;
           color: var(--text-gray);
         }

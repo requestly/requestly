@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal, Space, Typography } from "antd";
+import { Modal, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
 import {
   DeleteOutlined,
@@ -18,11 +18,7 @@ import ShareButton from "../ShareButton";
 import PageLoader from "components/misc/PageLoader";
 import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import {
-  getIsRequestedByOwner,
-  getSessionRecordingEventsFilePath,
-  getSessionRecordingName,
-} from "store/features/session-recording/selectors";
+import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
@@ -41,10 +37,10 @@ interface NavigationState {
   viewAfterSave?: boolean;
 }
 interface SessionCreatedOnboardingPromptProps {
-  togglePrompt: () => void;
+  onClose: () => void;
 }
 
-const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ togglePrompt }) => {
+const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ onClose }) => {
   return (
     <div className="session-onboarding-prompt">
       <div className="display-flex">
@@ -63,7 +59,7 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptPro
           <SettingOutlined />
           <span>Open settings</span>
         </Link>
-        <CloseOutlined className="session-onboarding-prompt-close-icon" onClick={togglePrompt} />
+        <CloseOutlined className="session-onboarding-prompt-close-icon" onClick={onClose} />
       </div>
     </div>
   );
@@ -77,7 +73,6 @@ const SavedSessionViewer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const hasAuthInitialized = useSelector(getAuthInitialization);
-  const name = useSelector(getSessionRecordingName);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
@@ -164,7 +159,7 @@ const SavedSessionViewer: React.FC = () => {
       });
   }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
-  const toggleOnboardingPrompt = () => {
+  const hideOnboardingPrompt = () => {
     setShowOnboardingPrompt((prev) => !prev);
   };
 
@@ -176,22 +171,16 @@ const SavedSessionViewer: React.FC = () => {
   ) : (
     <>
       <div className="session-viewer-page">
-        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt togglePrompt={toggleOnboardingPrompt} />}
+        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
         <div className="session-viewer-header">
-          <div className="display-row-center">
+          <div className="display-row-center w-full">
             <RQButton
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
               onClick={() => redirectToSessionRecordingHome(navigate)}
               className="back-button"
             />
-            {isRequestedByOwner ? (
-              <SessionViewerTitle />
-            ) : (
-              <Typography.Title level={3} className="session-recording-name">
-                {name}
-              </Typography.Title>
-            )}
+            <SessionViewerTitle isReadOnly={!isRequestedByOwner} />
           </div>
           {isRequestedByOwner ? (
             <div className="session-viewer-actions">
