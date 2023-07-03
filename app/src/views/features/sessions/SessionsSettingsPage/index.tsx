@@ -24,7 +24,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
-import "./configurationPage.css";
+import "./sessionsSettingsPage.css";
 
 const emptyPageSourceData: PageSource = {
   value: "",
@@ -48,7 +48,7 @@ const defaultSessionRecordingConfig: SessionRecordingConfig = {
   },
 };
 
-const ConfigurationPage: React.FC = () => {
+const SessionsSettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -335,5 +335,5 @@ const ConfigurationPage: React.FC = () => {
 };
 
 // @ts-ignore
-const ProtectedConfigurationPage = () => <ProtectedRoute component={ConfigurationPage} />;
-export default ProtectedConfigurationPage;
+const ProtectedSessionsSettingsPage = () => <ProtectedRoute component={SessionsSettingsPage} />;
+export default ProtectedSessionsSettingsPage;
