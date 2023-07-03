@@ -9,7 +9,6 @@ class RQToast extends HTMLElement {
   }
 
   connectedCallback() {
-    this.setAttribute("style", "position:fixed;z-index:2147483647;width:100%;top:0;right:0;");
     const heading = this.shadowRoot?.getElementById("heading");
     const subheading = this.shadowRoot?.getElementById("subheading");
     if (heading) heading.textContent = this.attributes.getNamedItem("heading")?.value ?? null;

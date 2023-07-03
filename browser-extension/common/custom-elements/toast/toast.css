@@ -1,3 +1,11 @@
+:host {
+  position: fixed;
+  z-index: 2147483647;
+  width: 100%;
+  top: 0;
+  right: 0;
+}
+
 #container {
   background-color: #295ff6;
   border-radius: 8px;
