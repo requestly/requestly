@@ -1,9 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, Input, Modal, Select, Button, Space, Table } from "antd";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { Alert, Input, Select, Button, Space, Table, Col, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "../../../../utils/Toast";
 import { isEqual } from "lodash";
+import { getAppMode } from "store/selectors";
+import Logger from "lib/logger";
+import { StorageService } from "init";
+import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
+import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { RQButton } from "lib/design-system/components";
+import { useNavigate } from "react-router-dom";
+import "./configurationPage.css";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -23,33 +35,62 @@ const PAGE_SOURCES_TYPE = {
   NO_PAGES: "no-pages",
 };
 
-const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCancelModal }) => {
+const ConfigurationPage = () => {
+  const [config, setConfig] = useState({});
+  const navigate = useNavigate();
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
 
+  const handleSaveConfig = useCallback(
+    async (newConfig) => {
+      Logger.log("Writing storage in handleSaveConfig");
+      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
+      setConfig(newConfig);
+      toast.success("Saved configuration successfully.");
+      trackConfigurationSaved({
+        pageSources: newConfig.pageSources.length,
+        maxDuration: newConfig.maxDuration,
+      });
+    },
+    [appMode]
+  );
+
   useEffect(() => {
-    if (isModalVisible && inputRef.current?.input?.dataset.index === "0") {
+    if (inputRef.current?.input?.dataset.index === "0") {
       inputRef.current.input.focus();
     }
-  }, [isModalVisible, customPageSources, pageSourceType]);
+  }, [customPageSources, pageSourceType]);
+
+  useEffect(() => {
+    Logger.log("Reading storage in SessionsIndexPage");
+    StorageService(appMode)
+      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+      .then((savedConfig) => setConfig(savedConfig || {}));
+  }, [appMode]);
+
+  useEffect(() => {
+    if (!isWorkspaceMode) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
+    }
+  }, [config?.pageSources?.length, isWorkspaceMode]);
 
   useEffect(() => {
     const initialCustomPageSources = [{ ...emptyPageSourceData }];
 
-    if (isModalVisible) {
-      if (config.pageSources?.length === 1 && isEqual(config.pageSources?.[0], allPagesSourceData)) {
-        setPageSourceType(PAGE_SOURCES_TYPE.ALL_PAGES);
-        setCustomPageSources(initialCustomPageSources);
-      } else if (config.pageSources?.length > 0) {
-        setPageSourceType(PAGE_SOURCES_TYPE.CUSTOM);
-        setCustomPageSources(config.pageSources);
-      } else {
-        setPageSourceType(PAGE_SOURCES_TYPE.NO_PAGES);
-        setCustomPageSources(initialCustomPageSources);
-      }
+    if (config.pageSources?.length === 1 && isEqual(config.pageSources?.[0], allPagesSourceData)) {
+      setPageSourceType(PAGE_SOURCES_TYPE.ALL_PAGES);
+      setCustomPageSources(initialCustomPageSources);
+    } else if (config.pageSources?.length > 0) {
+      setPageSourceType(PAGE_SOURCES_TYPE.CUSTOM);
+      setCustomPageSources(config.pageSources);
+    } else {
+      setPageSourceType(PAGE_SOURCES_TYPE.NO_PAGES);
+      setCustomPageSources(initialCustomPageSources);
     }
-  }, [config, isModalVisible]);
+  }, [config]);
 
   const setPageSourceValue = (index, key, value) => {
     const newPageSources = [...customPageSources];
@@ -106,10 +147,9 @@ const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCan
       key: "key",
       render: (text, _, index) => (
         <Select
-          style={{ width: "100%", padding: "8px" }}
+          style={{ width: "100%" }}
           value={text}
-          size="small"
-          className="recording-config"
+          className="source-key-config"
           onChange={(value) => {
             setPageSourceValue(index, "key", value);
           }}
@@ -121,7 +161,7 @@ const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCan
           ].map((value) => {
             return (
               <Select.Option key={value} value={value}>
-                {value}
+                {value.toUpperCase()}
               </Select.Option>
             );
           })}
@@ -136,9 +176,8 @@ const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCan
         return (
           <Select
             value={text}
-            size="small"
             style={{ width: "100%" }}
-            className="recording-config"
+            className="source-operator-config"
             onChange={(value) => {
               setPageSourceValue(index, "operator", value);
             }}
@@ -182,84 +221,85 @@ const ConfigurationPage = ({ config, isModalVisible, handleSaveConfig, handleCan
   ];
 
   return (
-    <Modal
-      title="Edit configuration"
-      visible={isModalVisible}
-      onCancel={handleCancelModal}
-      width="50%"
-      okText="Save"
-      onOk={savePageSource}
-      bodyStyle={{ padding: 24 }}
-      maskClosable={false}
-    >
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <div>
+    <Row className="configuration-container ">
+      <Col
+        xs={{ offset: 1, span: 22 }}
+        sm={{ offset: 1, span: 22 }}
+        md={{ offset: 2, span: 20 }}
+        lg={{ offset: 3, span: 18 }}
+        xl={{ offset: 4, span: 16 }}
+        flex="1 1 820px"
+      >
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <div>
-            <span>Page URLs where session should be recorded:</span>
-            <Select
-              style={{ width: "150px", marginLeft: "10px" }}
-              value={pageSourceType}
-              size="small"
-              onChange={setPageSourceType}
-            >
-              <Select.Option value={PAGE_SOURCES_TYPE.ALL_PAGES}>All Pages</Select.Option>
-              <Select.Option value={PAGE_SOURCES_TYPE.CUSTOM}>Custom Pages</Select.Option>
-              <Select.Option value={PAGE_SOURCES_TYPE.NO_PAGES}>No Pages</Select.Option>
-            </Select>
-          </div>
-          {pageSourceType === PAGE_SOURCES_TYPE.CUSTOM ? (
-            <>
-              <Button
-                size="small"
-                type="link"
-                icon={<PlusOutlined />}
-                onClick={addEmptyPageSource}
-                style={{ margin: "10px 0 10px -8px" }}
-              >
-                Add page source
-              </Button>
-              {customPageSources.length ? (
-                <Table
-                  rowKey={(_, i) => i}
-                  columns={pageSourceColumns}
-                  dataSource={customPageSources}
-                  pagination={false}
-                  showHeader={false}
-                  bordered={false}
+            <Row className="w-full" wrap={false} align="middle" justify="space-between">
+              <div className="header">
+                <RQButton
+                  iconOnly
+                  type="default"
+                  icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                  onClick={() => redirectToSessionRecordingHome(navigate)}
                 />
-              ) : null}
-            </>
-          ) : null}
-        </div>
-        <div>
-          <Alert
-            showIcon
-            type={pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES ? "warning" : "info"}
-            message={
-              pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES
-                ? "All the page sources in custom pages configuration will be removed!"
-                : "Activity for only last 5 minutes will be recorded in any session."
-            }
-            style={{ padding: "4px 12px" }}
-          />
-        </div>
-        {/* <div>
-          <span>Time duration for which session should be recorded:</span>
-          <Select
-            style={{ width: "150px", marginLeft: "10px" }}
-            value={maxDuration}
-            size="small"
-            onChange={setMaxDuration}
-          >
-            <Select.Option value={1}>1 min</Select.Option>
-            <Select.Option value={5}>5 min (default)</Select.Option>
-            <Select.Option value={10}>10 min</Select.Option>
-            <Select.Option value={15}>15 min</Select.Option>
-            <Select.Option value={30}>30 min</Select.Option>
-          </Select>
-        </div> */}
-      </Space>
-    </Modal>
+                <span>Session Recording Settings</span>
+              </div>
+
+              <Button type="primary" onClick={savePageSource} className="ml-auto">
+                Save
+              </Button>
+            </Row>
+            <div>
+              <span>Page URLs where session should be recorded:</span>
+              <Select
+                style={{ width: "150px", marginLeft: "10px" }}
+                value={pageSourceType}
+                size="small"
+                onChange={setPageSourceType}
+              >
+                <Select.Option value={PAGE_SOURCES_TYPE.ALL_PAGES}>All Pages</Select.Option>
+                <Select.Option value={PAGE_SOURCES_TYPE.CUSTOM}>Custom Pages</Select.Option>
+                <Select.Option value={PAGE_SOURCES_TYPE.NO_PAGES}>No Pages</Select.Option>
+              </Select>
+            </div>
+            {pageSourceType === PAGE_SOURCES_TYPE.CUSTOM ? (
+              <>
+                <Button
+                  size="small"
+                  type="link"
+                  icon={<PlusOutlined />}
+                  onClick={addEmptyPageSource}
+                  style={{ margin: "10px 0 10px -8px" }}
+                >
+                  Add page source
+                </Button>
+                {customPageSources.length ? (
+                  <Table
+                    rowKey={(_, i) => i}
+                    columns={pageSourceColumns}
+                    dataSource={customPageSources}
+                    pagination={false}
+                    showHeader={false}
+                    bordered={false}
+                    className="config-page-sources-table"
+                  />
+                ) : null}
+              </>
+            ) : null}
+          </div>
+          <div>
+            <Alert
+              showIcon
+              type={pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES ? "warning" : "info"}
+              message={
+                pageSourceType === PAGE_SOURCES_TYPE.NO_PAGES
+                  ? "All the page sources in custom pages configuration will be removed!"
+                  : "Activity for only last 5 minutes will be recorded in any session."
+              }
+              style={{ padding: "4px 12px" }}
+            />
+          </div>
+        </Space>
+      </Col>
+    </Row>
   );
 };
 
