@@ -23,7 +23,7 @@ const CheckItem: React.FC<{ label: string }> = ({ label }) => {
 };
 
 interface SessionOnboardProps {
-  launchConfig?: () => void;
+  redirectToSettingsPage?: () => void;
 }
 
 export enum OnboardingTypes {
@@ -77,7 +77,7 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   );
 };
 
-const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
+const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
   const openInstallExtensionModal = useCallback(() => {
     setIsInstallExtensionModalVisible(true);
@@ -108,13 +108,17 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
       <div>
         <AuthConfirmationPopover
           title="You need to sign up to configure webpages"
-          callback={isExtensionInstalled() ? launchConfig : openInstallExtensionModal}
+          callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
           source={AUTH.SOURCE.SESSION_RECORDING}
         >
           <Button
             type="primary"
             onClick={
-              user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig : openInstallExtensionModal) : null
+              user?.details?.isLoggedIn
+                ? isExtensionInstalled()
+                  ? redirectToSettingsPage
+                  : openInstallExtensionModal
+                : null
             }
             style={{ margin: "24px" }}
           >
@@ -151,11 +155,11 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) 
   );
 };
 
-const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
+const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return <SessionOnboardingView launchConfig={launchConfig} />;
+    return <SessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />;
   }
 };
 
