@@ -23,7 +23,7 @@ export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({ isReadOn
 
   const handleOnNameInputBlur = () => {
     setIsTitleEditable(false);
-    if (recordingId && hasTitleChanged) {
+    if (recordingId && hasTitleChanged && sessionRecordingName?.length) {
       updateSessionName(user?.details?.profile?.uid, recordingId, sessionRecordingName);
     } else trackDraftSessionNamed();
     setTimeout(() => {
