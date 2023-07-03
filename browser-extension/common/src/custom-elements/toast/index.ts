@@ -2,17 +2,28 @@
 import styles from "./toast.css";
 
 class RQToast extends HTMLElement {
+  time = 5000;
+
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: "open" });
     shadow.innerHTML = this._getDefaultMarkup();
+
+    this.show = this.show.bind(this);
+    this.hide = this.hide.bind(this);
   }
 
   connectedCallback() {
     const heading = this.shadowRoot?.getElementById("heading");
     const subheading = this.shadowRoot?.getElementById("subheading");
-    if (heading) heading.textContent = this.attributes.getNamedItem("heading")?.value ?? null;
-    if (subheading) subheading.textContent = this.attributes.getNamedItem("subheading")?.value ?? null;
+
+    heading!.textContent = this.attributes.getNamedItem("heading")?.value ?? null;
+    subheading!.textContent = this.attributes.getNamedItem("subheading")?.value ?? null;
+
+    const time = Number(this.attributes.getNamedItem("time")?.value) ?? null;
+    if (time) {
+      this.time = time;
+    }
 
     const iconPath = this.attributes.getNamedItem("icon-path")?.value;
     if (iconPath) {
@@ -22,11 +33,7 @@ class RQToast extends HTMLElement {
       iconContainer?.appendChild(icon);
     }
 
-    const container = this.shadowRoot?.getElementById("container");
-    if (container) {
-      setTimeout(() => container.classList.add("active"), 300);
-      setTimeout(() => container.classList.remove("active"), 4000);
-    }
+    this.show();
   }
 
   _getDefaultMarkup() {
@@ -42,6 +49,17 @@ class RQToast extends HTMLElement {
         </div>
      </div>
     `;
+  }
+
+  show() {
+    setTimeout(() => {
+      this.shadowRoot?.getElementById("container")!.classList.add("active");
+      setTimeout(this.hide, this.time);
+    }, 300);
+  }
+
+  hide() {
+    this.shadowRoot?.getElementById("container")!.classList.remove("active");
   }
 }
 

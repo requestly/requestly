@@ -106,7 +106,7 @@ export default [
     plugins: [...commonPlugins, nodeResolve()],
   },
   {
-    input: "custom-elements/index.ts",
+    input: "src/custom-elements/index.ts",
     output: {
       file: `${OUTPUT_DIR}/lib/customElements.js`,
       format: "iife",
