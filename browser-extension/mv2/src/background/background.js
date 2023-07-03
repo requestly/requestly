@@ -1073,14 +1073,8 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
   }
 
   if (window.tabService.getData(tabId, "recordSession") === true) {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () => {
+    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING, notify: true }, () => {
       window.tabService.removeData(tabId, "recordSession");
-      BG.Methods.showToast(
-        tabId,
-        "Requestly is recording session on this tab!",
-        "You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.",
-        "resources/images/128x128.png"
-      );
     });
   }
 };
@@ -1089,18 +1083,6 @@ BG.Methods.startRecordingOnUrl = (url) => {
   chrome.tabs.create({ url }, (tab) => {
     window.tabService.setData(tab.id, "recordSession", true);
   });
-};
-
-BG.Methods.showToast = (tabId, heading, subheading, iconPath) => {
-  const _showToast = `
-    const rqtoast = document.createElement("rq-toast");
-    rqtoast.setAttribute("heading", "${heading}");
-    rqtoast.setAttribute("subheading", "${subheading}");
-    rqtoast.setAttribute("icon-path", chrome.runtime.getURL("${iconPath}"));
-    document.documentElement.appendChild(rqtoast);
-    `;
-
-  chrome.tabs.executeScript(tabId, { code: _showToast });
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {

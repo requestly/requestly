@@ -6,6 +6,10 @@
   right: 0;
 }
 
+::slotted(*) {
+  all: unset !important;
+}
+
 #container {
   background-color: #295ff6;
   border-radius: 8px;
@@ -34,11 +38,6 @@
   line-height: 1.4;
 }
 
-#subheading-container {
-  display: flex;
-  flex-direction: row;
-}
-
 #heading-container {
   display: flex;
   flex-direction: row;
@@ -55,7 +54,12 @@
   cursor: pointer;
 }
 
-#subheading {
+#content-container {
+  display: flex;
+  flex-direction: row;
+}
+
+#content {
   font-size: 13px;
   line-height: 1.4;
 }

@@ -16,10 +16,7 @@ class RQToast extends HTMLElement {
 
   connectedCallback() {
     const heading = this.shadowRoot.getElementById("heading");
-    const subheading = this.shadowRoot.getElementById("subheading");
-
     heading.textContent = this.attributes.getNamedItem("heading")?.value ?? null;
-    subheading.textContent = this.attributes.getNamedItem("subheading")?.value ?? null;
 
     const time = Number(this.attributes.getNamedItem("time")?.value) ?? null;
     if (time) {
@@ -50,8 +47,8 @@ class RQToast extends HTMLElement {
           </div>
           <div id="close-icon">${CloseIcon}</div>
         </div>
-        <div id="subheading-container">
-          <div id="subheading"></div>
+        <div id="content-container">
+          <slot id="content" name="content"></slot>
         </div>
      </div>
     `;
