@@ -33,17 +33,38 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
   <a href="https://requestly.io/">
     <img src="https://github.com/requestly/requestly/assets/3108399/f0359812-35dc-495c-8ab3-10aced90de3e" alt="Requestly Details" width="60%"/>
   </a>
+</p>
 
-
-Requestly allows you to modify network (HTTP/S) requests by setting up **'Rules'** for **Redirects, Modifying Headers, Switching Hosts, Injecting Custom Scripts, Cancelling & Throttling Requests, Modifying request body and Modifying AJAX responses, to share debugging sessions and a whole lot more!**
-
-Requestly also offers a library service which allows you to upload and host JS/CSS files with direct links to ease debugging process. These files can also be used directly inside rules **with a single click!**
-
-- [Documentation](#documentation-)
+## 🏡 Getting Started
+- [🚀 What is Requestly?](https://github.com/requestly/requestly/edit/master/README.md#what-is-requestly)
 - [Features](#features-)
+    - [API Client](https://github.com/requestly/requestly/edit/master/README.md#api-client)
+    - Mock Server (Create API Mocks in seconds)
+    - HTTP Rules (Intercept & Modify HTTPs Requests)
+    - Sessions
+- [Documentation](#documentation-)
 - [Development](#development)
 - [Contributing](#contributing-%EF%B8%8F)
-- [Links](#links-)
+- [References](#References-)
+
+## 🚀 What is Requestly
+
+Requestly is an Open-Source platform for front-end developers with essential tooling & integrations that helps them write, test & debug their code 10x faster. Requestly reduces dependency on backend devs and environments for development & testing needs. 
+
+Using Requestly, devs can create mock, test, validate & override API responses, modify request & response headers, set up redirects (Map local, Map remote), and use Requestly sessions for faster debugging.
+
+## Features
+
+### API Client
+
+Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you import cURL requests, send new requests, and quickly test API responses.
+
+<p align="center">
+  <a href="https://requestly.io/">
+    <img width="60%" alt="store_asset_-_api_client_-_1280x800_8" src="https://github.com/requestly/requestly/assets/3108399/d04e3116-665c-4e60-8a50-4ce50326c900">
+  </a>
+</p>
+
 
 ## Documentation 📕
 
@@ -109,7 +130,7 @@ Start working on individual modules:
 
 Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
-## Links 🔗
+## References 🔗
 
 - 🏠 Website: [https://www.requestly.io](https://www.requestly.io)
 - 🌐 Web application: [https://app.requestly.io](https://app.requestly.io)
