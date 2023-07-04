@@ -43,15 +43,26 @@ export enum SourceOperator {
 }
 
 export interface UrlSource {
+  id?: string;
+  isActive?: boolean;
   key: SourceKey;
   operator: SourceOperator;
   value: string;
   filters?: unknown[];
 }
 
+export enum AutoRecordingMode {
+  CUSTOM = "custom",
+  ALL_PAGES = "allPages",
+}
+
 export interface SessionRecordingConfig {
   maxDuration: number;
   pageSources: UrlSource[];
+  autoRecording?: {
+    isActive: boolean;
+    mode: AutoRecordingMode;
+  };
 }
 
 export interface RulePair {
