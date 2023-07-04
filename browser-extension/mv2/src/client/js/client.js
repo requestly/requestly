@@ -3,6 +3,7 @@
     return;
   }
 
+  RQ.RegisterCustomElements.init();
   RQ.ConsoleLogger.setup();
   RQ.RuleExecutionHandler.setup();
   RQ.ScriptRuleHandler.setup();

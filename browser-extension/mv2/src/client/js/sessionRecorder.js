@@ -15,6 +15,9 @@ RQ.SessionRecorder.setup = () => {
       case RQ.CLIENT_MESSAGES.START_RECORDING:
         RQ.SessionRecorder.explicitRecordingFlag.set();
         RQ.SessionRecorder.startRecording();
+        if (message.notify) {
+          RQ.SessionRecorder.showToast();
+        }
         break;
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording");
@@ -157,4 +160,17 @@ RQ.SessionRecorder.explicitRecordingFlag = {
   clear: () => {
     window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
   },
+};
+
+RQ.SessionRecorder.showToast = () => {
+  const rqToast = document.createElement("rq-toast");
+  rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
+  rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  rqToast.innerHTML = `
+  <div slot="content">
+    You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
+  </div>
+  `;
+
+  document.documentElement.appendChild(rqToast);
 };

@@ -144,9 +144,11 @@ const SessionsIndexPage = () => {
   }, [dispatch, navigate, user?.loggedIn]);
 
   const ConfigureButton = () => (
-    <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
-      Settings
-    </Button>
+    <>
+      <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
+        Settings
+      </Button>
+    </>
   );
 
   useEffect(() => {

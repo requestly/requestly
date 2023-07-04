@@ -1091,9 +1091,9 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
   }
 
   if (window.tabService.getData(tabId, "recordSession") === true) {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () =>
-      window.tabService.removeData(tabId, "recordSession")
-    );
+    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING, notify: true }, () => {
+      window.tabService.removeData(tabId, "recordSession");
+    });
   }
 };
 

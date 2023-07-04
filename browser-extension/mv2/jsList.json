@@ -23,6 +23,7 @@
     "src/shared/constants.js",
     "src/client/js/utils.js",
     "src/client/js/ruleMatcher.js",
+    "src/client/js/registerCustomElements.js",
     "src/client/js/scriptRuleHandler.js",
     "src/client/js/userAgentRuleHandler.js",
     "src/client/js/requestResponseRuleHandler.js",
