@@ -32,7 +32,7 @@ const Logger = ({ sdkId, deviceId, showDeviceSelector }) => {
   }, []);
 
   // Deleting logs
-  const deviceRef = doc(db, ...["sdks", sdkId, "devices", deviceId]);
+  const deviceRef = doc(db, `sdks/${sdkId}/devices/${deviceId}`);
 
   const getAndUpdateLocalDeleteTimestamp = useCallback(async () => {
     return getDoc(deviceRef)
