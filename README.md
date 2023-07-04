@@ -1,85 +1,128 @@
 <p align="center">
 <p align="center">
-  <a rel="noreferrer noopener" href="https://requestly.io/">
-    <img src="https://user-images.githubusercontent.com/16779465/194505910-b6a7be70-df20-4b1a-9730-06a48cdd75ac.png" alt="Requestly Logo" width="40%"/>
+  <a target="_blank" href="https://requestly.io/">
+    <img src="https://github.com/requestly/requestly/assets/3108399/10cda4ec-ede7-4b2b-9ef3-ea025c951bb9" alt="Requestly Logo" width="40%"/>
   </a>
 </p>
 
 <p align="center">
   <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/requestly/requestly"/>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Rating" src="https://img.shields.io/chrome-web-store/rating/mdnleldcmiljblolnjhpnblkcekpdkpa" />
   </a>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Reviews" src="https://img.shields.io/chrome-web-store/rating-count/mdnleldcmiljblolnjhpnblkcekpdkpa?label=reviews" />
   </a>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Downloads" src="https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads" />
   </a>
 </p>
 
+<!--
 <p align="center">
-  <a href="https://docs.requestly.io">Docs</a> - <a href="https://requestly.io/downloads">Download</a> - <a href="https://app.requestly.io/getting-started">Getting Started</a> - <a href="https://bit.ly/requestly-slack">Support community</a> - <a href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
+  <a target="_blank" href="https://docs.requestly.io">Docs</a> - <a target="_blank" 
+href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
+</p>
+-->
+
+<h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
+
+**Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
+
+<p align="center">
+  <a href="https://requestly.io/">
+    <img src="https://github.com/requestly/requestly/assets/3108399/f0359812-35dc-495c-8ab3-10aced90de3e" alt="Requestly Details" width="60%"/>
+  </a>
 </p>
 
-<h2 align="center">Supercharge ⚡ your web & mobile development using Requestly</h2>
+## 🏡 Getting Started
+- [🚀 What is Requestly?](#-what-is-requestly)
+- [✨ Features](#-features)
+    - [HTTP Rules (Intercept & Modify HTTPs Requests)](#-http-rules-intercept--modify-https-requests)
+    - [API Client](#-api-client)
+    - [Mock Server (Create API Mocks in seconds)](#-mock-server-create-api-mocks-in-seconds)
+    - [Sessions for faster debugging](#-sessions)
+- [📕 Documentation](#-documentation)
+- [👩‍💻 Development](#-development)
+- [🙏 Contributing](#-contributing)
+- [🎯 Our Mission](#-our-mission)
 
-Requestly allows you to modify network (HTTP/S) requests by setting up **'Rules'** for **Redirects, Modifying Headers, Switching Hosts, Injecting Custom Scripts, Cancelling & Throttling Requests, Modifying request body and Modifying AJAX responses, to share debugging sessions and a whole lot more!**
+## 🚀 What is Requestly
 
-Requestly also offers a library service which allows you to upload and host JS/CSS files with direct links to ease debugging process. These files can also be used directly inside rules **with a single click!**
+Requestly is an Open-Source platform for front-end developers with essential tooling & integrations that helps them write, test & debug their code 10x faster. Requestly reduces dependency on backend devs and environments for development & testing needs. 
 
-- [Documentation](#documentation-)
-- [Features](#features-)
-- [Development](#development)
-- [Contributing](#contributing-%EF%B8%8F)
-- [Links](#links-)
+Using Requestly, devs can create mock, test, validate & override API responses, modify request & response headers, set up redirects (Map local, Map remote), and use Requestly sessions for faster debugging.
 
-## Documentation 📕
+## ✨ Features
 
-Please visit our [documentation](https://docs.requestly.io/) for step-by-step guide to get started with Requestly.
+### 👉 HTTP Rules (Intercept & Modify HTTPs Requests)
+Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
+- 👉 Use the browser extension for capturing & modifying traffic from browsers
+- 👉 Use the desktop app for capturing & modifying traffic from mobile apps & other desktop apps.
 
-## Features ✨
+Different Modifications supported
+- Rewriting URLs (Map Local & Map Remote) e.g.
+    - Change Hostname, QueryParams, etc in the URL
+    - Redirect traffic from one environment to another (e.g. production to dev)
+    - Swap Tag Manager scripts from production to staging/dev environment
+- Modify HTTP Request & Response Headers
+- Modify API Request & Response body
+- Throttles & Blocking of Requests
+- Inject scripts on web pages
 
-#### 🌐 Modify Request URL
+<br/>
 
-Modify the url of ongoing request and can change the url to something else. Common examples include:
+<p align="center">
+  <a target="_blank" href="https://requestly.io/">
+    <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
+  </a>
+</p>
 
-- Redirect Production to Local Environment
-- Redirect to local System files (Map Local)
-- Test API version changes:
-- Swap Tag Manager scripts from production to staging/dev environment
+### 👉 API Client
 
-#### 🔌 Modify API Request body and Response
+Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you 
+- Import cURL requests,
+- Send new requests, and
+- Quickly test API responses.
+- Integration with Mock Server to clone an API endpoint with the same response
+- Integration with Modify Response Rule to override the response body
 
-- Work on front-end while back-end is not available or ready yet
-- Modify certain part of response/request body programatically
-- Modify Response of GraphQL requests
+<p align="center">
+  <a target="_blank" href="https://requestly.io/feature/api-client">
+    <img width="60%" alt="store_asset_-_api_client_-_1280x800_8" src="https://github.com/requestly/requestly/assets/3108399/d04e3116-665c-4e60-8a50-4ce50326c900">
+  </a>
+</p>
 
-#### 📜 Insert Custom Scripts
+### 👉 Mock Server (Create API Mocks in seconds)
 
-- Run scripts on website and customize the web pages you want
-- Support your script with popular libraries like jQuery and underscore.
-- Use FileHosting service to upload long scripts and get a URL to be used in your websites or Requestly rules
-- Very similar to GreaseMonkey or TamperMonkey user scripts
+Mock Server helps you quickly create API mocks. Especially helpful when APIs don't exist and you have to build a feature, just define the response you need and get an endpoint to be used in your code.
 
-#### 🎬 Modify Headers
+<p align="center">
+  <a target="_blank" href="https://requestly.io/feature/mock-server">
+    <img width="60%" alt="mock_server_-_1280x800_4" src="https://github.com/requestly/requestly/assets/3108399/337b8251-3b62-4f87-825f-f3166417c7d5">
+  </a>
+</p>
 
-Modify HTTP Request & Response headers. (Extremely helpful for web developers for debugging applications)
+### 👉 Sessions
 
-#### 📱 Modify User Agent
+Collaborate with other teammates and get Requestly sessions that contain video, console logs, network logs, and env details for faster troubleshooting.
 
-- Setup different user agents for websites and test how they behave
-- Useful for web developers for testing cross-device compatibility
+<p align="center">
+  <a target="_blank" href="https://requestly.io/feature/mock-server">
+  <img width="60%" alt="session_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/41375ad4-021e-490e-b488-1967cade727c">
+  </a>
+</p>
 
-#### 🗃 Mock Server
 
-Host your APIs & files using Requestly Mock Server which can be directly used in rules. No need to setup local server now.
+## 📕 Documentation
 
-#### 🎥 Data Rich bug reports
+Please find our [documentation here](https://developers.requestly.io/). Our docs can help with
+- Getting Started
+- Product Documentation
+- FAQs
+- Troubleshooting
 
-Share data rich bug reports with Video, console logs, network logs, and env details with teammates.
-
-## Development
+## 👩‍💻 Development
 
 This repository contains the source code for Browser extension and UI application which make up the core of Requestly.
 Please follow the [Getting Started Guide](./getting-started.md) to get to know about the development process in this repository.
@@ -89,26 +132,17 @@ Start working on individual modules:
 - [Browser extension](./browser-extension)
 - [UI application](./app)
 - [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
-- [Mobile SDK](https://github.com/requestly/requestly-android-sdk) (to debug mobile apps)
 - [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates Session Recording)
 - [Mock Server](https://github.com/requestly/requestly-mock-server)
 - [Backend](https://github.com/requestly/requestly-backend)
 
-## Contributing ⌨️
+## 🙏 Contributing
 
 Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
-## Links 🔗
-
-- 🏠 Website: [https://www.requestly.io](https://www.requestly.io)
-- 🌐 Web application: [https://app.requestly.io](https://app.requestly.io)
-- 📖 Documentation: [https://docs.requestly.io](https://docs.requestly.io)
-- Chrome Store: [Visit Chrome Store](https://chrome.google.com/webstore/detail/requestly-redirect-url-mo/mdnleldcmiljblolnjhpnblkcekpdkpa)
-- 🖥️ Download Desktop App: [https://requestly.io/desktop/](https://requestly.io/desktop/)
-
 For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io)
 
-## Our Mission
+## 🎯 Our Mission
 
 Our mission is to help developers ship web and mobile apps faster and with confidence by giving them the tools to debug & resolve issues without external dependency.
 
