@@ -124,7 +124,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
       <SplitButtons
         type="primary"
         left={{
-          label: getVisibilityLabel(currentVisibility),
+          label: <span className="text-bold">{getVisibilityLabel(currentVisibility)}</span>,
           onClick: () => {
             trackSessionRecordingShareClicked();
             setIsShareModalVisible(true);

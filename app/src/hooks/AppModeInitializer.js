@@ -131,22 +131,26 @@ const AppModeInitializer = () => {
               });
             });
           }
+          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
+            if (payload?.origin && payload?.origin === "main") {
+              trackDesktopMainEvent(payload?.name, payload?.params);
+            } else {
+              // todo: need to setup relay for BG renderer events
+              trackDesktopBGEvent(payload?.name, payload?.params);
+            }
+          });
         });
       }
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
-        if (payload?.origin && payload?.origin === "main") {
-          trackDesktopMainEvent(payload?.name, payload?.params);
-        } else {
-          // todo: need to setup relay for BG renderer events
-          trackDesktopBGEvent(payload?.name, payload?.params);
-        }
-      });
+    }
+  }, [appMode, isBackgroundProcessActive, dispatch]);
 
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
       });
     }
-  }, [appMode, isBackgroundProcessActive, dispatch, navigate]);
+  }, []);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

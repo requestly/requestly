@@ -1,36 +1,69 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Dropdown, Menu, Modal, Space, Typography } from "antd";
-import { DeleteOutlined, ExclamationCircleOutlined, MoreOutlined } from "@ant-design/icons";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import "./sessionViewer.scss";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Modal, Space } from "antd";
+import { RQButton } from "lib/design-system/components";
+import {
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import SessionDetails from "./SessionDetails";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "./sessionEventsUtils";
+import ShareButton from "../ShareButton";
+import PageLoader from "components/misc/PageLoader";
+import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
+import PermissionError from "../errors/PermissionError";
+import NotFoundError from "../errors/NotFoundError";
+import { getRecording } from "backend/sessionRecording/getRecording";
+import { deleteRecording } from "../api";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import PATHS from "config/constants/sub/paths";
 import {
   trackSavedSessionViewedFromApp,
   trackSavedSessionViewedFromLink,
 } from "modules/analytics/events/features/sessionRecording";
-import ShareButton from "../ShareButton";
-import PATHS from "config/constants/sub/paths";
-import PageLoader from "components/misc/PageLoader";
-import { deleteRecording } from "../api";
-import { getAuthInitialization, getUserAuthDetails } from "store/selectors";
-import { sessionRecordingActions } from "store/features/session-recording/slice";
-import {
-  getIsRequestedByOwner,
-  getSessionRecordingEventsFilePath,
-  getSessionRecordingName,
-} from "store/features/session-recording/selectors";
-import PermissionError from "../errors/PermissionError";
-import NotFoundError from "../errors/NotFoundError";
-import { getRecording } from "backend/sessionRecording/getRecording";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import "./sessionViewer.scss";
 
 interface NavigationState {
   fromApp?: boolean;
   viewAfterSave?: boolean;
 }
+interface SessionCreatedOnboardingPromptProps {
+  onClose: () => void;
+}
+
+const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ onClose }) => {
+  return (
+    <div className="session-onboarding-prompt">
+      <div className="display-flex">
+        <CheckOutlined width={32} height={32} className="session-onboarding-prompt-check-icon" />
+        <div className="session-onboarding-prompt-message">
+          <p>
+            <strong>Congratulations!</strong> you have just saved your first recording.
+          </p>
+          <p>
+            You can now create a rule to <strong>automatically start recording</strong> when you visit a site.
+          </p>
+        </div>
+      </div>
+      <div className="session-onboarding-prompt-actions">
+        <Link to={PATHS.SESSIONS.SETTINGS.RELATIVE} className="session-onboarding-prompt-settings-link">
+          <SettingOutlined />
+          <span>Open settings</span>
+        </Link>
+        <CloseOutlined className="session-onboarding-prompt-close-icon" onClick={onClose} />
+      </div>
+    </div>
+  );
+};
 
 const SavedSessionViewer: React.FC = () => {
   const { id } = useParams();
@@ -40,12 +73,13 @@ const SavedSessionViewer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const hasAuthInitialized = useSelector(getAuthInitialization);
-  const name = useSelector(getSessionRecordingName);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
+  const userAttributes = useSelector(getUserAttributes);
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
@@ -72,16 +106,11 @@ const SavedSessionViewer: React.FC = () => {
     });
   }, [id, eventsFilePath, navigateToList]);
 
-  const sessionActionsDropdownMenu = useMemo(
-    () => (
-      <Menu className="session-viewer-more-actions">
-        <Menu.Item key="delete" className="more-action" onClick={confirmDeleteAction}>
-          <DeleteOutlined className="more-action-icon" /> Delete Recording
-        </Menu.Item>
-      </Menu>
-    ),
-    [confirmDeleteAction]
-  );
+  useEffect(() => {
+    if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
+      setShowOnboardingPrompt(true);
+    }
+  }, [location.state, userAttributes?.num_sessions]);
 
   useEffect(
     () => () => {
@@ -130,6 +159,10 @@ const SavedSessionViewer: React.FC = () => {
       });
   }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
 
+  const hideOnboardingPrompt = () => {
+    setShowOnboardingPrompt(false);
+  };
+
   if (showPermissionError) return <PermissionError />;
   if (showNotFoundError) return <NotFoundError />;
 
@@ -138,24 +171,23 @@ const SavedSessionViewer: React.FC = () => {
   ) : (
     <>
       <div className="session-viewer-page">
+        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
         <div className="session-viewer-header">
-          <div
-            style={{
-              display: "flex",
-              columnGap: "10px",
-            }}
-          >
-            <Typography.Title level={3} className="session-recording-name">
-              {name}
-            </Typography.Title>
+          <div className="display-row-center w-full">
+            <RQButton
+              iconOnly
+              type="default"
+              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              onClick={() => redirectToSessionRecordingHome(navigate)}
+              className="back-button"
+            />
+            <SessionViewerTitle isReadOnly={!isRequestedByOwner} />
           </div>
           {isRequestedByOwner ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
-                <Dropdown overlay={sessionActionsDropdownMenu} trigger={["click"]}>
-                  <Button icon={<MoreOutlined />} onClick={(e) => e.preventDefault()} />
-                </Dropdown>
+                <RQButton type="default" icon={<DeleteOutlined />} onClick={confirmDeleteAction} />
               </Space>
             </div>
           ) : null}
