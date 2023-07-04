@@ -1,28 +1,39 @@
 <p align="center">
 <p align="center">
-  <a rel="noreferrer noopener" href="https://requestly.io/">
-    <img src="https://user-images.githubusercontent.com/16779465/194505910-b6a7be70-df20-4b1a-9730-06a48cdd75ac.png" alt="Requestly Logo" width="40%"/>
+  <a target="_blank" href="https://requestly.io/">
+    <img src="https://github.com/requestly/requestly/assets/3108399/10cda4ec-ede7-4b2b-9ef3-ea025c951bb9" alt="Requestly Logo" width="40%"/>
   </a>
 </p>
 
 <p align="center">
   <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/requestly/requestly"/>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Rating" src="https://img.shields.io/chrome-web-store/rating/mdnleldcmiljblolnjhpnblkcekpdkpa" />
   </a>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Reviews" src="https://img.shields.io/chrome-web-store/rating-count/mdnleldcmiljblolnjhpnblkcekpdkpa?label=reviews" />
   </a>
-  <a rel="noreferrer noopener" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
+  <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Downloads" src="https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads" />
   </a>
 </p>
 
+<!--
 <p align="center">
-  <a href="https://docs.requestly.io">Docs</a> - <a href="https://requestly.io/downloads">Download</a> - <a href="https://app.requestly.io/getting-started">Getting Started</a> - <a href="https://bit.ly/requestly-slack">Support community</a> - <a href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
+  <a target="_blank" href="https://docs.requestly.io">Docs</a> - <a target="_blank" 
+href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
 </p>
+-->
 
-<h2 align="center">Supercharge ⚡ your web & mobile development using Requestly</h2>
+<h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
+
+**Bring the power of Charles Proxy, Fiddler & Postman into the browser** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
+
+<p align="center">
+  <a href="https://requestly.io/">
+    <img src="https://github.com/requestly/requestly/assets/3108399/f0359812-35dc-495c-8ab3-10aced90de3e" alt="Requestly Details" width="60%"/>
+  </a>
+
 
 Requestly allows you to modify network (HTTP/S) requests by setting up **'Rules'** for **Redirects, Modifying Headers, Switching Hosts, Injecting Custom Scripts, Cancelling & Throttling Requests, Modifying request body and Modifying AJAX responses, to share debugging sessions and a whole lot more!**
 
