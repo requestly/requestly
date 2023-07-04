@@ -5,6 +5,11 @@ import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
 import ConfigurationPage from "views/features/sessions/ConfigurationPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
+import SessionsSettingsPage from "views/features/sessions/SessionsSettingsPage";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+
+const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_RECORDING_SETTINGS_PAGE);
 
 export const sessionRoutes: RouteObject[] = [
   {
@@ -13,8 +18,10 @@ export const sessionRoutes: RouteObject[] = [
   },
   {
     path: PATHS.SESSIONS.SETTINGS.RELATIVE,
-    // @ts-ignore
-    element: <ProtectedRoute component={ConfigurationPage} />,
+    element: (
+      // @ts-ignore
+      <ProtectedRoute component={isSessionsNewSettingsPageCompatible ? SessionsSettingsPage : ConfigurationPage} />
+    ),
   },
   {
     path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
