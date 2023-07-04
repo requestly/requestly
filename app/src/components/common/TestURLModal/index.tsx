@@ -7,10 +7,11 @@ import { SourceKey, SourceOperator } from "types";
 import "./index.scss";
 
 interface ModalProps {
-  isOpen?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const TestURLModal: React.FC<ModalProps> = ({ isOpen = true }) => {
+export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
@@ -40,7 +41,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen = true }) => {
   }, []);
 
   return (
-    <RQModal centered open={isOpen} className="test-url-modal" width={800}>
+    <RQModal centered open={isOpen} className="test-url-modal" width={800} onCancel={onClose}>
       <div className="test-url-modal-header">
         <Typography.Title level={4}>Test URL condition</Typography.Title>
         <Typography.Text className="text-gray">
@@ -88,7 +89,9 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen = true }) => {
       </div>
       <div className="rq-modal-footer">
         <Row className="w-full" justify="end">
-          <RQButton type="default">Close</RQButton>
+          <RQButton type="default" onClick={onClose}>
+            Close
+          </RQButton>
         </Row>
       </div>
     </RQModal>
