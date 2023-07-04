@@ -27,7 +27,7 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
-**Bring the power of Charles Proxy, Fiddler & Postman into the browser** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
+**Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
 
 <p align="center">
   <a href="https://requestly.io/">
@@ -37,10 +37,10 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 ## 🏡 Getting Started
 - [🚀 What is Requestly?](https://github.com/requestly/requestly/edit/master/README.md#what-is-requestly)
-- [Features](#features-)
+- [✨ Features](#features-)
+    - HTTP Rules (Intercept & Modify HTTPs Requests)
     - [API Client](https://github.com/requestly/requestly/edit/master/README.md#api-client)
     - Mock Server (Create API Mocks in seconds)
-    - HTTP Rules (Intercept & Modify HTTPs Requests)
     - Sessions
 - [Documentation](#documentation-)
 - [Development](#development)
@@ -53,11 +53,39 @@ Requestly is an Open-Source platform for front-end developers with essential too
 
 Using Requestly, devs can create mock, test, validate & override API responses, modify request & response headers, set up redirects (Map local, Map remote), and use Requestly sessions for faster debugging.
 
-## Features
+## ✨ Features
+
+### HTTP Rules (Intercept & Modify HTTPs Requests)
+Intercept & Modify HTTPs requests & responses from browsers & mobile apps. 
+- 👉 Use the browser extension for capturing & modifying traffic from browsers
+- 👉 Use the desktop app for capturing & modifying traffic from mobile apps & other desktop apps.
+
+Different Modifications supported
+- Rewriting URLs (Map Local & Map Remote) e.g.
+    - Change Hostname, QueryParams, etc in the URL
+    - Redirect traffic from one environment to another (e.g. production to dev)
+    - Swap Tag Manager scripts from production to staging/dev environment
+- Modify HTTP Request & Response Headers
+- Modify API Request & Response body
+- Throttles & Blocking of Requests
+- Inject scripts on web pages
+
+<br/>
+
+<p align="center">
+  <a href="https://requestly.io/">
+    <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
+  </a>
+</p>
 
 ### API Client
 
-Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you import cURL requests, send new requests, and quickly test API responses.
+Requestly offers a minimal, lightweight API client that works directly in the browser. It can help you 
+- Import cURL requests,
+- Send new requests, and
+- Quickly test API responses.
+- Integration with Mock Server to clone an API endpoint with the same response
+- Integration with Modify Response Rule to override the response body
 
 <p align="center">
   <a href="https://requestly.io/">
@@ -65,43 +93,11 @@ Requestly offers a minimal, lightweight API client that works directly in the br
   </a>
 </p>
 
-
 ## Documentation 📕
 
 Please visit our [documentation](https://docs.requestly.io/) for step-by-step guide to get started with Requestly.
 
-## Features ✨
-
-#### 🌐 Modify Request URL
-
-Modify the url of ongoing request and can change the url to something else. Common examples include:
-
-- Redirect Production to Local Environment
-- Redirect to local System files (Map Local)
-- Test API version changes:
-- Swap Tag Manager scripts from production to staging/dev environment
-
-#### 🔌 Modify API Request body and Response
-
-- Work on front-end while back-end is not available or ready yet
-- Modify certain part of response/request body programatically
-- Modify Response of GraphQL requests
-
-#### 📜 Insert Custom Scripts
-
-- Run scripts on website and customize the web pages you want
-- Support your script with popular libraries like jQuery and underscore.
-- Use FileHosting service to upload long scripts and get a URL to be used in your websites or Requestly rules
-- Very similar to GreaseMonkey or TamperMonkey user scripts
-
-#### 🎬 Modify Headers
-
-Modify HTTP Request & Response headers. (Extremely helpful for web developers for debugging applications)
-
-#### 📱 Modify User Agent
-
-- Setup different user agents for websites and test how they behave
-- Useful for web developers for testing cross-device compatibility
+## Features 
 
 #### 🗃 Mock Server
 
