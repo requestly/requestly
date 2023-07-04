@@ -73,6 +73,10 @@ export const trackSessionRecordingDeleted = () => {
 export const trackSessionRecordingDescriptionUpdated = () =>
   trackEvent(SESSION_RECORDING.session_recording_description_added);
 
+export const trackSessionRecordingNameUpdated = () => {
+  trackEvent(SESSION_RECORDING.session_recording_name_updated);
+};
+
 export const trackSessionRecordingPanelTabClicked = (tab, session_type) => {
   trackEvent(SESSION_RECORDING.session_recording_panel_tab_clicked, {
     tab,
