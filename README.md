@@ -36,16 +36,16 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 </p>
 
 ## 🏡 Getting Started
-- [🚀 What is Requestly?](#what-is-requestly)
+- [🚀 What is Requestly?](#-what-is-requestly)
 - [✨ Features](#-features)
-    - [HTTP Rules (Intercept & Modify HTTPs Requests)](https://github.com/requestly/requestly/edit/master/README.md#http-rules-intercept--modify-https-requests)
-    - [API Client](https://github.com/requestly/requestly/edit/master/README.md#api-client)
-    - [Mock Server (Create API Mocks in seconds)](https://github.com/requestly/requestly/edit/master/README.md#mock-server-create-api-mocks-in-seconds)
-    - [Sessions for faster debugging](https://github.com/requestly/requestly/edit/master/README.md#sessions)
-- [📕 Documentation]()
-- [👩‍💻 Development]()
-- [🙏 Contributing]()
-- [🎯 Our Mission]()
+    - [HTTP Rules (Intercept & Modify HTTPs Requests)](#-http-rules-intercept--modify-https-requests)
+    - [API Client](#-api-client)
+    - [Mock Server (Create API Mocks in seconds)](#-mock-server-create-api-mocks-in-seconds)
+    - [Sessions for faster debugging](#-sessions)
+- [📕 Documentation](#-documentation)
+- [👩‍💻 Development](#-development)
+- [🙏 Contributing](#-contributing)
+- [🎯 Our Mission](#-our-mission)
 
 ## 🚀 What is Requestly
 
