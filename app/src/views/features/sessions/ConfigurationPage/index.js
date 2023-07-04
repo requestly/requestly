@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Alert, Input, Select, Button, Space, Table, Col, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
@@ -8,13 +9,14 @@ import { isEqual } from "lodash";
 import { getAppMode } from "store/selectors";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-import { trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
-import { useNavigate } from "react-router-dom";
+import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./configurationPage.css";
 
 const emptyPageSourceData = {
@@ -43,6 +45,10 @@ const ConfigurationPage = () => {
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    trackConfigurationOpened();
+  }, []);
 
   const handleSaveConfig = useCallback(
     async (newConfig) => {
@@ -139,6 +145,10 @@ const ConfigurationPage = () => {
   const addEmptyPageSource = () => {
     setCustomPageSources((prevPageSources) => [{ ...emptyPageSourceData }, ...prevPageSources]);
   };
+
+  if (!isExtensionInstalled()) {
+    return <InstallExtensionCTA eventPage="session_settings" />;
+  }
 
   const pageSourceColumns = [
     {
