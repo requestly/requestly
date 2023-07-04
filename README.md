@@ -36,8 +36,8 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 </p>
 
 ## 🏡 Getting Started
-- [🚀 What is Requestly?](https://github.com/requestly/requestly/edit/master/README.md#what-is-requestly)
-- [✨ Features](https://github.com/requestly/requestly/edit/master/README.md#-features)
+- [🚀 What is Requestly?](#what-is-requestly)
+- [✨ Features](#-features)
     - [HTTP Rules (Intercept & Modify HTTPs Requests)](https://github.com/requestly/requestly/edit/master/README.md#http-rules-intercept--modify-https-requests)
     - [API Client](https://github.com/requestly/requestly/edit/master/README.md#api-client)
     - [Mock Server (Create API Mocks in seconds)](https://github.com/requestly/requestly/edit/master/README.md#mock-server-create-api-mocks-in-seconds)
