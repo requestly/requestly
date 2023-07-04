@@ -612,7 +612,7 @@ const RulesTable = ({
               }}
             >
               <Link
-                href="/"
+                href={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
                 onClick={(e) => {
                   e.preventDefault();
                   handleRuleNameOnClick(e, record);
