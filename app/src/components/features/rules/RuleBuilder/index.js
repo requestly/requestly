@@ -40,6 +40,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import Help from "./Help";
 import "./RuleBuilder.css";
+import { TestURLModal } from "components/common/TestURLModal";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -268,6 +269,7 @@ const RuleBuilder = (props) => {
 
   return (
     <>
+      <TestURLModal />
       <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}

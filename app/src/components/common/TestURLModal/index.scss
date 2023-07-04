@@ -1,0 +1,62 @@
+.test-url-modal {
+  .ant-modal-body {
+    background: var(--component-background);
+  }
+  &-header {
+    padding: 20px 30px;
+    padding-bottom: 0;
+
+    h4.ant-typography {
+      color: var(--white);
+    }
+  }
+  .ant-divider {
+    margin-top: 1rem;
+    margin-bottom: 40px;
+  }
+  &-body {
+    padding: 40px 35px;
+    padding-top: 0;
+
+    .source-condition-input-wrapper,
+    .test-url-modal-section .ant-input {
+      box-shadow: var(--input-box-shadow);
+      border-radius: var(--border-radius-sm);
+      background-color: var(--component-dark-background);
+    }
+
+    .source-condition-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+
+      &-dropdown {
+        background: var(--input-background);
+      }
+      .source-url-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        margin: 0;
+        padding: 8px;
+        outline: none;
+        border: none;
+
+        &:focus {
+          outline: none;
+          border: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+  &-section {
+    margin-top: 1.5rem;
+
+    .ant-input {
+      padding: 12px;
+      padding-left: 8px;
+    }
+  }
+}
