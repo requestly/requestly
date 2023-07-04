@@ -5,6 +5,7 @@ import { toast } from "utils/Toast";
 import {
   trackSessionRecordingDeleted,
   trackSessionRecordingDescriptionUpdated,
+  trackSessionRecordingNameUpdated,
   trackSessionRecordingStartTimeOffsetUpdated,
   trackSessionRecordingVisibilityUpdated,
 } from "modules/analytics/events/features/sessionRecording";
@@ -77,6 +78,16 @@ export const updateDescription = async (userId: string, id: string, description:
     await updateSessionRecordingProperties(userId, id, { description });
     toast.success("Updated description for the recording");
     trackSessionRecordingDescriptionUpdated();
+  } catch (error) {
+    toast.error("Something went wrong!");
+    throw error;
+  }
+};
+export const updateSessionName = async (userId: string, id: string, name: string) => {
+  try {
+    await updateSessionRecordingProperties(userId, id, { name });
+    toast.success("Session name updated successfully");
+    trackSessionRecordingNameUpdated();
   } catch (error) {
     toast.error("Something went wrong!");
     throw error;

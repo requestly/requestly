@@ -1020,9 +1020,27 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
 BG.Methods.getSessionRecordingConfig = async (url) => {
   const sessionRecordingConfig = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG);
-  const pageSources = sessionRecordingConfig?.pageSources || [];
+  const isAutoRecordingActive = sessionRecordingConfig?.autoRecording?.isActive;
+  let pageSources = sessionRecordingConfig?.pageSources || [];
+
+  if ("autoRecording" in sessionRecordingConfig) {
+    if (!sessionRecordingConfig?.autoRecording.isActive) {
+      return null;
+    } else if (sessionRecordingConfig?.autoRecording.mode === "allPages") {
+      pageSources = [
+        {
+          value: "*",
+          key: "Url",
+          isActive: true,
+          operator: "Wildcard_Matches",
+        },
+      ];
+    }
+  }
+
   const shouldRecord =
     BG.statusSettings.isExtensionEnabled &&
+    (isAutoRecordingActive ?? true) &&
     pageSources.some((pageSource) => RuleMatcher.matchUrlWithPageSource(pageSource, url) !== null);
 
   return shouldRecord ? sessionRecordingConfig : null;
@@ -1073,9 +1091,9 @@ BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
   }
 
   if (window.tabService.getData(tabId, "recordSession") === true) {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING }, () =>
-      window.tabService.removeData(tabId, "recordSession")
-    );
+    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING, notify: true }, () => {
+      window.tabService.removeData(tabId, "recordSession");
+    });
   }
 };
 

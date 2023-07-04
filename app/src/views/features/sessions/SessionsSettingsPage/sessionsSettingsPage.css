@@ -1,0 +1,87 @@
+.session-settings-container {
+  margin-top: 2.5rem;
+}
+
+.session-settings-container .header {
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.session-settings-container .header .anticon {
+  font-size: 14px;
+}
+
+.automatic-recording-container {
+  margin-bottom: 2rem;
+}
+
+.automatic-recording-details .heading {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--white);
+}
+
+.automatic-recording-details .caption {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.automatic-recording-switch {
+  margin: 1rem 0;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+  color: var(--text-gray);
+}
+
+.automatic-recording-switch > span {
+  font-size: 13px;
+}
+
+.automatic-recording-radio-group.ant-radio-group {
+  display: block;
+  font-size: 13px;
+  border-radius: var(--border-radius-md);
+  background-color: var(--component-background);
+}
+
+.automatic-recording-radio-group.ant-radio-group > *:not(:last-child) {
+  border-bottom: 1px solid var(--body-background);
+}
+
+.automatic-recording-radio-group .learn-more-link {
+  padding: 1rem;
+  font-size: 11px;
+  margin-left: auto;
+  color: var(--link-color);
+}
+
+.automatic-recording-radio-group .learn-more-link:hover {
+  text-decoration: underline;
+}
+
+.session-settings-container .page-source-list {
+  margin: 0 20px;
+}
+
+.specific-page-mode-container {
+  padding-bottom: 1.5rem;
+}
+
+.specific-page-mode-container .add-new-source-btn.ant-btn {
+  margin-top: 6px;
+  padding: 11px;
+  font-size: 12px;
+  height: auto;
+  color: var(--white);
+  border: 1px dashed var(--primary);
+  border-radius: var(--border-radius-md);
+  background: rgba(30, 105, 255, 0.1);
+}
+
+.specific-page-mode-container .add-new-source-btn.ant-btn:hover {
+  background: rgba(30, 105, 255, 0.2);
+}
