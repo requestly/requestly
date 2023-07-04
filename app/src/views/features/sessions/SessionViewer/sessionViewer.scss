@@ -21,19 +21,55 @@
       iframe {
         background: white;
       }
+      .rr-player .rr-player_frame {
+        width: auto;
+      }
     }
 
     .session-recording-properties {
-      width: 300px;
+      width: 400px;
       overflow: auto;
       min-height: 100%;
 
       > div {
         height: auto;
       }
+      .ant-input,
+      .ant-input-number-input {
+        box-shadow: var(--input-box-shadow);
+        background: var(--component-dark-background);
+      }
 
       .session-property-label {
-        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      &.ant-pro-card.primary-card {
+        background: none !important;
+        border: none;
+
+        .ant-pro-card-body {
+          padding: 0;
+        }
+      }
+      .ant-pro-card-body .session-start-time-input-wrapper {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+
+        .ant-input-number-group-wrapper {
+          width: 100%;
+
+          .ant-input-number-wrapper .ant-input-number-group-addon {
+            background: var(--component-dark-background);
+          }
+        }
+      }
+      .readonly-session-description {
+        border: 1px solid var(--border);
+        box-shadow: var(--input-box-shadow);
+        border-radius: var(--border-radius-sm);
+        background: var(--component-background);
+        padding: 1rem;
       }
     }
   }
@@ -41,8 +77,56 @@
   .session-viewer-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
+    align-items: center;
+
+    .back-button {
+      margin-right: 8px;
+      padding: 8px;
+      border: none;
+    }
+
+    .session-title-name {
+      .session-title-name-wrapper {
+        width: 100%;
+        .ant-input {
+          font-size: 1.25rem;
+          max-width: 600px;
+          padding: 0;
+          border-radius: 0;
+          transition: 0.05s ease-in-out;
+          max-width: 450px;
+        }
+      }
+      .ant-input {
+        &:focus {
+          border-bottom: 1px solid var(--primary);
+        }
+        color: var(--white);
+        font-size: 1.25rem;
+        font-weight: 500;
+      }
+      .session-title {
+        display: flex;
+        gap: 4px;
+        width: 460px;
+        color: var(--white);
+        font-size: 1.25rem;
+        font-weight: 500;
+        svg {
+          align-self: center;
+          cursor: pointer;
+          width: 16px;
+          height: 16px;
+          min-width: 16px;
+          color: var(--text-gray);
+        }
+      }
+    }
+    .editor-title-container {
+      .session-title-name {
+        min-height: 33px;
+      }
+    }
 
     .session-recording-name {
       line-height: 40px;
@@ -56,7 +140,11 @@
       column-gap: 10px;
 
       button {
-        height: 40px;
+        height: 32px;
+      }
+      .session-viewer-save-action-btn svg {
+        width: 16px;
+        height: 16px;
       }
     }
   }
@@ -219,6 +307,100 @@
       }
     }
   }
+  .session-properties-wrapper {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+
+    & .ant-input-group-wrapper {
+      width: auto;
+
+      .ant-input-affix-wrapper {
+        background: var(--component-background);
+      }
+    }
+    & .ant-input-group-addon {
+      background: var(--component-background);
+      color: var(--text-gray);
+    }
+
+    .session-page-url-property .ant-input-wrapper .ant-input {
+      width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: var(--component-background);
+    }
+
+    .session-duration-property .ant-input-wrapper .ant-input {
+      width: 75px;
+      background: var(--component-background);
+    }
+
+    .session-recorded-at-property .ant-input-wrapper .ant-input {
+      width: 155px;
+      background: var(--component-background);
+    }
+  }
+  .session-onboarding-prompt {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1rem;
+    padding: 12px 16px;
+
+    .display-flex {
+      gap: 8px;
+    }
+
+    &-check-icon {
+      align-self: center;
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+    &-message {
+      color: var(--white);
+
+      > p {
+        margin-bottom: 0;
+      }
+    }
+    &-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    &-close-icon {
+      color: var(--text-gray);
+      transition: 0.2s ease-in-out;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+      &:hover {
+        color: var(--white);
+      }
+    }
+    &-settings-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--white);
+      font-weight: 500;
+
+      & span:not(.anticon) {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 .session-viewer-more-actions {
@@ -255,25 +437,24 @@ body.dark {
     }
 
     .ant-pro-card,
-    .ant-pro-card-body,
-    .rr-player,
-    .rr-controller {
-      background: #1c2128 !important;
+    .rr-player {
+      background: var(--component-background) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius-sm);
+      box-sizing: content-box;
     }
 
     .rr-player {
       overflow: hidden;
+      padding-top: 10px;
     }
 
-    .rr-player,
-    .ant-pro-card {
-      border: 1px solid #303030;
-      border-radius: 5px;
-      box-sizing: content-box;
+    .rr-controller {
+      background: transparent;
     }
 
     .ant-input-number-group-addon {
-      color: #ffffff;
+      color: var(--white);
       border-color: #313a46;
       background-color: #313a46;
     }
@@ -305,6 +486,8 @@ body.dark {
   .session-viewer-page {
     .session-viewer-header {
       flex-direction: column;
+      align-items: flex-start;
+      row-gap: 10px;
     }
 
     .session-recording-player-row {
@@ -319,5 +502,11 @@ body.dark {
         min-height: auto;
       }
     }
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .session-viewer-page .session-properties-wrapper .session-page-url-property .ant-input-wrapper .ant-input {
+    width: 100px;
   }
 }
