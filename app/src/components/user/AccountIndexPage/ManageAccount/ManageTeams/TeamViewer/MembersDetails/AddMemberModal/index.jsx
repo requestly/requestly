@@ -8,7 +8,6 @@ import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
-import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
@@ -126,15 +125,10 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
           </div>
         </div>
 
-        <Row align="middle" justify="space-between" className="rq-modal-footer">
-          <Col>
-            <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
-              Invite People
-            </Button>
-          </Col>
+        <Row align="middle" justify="end" className="rq-modal-footer">
+          <Button type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
+            Invite People
+          </Button>
         </Row>
       </RQModal>
 
