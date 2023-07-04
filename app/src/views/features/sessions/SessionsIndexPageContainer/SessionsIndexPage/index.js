@@ -20,7 +20,6 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { filterUniqueObjects } from "utils/FormattingHelper";
-import { trackConfigurationOpened } from "modules/analytics/events/features/sessionRecording";
 import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
@@ -50,7 +49,6 @@ const SessionsIndexPage = () => {
     return prevVal !== val;
   };
 
-  // Global State
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
@@ -143,7 +141,6 @@ const SessionsIndexPage = () => {
     }
 
     navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE);
-    trackConfigurationOpened();
   }, [dispatch, navigate, user?.loggedIn]);
 
   const ConfigureButton = () => (
