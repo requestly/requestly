@@ -7,7 +7,7 @@ import CopyButton from "components/misc/CopyButton";
 
 const db = getFirestore(firebaseApp);
 
-const DeviceSelector = ({ sdkId, deviceIdInput, setSelectedDeviceId, updateDeviceIdInput }) => {
+const DeviceSelector = ({ sdkId, deviceIdInput, setSelectedDeviceId }) => {
   const [availableDeviceIds, setAvailableDeviceIds] = useState([]);
   const [autoCompleteOptions, setAutoCompleteOptions] = useState([]);
   const getOptionObject = (arrayData) => {
@@ -69,11 +69,10 @@ const DeviceSelector = ({ sdkId, deviceIdInput, setSelectedDeviceId, updateDevic
         placeholder="Enter deviceId"
         onSelect={(value) => {
           setSelectedDeviceId(value);
-          updateDeviceIdInput(value);
         }}
         onSearch={handleAutocompleteSearch}
         style={{ width: "100%" }}
-        onChange={(value) => updateDeviceIdInput(value)}
+        onChange={(value) => setSelectedDeviceId(value)}
         value={deviceIdInput}
         // notFoundContent={"No Device Ids Found"}
       />
