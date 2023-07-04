@@ -28,7 +28,6 @@ const InterceptorUI = ({ appId }) => {
   // LOCAL
   const [sdkId, setSdkId] = useState("");
   const [deviceId, setDeviceId] = useState("");
-  const [deviceIdInput, setDeviceIdInput] = useState(deviceId);
 
   const [isDeviceSelectorVisible, setIsDeviceSelectorVisible] = useState(false);
   const [showLogger, setShowLogger] = useState(false);
@@ -65,13 +64,9 @@ const InterceptorUI = ({ appId }) => {
       return;
     }
 
-    if (!deviceIdInput) {
+    if (!deviceId) {
       toast.error("Please specify a deviceId");
       return;
-    }
-
-    if (deviceId !== deviceIdInput) {
-      setDeviceId(deviceIdInput);
     }
 
     saveUserDeviceSelectionInStore();
@@ -83,7 +78,6 @@ const InterceptorUI = ({ appId }) => {
   useEffect(() => {
     setSdkId(mobileDebuggerAppDetails["id"]);
     setDeviceId(mobileDebuggerInterceptorDetails["deviceId"]);
-    setDeviceIdInput(mobileDebuggerInterceptorDetails["deviceId"]);
 
     if (!mobileDebuggerInterceptorDetails["deviceId"]) {
       setIsDeviceSelectorVisible(true);
@@ -133,18 +127,17 @@ const InterceptorUI = ({ appId }) => {
         </Row> */}
         <Row>
           <Col span={24}>
-            <DeviceSelector
-              sdkId={sdkId}
-              deviceId={deviceIdInput}
-              setSelectedDeviceId={setDeviceId}
-              updateDeviceIdInput={setDeviceIdInput}
-            />
+            <DeviceSelector sdkId={sdkId} deviceId={deviceId} setSelectedDeviceId={setDeviceId} />
           </Col>
         </Row>
       </Modal>
       {showLogger ? (
         <>
-          <Logger sdkId={sdkId} deviceId={deviceId} showDeviceSelector={() => setIsDeviceSelectorVisible(true)} />
+          <Logger
+            sdkId={sdkId}
+            deviceId={mobileDebuggerInterceptorDetails?.["deviceId"]}
+            showDeviceSelector={() => setIsDeviceSelectorVisible(true)}
+          />
         </>
       ) : (
         <>
