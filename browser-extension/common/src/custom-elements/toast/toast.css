@@ -57,6 +57,7 @@
 #content-container {
   display: flex;
   flex-direction: row;
+  width: 96%;
 }
 
 #content {
