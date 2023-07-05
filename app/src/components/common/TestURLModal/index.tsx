@@ -74,11 +74,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
         <div className="text-bold white">Source condition</div>
         <div className="source-condition-input-wrapper mt-8">
           <Col className="shrink-0">
-            <Select
-              value={source.key}
-              className="source-condition-selector cursor-pointer uppercase"
-              //   onChange={(value) => handlePageSourceDetailsChange("key", value)}
-            >
+            <Select value={source.key} className="source-condition-selector cursor-pointer uppercase">
               {Object.entries(SourceKey).map(([key, value]) => (
                 <Select.Option key={value} value={value}>
                   {capitalize(value)}
@@ -87,11 +83,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
             </Select>
           </Col>
           <Col className="shrink-0">
-            <Select
-              value={source.operator}
-              className="source-condition-selector 6px cursor-pointer uppercase"
-              //   onChange={(value) => handlePageSourceDetailsChange("operator", value)}
-            >
+            <Select value={source.operator} className="source-condition-selector cursor-pointer uppercase">
               {Object.entries(SourceOperator).map(([key, value]) => (
                 <Select.Option key={key} value={value}>
                   {capitalize(

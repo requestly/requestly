@@ -10,6 +10,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown, RQButton } from "lib/design-system/components";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { TestURLModal } from "components/common/TestURLModal";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
 
@@ -20,8 +21,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
 
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
-
-  console.log({ pair, ruleDetails });
+  const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
 
   const sourceKeys = useMemo(
     () => [
@@ -173,14 +173,16 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
               data-selectionid="source-value"
             />
           </Col>
-          <RQButton
-            className="test-url-btn"
-            iconOnly
-            icon={<ExperimentOutlined />}
-            type="default"
-            disabled={!pair.source.value}
-            onClick={() => setIsTestURLModalVisible(true)}
-          />
+          {isTestURLFeatureFlagOn && (
+            <RQButton
+              className="test-url-btn"
+              iconOnly
+              icon={<ExperimentOutlined />}
+              type="default"
+              disabled={!pair.source.value}
+              onClick={() => setIsTestURLModalVisible(true)}
+            />
+          )}
         </Row>
         {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
           <Col span={1} align="right" className="source-filter-col">
