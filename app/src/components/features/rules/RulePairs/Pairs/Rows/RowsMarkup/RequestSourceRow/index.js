@@ -111,8 +111,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           destoryOnClose
           isOpen={isTestURLModalVisible}
           onClose={() => setIsTestURLModalVisible(false)}
-          source={pair.source.value}
-          sourceConfig={{ key: pair.source.key, operator: pair.source.operator }}
+          source={pair.source}
         />
       )}
 

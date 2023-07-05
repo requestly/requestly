@@ -52,9 +52,13 @@
           box-shadow: none;
         }
       }
-      .invalid-regex-icon {
-        font-size: 1.2rem;
-        color: var(--danger);
+      .invalid-regex-badge {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--white);
+        background: rgba(255, 66, 66, 0.263);
+        border-radius: var(--border-radius-sm);
+        padding: 1px 7px;
       }
     }
   }

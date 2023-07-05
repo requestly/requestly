@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { RQButton, RQModal, RQInput } from "lib/design-system/components";
-import { Typography, Divider, Row, Col, Select, Tooltip } from "antd";
-import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined, ExclamationOutlined } from "@ant-design/icons";
+import { Typography, Divider, Row, Col, Select } from "antd";
+import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { isRegexFormat } from "utils/rules/misc";
 import { SourceKey, SourceOperator } from "types";
@@ -11,13 +11,12 @@ import "./index.scss";
 
 interface ModalProps {
   isOpen: boolean;
-  source: string;
-  sourceConfig: { key: string; operator: string };
+  source: { key: string; operator: string; value: string };
   onClose: () => void;
 }
 
-export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, sourceConfig }) => {
-  const [sourceCondition, setSourceCondition] = useState<string>(source);
+export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) => {
+  const [sourceCondition, setSourceCondition] = useState<string>(source.value);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
 
@@ -51,8 +50,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
   }, [testURL, isCheckPassed]);
 
   const handleTestURL = (url: string) => {
-    const operator = sourceConfig.operator;
-    const key = sourceConfig.key;
+    const operator = source.operator;
+    const key = source.key;
     const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(
       { key, operator, value: sourceCondition },
       url,
@@ -76,7 +75,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
         <div className="source-condition-input-wrapper mt-8">
           <Col className="shrink-0">
             <Select
-              value={sourceConfig.key}
+              value={source.key}
               className="source-condition-selector cursor-pointer uppercase"
               //   onChange={(value) => handlePageSourceDetailsChange("key", value)}
             >
@@ -89,7 +88,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
           </Col>
           <Col className="shrink-0">
             <Select
-              value={sourceConfig.operator}
+              value={source.operator}
               className="source-condition-selector 6px cursor-pointer uppercase"
               //   onChange={(value) => handlePageSourceDetailsChange("operator", value)}
             >
@@ -112,10 +111,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
             value={sourceCondition}
             onChange={(e) => setSourceCondition(e.target.value)}
           />
-          {sourceConfig.operator === SourceOperator.MATCHES && !isRegexFormat(sourceCondition) && (
-            <Tooltip title="Invalid pattern">
-              <ExclamationOutlined className="invalid-regex-icon" />
-            </Tooltip>
+          {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceCondition) && (
+            <div className="invalid-regex-badge">INVALID REGEX</div>
           )}
         </div>
         <div className="test-url-modal-section">
