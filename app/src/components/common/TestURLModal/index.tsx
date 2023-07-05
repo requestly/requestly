@@ -16,7 +16,7 @@ interface ModalProps {
 }
 
 export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) => {
-  const [sourceCondition, setSourceCondition] = useState<string>(source.value);
+  const [sourceConfig, setSourceConfig] = useState<RulePairSource>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
 
@@ -50,13 +50,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
   }, [testURL, isCheckPassed]);
 
   const handleTestURL = (url: string) => {
-    const operator = source.operator;
-    const key = source.key;
-    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(
-      { key, operator, value: sourceCondition },
-      url,
-      null
-    );
+    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(sourceConfig, url, null);
     if (result === "") setIsCheckPassed(true);
     else setIsCheckPassed(false);
   };
@@ -100,10 +94,10 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
           <RQInput
             className="source-url-input"
             placeholder="Enter source URL"
-            value={sourceCondition}
-            onChange={(e) => setSourceCondition(e.target.value)}
+            value={sourceConfig.value}
+            onChange={(e) => setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }))}
           />
-          {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceCondition) && (
+          {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
             <div className="invalid-regex-badge">INVALID REGEX</div>
           )}
         </div>
