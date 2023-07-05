@@ -4,14 +4,14 @@ import { Typography, Divider, Row, Col, Select } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { isRegexFormat } from "utils/rules/misc";
-import { SourceKey, SourceOperator } from "types";
+import { RulePairSource, SourceKey, SourceOperator } from "types";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
 import "./index.scss";
 
 interface ModalProps {
   isOpen: boolean;
-  source: { key: string; operator: string; value: string };
+  source: RulePairSource;
   onClose: () => void;
 }
 
