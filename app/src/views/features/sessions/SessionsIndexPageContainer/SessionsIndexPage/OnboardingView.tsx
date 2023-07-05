@@ -37,7 +37,7 @@ const CheckItem: React.FC<{ label: string }> = ({ label }) => {
 };
 
 interface SessionOnboardProps {
-  launchConfig?: () => void;
+  redirectToSettingsPage?: () => void;
 }
 
 export enum OnboardingTypes {
@@ -96,7 +96,7 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   );
 };
 
-const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig }) => {
+const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
   const openInstallExtensionModal = useCallback(() => {
     setIsInstallExtensionModalVisible(true);
@@ -127,13 +127,17 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ launchConfig 
       <div>
         <AuthConfirmationPopover
           title="You need to sign up to configure webpages"
-          callback={isExtensionInstalled() ? launchConfig : openInstallExtensionModal}
+          callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
           source={AUTH.SOURCE.SESSION_RECORDING}
         >
           <Button
             type="primary"
             onClick={
-              user?.details?.isLoggedIn ? (isExtensionInstalled() ? launchConfig : openInstallExtensionModal) : null
+              user?.details?.isLoggedIn
+                ? isExtensionInstalled()
+                  ? redirectToSettingsPage
+                  : openInstallExtensionModal
+                : null
             }
             style={{ margin: "24px" }}
           >
@@ -309,17 +313,16 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
     </div>
   );
 };
-
-const OnboardingView: React.FC<OnboardingProps> = ({ type, launchConfig }) => {
+const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
   // todo: remove hard coded value once actual compatibility version has been set
   const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL) || true;
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
     return shownNewOnboarding ? (
-      <SessionOnboardingView launchConfig={launchConfig} />
+      <SessionOnboardingView />
     ) : (
-      <OldSessionOnboardingView launchConfig={launchConfig} />
+      <OldSessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />
     );
   }
 };

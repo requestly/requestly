@@ -68,4 +68,7 @@ FEATURES.NETWORK_SESSIONS = "network-sessions";
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
 
+// session recording
+FEATURES.SESSION_RECORDING_SETTINGS_PAGE = "session_recording_settings_page";
+
 export default FEATURES;

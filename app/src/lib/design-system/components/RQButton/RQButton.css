@@ -29,5 +29,6 @@
 .btn-icon-only.ant-btn:hover,
 .btn-icon-only.ant-btn:focus {
   border: none;
+  color: var(--white);
   background-color: var(--hover-color);
 }
