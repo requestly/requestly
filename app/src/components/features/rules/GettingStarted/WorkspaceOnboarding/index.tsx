@@ -82,6 +82,11 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   );
 
   const handleOnSurveyCompletion = useCallback(async () => {
+    if (isPendingEmailInvite) {
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      return;
+    }
+
     const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
     if (verifiedUser && pendingInvites != null) {
       if (!isCompanyEmail(user?.details?.profile?.email)) {
@@ -107,8 +112,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       } else {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       }
-    } else if (isPendingEmailInvite && pendingInvites?.length > 0) {
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
     } else {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     }
