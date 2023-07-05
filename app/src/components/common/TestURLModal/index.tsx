@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { RQButton, RQModal, RQInput } from "lib/design-system/components";
 import { Typography, Divider, Row, Col, Select } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
@@ -8,18 +8,26 @@ import { RulePairSource, SourceKey, SourceOperator } from "types";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
 import "./index.scss";
+import {
+  trackURLConditionMatchingTried,
+  trackURLConditionModalViewed,
+  trackURLConditionSourceModified,
+} from "modules/analytics/events/features/testUrlModal";
 
 interface ModalProps {
   isOpen: boolean;
   source: RulePairSource;
+  analyticsContext: string;
   onClose: () => void;
   onSave: (newSource: RulePairSource) => void;
 }
 
-export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, onSave }) => {
+export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsContext, onClose, onSave }) => {
   const [sourceConfig, setSourceConfig] = useState<RulePairSource>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
+  const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
+  const [isTestURLTried, setIsTestURLTried] = useState<boolean>(false);
 
   const renderResult = useCallback(() => {
     if (!testURL) {
@@ -51,6 +59,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, on
   }, [testURL, isCheckPassed]);
 
   const handleTestURL = (url: string) => {
+    setTestURL(url);
+    setIsTestURLTried(true);
     const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(sourceConfig, url, null);
     if (result === "") setIsCheckPassed(true);
     else setIsCheckPassed(false);
@@ -58,7 +68,24 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, on
 
   const handleSourceConfigChange = (key: keyof RulePairSource, value: RulePairSource[keyof RulePairSource]) => {
     setSourceConfig((prevConfig) => ({ ...prevConfig, [key]: value }));
+    setIsSourceModified(true);
   };
+
+  useEffect(() => {
+    trackURLConditionModalViewed(analyticsContext, source.operator);
+  }, [analyticsContext, source.operator]);
+
+  useEffect(() => {
+    if (isSourceModified) {
+      trackURLConditionSourceModified(analyticsContext, source.operator);
+    }
+  }, [analyticsContext, source.operator, isSourceModified]);
+
+  useEffect(() => {
+    if (isTestURLTried) {
+      trackURLConditionMatchingTried(analyticsContext, source.operator);
+    }
+  }, [isTestURLTried, analyticsContext, source.operator]);
 
   return (
     <RQModal centered open={isOpen} className="test-url-modal" width={800} onCancel={onClose}>
@@ -108,7 +135,10 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, on
             className="source-url-input"
             placeholder="Enter source URL"
             value={sourceConfig.value}
-            onChange={(e) => setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }))}
+            onChange={(e) => {
+              setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }));
+              setIsSourceModified(true);
+            }}
           />
           {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
             <div className="invalid-regex-badge">INVALID REGEX</div>
@@ -121,7 +151,6 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, on
             placeholder="https://www.example.com"
             value={testURL}
             onChange={(e) => {
-              setTestURL(e.target.value);
               handleTestURL(e.target.value);
             }}
           />

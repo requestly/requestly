@@ -117,6 +117,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           onClose={() => setIsTestURLModalVisible(false)}
           source={pair.source}
           onSave={updateSourceFromTestURLModal}
+          analyticsContext={currentlySelectedRuleConfig.TYPE}
         />
       )}
 
