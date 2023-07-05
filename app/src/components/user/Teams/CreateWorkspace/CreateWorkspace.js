@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import { Button, Col, Form, Input, Row, Typography } from "antd";
@@ -7,16 +7,14 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import lottie from "lottie-web/build/player/lottie_light";
-import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
-import Logger from "lib/logger";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
@@ -75,22 +73,6 @@ const CreateWorkspace = () => {
     toast.error("Please enter valid details");
   };
 
-  useEffect(() => {
-    try {
-      lottie.destroy("CreateWorkspace-teamSolvingPuzzle");
-    } catch (_e) {
-      Logger.log("Loading teamSolvingPuzzle");
-    }
-    lottie.loadAnimation({
-      name: "CreateWorkspace-teamSolvingPuzzle",
-      container: document.querySelector("#CreateWorkspace-teamSolvingPuzzle"),
-      animationData: teamSolvingPuzzle,
-      renderer: "svg", // "canvas", "html"
-      loop: 1, // boolean
-      autoplay: true, // boolean
-    });
-  }, []);
-
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border">
@@ -100,7 +82,7 @@ const CreateWorkspace = () => {
               <Col className="hp-text-center" span={24}>
                 <Typography.Title level={2}>Create a Workspace</Typography.Title>
                 <center>
-                  <div id="CreateWorkspace-teamSolvingPuzzle" style={{ height: "35vh" }} />
+                  <TeamWorkSolvePuzzleAnimation animationName="creating-workspace" style={{ height: "35vh" }} />
                 </center>
                 <Form
                   layout="vertical"
