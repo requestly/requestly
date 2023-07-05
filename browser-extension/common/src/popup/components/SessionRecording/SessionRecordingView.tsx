@@ -1,39 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Divider, Row, Typography } from "antd";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Col, Row, Typography } from "antd";
 import config from "../../../config";
 import { CLIENT_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
-import "./sessionRecordingView.css";
+import { PlayCircleFilled, SaveFilled } from "@ant-design/icons";
 import { EVENT, sendEvent } from "../../events";
+import "./sessionRecordingView.css";
 
 const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
   const [isExplicitRecordingSession, setIsExplicitRecordingSession] = useState<boolean>();
 
-  const startRecordingOnClick = () => {
+  const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED);
     chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.START_RECORDING }, { frameId: 0 }, () =>
       setIsRecordingSession(true)
     );
-  };
+  }, [currentTabId]);
 
-  const viewRecordedSession = () => {
+  const viewRecordedSession = useCallback(() => {
     window.open(`${config.WEB_URL}/sessions/draft/${currentTabId}`, "_blank");
-  };
+  }, [currentTabId]);
 
-  const stopRecordingOnClick = () => {
-    if (isExplicitRecordingSession) {
-      sendEvent(EVENT.STOP_RECORDING_CLICKED);
-      chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
-        setIsRecordingSession(false);
+  const stopRecordingOnClick = useCallback(
+    (stopRecording?: boolean) => {
+      if (isExplicitRecordingSession || stopRecording) {
+        sendEvent(EVENT.STOP_RECORDING_CLICKED);
+        chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
+          setIsRecordingSession(false);
+          viewRecordedSession();
+        });
+      } else {
+        sendEvent(EVENT.VIEW_RECORDING_CLICKED);
         viewRecordedSession();
-      });
-    } else {
-      sendEvent(EVENT.VIEW_RECORDING_CLICKED);
-      viewRecordedSession();
-    }
-  };
+      }
+    },
+    [viewRecordedSession, isExplicitRecordingSession]
+  );
 
   useEffect(() => {
     chrome.tabs.query({ currentWindow: true, active: true }, ([activeTab]) => {
@@ -61,28 +65,61 @@ const SessionRecordingView: React.FC = () => {
   }, [isRecordingSession]);
 
   return (
-    <Row wrap={false} align="middle" justify="space-between" className="session-view-content">
+    <Row
+      wrap={false}
+      align="middle"
+      justify="space-between"
+      className="session-view-content"
+      style={{
+        backgroundColor: isRecordingSession ? (isExplicitRecordingSession ? "#295FF6" : "#B429F6") : "transparent",
+      }}
+    >
       {isRecordingSession ? (
         <Row align="middle" justify="center">
-          <div className="icon-wrapper">
+          <div className="icon-wrapper session-recording-camera-icon">
             <VideoRecorderIcon />
           </div>
-          <i className="record-indicator" />
-          <Divider type="vertical" />
-          <Typography.Text type="secondary">Session is being recorded on this page.</Typography.Text>
+
+          <Col>
+            {isExplicitRecordingSession ? (
+              <>
+                <Typography.Text strong className="">
+                  Recording...
+                </Typography.Text>
+                <br />
+                <Typography.Text className="custom-mode-caption">
+                  This tab is being recorded by session recorder
+                </Typography.Text>
+              </>
+            ) : (
+              <>
+                <Typography.Text strong>Automatically recording</Typography.Text>
+                <br />
+                <Button
+                  type="link"
+                  target="_blank"
+                  className="session-view-link-button"
+                  onClick={() => stopRecordingOnClick(true)}
+                >
+                  <span className="stop-recording-text">Stop recording</span>
+                </Button>
+              </>
+            )}
+          </Col>
         </Row>
       ) : (
         <>
-          <Row align="top">
+          <Row align="middle">
             <Col>
               <div className="icon-wrapper session-recording-camera-icon">
                 <VideoRecorderIcon />
               </div>
             </Col>
             <Col className="no-session-recording-message">
-              <Typography.Text>No session recording</Typography.Text>
               <Typography.Text type="secondary" className="session-recording-caption">
-                Record all network traffic, console logs & errors on current domain.
+                Capture <span>mouse movement</span>, <span>console</span>, <span>network & environment data</span>
+                <br />
+                automatically for sharing and debugging
               </Typography.Text>
             </Col>
           </Row>
@@ -91,18 +128,24 @@ const SessionRecordingView: React.FC = () => {
 
       <Col>
         {isRecordingSession ? (
-          <Button type="link" target="_blank" className="session-view-link-button" onClick={stopRecordingOnClick}>
-            <span>{isExplicitRecordingSession ? "Stop recording" : "View recording"}</span>
+          <Button
+            type="link"
+            target="_blank"
+            className="session-view-link-button"
+            onClick={() => stopRecordingOnClick()}
+          >
+            <SaveFilled /> <span>{isExplicitRecordingSession ? "Stop & save recording" : "Save recording"}</span>
           </Button>
         ) : (
           <Typography.Link
             underline
             type="secondary"
             target="_blank"
-            className="session-view-link-button"
+            className="session-start-recording-link"
             onClick={startRecordingOnClick}
           >
-            Start Recording
+            <PlayCircleFilled />
+            <span>Start Recording</span>
           </Typography.Link>
         )}
       </Col>
