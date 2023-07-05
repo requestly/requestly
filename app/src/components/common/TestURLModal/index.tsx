@@ -1,6 +1,4 @@
 import React, { useState, useCallback } from "react";
-import { useSelector } from "react-redux";
-import { getCurrentlySelectedRuleData } from "store/selectors";
 import { RQButton, RQModal, RQInput } from "lib/design-system/components";
 import { Typography, Divider, Row, Col, Select, Tooltip } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined, ExclamationOutlined } from "@ant-design/icons";
@@ -22,7 +20,6 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
   const [sourceCondition, setSourceCondition] = useState<string>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
-  const ruleData = useSelector(getCurrentlySelectedRuleData);
 
   const renderResult = useCallback(() => {
     if (!testURL) {
@@ -54,16 +51,14 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source, so
   }, [testURL, isCheckPassed]);
 
   const handleTestURL = (url: string) => {
-    const ruleProcessor = RULE_PROCESSOR.getInstance(ruleData.ruleType);
-    const processedURL = ruleProcessor.process({
-      rule: ruleData,
-      requestURL: url,
-      originalHeaders: [],
-      typeOfHeaders: "Request",
-    });
-    console.log({ processedURL, ruleData });
-
-    if (processedURL) setIsCheckPassed(true);
+    const operator = sourceConfig.operator;
+    const key = sourceConfig.key;
+    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(
+      { key, operator, value: sourceCondition },
+      url,
+      null
+    );
+    if (result === "") setIsCheckPassed(true);
     else setIsCheckPassed(false);
   };
 

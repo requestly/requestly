@@ -182,8 +182,15 @@ export const getAllResponseBodyTypes = (rule) => {
  * @returns {boolean}
  */
 export const isRegexFormat = (regexStr) => {
-  const regexFormat = new RegExp("^/(.+)/(|i|g|ig|gi)$");
-  return regexFormat.test(regexStr);
+  try {
+    if (!regexStr.startsWith("/") || !regexStr.endsWith("/")) {
+      return false;
+    }
+    new RegExp(regexStr);
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 /**
