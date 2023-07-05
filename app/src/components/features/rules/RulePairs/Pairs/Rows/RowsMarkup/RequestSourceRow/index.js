@@ -106,7 +106,16 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
 
   return (
     <>
-      <TestURLModal isOpen={isTestURLModalVisible} onClose={() => setIsTestURLModalVisible(false)} />
+      {isTestURLModalVisible && (
+        <TestURLModal
+          destoryOnClose
+          isOpen={isTestURLModalVisible}
+          onClose={() => setIsTestURLModalVisible(false)}
+          source={pair.source.value}
+          sourceConfig={{ key: pair.source.key, operator: pair.source.operator }}
+        />
+      )}
+
       <div className="rule-pair-source-row-wrapper">
         <Row
           gutter={6}

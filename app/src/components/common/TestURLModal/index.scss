@@ -29,10 +29,14 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      padding: 6px;
+      padding: 4px 6px;
 
-      &-dropdown {
+      .source-condition-selector .ant-select-selector {
         background: var(--input-background);
+
+        .ant-select-selection-item {
+          font-weight: bold;
+        }
       }
       .source-url-input {
         flex: 1;
@@ -49,6 +53,10 @@
           box-shadow: none;
         }
       }
+      .invalid-regex-icon {
+        font-size: 1.2rem;
+        color: var(--danger);
+      }
     }
   }
   &-section {
@@ -59,5 +67,13 @@
       padding-left: 8px;
       border: none;
     }
+  }
+  .test-url-modal-section.match-result {
+    .anticon {
+      font-size: 1rem;
+    }
+  }
+  .result-text {
+    margin-left: 8px;
   }
 }
