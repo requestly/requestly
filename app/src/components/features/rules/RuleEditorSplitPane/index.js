@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, Row, Col, Tabs, Button } from "antd";
 import { CrownTwoTone, DownOutlined } from "@ant-design/icons";
-import RuleSimulator from "../../../../views/features/rules/RuleSimulatorContainer";
 import ExecutionLogs from "./ExecutionLogs";
 import { isExtensionVersionCompatible } from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
@@ -47,11 +46,6 @@ const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapse
           right: <Button icon={<DownOutlined />} onClick={collapseRulesPlane} style={{ marginBottom: "8px" }} />,
         }}
       >
-        <TabPane tab={"Test this Rule"} key="ruleSimulator">
-          <div style={{ padding: "5px", width: "90%" }}>
-            <RuleSimulator />
-          </div>
-        </TabPane>
         <TabPane
           tab={
             <span>
