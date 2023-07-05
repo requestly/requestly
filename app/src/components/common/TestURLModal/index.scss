@@ -30,13 +30,21 @@
       gap: 4px;
       padding: 4px 6px;
 
-      .source-condition-selector .ant-select-selector {
-        background: var(--input-background);
+      .source-condition-selector {
+        .ant-select-selector {
+          background: var(--input-background);
+          border-color: var(--border-dark);
 
-        .ant-select-selection-item {
-          font-weight: bold;
+          &:hover {
+            border-color: var(--border-dark);
+          }
+
+          .ant-select-selection-item {
+            font-weight: bold;
+          }
         }
       }
+
       .source-url-input {
         flex: 1;
         background: transparent;

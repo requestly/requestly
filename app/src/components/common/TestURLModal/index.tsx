@@ -13,9 +13,10 @@ interface ModalProps {
   isOpen: boolean;
   source: RulePairSource;
   onClose: () => void;
+  onSave: (newSource: RulePairSource) => void;
 }
 
-export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) => {
+export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, onClose, onSave }) => {
   const [sourceConfig, setSourceConfig] = useState<RulePairSource>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
@@ -55,6 +56,10 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
     else setIsCheckPassed(false);
   };
 
+  const handleSourceConfigChange = (key: keyof RulePairSource, value: RulePairSource[keyof RulePairSource]) => {
+    setSourceConfig((prevConfig) => ({ ...prevConfig, [key]: value }));
+  };
+
   return (
     <RQModal centered open={isOpen} className="test-url-modal" width={800} onCancel={onClose}>
       <div className="test-url-modal-header">
@@ -68,7 +73,11 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
         <div className="text-bold white">Source condition</div>
         <div className="source-condition-input-wrapper mt-8">
           <Col className="shrink-0">
-            <Select value={source.key} className="source-condition-selector cursor-pointer uppercase">
+            <Select
+              value={sourceConfig.key}
+              className="source-condition-selector cursor-pointer uppercase"
+              onChange={(value) => handleSourceConfigChange("key", value)}
+            >
               {Object.entries(SourceKey).map(([key, value]) => (
                 <Select.Option key={value} value={value}>
                   {capitalize(value)}
@@ -77,7 +86,11 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
             </Select>
           </Col>
           <Col className="shrink-0">
-            <Select value={source.operator} className="source-condition-selector cursor-pointer uppercase">
+            <Select
+              value={sourceConfig.operator}
+              className="source-condition-selector cursor-pointer uppercase"
+              onChange={(value) => handleSourceConfigChange("operator", value)}
+            >
               {Object.entries(SourceOperator).map(([key, value]) => (
                 <Select.Option key={key} value={value}>
                   {capitalize(
@@ -120,9 +133,22 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, onClose, source }) 
       </div>
       <div className="rq-modal-footer">
         <Row className="w-full" justify="end">
-          <RQButton type="default" onClick={onClose}>
-            Close
-          </RQButton>
+          {JSON.stringify(source) === JSON.stringify(sourceConfig) ? (
+            <RQButton type="default" onClick={onClose}>
+              Close
+            </RQButton>
+          ) : (
+            <RQButton
+              type="primary"
+              className="text-bold"
+              onClick={() => {
+                onSave(sourceConfig);
+                onClose();
+              }}
+            >
+              Save and close
+            </RQButton>
+          )}
         </Row>
       </div>
     </RQModal>

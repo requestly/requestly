@@ -104,6 +104,10 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     );
   }, [sourceOperators, modifyPairAtGivenPath, pairIndex]);
 
+  const updateSourceFromTestURLModal = (newSource) => {
+    modifyPairAtGivenPath(null, pairIndex, "source", newSource);
+  };
+
   return (
     <>
       {isTestURLModalVisible && (
@@ -112,6 +116,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           isOpen={isTestURLModalVisible}
           onClose={() => setIsTestURLModalVisible(false)}
           source={pair.source}
+          onSave={updateSourceFromTestURLModal}
         />
       )}
 
