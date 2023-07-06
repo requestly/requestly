@@ -25,6 +25,8 @@ import FEATURES from "config/constants/sub/features";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 
+import StartSessionRecordingGif from "assets/img/screenshots/session-recording-onboarding.gif";
+
 const { Text, Title } = Typography;
 
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
@@ -266,13 +268,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
           </Col>
           <Col span={13} className="right-col">
             <Row justify="end">
-              <video // todo: replace with main gif
-                className="demo-video"
-                src="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
-                playsInline
-                controls
-                preload="auto"
-              />
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
             </Row>
             <Row onClick={trackOnboardingYTVideoClicked}>
               <a
