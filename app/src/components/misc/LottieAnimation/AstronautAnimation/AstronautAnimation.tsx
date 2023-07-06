@@ -2,7 +2,7 @@ import React from "react";
 import animationData from "./astronaut.json";
 import LottieAnimation from "../LottieAnimation";
 
-interface Props extends React.ClassAttributes<HTMLDivElement> {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   animationName: string;
 }
 
