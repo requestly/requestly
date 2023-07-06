@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography } from "antd";
@@ -13,6 +13,7 @@ import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
+import PATHS from "config/constants/sub/paths";
 
 const { Text } = Typography;
 
@@ -21,6 +22,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
 
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
+  const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
 
   const sourceKeys = useMemo(
@@ -108,6 +110,17 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     modifyPairAtGivenPath(null, pairIndex, "source", newSource);
   };
 
+  const shouldStartTestURLRippleEffect = useCallback(() => {
+    if (
+      pair.source.value &&
+      !isTestURLClicked &&
+      window.location.href.includes(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE) &&
+      (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ||
+        pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)
+    )
+      return true;
+  }, [isTestURLClicked, pair.source.value, pair.source.operator]);
+
   return (
     <>
       {isTestURLModalVisible && (
@@ -181,12 +194,15 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           </Col>
           {isTestURLFeatureFlagOn && (
             <RQButton
-              className="test-url-btn"
+              className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
               iconOnly
               icon={<ExperimentOutlined />}
               type="default"
               disabled={!pair.source.value}
-              onClick={() => setIsTestURLModalVisible(true)}
+              onClick={() => {
+                setIsTestURLClicked(true);
+                setIsTestURLModalVisible(true);
+              }}
             />
           )}
         </Row>
