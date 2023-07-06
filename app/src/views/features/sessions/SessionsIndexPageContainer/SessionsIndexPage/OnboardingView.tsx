@@ -50,11 +50,6 @@ interface OnboardingProps extends SessionOnboardProps {
   type?: OnboardingTypes;
 }
 
-function navigateToSessionSettings() {
-  // todo: redirect to settings page and add event
-  console.info("todo: will add navigation once settings page is deployed");
-}
-
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   const navigate = useNavigate();
   const stableNavigate = useCallback(
@@ -176,7 +171,7 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSet
   );
 };
 
-const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
+const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
   const inputRef = useRef<InputRef>();
 
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
@@ -218,8 +213,8 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
 
   const handleSettingsNavigation = useCallback(() => {
     trackOnboardingToSettingsNavigate();
-    navigateToSessionSettings();
-  }, []);
+    redirectToSettingsPage();
+  }, [redirectToSettingsPage]);
 
   return (
     <div className="onboarding-content-container">
@@ -310,13 +305,12 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = () => {
   );
 };
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
-  // todo: remove hard coded value once actual compatibility version has been set
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL) || true;
+  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL);
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
     return shownNewOnboarding ? (
-      <SessionOnboardingView />
+      <SessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />
     ) : (
       <OldSessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />
     );
