@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import lottie from "lottie-web/build/player/lottie_light";
 import Logger from "lib/logger";
 
-interface Props extends React.ClassAttributes<HTMLDivElement> {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   animationName: string;
   animationData: unknown;
 }
