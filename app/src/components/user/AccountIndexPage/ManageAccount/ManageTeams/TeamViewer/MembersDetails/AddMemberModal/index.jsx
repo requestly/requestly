@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
-import { Button, Row, Col } from "antd";
+import { Row, Col } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { RQModal } from "lib/design-system/components";
+import { RQButton, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
+import PageLoader from "components/misc/PageLoader";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
+  const functions = getFunctions();
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
+  const [isTeamAdmin, setIsTeamAdmin] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
@@ -82,54 +86,85 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
   }, [isOpen]);
 
+  useEffect(() => {
+    setShowLoader(true);
+    const getIsTeamAdmin = httpsCallable(functions, "isTeamAdmin");
+    getIsTeamAdmin({
+      teamId,
+    })
+      .then((res) => {
+        if (res.data.success) {
+          setIsTeamAdmin(res.data.isAdmin);
+        }
+        setShowLoader(false);
+      })
+      .catch(() => {
+        setShowLoader(false);
+      });
+  }, [functions, teamId]);
+
+  if (showLoader) {
+    return <PageLoader />;
+  }
+
   return (
     <>
       <RQModal centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
-          <div>
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-          </div>
-          <div className="header add-member-modal-header">
-            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
-          </div>
-          <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
-
-          <ReactMultiEmail
-            className="members-email-input"
-            placeholder="Email Address"
-            type="email"
-            value={userEmail}
-            onChange={setUserEmail}
-            validateEmail={validateEmail}
-            getLabel={(email, index, removeEmail) => (
-              <div data-tag key={index} className="multi-email-tag">
-                {email}
-                <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                  <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                </span>
+          {isTeamAdmin ? (
+            <>
+              <div>
+                <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
               </div>
-            )}
-          />
+              <div className="header add-member-modal-header">
+                Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
+              </div>
+              <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-          <Row className="access-dropdown-container">
-            <Col span={24} align="right">
-              <MemberRoleDropdown
-                placement="bottomRight"
-                isAdmin={makeUserAdmin}
-                handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+              <ReactMultiEmail
+                className="members-email-input"
+                placeholder="Email Address"
+                type="email"
+                value={userEmail}
+                onChange={setUserEmail}
+                validateEmail={validateEmail}
+                getLabel={(email, index, removeEmail) => (
+                  <div data-tag key={index} className="multi-email-tag">
+                    {email}
+                    <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
+                      <img alt="remove" src="/assets/img/workspaces/cross.svg" />
+                    </span>
+                  </div>
+                )}
               />
-            </Col>
-          </Row>
-          <div className="text-gray add-members-modal-info-text">
-            <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
-          </div>
+              <Row className="access-dropdown-container">
+                <Col span={24} align="right">
+                  <MemberRoleDropdown
+                    placement="bottomRight"
+                    isAdmin={makeUserAdmin}
+                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                  />
+                </Col>
+              </Row>
+              <div className="text-gray add-members-modal-info-text">
+                <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
+              </div>
+            </>
+          ) : (
+            <div className="title empty-message">
+              <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+              <div>Make sure you are an admin to invite teammates</div>
+            </div>
+          )}
         </div>
 
-        <Row align="middle" justify="end" className="rq-modal-footer">
-          <Button type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
-            Invite People
-          </Button>
-        </Row>
+        {isTeamAdmin && (
+          <Row align="middle" justify="end" className="rq-modal-footer">
+            <RQButton type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
+              Invite People
+            </RQButton>
+          </Row>
+        )}
       </RQModal>
 
       <InviteErrorModal
