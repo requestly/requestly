@@ -29,6 +29,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
   const [isTestURLTried, setIsTestURLTried] = useState<boolean>(false);
+
   const timerRef = useRef(null);
   const urlInputRef = useRef<InputRef>(null);
   const sourceInputRef = useRef<InputRef>(null);
@@ -147,7 +148,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
           <Col className="shrink-0">
             <Select
               value={sourceConfig.operator}
-              className="source-condition-selector cursor-pointer uppercase"
+              className="source-condition-selector cursor-pointer"
               onChange={(value) => {
                 handleSourceConfigChange("operator", value);
                 handleTestURL(testURL, null, value, null);
@@ -155,13 +156,11 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             >
               {Object.entries(SourceOperator).map(([key, value]) => (
                 <Select.Option key={key} value={value}>
-                  {capitalize(
-                    value === SourceOperator.WILDCARD_MATCHES
-                      ? "Wildcard"
-                      : value === SourceOperator.MATCHES
-                      ? "RegEx"
-                      : value
-                  )}
+                  {value === SourceOperator.WILDCARD_MATCHES
+                    ? "Wildcard"
+                    : value === SourceOperator.MATCHES
+                    ? "RegEx"
+                    : value}
                 </Select.Option>
               ))}
             </Select>
@@ -173,7 +172,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             ref={sourceInputRef}
             onChange={handleSourceInputChange}
           />
-          {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
+          {sourceConfig.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
             <div className="invalid-regex-badge">INVALID REGEX</div>
           )}
         </div>
