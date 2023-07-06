@@ -30,7 +30,6 @@ import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
-import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
@@ -135,7 +134,6 @@ const WorkspaceSelector = () => {
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
   const loggedInUserEmail = user?.details?.profile?.email;
 
@@ -173,10 +171,6 @@ const WorkspaceSelector = () => {
 
   const handleJoinWorkspaceModalClose = () => {
     setIsJoinWorkspaceModalOpen(false);
-  };
-
-  const handleInviteModalClose = () => {
-    setIsInviteModalOpen(false);
   };
 
   const promptUserSignupModal = (callback = () => {}, source) => {
@@ -541,8 +535,6 @@ const WorkspaceSelector = () => {
         handleModalClose={handleJoinWorkspaceModalClose}
         handleCreateNewWorkspaceClick={handleCreateWorkspaceFromJoinModal}
       />
-
-      {isWorkspaceMode ? <AddMemberModal isOpen={isInviteModalOpen} handleModalClose={handleInviteModalClose} /> : null}
     </>
   );
 };

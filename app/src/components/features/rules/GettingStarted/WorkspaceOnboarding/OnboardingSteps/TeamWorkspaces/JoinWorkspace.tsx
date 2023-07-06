@@ -62,7 +62,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   };
 
   return (
-    <div className="onboarding-workspace-card">
+    <div className="workspace-list-card">
       <div className="display-flex">
         <Avatar
           size={28}
@@ -70,9 +70,9 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
           className="workspace-avatar"
           icon={<>{team?.teamName?.charAt(0)?.toUpperCase()}</>}
         />
-        <span className="text-bold onboarding-workspace-card-name">{team?.teamName}</span>
+        <span className="text-bold workspace-list-card-name">{team?.teamName}</span>
       </div>
-      <div className="text-gray">{`${team.teamAccessCount} members`}</div>
+      <div className="text-gray">{`${team.teamAccessCount ?? team.accessCount} members`}</div>
       <RQButton loading={isJoining} className="text-bold" type="primary" onClick={handleJoinWorkspace}>
         {isJoining ? "Joining" : "Join"}
       </RQButton>
@@ -83,7 +83,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
 export const JoinWorkspace: React.FC<{
   availableTeams: TeamInviteMetadata[];
   isPendingInvite: boolean;
-  createNewTeam: () => void;
+  createNewTeam?: () => void;
 }> = ({ availableTeams, isPendingInvite, createNewTeam }) => {
   const dispatch = useDispatch();
 

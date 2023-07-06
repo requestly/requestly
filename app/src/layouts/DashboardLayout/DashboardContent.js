@@ -27,6 +27,7 @@ import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/Wo
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
+import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -164,6 +165,13 @@ const DashboardContent = () => {
           isOpen={activeModals.inviteMembersModal.isActive}
           toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
           {...activeModals.inviteMembersModal.props}
+        />
+      ) : null}
+      {activeModals.switchWorkspaceModal.isActive ? (
+        <SwitchWorkspaceModal
+          isOpen={activeModals.switchWorkspaceModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+          {...activeModals.switchWorkspaceModal.props}
         />
       ) : null}
 

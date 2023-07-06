@@ -119,6 +119,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    switchWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */

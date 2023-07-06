@@ -39,7 +39,7 @@
   height: 40px;
   align-self: flex-end;
 }
-.workspace-onboarding-wrapper .workspace-onboarding-body .onboarding-workspace-card {
+.workspace-onboarding-wrapper .workspace-onboarding-body .workspace-list-card {
   display: grid;
   grid-template-columns: 1.3fr 1.2fr 0.5fr;
   align-items: center;
@@ -48,10 +48,10 @@
   border-radius: var(--border-radius-sm);
   margin: 8px 0;
 }
-.onboarding-workspace-card .workspace-avatar {
+.workspace-list-card .workspace-avatar {
   margin-right: 8px;
 }
 
-.onboarding-workspace-card .onboarding-workspace-card-name {
+.workspace-list-card .workspace-list-card-name {
   align-self: center;
 }
