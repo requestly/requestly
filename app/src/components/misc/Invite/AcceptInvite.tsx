@@ -1,10 +1,8 @@
 import { Avatar, Col, Row } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import lottie from "lottie-web/build/player/lottie_light";
-import inviteAccept from "assets/lottie/invite-accept.json";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { toast } from "utils/Toast";
 import "./index.css";
@@ -14,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
-import Logger from "lib/logger";
+import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
 
 interface Props {
   inviteId: string;
@@ -78,26 +76,6 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
       });
   };
 
-  useEffect(() => {
-    try {
-      lottie.destroy("inviteAcceptAnimation");
-    } catch (_e) {
-      Logger.log("loading welcome animation");
-    }
-    lottie.loadAnimation({
-      name: "inviteAcceptAnimation",
-      container: document.querySelector("#inviteAcceptAnimation"),
-      animationData: inviteAccept,
-      renderer: "svg", // "canvas", "html"
-      loop: true, // boolean
-      autoplay: true, // boolean,
-      rendererSettings: {
-        viewBoxOnly: true,
-        viewBoxSize: "50 70 400 340",
-      },
-    });
-  }, []);
-
   return (
     <Row className="invite-container" justify={"center"}>
       <Col xs={18} sm={16} md={14} lg={12} xl={8}>
@@ -121,7 +99,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
           <p className="text-gray invite-subheader">Accept to start collaborating together</p>
 
           <div className="invite-accept-lottie-animation-container">
-            <div className="invite-accept-lottie-animation" id="inviteAcceptAnimation" />
+            <InviteAcceptAnimation className="invite-accept-lottie-animation" animationName="invite-accept" />
           </div>
         </div>
         <div className="invite-footer">
