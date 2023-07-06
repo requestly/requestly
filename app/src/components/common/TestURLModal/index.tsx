@@ -5,7 +5,7 @@ import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@a
 import { capitalize } from "lodash";
 import { isRegexFormat } from "utils/rules/misc";
 import type { InputRef } from "antd";
-import { RulePairSource, SourceKey, SourceOperator } from "types";
+import { SourceKey, SourceOperator } from "types";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
 import "./index.scss";
@@ -15,16 +15,22 @@ import {
   trackURLConditionSourceModified,
 } from "modules/analytics/events/features/testUrlModal";
 
+type Source = {
+  key: SourceKey[keyof SourceKey];
+  operator: SourceKey[keyof SourceOperator];
+  value: string;
+};
+
 interface ModalProps {
   isOpen: boolean;
-  source: RulePairSource;
+  source: Source;
   analyticsContext: string;
   onClose: () => void;
-  onSave: (newSource: RulePairSource) => void;
+  onSave: (newSource: Source) => void;
 }
 
 export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsContext, onClose, onSave }) => {
-  const [sourceConfig, setSourceConfig] = useState<RulePairSource>(source);
+  const [sourceConfig, setSourceConfig] = useState<Source>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
@@ -66,8 +72,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   const handleTestURL = (
     url: string,
     newValue: string = null,
-    newOperator: RulePairSource[keyof RulePairSource] = null,
-    newKey: RulePairSource[keyof RulePairSource] = null
+    newOperator: Source[keyof Source] = null,
+    newKey: Source[keyof Source] = null
   ) => {
     const config = {
       value: newValue ?? sourceConfig.value,
@@ -78,7 +84,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     setIsCheckPassed(result === "");
   };
 
-  const handleSourceConfigChange = (key: keyof RulePairSource, value: RulePairSource[keyof RulePairSource]) => {
+  const handleSourceConfigChange = (key: keyof Source, value: Source[keyof Source]) => {
     setSourceConfig((prevConfig) => ({ ...prevConfig, [key]: value }));
     setIsSourceModified(true);
   };
