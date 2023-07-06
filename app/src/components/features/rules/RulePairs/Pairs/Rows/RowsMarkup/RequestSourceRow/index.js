@@ -107,7 +107,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
   }, [sourceOperators, modifyPairAtGivenPath, pairIndex]);
 
   const updateSourceFromTestURLModal = (newSource) => {
-    modifyPairAtGivenPath(null, pairIndex, "source", newSource);
+    const updatedSource = { ...pair.source, ...newSource };
+    modifyPairAtGivenPath(null, pairIndex, "source", updatedSource);
   };
 
   const shouldStartTestURLRippleEffect = useCallback(() => {
