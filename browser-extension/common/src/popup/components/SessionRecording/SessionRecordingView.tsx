@@ -10,7 +10,7 @@ import "./sessionRecordingView.css";
 const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
-  const [isExplicitRecordingSession, setIsExplicitRecordingSession] = useState<boolean>();
+  const [isManualMode, setIsManualMode] = useState<boolean>();
 
   const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED);
@@ -19,24 +19,24 @@ const SessionRecordingView: React.FC = () => {
     );
   }, [currentTabId]);
 
-  const viewRecordedSession = useCallback(() => {
+  const openRecordedSession = useCallback(() => {
     window.open(`${config.WEB_URL}/sessions/draft/${currentTabId}`, "_blank");
   }, [currentTabId]);
 
-  const stopRecordingOnClick = useCallback(
+  const viewRecordingOnClick = useCallback(
     (stopRecording?: boolean) => {
-      if (isExplicitRecordingSession || stopRecording) {
-        sendEvent(EVENT.STOP_RECORDING_CLICKED);
+      if (isManualMode || stopRecording) {
+        sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
         chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
           setIsRecordingSession(false);
-          viewRecordedSession();
+          openRecordedSession();
         });
       } else {
         sendEvent(EVENT.VIEW_RECORDING_CLICKED);
-        viewRecordedSession();
+        openRecordedSession();
       }
     },
-    [viewRecordedSession, isExplicitRecordingSession]
+    [openRecordedSession, isManualMode]
   );
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const SessionRecordingView: React.FC = () => {
           action: CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION,
         },
         { frameId: 0 },
-        setIsExplicitRecordingSession
+        setIsManualMode
       );
     }
   }, [isRecordingSession]);
@@ -71,7 +71,7 @@ const SessionRecordingView: React.FC = () => {
       justify="space-between"
       className="session-view-content"
       style={{
-        backgroundColor: isRecordingSession ? (isExplicitRecordingSession ? "#295FF6" : "#B429F6") : "transparent",
+        backgroundColor: isRecordingSession ? (isManualMode ? "#295FF6" : "#B429F6") : "transparent",
       }}
     >
       {isRecordingSession ? (
@@ -81,7 +81,7 @@ const SessionRecordingView: React.FC = () => {
           </div>
 
           <Col>
-            {isExplicitRecordingSession ? (
+            {isManualMode ? (
               <>
                 <Typography.Text strong className="">
                   Recording...
@@ -99,7 +99,7 @@ const SessionRecordingView: React.FC = () => {
                   type="link"
                   target="_blank"
                   className="session-view-link-button"
-                  onClick={() => stopRecordingOnClick(true)}
+                  onClick={() => viewRecordingOnClick(true)}
                 >
                   <span className="stop-recording-text">Stop recording</span>
                 </Button>
@@ -132,9 +132,9 @@ const SessionRecordingView: React.FC = () => {
             type="link"
             target="_blank"
             className="session-view-link-button"
-            onClick={() => stopRecordingOnClick()}
+            onClick={() => viewRecordingOnClick()}
           >
-            <SaveFilled /> <span>{isExplicitRecordingSession ? "Stop & save recording" : "Save recording"}</span>
+            <SaveFilled /> <span>{isManualMode ? "Stop & save recording" : "Save recording"}</span>
           </Button>
         ) : (
           <Typography.Link
