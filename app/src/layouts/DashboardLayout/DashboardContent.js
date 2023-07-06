@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useSearchParams, useNavigate, useRoutes } from "react-router-dom";
+import { useLocation, useSearchParams, useRoutes } from "react-router-dom";
 import { routes } from "routes";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
-import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import {
   getActiveModals,
-  getAppMode,
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getIsWorkspaceOnboardingCompleted,
@@ -32,7 +29,6 @@ const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
@@ -40,7 +36,6 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
@@ -78,12 +73,6 @@ const DashboardContent = () => {
   };
 
   const prevProps = usePrevious({ location });
-
-  useEffect(() => {
-    if (PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
-    }
-  }, [appMode, location, navigate]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {

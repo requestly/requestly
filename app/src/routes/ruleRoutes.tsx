@@ -10,6 +10,7 @@ import SharedListViewerIndexPage from "components/features/sharedLists/SharedLis
 import { joinPaths } from "utils/PathUtils";
 import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
+import NavigateToAppModesRootRoute from "../components/mode-specific/redirects/NavigateToAppModesRootRoute";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -66,10 +67,10 @@ export const ruleRoutes: RouteObject[] = [
   },
   {
     path: PATHS.ROOT,
-    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
+    element: <NavigateToAppModesRootRoute />,
   },
   {
     path: PATHS.INDEX_HTML,
-    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
+    element: <NavigateToAppModesRootRoute />,
   },
 ];
