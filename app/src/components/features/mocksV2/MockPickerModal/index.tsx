@@ -1,6 +1,7 @@
 import { Modal } from "antd";
 import React from "react";
-import MockListIndex, { MockListSource } from "../MockList";
+import MockListIndex from "../MockList";
+import { MockListSource } from "../types";
 
 interface Props {
   isVisible: boolean;

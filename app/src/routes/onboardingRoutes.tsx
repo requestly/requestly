@@ -1,6 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import RuleSelection from "views/landing/RuleSelection";
+import RuleSelection from "components/landing/ruleSelection";
 import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
 

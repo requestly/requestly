@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Layout, Col } from "antd";
 import { RESOURCE_TYPE_LIST } from "..";
 import { RQButton } from "lib/design-system/components";
-import "../../../mocksV2/MockEditor/Editor/Header/index.css";
+import "../../../mocksV2/MockEditorIndex/Editor/Header/index.css";
 
 export const MockEditorHeader = ({ isNewMock, mockType, savingInProgress, handleClose, handleSave }) => {
   const navigate = useNavigate();

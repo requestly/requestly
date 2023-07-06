@@ -175,25 +175,45 @@ $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-
     margin-bottom: 1rem !important;
   }
 }
-.mb-2 {
-  margin-bottom: 2em;
-}
-.mb-3 {
-  margin-bottom: 3em;
-}
-.mb-4 {
-  margin-bottom: 4em;
-}
-.mb-8 {
-  margin-bottom: 8em;
-}
-.mt-1 {
-  margin-top: 1em;
+
+:root {
+  .mb-2 {
+    margin-bottom: 2em;
+  }
+  .mb-3 {
+    margin-bottom: 3em;
+  }
+  .mb-4 {
+    margin-bottom: 4em;
+  }
+  .mb-8 {
+    margin-bottom: 8em;
+  }
+  .mt-1 {
+    margin-top: 1em;
+  }
+
+  .mt-4 {
+    margin-top: 4em;
+  }
+
+  .ml-1 {
+    margin-left: calc(var(--space) * 1);
+  }
+
+  .ml-2 {
+    margin-left: calc(var(--space) * 2);
+  }
+
+  .ml-3 {
+    margin-left: calc(var(--space) * 3);
+  }
+
+  .ml-4 {
+    margin-left: calc(var(--space) * 4);
+  }
 }
 
-.mt-4 {
-  margin-top: 4em;
-}
 //rule-list
 .all-direct-children-have-margin > * {
   margin: 0 0.5rem;

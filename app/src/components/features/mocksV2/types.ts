@@ -24,3 +24,7 @@ export interface RQMockMetadataSchema extends MockMetadataSchema {
 }
 
 export interface RQMockSchema extends MockSchema, RQMockMetadataSchema {}
+
+export enum MockListSource {
+  PICKER_MODAL,
+}
