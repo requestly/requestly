@@ -14,7 +14,7 @@ const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleTog
       {isExtensionEnabled ? (
         <SessionRecordingView />
       ) : (
-        <>
+        <div className="resume-btn-container">
           <Button danger className="popup-footer-resume-btn" onClick={handleToggleExtensionStatus}>
             <PlayIcon />
             <span className="popup-footer-resume-btn-text">Resume</span>
@@ -23,7 +23,7 @@ const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleTog
           <Typography.Text type="secondary">
             When paused, rules won't be applied and sessions won't be recorded.
           </Typography.Text>
-        </>
+        </div>
       )}
     </Row>
   );
