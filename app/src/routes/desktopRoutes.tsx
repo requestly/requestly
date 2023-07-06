@@ -7,6 +7,7 @@ import InterceptTraffic from "components/mode-specific/desktop/InterceptTraffic"
 export const desktopRoutes: RouteObject[] = [
   {
     path: PATHS.DESKTOP.MANUAL_SETUP.RELATIVE,
+    // @ts-ignore
     element: <ManualProxySetup />,
   },
   {
