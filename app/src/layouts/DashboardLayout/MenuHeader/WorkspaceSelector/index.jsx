@@ -30,7 +30,6 @@ import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
-import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -136,7 +135,6 @@ const WorkspaceSelector = () => {
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(false);
-  const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
   const loggedInUserEmail = user?.details?.profile?.email;
@@ -175,10 +173,6 @@ const WorkspaceSelector = () => {
 
   const handleJoinWorkspaceModalClose = () => {
     setIsJoinWorkspaceModalOpen(false);
-  };
-
-  const handleCreateWorkspaceModalClose = () => {
-    setIsCreateWorkspaceModalOpen(false);
   };
 
   const handleInviteModalClose = () => {
@@ -220,17 +214,22 @@ const WorkspaceSelector = () => {
 
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
-      setIsCreateWorkspaceModalOpen(true);
+      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
     } else {
       promptUserSignupModal(() => {
-        setIsCreateWorkspaceModalOpen(true);
+        dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
   const handleInviteTeammatesClick = () => {
     if (user.loggedIn) {
-      setIsInviteModalOpen(true);
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "inviteMembersModal",
+          newValue: true,
+        })
+      );
       trackInviteTeammatesClicked("sidebar_dropdown");
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
@@ -542,8 +541,6 @@ const WorkspaceSelector = () => {
         handleModalClose={handleJoinWorkspaceModalClose}
         handleCreateNewWorkspaceClick={handleCreateWorkspaceFromJoinModal}
       />
-
-      <CreateWorkspaceModal isOpen={isCreateWorkspaceModalOpen} handleModalClose={handleCreateWorkspaceModalClose} />
 
       {isWorkspaceMode ? <AddMemberModal isOpen={isInviteModalOpen} handleModalClose={handleInviteModalClose} /> : null}
     </>

@@ -14,7 +14,7 @@ import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 
-const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTeamId }) => {
+const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
@@ -31,7 +31,7 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
-    handleModalClose();
+    toggleModal();
   };
 
   const handleAddMember = () => {
@@ -62,7 +62,7 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
           callback?.();
           trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin, "add_member_modal");
           setIsProcessing(false);
-          handleModalClose();
+          toggleModal();
         } else {
           const inviteErrors = res?.data?.results.filter((result) => result?.success !== true);
           callback?.();
@@ -84,7 +84,7 @@ const AddMemberModal = ({ isOpen, handleModalClose, callback, teamId: currentTea
 
   return (
     <>
-      <RQModal centered open={isOpen} onCancel={handleModalClose}>
+      <RQModal centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
           <div>
             <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />

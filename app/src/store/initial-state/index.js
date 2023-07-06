@@ -111,6 +111,14 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    createWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
+    inviteMembersModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */

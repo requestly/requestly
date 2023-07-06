@@ -25,6 +25,8 @@ import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sourc
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
+import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
+import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
@@ -141,7 +143,6 @@ const DashboardContent = () => {
       {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
         <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
       ) : null}
-
       {appOnboardingExp === "workspace_onboarding" &&
       !isWorkspaceOnboardingCompleted &&
       !userPersona.isSurveyCompleted ? (
@@ -149,6 +150,20 @@ const DashboardContent = () => {
           isOpen={activeModals.workspaceOnboardingModal.isActive}
           handleUploadRulesModalClick={toggleImportRulesModal}
           toggle={toggleWorkspaceOnboardingModal}
+        />
+      ) : null}
+      {activeModals.createWorkspaceModal.isActive ? (
+        <CreateWorkspaceModal
+          isOpen={activeModals.createWorkspaceModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+          {...activeModals.createWorkspaceModal.props}
+        />
+      ) : null}
+      {activeModals.inviteMembersModal.isActive ? (
+        <AddMemberModal
+          isOpen={activeModals.inviteMembersModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
+          {...activeModals.inviteMembersModal.props}
         />
       ) : null}
 

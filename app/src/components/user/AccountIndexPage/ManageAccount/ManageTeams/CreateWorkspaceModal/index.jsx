@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -65,7 +65,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
             isNewTeam: true,
           },
         });
-        handleModalClose();
+        toggleModal();
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
       })
       .catch((err) => {
@@ -98,7 +98,7 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
   }, [isOpen]);
 
   return (
-    <RQModal centered open={isOpen} onCancel={handleModalClose}>
+    <RQModal centered open={isOpen} onCancel={toggleModal}>
       <Form
         layout="vertical"
         initialValues={{ remember: true }}
