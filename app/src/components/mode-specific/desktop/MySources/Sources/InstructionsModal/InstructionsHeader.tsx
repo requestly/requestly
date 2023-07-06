@@ -18,7 +18,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
   ExtraContentOnRight,
 }) => {
   const navigateBackToSources = () => {
-    setShowInstructions(false);
+    setShowInstructions?.(false);
   };
 
   return (

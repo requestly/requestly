@@ -4,14 +4,12 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Col, Form, Input, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import lottie from "lottie-web/build/player/lottie_light";
-import teamSolvingPuzzle from "assets/lottie/teamwork-solve-puzzle.json";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
+import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./CreateWorkspaceModal.css";
-import Logger from "lib/logger";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -78,22 +76,6 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
   const handleFinishFailed = () => toast.error("Please enter valid details");
 
   useEffect(() => {
-    try {
-      lottie.destroy("CreateWorkspace-teamSolvingPuzzle");
-    } catch (_e) {
-      Logger.log("Loading teamSolvingPuzzle");
-    }
-    lottie.loadAnimation({
-      name: "CreateWorkspace-teamSolvingPuzzle",
-      container: document.querySelector("#CreateWorkspace-teamSolvingPuzzle"),
-      animationData: teamSolvingPuzzle,
-      renderer: "svg", // "canvas", "html"
-      loop: 1, // boolean
-      autoplay: true, // boolean
-    });
-  }, []);
-
-  useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed();
   }, [isOpen]);
 
@@ -146,7 +128,10 @@ const CreateWorkspaceModal = ({ isOpen, handleModalClose }) => {
         </div>
 
         {/* footer */}
-        <Row align="middle" justify="end" className="rq-modal-footer">
+        <Row align="middle" justify="space-between" className="rq-modal-footer">
+          <Col>
+            <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+          </Col>
           <Col>
             <Button
               type="primary"
