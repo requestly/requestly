@@ -44,7 +44,8 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
             res?.data?.data?.invite?.metadata?.teamId,
             inviteId,
             "invite_screen",
-            res?.data?.data?.invite?.usage
+            res?.data?.data?.invite?.usage,
+            res?.data?.data?.invite?.metadata?.teamAccessCount
           );
 
           if (res?.data?.data?.invite.type === "teams") {
