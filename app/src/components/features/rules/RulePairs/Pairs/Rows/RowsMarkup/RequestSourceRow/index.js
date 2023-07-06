@@ -14,6 +14,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import "./RequestSourceRow.css";
 import PATHS from "config/constants/sub/paths";
+import { trackURLConditionModalClosed } from "modules/analytics/events/features/testUrlModal";
 
 const { Text } = Typography;
 
@@ -128,7 +129,10 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         <TestURLModal
           destoryOnClose
           isOpen={isTestURLModalVisible}
-          onClose={() => setIsTestURLModalVisible(false)}
+          onClose={(operator) => {
+            setIsTestURLModalVisible(false);
+            trackURLConditionModalClosed(currentlySelectedRuleConfig.TYPE, operator);
+          }}
           source={pair.source}
           onSave={updateSourceFromTestURLModal}
           analyticsContext={currentlySelectedRuleConfig.TYPE}

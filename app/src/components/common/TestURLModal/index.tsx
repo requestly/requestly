@@ -16,8 +16,8 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 
 type Source = {
-  key: SourceKey[keyof SourceKey];
-  operator: SourceKey[keyof SourceOperator];
+  key: SourceKey;
+  operator: SourceOperator;
   value: string;
 };
 
@@ -25,7 +25,7 @@ interface ModalProps {
   isOpen: boolean;
   source: Source;
   analyticsContext: string;
-  onClose: () => void;
+  onClose: (operator: SourceOperator) => void;
   onSave: (newSource: Source) => void;
 }
 
@@ -124,7 +124,13 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   }, [isTestURLTried, analyticsContext, source.operator]);
 
   return (
-    <RQModal centered open={isOpen} className="test-url-modal" width={800} onCancel={onClose}>
+    <RQModal
+      centered
+      open={isOpen}
+      className="test-url-modal"
+      width={800}
+      onCancel={() => onClose(sourceConfig.operator)}
+    >
       <div className="test-url-modal-header">
         <Typography.Title level={4}>Test URL condition</Typography.Title>
         <Typography.Text className="text-gray">
@@ -200,7 +206,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       <div className="rq-modal-footer">
         <Row className="w-full" justify="end">
           {JSON.stringify(source) === JSON.stringify(sourceConfig) ? (
-            <RQButton type="default" onClick={onClose}>
+            <RQButton type="default" onClick={() => onClose(sourceConfig.operator)}>
               Close
             </RQButton>
           ) : (
@@ -209,7 +215,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
               className="text-bold"
               onClick={() => {
                 onSave(sourceConfig);
-                onClose();
+                onClose(sourceConfig.operator);
               }}
             >
               Save and close
