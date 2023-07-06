@@ -187,6 +187,7 @@ export const TEST_URL_CONDITION = {
   TEST_URL_CONDITION_MODAL_VIEWED: "test_URL_condition_modal_viewed",
   TEST_URL_CONDITION_MATCHING_TRIED: "test_URL_condition_matching_tried",
   TEST_URL_CONDITION_SOURCE_MODIFIED: "test_URL_condition_source_modified",
+  TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED: "test_URL_condition_source_modification_saved",
   TEST_URL_CONDITION_MODAL_CLOSED: "test_URL_condition_modal_closed",
 };
 

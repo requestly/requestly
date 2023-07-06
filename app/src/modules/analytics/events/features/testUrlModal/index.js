@@ -20,3 +20,8 @@ export const trackURLConditionModalClosed = (type, operator_type) => {
   const params = { type, operator_type };
   trackEvent(TEST_URL_CONDITION.TEST_URL_CONDITION_MODAL_CLOSED, params);
 };
+
+export const trackURLConditionSourceModificationSaved = (type, operator_type) => {
+  const params = { type, operator_type };
+  trackEvent(TEST_URL_CONDITION.TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED, params);
+};

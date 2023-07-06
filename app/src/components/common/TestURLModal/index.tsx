@@ -12,6 +12,7 @@ import "./index.scss";
 import {
   trackURLConditionMatchingTried,
   trackURLConditionModalViewed,
+  trackURLConditionSourceModificationSaved,
   trackURLConditionSourceModified,
 } from "modules/analytics/events/features/testUrlModal";
 
@@ -216,6 +217,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
               onClick={() => {
                 onSave(sourceConfig);
                 onClose(sourceConfig.operator);
+                trackURLConditionSourceModificationSaved(analyticsContext, sourceConfig.operator);
               }}
             >
               Save and close
