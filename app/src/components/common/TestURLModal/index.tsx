@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { RQButton, RQModal, RQInput } from "lib/design-system/components";
-import { Typography, Divider, Row, Col, Select } from "antd";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { RQButton, RQModal } from "lib/design-system/components";
+import { Typography, Divider, Row, Col, Select, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { isRegexFormat } from "utils/rules/misc";
+import type { InputRef } from "antd";
 import { RulePairSource, SourceKey, SourceOperator } from "types";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
@@ -28,6 +29,9 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
   const [isTestURLTried, setIsTestURLTried] = useState<boolean>(false);
+  const timerRef = useRef(null);
+  const urlInputRef = useRef<InputRef>(null);
+  const sourceInputRef = useRef<InputRef>(null);
 
   const renderResult = useCallback(() => {
     if (!testURL) {
@@ -58,17 +62,42 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     );
   }, [testURL, isCheckPassed]);
 
-  const handleTestURL = (url: string) => {
-    setTestURL(url);
-    setIsTestURLTried(true);
-    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(sourceConfig, url, null);
-    if (result === "") setIsCheckPassed(true);
-    else setIsCheckPassed(false);
+  const handleTestURL = (
+    url: string,
+    newValue: string = null,
+    newOperator: RulePairSource[keyof RulePairSource] = null,
+    newKey: RulePairSource[keyof RulePairSource] = null
+  ) => {
+    const config = {
+      value: newValue ?? sourceConfig.value,
+      operator: newOperator ?? sourceConfig.operator,
+      key: newKey ?? sourceConfig.key,
+    };
+    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(config, url, null);
+    setIsCheckPassed(result === "");
   };
 
   const handleSourceConfigChange = (key: keyof RulePairSource, value: RulePairSource[keyof RulePairSource]) => {
     setSourceConfig((prevConfig) => ({ ...prevConfig, [key]: value }));
     setIsSourceModified(true);
+  };
+
+  const handleSourceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(timerRef.current);
+    setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }));
+    setIsSourceModified(true);
+    timerRef.current = setTimeout(() => {
+      handleTestURL(testURL, sourceInputRef.current.input.value);
+    }, 500);
+  };
+
+  const handleTestURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(timerRef.current);
+    setTestURL(e.target.value);
+    setIsTestURLTried(true);
+    timerRef.current = setTimeout(() => {
+      handleTestURL(urlInputRef.current.input.value);
+    }, 500);
   };
 
   useEffect(() => {
@@ -103,7 +132,10 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             <Select
               value={sourceConfig.key}
               className="source-condition-selector cursor-pointer uppercase"
-              onChange={(value) => handleSourceConfigChange("key", value)}
+              onChange={(value) => {
+                handleSourceConfigChange("key", value);
+                handleTestURL(testURL, null, null, value);
+              }}
             >
               {Object.entries(SourceKey).map(([key, value]) => (
                 <Select.Option key={value} value={value}>
@@ -116,7 +148,10 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             <Select
               value={sourceConfig.operator}
               className="source-condition-selector cursor-pointer uppercase"
-              onChange={(value) => handleSourceConfigChange("operator", value)}
+              onChange={(value) => {
+                handleSourceConfigChange("operator", value);
+                handleTestURL(testURL, null, value, null);
+              }}
             >
               {Object.entries(SourceOperator).map(([key, value]) => (
                 <Select.Option key={key} value={value}>
@@ -131,14 +166,12 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
               ))}
             </Select>
           </Col>
-          <RQInput
+          <Input
             className="source-url-input"
             placeholder="Enter source URL"
             value={sourceConfig.value}
-            onChange={(e) => {
-              setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }));
-              setIsSourceModified(true);
-            }}
+            ref={sourceInputRef}
+            onChange={handleSourceInputChange}
           />
           {source.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
             <div className="invalid-regex-badge">INVALID REGEX</div>
@@ -146,13 +179,12 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         </div>
         <div className="test-url-modal-section">
           <div className="text-bold white"> Enter URL to be checked</div>
-          <RQInput
+          <Input
             className="mt-8"
             placeholder="https://www.example.com"
             value={testURL}
-            onChange={(e) => {
-              handleTestURL(e.target.value);
-            }}
+            ref={urlInputRef}
+            onChange={handleTestURLChange}
           />
         </div>
         <div className="test-url-modal-section match-result">
