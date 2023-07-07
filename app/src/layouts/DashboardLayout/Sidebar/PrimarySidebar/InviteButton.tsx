@@ -1,11 +1,11 @@
 import React, { useCallback } from "react";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
-import { Link } from "react-router-dom";
 import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
+import { RQButton } from "lib/design-system/components";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -30,8 +30,8 @@ const InviteButton: React.FC = () => {
 
   return (
     <>
-      <Link
-        to={"#"}
+      <RQButton
+        type="text"
         onClick={() => {
           handleInviteClick();
           trackSidebarClicked("invite");
@@ -40,7 +40,7 @@ const InviteButton: React.FC = () => {
       >
         <span className="icon__wrapper">{<InviteIcon />}</span>
         <span className="link-title">{"Invite"}</span>
-      </Link>
+      </RQButton>
     </>
   );
 };
