@@ -31,8 +31,30 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   const [updatedSource, setUpdatedSource] = useState<Source>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
+  const [matchedGroups, setMatchedGroups] = useState<string[]>([]);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
   const [isTestURLTried, setIsTestURLTried] = useState<boolean>(false);
+
+  const renderMatchedGroups = useCallback(() => {
+    if (
+      updatedSource.operator === SourceOperator.MATCHES ||
+      updatedSource.operator === SourceOperator.WILDCARD_MATCHES
+    ) {
+      return (
+        <div className="group-match-wrapper">
+          {matchedGroups.map((group, index) => (
+            <span>
+              {group.length ? (
+                <>
+                  <span className="text-bold">${index + 1}</span> = {group}
+                </>
+              ) : null}
+            </span>
+          ))}
+        </div>
+      );
+    }
+  }, [matchedGroups, updatedSource.operator]);
 
   const renderResult = useCallback(() => {
     if (updatedSource.operator === SourceOperator.MATCHES && !isRegexFormat(updatedSource.value)) {
@@ -72,18 +94,13 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     );
   }, [testURL, isCheckPassed, updatedSource.value, updatedSource.operator]);
 
-  const handleTestURL = (
-    newValue: string = null,
-    newOperator: Source[keyof Source] = null,
-    newKey: Source[keyof Source] = null
-  ) => {
-    const config = {
-      value: newValue ?? updatedSource.value,
-      operator: newOperator ?? updatedSource.operator,
-      key: newKey ?? updatedSource.key,
-    };
-    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(config, testURL, null);
-    setIsCheckPassed(result === "");
+  const handleTestURL = () => {
+    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(updatedSource, testURL, null);
+    setIsCheckPassed(result.destination === "");
+    if (result.destination === "") {
+      if (result.extraInfo.length) setMatchedGroups(result.extraInfo);
+      else setMatchedGroups([]);
+    }
   };
 
   const debouncedHandleTestURL = useDebounce(handleTestURL);
@@ -149,6 +166,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
           <div className="text-bold white">Result</div>
           <div className="mt-1 text-gray">
             <Row align="middle">{renderResult()}</Row>
+            {matchedGroups.length > 0 && renderMatchedGroups()}
           </div>
         </div>
       </div>

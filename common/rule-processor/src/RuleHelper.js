@@ -1,4 +1,4 @@
-import { extractUrlComponent, toRegex, traverseJsonByPath } from "../../utils";
+import { extractUrlComponent, toRegex, traverseJsonByPath, getMatchedGroups } from "../../utils";
 import { PREDEFINED_FUNCTIONS, PATTERNS } from "./predefinedFunctions";
 import CONSTANTS from "../../constants";
 
@@ -97,6 +97,10 @@ class RuleMatcher {
    * In some cases like wildcard match or regex match, resultingUrl will be destination+replaced group variables.
    */
   static matchUrlWithRuleSource(sourceObject, url, destination) {
+    return RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(sourceObject, url, destination).destination;
+  }
+
+  static matchUrlWithRuleSourceWithExtraInfo(sourceObject, url, destination) {
     var operator = sourceObject.operator,
       urlComponent = extractUrlComponent(url, sourceObject.key),
       value = sourceObject.value,
@@ -107,8 +111,9 @@ class RuleMatcher {
         return null;
       }
     }
-
-    return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
+    const result = RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
+    const matchedGroups = getMatchedGroups(value, operator, url);
+    return { destination: result, extraInfo: matchedGroups };
   }
 
   // Destination Url is not present in all rule types (e.g. Cancel, QueryParam)

@@ -243,3 +243,18 @@ export function addDelay(milliseconds) {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
 }
+
+export const getMatchedGroups = (pattern, operator, url) => {
+  let regexPattern;
+  if (operator === "Wildcard_Matches") regexPattern = pattern.replace(/\*/g, "(.*?)");
+  else regexPattern = pattern.slice(1, -1);
+
+  const regex = new RegExp(regexPattern);
+  const match = regex.exec(url);
+  // Retrieve and return the matched groups
+  if (match) {
+    return match.slice(1);
+  } else {
+    return [];
+  }
+};
