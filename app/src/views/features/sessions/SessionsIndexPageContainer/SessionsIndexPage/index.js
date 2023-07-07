@@ -58,7 +58,7 @@ const SessionsIndexPage = () => {
   const [sharingRecordId, setSharingRecordId] = useState("");
   const [selectedRowVisibility, setSelectedRowVisibility] = useState("");
   const [sessionRecordings, setSessionRecordings] = useState([]);
-  const [isTableLoading, setIsTableLoading] = useState(true);
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [qs, setQs] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
 
