@@ -201,10 +201,11 @@ export const formatRegexSource = (regexStr) => {
 
 export function runMinorFixesOnRule(dispatch, rule) {
   const rulePairs = rule.pairs.map((pair) => {
+    let fixedPair = pair;
     // fix regex
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
       if (!isRegexFormat(pair.source.value)) {
-        return {
+        fixedPair = {
           ...pair,
           source: {
             ...pair.source,
@@ -214,13 +215,15 @@ export function runMinorFixesOnRule(dispatch, rule) {
       }
     }
     // trim white space from source value
-    return {
-      ...pair,
+    fixedPair = {
+      ...fixedPair,
       source: {
-        ...pair.source,
-        value: pair.source?.value?.trim(),
+        ...fixedPair.source,
+        value: fixedPair.source?.value?.trim(),
       },
     };
+
+    return fixedPair;
   });
 
   const fixedRule = {
