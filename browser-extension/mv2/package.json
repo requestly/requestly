@@ -24,7 +24,7 @@
     "test": "grunt test"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.12.1",
+    "@requestly/web-sdk": "0.12.2",
     "archiver": "^5.3.1",
     "babel-polyfill": "^6.26.0",
     "chokidar-cli": "^3.0.0",
