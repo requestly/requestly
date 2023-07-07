@@ -134,7 +134,7 @@ const SessionRecordingView: React.FC = () => {
             className="session-view-link-button"
             onClick={() => viewRecordingOnClick()}
           >
-            <SaveFilled /> <span>{isManualMode ? "Stop & save recording" : "Save recording"}</span>
+            <SaveFilled /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
           </Button>
         ) : (
           <Typography.Link
