@@ -2,12 +2,13 @@ import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons
 import { BsShieldCheck } from "react-icons/bs";
 import { Button, Divider, Input, Row, Col, Typography, InputRef } from "antd";
 import React, { useState, useCallback, useRef } from "react";
+import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import "./index.scss";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import {
   trackInstallExtensionDialogShown,
@@ -190,17 +191,18 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSet
 
 const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
   const inputRef = useRef<InputRef>();
-
-  const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const openInstallExtensionModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(true);
+    const modalProps = {
+      heading: "Install Browser extension to record sessions for faster debugging and bug reporting",
+      subHeading:
+        "Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser.",
+      eventPage: "session_recording_page",
+    };
+    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
     trackInstallExtensionDialogShown({ src: "sessions_home_page" });
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(false);
-  }, []);
+  }, [dispatch]);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
     trackStartRecordingWithURLClicked();
@@ -282,23 +284,18 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
             <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
           </Row>
           <Row onClick={trackOnboardingYTVideoClicked}>
-            <a href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74" target="__blank" className="yt-cta-container">
-              <Row justify="end" align="middle" className="yt-cta">
-                <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
-                <Text underline>Watch it in action</Text>
+            <a
+              href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+              target="__blank"
+              className="sample-link-container"
+            >
+              <Row justify="end" align="middle" className="sample-link">
+                <Text underline>View sample recording</Text>
               </Row>
             </a>
           </Row>
         </Col>
       </Row>
-
-      <InstallExtensionModal
-        open={isInstallExtensionModalVisible}
-        onCancel={closeModal}
-        heading="Install Browser extension to record sessions for faster debugging and bug reporting"
-        subHeading="Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser."
-        eventPage="session_recording_page"
-      />
     </div>
   );
 };
