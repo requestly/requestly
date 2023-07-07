@@ -23,52 +23,6 @@
       border-radius: var(--border-radius-sm);
       background-color: var(--component-dark-background);
     }
-
-    .source-condition-input-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 6px;
-
-      .source-condition-selector {
-        .ant-select-selector {
-          background: var(--input-background);
-          border-color: var(--border-dark);
-
-          &:hover {
-            border-color: var(--border-dark);
-          }
-
-          .ant-select-selection-item {
-            font-weight: bold;
-          }
-        }
-      }
-
-      .source-url-input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        margin: 0;
-        padding: 8px;
-        outline: none;
-        border: none;
-
-        &:focus {
-          outline: none;
-          border: none;
-          box-shadow: none;
-        }
-      }
-      .invalid-regex-badge {
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--white);
-        background: rgba(255, 66, 66, 0.263);
-        border-radius: var(--border-radius-sm);
-        padding: 1px 7px;
-      }
-    }
   }
   &-section {
     margin-top: 1.5rem;
@@ -82,9 +36,16 @@
   .test-url-modal-section.match-result {
     .anticon {
       font-size: 1rem;
+      margin-right: 8px;
     }
-  }
-  .result-text {
-    margin-left: 8px;
+    span.danger {
+      color: var(--danger);
+    }
+    span.success {
+      color: var(--success);
+    }
+    .result-text {
+      margin: 0 4px;
+    }
   }
 }

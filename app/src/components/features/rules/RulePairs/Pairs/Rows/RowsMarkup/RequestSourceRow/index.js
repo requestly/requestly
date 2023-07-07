@@ -11,10 +11,10 @@ import { RQDropdown, RQButton } from "lib/design-system/components";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import "./RequestSourceRow.css";
 import PATHS from "config/constants/sub/paths";
+import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import { trackURLConditionModalClosed } from "modules/analytics/events/features/testUrlModal";
+import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
@@ -127,7 +127,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     <>
       {isTestURLModalVisible && (
         <TestURLModal
-          destoryOnClose
           isOpen={isTestURLModalVisible}
           onClose={(operator) => {
             setIsTestURLModalVisible(false);

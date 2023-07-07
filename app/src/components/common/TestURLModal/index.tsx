@@ -1,26 +1,23 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useDebounce } from "hooks/useDebounce";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { Typography, Divider, Row, Col, Select, Input } from "antd";
+import { SourceURL } from "../SourceUrl";
+import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { capitalize } from "lodash";
 import { isRegexFormat } from "utils/rules/misc";
-import type { InputRef } from "antd";
-import { SourceKey, SourceOperator } from "types";
+import { isValidUrl } from "utils/FormattingHelper";
+import { isEqual } from "lodash";
+import { SourceOperator } from "types";
+import { Source } from "../SourceUrl/types";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
-import "./index.scss";
 import {
   trackURLConditionMatchingTried,
   trackURLConditionModalViewed,
   trackURLConditionSourceModificationSaved,
   trackURLConditionSourceModified,
 } from "modules/analytics/events/features/testUrlModal";
-
-type Source = {
-  key: SourceKey;
-  operator: SourceOperator;
-  value: string;
-};
+import "./index.scss";
 
 interface ModalProps {
   isOpen: boolean;
@@ -31,106 +28,96 @@ interface ModalProps {
 }
 
 export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsContext, onClose, onSave }) => {
-  const [sourceConfig, setSourceConfig] = useState<Source>(source);
+  const [updatedSource, setUpdatedSource] = useState<Source>(source);
   const [testURL, setTestURL] = useState<string>("");
   const [isCheckPassed, setIsCheckPassed] = useState<boolean>(false);
   const [isSourceModified, setIsSourceModified] = useState<boolean>(false);
   const [isTestURLTried, setIsTestURLTried] = useState<boolean>(false);
 
-  const timerRef = useRef(null);
-  const urlInputRef = useRef<InputRef>(null);
-  const sourceInputRef = useRef<InputRef>(null);
-
   const renderResult = useCallback(() => {
+    if (updatedSource.operator === SourceOperator.MATCHES && !isRegexFormat(updatedSource.value)) {
+      return (
+        <>
+          <CloseCircleOutlined className="danger" />
+          The regex pattern entered is <span className="danger result-text"> invalid</span>.
+        </>
+      );
+    }
     if (!testURL) {
       return (
-        <Row align="middle">
+        <>
           <InfoCircleOutlined />
-          <span className="result-text">
-            Match information will be displayed here automatically once you enter the URL.
-          </span>
-        </Row>
+          Match information will be displayed here automatically once you enter the URL.
+        </>
+      );
+    } else if (!isValidUrl(testURL)) {
+      return (
+        <>
+          <CloseCircleOutlined className="danger" />
+          The URL entered is <span className="danger result-text">invalid</span>.
+        </>
       );
     }
 
     return isCheckPassed ? (
-      <Row align="middle">
-        <CheckCircleOutlined style={{ color: "var(--success)" }} />
-        <span className="result-text">
-          The URL <span style={{ color: "var(--success)" }}>matches</span> the source condition you defined.
-        </span>
-      </Row>
+      <>
+        <CheckCircleOutlined className="success" />
+        The URL <span className="success result-text">matches</span> the source condition you defined.
+      </>
     ) : (
-      <Row align="middle">
-        <CloseCircleOutlined style={{ color: "var(--danger)" }} />
-        <span className="result-text">
-          The URL <span style={{ color: "var(--danger)" }}> doesn't match </span> the source condition you defined.
-        </span>
-      </Row>
+      <>
+        <CloseCircleOutlined className="danger" />
+        The URL <span className="danger result-text"> doesn't match </span> the source condition you defined.
+      </>
     );
-  }, [testURL, isCheckPassed]);
+  }, [testURL, isCheckPassed, updatedSource.value, updatedSource.operator]);
 
   const handleTestURL = (
-    url: string,
     newValue: string = null,
     newOperator: Source[keyof Source] = null,
     newKey: Source[keyof Source] = null
   ) => {
     const config = {
-      value: newValue ?? sourceConfig.value,
-      operator: newOperator ?? sourceConfig.operator,
-      key: newKey ?? sourceConfig.key,
+      value: newValue ?? updatedSource.value,
+      operator: newOperator ?? updatedSource.operator,
+      key: newKey ?? updatedSource.key,
     };
-    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(config, url, null);
+    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSource(config, testURL, null);
     setIsCheckPassed(result === "");
   };
 
-  const handleSourceConfigChange = (key: keyof Source, value: Source[keyof Source]) => {
-    setSourceConfig((prevConfig) => ({ ...prevConfig, [key]: value }));
-    setIsSourceModified(true);
+  const debouncedHandleTestURL = useDebounce(handleTestURL);
+
+  const handleSourceConfigChange = (updatedSource: Source) => {
+    if (!isSourceModified) {
+      trackURLConditionSourceModified(analyticsContext, updatedSource.operator);
+      setIsSourceModified(true);
+    }
+    setUpdatedSource(updatedSource);
+    debouncedHandleTestURL();
   };
 
-  const handleSourceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    clearTimeout(timerRef.current);
-    setSourceConfig((prevConfig) => ({ ...prevConfig, value: e.target.value }));
-    setIsSourceModified(true);
-    timerRef.current = setTimeout(() => {
-      handleTestURL(testURL, sourceInputRef.current.input.value);
-    }, 500);
-  };
-
-  const handleTestURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    clearTimeout(timerRef.current);
-    setTestURL(e.target.value);
-    setIsTestURLTried(true);
-    timerRef.current = setTimeout(() => {
-      handleTestURL(urlInputRef.current.input.value);
-    }, 500);
+  const handleTestURLChange = (value: string) => {
+    if (!isTestURLTried) {
+      trackURLConditionMatchingTried(analyticsContext, updatedSource.operator);
+      setIsTestURLTried(true);
+    }
+    setTestURL(value);
+    debouncedHandleTestURL();
   };
 
   useEffect(() => {
     trackURLConditionModalViewed(analyticsContext, source.operator);
   }, [analyticsContext, source.operator]);
 
-  useEffect(() => {
-    if (isSourceModified) {
-      trackURLConditionSourceModified(analyticsContext, source.operator);
-    }
-  }, [analyticsContext, source.operator, isSourceModified]);
-
-  useEffect(() => {
-    if (isTestURLTried) {
-      trackURLConditionMatchingTried(analyticsContext, source.operator);
-    }
-  }, [isTestURLTried, analyticsContext, source.operator]);
-
   return (
     <RQModal
+      destroyOnClose
       centered
       open={isOpen}
       className="test-url-modal"
       width={800}
-      onCancel={() => onClose(sourceConfig.operator)}
+      onCancel={() => onClose(updatedSource.operator)}
     >
       <div className="test-url-modal-header">
         <Typography.Title level={4}>Test URL condition</Typography.Title>
@@ -141,53 +128,11 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       <Divider />
       <div className="test-url-modal-body">
         <div className="text-bold white">Source condition</div>
-        <div className="source-condition-input-wrapper mt-8">
-          <Col className="shrink-0">
-            <Select
-              value={sourceConfig.key}
-              className="source-condition-selector cursor-pointer uppercase"
-              onChange={(value) => {
-                handleSourceConfigChange("key", value);
-                handleTestURL(testURL, null, null, value);
-              }}
-            >
-              {Object.entries(SourceKey).map(([key, value]) => (
-                <Select.Option key={value} value={value}>
-                  {capitalize(value)}
-                </Select.Option>
-              ))}
-            </Select>
-          </Col>
-          <Col className="shrink-0">
-            <Select
-              value={sourceConfig.operator}
-              className="source-condition-selector cursor-pointer"
-              onChange={(value) => {
-                handleSourceConfigChange("operator", value);
-                handleTestURL(testURL, null, value, null);
-              }}
-            >
-              {Object.entries(SourceOperator).map(([key, value]) => (
-                <Select.Option key={key} value={value}>
-                  {value === SourceOperator.WILDCARD_MATCHES
-                    ? "Wildcard"
-                    : value === SourceOperator.MATCHES
-                    ? "RegEx"
-                    : value}
-                </Select.Option>
-              ))}
-            </Select>
-          </Col>
-          <Input
-            className="source-url-input"
-            placeholder="Enter source URL"
-            value={sourceConfig.value}
-            ref={sourceInputRef}
-            onChange={handleSourceInputChange}
+        <div className="mt-8">
+          <SourceURL
+            source={updatedSource}
+            onSourceChange={(updatedSource) => handleSourceConfigChange(updatedSource)}
           />
-          {sourceConfig.operator === SourceOperator.MATCHES && !isRegexFormat(sourceConfig.value) && (
-            <div className="invalid-regex-badge">INVALID REGEX</div>
-          )}
         </div>
         <div className="test-url-modal-section">
           <div className="text-bold white"> Enter URL to be checked</div>
@@ -195,19 +140,22 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             className="mt-8"
             placeholder="https://www.example.com"
             value={testURL}
-            ref={urlInputRef}
-            onChange={handleTestURLChange}
+            onChange={(e) => {
+              handleTestURLChange(e.target.value);
+            }}
           />
         </div>
         <div className="test-url-modal-section match-result">
           <div className="text-bold white">Result</div>
-          <div className="mt-1 text-gray">{renderResult()}</div>
+          <div className="mt-1 text-gray">
+            <Row align="middle">{renderResult()}</Row>
+          </div>
         </div>
       </div>
       <div className="rq-modal-footer">
         <Row className="w-full" justify="end">
-          {JSON.stringify(source) === JSON.stringify(sourceConfig) ? (
-            <RQButton type="default" onClick={() => onClose(sourceConfig.operator)}>
+          {isEqual(source, updatedSource) ? (
+            <RQButton type="default" onClick={() => onClose(updatedSource.operator)}>
               Close
             </RQButton>
           ) : (
@@ -215,9 +163,9 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
               type="primary"
               className="text-bold"
               onClick={() => {
-                onSave(sourceConfig);
-                onClose(sourceConfig.operator);
-                trackURLConditionSourceModificationSaved(analyticsContext, sourceConfig.operator);
+                onSave(updatedSource);
+                onClose(updatedSource.operator);
+                trackURLConditionSourceModificationSaved(analyticsContext, updatedSource.operator);
               }}
             >
               Save and close
