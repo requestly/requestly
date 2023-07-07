@@ -246,7 +246,7 @@ export function addDelay(milliseconds) {
 
 export const getMatchedGroups = (pattern, operator, url) => {
   let regexPattern;
-  if (operator === "Wildcard_Matches") regexPattern = pattern.replace(/\*/g, "(.*?)");
+  if (operator === CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES) regexPattern = pattern.replace(/\*/g, "(.*?)");
   else regexPattern = pattern.slice(1, -1);
 
   const regex = new RegExp(regexPattern);

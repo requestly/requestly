@@ -26,7 +26,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .source-filter-icon-container {
@@ -34,7 +34,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
 }
 .rule-pair-source-row-wrapper .test-url-btn.ripple-animation {
   position: relative;

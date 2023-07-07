@@ -176,12 +176,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
               </Text>
             </RQDropdown>
           </Col>
-          <Col
-            span={14}
-            md={ruleDetails.TYPE === "Delay" ? 12 : 17}
-            lg={ruleDetails.TYPE === "Delay" ? 15 : 17}
-            xl={ruleDetails.TYPE === "Delay" ? 15 : 17}
-          >
+          <Col className="w-full">
             <Input
               placeholder={
                 ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
@@ -211,8 +206,13 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           )}
         </Row>
         {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
-          <Col span={1} align="right" className="source-filter-col">
-            &nbsp;&nbsp;
+          <Col
+            align="right"
+            className="source-filter-col"
+            style={{
+              marginLeft: ruleDetails.TYPE === "Delay" ? 0 : "4px",
+            }}
+          >
             <MoreInfo
               text={
                 <>
