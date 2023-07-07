@@ -34,3 +34,7 @@
 .teams-list li:not(:last-child) {
   margin-bottom: 8px;
 }
+
+.rq-modal.ant-modal .rq-modal-content.switch-workspace-modal-content {
+  padding-bottom: 16px;
+}

@@ -59,7 +59,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
 
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
-      <div className="rq-modal-content">
+      <div className="rq-modal-content switch-workspace-modal-content">
         {availableTeams?.length > 0 && <div className="header">You have access to these workspaces</div>}
 
         {availableTeams?.length > 0 ? (
