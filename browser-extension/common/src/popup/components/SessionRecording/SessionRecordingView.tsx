@@ -3,7 +3,7 @@ import { Button, Col, Row, Typography } from "antd";
 import config from "../../../config";
 import { CLIENT_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
-import { PlayCircleFilled, SaveFilled } from "@ant-design/icons";
+import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
 import { EVENT, sendEvent } from "../../events";
 import "./sessionRecordingView.css";
 
@@ -134,7 +134,7 @@ const SessionRecordingView: React.FC = () => {
             className="session-view-link-button"
             onClick={() => viewRecordingOnClick()}
           >
-            <SaveFilled /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
+            <EyeOutlined /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
           </Button>
         ) : (
           <Typography.Link
