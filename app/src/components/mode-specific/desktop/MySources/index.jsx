@@ -16,6 +16,8 @@ const MySources = () => {
   }
 
   redirectToTraffic(navigate);
+
+  return null;
 };
 
 export default MySources;

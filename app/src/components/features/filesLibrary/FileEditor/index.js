@@ -20,7 +20,7 @@ import isEmpty from "is-empty";
 import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast";
-import "../../mocksV2/MockEditor/Editor/index.css";
+import "../../mocksV2/MockEditorIndex/Editor/index.css";
 
 export const RESOURCE_TYPE_LIST = {
   HTML: "HTML",

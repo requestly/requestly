@@ -1,5 +1,5 @@
 //CONFIG
-import { MODES } from "components/misc/VerifyEmail";
+import { MODES } from "components/misc/VerifyEmail/modes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
 
