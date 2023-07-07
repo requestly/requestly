@@ -36,6 +36,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
             team.teamId,
+            team.teamName,
             team.inviteId,
             "onboarding",
             res?.data?.data?.invite?.usage,

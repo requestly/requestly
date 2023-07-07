@@ -42,6 +42,7 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
             res?.data?.data?.invite?.metadata?.teamId,
+            res?.data?.data?.invite?.metadata?.teamName,
             inviteId,
             "invite_screen",
             res?.data?.data?.invite?.usage,
