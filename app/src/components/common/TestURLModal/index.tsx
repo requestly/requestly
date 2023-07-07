@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "hooks/useDebounce";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { SourceURL } from "../SourceUrl";
+import { SourceUrl } from "../SourceUrl";
 import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { isRegexFormat } from "utils/rules/misc";
@@ -129,7 +129,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       <div className="test-url-modal-body">
         <div className="text-bold white">Source condition</div>
         <div className="mt-8">
-          <SourceURL
+          <SourceUrl
             source={updatedSource}
             onSourceChange={(updatedSource) => handleSourceConfigChange(updatedSource)}
           />

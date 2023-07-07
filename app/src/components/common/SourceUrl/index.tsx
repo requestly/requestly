@@ -10,7 +10,7 @@ interface SourceProps {
   onSourceChange: (updatedSource: Source) => void;
 }
 
-export const SourceURL: React.FC<SourceProps> = ({ source, onSourceChange }) => {
+export const SourceUrl: React.FC<SourceProps> = ({ source, onSourceChange }) => {
   return (
     <div className="source-condition-input-wrapper mt-8">
       <Col className="shrink-0">
