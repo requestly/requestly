@@ -42,7 +42,7 @@
 .rule-pair-source-row-wrapper .test-url-btn.ripple-animation::after {
   content: "";
   position: absolute;
-  right: 0;
+  right: 3px;
   width: 100%;
   height: 100%;
   background: transparent;
