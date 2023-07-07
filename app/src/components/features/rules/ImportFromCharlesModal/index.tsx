@@ -60,7 +60,11 @@ const CharlesDocsLink = ({ title, analyticEventSource }: { title: string; analyt
   </a>
 );
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, analyticEventSource = "" }) => {
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({
+  isOpen,
+  toggle,
+  analyticEventSource = "upload_screen",
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -225,6 +229,12 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
               title="Drag and drop your Charles export file"
             />
           )}
+        </div>
+
+        <div className="text-center title mt-16">
+          {" "}
+          To export your rules from Charles,{" "}
+          <CharlesDocsLink title="Follow these steps" analyticEventSource={analyticEventSource} />
         </div>
       </div>
 
