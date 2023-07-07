@@ -1,0 +1,78 @@
+.onboarding-content-container {
+  .settings-btn {
+    margin-right: 9px;
+    margin-top: 9px;
+    cursor: pointer;
+  }
+
+  .check-icon {
+    font-size: 0.8rem;
+  }
+
+  .onboarding-banner {
+    margin-left: 128px;
+    margin-right: 128px;
+    margin-top: 80px;
+
+    .banner-header {
+      width: 100%;
+      margin-bottom: 14px;
+
+      .banner-title {
+        font-size: 1.8rem;
+        vertical-align: bottom;
+      }
+    }
+
+    .banner-text-container {
+      padding-top: 5px;
+      .banner-text {
+        font-size: 1rem;
+      }
+      .banner-message {
+        padding-top: 20px;
+      }
+      .banner-description {
+        margin-bottom: 55px;
+      }
+
+      .record-label {
+        margin-bottom: 8px;
+      }
+
+      .input-container {
+        input {
+          height: 30px;
+        }
+      }
+
+      .start-btn-container {
+        padding-left: 12px;
+        text-align: center;
+        align-items: middle;
+
+        button {
+          height: 30px;
+        }
+      }
+    }
+
+    .banner-demo-video {
+      .demo-video {
+        width: 85%;
+      }
+      .sample-link-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        .sample-link {
+          margin-top: 4px;
+          width: 85%;
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

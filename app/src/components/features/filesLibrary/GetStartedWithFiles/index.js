@@ -10,7 +10,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { EditOutlined } from "@ant-design/icons";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import NewMockSelector from "../FilesLibraryTableContainer/FilesTable/mockModal";
+import NewMockSelector from "../FilesLibraryTableContainer/NewMockSelector";
 import UploadFileBtn from "../UploadFileBtn";
 import { redirectToCreateNewFile } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";

@@ -14,7 +14,7 @@ import moment from "moment";
 import { toast } from "utils/Toast.js";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { getMockUrl, getDelayMockUrl } from "utils/files/urlUtils";
-import NewMockSelector from "./mockModal";
+import NewMockSelector from "../NewMockSelector";
 import { isEmpty } from "lodash";
 import CreateNewRuleGroupModal from "../../../rules/CreateNewRuleGroupModal/";
 import { redirectToCreateNewFile } from "utils/RedirectionUtils";

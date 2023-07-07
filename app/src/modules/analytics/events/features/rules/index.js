@@ -46,7 +46,7 @@ export const trackCharlesSettingsImportComplete = (settings_count, setting_types
   trackEvent(CHARLES_SETTINGS.IMPORT_COMPLETE, params);
 };
 
-export const trackCharlesSettingsImportDocsClicked = (source) => {
-  const params = { source };
+export const trackCharlesSettingsImportDocsClicked = (source, trigger) => {
+  const params = { source, import_trigger: trigger };
   trackEvent(CHARLES_SETTINGS.DOCS_CLICKED, params);
 };

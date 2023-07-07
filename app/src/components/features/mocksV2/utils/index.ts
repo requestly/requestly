@@ -8,9 +8,9 @@ import {
   defaultEditorMock,
   defaultHtmlEditorMock,
   defaultJsEditorMock,
-} from "../MockEditor/constants";
+} from "../MockEditorIndex/constants";
 
-import { MockEditorDataSchema } from "../MockEditor/types";
+import { MockEditorDataSchema } from "../MockEditorIndex/types";
 import { RQMockSchema, FileType } from "../types";
 
 export const fileTypeColorMap = {
