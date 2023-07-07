@@ -14,6 +14,7 @@ import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
+import Logger from "lib/logger";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
   const functions = getFunctions();
@@ -96,16 +97,12 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
         if (res.data.success) {
           setIsTeamAdmin(res.data.isAdmin);
         }
-        setShowLoader(false);
       })
-      .catch(() => {
-        setShowLoader(false);
-      });
+      .catch((err) => {
+        Logger.log("err while checking team admin", err);
+      })
+      .finally(() => setShowLoader(false));
   }, [functions, teamId]);
-
-  if (showLoader) {
-    return <PageLoader />;
-  }
 
   return (
     <>
@@ -150,6 +147,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
               </div>
             </>
+          ) : showLoader ? (
+            <PageLoader />
           ) : (
             <div className="title empty-message">
               <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
