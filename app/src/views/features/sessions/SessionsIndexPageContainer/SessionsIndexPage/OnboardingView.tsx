@@ -25,7 +25,7 @@ import FEATURES from "config/constants/sub/features";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 
-import StartSessionRecordingGif from "assets/img/screenshots/session-recording-onboarding.gif";
+import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
 
 const { Text, Title } = Typography;
 
@@ -218,70 +218,64 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
 
   return (
     <div className="onboarding-content-container">
-      <div className="onboarding-banner">
-        <Row className="banner-header" justify="space-between">
-          <Col>
-            <Title className="banner-title">Record &amp; replay your first browsing sessions</Title>
-          </Col>
-          <Col className="settings-btn">
-            <Button onClick={handleSettingsNavigation}>
-              <SettingOutlined /> &nbsp; <Text>Settings</Text>
-            </Button>
-          </Col>
-        </Row>
-        <Row justify="space-between">
-          <Col span={11} className="banner-text-container">
-            <Row className="banner-description">
-              <Text type="secondary" className="banner-text">
-                <div>
-                  Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
-                  <Text strong>network</Text> &
-                </div>
-                <div>
-                  {" "}
-                  <Text strong>environment data</Text> automatically on your device for sharing &{" "}
-                </div>
-                <div> debugging </div>
-              </Text>
-            </Row>
-            <Row className="record-label">
-              <Text type="secondary" className="banner-text">
-                Record your first session
-              </Text>
-            </Row>
-            <Row>
-              <Col span={15} className="input-container">
-                <Input ref={inputRef} placeholder="Enter the URL you want to record" />
-              </Col>
-              <Col span={3} className="start-btn-container">
-                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                  {" "}
-                  Start Recording
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={13} className="right-col">
-            <Row justify="end">
-              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
-            </Row>
-            <Row onClick={trackOnboardingYTVideoClicked}>
-              <a
-                href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74"
-                target="__blank"
-                className="yt-cta-container"
-              >
-                <Row justify="end" align="middle" className="yt-cta">
-                  <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
-                  <Text underline>Watch it in action</Text>
-                </Row>
-              </a>
-            </Row>
-          </Col>
-        </Row>
-      </div>
+      <Row justify="end" align="middle" className="settings-btn" onClick={handleSettingsNavigation}>
+        <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+      </Row>
+      <Row justify="space-between" className="onboarding-banner">
+        <Col span={11} className="banner-text-container">
+          <Row className="banner-header">
+            <Title className="banner-title">Debug issues faster with Sessions</Title>
+          </Row>
+          <Row className="banner-description">
+            <Text type="secondary" className="banner-text">
+              <div>
+                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                <Text strong>network</Text> &
+              </div>
+              <div>
+                {" "}
+                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+              </div>
+              <div> debugging </div>
+            </Text>
+          </Row>
+          <Row className="record-label">
+            <Text type="secondary" className="banner-text">
+              Record your first session
+            </Text>
+          </Row>
+          <Row>
+            <Col span={15} className="input-container">
+              <Input ref={inputRef} placeholder="Enter the URL you want to record" />
+            </Col>
+            <Col span={3} className="start-btn-container">
+              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                {" "}
+                Start Recording
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+        <Col span={13} className="banner-demo-video">
+          <Row justify="end">
+            <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+          </Row>
+          <Row onClick={trackOnboardingYTVideoClicked}>
+            <a href="https://www.youtube.com/embed/g_qXQAzUQgU?start=74" target="__blank" className="yt-cta-container">
+              <Row justify="end" align="middle" className="yt-cta">
+                <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4, margin: 0 }} /> &nbsp;
+                <Text underline>Watch it in action</Text>
+              </Row>
+            </a>
+          </Row>
+        </Col>
+      </Row>
       <div className="onboarding-footer">
-        <Divider />
+        <div className="divider">
+          <div>
+            <Divider />
+          </div>
+        </div>
         <Row>
           <Col span={24}>
             <Text type="secondary">

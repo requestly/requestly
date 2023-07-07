@@ -1,11 +1,14 @@
 .onboarding-content-container {
-  margin-left: 3.5rem;
-  margin-right: 3.5rem;
-  margin-top: 2.5rem;
+  .settings-btn {
+    margin-right: 9px;
+    margin-top: 9px;
+    cursor: pointer;
+  }
 
   .onboarding-banner {
-    margin-right: 3rem;
-    margin-left: 3rem;
+    margin-left: 8rem;
+    margin-right: 8rem;
+    margin-top: 5rem;
 
     .banner-header {
       width: 100%;
@@ -15,22 +18,18 @@
         font-size: 1.8rem;
         vertical-align: bottom;
       }
-      .settings-btn {
-        display: flex;
-        align-items: flex-start;
-      }
     }
 
     .banner-text-container {
+      padding-top: 5px;
       .banner-text {
         font-size: 1rem;
       }
       .banner-description {
-        margin-bottom: 1rem;
+        margin-bottom: 5.8rem;
       }
 
       .record-label {
-        margin-top: 0.5em;
         margin-bottom: 0.5em;
       }
 
@@ -51,9 +50,9 @@
       }
     }
 
-    .right-col {
+    .banner-demo-video {
       .demo-video {
-        width: 70%;
+        width: 80%;
       }
       .yt-cta-container {
         display: flex;
@@ -61,7 +60,8 @@
         justify-content: flex-end;
         width: 100%;
         .yt-cta {
-          width: 70%;
+          margin-top: 0.2rem;
+          width: 80%;
           display: flex;
           justify-content: center;
         }
@@ -69,6 +69,17 @@
     }
   }
   .onboarding-footer {
-    margin-top: 3rem;
+    .divider {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+
+      display: flex;
+      justify-content: center;
+      width: 100%;
+
+      div {
+        width: 220px;
+      }
+    }
   }
 }
