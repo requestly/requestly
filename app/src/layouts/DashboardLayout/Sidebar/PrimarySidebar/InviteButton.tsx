@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { Link } from "react-router-dom";
 import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { actions } from "store";
-import { useCallback } from "react";
 import { getUserAuthDetails } from "store/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
