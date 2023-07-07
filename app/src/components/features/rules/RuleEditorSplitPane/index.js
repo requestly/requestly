@@ -1,17 +1,20 @@
 import React from "react";
 import { Card, Row, Col, Tabs, Button } from "antd";
 import { CrownTwoTone, DownOutlined } from "@ant-design/icons";
+import RuleSimulator from "../../../../views/features/rules/RuleSimulatorContainer";
 import ExecutionLogs from "./ExecutionLogs";
 import { isExtensionVersionCompatible } from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import PremiumRequiredCTA from "../../../payments/PremiumRequiredCTA";
 import { trackRuleSimulatorTried } from "modules/analytics/events/common/rules";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./ruleEditorSplitPane.css";
 const { TabPane } = Tabs;
 
 const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapseRulesPlane, ruleType }) => {
   const activeKey = showExecutionLogs ? "executionLogs" : "ruleSimulator";
   const isExecutionLogsCompatible = isExtensionVersionCompatible(APP_CONSTANTS.EXECUTION_LOGS_COMPATIBILITY_VERSION);
+  const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
 
   const UpgradeExtensionCTA = () => {
     return (
@@ -46,6 +49,14 @@ const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapse
           right: <Button icon={<DownOutlined />} onClick={collapseRulesPlane} style={{ marginBottom: "8px" }} />,
         }}
       >
+        {!isTestURLFeatureFlagOn && (
+          <TabPane tab={"Test this Rule"} key="ruleSimulator">
+            <div style={{ padding: "5px", width: "90%" }}>
+              <RuleSimulator />
+            </div>
+          </TabPane>
+        )}
+
         <TabPane
           tab={
             <span>
