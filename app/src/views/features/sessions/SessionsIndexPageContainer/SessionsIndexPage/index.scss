@@ -5,6 +5,10 @@
     cursor: pointer;
   }
 
+  .check-icon {
+    font-size: 0.8rem;
+  }
+
   .onboarding-banner {
     margin-left: 8rem;
     margin-right: 8rem;
@@ -25,8 +29,11 @@
       .banner-text {
         font-size: 1rem;
       }
+      .banner-message {
+        padding-top: 1.2rem;
+      }
       .banner-description {
-        margin-bottom: 5.8rem;
+        margin-bottom: 4rem;
       }
 
       .record-label {
@@ -52,7 +59,7 @@
 
     .banner-demo-video {
       .demo-video {
-        width: 80%;
+        width: 85%;
       }
       .yt-cta-container {
         display: flex;
@@ -61,7 +68,7 @@
         width: 100%;
         .yt-cta {
           margin-top: 0.2rem;
-          width: 80%;
+          width: 85%;
           display: flex;
           justify-content: center;
         }

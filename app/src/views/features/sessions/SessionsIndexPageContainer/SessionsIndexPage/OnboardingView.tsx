@@ -1,4 +1,5 @@
 import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
+import { BsShieldCheck } from "react-icons/bs";
 import { Button, Divider, Input, Row, Col, Typography, InputRef } from "antd";
 import React, { useState, useCallback, useRef } from "react";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
@@ -35,6 +36,22 @@ const CheckItem: React.FC<{ label: string }> = ({ label }) => {
       <CheckOutlined style={{ marginRight: "8px", fontSize: "16px", color: "#228B22" }} />
       <span>{label}</span>
     </div>
+  );
+};
+
+const GreenVerifiedCheck: React.FC<{}> = () => {
+  return (
+    <>
+      <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
+      {/* GREEN GRADIENT on svg */}
+      <svg width="0" height="0">
+        <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop stopColor="#eefccb" offset="0%" />
+          <stop stopColor="#aefc31" offset="50%" />
+          <stop stopColor="#0dbb48" offset="100%" />
+        </linearGradient>
+      </svg>
+    </>
   );
 };
 
@@ -222,7 +239,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
         <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
       </Row>
       <Row justify="space-between" className="onboarding-banner">
-        <Col span={11} className="banner-text-container">
+        <Col span={12} className="banner-text-container">
           <Row className="banner-header">
             <Title className="banner-title">Debug issues faster with Sessions</Title>
           </Row>
@@ -237,6 +254,10 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
                 <Text strong>environment data</Text> automatically on your device for sharing &{" "}
               </div>
               <div> debugging </div>
+            </Text>
+
+            <Text type="secondary" className="banner-message banner-text">
+              <GreenVerifiedCheck /> Recordings are not automatically saved to the cloud; they require manual saving
             </Text>
           </Row>
           <Row className="record-label">
@@ -256,7 +277,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
             </Col>
           </Row>
         </Col>
-        <Col span={13} className="banner-demo-video">
+        <Col span={12} className="banner-demo-video">
           <Row justify="end">
             <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
           </Row>
@@ -270,24 +291,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
           </Row>
         </Col>
       </Row>
-      <div className="onboarding-footer">
-        <div className="divider">
-          <div>
-            <Divider />
-          </div>
-        </div>
-        <Row>
-          <Col span={24}>
-            <Text type="secondary">
-              <Row justify="space-evenly">
-                <CheckItem label="Automatically record specified website or all activity" />
-                <CheckItem label="All recordings are saved locally until saved or shared" />
-                <CheckItem label="View network, console and environment details synced to video" />
-              </Row>
-            </Text>
-          </Col>
-        </Row>
-      </div>
+
       <InstallExtensionModal
         open={isInstallExtensionModalVisible}
         onCancel={closeModal}
