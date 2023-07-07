@@ -1023,10 +1023,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   const isAutoRecordingActive = sessionRecordingConfig?.autoRecording?.isActive;
   let pageSources = sessionRecordingConfig?.pageSources || [];
 
-  if ("autoRecording" in sessionRecordingConfig) {
-    if (!sessionRecordingConfig?.autoRecording.isActive) {
+  if (sessionRecordingConfig?.autoRecording) {
+    if (!sessionRecordingConfig.autoRecording?.isActive) {
       return null;
-    } else if (sessionRecordingConfig?.autoRecording.mode === "allPages") {
+    } else if (sessionRecordingConfig.autoRecording?.mode === "allPages") {
       pageSources = [
         {
           value: "*",
