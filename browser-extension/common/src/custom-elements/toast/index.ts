@@ -3,7 +3,7 @@ import styles from "./toast.css";
 import CloseIcon from "../../../resources/icons/close.svg";
 
 class RQToast extends HTMLElement {
-  time = 5000;
+  time = 10000;
 
   constructor() {
     super();

@@ -164,6 +164,7 @@ RQ.SessionRecorder.explicitRecordingFlag = {
 
 RQ.SessionRecorder.showToast = () => {
   const rqToast = document.createElement("rq-toast");
+  rqToast.classList.add("rq-element");
   rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
   rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   rqToast.innerHTML = `
