@@ -23,7 +23,7 @@ import "./ImportFromCharlesModal.css";
 interface ModalProps {
   isOpen: boolean;
   toggle: () => void;
-  analyticEventSource: string;
+  triggeredBy: string;
 }
 
 const validExportSteps = [
@@ -49,18 +49,26 @@ const validExportSteps = [
   },
 ];
 
-const CharlesDocsLink = ({ title, analyticEventSource }: { title: string; analyticEventSource: string }) => (
+const CharlesDocsLink = ({
+  title,
+  linkClickSrc,
+  importTriggerSrc,
+}: {
+  title: string;
+  linkClickSrc: string;
+  importTriggerSrc: string;
+}) => (
   <a
     target="_blank"
     rel="noreferrer"
     href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
-    onClick={() => trackCharlesSettingsImportDocsClicked(analyticEventSource)}
+    onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
   >
     {title}
   </a>
 );
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, analyticEventSource = "" }) => {
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, triggeredBy }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -179,13 +187,22 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
                 (isParsedRulesExist ? (
                   <div className="text-sm text-dark-gray">
                     Other settings are not supported.{" "}
-                    <CharlesDocsLink title="Learn more" analyticEventSource={analyticEventSource} />
+                    <CharlesDocsLink
+                      title="Learn more"
+                      linkClickSrc="some_settings_unsupported_screen"
+                      importTriggerSrc={triggeredBy}
+                    />
                   </div>
                 ) : (
                   <div className="text-center title mt-16" style={{ fontWeight: "normal" }}>
                     Uploaded settings are not supported. <br />
                     Learn more about supported setting types{" "}
-                    <CharlesDocsLink title="here" analyticEventSource={analyticEventSource} />.
+                    <CharlesDocsLink
+                      title="here"
+                      linkClickSrc="all_settings_unsupported_screen"
+                      importTriggerSrc={triggeredBy}
+                    />
+                    .
                   </div>
                 ))}
             </div>
@@ -225,6 +242,12 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, a
               title="Drag and drop your Charles export file"
             />
           )}
+        </div>
+
+        <div className="text-center title mt-16">
+          {" "}
+          To export your rules from Charles,{" "}
+          <CharlesDocsLink title="Follow these steps" linkClickSrc="upload_screen" importTriggerSrc={triggeredBy} />
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Spin, Row } from "antd";
-import { CloseCircleOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Col, Row } from "antd";
+import { CloseCircleOutlined } from "@ant-design/icons";
 import isEmpty from "is-empty";
 //SUB COMPONENTS
 import SharedListViewerTableContainer from "../SharedListViewerTableContainer";
@@ -18,6 +18,7 @@ import "./sharedListViewerIndexPage.css";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
+import PageLoader from "components/misc/PageLoader";
 
 const SharedListViewerIndexPage = () => {
   //Global State
@@ -83,16 +84,10 @@ const SharedListViewerIndexPage = () => {
     stableUpdateCollection();
   }, [stableUpdateCollection]);
 
-  const loaderIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
   return (
     <React.Fragment>
       {isDataLoading ? (
-        <Row type="flex" align="middle" justify="center">
-          <Col>
-            <Spin indicator={loaderIcon} />
-          </Col>
-        </Row>
+        <PageLoader message="Loading shared list..." />
       ) : sharedListPresent && !isEmpty(rulesFromSharedList) ? (
         <SharedListViewerTableContainer id={sharedListId} rules={rulesFromSharedList} groups={groupsFromSharedList} />
       ) : (

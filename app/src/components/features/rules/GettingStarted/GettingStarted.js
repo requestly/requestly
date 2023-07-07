@@ -198,13 +198,13 @@ const GettingStarted = () => {
       {/* {shouldShowPersonaRecommendations && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <PersonaRecommendation isUserLoggedIn={isUserLoggedIn} handleUploadRulesClick={handleUploadRulesClick} />
       ) : (
-       
+
      )}  */}
       {isImportCharlesRulesModalActive ? (
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}
           toggle={toggleImportCharlesRulesModal}
-          analyticEventSource={AUTH.SOURCE.GETTING_STARTED}
+          triggeredBy={AUTH.SOURCE.GETTING_STARTED}
         />
       ) : null}
 
