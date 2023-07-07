@@ -199,8 +199,9 @@ export const formatRegexSource = (regexStr) => {
   }
 };
 
-export const fixRuleRegexSourceFormat = (dispatch, rule) => {
+export function runMinorFixesOnRule(dispatch, rule) {
   const rulePairs = rule.pairs.map((pair) => {
+    // fix regex
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
       if (!isRegexFormat(pair.source.value)) {
         return {
@@ -212,7 +213,14 @@ export const fixRuleRegexSourceFormat = (dispatch, rule) => {
         };
       }
     }
-    return pair;
+    // trim white space from source value
+    return {
+      ...pair,
+      source: {
+        ...pair.source,
+        value: pair.source?.value?.trim(),
+      },
+    };
   });
 
   const fixedRule = {
@@ -223,4 +231,4 @@ export const fixRuleRegexSourceFormat = (dispatch, rule) => {
   setCurrentlySelectedRule(dispatch, fixedRule);
 
   return fixedRule;
-};
+}
