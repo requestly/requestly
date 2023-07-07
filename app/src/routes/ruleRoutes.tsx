@@ -3,12 +3,13 @@ import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
 import RulesIndexView from "views/features/rules/RulesIndexView";
-import SharedListsIndexView from "views/features/sharedLists/SharedListsIndexView";
-import TrashIndexView from "views/features/trash/TrashIndexView";
+import SharedListsIndexPage from "components/features/sharedLists/SharedListsIndexPage";
+import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
-import SharedListViewer from "views/features/sharedLists/SharedListViewer";
+import SharedListViewerIndexPage from "components/features/sharedLists/SharedListViewerIndexPage";
 import { joinPaths } from "utils/PathUtils";
-import SharedListImportView from "views/features/sharedLists/SharedListImportView";
+import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -34,11 +35,11 @@ export const ruleRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SHARED_LISTS.RELATIVE,
-        element: <SharedListsIndexView />,
+        element: <SharedListsIndexPage />,
       },
       {
         path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
-        element: <SharedListViewer />,
+        element: <SharedListViewerIndexPage />,
       },
       {
         path: PATHS.SHARED_LISTS.VIEWER.RELATIVE, // currently broken in prod
@@ -46,7 +47,7 @@ export const ruleRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE, // for desktop app
-        element: <SharedListImportView />,
+        element: <ProtectedRoute component={ImportSharedListIndexPage} />,
       },
       {
         path: PATHS.RULES.TEMPLATES.RELATIVE,
@@ -54,7 +55,7 @@ export const ruleRoutes: RouteObject[] = [
       },
       {
         path: PATHS.RULES.TRASH.RELATIVE,
-        element: <TrashIndexView />,
+        element: <TrashIndexPage />,
       },
     ],
   },

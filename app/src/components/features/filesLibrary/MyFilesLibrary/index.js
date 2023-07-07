@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import isEmpty from "is-empty";
 //SUB COMPONENTS
-import FilesLibView from "../FilesLibraryTableContainer/myFilesLibraryView";
+import FilesLibView from "../FilesLibraryTableContainer/MyFilesView";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import GetStartedWithFiles from "../GetStartedWithFiles";
 //ACTIONS

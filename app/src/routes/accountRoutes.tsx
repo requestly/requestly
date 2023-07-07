@@ -1,24 +1,25 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import MyTeamsView from "views/user/Account/Teams/MyTeams";
+import MyTeams from "components/user/AccountIndexPage/ManageAccount/ManageTeams/MyTeams";
 import CreateWorkspace from "components/user/Teams/CreateWorkspace";
 import PersonalSubscription from "components/user/AccountIndexPage/ManageAccount/PersonalSubscription";
-import UpdateSubscriptionContactUsView from "views/misc/payments/UpdateSubscriptionContactUs";
-import RefreshSubscriptionView from "views/misc/payments/RefreshSubscription";
-import UpdatePaymentMethodView from "views/misc/payments/UpdatePaymentMethod";
-import Backup from "views/user/Backup";
-import Account from "components/user/AccountIndexPage";
-import TeamViewerIndex from "views/user/Account/Teams/TeamViewerIndex";
+import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
+import RefreshSubscription from "components/payments/RefreshSubscription";
+import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
+import BackupPage from "components/user/BackupPage";
+import ManageAccount from "components/user/AccountIndexPage/ManageAccount";
+import TeamViewer from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer";
 import APP_CONSTANTS from "config/constants";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const accountRoutes: RouteObject[] = [
   {
     path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
-    element: <MyTeamsView />,
+    element: <ProtectedRoute component={MyTeams} />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.RELATIVE + "/:teamId",
-    element: <TeamViewerIndex />,
+    element: <ProtectedRoute component={TeamViewer} />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
@@ -34,7 +35,7 @@ export const accountRoutes: RouteObject[] = [
   },
   {
     path: PATHS.ACCOUNT.UPDATE_SUBSCRIPTION.RELATIVE,
-    element: <UpdateSubscriptionContactUsView />,
+    element: <ProtectedRoute component={UpdateSubscriptionContactUs} />,
   },
   {
     path: PATHS.ACCOUNT.UPDATE_SUBSCRIPTION_CONTACT_US.RELATIVE,
@@ -42,11 +43,11 @@ export const accountRoutes: RouteObject[] = [
   },
   {
     path: PATHS.ACCOUNT.UPDATE_PAYMENT_METHOD.RELATIVE,
-    element: <UpdatePaymentMethodView />,
+    element: <ProtectedRoute component={UpdatePaymentMethod} />,
   },
   {
     path: PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.RELATIVE,
-    element: <RefreshSubscriptionView />,
+    element: <ProtectedRoute component={RefreshSubscription} />,
   },
   {
     path: PATHS.ACCOUNT.CHECKOUT.RELATIVE,
@@ -58,11 +59,17 @@ export const accountRoutes: RouteObject[] = [
   },
   {
     path: PATHS.ACCOUNT.MY_ACCOUNT.RELATIVE,
-    element: <Account />,
+    element: <ProtectedRoute component={ManageAccount} />,
   },
   {
     path: PATHS.ACCOUNT.MY_BACKUPS.RELATIVE,
-    element: <Backup />,
+    element: (
+      <ProtectedRoute
+        premiumRequired
+        component={BackupPage}
+        premiumMessage="Get Requestly Premium to auto backup your data at periodic intervals so that you don't ever lose them while switching devices."
+      />
+    ),
   },
   {
     path: PATHS.ACCOUNT.RELATIVE,

@@ -32,7 +32,7 @@ export const trackEvent = (name, params, config) => {
 };
 
 export const trackAttr = (name, value) => {
-  if (!name || !value) return;
+  if (!name || value == null) return;
   if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 

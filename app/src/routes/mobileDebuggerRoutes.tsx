@@ -1,23 +1,24 @@
 import { RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import MobileDebuggerDashboardView from "views/features/mobileDebugger";
-import MobileDebuggerHomeView from "views/features/mobileDebugger/home";
-import MobileDebuggerInterceptorView from "views/features/mobileDebugger/features/interceptor";
+import MobileDebuggerDashboard from "components/features/mobileDebugger";
+import MobileDebuggerHome from "components/features/mobileDebugger/screens/home";
+import MobileDebuggerInterceptor from "components/features/mobileDebugger/features/interceptor";
 import MobileDebuggerUnauthorized from "components/features/mobileDebugger/screens/unauthorized";
-import MobileDebuggerCreateApp from "views/features/mobileDebugger/createApp";
+import MobileDebuggerCreateApp from "components/features/mobileDebugger/screens/createApp";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const mobileDebuggerRoutes: RouteObject[] = [
   {
     path: PATHS.MOBILE_DEBUGGER.RELATIVE,
-    element: <MobileDebuggerDashboardView />,
+    element: <MobileDebuggerDashboard />,
   },
   {
     path: PATHS.MOBILE_DEBUGGER.HOME.RELATIVE,
-    element: <MobileDebuggerHomeView />,
+    element: <ProtectedRoute component={MobileDebuggerHome} />,
   },
   {
     path: PATHS.MOBILE_DEBUGGER.INTERCEPTOR.RELATIVE,
-    element: <MobileDebuggerInterceptorView />,
+    element: <ProtectedRoute component={MobileDebuggerInterceptor} />,
   },
   {
     path: PATHS.MOBILE_DEBUGGER.UNAUTHORIZED.RELATIVE,
@@ -25,6 +26,6 @@ export const mobileDebuggerRoutes: RouteObject[] = [
   },
   {
     path: PATHS.MOBILE_DEBUGGER.NEW.RELATIVE,
-    element: <MobileDebuggerCreateApp />,
+    element: <ProtectedRoute component={MobileDebuggerCreateApp} />,
   },
 ];
