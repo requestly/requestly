@@ -99,8 +99,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     setIsCheckPassed(result.destination === "");
     if (result.destination === "") {
       if (result.extraInfo.length) setMatchedGroups(result.extraInfo);
-      else setMatchedGroups([]);
-    }
+    } else setMatchedGroups([]);
   };
 
   const debouncedHandleTestURL = useDebounce(handleTestURL);
