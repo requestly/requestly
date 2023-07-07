@@ -12,8 +12,9 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { trackOnboardingWorkspaceSkip, trackWorkspaceInviteAccepted } from "modules/analytics/events/common/teams";
+import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
 import { OnboardingSteps } from "../../types";
+import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -33,7 +34,14 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully accepted invite");
-          trackWorkspaceInviteAccepted("onboarding", team.name);
+          trackWorkspaceInviteAccepted(
+            team.teamId,
+            team.teamName,
+            team.inviteId,
+            "onboarding",
+            res?.data?.data?.invite?.usage,
+            res?.data?.data?.invite?.metadata?.teamAccessCount
+          );
 
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
