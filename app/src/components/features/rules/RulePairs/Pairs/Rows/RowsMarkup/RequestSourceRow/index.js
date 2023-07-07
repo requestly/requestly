@@ -134,7 +134,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           }}
           source={pair.source}
           onSave={updateSourceFromTestURLModal}
-          analyticsContext={currentlySelectedRuleConfig.TYPE}
+          analyticsContext={{ rule_type: currentlySelectedRuleConfig.TYPE }}
         />
       )}
 
