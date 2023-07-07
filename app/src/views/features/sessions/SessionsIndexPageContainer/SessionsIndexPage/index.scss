@@ -10,13 +10,13 @@
   }
 
   .onboarding-banner {
-    margin-left: 8rem;
-    margin-right: 8rem;
-    margin-top: 5rem;
+    margin-left: 128px;
+    margin-right: 128px;
+    margin-top: 80px;
 
     .banner-header {
       width: 100%;
-      margin-bottom: 0.5rem;
+      margin-bottom: 14px;
 
       .banner-title {
         font-size: 1.8rem;
@@ -30,14 +30,14 @@
         font-size: 1rem;
       }
       .banner-message {
-        padding-top: 1.2rem;
+        padding-top: 20px;
       }
       .banner-description {
-        margin-bottom: 4rem;
+        margin-bottom: 55px;
       }
 
       .record-label {
-        margin-bottom: 0.5em;
+        margin-bottom: 8px;
       }
 
       .input-container {
@@ -47,7 +47,7 @@
       }
 
       .start-btn-container {
-        padding-left: 0.7rem;
+        padding-left: 12px;
         text-align: center;
         align-items: middle;
 
@@ -72,20 +72,6 @@
           display: flex;
           justify-content: center;
         }
-      }
-    }
-  }
-  .onboarding-footer {
-    .divider {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-
-      display: flex;
-      justify-content: center;
-      width: 100%;
-
-      div {
-        width: 220px;
       }
     }
   }
