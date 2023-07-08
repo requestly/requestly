@@ -33,3 +33,12 @@ div.members-email-input > input {
 .access-dropdown-container {
   margin: -10px 0px 4px 0px;
 }
+
+.empty-message {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 1rem;
+}
