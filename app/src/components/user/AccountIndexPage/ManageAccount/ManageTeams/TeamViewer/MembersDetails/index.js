@@ -79,7 +79,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
 
   return (
     <div className="members-details-container">
-      <PublicInviteLink teamId={teamId} />
+      {isTeamAdmin ? <PublicInviteLink teamId={teamId} /> : null}
 
       {/* members table */}
       <Row justify="space-between" align="bottom">
