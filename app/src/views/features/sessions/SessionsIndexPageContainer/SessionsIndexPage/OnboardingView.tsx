@@ -237,8 +237,10 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
 
   return (
     <div className="onboarding-content-container">
-      <Row justify="end" align="middle" className="settings-btn" onClick={handleSettingsNavigation}>
-        <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+      <Row justify="end" align="middle" className="settings-row">
+        <span onClick={handleSettingsNavigation} className="settings-btn">
+          <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+        </span>
       </Row>
       <Row justify="space-between" className="onboarding-banner">
         <Col span={12} className="banner-text-container">
