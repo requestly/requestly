@@ -7,7 +7,7 @@
   border-right: 1px solid var(--border-dark);
 }
 
-.primary-sidebar-container > a:last-child {
+.primary-sidebar-container > button:last-child {
   margin-bottom: 0;
   cursor: pointer;
   border-top: 1px solid var(--border-dark);
@@ -29,7 +29,7 @@
   flex-grow: 1;
 }
 
-.primary-sidebar-link {
+.primary-sidebar-container .primary-sidebar-link {
   padding: 8px 4px;
   min-height: 4.5rem;
   margin-bottom: 2px;
@@ -38,14 +38,10 @@
   flex-direction: column;
   justify-content: center;
   row-gap: 8px;
-
+  color: var(--text-dark-gray);
   --border-transparent: 2px solid transparent;
   border-left: var(--border-transparent);
   border-right: var(--border-transparent);
-}
-
-.primary-sidebar-link {
-  color: var(--text-dark-gray);
 }
 
 .primary-sidebar-link:hover,

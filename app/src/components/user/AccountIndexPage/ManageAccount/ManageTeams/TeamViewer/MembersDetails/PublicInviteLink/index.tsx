@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Col, Row, Input, Divider, Typography, Switch, Space } from "antd";
-import { getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
 //Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
-
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { toast } from "utils/Toast";
 import { getUserAuthDetails } from "store/selectors";
-// import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
 import "./index.css";
 import {
   trackWorkspaceInviteLinkGenerated,
@@ -32,9 +29,7 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState(false);
 
   // Global state
-  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
   const user = useSelector(getUserAuthDetails);
-  const isCurrentUserAdmin = currentTeamMembers[user?.details?.profile?.uid]?.isAdmin === true;
 
   const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
@@ -118,20 +113,11 @@ const PublicInviteLink: React.FC<Props> = ({ teamId }) => {
     stableFetchPublicInviteLink();
   }, [stableFetchPublicInviteLink]);
 
-  if (!isCurrentUserAdmin) {
-    return null;
-  }
-
   return (
     <>
       {publicInviteLoading ? null : (
         <Row>
           <Col span={24}>
-            {/* <LearnMoreAboutWorkspace
-              linkText="Learn about adding members to your
-              workspace"
-            /> */}
-
             <Row align="middle" justify="space-between">
               <Col className="title">Public Invite link</Col>
               <Col className="ml-auto">
