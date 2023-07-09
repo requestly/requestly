@@ -130,7 +130,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           isOpen={isTestURLModalVisible}
           onClose={(operator) => {
             setIsTestURLModalVisible(false);
-            trackURLConditionModalClosed(currentlySelectedRuleConfig.TYPE, operator);
+            trackURLConditionModalClosed(operator, { rule_type: currentlySelectedRuleConfig.TYPE });
           }}
           source={pair.source}
           onSave={updateSourceFromTestURLModal}

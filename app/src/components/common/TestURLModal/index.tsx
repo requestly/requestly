@@ -42,15 +42,15 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
     ) {
       return (
         <div className="group-match-wrapper">
-          {matchedGroups.map((group, index) => (
-            <span>
-              {group.length ? (
-                <>
-                  <span className="text-bold">${index + 1}</span> = {group}
-                </>
-              ) : null}
-            </span>
-          ))}
+          {matchedGroups.map(
+            (group, index) =>
+              index !== 0 && (
+                <span key={index}>
+                  <span className="text-bold">${index}</span> ={" "}
+                  <Typography.Text code>{group.length ? group : '""'}</Typography.Text>
+                </span>
+              )
+          )}
         </div>
       );
     }
@@ -95,18 +95,25 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   }, [testURL, isCheckPassed, updatedSource.value, updatedSource.operator]);
 
   const handleTestURL = () => {
-    const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(updatedSource, testURL, null);
-    setIsCheckPassed(result.destination === "");
-    if (result.destination === "") {
-      if (result.extraInfo.length) setMatchedGroups(result.extraInfo);
-    } else setMatchedGroups([]);
+    try {
+      const result = RULE_PROCESSOR.RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(updatedSource, testURL, testURL);
+      if (result?.destination?.length) {
+        setIsCheckPassed(true);
+        if (result?.matches?.length) setMatchedGroups(result.matches);
+      } else {
+        setMatchedGroups([]);
+        setIsCheckPassed(false);
+      }
+    } catch {
+      return;
+    }
   };
 
   const debouncedHandleTestURL = useDebounce(handleTestURL);
 
   const handleSourceConfigChange = (updatedSource: Source) => {
     if (!isSourceModified) {
-      trackURLConditionSourceModified(analyticsContext, updatedSource.operator);
+      trackURLConditionSourceModified(updatedSource.operator, analyticsContext);
       setIsSourceModified(true);
     }
     setUpdatedSource(updatedSource);
@@ -115,7 +122,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
 
   const handleTestURLChange = (value: string) => {
     if (!isTestURLTried) {
-      trackURLConditionMatchingTried(analyticsContext, updatedSource.operator);
+      trackURLConditionMatchingTried(updatedSource.operator, analyticsContext);
       setIsTestURLTried(true);
     }
     setTestURL(value);
@@ -123,7 +130,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   };
 
   useEffect(() => {
-    trackURLConditionModalViewed(analyticsContext, source.operator);
+    trackURLConditionModalViewed(source.operator, analyticsContext);
   }, [analyticsContext, source.operator]);
 
   return (
@@ -165,7 +172,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
           <div className="text-bold white">Result</div>
           <div className="mt-1 text-gray">
             <Row align="middle">{renderResult()}</Row>
-            {matchedGroups.length > 0 && renderMatchedGroups()}
+            {matchedGroups.length && testURL.length ? renderMatchedGroups() : null}
           </div>
         </div>
       </div>
@@ -182,7 +189,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
               onClick={() => {
                 onSave(updatedSource);
                 onClose(updatedSource.operator);
-                trackURLConditionSourceModificationSaved(analyticsContext, updatedSource.operator);
+                trackURLConditionSourceModificationSaved(updatedSource.operator, analyticsContext);
               }}
             >
               Save and close

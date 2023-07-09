@@ -1,4 +1,4 @@
-import { extractUrlComponent, toRegex, traverseJsonByPath, getMatchedGroups } from "../../utils";
+import { extractUrlComponent, toRegex, traverseJsonByPath } from "../../utils";
 import { PREDEFINED_FUNCTIONS, PATTERNS } from "./predefinedFunctions";
 import CONSTANTS from "../../constants";
 
@@ -24,7 +24,7 @@ class RuleMatcher {
       finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
 
-    return finalString;
+    return { destination: finalString, matches };
   }
 
   /**
@@ -108,12 +108,16 @@ class RuleMatcher {
 
     for (var index = 0; index < blackListedDomains.length; index++) {
       if (url.indexOf(blackListedDomains[index]) !== -1) {
-        return null;
+        return { destination: null };
       }
     }
     const result = RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
-    const matchedGroups = getMatchedGroups(value, operator, url);
-    return { destination: result, extraInfo: matchedGroups };
+    if (result) {
+      if (typeof result === "string") return { destination: result };
+      else return { destination: result.destination, matches: result.matches };
+    } else {
+      return { destination: null };
+    }
   }
 
   // Destination Url is not present in all rule types (e.g. Cancel, QueryParam)
