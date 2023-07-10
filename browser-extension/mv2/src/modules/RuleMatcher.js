@@ -125,6 +125,9 @@ RuleMatcher.matchUrlWithPageSource = function (sourceObject, url) {
   var operator = sourceObject.operator,
     urlComponent = RQ.Utils.extractUrlComponent(url, sourceObject.key),
     value = sourceObject.value;
+  isActive = sourceObject.isActive ?? true;
+
+  if (!isActive) return null;
 
   return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, null);
 };

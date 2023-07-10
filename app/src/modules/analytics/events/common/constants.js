@@ -164,7 +164,6 @@ export const TEAMS = {
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
   ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
-  WORKSPACE_INVITE_ACCEPTED: "workspace_invite_accepted",
 };
 
 export const TRAFFIC_TABLE = {

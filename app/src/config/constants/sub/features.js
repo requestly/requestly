@@ -43,6 +43,7 @@ FEATURES.REDIRECT_RULE_DEMO_VIDEO_IN_EDITOR = "redirect-rule-tutorial-video-in-e
 FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
+
 // MARKETING
 FEATURES.INTERCEPTOR = {};
 FEATURES.INTERCEPTOR.INTERCEPTOR_LAUNCH = "interceptor-launch";
@@ -64,5 +65,8 @@ FEATURES.PERSONA_SURVEY = "persona-survey";
 FEATURES.NETWORK_SESSIONS = "network-sessions";
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
+
+// session recording
+FEATURES.SESSION_ONBOARDING = "session_onboarding";
 
 export default FEATURES;

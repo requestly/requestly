@@ -43,6 +43,11 @@ const extractUrlComponent = (url: string, key: SourceKey): string => {
 export const matchSourceUrl = (sourceObject: UrlSource, url: string): boolean => {
   const urlComponent = extractUrlComponent(url, sourceObject.key);
   const value = sourceObject.value;
+  const isActive = sourceObject.isActive ?? true;
+
+  if (!isActive) {
+    return false;
+  }
 
   if (!urlComponent) {
     return false;

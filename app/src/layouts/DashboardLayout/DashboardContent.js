@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useSearchParams, useNavigate, useRoutes } from "react-router-dom";
+import { useLocation, useSearchParams, useRoutes } from "react-router-dom";
 import { routes } from "routes";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
-import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import {
   getActiveModals,
-  getAppMode,
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getIsWorkspaceOnboardingCompleted,
@@ -25,11 +22,12 @@ import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sourc
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-const { PATHS } = APP_CONSTANTS;
+import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
+import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
+import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 
 const DashboardContent = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
@@ -37,7 +35,6 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
@@ -75,12 +72,6 @@ const DashboardContent = () => {
   };
 
   const prevProps = usePrevious({ location });
-
-  useEffect(() => {
-    if (PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
-    }
-  }, [appMode, location, navigate]);
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
@@ -141,7 +132,6 @@ const DashboardContent = () => {
       {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
         <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
       ) : null}
-
       {appOnboardingExp === "workspace_onboarding" &&
       !isWorkspaceOnboardingCompleted &&
       !userPersona.isSurveyCompleted ? (
@@ -149,6 +139,27 @@ const DashboardContent = () => {
           isOpen={activeModals.workspaceOnboardingModal.isActive}
           handleUploadRulesModalClick={toggleImportRulesModal}
           toggle={toggleWorkspaceOnboardingModal}
+        />
+      ) : null}
+      {activeModals.createWorkspaceModal.isActive ? (
+        <CreateWorkspaceModal
+          isOpen={activeModals.createWorkspaceModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+          {...activeModals.createWorkspaceModal.props}
+        />
+      ) : null}
+      {activeModals.inviteMembersModal.isActive ? (
+        <AddMemberModal
+          isOpen={activeModals.inviteMembersModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
+          {...activeModals.inviteMembersModal.props}
+        />
+      ) : null}
+      {activeModals.switchWorkspaceModal.isActive ? (
+        <SwitchWorkspaceModal
+          isOpen={activeModals.switchWorkspaceModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+          {...activeModals.switchWorkspaceModal.props}
         />
       ) : null}
 

@@ -3,11 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { StorageService } from "../../../../../init";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { getAppMode, getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "../../../../../store/selectors";
 import firebaseApp from "../../../../../firebase";
 import {
   getFirestore,
@@ -20,17 +18,15 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { filterUniqueObjects } from "utils/FormattingHelper";
-import { trackConfigurationOpened } from "modules/analytics/events/features/sessionRecording";
 import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
 import OnboardingView from "./OnboardingView";
 import { actions } from "../../../../../store";
-import CreateSessionGuide from "./CreateFirstSessionGuide";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import Logger from "lib/logger";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
+import PageLoader from "components/misc/PageLoader";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -50,10 +46,8 @@ const SessionsIndexPage = () => {
     return prevVal !== val;
   };
 
-  // Global State
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -63,9 +57,8 @@ const SessionsIndexPage = () => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sharingRecordId, setSharingRecordId] = useState("");
   const [selectedRowVisibility, setSelectedRowVisibility] = useState("");
-  const [config, setConfig] = useState({});
   const [sessionRecordings, setSessionRecordings] = useState([]);
-  const [isTableLoading, setIsTableLoading] = useState(true);
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [qs, setQs] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
 
@@ -143,21 +136,15 @@ const SessionsIndexPage = () => {
     }
 
     navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE);
-    trackConfigurationOpened();
   }, [dispatch, navigate, user?.loggedIn]);
 
   const ConfigureButton = () => (
-    <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
-      Settings
-    </Button>
+    <>
+      <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
+        Settings
+      </Button>
+    </>
   );
-
-  useEffect(() => {
-    Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
-      .then((savedConfig) => setConfig(savedConfig || {}));
-  }, [appMode]);
 
   useEffect(() => {
     if (user?.details?.profile?.uid) {
@@ -179,73 +166,71 @@ const SessionsIndexPage = () => {
     }
   }, [filteredRecordings?.length, isWorkspaceMode]);
 
-  return user?.loggedIn ? (
-    filteredRecordings?.length ? (
-      <>
-        <ProtectedRoute
-          component={() => (
-            <>
-              <RecordingsList
-                isTableLoading={isTableLoading}
-                filteredRecordings={filteredRecordings}
-                setSharingRecordId={setSharingRecordId}
-                setSelectedRowVisibility={setSelectedRowVisibility}
-                setIsShareModalVisible={setIsShareModalVisible}
-                fetchRecordings={fetchRecordings}
-                ConfigureButton={ConfigureButton}
-                callbackOnDeleteSuccess={() => {
-                  setSessionRecordings([]);
-                  setReachedEnd(false);
-                  fetchRecordings(null);
-                }}
-                _renderTableFooter={filteredRecordings.length > pageSize}
-                TableFooter={() => (
-                  <>
-                    {
-                      <center>
-                        {reachedEnd ? (
-                          <span>- End of all recordings -</span>
-                        ) : (
-                          <Button
-                            onClick={(e) => {
-                              fetchRecordings(qs.docs[qs.docs.length - 1]);
-                            }}
-                            type="link"
-                          >
-                            View Past Recordings
-                          </Button>
-                        )}
-                      </center>
-                    }
-                  </>
-                )}
-              />
-            </>
-          )}
-        />
-        {isShareModalVisible ? (
-          <ShareRecordingModal
-            isVisible={isShareModalVisible}
-            setVisible={setIsShareModalVisible}
-            recordingId={sharingRecordId}
-            currentVisibility={selectedRowVisibility}
-            onVisibilityChange={(newVisibility) => {
-              // Update local table
-              const foundIndex = sessionRecordings.findIndex((recording) => recording.id === sharingRecordId);
+  if (isTableLoading) {
+    return <PageLoader message="Loading sessions..." />;
+  }
 
-              const recordings = _.cloneDeep(sessionRecordings);
-              recordings[foundIndex].visibility = newVisibility;
-              setSelectedRowVisibility(newVisibility);
-              setSessionRecordings(recordings);
-            }}
-          />
-        ) : null}
-      </>
-    ) : config.pageSources?.length ? (
-      <CreateSessionGuide redirectToSettingsPage={redirectToSettingsPage} />
-    ) : (
-      <OnboardingView redirectToSettingsPage={redirectToSettingsPage} />
-    )
+  return user?.loggedIn && filteredRecordings?.length ? (
+    <>
+      <ProtectedRoute
+        component={() => (
+          <>
+            <RecordingsList
+              isTableLoading={isTableLoading}
+              filteredRecordings={filteredRecordings}
+              setSharingRecordId={setSharingRecordId}
+              setSelectedRowVisibility={setSelectedRowVisibility}
+              setIsShareModalVisible={setIsShareModalVisible}
+              fetchRecordings={fetchRecordings}
+              ConfigureButton={ConfigureButton}
+              callbackOnDeleteSuccess={() => {
+                setSessionRecordings([]);
+                setReachedEnd(false);
+                fetchRecordings(null);
+              }}
+              _renderTableFooter={filteredRecordings.length > pageSize}
+              TableFooter={() => (
+                <>
+                  {
+                    <center>
+                      {reachedEnd ? (
+                        <span>- End of all recordings -</span>
+                      ) : (
+                        <Button
+                          onClick={(e) => {
+                            fetchRecordings(qs.docs[qs.docs.length - 1]);
+                          }}
+                          type="link"
+                        >
+                          View Past Recordings
+                        </Button>
+                      )}
+                    </center>
+                  }
+                </>
+              )}
+            />
+          </>
+        )}
+      />
+      {isShareModalVisible ? (
+        <ShareRecordingModal
+          isVisible={isShareModalVisible}
+          setVisible={setIsShareModalVisible}
+          recordingId={sharingRecordId}
+          currentVisibility={selectedRowVisibility}
+          onVisibilityChange={(newVisibility) => {
+            // Update local table
+            const foundIndex = sessionRecordings.findIndex((recording) => recording.id === sharingRecordId);
+
+            const recordings = _.cloneDeep(sessionRecordings);
+            recordings[foundIndex].visibility = newVisibility;
+            setSelectedRowVisibility(newVisibility);
+            setSessionRecordings(recordings);
+          }}
+        />
+      ) : null}
+    </>
   ) : (
     <OnboardingView redirectToSettingsPage={redirectToSettingsPage} />
   );

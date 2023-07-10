@@ -43,22 +43,6 @@ button.ant-input-search-button {
   display: inline-block;
 }
 
-.ml-1 {
-  margin-left: calc(var(--space) * 1);
-}
-
-.ml-2 {
-  margin-left: calc(var(--space) * 2);
-}
-
-.ml-3 {
-  margin-left: calc(var(--space) * 3);
-}
-
-.ml-4 {
-  margin-left: calc(var(--space) * 4);
-}
-
 /* spinner & skeleton */
 .spinner-card {
   padding: 24px;
