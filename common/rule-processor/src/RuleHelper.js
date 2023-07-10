@@ -111,9 +111,7 @@ class RuleMatcher {
         return { destination: null };
       }
     }
-    const result = RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
-    if (result) return result;
-    else return { destination: null };
+    return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
   }
 
   // Destination Url is not present in all rule types (e.g. Cancel, QueryParam)
