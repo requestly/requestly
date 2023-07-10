@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.6.28",
+  "version": "23.7.10",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,
@@ -22,7 +22,7 @@
     "test": "grunt test",
     "start:firefox": "web-ext run -s dist",
     "release": "sh scripts/release-extension.sh",
-    "release:firefox": "sh scripts/release-firefox-extension.sh",
+    "release:firefox": "sh scripts/release-firefox-extension.sh && sh scripts/publish-firefox-extension.sh",
     "createReleaseBuild": "BUILD_MODE='production' npm run build && node scripts/createReleaseBuild"
   },
   "devDependencies": {
