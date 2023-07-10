@@ -105,7 +105,8 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         setIsCheckPassed(false);
       }
     } catch {
-      return;
+      setMatchedGroups([]);
+      setIsCheckPassed(false);
     }
   };
 

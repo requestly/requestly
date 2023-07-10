@@ -24,7 +24,7 @@ class RuleMatcher {
       finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
 
-    return { destination: finalString, matches };
+    return finalString;
   }
 
   /**
@@ -44,7 +44,7 @@ class RuleMatcher {
     }
 
     matches = regex.exec(inputString) || [];
-    return RuleMatcher.populateMatchesInString(finalString, matches);
+    return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
   /**
@@ -83,7 +83,7 @@ class RuleMatcher {
       inputString = inputString.slice(positionInInput + substr.length);
     }
 
-    return RuleMatcher.populateMatchesInString(finalString, matches);
+    return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
   /**
@@ -112,12 +112,8 @@ class RuleMatcher {
       }
     }
     const result = RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
-    if (result) {
-      if (typeof result === "string") return { destination: result };
-      else return { destination: result.destination, matches: result.matches };
-    } else {
-      return { destination: null };
-    }
+    if (result) return result;
+    else return { destination: null };
   }
 
   // Destination Url is not present in all rule types (e.g. Cancel, QueryParam)
@@ -129,13 +125,13 @@ class RuleMatcher {
     switch (operator) {
       case CONSTANTS.RULE_OPERATORS.EQUALS:
         if (value === urlComponent) {
-          return resultingUrl;
+          return { destination: resultingUrl };
         }
         break;
 
       case CONSTANTS.RULE_OPERATORS.CONTAINS:
         if (urlComponent.indexOf(value) !== -1) {
-          return resultingUrl;
+          return { destination: resultingUrl };
         }
         break;
 
@@ -148,7 +144,7 @@ class RuleMatcher {
       }
     }
 
-    return null;
+    return { destination: null };
   }
 
   /**
@@ -263,7 +259,7 @@ class RuleMatcher {
       pageUrlFilter = [pageUrlFilter];
     }
     return pageUrlFilter.every((urlFilter) => {
-      return RuleMatcher.matchUrlCriteria(pageUrl, urlFilter.operator, urlFilter.value) !== null;
+      return RuleMatcher.matchUrlCriteria(pageUrl, urlFilter.operator, urlFilter.value)?.destination !== null;
     });
   }
 
