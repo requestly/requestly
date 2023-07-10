@@ -23,7 +23,7 @@ class RuleMatcher {
       // Replace all $index values in destinationUrl with the matched groups
       finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
-
+    console.log({ finalString });
     return finalString;
   }
 
@@ -40,7 +40,7 @@ class RuleMatcher {
 
     // Do not match when regex is invalid or regex does not match with Url
     if (!regex || inputString.search(regex) === -1) {
-      return null;
+      return { destination: null, matches: [] };
     }
 
     matches = regex.exec(inputString) || [];
@@ -73,7 +73,7 @@ class RuleMatcher {
       positionInInput = inputString.indexOf(substr);
 
       if (positionInInput === -1) {
-        return null;
+        return { destination: null, matches: [] };
       } else if (positionInInput === 0) {
         matches.push("");
       } else {
@@ -111,6 +111,7 @@ class RuleMatcher {
         return { destination: null };
       }
     }
+    console.log(RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination));
     return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
   }
 
