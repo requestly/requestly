@@ -21,6 +21,4 @@ cp $XPI_FILE ../../builds/requestly-firefox-v$VERSION.xpi
 rm -rf web-ext-artifacts
 cd ../..
 
-./publish-firefox-extension.sh
-
-echo "INFO: Requestly firefox release process complete."
+echo "INFO: Requestly firefox release build created."
