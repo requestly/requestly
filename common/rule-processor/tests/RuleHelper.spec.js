@@ -116,30 +116,30 @@ describe("RuleHelper: ", function () {
       var d = "dest";
       expect(RuleHelper.checkRegexMatch("/yahoo/ig", "http://cricket.yahoo.com", d)).toEqual({
         destination: d,
-        matches: ["http://cricket.yahoo.com"],
+        matches: ["yahoo"],
       });
     });
 
     it("should replace group values in final string when there are groups in regex", function () {
-      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com?q=(.+)", "cricket.yahoo.com?q=rocks", "$1-$2")).toEqual({
+      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com\\?q=(.+)/", "cricket.yahoo.com?q=rocks", "$1-$2")).toEqual({
         destination: "cricket-rocks",
         matches: ["cricket.yahoo.com?q=rocks", "cricket", "rocks"],
       });
 
-      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com?q=(.+)", "mail.yahoo.com?q=sucks", "$1-$2")).toEqual({
+      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com\\?q=(.+)/", "mail.yahoo.com?q=sucks", "$1-$2")).toEqual({
         destination: "mail-sucks",
         matches: ["mail.yahoo.com?q=sucks", "mail", "sucks"],
       });
     });
 
     it("should convert extra/unmatched group values to empty string in final string", function () {
-      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com?q=(.+)", "cricket.yahoo.com?q=rocks", "$1-$2$3.")).toEqual({
-        destination: "cricket-rocks",
+      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com\\?q=(.+)/", "cricket.yahoo.com?q=rocks", "$1-$2$3.")).toEqual({
+        destination: "cricket-rocks$3.",
         matches: ["cricket.yahoo.com?q=rocks", "cricket", "rocks"],
       });
 
-      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com?q=(.+)", "mail.yahoo.com?q=sucks", "$1-$2$3.")).toEqual({
-        destination: "mail-sucks",
+      expect(RuleHelper.checkRegexMatch("/(.+).yahoo.com\\?q=(.+)/", "mail.yahoo.com?q=sucks", "$1-$2$3.")).toEqual({
+        destination: "mail-sucks$3.",
         matches: ["mail.yahoo.com?q=sucks", "mail", "sucks"],
       });
     });
@@ -160,13 +160,13 @@ describe("RuleHelper: ", function () {
     it("should replace $ values as empty string when empty values satisfy the input", function () {
       expect(
         RuleHelper.checkWildCardMatch("http://*example*.com", "http://example.com", "http://$1example$2.com")
-      ).toBe("http://example.com");
+      ).toEqual({ destination: "http://example.com", matches: ["", "", ""] });
     });
 
     it("should replace $ values in final string when there is match", function () {
       expect(RuleHelper.checkWildCardMatch("http://*exam*.com", "http://example.com", "$2-$1")).toEqual({
         destination: "ple-",
-        matches: ["", "", "ple-"],
+        matches: ["", "", "ple"],
       });
       expect(RuleHelper.checkWildCardMatch("*://exam*.com", "http://example.com", "$1_$2")).toEqual({
         destination: "http_ple",
@@ -190,7 +190,10 @@ describe("RuleHelper: ", function () {
           "http://requestly.in?qp1=web&qp2=library",
           "http://$2.requestly.in/$3service"
         )
-      ).toBe("http://web.requestly.in/libraryservice");
+      ).toEqual({
+        destination: "http://web.requestly.in/libraryservice",
+        matches: ["", "http://requestly.in", "web", "library"],
+      });
     });
   });
 

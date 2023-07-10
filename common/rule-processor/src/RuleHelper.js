@@ -42,7 +42,7 @@ class RuleMatcher {
       return { destination: null, matches: [] };
     }
 
-    matches = regex.exec(inputString) || [];
+    matches = regex.exec(inputString).map((match) => match) || [];
     return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
