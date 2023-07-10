@@ -63,7 +63,7 @@ const SessionsSettingsPage: React.FC = () => {
     } else if (source.operator === SourceOperator.WILDCARD_MATCHES) {
       return `${upperCasedSourceKey} matches wildcard: ${source.value}`;
     } else {
-      return `${upperCasedSourceKey} ${source.operator.toLocaleLowerCase()}: ${source.value}`;
+      return `${upperCasedSourceKey} ${source.operator.toLowerCase()}: ${source.value}`;
     }
   }, []);
 
