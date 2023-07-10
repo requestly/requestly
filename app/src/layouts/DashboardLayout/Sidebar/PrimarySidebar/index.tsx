@@ -12,12 +12,12 @@ import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
 import FEATURES from "config/constants/sub/features";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import "./PrimarySidebar.css";
+import InviteButton from "./InviteButton";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
@@ -105,7 +105,7 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
 
-      <PrimarySidebarLink title="Invite" icon={<InviteIcon />} path={PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE} />
+      <InviteButton />
     </div>
   );
 };

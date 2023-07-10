@@ -112,8 +112,8 @@
     "reactstrap": "9.0.1",
     "redux-deep-persist": "^1.0.6",
     "redux-persist": "^6.0.0",
-    "rrweb": "2.0.0-alpha.5",
-    "rrweb-player": "2.0.0-alpha.5",
+    "rrweb": "2.0.0-alpha.9",
+    "rrweb-player": "2.0.0-alpha.9",
     "semver": "^7.3.5",
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
@@ -128,7 +128,7 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.12.1",
+    "@requestly/web-sdk": "0.12.2",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
