@@ -92,14 +92,18 @@ export const validateRule = (rule, dispatch, appMode) => {
   //Headers Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
     if (rule.version > 1) {
-      rule.pairs.forEach((pair) => {
+      rule.pairs.every((pair, index) => {
         if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
-            message: `Please add atleast one modification to the rule.`,
+            message:
+              index > 0
+                ? `One of the rule conditions is empty. Please add some header modification to the condition.`
+                : `Please add atleast one modification to the rule.`,
             error: "missing modification",
           };
         }
+
         // Iterate over request headers
         pair.modifications.Request?.forEach((modification) => {
           //Header name shouldn't be empty
@@ -139,6 +143,12 @@ export const validateRule = (rule, dispatch, appMode) => {
             };
           }
         });
+
+        if (output?.result === false) {
+          return false;
+        } else {
+          return true;
+        }
       });
     } else {
       rule.pairs.forEach((pair) => {
