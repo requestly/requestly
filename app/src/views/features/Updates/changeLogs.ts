@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.7.10",
+    logs: [
+      {
+        title: "Improved user experience of Session Recording",
+      },
+    ],
+  },
+  {
     version: "23.6.23",
     logs: [
       {
