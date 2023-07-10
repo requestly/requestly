@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { CheckCircleOutlined } from "@ant-design/icons";
@@ -23,6 +23,7 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
   const [sharedListData, setSharedListData] = useState("");
   const [sharedListCreationDone, setSharedListCreationDone] = useState(false);
   const [nonRQUserEmails, setNonRQUserEmails] = useState([]);
+  const isSharedListShared = useRef(false);
 
   const user = useSelector(getUserAuthDetails);
   const attributes = useMemo(() => sharedListAttributes, [sharedListAttributes]);
@@ -45,7 +46,6 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     trackRQLastActivity("sharedList_notify_button_clicked");
     const functions = getFunctions();
     const sendSharedListShareEmail = httpsCallable(functions, "sendSharedListShareEmail");
-
     sendSharedListShareEmail({
       sharedListData: sharedListData,
       recipientEmails: attributes.sharedListRecipients,
@@ -109,19 +109,26 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     modalTriggerPage,
     modalTriggerSource,
     rulesCount,
-    attributes,
     stablePostCreationSteps,
     sharedListAccessType,
     user.details.profile,
+    attributes.appMode,
+    attributes.rulesToShare,
+    attributes.sharedListName,
+    attributes.groupwiseRulesToPopulate,
+    attributes.sharedListVisibility,
+    attributes.sharedListRecipients,
   ]);
 
   useEffect(() => {
     if (
+      !isSharedListShared.current &&
       sharedListCreationDone &&
       attributes.sharedListVisibility === "custom" &&
       attributes.sharedListRecipients.length
     ) {
       shareSharedList();
+      isSharedListShared.current = true;
     }
 
     if (sharedListCreationDone && sharedListPublicURL.includes("null")) {

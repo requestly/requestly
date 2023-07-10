@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Col, Row, Radio, Tag, Space, Tooltip } from "antd";
 import { Modal } from "antd";
@@ -104,10 +104,10 @@ const CreateSharedListModal = (props) => {
     return specialCharacters.test(sharedListName);
   };
 
-  const handlePostSharedListCreation = (url) => {
+  const handlePostSharedListCreation = useCallback((url) => {
     setIsSharedListCreated(true);
     setSharedListURL(url);
-  };
+  }, []);
 
   const getPrettyDescription = (visibility) => {
     switch (visibility) {
