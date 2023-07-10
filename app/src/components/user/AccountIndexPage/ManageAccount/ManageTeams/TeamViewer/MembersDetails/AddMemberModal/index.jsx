@@ -89,7 +89,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
 
   useEffect(() => {
     setShowLoader(true);
-    const getIsTeamAdmin = httpsCallable(functions, "isTeamAdmin");
+    const getIsTeamAdmin = httpsCallable(functions, "teams-isTeamAdmin");
     getIsTeamAdmin({
       teamId,
     })
