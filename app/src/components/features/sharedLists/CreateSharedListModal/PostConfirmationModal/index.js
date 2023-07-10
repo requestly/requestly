@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { CheckCircleOutlined } from "@ant-design/icons";
@@ -25,9 +25,10 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
   const [nonRQUserEmails, setNonRQUserEmails] = useState([]);
 
   const user = useSelector(getUserAuthDetails);
-  const rulesCount = sharedListAttributes.rulesCount;
+  const attributes = useMemo(() => sharedListAttributes, [sharedListAttributes]);
+  const rulesCount = attributes.rulesCount;
   const sharedListAccessType =
-    Visibility.PUBLIC === sharedListAttributes.sharedListVisibility ? "public_link" : "specific_people";
+    Visibility.PUBLIC === attributes.sharedListVisibility ? "public_link" : "specific_people";
 
   let modalTriggerPage,
     modalTriggerSource = "";
@@ -39,12 +40,6 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     modalTriggerPage = "editor";
   }
 
-  const renderLoader = () => (
-    <>
-      <SpinnerColumn />
-    </>
-  );
-
   const shareSharedList = useCallback(() => {
     trackSharedListNotifyClicked();
     trackRQLastActivity("sharedList_notify_button_clicked");
@@ -53,11 +48,11 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
 
     sendSharedListShareEmail({
       sharedListData: sharedListData,
-      recipientEmails: sharedListAttributes.sharedListRecipients,
+      recipientEmails: attributes.sharedListRecipients,
     }).catch((err) => {
       toast.error("Opps! Couldn't send the notification");
     });
-  }, [sharedListAttributes.sharedListRecipients, sharedListData]);
+  }, [attributes.sharedListRecipients, sharedListData]);
 
   const postCreationSteps = ({
     sharedListId,
@@ -86,12 +81,12 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     if (!createdSharedListId) {
       try {
         createSharedList(
-          sharedListAttributes.appMode,
-          sharedListAttributes.rulesToShare,
-          sharedListAttributes.sharedListName,
-          sharedListAttributes.groupwiseRulesToPopulate,
-          sharedListAttributes.sharedListVisibility,
-          sharedListAttributes.sharedListRecipients,
+          attributes.appMode,
+          attributes.rulesToShare,
+          attributes.sharedListName,
+          attributes.groupwiseRulesToPopulate,
+          attributes.sharedListVisibility,
+          attributes.sharedListRecipients,
           user.details.profile.uid
         ).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }) => {
           stablePostCreationSteps({
@@ -114,7 +109,7 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     modalTriggerPage,
     modalTriggerSource,
     rulesCount,
-    sharedListAttributes,
+    attributes,
     stablePostCreationSteps,
     sharedListAccessType,
     user.details.profile,
@@ -123,8 +118,8 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
   useEffect(() => {
     if (
       sharedListCreationDone &&
-      sharedListAttributes.sharedListVisibility === "custom" &&
-      sharedListAttributes.sharedListRecipients.length
+      attributes.sharedListVisibility === "custom" &&
+      attributes.sharedListRecipients.length
     ) {
       shareSharedList();
     }
@@ -134,10 +129,18 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
         url: sharedListPublicURL,
         message: "Sharelist URL contains 'null'",
         uid: user?.details?.profile?.uid,
-        rulesToShare: sharedListAttributes.rulesToShare,
+        rulesToShare: attributes.rulesToShare,
       });
     }
-  }, [shareSharedList, sharedListAttributes, sharedListCreationDone, sharedListPublicURL, user?.details?.profile?.uid]);
+  }, [
+    shareSharedList,
+    attributes.rulesToShare,
+    attributes.sharedListVisibility,
+    attributes.sharedListRecipients,
+    sharedListCreationDone,
+    sharedListPublicURL,
+    user?.details?.profile?.uid,
+  ]);
 
   return (
     <div>
@@ -191,7 +194,7 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
           ) : null}
         </div>
       ) : (
-        renderLoader()
+        <SpinnerColumn />
       )}
     </div>
   );
