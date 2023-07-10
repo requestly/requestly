@@ -42,7 +42,8 @@ class RuleMatcher {
       return { destination: null, matches: [] };
     }
 
-    matches = regex.exec(inputString).map((match) => match) || [];
+    //extract all the matches from regex.exec results
+    matches = regex.exec(inputString)?.map((match) => match) || [];
     return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
