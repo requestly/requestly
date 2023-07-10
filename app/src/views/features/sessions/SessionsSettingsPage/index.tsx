@@ -59,11 +59,11 @@ const SessionsSettingsPage: React.FC = () => {
     const upperCasedSourceKey = source.key.toUpperCase();
 
     if (source.operator === SourceOperator.MATCHES) {
-      return `${upperCasedSourceKey} matches regex ${source.value}`;
+      return `${upperCasedSourceKey} matches regex: ${source.value}`;
     } else if (source.operator === SourceOperator.WILDCARD_MATCHES) {
-      return `${upperCasedSourceKey} matches wildcard ${source.value}`;
+      return `${upperCasedSourceKey} matches wildcard: ${source.value}`;
     } else {
-      return `${upperCasedSourceKey} ${source.operator.toLocaleLowerCase()} ${source.value}`;
+      return `${upperCasedSourceKey} ${source.operator.toLocaleLowerCase()}: ${source.value}`;
     }
   }, []);
 
