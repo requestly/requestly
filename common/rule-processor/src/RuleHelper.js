@@ -23,7 +23,6 @@ class RuleMatcher {
       // Replace all $index values in destinationUrl with the matched groups
       finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
-    console.log({ finalString });
     return finalString;
   }
 
@@ -111,7 +110,6 @@ class RuleMatcher {
         return { destination: null };
       }
     }
-    console.log(RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination));
     return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
   }
 
