@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import { Modal, Space, Tag, Tooltip, Typography } from "antd";
@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecordingModal";
 import { deleteRecording } from "../../../api";
-import TutorialButton from "../TutorialButton";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
@@ -205,11 +204,6 @@ const RecordingsList = ({
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
               Session Recordings
             </Typography.Title>
-            <TutorialButton type="link" style={{ padding: 10 }}>
-              <Tooltip title="See how the feature works" placement="right">
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </TutorialButton>
           </>
         }
         footer={_renderTableFooter ? () => <TableFooter /> : null}
