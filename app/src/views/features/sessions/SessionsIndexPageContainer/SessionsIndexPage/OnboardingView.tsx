@@ -302,7 +302,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
   );
 };
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL);
+  const shownNewOnboarding = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
