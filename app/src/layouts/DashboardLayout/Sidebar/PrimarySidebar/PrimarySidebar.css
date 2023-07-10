@@ -44,14 +44,14 @@
   border-right: var(--border-transparent);
 }
 
-.primary-sidebar-link:hover,
-.primary-sidebar-active-link {
+.primary-sidebar-container .primary-sidebar-link:hover,
+.primary-sidebar-container .primary-sidebar-active-link {
   cursor: pointer;
   color: var(--white);
   background-color: var(--gray-dark);
 }
 
-.primary-sidebar-active-link {
+.primary-sidebar-container .primary-sidebar-active-link {
   border-left: 2px solid var(--primary);
 }
 
