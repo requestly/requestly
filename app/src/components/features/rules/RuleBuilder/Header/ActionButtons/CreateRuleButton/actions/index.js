@@ -96,13 +96,12 @@ export const validateRule = (rule, dispatch, appMode) => {
         if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
-            message: `Please add atleast one modification to the rule.`,
+            message:
+              index > 0
+                ? `One of the rule conditions is empty. Please add some header modification to the condition.`
+                : `Please add atleast one modification to the rule.`,
             error: "missing modification",
           };
-
-          if (index > 0) {
-            output.message = `One of the rule conditions is empty. Please add some header modification to the rule condition.`;
-          }
         }
 
         // Iterate over request headers
