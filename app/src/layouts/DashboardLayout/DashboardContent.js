@@ -25,7 +25,6 @@ import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
-const { PATHS } = APP_CONSTANTS;
 
 const DashboardContent = () => {
   const location = useLocation();
