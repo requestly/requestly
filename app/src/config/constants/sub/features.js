@@ -44,8 +44,6 @@ FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
 
-FEATURES.RECORD_SESSION_ON_URL = "record_session_on_url";
-
 // MARKETING
 FEATURES.INTERCEPTOR = {};
 FEATURES.INTERCEPTOR.INTERCEPTOR_LAUNCH = "interceptor-launch";
@@ -69,6 +67,6 @@ FEATURES.NETWORK_SESSIONS = "network-sessions";
 FEATURES.API_CLIENT = "api-client";
 
 // session recording
-FEATURES.SESSION_RECORDING_SETTINGS_PAGE = "session_recording_settings_page";
+FEATURES.SESSION_ONBOARDING = "session_onboarding";
 
 export default FEATURES;
