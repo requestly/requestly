@@ -29,7 +29,7 @@ import {
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
-import { fixRuleRegexSourceFormat } from "utils/rules/misc";
+import { runMinorFixesOnRule } from "utils/rules/misc";
 import "../RuleEditorActionButtons.css";
 
 // This is also the save rule button
@@ -66,8 +66,8 @@ const CreateRuleButton = ({
     const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
-    //Pre-validation regex fix
-    const fixedRuleData = fixRuleRegexSourceFormat(dispatch, currentlySelectedRuleData);
+    //Pre-validation: regex fix + trim whitespaces
+    const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Validation
     const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
     if (ruleValidation.result) {

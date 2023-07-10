@@ -24,7 +24,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import RuleSimulatorModal from "components/features/rules/RuleSimulatorModal";
 import { trackSimulateRulesEvent } from "modules/analytics/events/features/ruleSimulator";
-import { fixRuleRegexSourceFormat } from "utils/rules/misc";
+import { runMinorFixesOnRule } from "utils/rules/misc";
 
 const STEP_TYPES = {
   REDIRECT: "redirect",
@@ -75,10 +75,10 @@ const RuleSimulator = () => {
     const ruleProcessor = RULE_PROCESSOR.getInstance(rule.ruleType);
     let simulatedUrl;
 
-    const regexValidatedRule = fixRuleRegexSourceFormat(dispatch, rule);
+    const finalRuleData = runMinorFixesOnRule(dispatch, rule);
 
     simulatedUrl = ruleProcessor.process({
-      rule: cloneDeep(regexValidatedRule),
+      rule: cloneDeep(finalRuleData),
       requestURL,
       originalHeaders: [],
       typeOfHeaders: "Request",
