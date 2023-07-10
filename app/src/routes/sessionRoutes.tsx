@@ -9,7 +9,7 @@ import SessionsSettingsPage from "views/features/sessions/SessionsSettingsPage";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
-const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_RECORDING_SETTINGS_PAGE);
+const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
 export const sessionRoutes: RouteObject[] = [
   {
