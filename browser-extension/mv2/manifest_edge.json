@@ -25,7 +25,7 @@
   "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://ssl.google-analytics.com; object-src 'self'",
 
   "background": {
-    "scripts": ["generated/background/background-bundled.js", "libs/customElements.js", "resources/images/128x128.png"]
+    "scripts": ["generated/background/background-bundled.js"]
   },
 
   "browser_action": {
@@ -34,7 +34,7 @@
     "default_popup": "popup/popup.html"
   },
 
-  "web_accessible_resources": ["libs/requestly-web-sdk.js"],
+  "web_accessible_resources": ["libs/requestly-web-sdk.js", "libs/customElements.js", "resources/images/128x128.png"],
 
   "icons": {
     "16": "resources/images/16x16.png",
