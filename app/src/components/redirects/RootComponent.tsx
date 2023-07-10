@@ -10,7 +10,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
  * @description On initial render depending upon the app mode, this component will redirect
  * the root route ie "/" to the rules page or network traffic page.
  */
-const NavigateToAppModesRootRoute: React.FC = () => {
+const RootComponent: React.FC = () => {
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
@@ -20,4 +20,4 @@ const NavigateToAppModesRootRoute: React.FC = () => {
   );
 };
 
-export default NavigateToAppModesRootRoute;
+export default RootComponent;
