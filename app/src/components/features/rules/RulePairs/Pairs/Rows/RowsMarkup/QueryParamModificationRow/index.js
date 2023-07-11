@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Dropdown, Menu } from "antd";
 import { ImCross } from "react-icons/im";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
+import { actions } from "store";
 
 const QueryParamModificationRow = ({
   rowIndex,
@@ -12,7 +14,8 @@ const QueryParamModificationRow = ({
   modificationIndex,
   isInputDisabled,
 }) => {
-  const { modifyPairAtGivenPath, deleteModification } = helperFunctions;
+  const dispatch = useDispatch();
+  const { deleteModification } = helperFunctions;
 
   const modificationTypeMenuItems = useMemo(
     () => [
@@ -32,8 +35,16 @@ const QueryParamModificationRow = ({
     []
   );
 
-  const handleModificationTypeClick = (event, type) =>
-    modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].type`, type);
+  const handleModificationTypeClick = (event, type) => {
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        event,
+        pairIndex,
+        objectPath: `modifications[${modificationIndex}].type`,
+        customValue: type,
+      })
+    );
+  };
 
   const modificationTypeMenu = (
     <Menu>
@@ -71,7 +82,16 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Name"
           type="text"
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].param`)}
+          onChange={(event) => {
+            event?.preventDefault?.();
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                event,
+                pairIndex,
+                objectPath: `modifications[${modificationIndex}].param`,
+              })
+            );
+          }}
           value={modification.param}
           disabled={isInputDisabled ? true : modification.type === "Remove All" ? true : false}
           data-selectionid="query-param-name"
@@ -83,7 +103,16 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Value"
           type="text"
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].value`)}
+          onChange={(event) => {
+            event?.preventDefault?.();
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                event,
+                pairIndex,
+                objectPath: `modifications[${modificationIndex}].value`,
+              })
+            );
+          }}
           value={modification.value}
           disabled={isInputDisabled ? true : modification.type === "Add" ? false : true}
           data-selectionid="query-param-value"
