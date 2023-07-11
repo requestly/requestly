@@ -3,9 +3,18 @@ const CracoLessPlugin = require("craco-less");
 const { getThemeVariables } = require("antd/dist/theme");
 const { theme } = require("./src/lib/design-system/theme");
 const webpack = require("webpack");
+const CracoEsbuildPlugin = require("craco-esbuild");
 
 module.exports = {
   plugins: [
+    {
+      plugin: CracoEsbuildPlugin,
+      options: {
+        esbuildMinimizerOptions: {
+          target: "es2015",
+        },
+      },
+    },
     {
       plugin: CracoLessPlugin,
       options: {
