@@ -53,7 +53,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
 
     setIsLoading(true);
     const functions = getFunctions();
-    const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
+    const updateTeamUserRole = httpsCallable(functions, "teams-updateTeamUserRole");
 
     updateTeamUserRole({
       teamId: teamId,

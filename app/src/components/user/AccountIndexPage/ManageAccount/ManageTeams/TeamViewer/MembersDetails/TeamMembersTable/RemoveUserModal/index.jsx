@@ -16,7 +16,7 @@ const RemoveUserModal = ({ isOpen, toggleModal, userId, teamId, callbackOnSucces
   const removeUserFromTeam = () => {
     setShowLoader(true);
     const functions = getFunctions();
-    const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
+    const updateTeamUserRole = httpsCallable(functions, "teams-updateTeamUserRole");
 
     if (isUserRemovingHimself) window.hasUserRemovedHimselfRecently = true;
 
