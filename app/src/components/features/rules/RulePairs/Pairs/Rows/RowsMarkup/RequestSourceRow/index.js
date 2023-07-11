@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography } from "antd";
 import { FaFilter } from "react-icons/fa";
@@ -22,8 +23,9 @@ import "./RequestSourceRow.css";
 const { Text } = Typography;
 
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { modifyPairAtGivenPath, openFilterModal, getFilterCount, generatePlaceholderText } = helperFunctions;
+  const { openFilterModal, getFilterCount, generatePlaceholderText } = helperFunctions;
 
+  const dispatch = useDispatch();
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [isTestURLClicked, setIsTestURLClicked] = useState(false);
@@ -77,6 +79,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     []
   );
 
+  const updatePair = useCallback((payload) => {});
+
   const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
@@ -84,7 +88,14 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           <Menu.Item
             key={id}
             onClick={(event) => {
-              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS, ruleKey);
+              dispatch(
+                actions.updateRulePairAtGivenPath({
+                  event,
+                  pairIndex,
+                  objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
+                  customValue: ruleKey,
+                })
+              );
             }}
           >
             {title}
@@ -92,7 +103,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         ))}
       </Menu>
     );
-  }, [sourceKeys, modifyPairAtGivenPath, pairIndex]);
+  }, [sourceKeys, pairIndex]);
 
   const renderSourceOperators = useMemo(() => {
     return (
@@ -101,7 +112,14 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           <Menu.Item
             key={id}
             onClick={(event) => {
-              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS, ruleOperator);
+              dispatch(
+                actions.updateRulePairAtGivenPath({
+                  event,
+                  pairIndex,
+                  objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
+                  customValue: ruleOperator,
+                })
+              );
             }}
           >
             {title}
@@ -109,11 +127,18 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         ))}
       </Menu>
     );
-  }, [sourceOperators, modifyPairAtGivenPath, pairIndex]);
+  }, [sourceOperators, pairIndex]);
 
   const updateSourceFromTestURLModal = (newSource) => {
     const updatedSource = { ...pair.source, ...newSource };
-    modifyPairAtGivenPath(null, pairIndex, "source", updatedSource);
+
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        objectPath: APP_CONSTANTS.PATH_FROM_PAIR.SOURCE,
+        customValue: updatedSource,
+      })
+    );
   };
 
   const shouldStartTestURLRippleEffect = useCallback(() => {
@@ -193,7 +218,16 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
                   : generatePlaceholderText(pair.source.operator, "source-value", pair.source.key)
               }
               type="text"
-              onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "source.value")}
+              onChange={(event) => {
+                event?.preventDefault?.();
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    event,
+                    pairIndex,
+                    objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_VALUE,
+                  })
+                );
+              }}
               className="rules-pair-input"
               value={pair.source.value}
               disabled={isInputDisabled}
