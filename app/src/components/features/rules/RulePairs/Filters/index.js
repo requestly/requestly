@@ -175,14 +175,14 @@ const Filters = (props) => {
         })
       );
     },
-    [dispatch, pairIndex]
+    [dispatch]
   );
 
   const updateSourceRequestPayload = useCallback(
     (event, pairIndex, path) => {
       dispatch(actions.updateRulePairAtGivenPath({ event, pairIndex, objectPath: path }));
     },
-    [dispatch, pairIndex]
+    [dispatch]
   );
 
   const urlOperatorOptions = (

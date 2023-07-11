@@ -79,8 +79,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
     []
   );
 
-  const updatePair = useCallback((payload) => {});
-
   const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
@@ -103,7 +101,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         ))}
       </Menu>
     );
-  }, [sourceKeys, pairIndex]);
+  }, [dispatch, sourceKeys, pairIndex]);
 
   const renderSourceOperators = useMemo(() => {
     return (
@@ -127,7 +125,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
         ))}
       </Menu>
     );
-  }, [sourceOperators, pairIndex]);
+  }, [dispatch, sourceOperators, pairIndex]);
 
   const updateSourceFromTestURLModal = (newSource) => {
     const updatedSource = { ...pair.source, ...newSource };
