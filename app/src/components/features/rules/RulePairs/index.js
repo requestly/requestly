@@ -1,30 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Tooltip } from "antd";
-//Sub Components
 import Filters from "./Filters";
-// Pair markups of all rule types
-import RedirectRulePair from "./Pairs/RedirectRulePair";
-import CancelRulePair from "./Pairs/CancelRulePair";
-import HeadersRulePair from "./Pairs/HeadersRulePair";
-import ReplaceRulePair from "./Pairs/ReplaceRulePair";
-import QueryParamRulePair from "./Pairs/QueryParamRulePair";
-import ScriptRulePair from "./Pairs/ScriptRulePair";
-import ResponseRulePair from "./Pairs/ResponseRulePair";
-import UserAgentRulePair from "./Pairs/UserAgentRulePair";
-import DelayRulePair from "./Pairs/DelayRulePair";
-import RequestRulePair from "./Pairs/RequestRulePair";
-//ACTIONS
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
-//EXTERNALS
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-//UTILITIES
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import { FaTrash } from "react-icons/fa";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } from "./utils";
+import { rulePairComponents } from "./Pairs";
 import "./RulePairs.css";
 
 const set = require("lodash/set");
@@ -103,111 +88,16 @@ const RulePairs = (props) => {
       deleteArrayValueByIndexInPair: deleteArrayValueByIndexInPair,
     };
 
-    switch (props.currentlySelectedRuleConfig.TYPE) {
-      case GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT:
-        return (
-          <RedirectRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.CANCEL:
-        return (
-          <CancelRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.REPLACE:
-        return (
-          <ReplaceRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.HEADERS:
-        return (
-          <HeadersRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.QUERYPARAM:
-        return (
-          <QueryParamRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
-        return (
-          <ScriptRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
-        return (
-          <ResponseRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
-        return (
-          <RequestRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT:
-        return (
-          <UserAgentRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
-      case GLOBAL_CONSTANTS.RULE_TYPES.DELAY:
-        return (
-          <DelayRulePair
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={props.currentlySelectedRuleConfig}
-            isInputDisabled={isInputDisabled}
-          />
-        );
+    const commonProps = {
+      pair: pair,
+      pairIndex: pairIndex,
+      helperFunctions: helperFunctions,
+      ruleDetails: props.currentlySelectedRuleConfig,
+      isInputDisabled: isInputDisabled,
+    };
 
-      default:
-        break;
-    }
+    const Component = rulePairComponents[props.currentlySelectedRuleConfig.TYPE];
+    return <Component {...commonProps} />;
   };
 
   const deletePair = (event, pairIndex) => {
