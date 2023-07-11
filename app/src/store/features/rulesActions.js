@@ -1,5 +1,7 @@
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { set } from "lodash";
 
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -87,4 +89,30 @@ export const updateRecord = (prevState, action) => {
   const ruleIndex = prevState.rules.allRules[recordType].findIndex((record) => record.id === action.payload.id);
 
   prevState.rules.allRules[recordType][ruleIndex] = action.payload;
+};
+
+// rule editor actions
+export const updateRulePairAtGivenPath = (prevState, action) => {
+  const {
+    event = null,
+    pairIndex,
+    objectPath,
+    customValue,
+    arrayOfOtherValuesToModify = [],
+    triggerUnsavedChangesIndication = true,
+  } = action.payload;
+
+  const newValue = customValue !== undefined ? customValue : event.target.value;
+
+  set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
+
+  if (arrayOfOtherValuesToModify.length) {
+    arrayOfOtherValuesToModify.forEach((modification) => {
+      set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], modification.path, modification.value);
+    });
+  }
+
+  if (triggerUnsavedChangesIndication) {
+    prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+  }
 };
