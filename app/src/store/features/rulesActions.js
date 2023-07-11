@@ -45,28 +45,8 @@ export const updateHardRefreshPendingStatus = (prevState, action) => {
     : !prevState["pendingHardRefresh"][action.payload.type];
 };
 
-// not used anywhere
-export const toggleSelectedRule = (prevState, action) => {
-  const currentValue = prevState.rules.selectedRules[action.payload.ruleId];
-
-  prevState.rules.selectedRules[action.payload.ruleId] = currentValue ? false : true;
-};
-
 export const updateSelectedRules = (prevState, action) => {
   prevState.rules.selectedRules = action.payload;
-};
-
-// not used anywhere
-export const updateSelectAllRulesOfAGroup = (prevState, action) => {
-  const groupId = action.payload.groupId;
-  const allRulesUnderThisGroup =
-    prevState["rules"]["groupwiseRulesToPopulate"][groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_RULES];
-  const newSelectedRulesObject = {};
-  allRulesUnderThisGroup.forEach((rule) => {
-    newSelectedRulesObject[rule.id] = action.payload.newValue;
-  });
-
-  Object.assign(prevState.rules.selectedRules, newSelectedRulesObject);
 };
 
 export const clearSelectedRules = (prevState) => {
@@ -95,19 +75,6 @@ export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
     data: false,
     hasUnsavedChanges: false,
   };
-};
-
-// not used anywhere
-export const selectAllRules = (prevState, action) => {
-  const { newValue } = action.payload;
-
-  const newSelectedRules = {};
-
-  prevState.rules.rulesToPopulate.forEach((rule) => {
-    newSelectedRules[rule.id] = newValue;
-  });
-
-  prevState.rules.selectedRules = newSelectedRules;
 };
 
 export const updateRecord = (prevState, action) => {
