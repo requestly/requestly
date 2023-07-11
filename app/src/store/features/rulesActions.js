@@ -125,3 +125,12 @@ export const removeRulePairByIndex = (prevState, action) => {
   prevState.rules.currentlySelectedRule.data.pairs?.splice(pairIndex, 1);
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };
+
+export const addValueInRulePairArray = (prevState, action) => {
+  const { pairIndex, arrayPath, value } = action.payload;
+
+  const targetArray = get(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath);
+  set(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
+
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+};

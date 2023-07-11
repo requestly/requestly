@@ -13,9 +13,6 @@ import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } f
 import { rulePairComponents } from "./Pairs";
 import "./RulePairs.css";
 
-const set = require("lodash/set");
-const get = require("lodash/get");
-
 const generatePlaceholderText = (operator, type, sourceKey = "") => {
   if (type === "source-value") {
     return sourceRuleOperatorPlaceholders[sourceKey]?.[operator];
@@ -42,7 +39,6 @@ const RulePairs = (props) => {
       generatePlaceholderText: generatePlaceholderText,
       openFilterModal: openFilterModal,
       getFilterCount: getFilterCount,
-      pushValueToArrayInPair: pushValueToArrayInPair,
     };
 
     const commonProps = {
@@ -87,14 +83,6 @@ const RulePairs = (props) => {
     return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
       ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).length
       : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).length;
-  };
-
-  const pushValueToArrayInPair = (event, pairIndex, arrayPath, value) => {
-    event && event.preventDefault();
-    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-    const targetArray = get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath);
-    set(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 
   if (currentlySelectedRuleData.pairs && currentlySelectedRuleData.pairs.length === 0) {

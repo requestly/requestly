@@ -15,7 +15,6 @@ const ModifyHeaderRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDi
         <HeadersRulePairV2
           pair={pair}
           pairIndex={pairIndex}
-          helperFunctions={helperFunctions}
           isInputDisabled={isInputDisabled}
           ruleDetails={ruleDetails}
         />

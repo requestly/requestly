@@ -24,21 +24,23 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
 
   const [hasUserClickedDeleteIconInThisSession, setHasUserClickedDeleteIconInThisSession] = useState(false);
 
-  const { pushValueToArrayInPair } = helperFunctions;
+  const addEmptyScript = useCallback(
+    (event) => {
+      event?.preventDefault?.();
 
-  const addEmptyScript = (event) => {
-    event && event.preventDefault();
-    pushValueToArrayInPair(event, pairIndex, "scripts", {
-      ...ruleDetails.EMPTY_SCRIPT_FORMAT,
-      id: generateObjectId(),
-    });
-  };
-
-  const stableAddEmptyScript = useCallback(addEmptyScript, [
-    pairIndex,
-    pushValueToArrayInPair,
-    ruleDetails.EMPTY_SCRIPT_FORMAT,
-  ]);
+      dispatch(
+        actions.addValueInRulePairArray({
+          pairIndex,
+          arrayPath: "scripts",
+          value: {
+            ...ruleDetails.EMPTY_SCRIPT_FORMAT,
+            id: generateObjectId(),
+          },
+        })
+      );
+    },
+    [dispatch, pairIndex, ruleDetails.EMPTY_SCRIPT_FORMAT]
+  );
 
   const deleteScript = (event, pairIndex, scriptIndex) => {
     event && event.preventDefault();
@@ -58,9 +60,9 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
   useEffect(() => {
     if (Array.isArray(pair.scripts) && pair.scripts.length === 0) {
       if (hasUserClickedDeleteIconInThisSession) return;
-      stableAddEmptyScript();
+      addEmptyScript();
     }
-  }, [stableAddEmptyScript, pair.scripts, hasUserClickedDeleteIconInThisSession]);
+  }, [addEmptyScript, pair.scripts, hasUserClickedDeleteIconInThisSession]);
 
   return (
     <React.Fragment>
@@ -96,7 +98,7 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
           isInputDisabled={isInputDisabled}
         />
       ))}
-      <AddCustomScriptRow helperFunctions={{ ...helperFunctions, addEmptyScript }} />
+      <AddCustomScriptRow addEmptyScript={addEmptyScript} />
       {isExtensionManifestVersion3() ? (
         <div className="csp-header-removal-notice">
           <Checkbox

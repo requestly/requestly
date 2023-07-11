@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Alert, Badge, Button, Card, Col, Row, Space, Tabs } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import HeadersPairModificationRowV2 from "./HeadersPairModificationRowV2";
@@ -7,16 +8,16 @@ import { EditOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
+import { actions } from "store";
 
-const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, ruleDetails }) => {
+const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
   };
 
   const [activeTab, setActiveTab] = useState("Request");
-
-  const { pushValueToArrayInPair } = helperFunctions;
 
   const getEmptyModification = (type = GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD) => {
     return {
@@ -27,7 +28,13 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
   };
 
   const addEmptyModification = (modificationType, type) => {
-    pushValueToArrayInPair(null, pairIndex, ["modifications", modificationType], stableGetEmptyModification(type));
+    dispatch(
+      actions.addValueInRulePairArray({
+        pairIndex,
+        arrayPath: ["modifications", modificationType],
+        value: stableGetEmptyModification(type),
+      })
+    );
   };
 
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
