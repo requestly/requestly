@@ -10,7 +10,6 @@ import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } from "./utils";
 import { rulePairComponents } from "./Pairs";
-import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import "./RulePairs.css";
 
 const set = require("lodash/set");
@@ -37,41 +36,8 @@ const RulePairs = (props) => {
   //Component State
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
 
-  /**
-   * Handles onChange event with side effects
-   * Here, path is relative to a pair
-   * @param {Object|null|undefined} event onClick/onChange Event
-   * @param {!number} pairIndex Index of array "pairs"
-   * @param {!string} objectPath Path of item which we want to modify
-   * @param {*} customValue If customValue is defined, use it instead of event target value
-   * @param {array|undefined} arrayOfOtherValuesToModify Do other side effect modifications. Ex: [{path: "path_here",value:"value_to_be_placed"}]
-   */
-  const modifyPairAtGivenPath = (
-    event,
-    pairIndex,
-    objectPath,
-    customValue,
-    arrayOfOtherValuesToModify,
-    triggerUnsavedChangesIndication = true
-  ) => {
-    event?.preventDefault?.();
-
-    const newValue = customValue !== undefined ? customValue : event.target.value;
-
-    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-    set(copyOfCurrentlySelectedRule.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
-    if (arrayOfOtherValuesToModify) {
-      arrayOfOtherValuesToModify.forEach((modification) => {
-        set(copyOfCurrentlySelectedRule.pairs[pairIndex], modification.path, modification.value);
-      });
-    }
-
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, triggerUnsavedChangesIndication);
-  };
-
   const getPairMarkup = (pair, pairIndex) => {
     const helperFunctions = {
-      modifyPairAtGivenPath: modifyPairAtGivenPath,
       generatePlaceholderText: generatePlaceholderText,
       openFilterModal: openFilterModal,
       deletePair: deletePair,
@@ -199,7 +165,6 @@ const RulePairs = (props) => {
             <Filters
               pairIndex={ruleFilterActiveWithPairIndex}
               closeModal={closeFilterModal}
-              modifyPairAtGivenPath={modifyPairAtGivenPath}
               isInputDisabled={isInputDisabled}
             />
           ) : null}
