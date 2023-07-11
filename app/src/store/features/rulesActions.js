@@ -119,3 +119,9 @@ export const removeValueInRulePairByIndex = (prevState, action) => {
   get(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], arrayPath).splice(index, 1);
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };
+
+export const removeRulePairByIndex = (prevState, action) => {
+  const { pairIndex } = action.payload;
+  prevState.rules.currentlySelectedRule.data.pairs?.splice(pairIndex, 1);
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+};

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Tooltip } from "antd";
 import Filters from "./Filters";
+import { actions } from "store";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
@@ -40,7 +41,6 @@ const RulePairs = (props) => {
     const helperFunctions = {
       generatePlaceholderText: generatePlaceholderText,
       openFilterModal: openFilterModal,
-      deletePair: deletePair,
       getFilterCount: getFilterCount,
       pushValueToArrayInPair: pushValueToArrayInPair,
     };
@@ -55,15 +55,6 @@ const RulePairs = (props) => {
 
     const Component = rulePairComponents[props.currentlySelectedRuleConfig.TYPE];
     return <Component {...commonProps} />;
-  };
-
-  const deletePair = (event, pairIndex) => {
-    event?.preventDefault();
-
-    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-
-    copyOfCurrentlySelectedRule.pairs.splice(pairIndex, 1);
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 
   const migrateToNewSourceFilterFormat = (pairIndex, copyOfCurrentlySelectedRule) => {
@@ -114,7 +105,10 @@ const RulePairs = (props) => {
     (props.currentlySelectedRuleConfig.TYPE === "Replace" && !isInputDisabled) ||
     (props.currentlySelectedRuleConfig.SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW && !isInputDisabled) ? (
       <Tooltip title="Remove Pair">
-        <FaTrash className="delete-pair-icon cursor-pointer text-gray" onClick={(e) => deletePair(e, pairIndex)} />
+        <FaTrash
+          className="delete-pair-icon cursor-pointer text-gray"
+          onClick={(e) => dispatch(actions.removeRulePairByIndex({ pairIndex }))}
+        />
       </Tooltip>
     ) : null;
 
