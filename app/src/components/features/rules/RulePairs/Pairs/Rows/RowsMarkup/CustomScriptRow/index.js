@@ -81,7 +81,11 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
               disabled={isInputDisabled}
               onChange={(event) =>
                 dispatch(
-                  actions.updateRulePairAtGivenPath({ event, pairIndex, objectPath: `scripts[${scriptIndex}].value` })
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    newValue: event?.target?.value,
+                    objectPath: `scripts[${scriptIndex}].value`,
+                  })
                 )
               }
               value={script.value}
@@ -203,8 +207,8 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const scriptTypeChangeHandler = (event, newScriptType) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
-        event,
         pairIndex,
+        newValue: event?.target?.value,
         objectPath: `scripts[${scriptIndex}].type`,
         customValue: newScriptType,
         arrayOfOtherValuesToModify: [
@@ -235,8 +239,8 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     (event, type) =>
       dispatch(
         actions.updateRulePairAtGivenPath({
-          event,
           pairIndex,
+          newValue: event?.target?.value,
           objectPath: `scripts[${scriptIndex}].loadTime`,
           customValue: type,
         })

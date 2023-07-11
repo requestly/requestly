@@ -20,8 +20,8 @@ const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           onChange={(event) =>
             dispatch(
               actions.updateRulePairAtGivenPath({
-                event,
                 pairIndex,
+                newValue: event?.target?.value,
                 objectPath: "delay",
               })
             )

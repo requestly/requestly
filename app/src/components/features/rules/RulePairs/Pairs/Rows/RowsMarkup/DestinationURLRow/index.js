@@ -81,8 +81,8 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
       ) {
         dispatch(
           actions.updateRulePairAtGivenPath({
-            event: { target: { value: "http://" + currentDestinationURL } },
             pairIndex,
+            newValue: "http://" + currentDestinationURL,
             objectPath: "destination",
           })
         );
@@ -150,8 +150,8 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
         onChange={(event) =>
           dispatch(
             actions.updateRulePairAtGivenPath({
-              event,
               pairIndex,
+              newValue: event?.target?.value,
               objectPath: "destination",
             })
           )

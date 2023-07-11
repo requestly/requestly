@@ -91,7 +91,7 @@ export const updateRecord = (prevState, action) => {
 // rule editor actions
 export const updateRulePairAtGivenPath = (prevState, action) => {
   const {
-    event,
+    newValue: value,
     pairIndex,
     objectPath,
     customValue,
@@ -99,7 +99,7 @@ export const updateRulePairAtGivenPath = (prevState, action) => {
     triggerUnsavedChangesIndication = true,
   } = action.payload;
 
-  const newValue = customValue !== undefined ? customValue : event?.target?.value;
+  const newValue = customValue !== undefined ? customValue : value;
 
   set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
 

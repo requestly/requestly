@@ -88,8 +88,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
             onClick={(event) => {
               dispatch(
                 actions.updateRulePairAtGivenPath({
-                  event,
                   pairIndex,
+                  newValue: event?.target?.value,
                   objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
                   customValue: ruleKey,
                 })
@@ -112,8 +112,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
             onClick={(event) => {
               dispatch(
                 actions.updateRulePairAtGivenPath({
-                  event,
                   pairIndex,
+                  newValue: event?.target?.value,
                   objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
                   customValue: ruleOperator,
                 })
@@ -220,8 +220,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
                 event?.preventDefault?.();
                 dispatch(
                   actions.updateRulePairAtGivenPath({
-                    event,
                     pairIndex,
+                    newValue: event?.target?.value,
                     objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_VALUE,
                   })
                 );

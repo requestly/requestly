@@ -45,8 +45,8 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
 
       dispatch(
         actions.updateRulePairAtGivenPath({
-          event,
           pairIndex,
+          newValue: event?.target?.value,
           objectPath: "envType",
           customValue: newValue,
           arrayOfOtherValuesToModify: extraModifications,
@@ -130,8 +130,8 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
             onChange={(event) =>
               dispatch(
                 actions.updateRulePairAtGivenPath({
-                  event,
                   pairIndex,
+                  newValue: event?.target?.value,
                   objectPath: "userAgent",
                 })
               )

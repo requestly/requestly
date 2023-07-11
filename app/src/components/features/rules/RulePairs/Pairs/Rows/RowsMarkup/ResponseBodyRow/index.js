@@ -197,8 +197,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
       dispatch(
         actions.updateRulePairAtGivenPath({
-          event,
           pairIndex,
+          newValue: event?.target?.value,
           objectPath: "response.serveWithoutRequest",
           customValue: flag,
         })

@@ -69,7 +69,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   const handleRequestPayloadKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(actions.updateRulePairAtGivenPath({ event: e, pairIndex, objectPath: SOURCE_REQUEST_PAYLOAD_KEY }));
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        newValue: e?.target?.value,
+        objectPath: SOURCE_REQUEST_PAYLOAD_KEY,
+      })
+    );
     const key = e.target.value;
 
     if (key === "" && gqlOperationFilter.value === "") {
@@ -84,7 +90,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   const handleRequestPayloadValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(actions.updateRulePairAtGivenPath({ event: e, pairIndex, objectPath: SOURCE_REQUEST_PAYLOAD_VALUE }));
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        newValue: e?.target?.value,
+        objectPath: SOURCE_REQUEST_PAYLOAD_VALUE,
+      })
+    );
     const value = e.target.value;
 
     if (value === "" && gqlOperationFilter.key === "") {
