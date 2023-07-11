@@ -9,7 +9,6 @@ import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
 
 const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, ruleDetails }) => {
-  //Utils
   const navigate = useNavigate();
   const navigateToTraffic = () => {
     redirectToTraffic(navigate);
@@ -17,7 +16,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
 
   const [activeTab, setActiveTab] = useState("Request");
 
-  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
+  const { pushValueToArrayInPair } = helperFunctions;
 
   const getEmptyModification = (type = GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD) => {
     return {
@@ -32,10 +31,6 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
   };
 
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
-
-  const deleteModification = (event, pairIndex, modificationIndex, modificationType) => {
-    deleteArrayValueByIndexInPair(event, pairIndex, ["modifications", modificationType], modificationIndex);
-  };
 
   useEffect(() => {
     if (!pair.modifications.Request?.length && pair.modifications.Response?.length) {
@@ -75,10 +70,6 @@ const HeadersRulePairV2 = ({ pair, pairIndex, helperFunctions, isInputDisabled, 
                     modificationIndex={modificationIndex}
                     pairIndex={pairIndex}
                     isInputDisabled={isInputDisabled}
-                    helperFunctions={{
-                      ...helperFunctions,
-                      deleteModification,
-                    }}
                     modificationType={modificationType}
                     key={modificationIndex}
                   />

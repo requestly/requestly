@@ -13,11 +13,9 @@ const HeadersPairModificationRowV2 = ({
   modificationIndex,
   pairIndex,
   isInputDisabled,
-  helperFunctions,
   modificationType,
 }) => {
   const dispatch = useDispatch();
-  const { deleteModification } = helperFunctions;
 
   const pairTypeMenuItems = useMemo(
     () => [
@@ -126,7 +124,16 @@ const HeadersPairModificationRowV2 = ({
           <ImCross
             id="delete-pair"
             className="text-gray cursor-pointer"
-            onClick={(e) => deleteModification(e, pairIndex, modificationIndex, modificationType)}
+            onClick={(event) => {
+              event?.preventDefault?.();
+              dispatch(
+                actions.removeRulePairValueByIndex({
+                  pairIndex,
+                  arrayPath: ["modifications", modificationType],
+                  index: modificationIndex,
+                })
+              );
+            }}
           />
         </Tooltip>
       </Col>

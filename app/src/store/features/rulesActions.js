@@ -1,6 +1,6 @@
 import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { set } from "lodash";
+import { get, set } from "lodash";
 
 export const updateLastBackupTimeStamp = (prevState, action) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
@@ -91,7 +91,7 @@ export const updateRecord = (prevState, action) => {
 // rule editor actions
 export const updateRulePairAtGivenPath = (prevState, action) => {
   const {
-    event = null,
+    event,
     pairIndex,
     objectPath,
     customValue,
@@ -99,7 +99,7 @@ export const updateRulePairAtGivenPath = (prevState, action) => {
     triggerUnsavedChangesIndication = true,
   } = action.payload;
 
-  const newValue = customValue !== undefined ? customValue : event.target.value;
+  const newValue = customValue !== undefined ? customValue : event?.target?.value;
 
   set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
 
@@ -112,4 +112,10 @@ export const updateRulePairAtGivenPath = (prevState, action) => {
   if (triggerUnsavedChangesIndication) {
     prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
   }
+};
+
+export const removeRulePairValueByIndex = (prevState, action) => {
+  const { pairIndex, arrayPath, index } = action.payload;
+  get(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], arrayPath).splice(index, 1);
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };

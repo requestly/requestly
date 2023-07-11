@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { actions } from "store";
 import "./styles.css";
 
 const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
@@ -23,7 +24,7 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
 
   const [hasUserClickedDeleteIconInThisSession, setHasUserClickedDeleteIconInThisSession] = useState(false);
 
-  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
+  const { pushValueToArrayInPair } = helperFunctions;
 
   const addEmptyScript = (event) => {
     event && event.preventDefault();
@@ -44,7 +45,13 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
 
     setHasUserClickedDeleteIconInThisSession(true);
 
-    deleteArrayValueByIndexInPair(event, pairIndex, "scripts", scriptIndex);
+    dispatch(
+      actions.removeRulePairValueByIndex({
+        pairIndex,
+        arrayPath: "scripts",
+        index: scriptIndex,
+      })
+    );
   };
 
   // Auto Populate Empty Code Script

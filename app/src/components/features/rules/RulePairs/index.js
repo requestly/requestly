@@ -43,7 +43,6 @@ const RulePairs = (props) => {
       deletePair: deletePair,
       getFilterCount: getFilterCount,
       pushValueToArrayInPair: pushValueToArrayInPair,
-      deleteArrayValueByIndexInPair: deleteArrayValueByIndexInPair,
     };
 
     const commonProps = {
@@ -104,13 +103,6 @@ const RulePairs = (props) => {
     const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
     const targetArray = get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath);
     set(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
-    setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
-  };
-
-  const deleteArrayValueByIndexInPair = (event, pairIndex, arrayPath, arrayIndex) => {
-    event && event.preventDefault();
-    const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-    get(copyOfCurrentlySelectedRule.pairs[pairIndex], arrayPath).splice(arrayIndex, 1);
     setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule, true);
   };
 

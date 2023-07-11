@@ -6,7 +6,7 @@ import { generateObjectId } from "../../../../../../utils/FormattingHelper";
 import { Row, Col } from "antd";
 
 const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
+  const { pushValueToArrayInPair } = helperFunctions;
 
   const getEmptyModification = () => {
     return { ...ruleDetails.EMPTY_MODIFICATION_FORMAT, id: generateObjectId() };
@@ -28,10 +28,6 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
   };
 
   const stableInitializeQueryParamRule = useCallback(initializeQueryParamRule, [stableAddEmptyModification]);
-
-  const deleteModification = (event, pairIndex, modificationIndex) => {
-    deleteArrayValueByIndexInPair(event, pairIndex, "modifications", modificationIndex);
-  };
 
   useEffect(() => {
     if (pair.modifications.length === 0) {
@@ -62,7 +58,6 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
                 rowIndex={2}
                 pair={pair}
                 pairIndex={pairIndex}
-                helperFunctions={{ ...helperFunctions, deleteModification }}
                 modification={modification}
                 modificationIndex={modificationIndex}
                 isInputDisabled={isInputDisabled}

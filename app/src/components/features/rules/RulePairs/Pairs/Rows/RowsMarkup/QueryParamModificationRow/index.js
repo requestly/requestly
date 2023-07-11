@@ -6,16 +6,8 @@ import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
 import { actions } from "store";
 
-const QueryParamModificationRow = ({
-  rowIndex,
-  pairIndex,
-  helperFunctions,
-  modification,
-  modificationIndex,
-  isInputDisabled,
-}) => {
+const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modificationIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
-  const { deleteModification } = helperFunctions;
 
   const modificationTypeMenuItems = useMemo(
     () => [
@@ -122,7 +114,16 @@ const QueryParamModificationRow = ({
         <Tooltip title="Remove">
           <ImCross
             id="delete-pair"
-            onClick={(e) => deleteModification(e, pairIndex, modificationIndex)}
+            onClick={(event) => {
+              event?.preventDefault?.();
+              dispatch(
+                actions.removeRulePairValueByIndex({
+                  pairIndex,
+                  arrayPath: "modifications",
+                  index: modificationIndex,
+                })
+              );
+            }}
             className="text-gray cursor-pointer"
           />
         </Tooltip>
