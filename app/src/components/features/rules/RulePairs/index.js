@@ -10,6 +10,7 @@ import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } from "./utils";
 import { rulePairComponents } from "./Pairs";
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import "./RulePairs.css";
 
 const set = require("lodash/set");
@@ -23,15 +24,6 @@ const generatePlaceholderText = (operator, type, sourceKey = "") => {
   }
 
   return "";
-};
-
-export const getFilterObjectPath = (objectPath, filterIndex = 0) => {
-  if (!objectPath.includes("filters")) {
-    return objectPath;
-  }
-  const splitObjectPath = objectPath.split(".");
-  splitObjectPath[1] = splitObjectPath[1] + `[${filterIndex}]`;
-  return splitObjectPath.join(".");
 };
 
 const RulePairs = (props) => {
