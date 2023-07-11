@@ -80,7 +80,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const fetchTeamInfo = () => {
     setIsTeamInfoLoading(true);
     const functions = getFunctions();
-    const getTeamInfo = httpsCallable(functions, "getTeamInfo");
+    const getTeamInfo = httpsCallable(functions, "teams-getTeamInfo");
 
     getTeamInfo({ teamId: teamId })
       .then((res) => {

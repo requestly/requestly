@@ -38,13 +38,13 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
   const [billingExclude, setBillingExclude] = useState([]);
 
-  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "getTeamUsers"), []);
+  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamUsers"), []);
 
-  const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "getPendingUsers"), []);
+  const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingUsers"), []);
 
   const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "getTeamSubscriptionInfo"), []);
 
-  const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "getTeamBillingExclude"), []);
+  const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamBillingExclude"), []);
 
   const changeTeamUserRole = ({ teamId, userId, updatedRole, isAdmin, setIsLoading }) => {
     if ((isAdmin && updatedRole === "admin") || (!isAdmin && updatedRole === "user")) {
