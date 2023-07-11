@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { AutoComplete, Col, Dropdown, Input, Menu, Row, Tooltip } from "antd";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ImCross } from "react-icons/im";
 import HEADER_SUGGESTIONS from "../../../../../../../config/constants/sub/header-suggestions";
+import { actions } from "store";
 
 const HeadersPairModificationRowV2 = ({
   modification,
@@ -14,7 +16,8 @@ const HeadersPairModificationRowV2 = ({
   helperFunctions,
   modificationType,
 }) => {
-  const { modifyPairAtGivenPath, deleteModification } = helperFunctions;
+  const dispatch = useDispatch();
+  const { deleteModification } = helperFunctions;
 
   const pairTypeMenuItems = useMemo(
     () => [
@@ -36,14 +39,16 @@ const HeadersPairModificationRowV2 = ({
 
   const handlePairTypeMenuItemClick = useCallback(
     (event, type) => {
-      return modifyPairAtGivenPath(
-        event,
-        pairIndex,
-        `modifications[${modificationType}][${modificationIndex}].type`,
-        type
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          event,
+          pairIndex,
+          objectPath: `modifications[${modificationType}][${modificationIndex}].type`,
+          customValue: type,
+        })
       );
     },
-    [pairIndex, modifyPairAtGivenPath, modificationType, modificationIndex]
+    [dispatch, pairIndex, modificationType, modificationIndex]
   );
 
   const pairTypeMenu = useMemo(
@@ -73,11 +78,12 @@ const HeadersPairModificationRowV2 = ({
         <AutoComplete
           options={HEADER_SUGGESTIONS[modificationType]}
           onChange={(value) =>
-            modifyPairAtGivenPath(
-              null,
-              pairIndex,
-              `modifications[${modificationType}][${modificationIndex}].header`,
-              value
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                pairIndex,
+                objectPath: `modifications[${modificationType}][${modificationIndex}].header`,
+                customValue: value,
+              })
             )
           }
           filterOption={(input, option) => option?.value.toLowerCase().includes(input.toLowerCase())}
@@ -103,7 +109,13 @@ const HeadersPairModificationRowV2 = ({
             value={modification.value}
             data-selectionid="header-value"
             onChange={(event) =>
-              modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationType}][${modificationIndex}].value`)
+              dispatch(
+                actions.updateRulePairAtGivenPath({
+                  event,
+                  pairIndex,
+                  objectPath: `modifications[${modificationType}][${modificationIndex}].value`,
+                })
+              )
             }
             disabled={isInputDisabled}
           />
