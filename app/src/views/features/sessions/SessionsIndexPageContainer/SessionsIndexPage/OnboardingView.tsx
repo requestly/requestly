@@ -271,7 +271,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
           </Row>
           <Row>
             <Col span={15} className="input-container">
-              <Input ref={inputRef} placeholder="Enter the URL you want to record" />
+              <Input ref={inputRef} placeholder="Enter Page URL eg. https://ebay.com" />
             </Col>
             <Col span={3} className="start-btn-container">
               <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
@@ -302,7 +302,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
   );
 };
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.RECORD_SESSION_ON_URL);
+  const shownNewOnboarding = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
