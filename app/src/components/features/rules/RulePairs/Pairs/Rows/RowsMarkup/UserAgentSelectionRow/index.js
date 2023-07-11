@@ -1,22 +1,30 @@
 import React, { useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Input, Dropdown, Typography, Menu, Select } from "antd";
-//ACTIONS
+import { actions } from "store";
 import { getAvailableUserAgents } from "./actions";
 import { DownOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 const { Option, OptGroup } = Select;
 
-const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
 
   const userAgentSelectorOnChangeHandler = (itemSet) => {
-    modifyPairAtGivenPath(null, pairIndex, "env", itemSet.value.env, [
-      {
-        path: "userAgent",
-        value: itemSet.value.userAgent,
-      },
-    ]);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        objectPath: "env",
+        customValue: itemSet.value.env,
+        arrayOfOtherValuesToModify: [
+          {
+            path: "userAgent",
+            value: itemSet.value.userAgent,
+          },
+        ],
+      })
+    );
   };
 
   const deviceTypeDropdownOnChangeHandler = useCallback(
@@ -35,9 +43,17 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
         });
       }
 
-      modifyPairAtGivenPath(event, pairIndex, "envType", newValue, extraModifications);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          event,
+          pairIndex,
+          objectPath: "envType",
+          customValue: newValue,
+          arrayOfOtherValuesToModify: extraModifications,
+        })
+      );
     },
-    [modifyPairAtGivenPath, pairIndex]
+    [dispatch, pairIndex]
   );
 
   const getCurrentUserAgentValue = () => {
@@ -111,7 +127,15 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
             placeholder="Enter custom UserAgent string"
             type="text"
             disabled={isInputDisabled}
-            onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "userAgent")}
+            onChange={(event) =>
+              dispatch(
+                actions.updateRulePairAtGivenPath({
+                  event,
+                  pairIndex,
+                  objectPath: "userAgent",
+                })
+              )
+            }
             className="display-inline-block"
             value={pair.userAgent}
           />
