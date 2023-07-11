@@ -114,7 +114,7 @@ export const updateRulePairAtGivenPath = (prevState, action) => {
   }
 };
 
-export const removeRulePairValueByIndex = (prevState, action) => {
+export const removeValueInRulePairByIndex = (prevState, action) => {
   const { pairIndex, arrayPath, index } = action.payload;
   get(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], arrayPath).splice(index, 1);
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;

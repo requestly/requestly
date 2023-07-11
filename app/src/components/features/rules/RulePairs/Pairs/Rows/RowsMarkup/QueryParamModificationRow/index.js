@@ -117,7 +117,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
             onClick={(event) => {
               event?.preventDefault?.();
               dispatch(
-                actions.removeRulePairValueByIndex({
+                actions.removeValueInRulePairByIndex({
                   pairIndex,
                   arrayPath: "modifications",
                   index: modificationIndex,

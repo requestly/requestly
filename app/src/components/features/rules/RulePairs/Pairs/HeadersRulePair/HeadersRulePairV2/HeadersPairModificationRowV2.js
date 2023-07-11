@@ -127,7 +127,7 @@ const HeadersPairModificationRowV2 = ({
             onClick={(event) => {
               event?.preventDefault?.();
               dispatch(
-                actions.removeRulePairValueByIndex({
+                actions.removeValueInRulePairByIndex({
                   pairIndex,
                   arrayPath: ["modifications", modificationType],
                   index: modificationIndex,

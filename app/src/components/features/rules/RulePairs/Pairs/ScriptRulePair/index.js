@@ -46,7 +46,7 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
     setHasUserClickedDeleteIconInThisSession(true);
 
     dispatch(
-      actions.removeRulePairValueByIndex({
+      actions.removeValueInRulePairByIndex({
         pairIndex,
         arrayPath: "scripts",
         index: scriptIndex,
