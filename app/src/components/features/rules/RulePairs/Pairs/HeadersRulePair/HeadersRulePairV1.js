@@ -1,28 +1,39 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { useDispatch } from "react-redux";
 import { Col, Dropdown, Input, Menu } from "antd";
 import Text from "antd/lib/typography/Text";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DownOutlined } from "@ant-design/icons";
-const HeadersRulePairV1 = ({ pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+import { actions } from "store";
+
+const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
+
+  const updatePair = useCallback(
+    (event, pairIndex, path, value) => {
+      event?.preventDefault?.();
+
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          event,
+          pairIndex,
+          objectPath: path,
+          customValue: value,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const pairTargetMenu = (
     <Menu>
       <Menu.Item key={1}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(event, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST)
-          }
-        >
+        <Text onClick={(e) => updatePair(e, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST)}>
           {GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST}
         </Text>
       </Menu.Item>
       <Menu.Item key={2}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(event, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE)
-          }
-        >
+        <Text onClick={(e) => updatePair(e, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE)}>
           {GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE}
         </Text>
       </Menu.Item>
@@ -32,27 +43,15 @@ const HeadersRulePairV1 = ({ pair, pairIndex, helperFunctions, isInputDisabled }
   const pairTypeMenu = (
     <Menu>
       <Menu.Item key={1}>
-        <Text
-          onClick={(event) => modifyPairAtGivenPath(event, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD)}
-        >
-          Add
-        </Text>
+        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD)}>Add</Text>
       </Menu.Item>
       <Menu.Item key={2}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(event, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE)
-          }
-        >
+        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE)}>
           Remove
         </Text>
       </Menu.Item>
       <Menu.Item key={3}>
-        <Text
-          onClick={(event) =>
-            modifyPairAtGivenPath(event, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY)
-          }
-        >
+        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY)}>
           Modify
         </Text>
       </Menu.Item>
@@ -84,7 +83,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, helperFunctions, isInputDisabled }
           type="text"
           value={pair.header}
           disabled={isInputDisabled}
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "header")}
+          onChange={(e) => updatePair(e, pairIndex, "header")}
         />
       </Col>
       <Col span={16} lg={9} className="my-auto">
@@ -95,7 +94,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, helperFunctions, isInputDisabled }
           placeholder="Header Value"
           type="text"
           value={pair.value}
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, GLOBAL_CONSTANTS.RULE_KEYS.VALUE)}
+          onChange={(e) => updatePair(e, pairIndex, GLOBAL_CONSTANTS.RULE_KEYS.VALUE)}
           disabled={isInputDisabled ? true : pair.type === "Remove" ? true : false}
         />
       </Col>
