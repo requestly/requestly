@@ -1,9 +1,6 @@
 import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
-import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { set } from "lodash";
-
-const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
 export const updateLastBackupTimeStamp = (prevState, action) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
