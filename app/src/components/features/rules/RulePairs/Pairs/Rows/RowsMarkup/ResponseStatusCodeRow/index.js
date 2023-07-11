@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Select, AutoComplete } from "antd";
+import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { statusCodes } from "config/constants/sub/statusCode";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
@@ -7,8 +9,8 @@ import "./ResponseStatusCodeRow.css";
 
 const { Option, OptGroup } = Select;
 
-const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
   const [statusCode, setStatusCode] = useState(pair.response.statusCode);
 
   return (
@@ -24,12 +26,20 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
           value={statusCode || undefined}
           dropdownMatchSelectWidth={false}
           onChange={(value) => {
-            modifyPairAtGivenPath(null, pairIndex, "response.statusCode", value, [
-              {
-                path: "response.statusText",
-                value: statusCodes[value] || "",
-              },
-            ]);
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                pairIndex,
+                objectPath: "response.statusCode",
+                customValue: value,
+                arrayOfOtherValuesToModify: [
+                  {
+                    path: "response.statusText",
+                    value: statusCodes[value] || "",
+                  },
+                ],
+              })
+            );
+
             setStatusCode(value);
           }}
           filterOption={(inputValue, option) => {

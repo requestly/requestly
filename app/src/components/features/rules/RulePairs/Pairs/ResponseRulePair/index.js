@@ -55,20 +55,12 @@ const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInp
               pairIndex={pairIndex}
               gqlOperationFilter={gqlOperationFilter}
               setGqlOperationFilter={setGqlOperationFilter}
-              modifyPairAtGivenPath={helperFunctions?.modifyPairAtGivenPath}
             />
           </Col>
         )}
 
         <Col span={12}>
-          <ResponseStatusCodeRow
-            rowIndex={2}
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            ruleDetails={ruleDetails}
-            isInputDisabled={isInputDisabled}
-          />
+          <ResponseStatusCodeRow rowIndex={2} pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
         </Col>
       </Row>
       <Row>
@@ -77,7 +69,6 @@ const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInp
             rowIndex={2}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
           />
