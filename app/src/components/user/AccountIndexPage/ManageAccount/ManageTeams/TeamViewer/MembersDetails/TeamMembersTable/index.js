@@ -42,7 +42,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
 
   const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingUsers"), []);
 
-  const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "getTeamSubscriptionInfo"), []);
+  const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamSubscriptionInfo"), []);
 
   const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamBillingExclude"), []);
 
