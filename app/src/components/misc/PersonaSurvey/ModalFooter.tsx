@@ -62,7 +62,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
 
   return (
     <>
-      <div className="survey-footer w-full">
+      <div className="survey-footer w-full rq-modal-footer">
         <Row justify="space-between" align="middle">
           <Col>
             {isSurveyModal && currentPage === SurveyPage.GETTING_STARTED ? (
