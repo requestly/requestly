@@ -15,7 +15,7 @@ const {
   PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
 } = APP_CONSTANTS;
 
-const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const currentPayloadKey = useMemo(
@@ -41,7 +41,6 @@ const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInp
             rowIndex={1}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
           />

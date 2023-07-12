@@ -6,7 +6,7 @@ import HeadersRulePairV2 from "../../../HeadersRulePair/HeadersRulePairV2";
 import HeadersRulePairV1 from "../../../HeadersRulePair/HeadersRulePairV1";
 import { getCurrentlySelectedRuleData } from "../../../../../../../../store/selectors";
 
-const ModifyHeaderRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled, ruleDetails }) => {
+const ModifyHeaderRow = ({ rowIndex, pair, pairIndex, isInputDisabled, ruleDetails }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   return (
@@ -19,12 +19,7 @@ const ModifyHeaderRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDi
           ruleDetails={ruleDetails}
         />
       ) : (
-        <HeadersRulePairV1
-          pair={pair}
-          pairIndex={pairIndex}
-          helperFunctions={helperFunctions}
-          isInputDisabled={isInputDisabled}
-        />
+        <HeadersRulePairV1 pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
       )}
     </Row>
   );

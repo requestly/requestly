@@ -13,7 +13,7 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { actions } from "store";
 import "./styles.css";
 
-const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -70,18 +70,11 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
         rowIndex={1}
         pair={pair}
         pairIndex={pairIndex}
-        helperFunctions={helperFunctions}
         ruleDetails={ruleDetails}
         isInputDisabled={isInputDisabled}
       />
       {!!toShowLibraries && (
-        <AvailableScriptsRow
-          rowIndex={3}
-          pair={pair}
-          pairIndex={pairIndex}
-          helperFunctions={{ ...helperFunctions }}
-          isInputDisabled={isInputDisabled}
-        />
+        <AvailableScriptsRow rowIndex={3} pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
       )}
 
       {pair.scripts.map((script, scriptIndex) => (

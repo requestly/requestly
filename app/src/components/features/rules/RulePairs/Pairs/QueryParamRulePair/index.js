@@ -7,7 +7,7 @@ import AddQueryParamModificationRow from "../Rows/RowsMarkup/AddQueryParamModifi
 import { generateObjectId } from "../../../../../../utils/FormattingHelper";
 import { Row, Col } from "antd";
 
-const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+const QueryParamRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
 
   const getEmptyModification = useCallback(() => {
@@ -43,7 +43,6 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
             rowIndex={1}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
           />
