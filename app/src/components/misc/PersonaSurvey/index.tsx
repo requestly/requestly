@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
-import { shouldShowOnboarding, shuffleOptions } from "./utils";
+import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, PageConfig, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
@@ -27,7 +27,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const currentPage: SurveyPage = userPersona.page;
+  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
   const shuffledQ1 = useMemo(() => {
     return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
@@ -110,7 +110,10 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   );
 
   useEffect(() => {
-    if (SurveyConfig[currentPage]?.skip || (!isSurveyModal && currentPage === SurveyPage.GETTING_STARTED)) {
+    if (
+      SurveyConfig[currentPage as SurveyPage]?.skip ||
+      (!isSurveyModal && currentPage === SurveyPage.GETTING_STARTED)
+    ) {
       handleSurveyNavigation(currentPage, dispatch);
     }
   }, [currentPage, dispatch, isSurveyModal]);
@@ -153,7 +156,11 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   }, [dispatch, userPersona?.page]);
 
   const renderSurveyPages = useCallback(() => {
-    return <>{currentPage !== SurveyPage.RECOMMENDATIONS ? <>{renderPage(SurveyConfig[currentPage])}</> : null}</>;
+    return (
+      <>
+        {currentPage !== SurveyPage.RECOMMENDATIONS ? <>{renderPage(SurveyConfig[currentPage as SurveyPage])}</> : null}
+      </>
+    );
   }, [renderPage, currentPage]);
 
   return (

@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ImportRulesModal from "../ImportRulesModal";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -13,6 +12,7 @@ import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "sto
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
+import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
 import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,
@@ -40,11 +40,10 @@ const GettingStarted = () => {
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
 
-  const shouldShowRecommendationScreen =
-    state?.src === "persona_survey_modal" &&
-    !userPersona.isSurveyCompleted &&
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-    appOnboardingExp === "control";
+  const isRecommendationScreenVisible = useMemo(
+    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src) && appOnboardingExp === "control",
+    [appMode, state?.src, appOnboardingExp, userPersona]
+  );
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -97,7 +96,7 @@ const GettingStarted = () => {
   //   }
   // }, [dispatch, appMode, userPersona?.isSurveyCompleted, userPersona?.page, state?.src]);
 
-  if (shouldShowRecommendationScreen) {
+  if (isRecommendationScreenVisible) {
     return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
   }
 

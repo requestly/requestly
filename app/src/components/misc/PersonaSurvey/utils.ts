@@ -1,8 +1,10 @@
 import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { Option, UserPersona } from "./types";
+import { OldSurveyPageMap, Option, SurveyPage, UserPersona } from "./types";
 import { getValueAsPromise, setValue } from "actions/FirebaseActions";
 import PATHS from "config/constants/sub/paths";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const shouldShowOnboarding = async (appMode: string) => {
   if (
@@ -34,4 +36,26 @@ export const syncUserPersona = async (uid: string, dispatch: any, userPersona: U
     delete persona.isSurveyCompleted; // disable syncing this for existing users
     dispatch(actions.setUserPersonaData({ ...persona }));
   }
+};
+
+export const getSurveyPage = (currentPage: SurveyPage | number) => {
+  if (typeof currentPage === "number") {
+    //@ts-ignore
+    return OldSurveyPageMap[currentPage];
+  }
+  return currentPage;
+};
+
+export const shouldShowRecommendationScreen = (userPersona: UserPersona, appMode: string, state: string) => {
+  const page = getSurveyPage(userPersona.page);
+  console.log({ state });
+  if (
+    page === SurveyPage.RECOMMENDATIONS &&
+    !userPersona.isSurveyCompleted &&
+    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+    state === "persona_survey_modal"
+  )
+    return true;
+
+  return false;
 };
