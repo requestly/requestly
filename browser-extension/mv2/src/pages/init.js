@@ -1,10 +1,5 @@
-const extID = chrome.runtime.id;
-const extVersion = chrome.runtime.getManifest()["version"];
-
-// Add extensionID to localStorage so that page script can read and send message to it
-window.localStorage.setItem("extID", extID);
-
-document.documentElement.setAttribute("rq-ext-version", extVersion);
+document.documentElement.setAttribute("rq-ext-id", chrome.runtime.id);
+document.documentElement.setAttribute("rq-ext-version", chrome.runtime.getManifest()["version"]);
 
 chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
   switch (message.action) {
