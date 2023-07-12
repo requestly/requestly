@@ -32,9 +32,11 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
-  const shuffledQ1 = useMemo(() => {
-    return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
-  }, []);
+  const shuffledQuestionnaire = useMemo(() => {
+    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
+    const options = OptionsConfig[currentPage as QuestionnaireType]?.options;
+    return shuffleOptions(options);
+  }, [currentPage]);
 
   const SkippableButton = useCallback(() => {
     return (
@@ -67,14 +69,9 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
 
   const renderQuestionnaire = useCallback(
     (optionSet: QuestionnaireType) => {
-      switch (optionSet) {
-        case QuestionnaireType.PERSONA:
-          return renderOptions(shuffledQ1, optionSet);
-        default:
-          return null;
-      }
+      if (optionSet) return renderOptions(shuffledQuestionnaire, optionSet);
     },
-    [shuffledQ1]
+    [shuffledQuestionnaire]
   );
 
   const renderOptions = (options: Option[], optionSet: QuestionnaireType) => {
