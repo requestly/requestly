@@ -10,6 +10,7 @@ import MenuHeader from "./MenuHeader";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import "./DashboardLayout.css";
+import { SurveyPage } from "components/misc/PersonaSurvey/types";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -22,7 +23,7 @@ const DashboardLayout = () => {
 
   const isPersonaRecommendationScreen = useMemo(
     () =>
-      userPersona.page === 2 &&
+      userPersona.page === SurveyPage.RECOMMENDATIONS &&
       !userPersona.isSurveyCompleted &&
       appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
       state?.src === "persona_survey_modal",

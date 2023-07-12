@@ -16,13 +16,11 @@ export interface Option {
 }
 
 export interface PageConfig {
-  pageId: number;
+  page: number;
+  pageId: SurveyPage;
   title: string;
   subTitle: string;
-  /**
-   * If skip true then don't show the question in survey
-   */
-  skip?: boolean;
+  skip?: boolean; // If skip true then don't show the page in survey
   render?: QuestionnaireType | (() => ReactNode);
 }
 
@@ -58,3 +56,15 @@ export enum PersonaType {
 export enum QuestionnaireType {
   PERSONA = "persona",
 }
+
+export enum SurveyPage {
+  GETTING_STARTED = "getting_started",
+  PERSONA = "persona",
+  RECOMMENDATIONS = "recommendations",
+}
+
+export const OldSurveyPageMap = {
+  0: SurveyPage.GETTING_STARTED,
+  1: SurveyPage.PERSONA,
+  2: SurveyPage.RECOMMENDATIONS,
+};

@@ -1,13 +1,13 @@
-import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig } from "./types";
+import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig, SurveyPage } from "./types";
 import { setUserPersona } from "./actions";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 
 export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
   [QuestionnaireType.PERSONA]: {
-    key: "persona",
+    key: QuestionnaireType.PERSONA,
     questionType: "single",
     isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, "persona"),
+    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, QuestionnaireType.PERSONA),
     options: [
       {
         title: PersonaType.FRONTEND,
@@ -41,31 +41,21 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
   },
 };
 
-export const SurveyConfig: PageConfig[] = [
-  {
-    pageId: 0,
+export const SurveyConfig: Record<SurveyPage, PageConfig> = {
+  [SurveyPage.GETTING_STARTED]: {
+    page: 0,
+    pageId: SurveyPage.GETTING_STARTED,
     title: "Welcome to Requestly!",
     subTitle: "Help us personalise your experience by answering the following questionnaire",
     render: () => <GettingStartedWithSurvey />,
   },
-  {
-    pageId: 1,
+
+  [SurveyPage.PERSONA]: {
+    page: 1,
+    pageId: SurveyPage.PERSONA,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
     render: QuestionnaireType.PERSONA,
   },
-  // {
-  //   pageId: 2,
-  //   skip: true,
-  //   title: "What is your primary goal for using Requestly?",
-  //   subTitle: "Select as many as you like",
-  //   render: 2,
-  // },
-  // {
-  //   pageId: 3,
-  //   title: "How did you hear about Requestly?",
-  //   subTitle: "Select one",
-  //   skip: true,
-  //   render: 3,
-  // },
-];
+  [SurveyPage.RECOMMENDATIONS]: null,
+};

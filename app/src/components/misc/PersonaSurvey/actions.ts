@@ -1,5 +1,5 @@
 import { actions } from "store";
-import { multipleChoiceOption } from "./types";
+import { SurveyPage, multipleChoiceOption } from "./types";
 
 export const setUserPersona = (dispatch: any, value: string, clear: boolean, key: string) => {
   dispatch(actions.updateUserPersona({ value: clear ? "" : value, key }));
@@ -25,4 +25,15 @@ export const handleUseCaseActiveOption = (
     if (selectedUseCase) return true;
     else return false;
   } else return false;
+};
+export const handleSurveyNavigation = (currentPage: SurveyPage, dispatch: any) => {
+  switch (currentPage) {
+    case SurveyPage.GETTING_STARTED:
+      dispatch(actions.updatePersonaSurveyPage(SurveyPage.PERSONA));
+      break;
+
+    case SurveyPage.PERSONA:
+      dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+      break;
+  }
 };

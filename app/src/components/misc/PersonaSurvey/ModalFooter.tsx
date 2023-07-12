@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
@@ -12,11 +12,12 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackPersonaQ1Completed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
-import { QuestionnaireType } from "./types";
+import { QuestionnaireType, SurveyPage } from "./types";
 import PATHS from "config/constants/sub/paths";
+import { handleSurveyNavigation } from "./actions";
 
 interface FooterProps {
-  currentPage: number;
+  currentPage: SurveyPage;
   callback: () => void;
   isSurveyModal: boolean;
 }
@@ -28,9 +29,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
   const appMode = useSelector(getAppMode);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
+  const surveyLength = useMemo(() => Object.keys(SurveyConfig).length, []);
 
   const disableContinue = () => {
-    if (currentPage === 0) return false;
+    if (currentPage === SurveyPage.GETTING_STARTED) return false;
     if (userPersona[OptionsConfig[currentQuestionnaire as QuestionnaireType]?.key]?.length) return false;
     return true;
   };
@@ -57,8 +59,8 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
         }
         break;
     }
-    if (isSurveyModal || currentPage !== SurveyConfig.length - 1) {
-      dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+    if (isSurveyModal || Object.keys(SurveyConfig).indexOf(currentPage) !== surveyLength - 1) {
+      handleSurveyNavigation(currentPage, dispatch);
     } else {
       callback?.();
     }
@@ -69,13 +71,13 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
       <div className="survey-footer w-full">
         <Row justify="space-between" align="middle">
           <Col>
-            {isSurveyModal && currentPage === 0 ? (
+            {isSurveyModal && currentPage === SurveyPage.GETTING_STARTED ? (
               <>
                 <span className="survey-modal-emoji">😁</span> We are excited to see you here
               </>
             ) : (
               <>
-                {currentPage} / {SurveyConfig?.length - 1}
+                {Object.keys(SurveyConfig).indexOf(currentPage)} / {surveyLength - 1}
               </>
             )}
           </Col>
