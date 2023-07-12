@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getCurrentlySelectedRuleConfig } from "store/selectors";
+import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography } from "antd";
 import { FaFilter } from "react-icons/fa";
 import { ExperimentOutlined } from "@ant-design/icons";
@@ -14,24 +14,68 @@ import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
+import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import Filters from "components/features/rules/RulePairs/Filters";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import {
   trackURLConditionModalClosed,
   trackURLConditionAnimationViewed,
 } from "modules/analytics/events/features/testUrlModal";
+import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
 
-const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { openFilterModal, getFilterCount } = helperFunctions;
-
+const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [isTestURLClicked, setIsTestURLClicked] = useState(false);
+  const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
   const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
   const hasSeenTestURLAnimation = useRef(false);
+
+  const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
+    return Array.isArray(rule.pairs[pairIndex].source.filters) ? true : false;
+  }, []);
+
+  const migrateToNewSourceFilterFormat = useCallback(
+    (pairIndex, copyOfCurrentlySelectedRule) => {
+      copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters = [
+        copyOfCurrentlySelectedRule.pairs[pairIndex].source.filters,
+      ];
+      setCurrentlySelectedRule(dispatch, copyOfCurrentlySelectedRule);
+    },
+    [dispatch]
+  );
+
+  const openFilterModal = useCallback(
+    (pairIndex) => {
+      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
+      if (!isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)) {
+        migrateToNewSourceFilterFormat(pairIndex, copyOfCurrentlySelectedRule);
+      }
+      setRuleFilterActiveWithPairIndex(pairIndex);
+      trackRuleFilterModalToggled(true, currentlySelectedRuleData?.ruleType);
+    },
+    [currentlySelectedRuleData, isSourceFilterFormatUpgraded, migrateToNewSourceFilterFormat]
+  );
+
+  const closeFilterModal = useCallback(() => {
+    setRuleFilterActiveWithPairIndex(false);
+    trackRuleFilterModalToggled(false, currentlySelectedRuleData?.ruleType);
+  }, [currentlySelectedRuleData?.ruleType]);
+
+  const getFilterCount = useCallback(
+    (pairIndex) => {
+      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
+      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
+        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).length
+        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).length;
+    },
+    [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
+  );
 
   const sourceKeys = useMemo(
     () => [
@@ -170,6 +214,14 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
           analyticsContext={{ rule_type: currentlySelectedRuleConfig.TYPE }}
         />
       )}
+
+      {ruleFilterActiveWithPairIndex !== false ? (
+        <Filters
+          pairIndex={ruleFilterActiveWithPairIndex}
+          closeModal={closeFilterModal}
+          isInputDisabled={isInputDisabled}
+        />
+      ) : null}
 
       <div className="rule-pair-source-row-wrapper">
         <Row
