@@ -4,10 +4,7 @@ import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 
 export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
   [QuestionnaireType.PERSONA]: {
-    key: QuestionnaireType.PERSONA,
-    questionType: "single",
-    isActive: ({ key, title }) => key === title,
-    action: (dispatch, value, clear) => setUserPersona(dispatch, value, clear, QuestionnaireType.PERSONA),
+    action: (dispatch, value, doClear) => setUserPersona(dispatch, value, doClear, QuestionnaireType.PERSONA),
     options: [
       {
         title: PersonaType.FRONTEND,

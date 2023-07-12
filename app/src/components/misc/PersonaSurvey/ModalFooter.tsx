@@ -4,7 +4,7 @@ import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { OptionsConfig, SurveyConfig } from "./config";
+import { SurveyConfig } from "./config";
 import { handleSurveyNavigation } from "./actions";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { QuestionnaireType, SurveyPage } from "./types";
@@ -26,12 +26,12 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appMode = useSelector(getAppMode);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
-  const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
   const surveyLength = useMemo(() => Object.keys(SurveyConfig).length, []);
+  const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = useMemo(() => {
     if (currentPage === SurveyPage.GETTING_STARTED) return false;
-    if (userPersona[OptionsConfig[currentQuestionnaire as QuestionnaireType]?.key]?.length) return false;
+    if (userPersona[currentQuestionnaire as QuestionnaireType]?.length) return false;
     return true;
   }, [currentPage, currentQuestionnaire, userPersona]);
 

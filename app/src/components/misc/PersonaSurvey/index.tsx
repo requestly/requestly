@@ -68,28 +68,24 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   }, [dispatch]);
 
   const renderQuestionnaire = useCallback(
-    (optionSet: QuestionnaireType) => {
-      if (optionSet) return renderOptions(shuffledQuestionnaire, optionSet);
+    (questionnaire: QuestionnaireType) => {
+      if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
     },
     [shuffledQuestionnaire]
   );
 
-  const renderOptions = (options: Option[], optionSet: QuestionnaireType) => {
+  const renderOptions = (options: Option[], questionnaire: QuestionnaireType) => {
     return (
-      <>
-        <div className="survey-options-container">
-          {options.map((option: Option, index: number) => (
-            <SurveyOption
-              key={index}
-              option={option}
-              questionType={OptionsConfig[optionSet].questionType}
-              isActive={OptionsConfig[optionSet].isActive}
-              action={OptionsConfig[optionSet].action}
-              fieldKey={OptionsConfig[optionSet].key}
-            />
-          ))}
-        </div>
-      </>
+      <div className="survey-options-container">
+        {options.map((option: Option, index: number) => (
+          <SurveyOption
+            key={index}
+            option={option}
+            action={OptionsConfig[questionnaire].action}
+            questionnaire={questionnaire}
+          />
+        ))}
+      </div>
     );
   };
 

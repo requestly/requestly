@@ -5,7 +5,7 @@ export interface UserPersona {
   isSurveyCompleted: boolean;
   persona: string;
   referralChannel?: string;
-  useCases: multipleChoiceOption[];
+  useCases?: string[];
   numberOfEmployees?: string;
 }
 
@@ -25,22 +25,8 @@ export interface PageConfig {
 }
 
 export interface SurveyOptionsConfig {
-  key: string;
-  questionType: "single" | "multiple";
-  isActive?: (props: ActiveProps) => boolean;
-  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
-  conditional?: any;
+  action?: (dispatch: any, value: string, doClear: boolean) => void;
   options?: Option[];
-}
-
-export interface multipleChoiceOption {
-  optionType: "select" | "other";
-  value: "string";
-}
-export interface ActiveProps {
-  key: string | multipleChoiceOption[];
-  title: string;
-  optionType?: "select" | "other";
 }
 
 export enum PersonaType {
