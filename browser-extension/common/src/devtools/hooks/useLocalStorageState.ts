@@ -3,14 +3,20 @@ import { useState } from "react";
 const STORE_PROPERTY = "rq-devtools";
 
 const getFromStore = (key: string): string => {
-  const store = JSON.parse(window.localStorage.getItem(STORE_PROPERTY) || "{}");
-  return store[key];
+  try {
+    const store = JSON.parse(window.localStorage.getItem(STORE_PROPERTY) || "{}");
+    return store[key];
+  } catch (e) {
+    return undefined;
+  }
 };
 
 const saveToStore = (key: string, value: string): void => {
-  let store = JSON.parse(window.localStorage.getItem(STORE_PROPERTY) || "{}");
-  store = { ...store, [key]: value };
-  window.localStorage.setItem(STORE_PROPERTY, JSON.stringify(store));
+  try {
+    let store = JSON.parse(window.localStorage.getItem(STORE_PROPERTY) || "{}");
+    store = { ...store, [key]: value };
+    window.localStorage.setItem(STORE_PROPERTY, JSON.stringify(store));
+  } catch (e) {}
 };
 
 type SetValueAndSaveAction = (val: string) => void;

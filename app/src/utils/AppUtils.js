@@ -9,7 +9,7 @@ export const getAppDetails = () => {
   if (document.documentElement.getAttribute("rq-ext-version")) {
     app_mode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     app_version = document.documentElement.getAttribute("rq-ext-version");
-    ext_id = window.localStorage.getItem("extID");
+    ext_id = document.documentElement.getAttribute("rq-ext-id");
   } else if (window?.RQ?.MODE) {
     app_mode = window.RQ.MODE;
     app_version = window?.RQ?.DESKTOP?.VERSION;
