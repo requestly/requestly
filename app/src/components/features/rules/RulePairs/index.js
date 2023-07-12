@@ -28,9 +28,7 @@ const RulePairs = (props) => {
   };
 
   useEffect(() => {
-    console.log("running....");
     if (currentlySelectedRuleData.pairs && currentlySelectedRuleData.pairs.length === 0) {
-      console.log("controlled running...");
       addEmptyPair(currentlySelectedRuleData, props.currentlySelectedRuleConfig, dispatch);
     }
   }, [dispatch, currentlySelectedRuleData, props.currentlySelectedRuleConfig]);
