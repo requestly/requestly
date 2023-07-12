@@ -9,19 +9,8 @@ import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rul
 import { FaTrash } from "react-icons/fa";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
-import { sourceRuleOperatorPlaceholders, destinationRuleOperatorPlaceholders } from "./utils";
 import { rulePairComponents } from "./Pairs";
 import "./RulePairs.css";
-
-const generatePlaceholderText = (operator, type, sourceKey = "") => {
-  if (type === "source-value") {
-    return sourceRuleOperatorPlaceholders[sourceKey]?.[operator];
-  } else if (type === "destination") {
-    return destinationRuleOperatorPlaceholders[operator];
-  }
-
-  return "";
-};
 
 const RulePairs = (props) => {
   //Global State
@@ -36,7 +25,6 @@ const RulePairs = (props) => {
 
   const getPairMarkup = (pair, pairIndex) => {
     const helperFunctions = {
-      generatePlaceholderText: generatePlaceholderText,
       openFilterModal: openFilterModal,
       getFilterCount: getFilterCount,
     };

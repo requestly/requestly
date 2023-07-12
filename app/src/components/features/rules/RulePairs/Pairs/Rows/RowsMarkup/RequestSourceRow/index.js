@@ -13,6 +13,7 @@ import { MoreInfo } from "components/misc/MoreInfo";
 import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
+import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import {
   trackURLConditionModalClosed,
@@ -23,7 +24,7 @@ import "./RequestSourceRow.css";
 const { Text } = Typography;
 
 const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { openFilterModal, getFilterCount, generatePlaceholderText } = helperFunctions;
+  const { openFilterModal, getFilterCount } = helperFunctions;
 
   const dispatch = useDispatch();
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);

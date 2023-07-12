@@ -25,12 +25,11 @@ import {
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import "./index.css";
 import LINKS from "config/constants/sub/links";
+import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
+import "./index.css";
 
-const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { generatePlaceholderText } = helperFunctions;
-
+const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
