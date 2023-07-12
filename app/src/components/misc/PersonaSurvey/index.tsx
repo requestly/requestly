@@ -1,10 +1,12 @@
 import React, { useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
+import { handleSurveyNavigation } from "./actions";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, PageConfig, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
@@ -14,8 +16,8 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import PATHS from "config/constants/sub/paths";
 import "./index.css";
-import { handleSurveyNavigation } from "./actions";
 
 interface SurveyProps {
   callback?: () => void;
@@ -25,6 +27,7 @@ interface SurveyProps {
 
 export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
@@ -109,6 +112,20 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     [renderQuestionnaire, SkippableButton, currentPage]
   );
 
+  const handleMoveToRecommendationScreen = useCallback(() => {
+    const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;
+    dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen }));
+    if (isRecommendationScreen) {
+      navigate(PATHS.GETTING_STARTED, {
+        replace: true,
+        state: {
+          src: "persona_survey_modal",
+          redirectTo: window.location.pathname,
+        },
+      });
+    }
+  }, [currentPage, dispatch, navigate]);
+
   useEffect(() => {
     if (
       SurveyConfig[currentPage as SurveyPage]?.skip ||
@@ -124,28 +141,17 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         if (result) {
           if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
             dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
-          } else {
-            if (isExtensionInstalled()) {
-              const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;
-              dispatch(
-                actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen })
-              );
-            }
-          }
+          } else if (isExtensionInstalled()) handleMoveToRecommendationScreen();
         }
       });
     }
-  }, [appMode, currentPage, dispatch, isSurveyModal]);
+  }, [appMode, currentPage, dispatch, navigate, isSurveyModal, handleMoveToRecommendationScreen]);
 
   useEffect(() => {
     if (currentPage === SurveyPage.GETTING_STARTED) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result) {
-          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-            trackPersonaSurveyViewed();
-          } else if (isExtensionInstalled()) {
-            trackPersonaSurveyViewed();
-          }
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || isExtensionInstalled()) trackPersonaSurveyViewed();
         }
       });
     }
