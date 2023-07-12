@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.7.12",
+    logs: [
+      {
+        title: "Fixed console errors related to accessing localStorage or sessionStorage in sandboxed pages",
+      },
+    ],
+  },
+  {
     version: "23.7.10",
     logs: [
       {
