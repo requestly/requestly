@@ -40,15 +40,13 @@ export const syncUserPersona = async (uid: string, dispatch: any, userPersona: U
 
 export const getSurveyPage = (currentPage: SurveyPage | number) => {
   if (typeof currentPage === "number") {
-    //@ts-ignore
-    return OldSurveyPageMap[currentPage];
+    return OldSurveyPageMap[currentPage as keyof typeof OldSurveyPageMap];
   }
   return currentPage;
 };
 
 export const shouldShowRecommendationScreen = (userPersona: UserPersona, appMode: string, state: string) => {
   const page = getSurveyPage(userPersona.page);
-  console.log({ state });
   if (
     page === SurveyPage.RECOMMENDATIONS &&
     !userPersona.isSurveyCompleted &&

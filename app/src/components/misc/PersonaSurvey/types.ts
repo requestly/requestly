@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 export interface UserPersona {
-  page: number;
+  page: number | SurveyPage;
   isSurveyCompleted: boolean;
   persona: string;
   referralChannel?: string;

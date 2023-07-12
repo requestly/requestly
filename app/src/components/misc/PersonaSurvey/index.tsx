@@ -34,7 +34,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
 
   const shuffledQuestionnaire = useMemo(() => {
     if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
-    const options = OptionsConfig[currentPage as QuestionnaireType]?.options;
+    const options = OptionsConfig[currentPage]?.options;
     return shuffleOptions(options);
   }, [currentPage]);
 
