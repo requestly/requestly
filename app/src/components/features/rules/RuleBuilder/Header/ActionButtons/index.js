@@ -4,8 +4,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import CreateRuleButton from "./CreateRuleButton";
 import ShareRuleButton from "./ShareRuleButton";
 import { getCurrentlySelectedRuleData } from "store/selectors";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 import { getModeData } from "../../actions";
 import APP_CONSTANTS from "config/constants";
 import "./RuleEditorActionButtons.css";
@@ -14,8 +12,7 @@ const ActionButtons = (props) => {
   const { MODE } = getModeData(props.location);
   const rule = useSelector(getCurrentlySelectedRuleData);
 
-  const isDisabled =
-    rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST && !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
+  const isDisabled = rule?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
 
   return (
     <div className="rule-editor-header-action-btns">
