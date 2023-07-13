@@ -15,7 +15,8 @@ const ExtensionDeactivationMessage = () => {
           <li>Please resume the extension by following below steps:</li>
           <li>Open extension popup by clicking on Requestly icon on the browser's toolbar.</li>
           <li>Hover over the dropdown menu on the popup that says "Requestly paused".</li>
-          <li>Click on "Resume requestly" to resume Requestly again.</li>
+          <li>Click on "Resume requestly" to resume again.</li>
+          <li>Refresh the page to start using Requestly again.</li>
         </ol>
 
         <img width={628} height={235} src={resumeRequestly} alt="resume requestly" />
