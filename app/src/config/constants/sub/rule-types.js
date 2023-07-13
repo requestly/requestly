@@ -36,11 +36,7 @@ const modifyRequestDefaultCode = () => {
 };
 
 const getHeaderMetadataConfig = () => {
-  if (isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)) {
-    return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V2"];
-  }
-
-  return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V1"];
+  return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V2"];
 };
 
 const RULE_METADATA_CONFIG = {
