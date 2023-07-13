@@ -1,3 +1,4 @@
+import { DesktopNetworkLogEvent } from "../../TrafficTableV2/types";
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
 
 import { v4 as uuidv4 } from "uuid";
@@ -129,4 +130,54 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
   });
 
   return res;
+};
+
+export const convertNetworkEventToRQLogs = (networkEvent: DesktopNetworkLogEvent): RQNetworkLog[] => {
+  const har = networkEvent.data.data;
+  return har.log.entries.map((entry) => {
+    const requestHeaders: Record<string, string> = {};
+    entry.request.headers.forEach((headerObj) => {
+      requestHeaders[headerObj.name] = headerObj.value;
+    });
+
+    const responseHeaders: Record<string, string> = {};
+    entry.response.headers.forEach((headerObj) => {
+      responseHeaders[headerObj.name] = headerObj.value;
+    });
+
+    const url = new URL(entry.request.url);
+
+    const rqLog: RQNetworkLog = {
+      id: entry?._RQ?.id || uuidv4(),
+      timestamp: new Date(entry.startedDateTime).getTime() / 1000,
+      url: url.toString(),
+      request: {
+        method: entry.request.method,
+        path: url.pathname,
+        host: url.hostname,
+        port: url.port,
+        headers: requestHeaders,
+        body: entry.request.postData?.text,
+        queryParams: [],
+      },
+      response: {
+        statusCode: entry.response.status,
+        headers: responseHeaders,
+        contentType: entry.response.content?.mimeType,
+        // Hack to fix dictionary coming into body
+        body:
+          typeof entry.response.content?.text == "string"
+            ? entry.response.content?.text
+            : JSON.stringify(entry.response.content?.text),
+      },
+
+      consoleLogs: entry?._RQ?.consoleLogs || [],
+      requestState: networkEvent.type,
+      requestShellCurl: "create curl from har", // todo
+      actions: networkEvent.data.actions,
+
+      // todo: domain and app from backgroun
+    };
+    return rqLog;
+  });
 };

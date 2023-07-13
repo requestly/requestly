@@ -7,6 +7,7 @@ import APP_CONSTANTS from "config/constants";
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
+  console.log("actions", actions);
   const dispatch = useDispatch();
 
   const dedup_rules = (rules) => {
@@ -53,8 +54,8 @@ const AppliedRules = ({ actions }) => {
   const get_rules_from_actions = (actions) => {
     const rules = actions.map((action) => {
       return {
-        rule_type: action.rule_type,
-        rule_id: action.rule_id,
+        rule_type: action.ruleType,
+        rule_id: action.ruleId,
       };
     });
     return rules;
