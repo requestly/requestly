@@ -45,9 +45,6 @@ FEATURES.CONNECTED_APPS = "connected-apps";
 FEATURES.INTERCEPTOR = {};
 FEATURES.INTERCEPTOR.INTERCEPTOR_LAUNCH = "interceptor-launch";
 
-// RULES
-FEATURES.MODIFY_API_RESPONSE_STATUS = "response-rule-modify-status";
-
 FEATURES.MOCK_V2 = "mock-v2";
 FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 
