@@ -19,6 +19,8 @@ export const UNINSTALLATION = {
   EXTENSION_UNINSTALLED: "extension_uninstalled",
 };
 
+export const EXTENSION_CONTEXT_INVALIDATED = "extension_context_invalidated";
+
 export const ORGANIZATION = {
   VIEW_MORE_USERS_CLICKED: "organization_view_more_users_clicked",
   PAGE_VIEWED: "organization_my_org_page_viewed",
