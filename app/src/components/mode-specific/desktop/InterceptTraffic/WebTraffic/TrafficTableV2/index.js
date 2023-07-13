@@ -33,7 +33,7 @@ import {
 } from "modules/analytics/events/common/traffic-table";
 import "./css/draggable.css";
 import "./TrafficTableV2.css";
-import { createLogsHar } from "../TrafficExporter/harLogs/converter";
+import { convertNetworkEventToRQLogs, createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
@@ -183,9 +183,22 @@ const CurrentTrafficTable = ({
       }
     });
 
+    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v3", (payload) => {
+      if (isInterceptingTraffic) {
+        if (!payload) return;
+        const rqLog = convertNetworkEventToRQLogs(payload)[0];
+
+        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+        // printLogsToConsole(rqLog);
+
+        saveLogInRedux(rqLog);
+      }
+    });
+
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
         window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v3");
       }
     };
   }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);

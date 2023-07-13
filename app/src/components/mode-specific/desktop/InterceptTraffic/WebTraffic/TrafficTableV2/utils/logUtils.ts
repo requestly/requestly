@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { getRequestApp, getRequestDomain } from ".";
 import { convertHarJsonToRQLogs } from "../../TrafficExporter/harLogs/converter";
 
