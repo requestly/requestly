@@ -879,7 +879,7 @@ BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
       tabs.forEach((tab) => {
         chrome.tabs.executeScript(tab.id, {
           code: `window.postMessage({
-            event: "requestly:extensionUpdated",
+            action: "${RQ.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED}",
             oldVersion: "${details.previousVersion}",
             newVersion: "${chrome.runtime.getManifest().version}"
           }, "*")`,

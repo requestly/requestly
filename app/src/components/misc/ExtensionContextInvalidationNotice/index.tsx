@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Typography } from "antd";
 import { trackExtensionContextInvalidated } from "modules/analytics/events/misc/extensionContextInvalidation";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./extensionContextInvalidationNotice.scss";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("message", (event) => {
-      if (event.data?.event === "requestly:extensionUpdated") {
+    PageScriptMessageHandler.addMessageListener(
+      GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED,
+      ({ oldVersion, newVersion }: { oldVersion: string; newVersion: string }) => {
         setVisible(true);
-        trackExtensionContextInvalidated(event.data.oldVersion, event.data.newVersion);
+        trackExtensionContextInvalidated(oldVersion, newVersion);
       }
-    });
+    );
   }, []);
 
   return visible ? (
