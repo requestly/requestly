@@ -38,8 +38,8 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     return shuffleOptions(options);
   }, [currentPage]);
 
-  const SkippableButton = useCallback(() => {
-    return (
+  const renderSkipButton = useMemo(() => {
+    return () => {
       <div className="skip-recommendation-wrapper">
         Existing user?
         <RQButton
@@ -63,37 +63,40 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         >
           Sign in
         </RQButton>
-      </div>
-    );
+      </div>;
+    };
   }, [dispatch]);
 
-  const renderQuestionnaire = useCallback(
-    (questionnaire: QuestionnaireType) => {
-      if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
+  const renderOptions = useMemo(
+    () => (options: Option[], questionnaire: QuestionnaireType) => {
+      return (
+        <div className="survey-options-container">
+          {options.map((option: Option, index: number) => (
+            <SurveyOption
+              key={index}
+              option={option}
+              action={OptionsConfig[questionnaire].questionResponseAction}
+              questionnaire={questionnaire}
+            />
+          ))}
+        </div>
+      );
     },
-    [shuffledQuestionnaire]
+    []
   );
 
-  const renderOptions = (options: Option[], questionnaire: QuestionnaireType) => {
-    return (
-      <div className="survey-options-container">
-        {options.map((option: Option, index: number) => (
-          <SurveyOption
-            key={index}
-            option={option}
-            action={OptionsConfig[questionnaire].action}
-            questionnaire={questionnaire}
-          />
-        ))}
-      </div>
-    );
-  };
+  const renderQuestionnaire = useMemo(
+    () => (questionnaire: QuestionnaireType) => {
+      if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
+    },
+    [shuffledQuestionnaire, renderOptions]
+  );
 
-  const renderPage = useCallback(
-    (page: PageConfig) => {
+  const renderPage = useMemo(
+    () => (page: PageConfig) => {
       return (
         <>
-          {currentPage === SurveyPage.GETTING_STARTED && <SkippableButton />}
+          {currentPage === SurveyPage.GETTING_STARTED && renderSkipButton()}
           <div className="text-center white text-bold survey-title">{page.title}</div>
           <div className="w-full survey-subtitle-wrapper">
             <div className="text-gray text-center mt-8">{page.subTitle}</div>
@@ -102,7 +105,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         </>
       );
     },
-    [renderQuestionnaire, SkippableButton, currentPage]
+    [renderQuestionnaire, renderSkipButton, currentPage]
   );
 
   const handleMoveToRecommendationScreen = useCallback(() => {

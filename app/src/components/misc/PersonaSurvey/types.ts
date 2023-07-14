@@ -20,12 +20,15 @@ export interface PageConfig {
   pageId: SurveyPage;
   title: string;
   subTitle: string;
-  skip?: boolean; // If skip true then don't show the page in survey
+  /**
+   *  If skip true then don't show the page in survey
+   */
+  skip?: boolean;
   render?: QuestionnaireType | (() => ReactNode);
 }
 
 export interface SurveyOptionsConfig {
-  action?: (dispatch: any, value: string, doClear: boolean) => void;
+  questionResponseAction?: (dispatch: any, value: string, doClear: boolean) => void;
   options?: Option[];
 }
 
@@ -48,9 +51,3 @@ export enum SurveyPage {
   PERSONA = "persona",
   RECOMMENDATIONS = "recommendations",
 }
-
-export const OldSurveyPageMap = {
-  0: SurveyPage.GETTING_STARTED,
-  1: SurveyPage.PERSONA,
-  2: SurveyPage.RECOMMENDATIONS,
-};

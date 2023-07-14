@@ -1,10 +1,16 @@
 import { actions } from "store";
 import { getAndUpdateInstallationDate } from "utils/Misc";
-import { OldSurveyPageMap, Option, SurveyPage, UserPersona } from "./types";
+import { Option, SurveyPage, UserPersona } from "./types";
 import { getValueAsPromise, setValue } from "actions/FirebaseActions";
 import PATHS from "config/constants/sub/paths";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+
+const OldSurveyPageMap = {
+  0: SurveyPage.GETTING_STARTED,
+  1: SurveyPage.PERSONA,
+  2: SurveyPage.RECOMMENDATIONS,
+};
 
 export const shouldShowOnboarding = async (appMode: string) => {
   if (

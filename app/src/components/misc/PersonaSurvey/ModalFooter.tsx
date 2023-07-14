@@ -27,6 +27,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
   const appMode = useSelector(getAppMode);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
   const surveyLength = useMemo(() => Object.keys(SurveyConfig).length, []);
+  const currentPageIndex = useMemo(() => Object.keys(SurveyConfig).indexOf(currentPage), [currentPage]);
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = useMemo(() => {
@@ -71,7 +72,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
               </>
             ) : (
               <>
-                {Object.keys(SurveyConfig).indexOf(currentPage)} / {surveyLength - 1}
+                {currentPageIndex} / {surveyLength - 1}
               </>
             )}
           </Col>
