@@ -39,7 +39,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     setIsFilePickerModalActive(false);
 
     dispatch(
-      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, customValue: url })
+      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, newValue: url })
     );
   };
   /** Remove till here */
@@ -53,7 +53,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const handleMockPickerSelectionCallback = (url) => {
     setIsMockPickerVisible(false);
     dispatch(
-      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, customValue: url })
+      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, newValue: url })
     );
   };
 
@@ -129,7 +129,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: `scripts[${scriptIndex}].codeType`,
-        customValue: codeType,
+        newValue: codeType,
         arrayOfOtherValuesToModify: [
           {
             path: `scripts[${scriptIndex}].value`,
@@ -149,8 +149,8 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
+          newValue: value,
           objectPath: `scripts[${scriptIndex}].value`,
-          customValue: value,
           triggerUnsavedChangesIndication: !isCodeFormatted,
         })
       );
@@ -204,13 +204,12 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     );
   };
 
-  const scriptTypeChangeHandler = (event, newScriptType) => {
+  const scriptTypeChangeHandler = (newScriptType) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        newValue: event?.target?.value,
         objectPath: `scripts[${scriptIndex}].type`,
-        customValue: newScriptType,
+        newValue: newScriptType,
         arrayOfOtherValuesToModify: [
           {
             path: `scripts[${scriptIndex}].value`,
@@ -236,13 +235,12 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   );
 
   const handleLoadTimeClick = useCallback(
-    (event, type) =>
+    (type) =>
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
           objectPath: `scripts[${scriptIndex}].loadTime`,
-          customValue: type,
+          newValue: type,
         })
       ),
     [dispatch, pairIndex, scriptIndex]
@@ -251,7 +249,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const loadTimeMenu = (
     <Menu>
       {loadTimeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => handleLoadTimeClick(e, type)}>
+        <Menu.Item key={index} onClick={(e) => handleLoadTimeClick(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -275,7 +273,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const scriptTypeMenu = (
     <Menu>
       {scriptTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(e, type)}>
+        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(type)}>
           {title}
         </Menu.Item>
       ))}

@@ -169,9 +169,8 @@ const Filters = (props) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
           objectPath: APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-          customValue: operator,
+          newValue: operator,
         })
       );
     },

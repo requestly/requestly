@@ -51,7 +51,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "destination",
-        customValue: url,
+        newValue: url,
       })
     );
   };
@@ -62,7 +62,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "destination",
-        customValue: `file://${filePath}`,
+        newValue: `file://${filePath}`,
       })
     );
   };
@@ -125,7 +125,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "destinationType",
-        customValue: destinationPopupSelection,
+        newValue: destinationPopupSelection,
         arrayOfOtherValuesToModify: [
           {
             path: "destination",

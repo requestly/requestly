@@ -58,7 +58,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         actions.updateRulePairAtGivenPath({
           pairIndex,
           objectPath: "response.type",
-          customValue: responseBodyType,
+          newValue: responseBodyType,
           arrayOfOtherValuesToModify: [
             {
               path: "response.value",
@@ -79,7 +79,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "response.type",
-        customValue: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
+        newValue: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
         arrayOfOtherValuesToModify: [
           {
             path: `response.value`,
@@ -158,7 +158,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "response.type",
-        customValue: pair.response.type,
+        newValue: pair.response.type,
         arrayOfOtherValuesToModify: [
           {
             path: "response.value",
@@ -198,9 +198,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
           objectPath: "response.serveWithoutRequest",
-          customValue: flag,
+          newValue: flag,
         })
       );
     }

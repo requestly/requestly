@@ -30,7 +30,7 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
               actions.updateRulePairAtGivenPath({
                 pairIndex,
                 objectPath: "response.statusCode",
-                customValue: value,
+                newValue: value,
                 arrayOfOtherValuesToModify: [
                   {
                     path: "response.statusText",

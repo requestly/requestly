@@ -45,7 +45,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         actions.updateRulePairAtGivenPath({
           pairIndex,
           objectPath: SOURCE_REQUEST_PAYLOAD_KEY,
-          customValue: gqlOperationFilter.key,
+          newValue: gqlOperationFilter.key,
           triggerUnsavedChangesIndication: false,
           arrayOfOtherValuesToModify: [
             {

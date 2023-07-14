@@ -36,7 +36,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         actions.updateRulePairAtGivenPath({
           pairIndex,
           objectPath: "request.type",
-          customValue: requestType,
+          newValue: requestType,
           arrayOfOtherValuesToModify: [
             {
               path: `request.value`,
@@ -64,7 +64,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "request.type",
-        customValue: pair.request.type,
+        newValue: pair.request.type,
         arrayOfOtherValuesToModify: [
           {
             path: `request.value`,

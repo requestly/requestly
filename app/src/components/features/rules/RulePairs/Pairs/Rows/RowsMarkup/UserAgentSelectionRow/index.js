@@ -16,7 +16,7 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: "env",
-        customValue: itemSet.value.env,
+        newValue: itemSet.value.env,
         arrayOfOtherValuesToModify: [
           {
             path: "userAgent",
@@ -28,7 +28,7 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
   };
 
   const deviceTypeDropdownOnChangeHandler = useCallback(
-    (event, newValue) => {
+    (newValue) => {
       let extraModifications = [
         {
           path: "env",
@@ -46,9 +46,8 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
           objectPath: "envType",
-          customValue: newValue,
+          newValue: newValue,
           arrayOfOtherValuesToModify: extraModifications,
         })
       );
@@ -89,8 +88,8 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
         {envTypeOptions.map(({ id, name, deviceType }) => (
           <Menu.Item
             key={id}
-            onClick={(event) => {
-              deviceTypeDropdownOnChangeHandler(event, deviceType);
+            onClick={() => {
+              deviceTypeDropdownOnChangeHandler(deviceType);
             }}
           >
             {name}

@@ -134,9 +134,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  newValue: event?.target?.value,
                   objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-                  customValue: ruleKey,
+                  newValue: ruleKey,
                 })
               );
             }}
@@ -158,9 +157,8 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  newValue: event?.target?.value,
                   objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-                  customValue: ruleOperator,
+                  newValue: ruleOperator,
                 })
               );
             }}
@@ -179,7 +177,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
       actions.updateRulePairAtGivenPath({
         pairIndex,
         objectPath: APP_CONSTANTS.PATH_FROM_PAIR.SOURCE,
-        customValue: updatedSource,
+        newValue: updatedSource,
       })
     );
   };

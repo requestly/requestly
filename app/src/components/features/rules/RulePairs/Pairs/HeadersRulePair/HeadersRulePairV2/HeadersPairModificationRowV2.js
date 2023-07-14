@@ -40,9 +40,8 @@ const HeadersPairModificationRowV2 = ({
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
           objectPath: `modifications[${modificationType}][${modificationIndex}].type`,
-          customValue: type,
+          newValue: type,
         })
       );
     },
@@ -80,7 +79,7 @@ const HeadersPairModificationRowV2 = ({
               actions.updateRulePairAtGivenPath({
                 pairIndex,
                 objectPath: `modifications[${modificationType}][${modificationIndex}].header`,
-                customValue: value,
+                newValue: value,
               })
             )
           }

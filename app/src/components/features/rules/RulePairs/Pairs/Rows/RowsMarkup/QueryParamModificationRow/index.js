@@ -27,13 +27,12 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
     []
   );
 
-  const handleModificationTypeClick = (event, type) => {
+  const handleModificationTypeClick = (type) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        newValue: event?.target?.value,
         objectPath: `modifications[${modificationIndex}].type`,
-        customValue: type,
+        newValue: type,
       })
     );
   };
@@ -41,7 +40,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
   const modificationTypeMenu = (
     <Menu>
       {modificationTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => handleModificationTypeClick(e, type)}>
+        <Menu.Item key={index} onClick={(e) => handleModificationTypeClick(type)}>
           {title}
         </Menu.Item>
       ))}
