@@ -1,7 +1,7 @@
 import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
 import { BsShieldCheck } from "react-icons/bs";
 import { Button, Divider, Input, Row, Col, Typography, InputRef } from "antd";
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
@@ -13,7 +13,8 @@ import { getUserAuthDetails } from "store/selectors";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
-  trackOnboardingYTVideoClicked,
+  trackOnboardingSampleSessionViewed,
+  trackOnboardingPageViewed,
   trackStartRecordingOnExternalTarget,
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
@@ -193,6 +194,10 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    trackOnboardingPageViewed();
+  }, []);
+
   const openInstallExtensionModal = useCallback(() => {
     const modalProps = {
       heading: "Install Browser extension to record sessions for faster debugging and bug reporting",
@@ -285,7 +290,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
           <Row justify="end">
             <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
           </Row>
-          <Row onClick={trackOnboardingYTVideoClicked}>
+          <Row onClick={trackOnboardingSampleSessionViewed}>
             <a
               href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
               target="__blank"
