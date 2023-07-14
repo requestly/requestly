@@ -1123,12 +1123,6 @@ const RulesTable = ({
     groupingAndRuleActivationExp,
   ]);
 
-  // useCustom = (config) => {
-  //   const [x, setX] = useState();
-
-  //   return [x, setX, updateProductTourCompleted];
-  // };
-
   return (
     <>
       <ProductWalkthrough
