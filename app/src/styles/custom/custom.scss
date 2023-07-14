@@ -1,13 +1,6 @@
 @import "../../../node_modules/codemirror/lib/codemirror.css";
 @import "../../../node_modules/codemirror/theme/eclipse.css";
 
-@import "../pricing/comparison-table/index.css";
-@import "../pricing/paypal-modal/index.css";
-@import "../pricing/PricingIndexPage/index.css";
-
-@import "./animations.scss";
-// @import "./icons.scss";
-
 $theme-primary-color: #0a48b3;
 $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
 
