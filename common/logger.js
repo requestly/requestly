@@ -20,7 +20,7 @@ var Logger = {
 };
 
 let urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has("enableLogger")) {
+if (urlParams.has("debug")) {
   Logger.enabled = true;
 }
 
