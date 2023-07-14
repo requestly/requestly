@@ -22,7 +22,8 @@ export const SESSION_RECORDING = {
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
 
   ONBAORDING: {
-    youtube_link_clicked: "session_onboarding_youtube_link_clicked",
+    onboarding_page_viewed: "session_onboarding_page_viewed",
+    sample_session_viewed: "sample_session_viewed",
     start_recording_clicked: "start_recording_btn_clicked",
     invalid_recording_url: "invalid_recording_url_entered",
     navigate_to_target_website: "navigated_to_recording_target",
@@ -188,6 +189,14 @@ export const EXECUTION_LOGS = {
 
 export const RULE_SIMULATOR = {
   SIMULATED: "rule_simulated",
+};
+
+export const TEST_URL_CONDITION = {
+  TEST_URL_CONDITION_MODAL_VIEWED: "test_URL_condition_modal_viewed",
+  TEST_URL_CONDITION_MATCHING_TRIED: "test_URL_condition_matching_tried",
+  TEST_URL_CONDITION_SOURCE_MODIFIED: "test_URL_condition_source_modified",
+  TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED: "test_URL_condition_source_modification_saved",
+  TEST_URL_CONDITION_MODAL_CLOSED: "test_URL_condition_modal_closed",
 };
 
 export const RULE_EDITOR = {

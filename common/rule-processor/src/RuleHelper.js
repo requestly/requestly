@@ -23,7 +23,6 @@ class RuleMatcher {
       // Replace all $index values in destinationUrl with the matched groups
       finalString = finalString.replace(new RegExp("[$]" + index, "g"), matchValue);
     });
-
     return finalString;
   }
 
@@ -40,11 +39,12 @@ class RuleMatcher {
 
     // Do not match when regex is invalid or regex does not match with Url
     if (!regex || inputString.search(regex) === -1) {
-      return null;
+      return { destination: null, matches: [] };
     }
 
-    matches = regex.exec(inputString) || [];
-    return RuleMatcher.populateMatchesInString(finalString, matches);
+    //extract all the matches from regex.exec results and ignore extra properties index, input, groups
+    matches = regex.exec(inputString)?.map((match) => match) || [];
+    return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
   /**
@@ -73,7 +73,7 @@ class RuleMatcher {
       positionInInput = inputString.indexOf(substr);
 
       if (positionInInput === -1) {
-        return null;
+        return { destination: null, matches: [] };
       } else if (positionInInput === 0) {
         matches.push("");
       } else {
@@ -83,7 +83,7 @@ class RuleMatcher {
       inputString = inputString.slice(positionInInput + substr.length);
     }
 
-    return RuleMatcher.populateMatchesInString(finalString, matches);
+    return { destination: RuleMatcher.populateMatchesInString(finalString, matches), matches };
   }
 
   /**
@@ -97,6 +97,10 @@ class RuleMatcher {
    * In some cases like wildcard match or regex match, resultingUrl will be destination+replaced group variables.
    */
   static matchUrlWithRuleSource(sourceObject, url, destination) {
+    return RuleMatcher.matchUrlWithRuleSourceWithExtraInfo(sourceObject, url, destination).destination;
+  }
+
+  static matchUrlWithRuleSourceWithExtraInfo(sourceObject, url, destination) {
     var operator = sourceObject.operator,
       urlComponent = extractUrlComponent(url, sourceObject.key),
       value = sourceObject.value,
@@ -104,10 +108,9 @@ class RuleMatcher {
 
     for (var index = 0; index < blackListedDomains.length; index++) {
       if (url.indexOf(blackListedDomains[index]) !== -1) {
-        return null;
+        return { destination: null };
       }
     }
-
     return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
   }
 
@@ -120,13 +123,13 @@ class RuleMatcher {
     switch (operator) {
       case CONSTANTS.RULE_OPERATORS.EQUALS:
         if (value === urlComponent) {
-          return resultingUrl;
+          return { destination: resultingUrl };
         }
         break;
 
       case CONSTANTS.RULE_OPERATORS.CONTAINS:
         if (urlComponent.indexOf(value) !== -1) {
-          return resultingUrl;
+          return { destination: resultingUrl };
         }
         break;
 
@@ -139,7 +142,7 @@ class RuleMatcher {
       }
     }
 
-    return null;
+    return { destination: null };
   }
 
   /**
@@ -254,7 +257,7 @@ class RuleMatcher {
       pageUrlFilter = [pageUrlFilter];
     }
     return pageUrlFilter.every((urlFilter) => {
-      return RuleMatcher.matchUrlCriteria(pageUrl, urlFilter.operator, urlFilter.value) !== null;
+      return RuleMatcher.matchUrlCriteria(pageUrl, urlFilter.operator, urlFilter.value)?.destination !== null;
     });
   }
 

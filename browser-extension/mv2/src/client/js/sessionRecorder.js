@@ -1,7 +1,6 @@
-RQ.SessionRecorder = {
-  isRecording: false,
-  sendResponseCallbacks: {},
-};
+RQ.SessionRecorder = {};
+RQ.SessionRecorder.isRecording = false;
+RQ.SessionRecorder.sendResponseCallbacks = {};
 
 RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.getRecordingConfig().then((config) => {
@@ -151,14 +150,28 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
 
 RQ.SessionRecorder.explicitRecordingFlag = {
   IS_EXPLICIT_RECORDING: "__RQ__isExplicitRecording",
+  fallback: false, // use when window.sessionStorage is not supported
+
   set: () => {
-    window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
+    try {
+      window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
+    } catch (e) {
+      RQ.SessionRecorder.explicitRecordingFlag.fallback = true;
+    }
   },
   get: () => {
-    return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    try {
+      return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    } catch (e) {
+      return RQ.SessionRecorder.explicitRecordingFlag.fallback;
+    }
   },
   clear: () => {
-    window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    try {
+      window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    } catch (e) {
+      RQ.SessionRecorder.explicitRecordingFlag.fallback = false;
+    }
   },
 };
 
