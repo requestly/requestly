@@ -46,7 +46,7 @@ const UpdatePaymentMethod = () => {
 
   const fetchTeamInfo = () => {
     const functions = getFunctions();
-    const getTeamInfo = httpsCallable(functions, "getTeamInfo");
+    const getTeamInfo = httpsCallable(functions, "teams-getTeamInfo");
 
     getTeamInfo({ teamId: teamId })
       .then((res) => {
