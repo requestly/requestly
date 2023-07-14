@@ -12,8 +12,6 @@ export const useIsExtensionEnabled = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
-  console.log({ appMode });
-
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       Logger.log(`Reading storage in App`);
