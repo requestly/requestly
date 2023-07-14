@@ -4,7 +4,7 @@ import { RQButton, RQModal } from "lib/design-system/components";
 import { SourceConditionInput } from "../SourceUrl";
 import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { isRegexFormat } from "utils/rules/misc";
+import { isValidRegex } from "utils/rules/misc";
 import { isValidUrl } from "utils/FormattingHelper";
 import { isEqual } from "lodash";
 import { SourceOperator } from "types";
@@ -57,7 +57,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   }, [matchedGroups, updatedSource.operator]);
 
   const renderResult = useCallback(() => {
-    if (updatedSource.operator === SourceOperator.MATCHES && !isRegexFormat(updatedSource.value)) {
+    if (updatedSource.operator === SourceOperator.MATCHES && !isValidRegex(updatedSource.value)) {
       return (
         <>
           <CloseCircleOutlined className="danger" />
