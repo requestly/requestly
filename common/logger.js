@@ -24,10 +24,12 @@ if (urlParams.has("debug")) {
   Logger.enabled = true;
 }
 
-window.RQ = window.RQ || {};
-window.RQ.components = window.RQ.components || {};
-if (window.RQ.components) window.RQ.components.logger = Logger;
+window.rq_debug = () => (Logger.enabled = true);
 
 if (isReactApp) {
   module.exports = Logger;
+} else {
+  window.RQ = window.RQ || {};
+  window.RQ.components = window.RQ.components || {};
+  window.RQ.components.logger = Logger;
 }
