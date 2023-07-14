@@ -28,7 +28,7 @@ const TeamViewer = () => {
 
   useEffect(() => {
     const functions = getFunctions();
-    const getIsTeamAdmin = httpsCallable(functions, "isTeamAdmin");
+    const getIsTeamAdmin = httpsCallable(functions, "teams-isTeamAdmin");
 
     getIsTeamAdmin({
       teamId,

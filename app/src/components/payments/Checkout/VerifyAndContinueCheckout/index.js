@@ -102,7 +102,7 @@ const VerifyAndContinueCheckout = ({
 
   const fetchTeamInfo = () => {
     const functions = getFunctions();
-    const getTeamInfo = httpsCallable(functions, "getTeamInfo");
+    const getTeamInfo = httpsCallable(functions, "teams-getTeamInfo");
 
     if (!teamId) {
       setIsSubscriptionCheckPassed(true);
