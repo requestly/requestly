@@ -91,7 +91,8 @@ export const trackSampleSessionClicked = (log_type) => {
 };
 
 /* ONBOARDING */
-export const trackOnboardingYTVideoClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.youtube_link_clicked);
+export const trackOnboardingPageViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.onboarding_page_viewed);
+export const trackOnboardingSampleSessionViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.sample_session_viewed);
 export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
 export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
 export const trackStartRecordingOnExternalTarget = (url) => {
