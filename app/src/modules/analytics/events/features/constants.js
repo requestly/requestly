@@ -22,7 +22,8 @@ export const SESSION_RECORDING = {
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
 
   ONBAORDING: {
-    youtube_link_clicked: "session_onboarding_youtube_link_clicked",
+    onboarding_page_viewed: "session_onboarding_page_viewed",
+    sample_session_viewed: "sample_session_viewed",
     start_recording_clicked: "start_recording_btn_clicked",
     invalid_recording_url: "invalid_recording_url_entered",
     navigate_to_target_website: "navigated_to_recording_target",
