@@ -176,16 +176,21 @@ export const getAllResponseBodyTypes = (rule) => {
   return bodyTypes;
 };
 
+const regexFormat = "^/(.+)(/)(|i|g|ig|gi)$";
+
 /**
- * Check if the regex string contains the forward and backward slashes or not
+ * Checks if the regex string is a valid regex or not
  * @param {string} regexStr
  * @returns {boolean}
  */
-export const isRegexFormat = (regexStr) => {
+export const isValidRegex = (regexStr) => {
   try {
-    if (!regexStr.startsWith("/") || !regexStr.endsWith("/")) {
+    // Checking if pattern matches
+    const isValidRegexPattern = regexStr.search(new RegExp(regexFormat)) !== -1;
+    if (!isValidRegexPattern) {
       return false;
     }
+    // Checking if regex can be made using string
     new RegExp(regexStr);
     return true;
   } catch (error) {
@@ -198,12 +203,20 @@ export const isRegexFormat = (regexStr) => {
  * @param {string} regexStr
  * @returns {string}
  */
-export const formatRegexSource = (regexStr) => {
-  try {
-    return regexStr.replace(/^\/?([^/]+(?:\/[^/]+)*)\/?$/, "/$1/");
-  } catch {
+export const fixRegexStr = (regexStr) => {
+  if (regexStr[0] !== "/") {
+    regexStr = "/" + regexStr;
+  }
+
+  if (isValidRegex(regexStr)) {
     return regexStr;
   }
+
+  if (regexStr[regexStr.length - 1] !== "/") {
+    regexStr = regexStr + "/";
+  }
+
+  return regexStr;
 };
 
 export function runMinorFixesOnRule(dispatch, rule) {
@@ -211,12 +224,12 @@ export function runMinorFixesOnRule(dispatch, rule) {
     let fixedPair = pair;
     // fix regex
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
-      if (!isRegexFormat(pair.source.value)) {
+      if (!isValidRegex(pair.source.value)) {
         fixedPair = {
           ...pair,
           source: {
             ...pair.source,
-            value: formatRegexSource(pair.source.value),
+            value: fixRegexStr(pair.source.value),
           },
         };
       }
