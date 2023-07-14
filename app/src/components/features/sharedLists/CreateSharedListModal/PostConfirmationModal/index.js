@@ -45,7 +45,7 @@ export const PostConfirmationModal = ({ sharedListAttributes, onSharedListCreati
     trackSharedListNotifyClicked();
     trackRQLastActivity("sharedList_notify_button_clicked");
     const functions = getFunctions();
-    const sendSharedListShareEmail = httpsCallable(functions, "sendSharedListShareEmail");
+    const sendSharedListShareEmail = httpsCallable(functions, "sharedLists-sendSharedListShareEmail");
     sendSharedListShareEmail({
       sharedListData: sharedListData,
       recipientEmails: attributes.sharedListRecipients,
