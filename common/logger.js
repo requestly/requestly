@@ -20,14 +20,14 @@ var Logger = {
 };
 
 let urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has("enableLogger")) {
+if (urlParams.has("debug")) {
   Logger.enabled = true;
 }
 
+window.RQ = window.RQ || {};
+window.RQ.components = window.RQ.components || {};
+if (window.RQ.components) window.RQ.components.logger = Logger;
+
 if (isReactApp) {
   module.exports = Logger;
-} else {
-  window.RQ = window.RQ || {};
-  window.RQ.components = window.RQ.components || {};
-  window.RQ.components.logger = Logger;
 }
