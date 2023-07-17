@@ -1,8 +1,47 @@
 @import "../../../node_modules/codemirror/lib/codemirror.css";
 @import "../../../node_modules/codemirror/theme/eclipse.css";
+@import "../../lib/design-system/custom/variables.css";
+@import "../../lib/design-system/custom/base.css";
 
 $theme-primary-color: #0a48b3;
 $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 1rem;
+  background-color: rgba(164, 164, 164, 0.227);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+li {
+  list-style: none;
+}
+
+input.ant-input {
+  padding: 8px;
+}
+
+button.ant-btn {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.ant-btn-lg {
+  font-size: 16px;
+}
+
+button.ant-input-search-button {
+  height: auto;
+}
 
 .typeform-btn {
   background-color: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
@@ -346,4 +385,187 @@ input[id^="react-select-"] {
   background-color: transparent;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--success);
+}
+
+/* spinner & skeleton */
+.spinner-card {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+}
+
+/* buttons & icons */
+.header-icon,
+.ant-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-menu-item .remix-icon {
+  min-width: 20px;
+}
+
+.ant-btn-dashed {
+  border-color: #4f5053;
+}
+
+.checkbox {
+  margin-right: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.card-body .row {
+  margin-top: 0.6rem;
+  box-shadow: none;
+}
+
+.dropdown .dropdown-menu {
+  display: none;
+  pointer-events: none;
+}
+
+.dropdown.show .dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  pointer-events: all;
+  position: absolute;
+  left: 50% !important;
+  top: 70% !important;
+  background: #fff;
+  padding: 0.4rem;
+  z-index: 500;
+  transform: translate(-50%, -50%) !important;
+  width: 80% !important;
+}
+
+.gutter {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transition: 0.3s all;
+}
+
+/* Gutter on rule editor splitter pane - execution logs */
+.gutter:hover {
+  opacity: 0.8;
+}
+
+.gutter.gutter-vertical {
+  background-color: #1c1d21;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
+}
+
+/* header */
+.alert .ant-alert-message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.desktop-auth-message {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (min-width: 64em) {
+  .ant-table-ping-right:not(.ant-table-has-fix-right) .ant-table-container::after {
+    box-shadow: none;
+  }
+}
+
+.signin-link {
+  padding: 0 6px 0 0;
+  border: none !important;
+}
+
+.ant-btn-link.signin-link:hover,
+.ant-btn-link.signin-link:focus {
+  background: none !important;
+  text-decoration: underline;
+}
+
+/* user info */
+.ant-btn .anticon {
+  margin: 4px 0;
+}
+
+.ant-input-search-button .anticon {
+  margin: 11px 0;
+}
+
+.icon-wrapper {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrapper-sm {
+  width: 13px;
+  height: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  margin-right: 5px;
+}
+
+.icon-wrapper svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--text-gray);
+}
+
+.ant-dropdown-menu.ant-dropdown-menu-root .ant-dropdown-menu-item.ant-dropdown-menu-item-active {
+  color: var(--white);
+}
+
+/* react multi email */
+div.react-multi-email {
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+  background-color: var(--component-dark-background);
+}
+
+div.react-multi-email:hover {
+  cursor: text;
+  border-color: #2051b4;
+  transition: border 0.2s;
+}
+
+div.react-multi-email > input {
+  color: var(--white);
+  background-color: var(--component-dark-background);
+}
+
+div.react-multi-email.focused {
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
+  background-color: var(--component-dark-background);
+}
+
+div.react-multi-email .multi-email-tag {
+  font-size: 12px;
+  font-weight: 400;
+  padding: 4px 8px;
+  color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.records-table.ant-pro-table .ant-table-tbody tr td a:hover,
+.records-table.ant-pro-table .ant-table-tbody tr td a span:hover,
+.records-table.ant-table-wrapper .ant-table-tbody tr td a:hover {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.ant-btn.ant-btn-default:focus:not(.ant-btn-icon-only),
+.ant-btn.ant-btn-default:hover:not(.ant-btn-icon-only) {
+  color: var(--white);
+  border: 1px solid #343434;
+  background-color: var(--hover-color);
 }
