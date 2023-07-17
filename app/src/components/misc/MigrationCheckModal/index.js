@@ -12,10 +12,8 @@ import {
 } from "../../../utils/MigrationSteps";
 //ACTIONS
 import SpinnerColumn from "../SpinnerColumn";
-import FEATURES from "../../../config/constants/sub/features";
 // UTILS
 import { getAppMode } from "../../../store/selectors";
-import { isFeatureCompatible } from "../../../utils/CompatibilityUtils";
 import { trackHeaderRulesMigratedToV2 } from "modules/analytics/events/misc/migration";
 
 const MigrationCheckModal = () => {
@@ -47,18 +45,17 @@ const MigrationCheckModal = () => {
   }, [appMode]);
 
   useEffect(() => {
-    if (isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)) {
-      checkIfHeadersV2MigrationStepsAreAlreadyPerformed(appMode).then((result) => {
-        if (!result) {
-          executeV2MigrationForHeaderRules(appMode).then(() => {
-            setHeadersV2MigrationStepsDone(appMode);
-            trackHeaderRulesMigratedToV2();
-          });
-        } else {
-          return;
-        }
-      });
-    }
+    checkIfHeadersV2MigrationStepsAreAlreadyPerformed(appMode).then((result) => {
+      if (!result) {
+        executeV2MigrationForHeaderRules(appMode).then(() => {
+          setHeadersV2MigrationStepsDone(appMode);
+          trackHeaderRulesMigratedToV2();
+        });
+      } else {
+        return;
+      }
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

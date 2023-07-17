@@ -26,13 +26,7 @@ const modifyResponseDefaultCode = () => {
 
 const modifyRequestDefaultCode = () => {
   let value =
-    "function modifyRequest(args) {\n  const {method, url, request:requestData} = args;\n  // Change request below depending upon request attributes received in args\n  \n  return requestData;\n}";
-
-  // updated modifyRequestBody starter template with renamed args
-  if (isFeatureCompatible(FEATURES.UPDATED_REQUEST_BODY_ARGS)) {
-    value =
-      "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  \n  return body;\n}";
-  }
+    "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  \n  return body;\n}";
 
   if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_RESPONSE_BODY)) {
     value = "async " + value;
@@ -42,11 +36,7 @@ const modifyRequestDefaultCode = () => {
 };
 
 const getHeaderMetadataConfig = () => {
-  if (isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)) {
-    return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V2"];
-  }
-
-  return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V1"];
+  return RULE_METADATA_CONFIG[GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]["V2"];
 };
 
 const RULE_METADATA_CONFIG = {
