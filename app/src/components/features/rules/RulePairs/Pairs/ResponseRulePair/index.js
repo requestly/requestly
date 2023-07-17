@@ -5,8 +5,6 @@ import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import ResponseBodyRow from "../Rows/RowsMarkup/ResponseBodyRow";
 import ResponseStatusCodeRow from "../Rows/RowsMarkup/ResponseStatusCodeRow";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 import GraphqlRequestPayload from "./GraphqlRequestPayload";
 import { ResponseRuleResourceType } from "types/rules";
 import getObjectValue from "../../Filters/actions/getObjectValue";
@@ -35,10 +33,6 @@ const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInp
     value: currentPayloadValue,
   });
 
-  const canOverrideStatus = useMemo(() => {
-    return isFeatureCompatible(FEATURES.MODIFY_API_RESPONSE_STATUS) && window?.RQ?.DESKTOP?.VERSION !== "1.0";
-  }, []);
-
   return (
     <React.Fragment>
       <Row>
@@ -66,18 +60,16 @@ const ResponseRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInp
           </Col>
         )}
 
-        {canOverrideStatus ? (
-          <Col span={12}>
-            <ResponseStatusCodeRow
-              rowIndex={2}
-              pair={pair}
-              pairIndex={pairIndex}
-              helperFunctions={helperFunctions}
-              ruleDetails={ruleDetails}
-              isInputDisabled={isInputDisabled}
-            />
-          </Col>
-        ) : null}
+        <Col span={12}>
+          <ResponseStatusCodeRow
+            rowIndex={2}
+            pair={pair}
+            pairIndex={pairIndex}
+            helperFunctions={helperFunctions}
+            ruleDetails={ruleDetails}
+            isInputDisabled={isInputDisabled}
+          />
+        </Col>
       </Row>
       <Row>
         <Col span={24}>

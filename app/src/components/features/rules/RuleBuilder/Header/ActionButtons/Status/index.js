@@ -9,11 +9,9 @@ import {
   getCurrentlySelectedRuleData,
   getUserAuthDetails,
 } from "../../../../../../../store/selectors";
-import FEATURES from "config/constants/sub/features";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
 import { StorageService } from "init";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 
@@ -25,9 +23,7 @@ const Status = ({ location, isRuleEditorModal }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const isDisabled =
-    currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST &&
-    !isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY);
+  const isDisabled = currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
