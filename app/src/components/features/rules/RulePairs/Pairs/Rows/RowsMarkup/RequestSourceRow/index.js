@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography } from "antd";
@@ -13,7 +13,10 @@ import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import { trackURLConditionModalClosed } from "modules/analytics/events/features/testUrlModal";
+import {
+  trackURLConditionModalClosed,
+  trackURLConditionAnimationViewed,
+} from "modules/analytics/events/features/testUrlModal";
 import "./RequestSourceRow.css";
 
 const { Text } = Typography;
@@ -25,6 +28,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
+  const hasSeenTestURLAnimation = useRef(false);
 
   const sourceKeys = useMemo(
     () => [
@@ -119,8 +123,13 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDeta
       window.location.href.includes(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE) &&
       (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ||
         pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)
-    )
+    ) {
+      if (!hasSeenTestURLAnimation.current) {
+        trackURLConditionAnimationViewed();
+        hasSeenTestURLAnimation.current = true;
+      }
       return true;
+    }
   }, [isTestURLClicked, pair.source.value, pair.source.operator]);
 
   return (

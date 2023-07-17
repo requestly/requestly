@@ -1,16 +1,22 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useDebounce } from "hooks/useDebounce";
 import { Command } from "cmdk";
 import fuzzysort from "fuzzysort";
-
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
 import { getAllRules, getUserAuthDetails, getAppMode } from "store/selectors";
-import { trackCommandBarToggled, trackCommandBarActionSelected } from "modules/analytics/events/misc/commandBar";
-import "./index.css";
+import {
+  trackCommandPaletteClosed,
+  trackCommandPaletteOpened,
+  trackCommandPaletteOptionSearched,
+  trackCommandPaletteOptionSelected,
+} from "modules/analytics/events/misc/commandBar";
 import { config } from "./config";
+import { getUserOS } from "utils/Misc";
 import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
+import "./index.css";
 
 export const CommandBar = () => {
   const [open, setOpen] = useState(false);
@@ -22,6 +28,7 @@ export const CommandBar = () => {
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
 
   let currentPage = pagesStack[pagesStack.length - 1];
 
@@ -61,8 +68,9 @@ export const CommandBar = () => {
     if (!open) {
       setPagesStack([Page.HOME]);
       setSearch("");
+      trackCommandPaletteClosed();
     } else {
-      trackCommandBarToggled();
+      trackCommandPaletteOpened(getUserOS());
     }
   }, [open]);
 
@@ -111,7 +119,7 @@ export const CommandBar = () => {
           onSelect={() => {
             if (item?.action) {
               item.action({ navigate, dispatch, user, appMode, rules });
-              trackCommandBarActionSelected(item.id.split(" ").join("_"));
+              trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               setOpen(false);
             }
 
@@ -136,6 +144,11 @@ export const CommandBar = () => {
   const renderAsyncPage = (fetcher: Function): ReactNode => {
     const items = fetcher(rules);
     return renderItems(items);
+  };
+
+  const handleValueChange = (value: string) => {
+    setSearch(value);
+    debouncedTrackOptionSearcedEvent();
   };
 
   return (
@@ -164,7 +177,7 @@ export const CommandBar = () => {
               <Command.Input
                 autoFocus={true}
                 value={search}
-                onValueChange={setSearch}
+                onValueChange={handleValueChange}
                 placeholder="Explore Requestly"
               />
               <Command.List>

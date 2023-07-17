@@ -4,10 +4,8 @@ import ReactSelect from "react-select";
 import { Button, Modal, Row, Col, Input, Typography, Dropdown, Menu } from "antd";
 //UTILITIES
 import { getCurrentlySelectedRuleData } from "../../../../../store/selectors";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
 //EXTERNALS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import FEATURES from "config/constants/sub/features";
 import APP_CONSTANTS from "config/constants";
 //actions
 import deleteObjectAtPath from "./actions/deleteObjectAtPath";
@@ -87,8 +85,7 @@ const Filters = (props) => {
     return ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
-  const isRequestPayloadFilterCompatible =
-    isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER) && isResponseRule() && hasLegacyPayloadFilter();
+  const isRequestPayloadFilterCompatible = isResponseRule() && hasLegacyPayloadFilter();
 
   const isHTTPMethodFilterCompatible = true;
   const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
