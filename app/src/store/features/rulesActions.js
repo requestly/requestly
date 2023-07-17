@@ -90,20 +90,10 @@ export const updateRecord = (prevState, action) => {
 
 // rule editor actions
 export const updateRulePairAtGivenPath = (prevState, action) => {
-  const {
-    newValue,
-    pairIndex,
-    objectPath,
-    arrayOfOtherValuesToModify = [],
-    triggerUnsavedChangesIndication = true,
-  } = action.payload;
+  const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
 
-  set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(objectPath), newValue);
-
-  if (arrayOfOtherValuesToModify.length) {
-    arrayOfOtherValuesToModify.forEach((modification) => {
-      set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], modification.path, modification.value);
-    });
+  for (const [modificationPath, value] of Object.entries(updates)) {
+    set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(modificationPath), value);
   }
 
   if (triggerUnsavedChangesIndication) {
