@@ -149,3 +149,13 @@
 .network-table-wrapper-override .ant-pro-card-body > div > div > div {
   overflow: auto !important;
 }
+
+.previewData {
+  display: flex;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.previewData .rdt_TableRow {
+  min-height: fit-content;
+}
