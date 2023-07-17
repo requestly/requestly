@@ -197,6 +197,7 @@ export const TEST_URL_CONDITION = {
   TEST_URL_CONDITION_SOURCE_MODIFIED: "test_URL_condition_source_modified",
   TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED: "test_URL_condition_source_modification_saved",
   TEST_URL_CONDITION_MODAL_CLOSED: "test_URL_condition_modal_closed",
+  TEST_URL_CONDITION_ANIMATION_VIEWED: "test_URL_condition_animation_viewed",
 };
 
 export const RULE_EDITOR = {
