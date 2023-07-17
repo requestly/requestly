@@ -134,8 +134,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS,
-                  newValue: ruleKey,
+                  updates: {
+                    [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
+                  },
                 })
               );
             }}
@@ -157,8 +158,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS,
-                  newValue: ruleOperator,
+                  updates: {
+                    [APP_CONSTANTS.PATH_FROM_PAIR.RULE_OPERATORS]: ruleOperator,
+                  },
                 })
               );
             }}
@@ -176,8 +178,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: APP_CONSTANTS.PATH_FROM_PAIR.SOURCE,
-        newValue: updatedSource,
+        updates: {
+          [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE]: updatedSource,
+        },
       })
     );
   };
@@ -272,8 +275,9 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 dispatch(
                   actions.updateRulePairAtGivenPath({
                     pairIndex,
-                    newValue: event?.target?.value,
-                    objectPath: APP_CONSTANTS.PATH_FROM_PAIR.RULE_VALUE,
+                    updates: {
+                      [APP_CONSTANTS.PATH_FROM_PAIR.RULE_VALUE]: event?.target?.value,
+                    },
                   })
                 );
               }}
