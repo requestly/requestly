@@ -44,15 +44,11 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: SOURCE_REQUEST_PAYLOAD_KEY,
-          newValue: gqlOperationFilter.key,
           triggerUnsavedChangesIndication: false,
-          arrayOfOtherValuesToModify: [
-            {
-              path: "source.filters[0].requestPayload.value",
-              value: gqlOperationFilter.value,
-            },
-          ],
+          updates: {
+            [SOURCE_REQUEST_PAYLOAD_KEY]: gqlOperationFilter.key,
+            "source.filters.requestPayload.value": gqlOperationFilter.value,
+          },
         })
       );
     }
@@ -72,8 +68,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        newValue: e?.target?.value,
-        objectPath: SOURCE_REQUEST_PAYLOAD_KEY,
+        updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: e?.target?.value },
       })
     );
     const key = e.target.value;
@@ -93,8 +88,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        newValue: e?.target?.value,
-        objectPath: SOURCE_REQUEST_PAYLOAD_VALUE,
+        updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: e?.target?.value },
       })
     );
     const value = e.target.value;
