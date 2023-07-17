@@ -42,7 +42,7 @@ const RuleEditor = () => {
   }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
   unstable_usePrompt({
-    message: "Are you sure you want to leave this page? You have unsaved changes.",
+    message: "Discard changes? Changes you made may not be saved.",
     when: isCurrentlySelectedRuleHasUnsavedChanges,
   });
 
