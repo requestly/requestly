@@ -7,18 +7,18 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
 
   const handleInputChange = useCallback(
-    (event, pairIndex, path) => {
-      event?.preventDefault?.();
+    (e, path) => {
+      e?.preventDefault?.();
 
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: event?.target?.value,
+          newValue: e?.target?.value,
           objectPath: path,
         })
       );
     },
-    [dispatch]
+    [dispatch, pairIndex]
   );
 
   return (
@@ -30,7 +30,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           addonBefore="Replace"
           placeholder="This part in URL"
           disabled={isInputDisabled}
-          onChange={(event) => handleInputChange(event, pairIndex, "from")}
+          onChange={(e) => handleInputChange(e, "from")}
           data-selectionid="replace-from-in-url"
         />
       </Col>
@@ -41,7 +41,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           addonBefore="With"
           placeholder="This part"
           disabled={isInputDisabled}
-          onChange={(event) => handleInputChange(event, pairIndex, "to")}
+          onChange={(e) => handleInputChange(e, "to")}
           data-selectionid="replace-to-in-url"
         />
       </Col>
