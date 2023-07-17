@@ -13,8 +13,9 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: e?.target?.value,
-          objectPath: path,
+          updates: {
+            [path]: e?.target?.value,
+          },
         })
       );
     },

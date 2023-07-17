@@ -31,8 +31,9 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: `modifications[${modificationIndex}].type`,
-        newValue: type,
+        updates: {
+          [`modifications[${modificationIndex}].type`]: type,
+        },
       })
     );
   };
@@ -78,8 +79,9 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                newValue: event?.target?.value,
-                objectPath: `modifications[${modificationIndex}].param`,
+                updates: {
+                  [`modifications[${modificationIndex}].param`]: event?.target?.value,
+                },
               })
             );
           }}
@@ -99,8 +101,9 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                newValue: event?.target?.value,
-                objectPath: `modifications[${modificationIndex}].value`,
+                updates: {
+                  [`modifications[${modificationIndex}].value`]: event?.target?.value,
+                },
               })
             );
           }}

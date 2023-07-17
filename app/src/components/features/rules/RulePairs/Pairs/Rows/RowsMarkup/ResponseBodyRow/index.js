@@ -57,18 +57,11 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: "response.type",
-          newValue: responseBodyType,
-          arrayOfOtherValuesToModify: [
-            {
-              path: "response.value",
-              value: value,
-            },
-            {
-              path: "response.serveWithoutRequest",
-              value: undefined,
-            },
-          ],
+          updates: {
+            "response.type": responseBodyType,
+            "response.value": value,
+            "response.serveWithoutRequest": undefined,
+          },
         })
       );
     }
@@ -78,16 +71,12 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "response.type",
-        newValue: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
-        arrayOfOtherValuesToModify: [
-          {
-            path: `response.value`,
-            value: selectedFile,
-            // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
-            // value: `file://${selectedFile}`,
-          },
-        ],
+        updates: {
+          "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
+          "response.value": selectedFile,
+          // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
+          // value: `file://${selectedFile}`,
+        },
       })
     );
   };
@@ -157,14 +146,11 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "response.type",
-        newValue: pair.response.type,
-        arrayOfOtherValuesToModify: [
-          {
-            path: "response.value",
-            value: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
-          },
-        ],
+        updates: {
+          "response.type": pair.response.type,
+          "response.value":
+            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+        },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
     );
@@ -198,8 +184,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: "response.serveWithoutRequest",
-          newValue: flag,
+          updates: {
+            "response.serveWithoutRequest": flag,
+          },
         })
       );
     }

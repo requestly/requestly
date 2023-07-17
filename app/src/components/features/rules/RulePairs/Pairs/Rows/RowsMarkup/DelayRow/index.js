@@ -21,8 +21,9 @@ const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                newValue: event?.target?.value,
-                objectPath: "delay",
+                updates: {
+                  delay: event?.target?.value,
+                },
               })
             )
           }

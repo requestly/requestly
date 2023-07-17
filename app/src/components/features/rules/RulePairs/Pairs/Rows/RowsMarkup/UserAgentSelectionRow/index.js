@@ -15,40 +15,29 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "env",
-        newValue: itemSet.value.env,
-        arrayOfOtherValuesToModify: [
-          {
-            path: "userAgent",
-            value: itemSet.value.userAgent,
-          },
-        ],
+        updates: {
+          env: itemSet.value.env,
+          userAgent: itemSet.value.userAgent,
+        },
       })
     );
   };
 
   const deviceTypeDropdownOnChangeHandler = useCallback(
     (newValue) => {
-      let extraModifications = [
-        {
-          path: "env",
-          value: "",
-        },
-      ];
+      const extraModifications = { env: "" };
 
       if (newValue === "custom") {
-        extraModifications.push({
-          path: "userAgent",
-          value: window.navigator.userAgent,
-        });
+        extraModifications["userAgent"] = window.navigator.userAgent;
       }
 
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: "envType",
-          newValue: newValue,
-          arrayOfOtherValuesToModify: extraModifications,
+          updates: {
+            envType: newValue,
+            ...extraModifications,
+          },
         })
       );
     },
@@ -130,8 +119,9 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  newValue: event?.target?.value,
-                  objectPath: "userAgent",
+                  updates: {
+                    userAgent: event?.target?.value,
+                  },
                 })
               )
             }

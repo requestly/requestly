@@ -39,7 +39,12 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     setIsFilePickerModalActive(false);
 
     dispatch(
-      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, newValue: url })
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].value`]: url,
+        },
+      })
     );
   };
   /** Remove till here */
@@ -53,7 +58,12 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const handleMockPickerSelectionCallback = (url) => {
     setIsMockPickerVisible(false);
     dispatch(
-      actions.updateRulePairAtGivenPath({ pairIndex, objectPath: `scripts[${scriptIndex}].value`, newValue: url })
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].value`]: url,
+        },
+      })
     );
   };
 
@@ -83,8 +93,9 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
                 dispatch(
                   actions.updateRulePairAtGivenPath({
                     pairIndex,
-                    newValue: event?.target?.value,
-                    objectPath: `scripts[${scriptIndex}].value`,
+                    updates: {
+                      [`scripts[${scriptIndex}].value`]: event?.target?.value,
+                    },
                   })
                 )
               }
@@ -128,14 +139,10 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: `scripts[${scriptIndex}].codeType`,
-        newValue: codeType,
-        arrayOfOtherValuesToModify: [
-          {
-            path: `scripts[${scriptIndex}].value`,
-            value: "",
-          },
-        ],
+        updates: {
+          [`scripts[${scriptIndex}].codeType`]: codeType,
+          [`scripts[${scriptIndex}].value`]: "",
+        },
       })
     );
   };
@@ -149,9 +156,10 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          newValue: value,
-          objectPath: `scripts[${scriptIndex}].value`,
           triggerUnsavedChangesIndication: !isCodeFormatted,
+          updates: {
+            [`scripts[${scriptIndex}].value`]: value,
+          },
         })
       );
     };
@@ -208,14 +216,10 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: `scripts[${scriptIndex}].type`,
-        newValue: newScriptType,
-        arrayOfOtherValuesToModify: [
-          {
-            path: `scripts[${scriptIndex}].value`,
-            value: "",
-          },
-        ],
+        updates: {
+          [`scripts[${scriptIndex}].type`]: newScriptType,
+          [`scripts[${scriptIndex}].value`]: "",
+        },
       })
     );
   };
@@ -239,8 +243,9 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: `scripts[${scriptIndex}].loadTime`,
-          newValue: type,
+          updates: {
+            [`scripts[${scriptIndex}].loadTime`]: type,
+          },
         })
       ),
     [dispatch, pairIndex, scriptIndex]

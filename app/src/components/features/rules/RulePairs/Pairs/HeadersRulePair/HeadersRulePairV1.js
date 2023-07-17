@@ -16,8 +16,9 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: path,
-          newValue: value,
+          updates: {
+            [path]: value,
+          },
         })
       );
     },

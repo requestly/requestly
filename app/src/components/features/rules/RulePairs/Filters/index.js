@@ -169,8 +169,9 @@ const Filters = (props) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-          newValue: operator,
+          updates: {
+            [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR]: operator,
+          },
         })
       );
     },
@@ -179,7 +180,14 @@ const Filters = (props) => {
 
   const updateSourceRequestPayload = useCallback(
     (event, pairIndex, path) => {
-      dispatch(actions.updateRulePairAtGivenPath({ newValue: event?.target?.value, pairIndex, objectPath: path }));
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            [path]: event?.target?.value,
+          },
+        })
+      );
     },
     [dispatch]
   );

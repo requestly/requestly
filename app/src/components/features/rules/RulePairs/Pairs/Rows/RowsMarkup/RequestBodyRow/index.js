@@ -35,14 +35,10 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: "request.type",
-          newValue: requestType,
-          arrayOfOtherValuesToModify: [
-            {
-              path: `request.value`,
-              value: value,
-            },
-          ],
+          updates: {
+            "request.type": requestType,
+            "request.value": value,
+          },
         })
       );
     }
@@ -63,15 +59,12 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "request.type",
-        newValue: pair.request.type,
-        arrayOfOtherValuesToModify: [
-          {
-            path: `request.value`,
-            value: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
-          },
-        ],
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        updates: {
+          "request.type": pair.request.type,
+          "request.value":
+            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+        },
       })
     );
   };

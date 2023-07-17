@@ -36,12 +36,13 @@ const HeadersPairModificationRowV2 = ({
   );
 
   const handlePairTypeMenuItemClick = useCallback(
-    (event, type) => {
+    (type) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          objectPath: `modifications[${modificationType}][${modificationIndex}].type`,
-          newValue: type,
+          updates: {
+            [`modifications[${modificationType}][${modificationIndex}].type`]: type,
+          },
         })
       );
     },
@@ -52,7 +53,7 @@ const HeadersPairModificationRowV2 = ({
     () => (
       <Menu>
         {pairTypeMenuItems.map(({ title, type }, index) => (
-          <Menu.Item key={index} onClick={(e) => handlePairTypeMenuItemClick(e, type)}>
+          <Menu.Item key={index} onClick={(e) => handlePairTypeMenuItemClick(type)}>
             {title}
           </Menu.Item>
         ))}
@@ -78,8 +79,9 @@ const HeadersPairModificationRowV2 = ({
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                objectPath: `modifications[${modificationType}][${modificationIndex}].header`,
-                newValue: value,
+                updates: {
+                  [`modifications[${modificationType}][${modificationIndex}].header`]: value,
+                },
               })
             )
           }
@@ -109,8 +111,9 @@ const HeadersPairModificationRowV2 = ({
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  newValue: event?.target?.value,
-                  objectPath: `modifications[${modificationType}][${modificationIndex}].value`,
+                  updates: {
+                    [`modifications[${modificationType}][${modificationIndex}].value`]: event?.target?.value,
+                  },
                 })
               )
             }

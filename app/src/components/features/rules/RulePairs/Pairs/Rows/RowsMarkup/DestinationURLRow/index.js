@@ -50,8 +50,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "destination",
-        newValue: url,
+        updates: { destination: url },
       })
     );
   };
@@ -61,8 +60,9 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "destination",
-        newValue: `file://${filePath}`,
+        updates: {
+          destination: `file://${filePath}`,
+        },
       })
     );
   };
@@ -81,8 +81,9 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            newValue: "http://" + currentDestinationURL,
-            objectPath: "destination",
+            updates: {
+              destination: "http://" + currentDestinationURL,
+            },
           })
         );
       }
@@ -124,14 +125,10 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        objectPath: "destinationType",
-        newValue: destinationPopupSelection,
-        arrayOfOtherValuesToModify: [
-          {
-            path: "destination",
-            value: "",
-          },
-        ],
+        updates: {
+          destination: "",
+          destinationType: destinationPopupSelection,
+        },
       })
     );
 
@@ -150,8 +147,9 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           dispatch(
             actions.updateRulePairAtGivenPath({
               pairIndex,
-              newValue: event?.target?.value,
-              objectPath: "destination",
+              updates: {
+                destination: event?.target?.value,
+              },
             })
           )
         }

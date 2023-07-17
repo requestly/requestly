@@ -29,14 +29,10 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                objectPath: "response.statusCode",
-                newValue: value,
-                arrayOfOtherValuesToModify: [
-                  {
-                    path: "response.statusText",
-                    value: statusCodes[value] || "",
-                  },
-                ],
+                updates: {
+                  "response.statusCode": value,
+                  "response.statusText": statusCodes[value] || "",
+                },
               })
             );
 
