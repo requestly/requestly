@@ -165,7 +165,7 @@ const Filters = (props) => {
   };
 
   const updateSourceOperator = useCallback(
-    (event, pairIndex, operator) => {
+    (pairIndex, operator) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
@@ -187,20 +187,18 @@ const Filters = (props) => {
   const urlOperatorOptions = (
     <Menu>
       <Menu.Item key={1}>
-        <span onClick={(e) => updateSourceOperator(e, pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
+        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
       </Menu.Item>
       <Menu.Item key={2}>
-        <span onClick={(e) => updateSourceOperator(e, pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>
-          Contains
-        </span>
+        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
       </Menu.Item>
       <Menu.Item key={3}>
-        <span onClick={(e) => updateSourceOperator(e, pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>
+        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>
           Matches (RegEx)
         </span>
       </Menu.Item>
       <Menu.Item key={4}>
-        <span onClick={(e) => updateSourceOperator(e, pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
+        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
           Matches (Wildcard)
         </span>
       </Menu.Item>
