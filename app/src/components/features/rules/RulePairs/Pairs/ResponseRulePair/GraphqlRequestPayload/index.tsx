@@ -6,8 +6,6 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 import { debounce, snakeCase } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
 import {
@@ -48,7 +46,6 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const isRequestPayloadFilterCompatible = isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER);
 
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
@@ -110,7 +107,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  return isRequestPayloadFilterCompatible ? (
+  return (
     <Col span={24} data-tour-id="rule-editor-response-graphql-payload">
       <label className="subtitle graphql-operation-label">
         GraphQL Operation (Request Payload Filter)
@@ -149,7 +146,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         />
       </Row>
     </Col>
-  ) : null;
+  );
 };
 
 export default GraphqlRequestPayload;
