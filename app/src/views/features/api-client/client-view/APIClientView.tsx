@@ -22,13 +22,9 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
-import { StorageService } from "init";
-import APP_CONSTANTS from "config/constants";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
 
@@ -43,8 +39,9 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 }));
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
-  const appMode = useSelector(getAppMode);
   const location = useLocation();
+  const appMode = useSelector(getAppMode);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const [entry, setEntry] = useState<RQAPI.Entry>(getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
@@ -52,21 +49,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
   const abortControllerRef = useRef<AbortController>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationTimerRef = useRef<NodeJS.Timeout>();
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
-
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-        .then((value) => {
-          if (value) {
-            setIsExtensionEnabled(value.isExtensionEnabled);
-          } else {
-            setIsExtensionEnabled(true);
-          }
-        });
-    }
-  }, [appMode]);
 
   useEffect(() => {
     if (apiEntry) {

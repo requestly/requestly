@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
@@ -27,33 +27,20 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
 import PageLoader from "components/misc/PageLoader";
+import { useHasChanged } from "hooks";
 
 const _ = require("lodash");
 const pageSize = 15;
 let unsubscribeListener;
 
 const SessionsIndexPage = () => {
-  // Custom Hooks
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  // Custom Hook utilization
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  // Component State
+
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sharingRecordId, setSharingRecordId] = useState("");
   const [selectedRowVisibility, setSelectedRowVisibility] = useState("");
