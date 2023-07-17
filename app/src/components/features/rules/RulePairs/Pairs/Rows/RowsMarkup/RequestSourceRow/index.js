@@ -37,7 +37,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const hasSeenTestURLAnimation = useRef(false);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
-    return Array.isArray(rule.pairs[pairIndex].source.filters) ? true : false;
+    return Array.isArray(rule.pairs[pairIndex].source.filters);
   }, []);
 
   const migrateToNewSourceFilterFormat = useCallback(
