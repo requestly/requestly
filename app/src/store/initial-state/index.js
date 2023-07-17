@@ -19,6 +19,8 @@ const INITIAL_STATE = {
     isSurveyCompleted: false,
   },
 
+  isExtensionEnabled: true,
+
   /* App Mode */
   appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
 

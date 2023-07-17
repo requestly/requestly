@@ -9,23 +9,20 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
-import "react-multi-email/style.css";
-import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
-import Logger from "lib/logger";
+import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
+import "react-multi-email/style.css";
+import "./AddMemberModal.css";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
-  const functions = getFunctions();
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
-  const [isTeamAdmin, setIsTeamAdmin] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
 
   // Global state
   const availableTeams = useSelector(getAvailableTeams);
@@ -33,6 +30,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = currentTeamId ?? activeWorkspaceId;
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
+  const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
@@ -87,23 +85,6 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
   }, [isOpen]);
 
-  useEffect(() => {
-    setShowLoader(true);
-    const getIsTeamAdmin = httpsCallable(functions, "teams-isTeamAdmin");
-    getIsTeamAdmin({
-      teamId,
-    })
-      .then((res) => {
-        if (res.data.success) {
-          setIsTeamAdmin(res.data.isAdmin);
-        }
-      })
-      .catch((err) => {
-        Logger.log("err while checking team admin", err);
-      })
-      .finally(() => setShowLoader(false));
-  }, [functions, teamId]);
-
   return (
     <>
       <RQModal centered open={isOpen} onCancel={toggleModal}>
@@ -147,7 +128,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
               </div>
             </>
-          ) : showLoader ? (
+          ) : isLoading ? (
             <PageLoader />
           ) : (
             <div className="title empty-message">

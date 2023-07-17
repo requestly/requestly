@@ -1,47 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
-import { getAppMode } from "store/selectors";
-import APP_CONSTANTS from "config/constants";
+import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
-import Logger from "lib/logger";
 import "./RuleEditor.css";
 
 const INITIAL_PANE_SIZES = [92, 8];
 
 const RuleEditor = () => {
   const location = useLocation();
-  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
-
-  // Component State
-  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
-
-  //Global State
   const appMode = useSelector(getAppMode);
-
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      Logger.log("Reading storage in RuleEditor useEffect");
-      StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-        .then((value) => {
-          if (value) {
-            setIsExtensionEnabled(value.isExtensionEnabled);
-          } else {
-            setIsExtensionEnabled(true);
-          }
-        });
-    }
-  }, [appMode]);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
+  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
 
   const expandRulePane = () => setRulePaneSizes([30, 70]);
 

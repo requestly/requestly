@@ -4,6 +4,10 @@ export const getGlobalState = (rootState) => {
   return rootState[ReducerKeys.GLOBAL];
 };
 
+export const getIsExtensionEnabled = (state) => {
+  return getGlobalState(state)["isExtensionEnabled"];
+};
+
 export const getRulesNode = (state) => {
   return getGlobalState(state)["rules"];
 };
