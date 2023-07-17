@@ -97,11 +97,11 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
       return (
         <>
           {currentPage === SurveyPage.GETTING_STARTED && renderSkipButton()}
-          <div className="text-center white text-bold survey-title">{page.title}</div>
+          <div className="text-center white text-bold survey-title">{page?.title}</div>
           <div className="w-full survey-subtitle-wrapper">
-            <div className="text-gray text-center mt-8">{page.subTitle}</div>
+            <div className="text-gray text-center mt-8">{page?.subTitle}</div>
           </div>
-          <>{typeof page.render === "function" ? page.render() : renderQuestionnaire(page.render)}</>
+          <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
         </>
       );
     },
@@ -156,6 +156,12 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   useEffect(() => {
     if (userPersona?.page > 2) dispatch(actions.updateIsPersonaSurveyCompleted(true));
   }, [dispatch, userPersona?.page]);
+
+  useEffect(() => {
+    if (!(currentPage in SurveyConfig)) {
+      dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+    }
+  }, [currentPage, dispatch]);
 
   const renderSurveyPages = useCallback(() => {
     return (
