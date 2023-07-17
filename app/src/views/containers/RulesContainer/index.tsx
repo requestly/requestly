@@ -1,15 +1,10 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { actions } from "store";
+import React from "react";
 import { RulesSidebar } from "./RulesSidebar";
 import { ContainerWithSecondarySidebar } from "../common/ContainerWithSecondarySidebar";
+import { useResetSecondarySidebarCollapse } from "../common/hooks/useResetSecondarySidebarCollapse";
 
 export const RulesContainer: React.FC = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(actions.updateSecondarySidebarCollapse(false));
-  }, [dispatch]);
+  useResetSecondarySidebarCollapse();
 
   return <ContainerWithSecondarySidebar sidebar={<RulesSidebar />} />;
 };

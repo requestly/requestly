@@ -1,15 +1,10 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { actions } from "store";
+import React from "react";
 import { MockServerSidebar } from "./MockServerSidebar";
 import { ContainerWithSecondarySidebar } from "../common/ContainerWithSecondarySidebar";
+import { useResetSecondarySidebarCollapse } from "../common/hooks/useResetSecondarySidebarCollapse";
 
 export const MockServerContainer: React.FC = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(actions.updateSecondarySidebarCollapse(false));
-  }, [dispatch]);
+  useResetSecondarySidebarCollapse();
 
   return <ContainerWithSecondarySidebar sidebar={<MockServerSidebar />} />;
 };

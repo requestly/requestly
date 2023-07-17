@@ -7,26 +7,19 @@ import RulesIndexPage from "components/features/rules/RulesIndexPage";
 //ACTIONS
 import { isExtensionInstalled } from "actions/ExtensionActions";
 // UTILS
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-//discount Widget
-import { StorageService } from "init";
-import APP_CONSTANTS from "config/constants";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import SpinnerCard from "components/misc/SpinnerCard";
-import Logger from "lib/logger";
 
 const RulesIndexView = () => {
-  //Global State
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-
-  //Local State
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
-  const [showInstallExtensionCTA, setShowInstallExtensionCTA] = useState(true);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const [showLoader, setShowLoader] = useState(false);
+  const [showInstallExtensionCTA, setShowInstallExtensionCTA] = useState(true);
 
   const checkForAndroidDebugger = async () => {
     if (user.loggedIn && user.details?.profile?.uid) {
@@ -46,21 +39,9 @@ const RulesIndexView = () => {
   const safeCheckForAndroidDebugger = useCallback(checkForAndroidDebugger, [user.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
-    // setting if extension is disabled
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      Logger.log("Reading storage in RulesIndexView useEffect");
-      StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-        .then((value) => {
-          if (value) {
-            setIsExtensionEnabled(value.isExtensionEnabled);
-          } else {
-            setIsExtensionEnabled(true);
-          }
-        });
-    } else {
-      safeCheckForAndroidDebugger();
-    }
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) return;
+
+    safeCheckForAndroidDebugger();
   }, [appMode, user, showInstallExtensionCTA, safeCheckForAndroidDebugger]);
 
   const renderRulesIndex = () => {

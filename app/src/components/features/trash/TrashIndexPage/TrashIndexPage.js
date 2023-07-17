@@ -6,18 +6,15 @@ import SpinnerCard from "../../../misc/SpinnerCard";
 import TrashTableContainer from "../TrashTableContainer";
 import TrashInfo from "../TrashInfo";
 //UTILS
-import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "../../../../store/selectors";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
 import { getAllRecordsFromTrash } from "utils/trash/TrashUtils";
-import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import Logger from "lib/logger";
 
 const TrashIndexPage = () => {
   //Global State
@@ -26,10 +23,10 @@ const TrashIndexPage = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const trashLimit = 30; // days
   //Component State
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
   const [loadingRecords, setLoadingRecords] = useState(true);
   const [records, setRecords] = useState([]);
   const [error, setError] = useState(false);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
 
   const fetchTrashRules = (user) => {
     setLoadingRecords(true);
@@ -60,21 +57,6 @@ const TrashIndexPage = () => {
   };
 
   const stableUpdateCollection = useCallback(fetchTrashRules, [trashLimit]);
-
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      Logger.log("Reading storage in TrashIndexPage useEffect");
-      StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-        .then((value) => {
-          if (value) {
-            setIsExtensionEnabled(value.isExtensionEnabled);
-          } else {
-            setIsExtensionEnabled(true);
-          }
-        });
-    }
-  }, [appMode]);
 
   useEffect(() => {
     if (user.loggedIn && user.details.profile) {

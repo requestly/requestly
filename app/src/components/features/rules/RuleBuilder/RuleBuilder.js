@@ -38,6 +38,7 @@ import {
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import { useHasChanged } from "hooks";
 import Help from "./Help";
 import "./RuleBuilder.css";
 
@@ -80,19 +81,6 @@ const RuleBuilder = (props) => {
   }, [enableDocs, showDocs]);
 
   useExternalRuleCreation(MODE);
-
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
 
   useEffect(() => {
     if (isDocsVisible) {
