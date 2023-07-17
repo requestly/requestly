@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
@@ -27,6 +27,27 @@ const RuleEditor = () => {
 
   //Global State
   const appMode = useSelector(getAppMode);
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+
+  unstable_usePrompt({
+    message: "Discard changes? Changes you made may not be saved.",
+    when: isCurrentlySelectedRuleHasUnsavedChanges,
+  });
+
+  useEffect(() => {
+    const unloadListener = (e) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure?";
+    };
+
+    if (isCurrentlySelectedRuleHasUnsavedChanges) {
+      window.addEventListener("beforeunload", unloadListener);
+    } else {
+      window.removeEventListener("beforeunload", unloadListener);
+    }
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
