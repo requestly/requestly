@@ -9,51 +9,11 @@ $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-
   border-radius: 7px !important;
 }
 
-//React-Notifications
-.Toastify__toast--default {
-  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
-  border-radius: 7px !important;
-}
-.Toastify__toast--info {
-  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
-  border-radius: 7px !important;
-}
-.Toastify__toast--success {
-  background: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
-  border-radius: 7px !important;
-}
-.Toastify__toast--warning {
-  background: #b36200 !important;
-  border-radius: 7px !important;
-}
-.Toastify__toast--error {
-  background: #b36200 !important;
-  border-radius: 7px !important;
-}
-
 .has-no-box-shadow,
 .has-no-box-shadow:hover,
 .has-no-box-shadow:active,
 .has-no-box-shadow:focus {
   box-shadow: none;
-}
-
-.has-little-box-shadow,
-.has-little-box-shadow:hover,
-.has-little-box-shadow:active,
-.has-little-box-shadow:focus {
-  box-shadow: 0px 0px 2rem 0px rgba(152, 176, 155, 0.1);
-}
-
-.unselectable {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+/Edge */
-  user-select: none; /* Standard */
-}
-
-.underline-text-on-hover:hover {
-  text-decoration: underline;
 }
 
 .has-modern-border {
@@ -165,13 +125,6 @@ $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-
 .has-dark-text:focus {
   color: #4a5868;
 }
-.one-margin-bottom {
-  margin-bottom: 1rem;
-}
-
-.height-two-rem {
-  height: 2rem;
-}
 
 // Script rule editor
 .codemirror-character-count {
@@ -219,27 +172,6 @@ $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-
   transform: translate(0%, -5%);
 }
 
-.banner-alert-close {
-  right: 0 !important;
-  margin-right: -1em;
-}
-
-// Desktop App - Web Traffic Table
-.previewData {
-  display: flex;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.previewData .rdt_TableRow {
-  min-height: fit-content;
-}
-
-.text-overlay-on-hover-container {
-  position: relative;
-  width: 50%;
-}
-
 .fix-icon-is-up {
   transform: translate(0%, 12%);
 }
@@ -278,13 +210,6 @@ $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-
   -ms-filter: none;
   filter: none;
   transform: scale(1.1);
-}
-
-.fit-text-content {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 90%;
 }
 
 .ant-pro-global-footer-links .ant-typography {
@@ -396,20 +321,6 @@ input[id^="react-select-"] {
 
 .ant-modal-confirm-success {
   width: 750px !important;
-}
-
-// desktop app log pane
-.log-table {
-  color: #ffffffd9;
-  background-color: #1d1d1d;
-
-  & * {
-    border: none !important;
-  }
-
-  &[class*="Table-table"]:last-child {
-    border: none !important;
-  }
 }
 
 @keyframes rotate {

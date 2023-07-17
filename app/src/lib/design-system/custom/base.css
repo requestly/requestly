@@ -211,3 +211,21 @@
   align-items: center;
   justify-content: center;
 }
+
+.unselectable {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.underline-text-on-hover:hover {
+  text-decoration: underline;
+}
+
+.fit-text-content {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
