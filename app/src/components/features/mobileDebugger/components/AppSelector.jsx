@@ -25,8 +25,8 @@ const MobileDebuggerAppSelector = () => {
   const [selectedApp, setSelectedApp] = useState(null);
 
   useEffect(() => {
-    if (user.loggedIn) {
-      getSdkApps(user.details.profile.uid).then((sdkApps) => {
+    if (user?.loggedIn) {
+      getSdkApps(user?.details?.profile?.uid).then((sdkApps) => {
         if (sdkApps) {
           setApps([...sdkApps]);
         }
@@ -35,7 +35,7 @@ const MobileDebuggerAppSelector = () => {
     } else {
       setAreAppsLoaded(true);
     }
-  }, [user.details.profile.uid, user.loggedIn]);
+  }, [user?.details?.profile?.uid, user?.loggedIn]);
 
   useEffect(() => {
     if (mobileDebuggerAppDetails) {
