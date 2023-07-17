@@ -25,3 +25,7 @@ export const trackURLConditionSourceModificationSaved = (operator_type, kwargs) 
   const params = { operator_type, ...kwargs };
   trackEvent(TEST_URL_CONDITION.TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED, params);
 };
+
+export const trackURLConditionAnimationViewed = () => {
+  trackEvent(TEST_URL_CONDITION.TEST_URL_CONDITION_ANIMATION_VIEWED);
+};
