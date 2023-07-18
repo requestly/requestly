@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { flushSync } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 //Actions
@@ -8,7 +7,6 @@ import { closeBtnOnClickHandler } from "../actions";
 import { Modal, Tooltip } from "antd";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
-import { setIsCurrentlySelectedRuleHasUnsavedChanges } from "../../../actions";
 
 const CloseButton = ({ ruleType, mode }) => {
   //Constants
@@ -25,9 +23,6 @@ const CloseButton = ({ ruleType, mode }) => {
       content: "Changes you made may not be saved.",
       okText: "Discard",
       onOk() {
-        flushSync(() => {
-          setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
-        });
         closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
       },
     });

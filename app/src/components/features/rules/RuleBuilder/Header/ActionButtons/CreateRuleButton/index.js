@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { flushSync } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -84,9 +83,7 @@ const CreateRuleButton = ({
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
 
-        flushSync(() => {
-          setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
-        });
+        setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
 
         /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
 
@@ -135,7 +132,9 @@ const CreateRuleButton = ({
         const ruleId = currentlySelectedRuleData.id;
 
         if (!isRuleEditorModal) {
-          redirectToRuleEditor(navigate, ruleId, "create");
+          setTimeout(() => {
+            redirectToRuleEditor(navigate, ruleId, "create");
+          }, 0);
         }
       });
     } else {

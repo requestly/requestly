@@ -64,5 +64,7 @@ export const saveRule = async (appMode, ruleObject, callback) => {
 export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
   clearCurrentlySelectedRuleAndConfig(dispatch);
   trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
-  redirectToRules(navigate);
+  setTimeout(() => {
+    redirectToRules(navigate);
+  }, 0);
 };
