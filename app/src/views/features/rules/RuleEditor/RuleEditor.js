@@ -34,8 +34,6 @@ const RuleEditor = () => {
 
     if (isCurrentlySelectedRuleHasUnsavedChanges) {
       window.addEventListener("beforeunload", unloadListener);
-    } else {
-      window.removeEventListener("beforeunload", unloadListener);
     }
 
     return () => window.removeEventListener("beforeunload", unloadListener);
