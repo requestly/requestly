@@ -112,6 +112,9 @@
 .display-inline-block {
   display: inline-block;
 }
+.display-block {
+  display: block;
+}
 
 .display-flex {
   display: flex;
