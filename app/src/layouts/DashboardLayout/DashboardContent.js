@@ -160,7 +160,7 @@ const DashboardContent = () => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
-      <WorkspaceNudge />
+      {user?.loggedIn && <WorkspaceNudge />}
     </>
   );
 };

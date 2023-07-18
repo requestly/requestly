@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "" }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -24,7 +24,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
-    workspaceName: "",
+    workspaceName: defaultWorkspaceName,
     description: "",
   });
 
@@ -102,6 +102,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
             <Form.Item
               label="Workspace name"
               name="workspaceName"
+              initialValue={defaultWorkspaceName}
               rules={[
                 {
                   required: true,

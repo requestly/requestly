@@ -8,6 +8,7 @@ import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
+import CopyButton from "components/misc/CopyButton";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
@@ -139,7 +140,14 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
         </div>
 
         {isTeamAdmin && (
-          <Row align="middle" justify="end" className="rq-modal-footer">
+          <Row align="middle" justify="end" className="rq-modal-footer add-member-actions-wrapper">
+            <CopyButton
+              disableTooltip
+              type="default"
+              title="Copy link"
+              showIcon={false}
+              copyText={`${window.location.origin}/invite/${teamId}`}
+            />
             <RQButton type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
               Invite People
             </RQButton>

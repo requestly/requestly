@@ -42,3 +42,7 @@ div.members-email-input > input {
   justify-content: center;
   row-gap: 1rem;
 }
+.add-member-actions-wrapper {
+  display: flex;
+  gap: 8px;
+}
