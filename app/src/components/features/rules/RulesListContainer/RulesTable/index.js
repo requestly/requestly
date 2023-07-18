@@ -748,7 +748,7 @@ const RulesTable = ({
             return (
               <ReactHoverObserver>
                 {({ isHovering }) => (
-                  <div className={hideActionButtons ? "group-action-buttons hidden-element" : "group-action-buttons"}>
+                  <div className={hideActionButtons ? "group-action-buttons not-visible" : "group-action-buttons"}>
                     <Space>
                       {isFavouritingAllowed && showGroupPinIcon && (
                         <Text
@@ -825,7 +825,7 @@ const RulesTable = ({
 
         if (areActionsEnabled) {
           return (
-            <div className={hideActionButtons ? "rule-action-buttons hidden-element" : "rule-action-buttons"}>
+            <div className={hideActionButtons ? "rule-action-buttons not-visible" : "rule-action-buttons"}>
               <ReactHoverObserver>
                 {({ isHovering }) => (
                   <Space>
