@@ -7,7 +7,6 @@ import APP_CONSTANTS from "config/constants";
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
-  console.log("actions", actions);
   const dispatch = useDispatch();
 
   const dedup_rules = (rules) => {
