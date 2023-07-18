@@ -31,6 +31,8 @@ import {
   trackTrafficTableSearched,
 } from "modules/analytics/events/desktopApp";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 
 const { Text } = Typography;
 
@@ -213,6 +215,7 @@ const ActionHeader = ({
                 onClick={() => {
                   downloadHar(logsToSaveAsHar || {}, "");
                   trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
+                  trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                 }}
               >
                 Download
@@ -227,6 +230,7 @@ const ActionHeader = ({
                 disabled={!filteredLogsCount}
                 onClick={() => {
                   trackNetworkSessionSaveClicked();
+                  trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
                   openSaveModal();
                 }}
               >
