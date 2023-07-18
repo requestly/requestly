@@ -14,6 +14,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
+import { msToTimeStringWithSuffix } from "utils/DateTimeUtils";
 
 export const ITEM_SIZE = 30;
 
@@ -51,7 +52,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
     () => [
       {
         id: "time",
-        title: "Time",
+        title: "Start time",
         dataIndex: "timestamp",
         width: "8%",
         render: (timestamp: any) => {
@@ -65,6 +66,15 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         title: "URL",
         dataIndex: "url",
         width: "48%",
+      },
+      {
+        id: "duration",
+        title: "Time",
+        dataIndex: "duration",
+        width: "8%",
+        render: (duration: number) => {
+          return msToTimeStringWithSuffix(duration);
+        },
       },
       {
         id: "method",

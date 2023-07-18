@@ -103,6 +103,26 @@ export const msToMinutesAndSeconds = (ms) => {
   return addPadding(minutes) + ":" + addPadding(seconds);
 };
 
+// string with 2 decimal places
+export const msToTimeStringWithSuffix = (ms) => {
+  const seconds = Math.floor(ms / 1000).toFixed(2);
+  const minutes = (Math.floor(seconds / 60) + (seconds % 60) / 100).toFixed(2);
+  const hours = (Math.floor(seconds / 3600) + (minutes % 60) / 100).toFixed(2);
+  const days = (Math.floor(seconds / 86400) + (hours % 24) / 100).toFixed(2);
+
+  if (days > 1) {
+    return `${days}days`;
+  } else if (hours > 1) {
+    return `${hours}hrs`;
+  } else if (minutes > 1) {
+    return `${minutes}min`;
+  } else if (seconds > 1) {
+    return `${seconds}s`;
+  } else {
+    return `${ms}ms`;
+  }
+};
+
 export const secToMinutesAndSeconds = (sec) => {
   const minutes = Math.floor(sec / 60);
   const seconds = sec % 60;

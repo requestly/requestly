@@ -180,6 +180,7 @@ export const convertNetworkEventToRQLogs = (networkEvent: DesktopNetworkLogEvent
 
       domain: entry?._RQ?.domain,
       app: entry?._RQ?.app,
+      duration: entry?._RQ?.duration,
     };
     return rqLog;
   });
