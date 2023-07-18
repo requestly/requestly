@@ -26,6 +26,7 @@ import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
+import { WorkspaceNudge } from "components/misc/WorkspaceNudge";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -159,6 +160,7 @@ const DashboardContent = () => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
+      <WorkspaceNudge />
     </>
   );
 };

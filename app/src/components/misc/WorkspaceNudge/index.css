@@ -1,0 +1,14 @@
+.nudge-container {
+  position: fixed;
+  left: 0;
+  bottom: 21px;
+  background: green;
+  padding: 20px 14px;
+  padding-top: 10px;
+  background: var(--background-dark);
+}
+
+.nudge-close-icon {
+  position: absolute;
+  left: 10px;
+}
