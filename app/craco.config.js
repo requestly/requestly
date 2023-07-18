@@ -44,6 +44,8 @@ module.exports = {
           stream: require.resolve("stream-browserify"),
           "process/browser": require.resolve("process/browser"),
           util: require.resolve("util"),
+          url: require.resolve("url"),
+          querystring: require.resolve("querystring-es3"),
           path: false,
           fs: false,
         },
