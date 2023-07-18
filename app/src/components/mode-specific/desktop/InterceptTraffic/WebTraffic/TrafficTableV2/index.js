@@ -38,6 +38,8 @@ import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode"
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels } from "./utils";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -166,39 +168,43 @@ const CurrentTrafficTable = ({
   );
 
   useEffect(() => {
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
-      if (isInterceptingTraffic) {
-        const rqLog = convertProxyLogToUILog(payload);
-        if (rqLog?.domain) {
-          updateDomainList(rqLog.domain);
+    if (isFeatureCompatible(FEATURES.HAR_BASED_PROXY_LOGS)) {
+      window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v3", (payload) => {
+        if (isInterceptingTraffic) {
+          if (!payload) return;
+          const rqLog = convertNetworkEventToRQLogs(payload)[0];
+
+          // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+          // printLogsToConsole(rqLog);
+
+          saveLogInRedux(rqLog);
         }
-        if (rqLog?.app) {
-          updateAppList(rqLog.app);
+      });
+    } else {
+      window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v2", (payload) => {
+        if (isInterceptingTraffic) {
+          const rqLog = convertProxyLogToUILog(payload);
+          if (rqLog?.domain) {
+            updateDomainList(rqLog.domain);
+          }
+          if (rqLog?.app) {
+            updateAppList(rqLog.app);
+          }
+
+          // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
+          // printLogsToConsole(rqLog);
+
+          saveLogInRedux(rqLog);
         }
-
-        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
-        // printLogsToConsole(rqLog);
-
-        saveLogInRedux(rqLog);
-      }
-    });
-
-    window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent("log-network-request-v3", (payload) => {
-      if (isInterceptingTraffic) {
-        if (!payload) return;
-        const rqLog = convertNetworkEventToRQLogs(payload)[0];
-
-        // @wrongsahil: Disabling this for now as this is leading to rerendering of this component which is degrading the perfomance
-        // printLogsToConsole(rqLog);
-
-        saveLogInRedux(rqLog);
-      }
-    });
-
+      });
+    }
     return () => {
       if (window.RQ && window.RQ.DESKTOP) {
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v3");
+        if (isFeatureCompatible(FEATURES.HAR_BASED_PROXY_LOGS)) {
+          window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v3");
+        } else {
+          window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+        }
       }
     };
   }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
