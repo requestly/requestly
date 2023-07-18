@@ -103,12 +103,21 @@ export const msToMinutesAndSeconds = (ms) => {
   return addPadding(minutes) + ":" + addPadding(seconds);
 };
 
-// string with 2 decimal places
+// string with max 2 decimal places
 export const msToTimeStringWithSuffix = (ms) => {
-  const seconds = Math.floor(ms / 1000).toFixed(2);
-  const minutes = (Math.floor(seconds / 60) + (seconds % 60) / 100).toFixed(2);
-  const hours = (Math.floor(seconds / 3600) + (minutes % 60) / 100).toFixed(2);
-  const days = (Math.floor(seconds / 86400) + (hours % 24) / 100).toFixed(2);
+  const conciseFloat = (num) => {
+    let result = num.toFixed(2);
+    if (result % 1 == 0) {
+      // checking if floating point is 0
+      return Math.floor(result);
+    }
+    return result;
+  };
+
+  const seconds = conciseFloat(Math.floor(ms / 1000));
+  const minutes = conciseFloat(Math.floor(seconds / 60) + (seconds % 60) / 100);
+  const hours = conciseFloat(Math.floor(seconds / 3600) + (minutes % 60) / 100);
+  const days = conciseFloat(Math.floor(seconds / 86400) + (hours % 24) / 100);
 
   if (days > 1) {
     return `${days}days`;
@@ -119,6 +128,7 @@ export const msToTimeStringWithSuffix = (ms) => {
   } else if (seconds > 1) {
     return `${seconds}s`;
   } else {
+    if (ms === 0) return "-";
     return `${ms}ms`;
   }
 };
