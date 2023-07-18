@@ -165,7 +165,7 @@ const Filters = (props) => {
   };
 
   const updateSourceOperator = useCallback(
-    (pairIndex, operator) => {
+    (operator) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
@@ -175,11 +175,11 @@ const Filters = (props) => {
         })
       );
     },
-    [dispatch]
+    [dispatch, pairIndex]
   );
 
   const updateSourceRequestPayload = useCallback(
-    (event, pairIndex, path) => {
+    (event, path) => {
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
@@ -189,24 +189,22 @@ const Filters = (props) => {
         })
       );
     },
-    [dispatch]
+    [dispatch, pairIndex]
   );
 
   const urlOperatorOptions = (
     <Menu>
       <Menu.Item key={1}>
-        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
       </Menu.Item>
       <Menu.Item key={2}>
-        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
       </Menu.Item>
       <Menu.Item key={3}>
-        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>
-          Matches (RegEx)
-        </span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>Matches (RegEx)</span>
       </Menu.Item>
       <Menu.Item key={4}>
-        <span onClick={(e) => updateSourceOperator(pairIndex, GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
           Matches (Wildcard)
         </span>
       </Menu.Item>
@@ -239,7 +237,7 @@ const Filters = (props) => {
             )}
             onChange={(e) => {
               e?.preventDefault?.();
-              updateSourceRequestPayload(e, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY);
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY);
               clearRequestPayload(e.target.value);
               LOG_ANALYTICS.KEY();
             }}
@@ -259,7 +257,7 @@ const Filters = (props) => {
             )}
             onChange={(e) => {
               e?.preventDefault?.();
-              updateSourceRequestPayload(e, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE);
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE);
               clearRequestPayload(e.target.value);
               LOG_ANALYTICS.VALUE();
             }}
@@ -387,7 +385,7 @@ const Filters = (props) => {
             )}
             onChange={(e) => {
               e?.preventDefault?.();
-              updateSourceRequestPayload(e, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
               LOG_ANALYTICS.PAGE_URL_MODIFIED();
             }}
             disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
