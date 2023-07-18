@@ -10,7 +10,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
 
   const updatePair = useCallback(
-    (event, pairIndex, path, value) => {
+    (event, path, value) => {
       event?.preventDefault?.();
 
       dispatch(
@@ -22,18 +22,18 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
         })
       );
     },
-    [dispatch]
+    [dispatch, pairIndex]
   );
 
   const pairTargetMenu = (
     <Menu>
       <Menu.Item key={1}>
-        <Text onClick={(e) => updatePair(e, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST)}>
+        <Text onClick={(e) => updatePair(e, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST)}>
           {GLOBAL_CONSTANTS.HEADERS_TARGET.REQUEST}
         </Text>
       </Menu.Item>
       <Menu.Item key={2}>
-        <Text onClick={(e) => updatePair(e, pairIndex, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE)}>
+        <Text onClick={(e) => updatePair(e, "target", GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE)}>
           {GLOBAL_CONSTANTS.HEADERS_TARGET.RESPONSE}
         </Text>
       </Menu.Item>
@@ -43,17 +43,13 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
   const pairTypeMenu = (
     <Menu>
       <Menu.Item key={1}>
-        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD)}>Add</Text>
+        <Text onClick={(e) => updatePair(e, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.ADD)}>Add</Text>
       </Menu.Item>
       <Menu.Item key={2}>
-        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE)}>
-          Remove
-        </Text>
+        <Text onClick={(e) => updatePair(e, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.REMOVE)}>Remove</Text>
       </Menu.Item>
       <Menu.Item key={3}>
-        <Text onClick={(e) => updatePair(e, pairIndex, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY)}>
-          Modify
-        </Text>
+        <Text onClick={(e) => updatePair(e, "type", GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY)}>Modify</Text>
       </Menu.Item>
     </Menu>
   );
@@ -83,7 +79,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
           type="text"
           value={pair.header}
           disabled={isInputDisabled}
-          onChange={(e) => updatePair(e, pairIndex, "header")}
+          onChange={(e) => updatePair(e, "header", e.target.value)}
         />
       </Col>
       <Col span={16} lg={9} className="my-auto">
@@ -94,7 +90,7 @@ const HeadersRulePairV1 = ({ pair, pairIndex, isInputDisabled }) => {
           placeholder="Header Value"
           type="text"
           value={pair.value}
-          onChange={(e) => updatePair(e, pairIndex, GLOBAL_CONSTANTS.RULE_KEYS.VALUE)}
+          onChange={(e) => updatePair(e, GLOBAL_CONSTANTS.RULE_KEYS.VALUE, e.target.value)}
           disabled={isInputDisabled ? true : pair.type === "Remove" ? true : false}
         />
       </Col>
