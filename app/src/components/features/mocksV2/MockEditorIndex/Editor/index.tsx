@@ -30,6 +30,8 @@ import AIResponseModal from "./AIResponseModal";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
+import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { MOCKSV2 } from "modules/analytics/events/features/constants";
 
 interface Props {
   isNew?: boolean;
@@ -185,6 +187,8 @@ const MockEditor: React.FC<Props> = ({
   const handleTest = useCallback(() => {
     setIsTestModalOpen(true);
     trackTestMockClicked();
+    trackRQLastActivity(MOCKSV2.TEST_MOCK_CLICKED);
+    trackRQDesktopLastActivity(MOCKSV2.TEST_MOCK_CLICKED);
   }, []);
 
   const onNameChange = (name: string) => {

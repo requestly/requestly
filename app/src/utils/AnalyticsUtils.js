@@ -3,6 +3,7 @@ import DataStoreUtils from "./DataStoreUtils";
 import { getDateString } from "./DateTimeUtils";
 import { getAppDetails } from "./AppUtils";
 import { trackAttr } from "modules/analytics";
+import { isDesktopMode } from "./Misc";
 
 export const submitAttrUtil = (attr, value) => {
   trackAttr(attr, value);
@@ -27,8 +28,10 @@ export const trackRQLastActivity = (activity) => {
 };
 
 export const trackRQDesktopLastActivity = (activity) => {
-  trackAttr("rq_last_desktop_activity_ts", getDateString(new Date()));
-  trackAttr("rq_last_desktop_activity", activity);
+  if (isDesktopMode()) {
+    trackAttr("rq_last_desktop_activity_ts", getDateString(new Date()));
+    trackAttr("rq_last_desktop_activity", activity);
+  }
 };
 
 export const getAttrFromFirebase = async (attrName) => {
