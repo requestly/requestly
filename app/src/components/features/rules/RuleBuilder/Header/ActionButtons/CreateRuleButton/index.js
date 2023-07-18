@@ -132,6 +132,8 @@ const CreateRuleButton = ({
         const ruleId = currentlySelectedRuleData.id;
 
         if (!isRuleEditorModal) {
+          // Using setTimeout so that navigation happens after `isCurrentlySelectedRuleHasUnsavedChanges`
+          // is updated so that usePrompt gets the updated state while navigating.
           setTimeout(() => {
             redirectToRuleEditor(navigate, ruleId, "create");
           }, 0);

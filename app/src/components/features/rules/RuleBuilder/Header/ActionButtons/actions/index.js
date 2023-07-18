@@ -64,6 +64,8 @@ export const saveRule = async (appMode, ruleObject, callback) => {
 export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
   clearCurrentlySelectedRuleAndConfig(dispatch);
   trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
+  // Using setTimeout so that navigation happens after `isCurrentlySelectedRuleHasUnsavedChanges`
+  // is updated so that usePrompt gets the updated state while navigating.
   setTimeout(() => {
     redirectToRules(navigate);
   }, 0);
