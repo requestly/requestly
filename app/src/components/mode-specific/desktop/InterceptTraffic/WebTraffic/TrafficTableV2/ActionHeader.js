@@ -33,6 +33,8 @@ import {
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
+import { track } from "@amplitude/analytics-browser";
 
 const { Text } = Typography;
 
@@ -70,7 +72,10 @@ const ActionHeader = ({
 
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
-    if (searchValue) trackTrafficTableSearched();
+    if (searchValue) {
+      trackTrafficTableSearched();
+      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_SEARCHED);
+    }
     dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
 
@@ -134,6 +139,7 @@ const ActionHeader = ({
   const handleFilterClick = () => {
     setIsFiltersCollapsed((prev) => !prev);
     trackTrafficTableFilterClicked();
+    trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
 
   return (
@@ -258,6 +264,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConn
         setIsPaused(false);
         onChange(false); // isPaused
         trackTrafficInterceptionResumed();
+        trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_RESUMED);
       }}
     >
       {buttonText}
@@ -270,6 +277,7 @@ function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConn
         setIsPaused(true);
         onChange(true); // isPaused
         trackTrafficInterceptionPaused();
+        trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_PAUSED);
       }}
     >
       {buttonText}
