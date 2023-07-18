@@ -26,6 +26,11 @@ export const trackRQLastActivity = (activity) => {
   trackAttr("rq_last_activity", activity);
 };
 
+export const trackRQDesktopLastActivity = (activity) => {
+  trackAttr("rq_last_desktop_activity_ts", getDateString(new Date()));
+  trackAttr("rq_last_desktop_activity", activity);
+};
+
 export const getAttrFromFirebase = async (attrName) => {
   return new Promise((resolve, reject) => {
     DataStoreUtils.isUserAuthenticated(async (userData) => {
