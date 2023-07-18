@@ -39,6 +39,17 @@
 }
 
 /* log table */
+.log-table {
+  color: #ffffffd9;
+  background-color: #1d1d1d;
+}
+.log-table * {
+  border: none !important;
+}
+.log-table[class*="Table-table"]:last-child {
+  border: none !important;
+}
+
 .request-log-pane .log-table {
   color: var(--white);
 }
