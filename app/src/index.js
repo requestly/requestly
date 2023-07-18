@@ -11,9 +11,8 @@ import App from "./App";
 import "./init";
 import "./assets/icons/remixicon/remixicon.css";
 import "./assets/less/index.less";
-import "./styles/custom/custom.css";
 import "./styles/custom/custom.scss";
-import "./styles/custom/postMigrationCustom.scss";
+
 import PageError from "components/misc/PageError";
 
 const persistor = persistStore(reduxStore);

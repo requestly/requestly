@@ -6,8 +6,8 @@ import { CloseOutlined } from "@ant-design/icons";
 import RequestPayloadPreview from "./Preview/PayloadPreview";
 import RequestSummary from "./RequestSummary";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./FixedRequestLogPane.css";
 import JSONPreview from "./Preview/JsonPreviewV2";
+import "./FixedRequestLogPane.css";
 
 const { Text } = Typography;
 
