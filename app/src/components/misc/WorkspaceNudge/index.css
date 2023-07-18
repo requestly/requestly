@@ -9,6 +9,6 @@
 }
 
 .nudge-close-icon {
-  position: absolute;
+  position: relative;
   left: 10px;
 }
