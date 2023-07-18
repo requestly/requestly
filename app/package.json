@@ -143,9 +143,11 @@
     "craco-esbuild": "^0.5.2",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "process": "^0.11.10",
+    "querystring-es3": "^0.2.1",
     "sass": "^1.58.3",
     "source-map-loader": "^3.0.1",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "url": "^0.11.1"
   },
   "jest": {
     "transformIgnorePatterns": [

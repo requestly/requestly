@@ -65,8 +65,8 @@ export interface HarResponse {
 }
 
 interface HarRequestPostData {
-  mimeType?: string; // required in spec. optional here because we don't sniff mime type
-  text: string;
+  mimeType: string;
+  text?: string;
   params?: any;
   comment?: string;
 }

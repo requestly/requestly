@@ -2,7 +2,7 @@ import { DesktopNetworkLogEvent } from "../../TrafficTableV2/types";
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
 
 import { v4 as uuidv4 } from "uuid";
-import { getCurlFromHarEntry } from "./utils";
+import { getCurlFromHar } from "./utils";
 
 const createHarHeaders = (headersObject: HeaderMap) => {
   const headers: HarHeaderEntry[] = [];
@@ -25,6 +25,7 @@ const convertLogToHarEntry = (log: RQNetworkLog) => {
     queryString: log.request.queryParams,
     url: log.url,
     postData: {
+      mimeType: "", // todo: implement mime sniffing in RQ proxy
       text: log.request.body,
     },
     headers: createHarHeaders(log.request.headers),
@@ -174,7 +175,7 @@ export const convertNetworkEventToRQLogs = (networkEvent: DesktopNetworkLogEvent
 
       consoleLogs: entry?._RQ?.consoleLogs || [],
       requestState: networkEvent.type,
-      requestShellCurl: getCurlFromHarEntry(entry),
+      requestShellCurl: getCurlFromHar(har),
       actions: networkEvent.data.actions,
 
       domain: entry?._RQ?.domain,
