@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import FeatureCard from "./FeatureCard";
 import { CloudOutlined, BugOutlined, MobileOutlined, CreditCardOutlined } from "@ant-design/icons";
+import "./index.scss";
 
 const Home = () => {
   const user = useSelector(getUserAuthDetails);

@@ -25,6 +25,7 @@ import { Dropdown, Menu } from "antd";
 import isEmpty from "is-empty";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
+import "./index.css";
 
 const getDesignationDisplayValue = (originalValue) => {
   switch (originalValue) {

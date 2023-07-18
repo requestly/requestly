@@ -41,7 +41,6 @@ const DeleteConfirmationModal = ({
     return (
       <Modal
         className="modal-dialog-centered modal-danger"
-        contentClassName="bg-gradient-danger bg-gradient-blue"
         open={isOpen}
         onCancel={!isMoveToTrashInProgress && !isDeletionInProgress && toggle}
         footer={null}

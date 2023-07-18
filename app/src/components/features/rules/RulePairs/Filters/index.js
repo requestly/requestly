@@ -365,14 +365,10 @@ const Filters = (props) => {
           <Dropdown overlay={urlOperatorOptions} disabled={props.isInputDisabled}>
             <Text
               strong
-              className="ant-dropdown-link all-caps-text"
+              className="ant-dropdown-link cursor-pointer capitalize uppercase"
               onClick={(e) => {
                 e.preventDefault();
                 LOG_ANALYTICS.PAGE_URL_MODIFIED(e);
-              }}
-              style={{
-                textTransform: "uppercase",
-                cursor: "pointer",
               }}
             >
               {getCurrentPageURLOperatorText()} <DownOutlined />

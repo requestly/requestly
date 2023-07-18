@@ -137,3 +137,25 @@
 .traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"] {
   background-color: #1e69ffdb;
 }
+
+.network-table-wrapper-override {
+  height: 100%;
+  border-style: none !important;
+}
+.network-table-wrapper-override .ant-pro-card-body {
+  padding-right: 0;
+}
+
+.network-table-wrapper-override .ant-pro-card-body > div > div > div {
+  overflow: auto !important;
+}
+
+.previewData {
+  display: flex;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.previewData .rdt_TableRow {
+  min-height: fit-content;
+}

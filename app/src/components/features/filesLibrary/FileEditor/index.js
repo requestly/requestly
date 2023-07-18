@@ -377,7 +377,7 @@ const FileEditor = (props) => {
     if (contentType.startsWith("image")) {
       return (
         <Row>
-          <Col className="text-align-center" span={24} align="center">
+          <Col className="text-center" span={24} align="center">
             {<ImageViewer src={props.fileDetails.webContentLink} />}
           </Col>
         </Row>
