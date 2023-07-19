@@ -1,7 +1,8 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog } from "./types";
+import { ConsoleLog, SessionRecording } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
+import fileDownload from "js-file-download";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
 
@@ -58,4 +59,12 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
 
 export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventData[] => {
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
+};
+
+export const prepareSessionToExport = (events: string, recording: SessionRecording): Promise<string> => {
+  return new Promise((resolve) => resolve(JSON.stringify({ events, recording })));
+};
+
+export const downloadSession = (fileContent: string, fileName: string): void => {
+  fileDownload(fileContent, `${fileName}.json`, "application/json");
 };
