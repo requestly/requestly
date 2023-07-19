@@ -38,6 +38,7 @@ export interface TeamInviteMetadata extends Record<string, unknown> {
   teamAccessCount?: number;
   plan?: string;
   inviteId?: string;
+  domain?: string;
 }
 
 export interface TeamInvite extends Invite {
