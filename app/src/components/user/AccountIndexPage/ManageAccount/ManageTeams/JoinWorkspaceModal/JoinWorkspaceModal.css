@@ -16,9 +16,13 @@
 }
 
 .team-invite-row {
-  padding: 12px 12px 12px 1rem;
+  display: grid;
+  grid-template-columns: 1.3fr 1.2fr 0.5fr;
+  align-items: center;
   border: 1px solid var(--border-dark);
+  padding: 12px 14px;
   border-radius: var(--border-radius-sm);
+  margin: 8px 0;
 }
 
 .team-invite-row .ant-col {
