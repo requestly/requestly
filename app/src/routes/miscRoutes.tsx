@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import AppMode from "components/misc/AppMode";
-import Feedback from "components/misc/Feedback";
 import Updates from "views/features/Updates";
 import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
 import Goodbye from "components/misc/Goodbye";
@@ -25,10 +24,6 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.APP_MODE.RELATIVE,
     element: <AppMode />,
-  },
-  {
-    path: PATHS.FEEDBACK.RELATIVE,
-    element: <Feedback />,
   },
   {
     path: PATHS.UPDATES.RELATIVE,

@@ -49,7 +49,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const [areRulesImporting, setAreRulesImporting] = useState(false);
 
   const functions = getFunctions();
-  const sendSharedListImportAsEmail = httpsCallable(functions, "sendSharedListImportAsEmail");
+  const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");
 
   const openAuthModal = (source) => {
     dispatch(
