@@ -1,5 +1,5 @@
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import deleteObjectAtPath from "./deleteObjectAtPath";
-import { getFilterObjectPath } from "../../index";
 const set = require("lodash/set");
 const get = require("lodash/get");
 

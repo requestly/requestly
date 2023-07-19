@@ -1,9 +1,11 @@
 import { Row, Col } from "antd";
+import { useDispatch } from "react-redux";
 import { RQInput } from "lib/design-system/components";
+import { actions } from "store";
 import "./delayRow.css";
 
-const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
 
   return (
     <Row align="middle" key={rowIndex}>
@@ -15,7 +17,16 @@ const DelayRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled 
           disabled={isInputDisabled}
           className="delay-rule-input display-inline-block"
           addonBefore={<span className="text-gray">DELAY (ms):</span>}
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "delay")}
+          onChange={(event) =>
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                pairIndex,
+                updates: {
+                  delay: event?.target?.value,
+                },
+              })
+            )
+          }
           data-selectionid="delay-value"
         />
       </Col>

@@ -3,9 +3,7 @@ import { Row, Col, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import "./AddCustomScriptRow.css";
 
-const AddCustomScriptRow = ({ rowIndex, helperFunctions }) => {
-  const { addEmptyScript } = helperFunctions;
-
+const AddCustomScriptRow = ({ rowIndex, addEmptyScript }) => {
   return (
     <Row className="margin-top-one" key={rowIndex}>
       <Col span={24}>
