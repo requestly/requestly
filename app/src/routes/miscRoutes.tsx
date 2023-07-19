@@ -4,7 +4,6 @@ import AppMode from "components/misc/AppMode";
 import Feedback from "components/misc/Feedback";
 import Updates from "views/features/Updates";
 import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
-import ManageLicenseIndexPage from "components/user/ManageLicenseIndexPage";
 import Goodbye from "components/misc/Goodbye";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
@@ -38,26 +37,6 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.PRICING.RELATIVE,
     element: <PricingIndexPage />,
-  },
-  {
-    path: PATHS.LEGACY.PRICING.ABSOLUTE,
-    element: <Navigate to={PATHS.PRICING.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.MANAGE.RELATIVE,
-    element: <ProtectedRoute component={ManageLicenseIndexPage} />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.MANAGE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.MANAGE.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.RELATIVE} />,
   },
   {
     path: PATHS.GOODBYE.RELATIVE,

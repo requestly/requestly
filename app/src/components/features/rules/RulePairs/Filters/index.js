@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSelect from "react-select";
 import { Button, Modal, Row, Col, Input, Typography, Dropdown, Menu } from "antd";
@@ -23,6 +23,7 @@ import {
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
+import { actions } from "store";
 
 const { Text, Link } = Typography;
 
@@ -70,7 +71,6 @@ const generatePlaceholderText = (operator) => {
 };
 
 const Filters = (props) => {
-  const { modifyPairAtGivenPath } = props;
   const { pairIndex } = props;
 
   //Global State
@@ -164,61 +164,47 @@ const Filters = (props) => {
     );
   };
 
+  const updateSourceOperator = useCallback(
+    (operator) => {
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR]: operator,
+          },
+        })
+      );
+    },
+    [dispatch, pairIndex]
+  );
+
+  const updateSourceRequestPayload = useCallback(
+    (event, path) => {
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            [path]: event?.target?.value,
+          },
+        })
+      );
+    },
+    [dispatch, pairIndex]
+  );
+
   const urlOperatorOptions = (
     <Menu>
       <Menu.Item key={1}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS
-            )
-          }
-        >
-          Equals
-        </span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
       </Menu.Item>
       <Menu.Item key={2}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS
-            )
-          }
-        >
-          Contains
-        </span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
       </Menu.Item>
       <Menu.Item key={3}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES
-            )
-          }
-        >
-          Matches (RegEx)
-        </span>
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>Matches (RegEx)</span>
       </Menu.Item>
       <Menu.Item key={4}>
-        <span
-          onClick={(event) =>
-            modifyPairAtGivenPath(
-              event,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR,
-              GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES
-            )
-          }
-        >
+        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
           Matches (Wildcard)
         </span>
       </Menu.Item>
@@ -249,9 +235,10 @@ const Filters = (props) => {
               pairIndex,
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY
             )}
-            onChange={(event) => {
-              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY);
-              clearRequestPayload(event.target.value);
+            onChange={(e) => {
+              e?.preventDefault?.();
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_KEY);
+              clearRequestPayload(e.target.value);
               LOG_ANALYTICS.KEY();
             }}
           />
@@ -268,9 +255,10 @@ const Filters = (props) => {
               pairIndex,
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE
             )}
-            onChange={(event) => {
-              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE);
-              clearRequestPayload(event.target.value);
+            onChange={(e) => {
+              e?.preventDefault?.();
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_REQUEST_PAYLOAD_VALUE);
+              clearRequestPayload(e.target.value);
               LOG_ANALYTICS.VALUE();
             }}
           />
@@ -391,8 +379,9 @@ const Filters = (props) => {
               pairIndex,
               APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
             )}
-            onChange={(event) => {
-              modifyPairAtGivenPath(event, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
+            onChange={(e) => {
+              e?.preventDefault?.();
+              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
               LOG_ANALYTICS.PAGE_URL_MODIFIED();
             }}
             disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}

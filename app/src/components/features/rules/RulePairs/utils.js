@@ -28,3 +28,13 @@ export const destinationRuleOperatorPlaceholders = {
     "e.g. $1://$2.newdomain.com/$3 (Each * can be replaced with respective $)",
   [GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES]: "e.g. http://www.new-example.com?queryParam=$1&searchParam=$2",
 };
+
+export const generatePlaceholderText = (operator, type, sourceKey = "") => {
+  if (type === "source-value") {
+    return sourceRuleOperatorPlaceholders[sourceKey]?.[operator];
+  } else if (type === "destination") {
+    return destinationRuleOperatorPlaceholders[operator];
+  }
+
+  return "";
+};
