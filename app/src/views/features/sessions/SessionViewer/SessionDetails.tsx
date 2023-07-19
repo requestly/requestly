@@ -66,6 +66,10 @@ const SessionDetails: React.FC = () => {
             width: playerContainer.current.clientWidth,
             height: 400,
             autoPlay: true,
+            // prevents elements inside rrweb-player to steal focus
+            // The elements inside the player were stealing the focus from the inputs in the session viewer pages
+            // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
+            triggerFocus: false,
           },
         })
       );
