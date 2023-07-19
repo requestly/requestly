@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
@@ -28,6 +28,11 @@ import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/
 import { getOwnerId } from "backend/utils";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
+import { RQButton, RQModal } from "lib/design-system/components";
+import { FilePicker } from "components/common/FilePicker";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
+import PATHS from "config/constants/sub/paths";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -48,6 +53,8 @@ const SessionsIndexPage = () => {
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [qs, setQs] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [processingDataToImport, setProcessingDataToImport] = useState(false);
 
   const fetchRecordings = (lastDoc = null) => {
     if (unsubscribeListener) unsubscribeListener();
@@ -125,12 +132,15 @@ const SessionsIndexPage = () => {
     navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE);
   }, [dispatch, navigate, user?.loggedIn]);
 
-  const ConfigureButton = () => (
-    <>
-      <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
-        Settings
-      </Button>
-    </>
+  const configureBtn = useMemo(
+    () => (
+      <>
+        <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
+          Settings
+        </Button>
+      </>
+    ),
+    [redirectToSettingsPage]
   );
 
   useEffect(() => {
@@ -153,12 +163,67 @@ const SessionsIndexPage = () => {
     }
   }, [filteredRecordings?.length, isWorkspaceMode]);
 
+  const toggleOpenDownloadedSessionModal = useCallback(() => setIsOpen((prev) => !prev), []);
+
+  const onSessionRecordingFileDrop = useCallback(
+    async (acceptedFiles) => {
+      //Ignore other uploaded files
+      const file = acceptedFiles[0];
+      const reader = new FileReader();
+
+      reader.onabort = () => toggleOpenDownloadedSessionModal();
+      reader.onerror = () => toggleOpenDownloadedSessionModal();
+      reader.onload = () => {
+        try {
+          setProcessingDataToImport(true);
+          const parsedData = JSON.parse(reader.result);
+
+          dispatch(sessionRecordingActions.setSessionRecording({ ...parsedData.recording }));
+
+          const recordedSessionEvents = decompressEvents(parsedData.events);
+          dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+
+          navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`, { state: { isImported: true } });
+        } catch (error) {
+          alert("Imported file doesn't match Requestly format. Please choose another file.");
+        } finally {
+          setProcessingDataToImport(false);
+          toggleOpenDownloadedSessionModal();
+        }
+      };
+      reader.readAsText(file);
+    },
+    [navigate, toggleOpenDownloadedSessionModal, dispatch]
+  );
+
+  const openDownloadedSessionModalBtn = useMemo(
+    () => (
+      <RQButton type="default" onClick={toggleOpenDownloadedSessionModal}>
+        Open downloaded session
+      </RQButton>
+    ),
+    [toggleOpenDownloadedSessionModal]
+  );
+
   if (isTableLoading) {
     return <PageLoader message="Loading sessions..." />;
   }
 
   return user?.loggedIn && filteredRecordings?.length ? (
     <>
+      <RQModal open={isOpen} onCancel={toggleOpenDownloadedSessionModal}>
+        <div className="rq-modal-content">
+          <div className="header mb-16 text-center">Import session</div>
+
+          <FilePicker
+            onFilesDrop={onSessionRecordingFileDrop}
+            isProcessing={processingDataToImport}
+            loaderMessage="Loading session..."
+            title="Drag and drop your exported session recording file"
+          />
+        </div>
+      </RQModal>
+
       <ProtectedRoute
         component={() => (
           <>
@@ -169,7 +234,8 @@ const SessionsIndexPage = () => {
               setSelectedRowVisibility={setSelectedRowVisibility}
               setIsShareModalVisible={setIsShareModalVisible}
               fetchRecordings={fetchRecordings}
-              ConfigureButton={ConfigureButton}
+              configureBtn={configureBtn}
+              openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
               callbackOnDeleteSuccess={() => {
                 setSessionRecordings([]);
                 setReachedEnd(false);

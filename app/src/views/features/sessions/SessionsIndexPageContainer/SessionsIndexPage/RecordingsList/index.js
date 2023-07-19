@@ -44,7 +44,8 @@ const RecordingsList = ({
   setSharingRecordId,
   setSelectedRowVisibility,
   setIsShareModalVisible,
-  ConfigureButton,
+  configureBtn,
+  openDownloadedSessionModalBtn,
   callbackOnDeleteSuccess,
   TableFooter,
   _renderTableFooter,
@@ -198,7 +199,7 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => [<ConfigureButton />]}
+        toolBarRender={() => [openDownloadedSessionModalBtn, configureBtn]}
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
