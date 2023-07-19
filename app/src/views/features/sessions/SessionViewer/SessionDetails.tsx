@@ -66,6 +66,7 @@ const SessionDetails: React.FC = () => {
             width: playerContainer.current.clientWidth,
             height: 400,
             autoPlay: true,
+            triggerFocus: false,
           },
         })
       );
