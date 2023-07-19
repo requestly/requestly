@@ -138,10 +138,12 @@
       display: flex;
       flex-direction: row;
       column-gap: 10px;
+      position: relative;
 
       button {
         height: 32px;
       }
+
       .session-viewer-save-action-btn svg {
         width: 16px;
         height: 16px;
@@ -307,6 +309,7 @@
       }
     }
   }
+
   .session-properties-wrapper {
     display: flex;
     gap: 1rem;
@@ -343,6 +346,7 @@
       background: var(--component-background);
     }
   }
+
   .session-onboarding-prompt {
     display: flex;
     justify-content: space-between;
@@ -399,6 +403,70 @@
       & span:not(.anticon) {
         text-decoration: underline;
       }
+    }
+  }
+
+  .save-recording-config-modal {
+    position: absolute;
+    width: 413px;
+    top: 42px;
+    right: 0px;
+    z-index: 10;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--border-radius-md);
+    background-color: var(--component-background);
+
+    // ant-design modal's default box shadow
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48), 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+
+    .header-container {
+      padding: 8px 20px;
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+      background-color: var(--component-dark-background);
+
+      .header {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      button.ant-btn {
+        border: none;
+        padding: 16px 11px;
+
+        svg {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .config-container {
+      padding: 16px 20px;
+
+      > div {
+        margin-bottom: 24px;
+      }
+
+      .mode-radio-group {
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
+      }
+
+      .config-label {
+        font-size: 14px;
+        line-height: 25px;
+        margin-bottom: 12px;
+        color: var(--text-gray);
+      }
+    }
+
+    .footer {
+      padding: 4px 16px;
+      border-bottom-left-radius: inherit;
+      border-bottom-right-radius: inherit;
+      border-top: 1px solid var(--border-dark);
+      background-color: var(--component-dark-background);
     }
   }
 }
