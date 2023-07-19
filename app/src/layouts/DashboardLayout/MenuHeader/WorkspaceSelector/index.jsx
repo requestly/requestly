@@ -142,7 +142,7 @@ const WorkspaceSelector = () => {
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getPendingInvites({ email: true })
+    getPendingInvites({ email: true, domain: true })
       .then((res) => {
         setTeamInvites(res?.data?.pendingInvites ?? []);
       })
