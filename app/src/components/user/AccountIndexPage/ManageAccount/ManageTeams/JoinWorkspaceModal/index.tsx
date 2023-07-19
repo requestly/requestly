@@ -115,9 +115,10 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
 
         {sortedInvites?.length > 0 ? (
           <ul className="teams-invite-list">
-            {getUniqueTeamsFromInvites(sortedInvites).map((team: TeamInviteMetadata, index) => (
-              <InviteRow team={team} index={index} handleModalClose={handleModalClose} />
-            ))}
+            {getUniqueTeamsFromInvites(sortedInvites).map((team: TeamInviteMetadata, index) => {
+              if (team.domain && team.teamAccessCount <= 1) return null;
+              return <InviteRow team={team} index={index} handleModalClose={handleModalClose} />;
+            })}
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
