@@ -76,7 +76,7 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
         <div className="header">Delete Mock</div>
         <div className="text-gray text-sm mt-1">
           <p>
-            Do you really want to delete <span className="text-bold white-color">{mock?.name}</span> mock?
+            Do you really want to delete <span className="text-bold text-white">{mock?.name}</span> mock?
           </p>
         </div>
       </div>

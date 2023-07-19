@@ -62,7 +62,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
           </span>
         </h1>
         <div className="caption">
-          Inpect and modify HTTP(S) traffic from any browser, <br />
+          Inspect and modify HTTP(S) traffic from any browser, <br />
           desktop apps & mobile apps
         </div>
 
