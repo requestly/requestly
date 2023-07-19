@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -52,6 +52,8 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+
+  const [redirectToEditor, setRedirectToEditor] = useState(false);
 
   const tooltipText = isDisabled
     ? "Only available in desktop app."
@@ -129,15 +131,9 @@ const CreateRuleButton = ({
           }
         }
 
-        const ruleId = currentlySelectedRuleData.id;
-
-        if (!isRuleEditorModal) {
-          // Using setTimeout so that navigation happens after `isCurrentlySelectedRuleHasUnsavedChanges`
-          // is updated so that usePrompt gets the updated state while navigating.
-          setTimeout(() => {
-            redirectToRuleEditor(navigate, ruleId, "create");
-          }, 0);
-        }
+        // It is necessary to redirect to editor after all the states have been updated so
+        // that usePrompt does not block the navigation
+        setRedirectToEditor(true);
       });
     } else {
       toast.warn(ruleValidation.message, {
@@ -154,6 +150,12 @@ const CreateRuleButton = ({
       handleBtnOnClick();
     }
   };
+
+  useEffect(() => {
+    if (redirectToEditor && !isRuleEditorModal) {
+      redirectToRuleEditor(navigate, currentlySelectedRuleData.id, "create");
+    }
+  }, [currentlySelectedRuleData.id, isRuleEditorModal, navigate, redirectToEditor]);
 
   useEffect(() => {
     document.addEventListener("keydown", saveFn);

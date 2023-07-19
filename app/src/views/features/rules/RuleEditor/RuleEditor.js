@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { unstable_usePrompt, useLocation } from "react-router-dom";
+import { unstable_usePrompt as usePrompt, useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
@@ -39,7 +39,7 @@ const RuleEditor = () => {
     return () => window.removeEventListener("beforeunload", unloadListener);
   }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
-  unstable_usePrompt({
+  usePrompt({
     message: "Discard changes? Changes you made may not be saved.",
     when: isCurrentlySelectedRuleHasUnsavedChanges,
   });
