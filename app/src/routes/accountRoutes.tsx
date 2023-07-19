@@ -76,10 +76,6 @@ export const accountRoutes: RouteObject[] = [
     element: <Navigate to={PATHS.ACCOUNT.MY_ACCOUNT.ABSOLUTE} />,
   },
   {
-    path: PATHS.LICENSE.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
-  },
-  {
     path: PATHS.BACKUP.RELATIVE,
     element: <Navigate to={PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE} />,
   },

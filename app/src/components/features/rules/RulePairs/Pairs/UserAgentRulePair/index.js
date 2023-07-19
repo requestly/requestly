@@ -3,7 +3,7 @@ import UserAgentSelectionRow from "../Rows/RowsMarkup/UserAgentSelectionRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import { Row, Col } from "antd";
 
-const UserAgentRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+const UserAgentRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
   return (
     <React.Fragment>
       <Row>
@@ -12,7 +12,6 @@ const UserAgentRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isIn
             rowIndex={1}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
           />
@@ -20,13 +19,7 @@ const UserAgentRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isIn
       </Row>
       <Row>
         <Col span={24}>
-          <UserAgentSelectionRow
-            rowIndex={2}
-            pair={pair}
-            pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
-            isInputDisabled={isInputDisabled}
-          />
+          <UserAgentSelectionRow rowIndex={2} pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
         </Col>
       </Row>
     </React.Fragment>

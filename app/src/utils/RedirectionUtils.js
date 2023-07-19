@@ -236,16 +236,6 @@ export const redirectToUnlockPremium = (navigate) => {
   navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
 };
 
-/* USER - License - Index Page */
-export const redirectToLicenseIndexPage = (navigate) => {
-  navigate(PATHS.LICENSE.ABSOLUTE);
-};
-
-/* USER - License - Manage */
-export const redirectToManageLicense = (navigate) => {
-  navigate(PATHS.LICENSE.MANAGE.ABSOLUTE);
-};
-
 /* ACCOUNT */
 
 /* ACCOUNT - View Account Details */

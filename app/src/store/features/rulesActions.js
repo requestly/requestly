@@ -1,7 +1,6 @@
-import APP_CONSTANTS from "../../config/constants";
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-
-const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
+import { get, set } from "lodash";
 
 export const updateLastBackupTimeStamp = (prevState, action) => {
   prevState.rules.lastBackupTimeStamp = action.payload;
@@ -45,28 +44,8 @@ export const updateHardRefreshPendingStatus = (prevState, action) => {
     : !prevState["pendingHardRefresh"][action.payload.type];
 };
 
-// not used anywhere
-export const toggleSelectedRule = (prevState, action) => {
-  const currentValue = prevState.rules.selectedRules[action.payload.ruleId];
-
-  prevState.rules.selectedRules[action.payload.ruleId] = currentValue ? false : true;
-};
-
 export const updateSelectedRules = (prevState, action) => {
   prevState.rules.selectedRules = action.payload;
-};
-
-// not used anywhere
-export const updateSelectAllRulesOfAGroup = (prevState, action) => {
-  const groupId = action.payload.groupId;
-  const allRulesUnderThisGroup =
-    prevState["rules"]["groupwiseRulesToPopulate"][groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_RULES];
-  const newSelectedRulesObject = {};
-  allRulesUnderThisGroup.forEach((rule) => {
-    newSelectedRulesObject[rule.id] = action.payload.newValue;
-  });
-
-  Object.assign(prevState.rules.selectedRules, newSelectedRulesObject);
 };
 
 export const clearSelectedRules = (prevState) => {
@@ -97,19 +76,6 @@ export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
   };
 };
 
-// not used anywhere
-export const selectAllRules = (prevState, action) => {
-  const { newValue } = action.payload;
-
-  const newSelectedRules = {};
-
-  prevState.rules.rulesToPopulate.forEach((rule) => {
-    newSelectedRules[rule.id] = newValue;
-  });
-
-  prevState.rules.selectedRules = newSelectedRules;
-};
-
 export const updateRecord = (prevState, action) => {
   const ObjectTypeMap = {
     [GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP]: "groups",
@@ -120,4 +86,38 @@ export const updateRecord = (prevState, action) => {
   const ruleIndex = prevState.rules.allRules[recordType].findIndex((record) => record.id === action.payload.id);
 
   prevState.rules.allRules[recordType][ruleIndex] = action.payload;
+};
+
+// rule editor actions
+export const updateRulePairAtGivenPath = (prevState, action) => {
+  const { pairIndex, updates = {}, triggerUnsavedChangesIndication = true } = action.payload;
+
+  for (const [modificationPath, value] of Object.entries(updates)) {
+    set(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], getFilterObjectPath(modificationPath), value);
+  }
+
+  if (triggerUnsavedChangesIndication) {
+    prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+  }
+};
+
+export const removeValueInRulePairByIndex = (prevState, action) => {
+  const { pairIndex, arrayPath, index } = action.payload;
+  get(prevState.rules.currentlySelectedRule.data?.pairs[pairIndex], arrayPath).splice(index, 1);
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+};
+
+export const removeRulePairByIndex = (prevState, action) => {
+  const { pairIndex } = action.payload;
+  prevState.rules.currentlySelectedRule.data.pairs?.splice(pairIndex, 1);
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+};
+
+export const addValueInRulePairArray = (prevState, action) => {
+  const { pairIndex, arrayPath, value } = action.payload;
+
+  const targetArray = get(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath);
+  set(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
+
+  prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
 };

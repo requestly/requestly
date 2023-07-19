@@ -1,4 +1,4 @@
-import { getFilterObjectPath } from "../../index";
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
 const get = require("lodash/get");
 
 const getObjectValue = (currentlySelectedRuleData, pairIndex, objectPath) => {
