@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
@@ -12,6 +12,7 @@ import { TeamInvite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { toast } from "utils/Toast";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { actions } from "store";
 import "./JoinWorkspaceModal.css";
 
 interface JoinWorkspaceModalProps {
@@ -101,10 +102,18 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   handleModalClose,
   handleCreateNewWorkspaceClick,
 }) => {
+  const dispatch = useDispatch();
   const sortedInvites = useMemo(
     () => teamInvites.sort((a, b) => b.metadata.teamAccessCount - a.metadata.teamAccessCount),
     [teamInvites]
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      const inviteIds = teamInvites.map((invite) => invite.id);
+      dispatch(actions.updateLastSeenInvites(inviteIds));
+    }
+  }, [dispatch, teamInvites, isOpen]);
 
   return (
     <RQModal centered open={isOpen} onCancel={handleModalClose} className="join-workspace-modal">
@@ -116,7 +125,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
         {sortedInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {getUniqueTeamsFromInvites(sortedInvites).map((team: TeamInviteMetadata, index) => {
-              if (team.domain && team.teamAccessCount <= 1) return null;
+              if (team?.domain && team.teamAccessCount <= 1) return null;
               return <InviteRow team={team} index={index} handleModalClose={handleModalClose} />;
             })}
           </ul>

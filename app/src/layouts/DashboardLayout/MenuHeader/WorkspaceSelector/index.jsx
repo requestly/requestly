@@ -24,7 +24,12 @@ import {
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getUserAuthDetails } from "store/selectors";
+import {
+  getAppMode,
+  getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getLastSeenInvites,
+  getUserAuthDetails,
+} from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
@@ -56,7 +61,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ menu }) => {
+const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -105,6 +110,7 @@ const WorkSpaceDropDown = ({ menu }) => {
         >
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+            {hasNewInvites ? <Badge dot={true} /> : null}
             <DownOutlined className="active-workspace-name-down-icon" />
           </span>
         </Tooltip>
@@ -130,6 +136,7 @@ const WorkspaceSelector = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const lastSeenInvites = useSelector(getLastSeenInvites);
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -138,6 +145,13 @@ const WorkspaceSelector = () => {
   const loggedInUserEmail = user?.details?.profile?.email;
 
   const getPendingInvites = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingTeamInvites"), []);
+
+  const hasNewInvites = useMemo(() => {
+    if (user?.loggedIn && teamInvites?.length) {
+      return teamInvites.some((invite) => !lastSeenInvites.includes(invite.id));
+    }
+    return false;
+  }, [lastSeenInvites, teamInvites, user?.loggedIn]);
 
   useEffect(() => {
     if (!user.loggedIn) return;
@@ -525,7 +539,7 @@ const WorkspaceSelector = () => {
 
   return (
     <>
-      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
+      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} hasNewInvites={hasNewInvites} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 
