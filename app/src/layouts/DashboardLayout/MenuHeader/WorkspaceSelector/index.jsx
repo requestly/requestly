@@ -37,7 +37,7 @@ import APP_CONSTANTS from "config/constants";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./WorkSpaceSelector.css";
@@ -148,7 +148,7 @@ const WorkspaceSelector = () => {
 
   const hasNewInvites = useMemo(() => {
     if (user?.loggedIn && teamInvites?.length) {
-      return teamInvites.some((invite) => !lastSeenInvites.includes(invite.id));
+      return teamInvites.some((invite) => !lastSeenInvites.includes(invite.inviteId));
     }
     return false;
   }, [lastSeenInvites, teamInvites, user?.loggedIn]);
@@ -158,7 +158,8 @@ const WorkspaceSelector = () => {
 
     getPendingInvites({ email: true, domain: true })
       .then((res) => {
-        setTeamInvites(res?.data?.pendingInvites ?? []);
+        const uniqueInvites = getUniqueTeamsFromInvites(res?.data?.pendingInvites ?? []);
+        setTeamInvites(uniqueInvites);
       })
       .catch((e) => setTeamInvites([]));
   }, [user.loggedIn, loggedInUserEmail, getPendingInvites]);
@@ -536,6 +537,7 @@ const WorkspaceSelector = () => {
       ) : null}
     </Menu>
   );
+  console.log({ teamInvites });
 
   return (
     <>
