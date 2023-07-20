@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -53,8 +53,6 @@ const CreateRuleButton = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const [redirectToEditor, setRedirectToEditor] = useState(false);
-
   const tooltipText = isDisabled
     ? "Only available in desktop app."
     : navigator.platform.match("Mac")
@@ -73,19 +71,24 @@ const CreateRuleButton = ({
     //Validation
     const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
     if (ruleValidation.result) {
-      saveRule(appMode, {
-        ...fixedRuleData,
-        createdBy,
-        currentOwner,
-        lastModifiedBy,
-      }).then(async () => {
+      saveRule(
+        appMode,
+        {
+          ...fixedRuleData,
+          createdBy,
+          currentOwner,
+          lastModifiedBy,
+        },
+        // updating `isCurrentlySelectedRuleHasUnsavedChanges` in the callback of saveRule
+        // because the navigation blocker prompt is dependent on this value so we need to
+        // update it before navigating away from the page
+        () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
+      ).then(async () => {
         if (isRuleEditorModal) {
           ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
         } else {
           toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
         }
-
-        setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
 
         /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
 
@@ -131,9 +134,9 @@ const CreateRuleButton = ({
           }
         }
 
-        // It is necessary to redirect to editor after all the states have been updated so
-        // that usePrompt does not block the navigation
-        setRedirectToEditor(true);
+        if (!isRuleEditorModal) {
+          redirectToRuleEditor(navigate, currentlySelectedRuleData.id, "create");
+        }
       });
     } else {
       toast.warn(ruleValidation.message, {
@@ -150,12 +153,6 @@ const CreateRuleButton = ({
       handleBtnOnClick();
     }
   };
-
-  useEffect(() => {
-    if (redirectToEditor && !isRuleEditorModal) {
-      redirectToRuleEditor(navigate, currentlySelectedRuleData.id, "create");
-    }
-  }, [currentlySelectedRuleData.id, isRuleEditorModal, navigate, redirectToEditor]);
 
   useEffect(() => {
     document.addEventListener("keydown", saveFn);
