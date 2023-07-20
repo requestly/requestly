@@ -80,6 +80,7 @@ const DashboardContent = () => {
   return (
     <>
       <div id="dashboardMainContent">
+        {/* Outlet renders all the children of the root route */}
         <Outlet />
       </div>
 
