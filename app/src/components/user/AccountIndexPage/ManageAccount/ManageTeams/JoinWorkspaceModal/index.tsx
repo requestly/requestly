@@ -6,9 +6,9 @@ import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
-import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueColorForWorkspace } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { TeamInvite, TeamInviteMetadata } from "types";
+import { TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { toast } from "utils/Toast";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -17,7 +17,7 @@ import "./JoinWorkspaceModal.css";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
-  teamInvites: TeamInvite[];
+  teamInvites: TeamInviteMetadata[];
   allowCreateNewWorkspace?: boolean;
   handleModalClose: () => void;
   handleCreateNewWorkspaceClick?: (e: React.MouseEvent) => void;
@@ -103,14 +103,11 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   handleCreateNewWorkspaceClick,
 }) => {
   const dispatch = useDispatch();
-  const sortedInvites = useMemo(
-    () => teamInvites.sort((a, b) => b.metadata.teamAccessCount - a.metadata.teamAccessCount),
-    [teamInvites]
-  );
+  const sortedInvites = useMemo(() => teamInvites.sort((a, b) => b.teamAccessCount - a.teamAccessCount), [teamInvites]);
 
   useEffect(() => {
     if (isOpen) {
-      const inviteIds = teamInvites.map((invite) => invite.id);
+      const inviteIds = teamInvites.map((invite) => invite.inviteId);
       dispatch(actions.updateLastSeenInvites(inviteIds));
     }
   }, [dispatch, teamInvites, isOpen]);
@@ -124,7 +121,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
 
         {sortedInvites?.length > 0 ? (
           <ul className="teams-invite-list">
-            {getUniqueTeamsFromInvites(sortedInvites).map((team: TeamInviteMetadata, index) => {
+            {sortedInvites.map((team: TeamInviteMetadata, index) => {
               if (team?.domain && team.teamAccessCount <= 1) return null;
               return <InviteRow team={team} index={index} handleModalClose={handleModalClose} />;
             })}

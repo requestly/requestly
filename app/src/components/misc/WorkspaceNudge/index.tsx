@@ -7,15 +7,16 @@ import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { actions } from "store";
-import { Invite, TeamInvite } from "types";
+import { Invite, TeamInvite, TeamInviteMetadata } from "types";
 import "./index.css";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
+import { getUniqueTeamsFromInvites } from "utils/teams";
 
 export const WorkspaceNudge: React.FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [hasActiveWorkspace, setHasActiveWorkspace] = useState<boolean>(false);
-  const [teamInvites, setTeamInvites] = useState<TeamInvite[]>(null);
+  const [teamInvites, setTeamInvites] = useState<TeamInviteMetadata[]>(null);
   const [isJoinWorkspaceModalVisible, setIsJoinWorkspaceModalVisible] = useState<boolean>(false);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0], [
     user?.details?.profile?.email,
@@ -54,7 +55,8 @@ export const WorkspaceNudge: React.FC = () => {
             );
             if (hasActive) {
               setHasActiveWorkspace(true);
-              setTeamInvites(res?.data?.pendingInvites);
+              const uniqueInvites = getUniqueTeamsFromInvites(res.data.pendingInvites);
+              setTeamInvites(uniqueInvites);
             }
           }
         })
