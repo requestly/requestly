@@ -27,6 +27,8 @@ import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import "./apiClientView.scss";
+import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -202,9 +204,13 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
             type: getContentTypeFromResponseHeaders(response.headers),
             time: Math.round(response.time / 1000),
           });
+          trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
+          trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
         } else {
           setIsFailed(true);
           trackRequestFailed();
+          trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
+          trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
         }
         notifyApiRequestFinished?.(entryWithResponse);
       })
@@ -226,6 +232,8 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       isDemoURL: sanitizedEntry.request.url === DEMO_API_URL,
       path: location.pathname,
     });
+    trackRQLastActivity(API_CLIENT.REQUEST_SENT);
+    trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [appMode, entry, notifyApiRequestFinished, location.pathname]);
 
   const cancelRequest = useCallback(() => {
