@@ -18,6 +18,15 @@ const REQUEST_METHOD_COLOR_CODES: Record<string, string> = {
   DELETE: "red",
 };
 
+const RESPONSE_STATUS_COLOR_CODES: Record<string, string> = {
+  "0": "#FF4D4F",
+  "1": "#E3A324",
+  "2": "#4EB433",
+  "3": "#106D7A",
+  "4": "#FA0C1E",
+  "5": "#FF4D4F",
+};
+
 const NetworkLogRow: React.FC<Props> = ({
   timeOffset,
   method,
@@ -50,6 +59,9 @@ const NetworkLogRow: React.FC<Props> = ({
     >
       <Tag color={REQUEST_METHOD_COLOR_CODES[requestMethod]} className="request-method-tag">
         {requestMethod}
+      </Tag>
+      <Tag color={RESPONSE_STATUS_COLOR_CODES[status?.toString()?.[0]]} className="request-method-tag">
+        {status}
       </Tag>
       <span className={classNames("network-log-url", { failed: isFailedRequest })}>{networkUrl}</span>
     </SessionDetailsPanelRow>
