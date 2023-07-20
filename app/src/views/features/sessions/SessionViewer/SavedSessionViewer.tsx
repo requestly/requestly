@@ -167,15 +167,7 @@ const SavedSessionViewer: React.FC = () => {
     getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
-
-        console.log({ res });
-
-        dispatch(
-          sessionRecordingActions.setSessionRecording({
-            id,
-            ...res.payload,
-          })
-        );
+        dispatch(sessionRecordingActions.setSessionRecording({ id, ...res.payload }));
 
         const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
         dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
