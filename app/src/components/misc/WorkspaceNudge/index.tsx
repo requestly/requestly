@@ -10,7 +10,6 @@ import { actions } from "store";
 import { Invite, TeamInvite, TeamInviteMetadata } from "types";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { getUniqueTeamsFromInvites } from "utils/teams";
-import { getOrganizationMembers } from "backend/workspace";
 import "./index.css";
 
 export const WorkspaceNudge: React.FC = () => {
@@ -20,12 +19,7 @@ export const WorkspaceNudge: React.FC = () => {
   const [teamInvites, setTeamInvites] = useState<TeamInviteMetadata[]>(null);
   const [isJoinWorkspaceModalVisible, setIsJoinWorkspaceModalVisible] = useState<boolean>(false);
   const [organizationMembers, setOrganizationMembers] = useState(null);
-
-  const memberCount = useMemo(() => {
-    if (organizationMembers) {
-      return Object.keys(organizationMembers).length;
-    } else return 0;
-  }, [organizationMembers]);
+  const [membersCount, setMembersCount] = useState<number>(0);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0], [
     user?.details?.profile?.email,
@@ -39,6 +33,8 @@ export const WorkspaceNudge: React.FC = () => {
       ),
     []
   );
+
+  const getOrganizationMembers = useMemo(() => httpsCallable(getFunctions(), "getOrganizationMembers"), []);
 
   // const createOrgMap = useMemo(() => httpsCallable(getFunctions(), "createOrganizationMap"), []);
 
@@ -57,10 +53,15 @@ export const WorkspaceNudge: React.FC = () => {
   };
 
   useEffect(() => {
-    getOrganizationMembers(getDomainFromEmail(user?.details?.profile?.email))
-      .then((result) => setOrganizationMembers(result))
+    getOrganizationMembers({ domain: getDomainFromEmail(user?.details?.profile?.email) })
+      .then((result) => {
+        if (result.data) {
+          setOrganizationMembers(result.data);
+          setMembersCount(Object.keys(result.data).length);
+        }
+      })
       .catch((e) => console.log(e));
-  }, [userEmailDomain, user?.details?.profile?.email]);
+  }, [userEmailDomain, user?.details?.profile?.email, getOrganizationMembers]);
 
   useEffect(() => {
     if (user?.loggedIn) {
@@ -85,7 +86,7 @@ export const WorkspaceNudge: React.FC = () => {
 
   return (
     <>
-      {memberCount >= 3 ? (
+      {membersCount >= 3 ? (
         <>
           <div className="nudge-container">
             <Row justify="end">
@@ -107,8 +108,8 @@ export const WorkspaceNudge: React.FC = () => {
             </div>
             <Typography.Text className="display-block nudge-text">
               {hasActiveWorkspace
-                ? `${memberCount} users from ${userEmailDomain} are collaborating on a team workspace`
-                : `${memberCount} users from ${userEmailDomain} are using Requestly.`}
+                ? `${membersCount} users from ${userEmailDomain} are collaborating on a team workspace`
+                : `${membersCount} users from ${userEmailDomain} are using Requestly.`}
             </Typography.Text>
             <RQButton type="primary" className="mt-8 text-bold" onClick={handleNudgeCTAClick}>
               {hasActiveWorkspace ? "Join your teammates" : "Start collaborating"}
