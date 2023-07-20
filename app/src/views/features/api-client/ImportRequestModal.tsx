@@ -4,6 +4,8 @@ import { parseCurlRequest } from "./apiUtils";
 import { RQAPI } from "./types";
 import { toast } from "utils/Toast";
 import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
+import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
   isOpen: boolean;
@@ -40,6 +42,8 @@ const ImportRequestModal: React.FC<Props> = ({ isOpen, handleImportRequest, onCl
 
     handleImportRequest(requestFromCurl);
     trackCurlImported();
+    trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
+    trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);
   }, [curlCommand, handleImportRequest]);
 
   return (
