@@ -33,6 +33,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
+import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -178,13 +179,19 @@ const SessionsIndexPage = () => {
           setProcessingDataToImport(true);
           const parsedData = JSON.parse(reader.result);
 
+          if (!parsedData.recording || !parsedData.events) {
+            throw new Error("Invalid file format!");
+          }
+
           dispatch(sessionRecordingActions.setSessionRecording({ ...parsedData.recording }));
 
           const recordedSessionEvents = decompressEvents(parsedData.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
 
-          navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`, { state: { isImported: true } });
+          trackSessionRecordingUpload("success");
+          navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
         } catch (error) {
+          trackSessionRecordingUpload("failed");
           alert("Imported file doesn't match Requestly format. Please choose another file.");
         } finally {
           setProcessingDataToImport(false);

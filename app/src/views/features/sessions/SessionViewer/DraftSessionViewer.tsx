@@ -44,17 +44,17 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
+enum SessionSaveMode {
+  LOCAL = "local",
+  ONLINE = "online",
+}
+
 enum DebugInfo {
   INCLUDE_NETWORK_LOGS = "includeNetworkLogs",
   INCLUDE_CONSOLE_LOGS = "includeConsoleLogs",
 }
 
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
-
-enum SessionSaveMode {
-  LOCAL = "local",
-  ONLINE = "online",
-}
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -77,7 +77,7 @@ const DraftSessionViewer: React.FC = () => {
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
 
   const importedSessionRecordingOptions = useMemo(
-    () => Object.keys(sessionRecording?.options ?? {}).filter((key: DebugInfo) => sessionRecording?.options[key]),
+    () => Object.keys(sessionRecording?.options ?? {}).filter((key: DebugInfo) => sessionRecording?.options?.[key]),
     [sessionRecording?.options]
   );
 
@@ -104,8 +104,6 @@ const DraftSessionViewer: React.FC = () => {
     },
     [dispatch]
   );
-
-  console.log({ x: sessionRecording.options });
 
   useEffect(() => {
     trackDraftSessionViewed();
@@ -192,9 +190,14 @@ const DraftSessionViewer: React.FC = () => {
     prepareSessionToExport(sessionEvents, { ...sessionRecording, options: recordingOptionsToSave })
       .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
       .finally(() => {
-        toast.success("Recording saved successfully");
+        toast.success("Recording downloaded successfully");
         setSessionSaveMode(SessionSaveMode.ONLINE);
         setIsSaveModalVisible(false);
+        trackDraftSessionSaved(
+          sessionRecording.sessionAttributes.duration,
+          recordingOptionsToSave,
+          SessionSaveMode.LOCAL
+        );
       });
   };
 
@@ -239,7 +242,7 @@ const DraftSessionViewer: React.FC = () => {
           setSessionSaveMode(SessionSaveMode.ONLINE);
           setIsSaveModalVisible(false);
           toast.success("Recording saved successfully");
-          trackDraftSessionSaved(sessionAttributes.duration, recordingOptionsToSave);
+          trackDraftSessionSaved(sessionAttributes.duration, recordingOptionsToSave, SessionSaveMode.ONLINE);
           navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
             replace: true,
             state: { fromApp: true, viewAfterSave: true },
