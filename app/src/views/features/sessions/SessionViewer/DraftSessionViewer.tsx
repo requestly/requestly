@@ -1,21 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Checkbox, Modal, Radio, RadioChangeEvent, Row } from "antd";
-import { CloseOutlined, DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { Modal, RadioChangeEvent } from "antd";
+import { DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
-import { RQSession, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
+import { RQSession } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import {
   compressEvents,
   downloadSession,
-  filterOutConsoleLogs,
   filterOutLargeNetworkResponses,
+  getSessionEventsToSave,
+  getSessionRecordingOptions,
   prepareSessionToExport,
 } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
@@ -33,8 +34,10 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import PageError from "components/misc/PageError";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { RecordingOptions } from "./types";
+import { DebugInfo, RecordingOptions, SessionSaveMode } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
+import { defaultDebugInfo } from "./constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionSaved,
@@ -44,17 +47,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
-enum SessionSaveMode {
-  LOCAL = "local",
-  ONLINE = "online",
-}
-
-enum DebugInfo {
-  INCLUDE_NETWORK_LOGS = "includeNetworkLogs",
-  INCLUDE_CONSOLE_LOGS = "includeConsoleLogs",
-}
-
-const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
+const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -72,23 +65,18 @@ const DraftSessionViewer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
-  const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+  const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
 
-  const importedSessionRecordingOptions = useMemo(
-    () => Object.keys(sessionRecording?.options ?? {}).filter((key: DebugInfo) => sessionRecording?.options?.[key]),
-    [sessionRecording?.options]
-  );
+  const importedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecording?.options), [
+    sessionRecording?.options,
+  ]);
 
   const isIncludeNetworkLogsDisabled =
     isImportedSession && !importedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
   const isIncludeConsoleLogsDisabled =
     isImportedSession && !importedSessionRecordingOptions.includes(DebugInfo.INCLUDE_CONSOLE_LOGS);
-
-  console.log({ sessionRecording, sessionEvents, sessionSaveMode });
-
-  const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -104,6 +92,16 @@ const DraftSessionViewer: React.FC = () => {
     },
     [dispatch]
   );
+
+  // useEffect(
+  //   () => () => {
+  //     if (isImportedSession && sessionRecording === null) {
+  //       console.log("navigating...");
+  //       navigate(PATHS.SESSIONS.ABSOLUTE);
+  //     }
+  //   },
+  //   [navigate, isImportedSession, sessionRecording]
+  // );
 
   useEffect(() => {
     trackDraftSessionViewed();
@@ -150,27 +148,6 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, importedSessionRecordingOptions]);
 
-  const getSessionEventsToSave = useCallback(
-    (options: RecordingOptions): RQSessionEvents => {
-      const filteredSessionEvents: RQSessionEvents = {
-        [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
-        [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
-      };
-
-      if (options.includeNetworkLogs === false) {
-        delete filteredSessionEvents[RQSessionEventType.NETWORK];
-      }
-
-      if (options.includeConsoleLogs === false) {
-        const filteredRRWebEvent = filterOutConsoleLogs(sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]);
-        filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
-      }
-
-      return filteredSessionEvents;
-    },
-    [sessionEvents]
-  );
-
   const getRecordingOptionsToSave = useCallback((): RecordingOptions => {
     const recordingOptions: RecordingOptions = {
       includeConsoleLogs: true,
@@ -183,23 +160,6 @@ const DraftSessionViewer: React.FC = () => {
 
     return recordingOptions;
   }, [includedDebugInfo]);
-
-  const handleDownloadLocalClick = (e: React.MouseEvent) => {
-    const recordingOptionsToSave = getRecordingOptionsToSave();
-    const sessionEvents = compressEvents(getSessionEventsToSave(recordingOptionsToSave));
-    prepareSessionToExport(sessionEvents, { ...sessionRecording, options: recordingOptionsToSave })
-      .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
-      .finally(() => {
-        toast.success("Recording downloaded successfully");
-        setSessionSaveMode(SessionSaveMode.ONLINE);
-        setIsSaveModalVisible(false);
-        trackDraftSessionSaved(
-          sessionRecording.sessionAttributes.duration,
-          recordingOptionsToSave,
-          SessionSaveMode.LOCAL
-        );
-      });
-  };
 
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
@@ -235,12 +195,12 @@ const DraftSessionViewer: React.FC = () => {
         user?.details?.profile?.uid,
         workspace?.id,
         sessionRecording,
-        compressEvents(getSessionEventsToSave(recordingOptionsToSave)),
+        compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
         recordingOptionsToSave
       ).then((response) => {
         if (response?.success) {
           setSessionSaveMode(SessionSaveMode.ONLINE);
-          setIsSaveModalVisible(false);
+          setIsSavePopupVisible(false);
           toast.success("Recording saved successfully");
           trackDraftSessionSaved(sessionAttributes.duration, recordingOptionsToSave, SessionSaveMode.ONLINE);
           navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
@@ -259,15 +219,52 @@ const DraftSessionViewer: React.FC = () => {
       user?.details?.profile?.uid,
       workspace?.id,
       isSaving,
+      sessionEvents,
       sessionRecording,
       sessionRecordingName,
       sessionAttributes,
       dispatch,
-      AUTH_ACTION_LABELS.SIGN_UP,
       navigate,
-      getSessionEventsToSave,
       getRecordingOptionsToSave,
     ]
+  );
+
+  const handleDownloadFileClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!user?.loggedIn) {
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "authModal",
+            newValue: true,
+            newProps: {
+              authMode: AUTH_ACTION_LABELS.SIGN_UP,
+              src: window.location.href,
+              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
+            },
+          })
+        );
+        return;
+      }
+
+      setIsSaving(true);
+      const recordingOptionsToSave = getRecordingOptionsToSave();
+      const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
+
+      prepareSessionToExport(events, { ...sessionRecording, options: recordingOptionsToSave })
+        .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
+        .finally(() => {
+          toast.success("Recording downloaded successfully.");
+          setIsSaving(false);
+          setSessionSaveMode(SessionSaveMode.ONLINE);
+          setIsSavePopupVisible(false);
+          trackDraftSessionSaved(
+            sessionRecording.sessionAttributes.duration,
+            recordingOptionsToSave,
+            SessionSaveMode.LOCAL
+          );
+        });
+    },
+    [dispatch, user?.loggedIn, getRecordingOptionsToSave, sessionEvents, sessionRecording]
   );
 
   const confirmDiscard = () => {
@@ -307,64 +304,26 @@ const DraftSessionViewer: React.FC = () => {
             Discard
           </RQButton>
           <RQButton
-            className="text-bold session-viewer-save-action-btn"
             type="primary"
-            onClick={() => setIsSaveModalVisible((prev) => !prev)}
+            className="text-bold session-viewer-save-action-btn"
+            onClick={() => setIsSavePopupVisible((prev) => !prev)}
           >
             Save Recording <DownOutlined />
           </RQButton>
 
-          {isSaveModalVisible && (
-            <div className="save-recording-config-modal">
-              <Row align="middle" justify="space-between" className="w-full header-container">
-                <div className="header">Save your session recording</div>
-                <Button onClick={() => setIsSaveModalVisible(false)}>
-                  <CloseOutlined />
-                </Button>
-              </Row>
-              <div className="config-container">
-                <div>
-                  <div className="config-label">Mode of saving the session</div>
-                  <Radio.Group
-                    value={sessionSaveMode}
-                    onChange={handleSessionSaveModeChange}
-                    className="mode-radio-group"
-                  >
-                    <Radio value={SessionSaveMode.ONLINE}>Save online</Radio>
-                    <Radio value={SessionSaveMode.LOCAL}>Download JSON file</Radio>
-                  </Radio.Group>
-                </div>
-                <div>
-                  <div className="config-label">Information to include in session</div>
-                  <Checkbox.Group
-                    onChange={setIncludedDebugInfo}
-                    value={includedDebugInfo}
-                    options={[
-                      {
-                        label: "Network Logs",
-                        value: "includeNetworkLogs",
-                        disabled: isIncludeNetworkLogsDisabled,
-                      },
-                      {
-                        label: "Console Logs",
-                        value: "includeConsoleLogs",
-                        disabled: isIncludeConsoleLogsDisabled,
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
-              <Row className="w-full footer">
-                <Button
-                  type="primary"
-                  className="ml-auto"
-                  loading={isSaving}
-                  onClick={sessionSaveMode === SessionSaveMode.ONLINE ? saveDraftSession : handleDownloadLocalClick}
-                >
-                  {sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}
-                </Button>
-              </Row>
-            </div>
+          {isSavePopupVisible && (
+            <SaveRecordingConfigPopup
+              isSaving={isSaving}
+              onClose={() => setIsSavePopupVisible(false)}
+              includedDebugInfo={includedDebugInfo}
+              setIncludedDebugInfo={setIncludedDebugInfo}
+              sessionSaveMode={sessionSaveMode}
+              saveDraftSession={saveDraftSession}
+              handleDownloadFileClick={handleDownloadFileClick}
+              handleSessionSaveModeChange={handleSessionSaveModeChange}
+              isIncludeNetworkLogsDisabled={isIncludeNetworkLogsDisabled}
+              isIncludeConsoleLogsDisabled={isIncludeConsoleLogsDisabled}
+            />
           )}
         </div>
       </div>
