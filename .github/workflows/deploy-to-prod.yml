@@ -1,0 +1,18 @@
+name: Trigger Prod Deployment
+on:
+  push:
+    branches: [production]
+
+jobs:
+  deploy:
+    name: Trigger Prod Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Prod Deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REQUESTLY_CLOUD_TOKEN }}
+          repository: requestly/requestly-cloud
+          event-type: deploy-prod
+          client-payload: "{}"
