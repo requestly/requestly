@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog, SessionRecording } from "./types";
+import { ConsoleLog, DebugInfo, RecordingOptions, SessionRecording } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
 import fileDownload from "js-file-download";
 
@@ -61,10 +61,32 @@ export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventD
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
 };
 
+export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: RecordingOptions): RQSessionEvents => {
+  const filteredSessionEvents: RQSessionEvents = {
+    [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
+    [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
+  };
+
+  if (options.includeNetworkLogs === false) {
+    delete filteredSessionEvents[RQSessionEventType.NETWORK];
+  }
+
+  if (options.includeConsoleLogs === false) {
+    const filteredRRWebEvent = filterOutConsoleLogs(sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]);
+    filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
+  }
+
+  return filteredSessionEvents;
+};
+
 export const prepareSessionToExport = (events: string, recording: SessionRecording): Promise<string> => {
   return new Promise((resolve) => resolve(JSON.stringify({ events, recording })));
 };
 
 export const downloadSession = (fileContent: string, fileName: string): void => {
-  fileDownload(fileContent, `${fileName}.json`, "application/json");
+  fileDownload(fileContent, `${fileName}.rq`);
+};
+
+export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
+  return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
 };
