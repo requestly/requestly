@@ -100,6 +100,12 @@ export const isDesktopMode = () => {
   else return false;
 };
 
+export const isMacOs = () => {
+  // platform is deprecated but still supported for all browsers
+  // will switch to navigator.userAgentData.platform when it's supported by all browsers
+  return window.navigator.platform.includes("Mac");
+};
+
 export const parseGravatarImage = (urlString) => {
   const url = new URL(urlString);
   url.searchParams.set(

@@ -78,6 +78,8 @@ import LINKS from "config/constants/sub/links";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
+import { FiCommand } from "react-icons/fi";
+import { isDesktopMode, isMacOs } from "utils/Misc";
 
 //Lodash
 const set = require("lodash/set");
@@ -1282,6 +1284,7 @@ const RulesTable = ({
                   setSearchValue(e.target.value);
                 }}
                 prefix={<SearchOutlined />}
+                suffix={isDesktopMode() || isMacOs() ? <Typography.Text type="secondary">⌘+K</Typography.Text> : null}
                 style={{ width: 240, marginLeft: "8px" }}
               />
             </>
