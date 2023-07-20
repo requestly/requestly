@@ -17,11 +17,17 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.active-workspace-name .ant-badge .ant-badge-dot {
+  width: 8px;
+  height: 8px;
+  top: 4px;
+  background: var(--primary);
+}
 
 .active-workspace-name-down-icon.anticon {
   font-size: 9px;
   margin-top: 1px;
-  margin-left: 4px;
+  margin-left: 8px;
 }
 
 .workspace-divider.ant-divider {

@@ -19,7 +19,7 @@ export const getUniqueTeamsFromInvites = (pendingInvites: Invite[]): TeamInviteM
     } else if (invite.email !== null) {
       teamsMap[teamId] = { ...invite.metadata };
     }
-    if (invite?.domains.length) teamsMap[teamId].domain = invite.domains;
+    if (invite?.domains?.length) teamsMap[teamId].domain = invite.domains;
     teamsMap[teamId].inviteId = invite.id;
   });
 

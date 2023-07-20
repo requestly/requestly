@@ -64,8 +64,6 @@ export const WorkspaceNudge: React.FC = () => {
     }
   }, [dispatch, getPendingInvites, user?.loggedIn]);
 
-  console.log({ teamInvites });
-
   return (
     <>
       <div className="nudge-container">
