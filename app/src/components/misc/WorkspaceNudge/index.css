@@ -6,6 +6,9 @@
   padding: 20px 14px;
   padding-top: 10px;
   background: var(--background-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  width: 300px;
 }
 
 .nudge-close-icon {
@@ -13,5 +16,8 @@
   left: 10px;
 }
 .nudge-text {
-  max-width: 270px;
+  max-width: 280px;
+}
+.avatar-row-container {
+  margin-bottom: 8px;
 }
