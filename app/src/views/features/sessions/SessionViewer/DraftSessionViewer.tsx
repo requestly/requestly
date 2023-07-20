@@ -93,15 +93,11 @@ const DraftSessionViewer: React.FC = () => {
     [dispatch]
   );
 
-  // useEffect(
-  //   () => () => {
-  //     if (isImportedSession && sessionRecording === null) {
-  //       console.log("navigating...");
-  //       navigate(PATHS.SESSIONS.ABSOLUTE);
-  //     }
-  //   },
-  //   [navigate, isImportedSession, sessionRecording]
-  // );
+  useEffect(() => {
+    if (isImportedSession && sessionRecording === null) {
+      navigate(PATHS.SESSIONS.ABSOLUTE);
+    }
+  }, [navigate, isImportedSession, sessionRecording]);
 
   useEffect(() => {
     trackDraftSessionViewed();
@@ -109,7 +105,6 @@ const DraftSessionViewer: React.FC = () => {
     setIsLoading(true);
 
     if (tabId === "imported") {
-      console.log("running...");
       setIncludedDebugInfo(importedSessionRecordingOptions);
       setIsLoading(false);
     } else if (tabId === "mock") {
@@ -164,13 +159,11 @@ const DraftSessionViewer: React.FC = () => {
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
-        // Prompt to login
         dispatch(
           actions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {
-              // redirectURL: window.location.href,
               authMode: AUTH_ACTION_LABELS.SIGN_UP,
               src: window.location.href,
               eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
