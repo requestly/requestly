@@ -34,7 +34,8 @@ export const CommandBar = () => {
 
   useEffect(() => {
     const down = (e: any) => {
-      if (e.key === "k" && e.metaKey) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
         setOpen((open) => !open);
       }
     };
