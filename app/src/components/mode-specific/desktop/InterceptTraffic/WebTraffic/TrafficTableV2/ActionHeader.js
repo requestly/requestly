@@ -35,6 +35,7 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { track } from "@amplitude/analytics-browser";
+import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
 
@@ -70,11 +71,15 @@ const ActionHeader = ({
 
   const isRegexSearchActive = trafficTableFilters.search.regex;
 
+  const sendOnSearchEvents = useDebounce(() => {
+    trackTrafficTableSearched();
+    trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_SEARCHED);
+  });
+
   const handleOnSearchChange = (e) => {
     const searchValue = e.target.value;
     if (searchValue) {
-      trackTrafficTableSearched();
-      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_SEARCHED);
+      sendOnSearchEvents();
     }
     dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
   };
