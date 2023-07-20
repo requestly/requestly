@@ -2,6 +2,16 @@
 import { NetworkEventData, RQSessionAttributes } from "@requestly/web-sdk";
 import { LogData } from "rrweb";
 
+export enum SessionSaveMode {
+  LOCAL = "local",
+  ONLINE = "online",
+}
+
+export enum DebugInfo {
+  INCLUDE_NETWORK_LOGS = "includeNetworkLogs",
+  INCLUDE_CONSOLE_LOGS = "includeConsoleLogs",
+}
+
 export enum Visibility {
   ONLY_ME = "only-me",
   PUBLIC = "public",
