@@ -179,7 +179,7 @@ const SessionsIndexPage = () => {
           setProcessingDataToImport(true);
           const parsedData = JSON.parse(reader.result);
 
-          if (!parsedData.recording || !parsedData.events) {
+          if (!file.type.includes("json") || !parsedData.recording || !parsedData.events) {
             throw new Error("Invalid file format!");
           }
 
@@ -188,6 +188,7 @@ const SessionsIndexPage = () => {
           const recordedSessionEvents = decompressEvents(parsedData.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
 
+          toggleOpenDownloadedSessionModal();
           trackSessionRecordingUpload("success");
           navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
         } catch (error) {
@@ -195,7 +196,6 @@ const SessionsIndexPage = () => {
           alert("Imported file doesn't match Requestly format. Please choose another file.");
         } finally {
           setProcessingDataToImport(false);
-          toggleOpenDownloadedSessionModal();
         }
       };
       reader.readAsText(file);
@@ -225,7 +225,7 @@ const SessionsIndexPage = () => {
           <FilePicker
             onFilesDrop={onSessionRecordingFileDrop}
             isProcessing={processingDataToImport}
-            loaderMessage="Loading session..."
+            loaderMessage="Importing session..."
             title="Drag and drop your exported session recording file"
           />
         </div>
