@@ -11,6 +11,8 @@ import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { saveNetworkSession } from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/actions";
 import { toast } from "utils/Toast";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 
 interface Props {
   onSaved: (sessionId: string) => void;
@@ -45,6 +47,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
     async (data: Har, name: string) => {
       setImportedHar(data);
       trackHarImportCompleted();
+      trackRQDesktopLastActivity(SESSION_RECORDING.network.import.completed);
       if (name) {
         // just in case the file reader is unable to read the name
         const id = await saveNetworkSession(name, data);
@@ -92,6 +95,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
         type="primary"
         onClick={() => {
           trackHarImportButtonClicked();
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.btn_clicked);
           openDropZone();
         }}
         className="mt-8"
@@ -104,6 +108,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
         maskClosable={false}
         onCancel={() => {
           trackHarImportCanceled();
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.canceled);
           closeDropZone();
         }}
       >
