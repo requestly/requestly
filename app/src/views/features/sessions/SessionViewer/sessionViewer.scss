@@ -144,6 +144,13 @@
         height: 32px;
       }
 
+      .download-recording-btn.ant-btn {
+        .anticon svg {
+          width: 10px;
+          height: 10px;
+        }
+      }
+
       .session-viewer-save-action-btn.ant-btn {
         display: inline-flex;
         align-items: center;
@@ -416,7 +423,7 @@
     }
   }
 
-  .save-recording-config-modal {
+  .save-recording-config-popup {
     position: absolute;
     width: 413px;
     top: 42px;

@@ -6,13 +6,19 @@
   .left-button {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: 0;
-    margin-right: 1px;
   }
 
   .right-button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
+
+    &:hover,
+    &:focus {
+      color: var(--white);
+      border: 1px solid #343434;
+      border-left: 0;
+      background-color: var(--hover-color);
+    }
   }
 }
