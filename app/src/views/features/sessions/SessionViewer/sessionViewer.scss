@@ -144,9 +144,19 @@
         height: 32px;
       }
 
+      .session-viewer-save-action-btn.ant-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .anticon {
+          margin-top: 5px;
+        }
+      }
+
       .session-viewer-save-action-btn svg {
-        width: 16px;
-        height: 16px;
+        width: 12px;
+        height: 12px;
       }
     }
   }
@@ -420,7 +430,7 @@
     box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48), 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
 
     .header-container {
-      padding: 8px 20px;
+      padding: 8px 8px 8px 20px;
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
       background-color: var(--component-dark-background);
@@ -462,7 +472,7 @@
     }
 
     .footer {
-      padding: 4px 16px;
+      padding: 4px 8px;
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
       border-top: 1px solid var(--border-dark);
