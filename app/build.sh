@@ -7,6 +7,7 @@ fi
 
 npm run build
 
+echo "GITHUB_COMMIT_SHA=${GITHUB_COMMIT_SHA}"
 if [[ "$env" == "prod" ]]; then
     sh ./sourcemaps.sh
 else
