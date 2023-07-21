@@ -100,7 +100,7 @@ const isGroupSwitchDisabled = (record, groupwiseRulesToPopulate) => {
 
   if (!record.groupId) return false;
   if (!groupwiseRulesToPopulate[record.groupId]) return false;
-  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE)
+  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] !== GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE)
     return true;
   return false;
 };
@@ -706,7 +706,7 @@ const RulesTable = ({
           return (
             <Switch
               size="small"
-              // We Rule's group is OFF, this switch must be disabled
+              // When Rule's group is OFF, this switch must be disabled
               disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
               checked={checkIfRuleIsActive(record)}
               onClick={(_, event) => toggleRuleStatus(event, record)}
