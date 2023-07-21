@@ -16,6 +16,7 @@ import {
   compressEvents,
   downloadSession,
   filterOutLargeNetworkResponses,
+  getRecordingOptionsToSave,
   getSessionEventsToSave,
   getSessionRecordingOptions,
   prepareSessionToExport,
@@ -35,10 +36,9 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import PageError from "components/misc/PageError";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { DebugInfo, RecordingOptions, SessionSaveMode } from "./types";
+import { DebugInfo, SessionSaveMode } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import { defaultDebugInfo } from "./constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionSaved,
@@ -49,6 +49,8 @@ import {
 import "./sessionViewer.scss";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+
+export const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -144,19 +146,6 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, importedSessionRecordingOptions]);
 
-  const getRecordingOptionsToSave = useCallback((): RecordingOptions => {
-    const recordingOptions: RecordingOptions = {
-      includeConsoleLogs: true,
-      includeNetworkLogs: true,
-    };
-    let option: keyof RecordingOptions;
-    for (option in recordingOptions) {
-      recordingOptions[option] = includedDebugInfo.includes(option);
-    }
-
-    return recordingOptions;
-  }, [includedDebugInfo]);
-
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
@@ -182,7 +171,7 @@ const DraftSessionViewer: React.FC = () => {
         return;
       }
 
-      const recordingOptionsToSave = getRecordingOptionsToSave();
+      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
 
       setIsSaving(true);
       saveRecording(
@@ -213,13 +202,13 @@ const DraftSessionViewer: React.FC = () => {
       user?.details?.profile?.uid,
       workspace?.id,
       isSaving,
+      includedDebugInfo,
       sessionEvents,
       sessionRecording,
       sessionRecordingName,
       sessionAttributes,
       dispatch,
       navigate,
-      getRecordingOptionsToSave,
     ]
   );
 
@@ -241,7 +230,7 @@ const DraftSessionViewer: React.FC = () => {
       }
 
       setIsSaving(true);
-      const recordingOptionsToSave = getRecordingOptionsToSave();
+      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
       const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
 
       prepareSessionToExport(events, { ...sessionRecording, options: recordingOptionsToSave })
@@ -258,7 +247,7 @@ const DraftSessionViewer: React.FC = () => {
           );
         });
     },
-    [dispatch, user?.loggedIn, getRecordingOptionsToSave, sessionEvents, sessionRecording]
+    [dispatch, user?.loggedIn, includedDebugInfo, sessionEvents, sessionRecording]
   );
 
   const confirmDiscard = () => {

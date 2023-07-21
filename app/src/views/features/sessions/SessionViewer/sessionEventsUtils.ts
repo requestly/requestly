@@ -3,6 +3,7 @@ import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData }
 import { ConsoleLog, DebugInfo, RecordingOptions, SessionRecording } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "./constants";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import fileDownload from "js-file-download";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
@@ -60,6 +61,20 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
 
 export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventData[] => {
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
+};
+
+export const getRecordingOptionsToSave = (includedDebugInfo: CheckboxValueType[]): RecordingOptions => {
+  const recordingOptions: RecordingOptions = {
+    includeConsoleLogs: true,
+    includeNetworkLogs: true,
+  };
+
+  let option: keyof RecordingOptions;
+  for (option in recordingOptions) {
+    recordingOptions[option] = includedDebugInfo.includes(option);
+  }
+
+  return recordingOptions;
 };
 
 export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: RecordingOptions): RQSessionEvents => {

@@ -18,6 +18,7 @@ import {
   compressEvents,
   decompressEvents,
   downloadSession,
+  getRecordingOptionsToSave,
   getSessionEventsToSave,
   getSessionRecordingOptions,
   prepareSessionToExport,
@@ -41,7 +42,6 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import { defaultDebugInfo } from "./constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DebugInfo, SessionSaveMode } from "./types";
 import {
@@ -105,7 +105,7 @@ const SavedSessionViewer: React.FC = () => {
   const [showNotFoundError, setShowNotFoundError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
   const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
-  const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
+  const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>([]);
 
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecording?.options), [
     sessionRecording?.options,
@@ -138,6 +138,10 @@ const SavedSessionViewer: React.FC = () => {
       },
     });
   }, [id, eventsFilePath, navigateToList]);
+
+  useEffect(() => {
+    setIncludedDebugInfo(savedSessionRecordingOptions);
+  }, [savedSessionRecordingOptions]);
 
   useEffect(() => {
     if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
@@ -193,10 +197,11 @@ const SavedSessionViewer: React.FC = () => {
   const handleDownloadFileClick = useCallback(
     (e: React.MouseEvent) => {
       setIsSaving(true);
-      const events = compressEvents(getSessionEventsToSave(sessionEvents, sessionRecording.options));
+      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
+      const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
       const recording = {
         name: sessionRecording.name,
-        options: { ...sessionRecording.options },
+        options: { ...recordingOptionsToSave },
         sessionAttributes: { ...sessionRecording.sessionAttributes },
       };
 
@@ -208,12 +213,12 @@ const SavedSessionViewer: React.FC = () => {
           setIsDownloadPopupVisible(false);
           trackDraftSessionSaved(
             sessionRecording.sessionAttributes?.duration,
-            sessionRecording.options,
+            recordingOptionsToSave,
             SessionSaveMode.LOCAL
           );
         });
     },
-    [sessionEvents, sessionRecording]
+    [sessionEvents, sessionRecording, includedDebugInfo]
   );
 
   if (showPermissionError) return <PermissionError />;
