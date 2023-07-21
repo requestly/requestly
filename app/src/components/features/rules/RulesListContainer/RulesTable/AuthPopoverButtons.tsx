@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 
@@ -31,10 +31,12 @@ const AuthPopoverButton: React.FC<Props> = ({
   isScreenSmall,
   authSource,
 }) => {
+  const [isChinaUser, setIsChinaUser] = useState<boolean>(false);
+
   return (
     <AuthConfirmationPopover
       title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-      disabled={!hasPopconfirm}
+      disabled={!hasPopconfirm || isChinaUser}
       callback={onClickHandler}
       source={"cool" || authSource}
     >
@@ -43,11 +45,18 @@ const AuthPopoverButton: React.FC<Props> = ({
         shape={isScreenSmall ? shape : null}
         onClick={() => {
           trackClickEvent();
+          if (isChinaUser) {
+            onClickHandler();
+            return;
+          }
           if (hasPopconfirm) {
             isLoggedIn && onClickHandler();
           } else {
             onClickHandler();
           }
+        }}
+        onMouseEnter={() => {
+          setIsChinaUser(window.isChinaUser ?? false);
         }}
         icon={icon}
         data-tour-id={tourId}
