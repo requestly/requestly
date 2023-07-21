@@ -38,7 +38,7 @@ const AuthPopoverButton: React.FC<Props> = ({
       title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
       disabled={!hasPopconfirm || isChinaUser}
       callback={onClickHandler}
-      source={"cool" || authSource}
+      source={authSource}
     >
       <Button
         type={type || "default"}

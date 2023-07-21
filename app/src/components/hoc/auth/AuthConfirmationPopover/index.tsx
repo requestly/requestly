@@ -75,7 +75,6 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
         trackPopoverForAuthContinued(source);
       }}
       onOpenChange={handleOpenChange}
-      trigger={["click"]}
     >
       {children}
     </Popconfirm>
