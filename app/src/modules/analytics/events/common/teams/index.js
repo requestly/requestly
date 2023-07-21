@@ -67,8 +67,9 @@ export const trackUpgradeWorkspaceClicked = () => {
   trackEvent(TEAMS.UPGRADE_WORKSPACE_CLICKED);
 };
 
-export const trackAddWorkspaceNameModalViewed = () => {
-  trackEvent(TEAMS.ADD_WORKSPACE_NAME_MODAL_VIEWED);
+export const trackAddWorkspaceNameModalViewed = (source) => {
+  const params = { source };
+  trackEvent(TEAMS.ADD_WORKSPACE_NAME_MODAL_VIEWED, params);
 };
 
 export const trackAddMembersInWorkspaceModalViewed = () => {

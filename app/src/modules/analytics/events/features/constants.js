@@ -168,6 +168,9 @@ export const TEAMS = {
   WORKSPACE_JOINING_MODAL_OPENED: "workspace_joining_modal_opened",
   WORKSPACE_JOIN_CLICKED: "workspace_join_clicked",
   WORKSPACE_ONBOARDING_VIEWED: "workspace_onboarding_viewed",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED: "team_workspace_organization_card_viewed",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
 };
 
 export const TRASH = {

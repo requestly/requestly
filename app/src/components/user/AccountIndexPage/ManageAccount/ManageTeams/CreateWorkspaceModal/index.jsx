@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", callback }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", callback, source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -77,7 +77,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", 
   const handleFinishFailed = () => toast.error("Please enter valid details");
 
   useEffect(() => {
-    if (isOpen) trackAddWorkspaceNameModalViewed();
+    if (isOpen) trackAddWorkspaceNameModalViewed(source);
   }, [isOpen]);
 
   return (

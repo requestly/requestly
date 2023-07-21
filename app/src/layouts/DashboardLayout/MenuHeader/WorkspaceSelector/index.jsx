@@ -61,7 +61,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
+const WorkSpaceDropDown = ({ menu, hasNewInvites, teamInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -75,7 +75,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
-      trackTopbarClicked("workspace");
+      trackTopbarClicked("workspace", { join_workspace_count: teamInvites?.length });
     }
   };
 
@@ -207,11 +207,11 @@ const WorkspaceSelector = () => {
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       setIsJoinWorkspaceModalOpen(true);
-      trackWorkspaceJoiningModalOpened(teamInvites.length);
+      trackWorkspaceJoiningModalOpened(teamInvites.length, "sidebar_dropdown");
     } else {
       promptUserSignupModal(() => {
         setIsJoinWorkspaceModalOpen(true);
-        trackWorkspaceJoiningModalOpened(teamInvites.length);
+        trackWorkspaceJoiningModalOpened(teamInvites.length, "sidebar_dropdown");
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
@@ -223,10 +223,22 @@ const WorkspaceSelector = () => {
 
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "sidebar_dropdown" },
+        })
+      );
     } else {
       promptUserSignupModal(() => {
-        dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "createWorkspaceModal",
+            newValue: true,
+            newProps: { source: "sidebar_dropdown" },
+          })
+        );
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
@@ -541,7 +553,11 @@ const WorkspaceSelector = () => {
 
   return (
     <>
-      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} hasNewInvites={hasNewInvites} />
+      <WorkSpaceDropDown
+        menu={user.loggedIn ? menu : unauthenticatedUserMenu}
+        hasNewInvites={hasNewInvites}
+        teamInvites={teamInvites}
+      />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
 

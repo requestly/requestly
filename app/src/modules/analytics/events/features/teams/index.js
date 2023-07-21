@@ -41,8 +41,8 @@ export const trackWorkspaceInviteScreenError = (error_type, team_id, invite_id) 
   trackEvent(TEAMS.WORKSPACE_INVITE_SCREEN_ERROR, params);
 };
 
-export const trackWorkspaceJoiningModalOpened = (pending_invites) => {
-  const params = { pending_invites };
+export const trackWorkspaceJoiningModalOpened = (pending_invites, source) => {
+  const params = { pending_invites, source };
   trackEvent(TEAMS.WORKSPACE_JOINING_MODAL_OPENED, params);
 };
 
@@ -53,4 +53,18 @@ export const trackWorkspaceJoinClicked = (team_id, source) => {
 
 export const trackWorkspaceOnboardingViewed = () => {
   trackEvent(TEAMS.WORKSPACE_ONBOARDING_VIEWED);
+};
+
+export const trackWorkspaceOrganizationCardViewed = (domain, cta) => {
+  const params = { domain, cta };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED, params);
+};
+
+export const trackWorkspaceOrganizationCardCancelled = (domain, cta) => {
+  const params = { domain, cta };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED, params);
+};
+export const trackWorkspaceOrganizationCardClicked = (action) => {
+  const params = { action };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED, params);
 };
