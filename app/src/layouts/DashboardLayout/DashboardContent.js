@@ -11,7 +11,7 @@ import {
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getIsWorkspaceOnboardingCompleted,
-  getIsJoinWorkspacePromptClosed,
+  getIsJoinWorkspacePromptVisible,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -41,7 +41,7 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
-  const isJoinWorkspacePromptClosed = useSelector(getIsJoinWorkspacePromptClosed);
+  const isJoinWorkspacePromptVisible = useSelector(getIsJoinWorkspacePromptVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -162,7 +162,7 @@ const DashboardContent = () => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
-      {user?.loggedIn && !isJoinWorkspacePromptClosed && <JoinWorkspacePrompt />}
+      {user?.loggedIn && isJoinWorkspacePromptVisible && <JoinWorkspacePrompt />}
     </>
   );
 };
