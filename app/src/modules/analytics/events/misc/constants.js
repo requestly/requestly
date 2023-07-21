@@ -19,6 +19,8 @@ export const UNINSTALLATION = {
   EXTENSION_UNINSTALLED: "extension_uninstalled",
 };
 
+export const EXTENSION_CONTEXT_INVALIDATED = "extension_context_invalidated";
+
 export const ORGANIZATION = {
   VIEW_MORE_USERS_CLICKED: "organization_view_more_users_clicked",
   PAGE_VIEWED: "organization_my_org_page_viewed",
@@ -65,9 +67,11 @@ export const USERNAME = {
   USERNAME_UPDATED: "username_updated",
 };
 
-export const COMMAND_BAR = {
-  COMMAND_BAR_TOGGLED: "command_bar_toggled",
-  COMMAND_BAR_ACTION_SELECTED: "command_bar_action_selected",
+export const COMMAND_PALETTE = {
+  COMMAND_PALETTE_OPENED: "command_palette_opened",
+  COMMAND_PALETTE_CLOSED: "command_palette_closed",
+  COMMAND_PALETTE_OPTION_SELECTED: "command_palette_option_selected",
+  COMMAND_PALETTE_OPTION_SEARCHED: "command_palette_option_searched",
 };
 
 export const SETTINGS_TOGGLED = "settings_toggled";

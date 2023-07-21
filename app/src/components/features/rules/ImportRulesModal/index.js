@@ -268,7 +268,7 @@ const ImportRulesModal = (props) => {
         <ImportFromCharlesModal
           isOpen={isImportFromCharlesModalOpen}
           toggle={toggleImportFromCharlesModal}
-          analyticEventSource={AUTH.SOURCE.RULES_LIST}
+          triggeredBy={AUTH.SOURCE.RULES_LIST}
         />
       ) : null}
 

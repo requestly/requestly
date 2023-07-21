@@ -73,6 +73,10 @@ export const trackSessionRecordingDeleted = () => {
 export const trackSessionRecordingDescriptionUpdated = () =>
   trackEvent(SESSION_RECORDING.session_recording_description_added);
 
+export const trackSessionRecordingNameUpdated = () => {
+  trackEvent(SESSION_RECORDING.session_recording_name_updated);
+};
+
 export const trackSessionRecordingPanelTabClicked = (tab, session_type) => {
   trackEvent(SESSION_RECORDING.session_recording_panel_tab_clicked, {
     tab,
@@ -84,4 +88,16 @@ export const trackSampleSessionClicked = (log_type) => {
   trackEvent(SESSION_RECORDING.session_recording_panel_sample_session_clicked, {
     log_type,
   });
+};
+
+/* ONBOARDING */
+export const trackOnboardingPageViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.onboarding_page_viewed);
+export const trackOnboardingSampleSessionViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.sample_session_viewed);
+export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
+export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
+export const trackStartRecordingOnExternalTarget = (url) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.navigate_to_target_website, { url });
+};
+export const trackTriedRecordingForInvalidURL = (url) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.invalid_recording_url, { url });
 };

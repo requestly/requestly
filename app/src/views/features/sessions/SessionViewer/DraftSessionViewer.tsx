@@ -1,24 +1,17 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Button, Checkbox, Col, Input, Modal, Row, Space, Tooltip, Typography } from "antd";
+import { Checkbox, Col, Modal, Row, Space, Tooltip } from "antd";
 import { ExclamationCircleOutlined, SaveOutlined } from "@ant-design/icons";
+import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
-import "./sessionViewer.scss";
 import SessionDetails from "./SessionDetails";
+import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import { compressEvents, filterOutConsoleLogs, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
-import {
-  trackDraftSessionDiscarded,
-  trackDraftSessionNamed,
-  trackDraftSessionSaved,
-  trackDraftSessionSaveFailed,
-  trackDraftSessionViewed,
-  trackSessionRecordingFailed,
-} from "modules/analytics/events/features/sessionRecording";
 import PageLoader from "components/misc/PageLoader";
 import { getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
@@ -38,6 +31,14 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
 import { RecordingOptions } from "./types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import {
+  trackDraftSessionDiscarded,
+  trackDraftSessionSaved,
+  trackDraftSessionSaveFailed,
+  trackDraftSessionViewed,
+  trackSessionRecordingFailed,
+} from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 const defaultDebugInfo: CheckboxValueType[] = ["includeNetworkLogs", "includeConsoleLogs"];
 
@@ -60,6 +61,14 @@ const DraftSessionViewer: React.FC = () => {
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
 
   const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+
+  const generateDraftSessionTitle = useCallback((url: string) => {
+    const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
+    const date = new Date();
+    const month = date.toLocaleString("default", { month: "short" });
+    const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
+    return `${hostname}@${formattedDate}`;
+  }, []);
 
   useEffect(
     () => () => {
@@ -95,7 +104,7 @@ const DraftSessionViewer: React.FC = () => {
             dispatch(
               sessionRecordingActions.setSessionRecording({
                 sessionAttributes: tabSession.attributes,
-                name: "Session-" + Date.now(),
+                name: generateDraftSessionTitle(tabSession.attributes?.url),
               })
             );
 
@@ -106,7 +115,7 @@ const DraftSessionViewer: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
   const getSessionEventsToSave = useCallback(
     (options: RecordingOptions): RQSessionEvents => {
@@ -207,13 +216,6 @@ const DraftSessionViewer: React.FC = () => {
     getRecordingOptionsToSave,
   ]);
 
-  const handleNameChangeEvent = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      dispatch(sessionRecordingActions.setName(event.target.value));
-    },
-    [dispatch]
-  );
-
   const confirmDiscard = () => {
     Modal.confirm({
       title: "Confirm Discard",
@@ -241,14 +243,19 @@ const DraftSessionViewer: React.FC = () => {
   ) : (
     <div className="session-viewer-page">
       <div className="session-viewer-header">
-        <Typography.Title level={3} className="session-recording-name">
-          {sessionRecordingName || "New Session"} (draft)
-        </Typography.Title>
+        <SessionViewerTitle />
         <div className="session-viewer-actions">
-          <Button onClick={confirmDiscard}>Discard</Button>
-          <Button type="primary" icon={<SaveOutlined />} onClick={() => setIsSaveModalVisible(true)}>
-            Save Session
-          </Button>
+          <RQButton type="default" onClick={confirmDiscard}>
+            Discard
+          </RQButton>
+          <RQButton
+            className="text-bold session-viewer-save-action-btn"
+            type="primary"
+            icon={<SaveOutlined />}
+            onClick={() => setIsSaveModalVisible(true)}
+          >
+            Save Recording
+          </RQButton>
           <Modal
             title="Save Session"
             open={isSaveModalVisible}
@@ -261,15 +268,6 @@ const DraftSessionViewer: React.FC = () => {
             confirmLoading={isSaving}
           >
             <Space direction="vertical">
-              <Row>
-                <p>Session Name:</p>
-                <Input
-                  status={!sessionRecordingName ? "error" : ""}
-                  value={sessionRecordingName}
-                  onChange={handleNameChangeEvent}
-                  onBlur={trackDraftSessionNamed}
-                />
-              </Row>
               <Row>
                 <Col>
                   <p>Information to include in session:</p>

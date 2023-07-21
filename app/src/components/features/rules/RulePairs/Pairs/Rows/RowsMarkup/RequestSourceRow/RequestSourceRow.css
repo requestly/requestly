@@ -1,3 +1,8 @@
+.rule-pair-source-row-wrapper {
+  display: flex;
+  gap: 2px;
+}
+
 .rules-pair-content-header {
   padding: 4px;
   box-shadow: var(--input-box-shadow);
@@ -19,9 +24,9 @@
 
 .source-filter-col.ant-col {
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .source-filter-icon-container {
@@ -29,5 +34,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
+}
+.rule-pair-source-row-wrapper .test-url-btn.ripple-animation {
+  position: relative;
+  z-index: 10;
+}
+.rule-pair-source-row-wrapper .test-url-btn.ripple-animation::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 1px solid rgb(232, 232, 232);
+  border-radius: var(--border-radius-sm);
+  z-index: 1;
+  animation: ripple 1.2s ease-out infinite !important;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+.rule-pair-source-row-wrapper .test-url-btn.ant-btn,
+.rule-pair-source-row-wrapper .test-url-btn.ant-btn:hover,
+.rule-pair-source-row-wrapper .test-url-btn.ant-btn:focus {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: auto;
+  background: none;
+  padding-right: 6px;
 }

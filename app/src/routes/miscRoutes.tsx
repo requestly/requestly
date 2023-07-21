@@ -1,16 +1,15 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import AppModeView from "views/misc/AppMode";
-import FeedbackView from "views/misc/Feedback";
+import AppMode from "components/misc/AppMode";
 import Updates from "views/features/Updates";
-import Pricing from "views/landing/Pricing";
-import ManageLicense from "views/user/ManageLicense";
+import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
 import Goodbye from "components/misc/Goodbye";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import Page403 from "views/misc/ServerResponses/403";
 import Page404 from "views/misc/ServerResponses/404";
-import AcceptTeamInviteView from "views/user/Teams/AcceptInvite";
+import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -24,11 +23,7 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.APP_MODE.RELATIVE,
-    element: <AppModeView />,
-  },
-  {
-    path: PATHS.FEEDBACK.RELATIVE,
-    element: <FeedbackView />,
+    element: <AppMode />,
   },
   {
     path: PATHS.UPDATES.RELATIVE,
@@ -36,27 +31,7 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.PRICING.RELATIVE,
-    element: <Pricing />,
-  },
-  {
-    path: PATHS.LEGACY.PRICING.ABSOLUTE,
-    element: <Navigate to={PATHS.PRICING.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.MANAGE.RELATIVE,
-    element: <ManageLicense />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.MANAGE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.MANAGE.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.RELATIVE} />,
+    element: <PricingIndexPage />,
   },
   {
     path: PATHS.GOODBYE.RELATIVE,
@@ -76,7 +51,7 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
-    element: <AcceptTeamInviteView />,
+    element: <ProtectedRoute component={AcceptTeamInvite} />,
   },
   {
     path: PATHS.ANY,

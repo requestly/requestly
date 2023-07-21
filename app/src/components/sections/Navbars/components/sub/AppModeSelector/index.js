@@ -41,7 +41,7 @@ const AppModeSelector = () => {
         isOpen={popoverOpen}
         toggle={toggle}
       >
-        <PopoverHeader className=" bg-default white-color no-bottom-border text-align-center">
+        <PopoverHeader className=" bg-default text-white no-bottom-border text-center">
           Use Requestly with
         </PopoverHeader>
         <PopoverBody className=" bg-default">
@@ -61,7 +61,7 @@ const AppModeSelector = () => {
                   >
                     {React.createElement(AppModesConfig[appMode].Icon)}
                   </span>
-                  <small className="white-color bright-on-hover">{AppModesConfig[appMode].shortName}</small>
+                  <small className="text-white bright-on-hover">{AppModesConfig[appMode].shortName}</small>
                 </span>
               );
             })}

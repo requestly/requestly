@@ -114,12 +114,12 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
       key: Visibility.PUBLIC,
       label: "Anyone with the link",
     },
-    {
-      key: Visibility.ORGANIZATION,
-      label: "All members of my organization",
-      disabled: true,
-      tag: "Coming Soon",
-    },
+    // { // commented until supported
+    //   key: Visibility.ORGANIZATION,
+    //   label: "All members of my organization",
+    //   disabled: true,
+    //   tag: "Coming Soon",
+    // },
     {
       key: Visibility.CUSTOM,
       label: isWorkspaceMode ? "Only with specific people outside this workspace" : "Only with specific people",

@@ -10,9 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { actions } from "store";
 import "./styles.css";
 
-const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
+const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -23,37 +24,45 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
 
   const [hasUserClickedDeleteIconInThisSession, setHasUserClickedDeleteIconInThisSession] = useState(false);
 
-  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
+  const addEmptyScript = useCallback(
+    (event) => {
+      event?.preventDefault?.();
 
-  const addEmptyScript = (event) => {
-    event && event.preventDefault();
-    pushValueToArrayInPair(event, pairIndex, "scripts", {
-      ...ruleDetails.EMPTY_SCRIPT_FORMAT,
-      id: generateObjectId(),
-    });
-  };
-
-  const stableAddEmptyScript = useCallback(addEmptyScript, [
-    pairIndex,
-    pushValueToArrayInPair,
-    ruleDetails.EMPTY_SCRIPT_FORMAT,
-  ]);
+      dispatch(
+        actions.addValueInRulePairArray({
+          pairIndex,
+          arrayPath: "scripts",
+          value: {
+            ...ruleDetails.EMPTY_SCRIPT_FORMAT,
+            id: generateObjectId(),
+          },
+        })
+      );
+    },
+    [dispatch, pairIndex, ruleDetails.EMPTY_SCRIPT_FORMAT]
+  );
 
   const deleteScript = (event, pairIndex, scriptIndex) => {
     event && event.preventDefault();
 
     setHasUserClickedDeleteIconInThisSession(true);
 
-    deleteArrayValueByIndexInPair(event, pairIndex, "scripts", scriptIndex);
+    dispatch(
+      actions.removeValueInRulePairByIndex({
+        pairIndex,
+        arrayPath: "scripts",
+        index: scriptIndex,
+      })
+    );
   };
 
   // Auto Populate Empty Code Script
   useEffect(() => {
     if (Array.isArray(pair.scripts) && pair.scripts.length === 0) {
       if (hasUserClickedDeleteIconInThisSession) return;
-      stableAddEmptyScript();
+      addEmptyScript();
     }
-  }, [stableAddEmptyScript, pair.scripts, hasUserClickedDeleteIconInThisSession]);
+  }, [addEmptyScript, pair.scripts, hasUserClickedDeleteIconInThisSession]);
 
   return (
     <React.Fragment>
@@ -61,18 +70,11 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
         rowIndex={1}
         pair={pair}
         pairIndex={pairIndex}
-        helperFunctions={helperFunctions}
         ruleDetails={ruleDetails}
         isInputDisabled={isInputDisabled}
       />
       {!!toShowLibraries && (
-        <AvailableScriptsRow
-          rowIndex={3}
-          pair={pair}
-          pairIndex={pairIndex}
-          helperFunctions={{ ...helperFunctions }}
-          isInputDisabled={isInputDisabled}
-        />
+        <AvailableScriptsRow rowIndex={3} pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
       )}
 
       {pair.scripts.map((script, scriptIndex) => (
@@ -81,7 +83,7 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
           rowIndex={2}
           pair={pair}
           pairIndex={pairIndex}
-          helperFunctions={{ ...helperFunctions, deleteScript }}
+          deleteScript={deleteScript}
           ruleDetails={ruleDetails}
           script={script}
           scriptIndex={scriptIndex}
@@ -89,7 +91,7 @@ const ScriptRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInput
           isInputDisabled={isInputDisabled}
         />
       ))}
-      <AddCustomScriptRow helperFunctions={{ ...helperFunctions, addEmptyScript }} />
+      <AddCustomScriptRow addEmptyScript={addEmptyScript} />
       {isExtensionManifestVersion3() ? (
         <div className="csp-header-removal-notice">
           <Checkbox

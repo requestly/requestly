@@ -19,6 +19,8 @@ const INITIAL_STATE = {
     isSurveyCompleted: false,
   },
 
+  isExtensionEnabled: true,
+
   /* App Mode */
   appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
 
@@ -111,6 +113,18 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    createWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
+    inviteMembersModal: {
+      isActive: false,
+      props: {},
+    },
+    switchWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -171,6 +185,10 @@ const INITIAL_STATE = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      isMiscTourCompleted: {
+        firstRule: false,
+        fifthRule: false,
+      },
 
       hasConnectedApp: false,
     },

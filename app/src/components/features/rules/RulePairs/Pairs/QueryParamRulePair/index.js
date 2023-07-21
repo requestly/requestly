@@ -1,43 +1,39 @@
 import React, { useCallback, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 import QueryParamModificationRow from "../Rows/RowsMarkup/QueryParamModificationRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import AddQueryParamModificationRow from "../Rows/RowsMarkup/AddQueryParamModificationRow";
 import { generateObjectId } from "../../../../../../utils/FormattingHelper";
 import { Row, Col } from "antd";
 
-const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { pushValueToArrayInPair, deleteArrayValueByIndexInPair } = helperFunctions;
+const QueryParamRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  const dispatch = useDispatch();
 
-  const getEmptyModification = () => {
+  const getEmptyModification = useCallback(() => {
     return { ...ruleDetails.EMPTY_MODIFICATION_FORMAT, id: generateObjectId() };
-  };
-  const addEmptyModification = (event) => {
-    pushValueToArrayInPair(event, pairIndex, "modifications", stableGetEmptyModification());
-  };
+  }, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
 
-  const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
+  const addEmptyModification = useCallback(
+    (event) => {
+      event?.preventDefault?.();
 
-  const stableAddEmptyModification = useCallback(addEmptyModification, [
-    stableGetEmptyModification,
-    pairIndex,
-    pushValueToArrayInPair,
-  ]);
-
-  const initializeQueryParamRule = () => {
-    stableAddEmptyModification();
-  };
-
-  const stableInitializeQueryParamRule = useCallback(initializeQueryParamRule, [stableAddEmptyModification]);
-
-  const deleteModification = (event, pairIndex, modificationIndex) => {
-    deleteArrayValueByIndexInPair(event, pairIndex, "modifications", modificationIndex);
-  };
+      dispatch(
+        actions.addValueInRulePairArray({
+          pairIndex,
+          arrayPath: "modifications",
+          value: getEmptyModification(),
+        })
+      );
+    },
+    [dispatch, pairIndex, getEmptyModification]
+  );
 
   useEffect(() => {
     if (pair.modifications.length === 0) {
-      stableInitializeQueryParamRule();
+      addEmptyModification();
     }
-  }, [stableInitializeQueryParamRule, pair.modifications.length]);
+  }, [addEmptyModification, pair.modifications.length]);
 
   return (
     <React.Fragment>
@@ -47,7 +43,6 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
             rowIndex={1}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={helperFunctions}
             ruleDetails={ruleDetails}
             isInputDisabled={isInputDisabled}
           />
@@ -62,7 +57,6 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
                 rowIndex={2}
                 pair={pair}
                 pairIndex={pairIndex}
-                helperFunctions={{ ...helperFunctions, deleteModification }}
                 modification={modification}
                 modificationIndex={modificationIndex}
                 isInputDisabled={isInputDisabled}
@@ -77,7 +71,7 @@ const QueryParamRulePair = ({ pair, pairIndex, helperFunctions, ruleDetails, isI
             rowIndex={3}
             pair={pair}
             pairIndex={pairIndex}
-            helperFunctions={{ ...helperFunctions, addEmptyModification }}
+            addEmptyModification={addEmptyModification}
             isInputDisabled={isInputDisabled}
           />
         </Col>

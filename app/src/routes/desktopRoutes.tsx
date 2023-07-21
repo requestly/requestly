@@ -1,21 +1,22 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import ManualSetupView from "views/mode-specific/desktop/ManualSetupView";
-import MySourcesView from "views/mode-specific/desktop/MySourcesView";
-import InterceptTrafficView from "views/mode-specific/desktop/InterceptTrafficView";
+import ManualProxySetup from "components/mode-specific/desktop/ManualProxySetup";
+import MySources from "components/mode-specific/desktop/MySources";
+import InterceptTraffic from "components/mode-specific/desktop/InterceptTraffic";
 
 export const desktopRoutes: RouteObject[] = [
   {
     path: PATHS.DESKTOP.MANUAL_SETUP.RELATIVE,
-    element: <ManualSetupView />,
+    // @ts-ignore
+    element: <ManualProxySetup />,
   },
   {
     path: PATHS.DESKTOP.MY_APPS.ABSOLUTE,
-    element: <MySourcesView />,
+    element: <MySources />,
   },
   {
     path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE,
-    element: <InterceptTrafficView />,
+    element: <InterceptTraffic />,
   },
   {
     path: PATHS.DESKTOP.RELATIVE,

@@ -10,6 +10,7 @@ import EnvironmentDetailsPanel from "./EnvironmentDetailsPanel";
 import { ApiOutlined, CodeOutlined, ProfileOutlined } from "@ant-design/icons";
 import { ConsoleLog, NetworkLog } from "./types";
 import SessionPropertiesPanel from "./SessionPropertiesPanel";
+import CopyButton from "components/misc/CopyButton";
 import {
   getSessionRecordingAttributes,
   getSessionRecordingEvents,
@@ -18,7 +19,9 @@ import {
 import { useSelector } from "react-redux";
 import { cloneDeep } from "lodash";
 import { getConsoleLogs } from "./sessionEventsUtils";
+import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
+import "./sessionViewer.scss";
 
 const SessionDetails: React.FC = () => {
   const attributes = useSelector(getSessionRecordingAttributes);
@@ -63,6 +66,10 @@ const SessionDetails: React.FC = () => {
             width: playerContainer.current.clientWidth,
             height: 400,
             autoPlay: true,
+            // prevents elements inside rrweb-player to steal focus
+            // The elements inside the player were stealing the focus from the inputs in the session viewer pages
+            // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
+            triggerFocus: false,
           },
         })
       );
@@ -163,7 +170,33 @@ const SessionDetails: React.FC = () => {
 
   return (
     <>
-      <Input readOnly addonBefore="Page URL" value={attributes.url} />
+      <div className="session-properties-wrapper">
+        {attributes?.url && (
+          <Input
+            readOnly
+            addonBefore="Page URL"
+            value={attributes?.url}
+            className="session-page-url-property"
+            suffix={<CopyButton showIcon={true} copyText={attributes?.url} title="" />}
+          />
+        )}
+        {events?.rrweb?.length && attributes?.duration && (
+          <Input
+            readOnly
+            addonBefore="Duration"
+            value={msToHoursMinutesAndSeconds(attributes?.duration)}
+            className="session-duration-property"
+          />
+        )}
+        {attributes?.startTime && (
+          <Input
+            readOnly
+            addonBefore="Recorded at"
+            value={epochToDateAndTimeString(attributes?.startTime)}
+            className="session-recorded-at-property"
+          />
+        )}
+      </div>
       <div className="session-recording-player-row">
         <div className="session-recording-player-container" ref={playerContainer} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />

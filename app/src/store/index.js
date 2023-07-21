@@ -38,6 +38,7 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "user",
   "appMode",
   "appTheme",
+  "isExtensionEnabled",
   // "rules",
   // "desktopSpecificDetails.appsList",
   "hasConnectedApp",
