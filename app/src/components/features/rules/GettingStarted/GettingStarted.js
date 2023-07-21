@@ -156,6 +156,7 @@ const GettingStarted = () => {
                   title="You need to sign up to upload rules"
                   callback={handleUploadRulesClick}
                   source={AUTH.SOURCE.UPLOAD_RULES}
+                  disabled={window.isChinaUser}
                 >
                   <RQButton
                     type="default"
