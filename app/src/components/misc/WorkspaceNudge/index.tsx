@@ -5,11 +5,12 @@ import { Typography, Row, Avatar } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getDomainFromEmail } from "utils/FormattingHelper";
 import { actions } from "store";
 import { Invite, TeamInvite, TeamInviteMetadata } from "types";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getUniqueTeamsFromInvites } from "utils/teams";
+import { isEmailVerified } from "utils/AuthUtils";
 import "./index.css";
 
 export const WorkspaceNudge: React.FC = () => {
@@ -20,6 +21,7 @@ export const WorkspaceNudge: React.FC = () => {
   const [isJoinWorkspaceModalVisible, setIsJoinWorkspaceModalVisible] = useState<boolean>(false);
   const [organizationMembers, setOrganizationMembers] = useState(null);
   const [membersCount, setMembersCount] = useState<number>(0);
+  const [isBusinessDomainUser, setIsBusinessDomainUser] = useState<boolean>(false);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0], [
     user?.details?.profile?.email,
@@ -53,18 +55,27 @@ export const WorkspaceNudge: React.FC = () => {
   };
 
   useEffect(() => {
-    getOrganizationMembers({ domain: getDomainFromEmail(user?.details?.profile?.email) })
-      .then((result) => {
-        if (result.data) {
-          setOrganizationMembers(result.data);
-          setMembersCount(Object.keys(result.data).length);
-        }
-      })
-      .catch((e) => console.log(e));
-  }, [userEmailDomain, user?.details?.profile?.email, getOrganizationMembers]);
+    isEmailVerified(user?.details?.profile?.uid).then((result) => {
+      if (result && isCompanyEmail(user?.details?.profile?.email)) setIsBusinessDomainUser(true);
+      else setIsBusinessDomainUser(false);
+    });
+  }, [user?.details?.profile?.uid, user?.details?.profile?.email]);
 
   useEffect(() => {
-    if (user?.loggedIn) {
+    if (isBusinessDomainUser) {
+      getOrganizationMembers({ domain: getDomainFromEmail(user?.details?.profile?.email) })
+        .then((result) => {
+          if (result.data) {
+            setOrganizationMembers(result.data);
+            setMembersCount(Object.keys(result.data).length);
+          }
+        })
+        .catch((e) => console.log(e));
+    }
+  }, [userEmailDomain, user?.details?.profile?.email, isBusinessDomainUser, getOrganizationMembers]);
+
+  useEffect(() => {
+    if (user?.loggedIn && isBusinessDomainUser) {
       getPendingInvites({ email: true, domain: true })
         .then((res) => {
           if (res?.data?.pendingInvites) {
@@ -82,11 +93,11 @@ export const WorkspaceNudge: React.FC = () => {
           setHasActiveWorkspace(false);
         });
     }
-  }, [dispatch, getPendingInvites, user?.loggedIn]);
+  }, [dispatch, getPendingInvites, user?.loggedIn, isBusinessDomainUser]);
 
   return (
     <>
-      {membersCount >= 3 ? (
+      {membersCount >= 3 && isBusinessDomainUser ? (
         <>
           <div className="nudge-container">
             <Row justify="end">
