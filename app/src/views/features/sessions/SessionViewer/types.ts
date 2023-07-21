@@ -50,9 +50,3 @@ export interface ConsoleLog extends LogData {
 export interface NetworkLog extends NetworkEventData {
   timeOffset: number;
 }
-
-export type SessionRecordingExportData = {
-  events: string;
-  payload: SessionRecording;
-  options: RecordingOptions;
-};
