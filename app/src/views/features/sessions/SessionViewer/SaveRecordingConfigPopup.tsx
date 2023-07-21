@@ -47,7 +47,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
             <div className="config-label">Mode of saving the session</div>
             <Radio.Group value={sessionSaveMode} onChange={handleSessionSaveModeChange} className="mode-radio-group">
               <Radio value={SessionSaveMode.ONLINE}>Save online</Radio>
-              <Radio value={SessionSaveMode.LOCAL}>Download JSON file</Radio>
+              <Radio value={SessionSaveMode.LOCAL}>Download as a file</Radio>
             </Radio.Group>
           </div>
         )}
