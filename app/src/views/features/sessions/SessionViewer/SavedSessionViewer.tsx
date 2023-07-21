@@ -245,7 +245,7 @@ const SavedSessionViewer: React.FC = () => {
                   className="download-recording-btn"
                   onClick={() => setIsDownloadPopupVisible((prev) => !prev)}
                 >
-                  Download Recording <DownArrow />
+                  Download <DownArrow />
                 </Button>
                 <RQButton type="default" icon={<DeleteOutlined />} onClick={confirmDeleteAction} />
               </Space>

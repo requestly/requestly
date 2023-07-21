@@ -302,7 +302,7 @@ const DraftSessionViewer: React.FC = () => {
             className="text-bold session-viewer-save-action-btn"
             onClick={() => setIsSavePopupVisible((prev) => !prev)}
           >
-            Save Recording <DownArrow />
+            Save <DownArrow />
           </RQButton>
 
           {isSavePopupVisible && (
