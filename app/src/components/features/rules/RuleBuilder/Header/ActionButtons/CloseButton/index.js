@@ -1,40 +1,18 @@
 import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 //Actions
 import { RQButton } from "lib/design-system/components";
 import { closeBtnOnClickHandler } from "../actions";
-import { Modal, Tooltip } from "antd";
-import { ExclamationCircleFilled } from "@ant-design/icons";
-import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { Tooltip } from "antd";
 
 const CloseButton = ({ ruleType, mode }) => {
-  //Constants
   const navigate = useNavigate();
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-
-  //Global State
   const dispatch = useDispatch();
 
-  const showConfirmModal = useCallback(() => {
-    Modal.confirm({
-      title: "Discard changes?",
-      icon: <ExclamationCircleFilled />,
-      content: "Changes you made may not be saved.",
-      okText: "Discard",
-      onOk() {
-        closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
-      },
-    });
-  }, [dispatch, mode, navigate, ruleType]);
-
   const closeButtonHandler = useCallback(() => {
-    if (isCurrentlySelectedRuleHasUnsavedChanges) {
-      showConfirmModal();
-    } else {
-      closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
-    }
-  }, [dispatch, isCurrentlySelectedRuleHasUnsavedChanges, mode, navigate, ruleType, showConfirmModal]);
+    closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
+  }, [dispatch, mode, navigate, ruleType]);
 
   return (
     <Tooltip title="Back to rules" placement="bottom">

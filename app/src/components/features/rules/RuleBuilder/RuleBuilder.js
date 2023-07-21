@@ -24,7 +24,6 @@ import {
   getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsRuleEditorTourCompleted,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
@@ -56,7 +55,6 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
@@ -228,21 +226,6 @@ const RuleBuilder = (props) => {
     )
       cleanup(dispatch);
   }, [dispatch, location]);
-
-  useEffect(() => {
-    const unloadListener = (e) => {
-      e.preventDefault();
-      e.returnValue = "Are you sure?";
-    };
-
-    if (isCurrentlySelectedRuleHasUnsavedChanges) {
-      window.addEventListener("beforeunload", unloadListener);
-    } else {
-      window.removeEventListener("beforeunload", unloadListener);
-    }
-
-    return () => window.removeEventListener("beforeunload", unloadListener);
-  }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
   if (
     currentlySelectedRuleConfig === false ||
