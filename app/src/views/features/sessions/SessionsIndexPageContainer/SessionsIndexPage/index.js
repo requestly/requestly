@@ -33,6 +33,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
+import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
 import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
 
 const _ = require("lodash");
@@ -179,13 +180,20 @@ const SessionsIndexPage = () => {
           setProcessingDataToImport(true);
           const parsedData = JSON.parse(reader.result);
 
-          if (!file.type.includes("json") || !parsedData.recording || !parsedData.events) {
+          const splittedFileName = file?.name?.split(".") ?? [];
+          const fileExtension = splittedFileName[splittedFileName.length - 1];
+
+          if (
+            fileExtension !== EXPORTED_SESSION_FILE_EXTENSION ||
+            parsedData?.type !== SESSION_EXPORT_TYPE ||
+            !parsedData?.data
+          ) {
             throw new Error("Invalid file format!");
           }
 
-          dispatch(sessionRecordingActions.setSessionRecording({ ...parsedData.recording }));
+          dispatch(sessionRecordingActions.setSessionRecording({ ...parsedData.data.recording }));
 
-          const recordedSessionEvents = decompressEvents(parsedData.events);
+          const recordedSessionEvents = decompressEvents(parsedData.data.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
 
           toggleOpenDownloadedSessionModal();
