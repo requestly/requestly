@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "antd";
+import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
@@ -11,7 +13,6 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
-import "./ResponseBodyRow.css";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
@@ -20,9 +21,10 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system/components";
 import LINKS from "config/constants/sub/links";
+import "./ResponseBodyRow.css";
 
-const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  const dispatch = useDispatch();
   const { MODE } = getModeData(window.location);
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
@@ -52,29 +54,31 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
         setIsCodeMinified(true);
         setEditorStaticValue(value);
       }
-
-      modifyPairAtGivenPath(null, pairIndex, `response.type`, responseBodyType, [
-        {
-          path: `response.value`,
-          value: value,
-        },
-        {
-          path: `response.serveWithoutRequest`,
-          value: undefined,
-        },
-      ]);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            "response.type": responseBodyType,
+            "response.value": value,
+            "response.serveWithoutRequest": undefined,
+          },
+        })
+      );
     }
   };
 
   const handleFileSelectCallback = (selectedFile) => {
-    modifyPairAtGivenPath(null, pairIndex, `response.type`, GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE, [
-      {
-        path: `response.value`,
-        value: selectedFile,
-        // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
-        // value: `file://${selectedFile}`,
-      },
-    ]);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
+          "response.value": selectedFile,
+          // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
+          // value: `file://${selectedFile}`,
+        },
+      })
+    );
   };
 
   const showPopup = (e) => {
@@ -135,22 +139,20 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
   };
 
   const responseBodyChangeHandler = (value) => {
-    let triggerUnsavedChangesIndication = !codeFormattedFlag.current;
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
     }
-    modifyPairAtGivenPath(
-      null,
-      pairIndex,
-      `response.type`,
-      pair.response.type,
-      [
-        {
-          path: `response.value`,
-          value: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          "response.type": pair.response.type,
+          "response.value":
+            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
         },
-      ],
-      triggerUnsavedChangesIndication
+        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+      })
     );
   };
 
@@ -171,15 +173,22 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetai
     }, 2000);
   };
 
-  const handleServeWithoutRequestFlagChange = (evt) => {
+  const handleServeWithoutRequestFlagChange = (event) => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      const flag = evt.target.checked;
+      const flag = event.target.checked;
 
       if (flag) {
         trackServeResponseWithoutRequestEnabled();
       }
 
-      modifyPairAtGivenPath(evt, pairIndex, "response.serveWithoutRequest", flag);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            "response.serveWithoutRequest": flag,
+          },
+        })
+      );
     }
   };
 

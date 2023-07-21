@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
@@ -6,19 +6,20 @@ import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
-import AddMemberModal from "./AddMemberModal";
 import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
+import { actions } from "store";
+import { useDispatch } from "react-redux";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const isNewTeam = location.state?.isNewTeam;
 
   // Component state
   const [seats, setSeats] = useState({});
   const [showSeatStatus, setShowSeatStatus] = useState(false);
-  const [isAddMemberModalActive, setIsAddMemberModalActive] = useState(false);
   const [refreshTeamMembersTable, setRefreshTeamMembersTable] = useState(false);
 
   // Global state
@@ -27,48 +28,60 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const accessCount = teamDetails?.accessCount;
 
   // To handle refresh in TeamMembersTable
-  const doRefreshTeamMembersTable = () => {
+  const doRefreshTeamMembersTable = useCallback(() => {
     setRefreshTeamMembersTable(!refreshTeamMembersTable);
-  };
+  }, [refreshTeamMembersTable]);
 
-  const toggleAddMemberModal = () => {
-    setIsAddMemberModalActive(!isAddMemberModalActive);
-  };
-
-  const handleAddMemberClick = () => {
-    setIsAddMemberModalActive(true);
+  const handleAddMemberClick = useCallback(() => {
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "inviteMembersModal",
+        newValue: true,
+        teamId: teamId,
+        callback: doRefreshTeamMembersTable,
+      })
+    );
     trackAddMemberClicked();
-  };
+  }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
   useEffect(() => {
     if (isNewTeam) {
-      setIsAddMemberModalActive(true);
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "inviteMembersModal",
+          newValue: true,
+          teamId: teamId,
+          callback: doRefreshTeamMembersTable,
+        })
+      );
     }
-  }, [isNewTeam]);
+  }, [dispatch, doRefreshTeamMembersTable, isNewTeam, teamId]);
 
   useEffect(() => {
-    const functions = getFunctions();
-    const getTeamBillingUsers = httpsCallable(functions, "getTeamBillingUsers");
+    if (refreshTeamMembersTable) {
+      const functions = getFunctions();
+      const getTeamBillingUsers = httpsCallable(functions, "teams-getTeamBillingUsers");
 
-    getTeamBillingUsers({
-      teamId,
-    })
-      .then((res) => {
-        const seatsData = res.data;
-        if (seatsData.success) {
-          setSeats({
-            billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
-            actualBillQuantity: seatsData.actualBillQuantity, // total number of users
-          });
-          setShowSeatStatus(true);
-        }
+      getTeamBillingUsers({
+        teamId,
       })
-      .catch(() => setShowSeatStatus(false));
+        .then((res) => {
+          const seatsData = res.data;
+          if (seatsData.success) {
+            setSeats({
+              billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
+              actualBillQuantity: seatsData.actualBillQuantity, // total number of users
+            });
+            setShowSeatStatus(true);
+          }
+        })
+        .catch(() => setShowSeatStatus(false));
+    }
   }, [teamId, refreshTeamMembersTable]);
 
   return (
     <div className="members-details-container">
-      <PublicInviteLink teamId={teamId} />
+      {isTeamAdmin ? <PublicInviteLink teamId={teamId} /> : null}
 
       {/* members table */}
       <Row justify="space-between" align="bottom">
@@ -114,15 +127,6 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           </Typography.Text>
         ) : null}
       </Row>
-
-      {isAddMemberModalActive ? (
-        <AddMemberModal
-          teamId={teamId}
-          isOpen={isAddMemberModalActive}
-          handleModalClose={toggleAddMemberModal}
-          callback={doRefreshTeamMembersTable}
-        />
-      ) : null}
     </div>
   );
 };

@@ -19,6 +19,8 @@ import {
   trackDeleteNetworkSessionConfirmed,
   trackDownloadNetworkSessionClicked,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 
 const { Text } = Typography;
 
@@ -93,6 +95,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
                         const sessionRecord = await getNetworkSession(id);
                         downloadHar(sessionRecord.har || {}, record.name);
                         trackDownloadNetworkSessionClicked(ActionSource.List);
+                        trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                       }}
                     >
                       <Tooltip title="Export Session">

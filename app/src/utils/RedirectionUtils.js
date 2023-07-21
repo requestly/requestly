@@ -1,5 +1,5 @@
 //CONFIG
-import { MODES } from "components/misc/VerifyEmail";
+import { MODES } from "components/misc/VerifyEmail/modes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
 
@@ -234,16 +234,6 @@ export const redirectToGDPRPage = (navigate, { newTab }) => {
 /* USER - Unlock Premium */
 export const redirectToUnlockPremium = (navigate) => {
   navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
-};
-
-/* USER - License - Index Page */
-export const redirectToLicenseIndexPage = (navigate) => {
-  navigate(PATHS.LICENSE.ABSOLUTE);
-};
-
-/* USER - License - Manage */
-export const redirectToManageLicense = (navigate) => {
-  navigate(PATHS.LICENSE.MANAGE.ABSOLUTE);
 };
 
 /* ACCOUNT */

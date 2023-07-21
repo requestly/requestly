@@ -1,0 +1,56 @@
+.test-url-modal {
+  .ant-modal-body {
+    background: var(--component-background);
+  }
+  &-header {
+    padding: 20px 30px;
+    padding-bottom: 0;
+
+    h4.ant-typography {
+      color: var(--white);
+    }
+  }
+  .ant-divider {
+    margin: 1rem 0;
+  }
+  &-body {
+    padding: 16px 30px;
+    padding-top: 0;
+
+    .source-condition-input-wrapper,
+    .test-url-modal-section .ant-input {
+      box-shadow: var(--input-box-shadow);
+      border-radius: var(--border-radius-sm);
+      background-color: var(--component-dark-background);
+    }
+  }
+  &-section {
+    margin-top: 1.5rem;
+
+    .ant-input {
+      padding: 12px;
+      padding-left: 8px;
+      border: none;
+    }
+  }
+  .test-url-modal-section.match-result {
+    .anticon {
+      font-size: 1rem;
+      margin-right: 8px;
+    }
+    span.danger {
+      color: var(--danger);
+    }
+    span.success {
+      color: var(--success);
+    }
+    .result-text {
+      margin: 0 4px;
+    }
+  }
+  .group-match-wrapper {
+    margin-top: 10px;
+    display: flex;
+    gap: 12px;
+  }
+}

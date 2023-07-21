@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 //Components
 import RulesListContainer from "../RulesListContainer";
@@ -24,23 +24,11 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import CreateTeamRuleCTA from "../CreateTeamRuleCTA";
 import GettingStarted from "../GettingStarted";
 import Logger from "lib/logger";
+import { useHasChanged } from "hooks";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
 const RulesIndexPage = () => {
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
-
   //Global State
   const dispatch = useDispatch();
   const rules = useSelector(getAllRules);

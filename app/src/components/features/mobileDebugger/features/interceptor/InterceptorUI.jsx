@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "antd/lib/modal/Modal";
 import ProCard from "@ant-design/pro-card";
@@ -28,7 +28,6 @@ const InterceptorUI = ({ appId }) => {
   // LOCAL
   const [sdkId, setSdkId] = useState("");
   const [deviceId, setDeviceId] = useState("");
-  const [deviceIdInput, setDeviceIdInput] = useState(deviceId);
 
   const [isDeviceSelectorVisible, setIsDeviceSelectorVisible] = useState(false);
   const [showLogger, setShowLogger] = useState(false);
@@ -37,7 +36,7 @@ const InterceptorUI = ({ appId }) => {
     dispatch(actions.updateMobileDebuggerInterceptorDetails({ deviceId }));
   };
 
-  const attachUserRulesToDevice = useCallback(() => {
+  const attachUserRulesToDevice = (sdkId, deviceId) => {
     let functions = getFunctions();
     const createUserDeviceMapping = httpsCallable(functions, "createUserDeviceMapping");
     createUserDeviceMapping({
@@ -57,7 +56,7 @@ const InterceptorUI = ({ appId }) => {
         toast.error(err);
         trackDeviceIdSelectedFailureEvent();
       });
-  }, [deviceId, sdkId]);
+  };
 
   const handleInterceptorParamSelection = () => {
     if (!sdkId) {
@@ -65,17 +64,13 @@ const InterceptorUI = ({ appId }) => {
       return;
     }
 
-    if (!deviceIdInput) {
+    if (!deviceId) {
       toast.error("Please specify a deviceId");
       return;
     }
 
-    if (deviceId !== deviceIdInput) {
-      setDeviceId(deviceIdInput);
-    }
-
     saveUserDeviceSelectionInStore();
-    attachUserRulesToDevice();
+    attachUserRulesToDevice(sdkId, deviceId);
     setShowLogger(true);
     setIsDeviceSelectorVisible(false);
   };
@@ -83,16 +78,16 @@ const InterceptorUI = ({ appId }) => {
   useEffect(() => {
     setSdkId(mobileDebuggerAppDetails["id"]);
     setDeviceId(mobileDebuggerInterceptorDetails["deviceId"]);
-    setDeviceIdInput(mobileDebuggerInterceptorDetails["deviceId"]);
 
     if (!mobileDebuggerInterceptorDetails["deviceId"]) {
       setIsDeviceSelectorVisible(true);
     } else {
-      attachUserRulesToDevice();
+      attachUserRulesToDevice(sdkId, deviceId);
       setShowLogger(true);
       setIsDeviceSelectorVisible(false);
     }
-  }, [attachUserRulesToDevice, mobileDebuggerAppDetails, mobileDebuggerInterceptorDetails]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileDebuggerAppDetails, mobileDebuggerInterceptorDetails]);
 
   return (
     <>
@@ -132,18 +127,17 @@ const InterceptorUI = ({ appId }) => {
         </Row> */}
         <Row>
           <Col span={24}>
-            <DeviceSelector
-              sdkId={sdkId}
-              deviceId={deviceIdInput}
-              setSelectedDeviceId={setDeviceId}
-              updateDeviceIdInput={setDeviceIdInput}
-            />
+            <DeviceSelector sdkId={sdkId} deviceId={deviceId} setSelectedDeviceId={setDeviceId} />
           </Col>
         </Row>
       </Modal>
       {showLogger ? (
         <>
-          <Logger sdkId={sdkId} deviceId={deviceId} showDeviceSelector={() => setIsDeviceSelectorVisible(true)} />
+          <Logger
+            sdkId={sdkId}
+            deviceId={mobileDebuggerInterceptorDetails?.["deviceId"]}
+            showDeviceSelector={() => setIsDeviceSelectorVisible(true)}
+          />
         </>
       ) : (
         <>

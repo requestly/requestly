@@ -38,6 +38,9 @@ import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode"
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels } from "./utils";
+import { track } from "@amplitude/analytics-browser";
+import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -108,6 +111,7 @@ const CurrentTrafficTable = ({
     setSelectedRequestData(row);
     handlePreviewVisibility(true);
     trackTrafficTableRequestClicked();
+    trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_CLICKED);
   }, []);
 
   const handleClosePane = () => {
@@ -131,6 +135,7 @@ const CurrentTrafficTable = ({
     setDomainList(new Set([...trafficTableFilters.domain]));
     setAppList(new Set([...trafficTableFilters.app]));
     trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
+    trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_LOGS_CLEARED);
 
     if (clearLogsCallback) clearLogsCallback();
   };
@@ -283,10 +288,13 @@ const CurrentTrafficTable = ({
 
   const getRequestLogs = useCallback(
     (desc = true) => {
-      let logs = isStaticPreview ? propLogs : newLogs;
+      let logs = newLogs;
+      if (propLogs?.length > 0) {
+        logs = propLogs;
+      }
       return logs;
     },
-    [isStaticPreview, newLogs, propLogs]
+    [newLogs, propLogs]
   );
 
   const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
@@ -403,6 +411,7 @@ const CurrentTrafficTable = ({
           label: getApplogAvatar(`${logType.APP}`, appName),
           onClick: () => {
             trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.APP, appName);
+            trackRQDesktopLastActivity(TRAFFIC_TABLE.SIDEBAR_FILTER_SELECTED);
           },
         }));
     },
@@ -418,6 +427,7 @@ const CurrentTrafficTable = ({
           label: getDomainLogAvatar(`${logType.DOMAIN}`, domain),
           onClick: () => {
             trackSidebarFilterSelected(ANALYTIC_EVENT_SOURCE, logType.DOMAIN, domain);
+            trackRQDesktopLastActivity(TRAFFIC_TABLE.SIDEBAR_FILTER_SELECTED);
           },
         }));
     },

@@ -1,0 +1,37 @@
+.configuration-container {
+  margin-top: 2.5rem;
+}
+
+.configuration-container .header-container {
+  margin-bottom: 2rem;
+}
+
+.configuration-container .header {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.configuration-container .config-page-sources-table .ant-table .ant-table-tbody tr td:first-child {
+  min-width: 110px;
+}
+
+.configuration-container .config-page-sources-table .ant-table .ant-table-tbody tr td:nth-child(2) {
+  min-width: 205px;
+  padding-left: 0;
+}
+
+.configuration-container .config-page-sources-table .ant-table .ant-table-tbody tr td:nth-child(3) {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.recording-config .ant-select-selector {
+  padding: 6px !important;
+  height: auto !important;
+}
+
+.recording-config.ant-input {
+  padding: 6px;
+}

@@ -18,6 +18,8 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import BetaBadge from "components/misc/BetaBadge";
 import { getLogResponseById } from "store/features/desktop-traffic-table/selectors";
 import "./index.css";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 
 interface ContextMenuProps {
   log: any;
@@ -43,6 +45,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         })
       );
       trackTrafficTableDropdownClicked(menuInfo.key);
+      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
       trackRuleCreationWorkflowStartedEvent(menuInfo.key, "modal");
     },
     [dispatch, selectedRequestResponse]
@@ -56,6 +59,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         onClick: () => {
           copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_curl");
+          trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
         },
       },
       {
@@ -64,6 +68,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_url");
+          trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
         },
       },
       {
@@ -133,6 +138,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         label: <BetaBadge text="Edit and Replay" />,
         onClick: () => {
           trackTrafficTableDropdownClicked("replay_request");
+          trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);
           onReplayRequest();
         },
       });
@@ -148,6 +154,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {
       trackTrafficTableRequestRightClicked();
+      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_RIGHT_CLICKED);
       if (!isTrafficTableTourCompleted) {
         dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }));
         trackWalkthroughCompleted(FEATURES.DESKTOP_APP_TRAFFIC_TABLE);

@@ -1,43 +1,47 @@
 import React, { useCallback, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Input, Dropdown, Typography, Menu, Select } from "antd";
-//ACTIONS
+import { actions } from "store";
 import { getAvailableUserAgents } from "./actions";
 import { DownOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 const { Option, OptGroup } = Select;
 
-const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
+const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
 
   const userAgentSelectorOnChangeHandler = (itemSet) => {
-    modifyPairAtGivenPath(null, pairIndex, "env", itemSet.value.env, [
-      {
-        path: "userAgent",
-        value: itemSet.value.userAgent,
-      },
-    ]);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          env: itemSet.value.env,
+          userAgent: itemSet.value.userAgent,
+        },
+      })
+    );
   };
 
   const deviceTypeDropdownOnChangeHandler = useCallback(
-    (event, newValue) => {
-      let extraModifications = [
-        {
-          path: "env",
-          value: "",
-        },
-      ];
+    (newValue) => {
+      const extraModifications = { env: "" };
 
       if (newValue === "custom") {
-        extraModifications.push({
-          path: "userAgent",
-          value: window.navigator.userAgent,
-        });
+        extraModifications["userAgent"] = window.navigator.userAgent;
       }
 
-      modifyPairAtGivenPath(event, pairIndex, "envType", newValue, extraModifications);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            envType: newValue,
+            ...extraModifications,
+          },
+        })
+      );
     },
-    [modifyPairAtGivenPath, pairIndex]
+    [dispatch, pairIndex]
   );
 
   const getCurrentUserAgentValue = () => {
@@ -73,8 +77,8 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
         {envTypeOptions.map(({ id, name, deviceType }) => (
           <Menu.Item
             key={id}
-            onClick={(event) => {
-              deviceTypeDropdownOnChangeHandler(event, deviceType);
+            onClick={() => {
+              deviceTypeDropdownOnChangeHandler(deviceType);
             }}
           >
             {name}
@@ -111,7 +115,16 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, helperFunctions, isI
             placeholder="Enter custom UserAgent string"
             type="text"
             disabled={isInputDisabled}
-            onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "userAgent")}
+            onChange={(event) =>
+              dispatch(
+                actions.updateRulePairAtGivenPath({
+                  pairIndex,
+                  updates: {
+                    userAgent: event?.target?.value,
+                  },
+                })
+              )
+            }
             className="display-inline-block"
             value={pair.userAgent}
           />

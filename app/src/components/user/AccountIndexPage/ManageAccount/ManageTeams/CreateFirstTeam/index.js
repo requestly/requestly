@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Row, Col, Space } from "antd";
 import ProCard from "@ant-design/pro-card";
-import CreateWorkspaceModal from "../CreateWorkspaceModal";
 import APP_CONSTANTS from "../../../../../../config/constants";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { actions } from "store";
+import { useDispatch } from "react-redux";
 
 const CreateFirstTeam = () => {
-  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
-
-  const handleCreateWorkspaceModalClose = () => {
-    setIsCreateTeamModalOpen(false);
-  };
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -26,7 +23,7 @@ const CreateFirstTeam = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  setIsCreateTeamModalOpen(true);
+                  dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
                   trackCreateNewTeamClicked("my_teams");
                 }}
               >
@@ -39,8 +36,6 @@ const CreateFirstTeam = () => {
           </Col>
         </Row>
       </ProCard>
-
-      <CreateWorkspaceModal isOpen={isCreateTeamModalOpen} handleModalClose={handleCreateWorkspaceModalClose} />
     </>
   );
 };

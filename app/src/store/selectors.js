@@ -4,6 +4,10 @@ export const getGlobalState = (rootState) => {
   return rootState[ReducerKeys.GLOBAL];
 };
 
+export const getIsExtensionEnabled = (state) => {
+  return getGlobalState(state)["isExtensionEnabled"];
+};
+
 export const getRulesNode = (state) => {
   return getGlobalState(state)["rules"];
 };
@@ -229,6 +233,10 @@ export const getIsRuleEditorTourCompleted = (state) => {
     getGlobalState(state).misc.persist?.isRuleEditorTourCompleted ||
     getGlobalState(state).misc.persist?.isRedirectRuleTourCompleted
   );
+};
+
+export const getIsMiscTourCompleted = (state) => {
+  return getGlobalState(state).misc.persist?.isMiscTourCompleted;
 };
 
 export const getIsConnectedAppsTourCompleted = (state) => {

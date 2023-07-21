@@ -31,8 +31,8 @@ export const trackWorkspaceInviteLinkRevoked = (team_id) => {
   trackEvent(TEAMS.WORKSPACE_INVITE_LINK_REVOKED, params);
 };
 
-export const trackWorkspaceInviteAccepted = (team_id, invite_id, source, usage_type) => {
-  const params = { team_id, source, invite_id, usage_type };
+export const trackWorkspaceInviteAccepted = (team_id, team_name, invite_id, source, usage_type, members_count) => {
+  const params = { team_id, team_name, source, invite_id, usage_type, members_count };
   trackEvent(TEAMS.WORKSPACE_INVITE_ACCEPTED, params);
 };
 

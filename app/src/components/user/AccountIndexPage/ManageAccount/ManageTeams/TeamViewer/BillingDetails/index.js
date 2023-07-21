@@ -18,7 +18,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
     setIsLoading(true);
 
     const functions = getFunctions();
-    const getTeamSubscriptionInfo = httpsCallable(functions, "getTeamSubscriptionInfo");
+    const getTeamSubscriptionInfo = httpsCallable(functions, "teams-getTeamSubscriptionInfo");
 
     getTeamSubscriptionInfo({
       teamId: teamId,

@@ -28,7 +28,7 @@
 .rq-modal.ant-modal .rq-modal-content {
   padding: 3rem;
   border-radius: inherit;
-  background-color: var(--body-background);
+  background-color: var(--component-background);
 }
 
 /* if footer or any other sibling exist then fix the border-radius for content  */
@@ -42,7 +42,7 @@
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
   border-top: 1px solid var(--border-dark);
-  background-color: var(--component-dark-background);
+  background-color: var(--body-background);
 }
 
 .rq-modal-footer button.ant-btn {

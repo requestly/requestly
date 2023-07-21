@@ -1,0 +1,46 @@
+.home-container {
+  width: 100%;
+  padding: 2rem;
+
+  & h2 {
+    font-weight: bold;
+  }
+  & p {
+    margin-bottom: 0;
+  }
+}
+
+.home-sm-text,
+.feature-card-info {
+  color: #c2c2c2 !important;
+}
+.feature-card-container {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-column-gap: 0.5rem;
+  grid-row-gap: 1.5rem;
+}
+
+.setup-box {
+  padding: 10px;
+  border-radius: 5px;
+  background: #4a586895;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  display: flex;
+  color: #fff !important;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  transition: 0.2s ease-in-out;
+}
+
+.setup-box:hover {
+  background: #0b76d9;
+}
+.feature-card-icon {
+  font-size: 4rem;
+  color: #4a586895;
+  margin: 1rem 0;
+}

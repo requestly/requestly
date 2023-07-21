@@ -2,8 +2,7 @@ import React from "react";
 import { Row, Col, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
-const AddQueryParamModificationRow = ({ rowIndex, helperFunctions, isInputDisabled }) => {
-  const { addEmptyModification } = helperFunctions;
+const AddQueryParamModificationRow = ({ rowIndex, addEmptyModification, isInputDisabled }) => {
   return (
     <Row className="margin-top-one" key={rowIndex}>
       <Col offset={4} span={20}>

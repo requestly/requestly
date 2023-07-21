@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES } from "common/constants";
 import { getRecord, saveRecord } from "common/storage";
-import { SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
+import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
 
@@ -8,8 +8,24 @@ const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
 const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingConfig> => {
   const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
-  const pageSources = sessionRecordingConfig?.pageSources || [];
+  let pageSources = sessionRecordingConfig?.pageSources || [];
+
   if (await isExtensionEnabled()) {
+    if ("autoRecording" in sessionRecordingConfig) {
+      if (!sessionRecordingConfig?.autoRecording.isActive) {
+        return null;
+      } else if (sessionRecordingConfig?.autoRecording.mode === AutoRecordingMode.ALL_PAGES) {
+        pageSources = [
+          {
+            value: "*",
+            key: SourceKey.URL,
+            isActive: true,
+            operator: SourceOperator.WILDCARD_MATCHES,
+          },
+        ];
+      }
+    }
+
     if (pageSources.some((pageSource) => matchSourceUrl(pageSource, url))) {
       return sessionRecordingConfig;
     }

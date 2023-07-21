@@ -5,8 +5,11 @@ import { getValueAsPromise, setValue } from "actions/FirebaseActions";
 import PATHS from "config/constants/sub/paths";
 
 export const shouldShowOnboarding = async (appMode: string) => {
-  // Don't show persona survey on Browser if user is authenticating from desktop app
-  if (window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) || window.location.href.includes("/invite"))
+  if (
+    window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
+    window.location.href.includes("/invite") ||
+    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE)
+  )
     return false;
 
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);

@@ -167,6 +167,10 @@ module.exports = function (grunt) {
             src: "node_modules/@requestly/web-sdk/dist/requestly-web-sdk.js",
             dest: "dist/libs/requestly-web-sdk.js",
           },
+          {
+            src: "../common/dist/lib/customElements.js",
+            dest: "dist/libs/customElements.js",
+          },
         ],
       },
       popup: {

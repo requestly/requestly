@@ -10,6 +10,7 @@ export const trackLoginAttemptedEvent = ({ auth_provider, email, place, email_ty
     domain,
     source,
   };
+
   trackEvent(AUTH.LOGIN.ATTEMPTED, params);
 };
 
@@ -42,5 +43,6 @@ export const trackLoginSuccessEvent = ({ auth_provider, uid, place, email, email
     domain,
     source,
   };
+
   trackEvent(AUTH.LOGIN.SUCCESS, params);
 };

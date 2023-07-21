@@ -50,7 +50,7 @@ const TopBanner = ({
             className="p-2 mt-0 alert text-secondary alert-banner alert-primary shadow my-0"
             isOpen={dismissible ? !isDismissed : true}
             toggle={onDismiss}
-            closeClassName={dismissible ? "banner-alert-close" : "hide-element"}
+            closeClassName={dismissible ? "banner-alert-close" : "hidden"}
           >
             <span>
               {renderBannerIcon()}

@@ -25,15 +25,7 @@ const GlobalSettings = ({ appMode }) => {
   const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.EXTENSION_CONSOLE_LOGGER), []);
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !storageType) {
-    return (
-      <InstallExtensionCTA
-        heading={"Requestly Extension Settings"}
-        subHeadingExtension={"Start intercepting HTTP requests"}
-        content={"Please install Requestly Browser Extension first."}
-        supportsMobileDevices={false}
-        eventPage="settings_page"
-      />
-    );
+    return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
   }
 
   return (

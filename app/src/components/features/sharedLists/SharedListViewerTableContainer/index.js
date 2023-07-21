@@ -48,7 +48,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const [areRulesImporting, setAreRulesImporting] = useState(false);
 
   const functions = getFunctions();
-  const sendSharedListImportAsEmail = httpsCallable(functions, "sendSharedListImportAsEmail");
+  const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");
 
   const openAuthModal = (source) => {
     dispatch(
@@ -74,7 +74,9 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
         actions.toggleActiveModal({
           modalName: "extensionModal",
           newValue: true,
-          newProps: {},
+          newProps: {
+            eventPage: "shared_list",
+          },
         })
       );
       trackSharedListImportFailed(id);

@@ -8,10 +8,6 @@
   background-color: var(--hover-color);
 }
 
-.workspace-selector-dropdown .workspace-avatar.ant-avatar {
-  margin-right: 8px;
-}
-
 .active-workspace-name {
   display: inline-block;
   font-size: 13px;
@@ -37,6 +33,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-right: 8px;
 }
 
 .ant-dropdown .ant-dropdown-placement-bottomLeft {

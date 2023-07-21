@@ -26,23 +26,12 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
+import { useHasChanged } from "./useHasChanged";
 
 let hasAppModeBeenSet = false;
 
 const AppModeInitializer = () => {
   const navigate = useNavigate();
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-  //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
@@ -131,22 +120,26 @@ const AppModeInitializer = () => {
               });
             });
           }
+          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
+            if (payload?.origin && payload?.origin === "main") {
+              trackDesktopMainEvent(payload?.name, payload?.params);
+            } else {
+              // todo: need to setup relay for BG renderer events
+              trackDesktopBGEvent(payload?.name, payload?.params);
+            }
+          });
         });
       }
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
-        if (payload?.origin && payload?.origin === "main") {
-          trackDesktopMainEvent(payload?.name, payload?.params);
-        } else {
-          // todo: need to setup relay for BG renderer events
-          trackDesktopBGEvent(payload?.name, payload?.params);
-        }
-      });
+    }
+  }, [appMode, isBackgroundProcessActive, dispatch]);
 
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
       });
     }
-  }, [appMode, isBackgroundProcessActive, dispatch, navigate]);
+  }, []);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {

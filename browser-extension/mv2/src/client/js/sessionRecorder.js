@@ -1,7 +1,6 @@
-RQ.SessionRecorder = {
-  isRecording: false,
-  sendResponseCallbacks: {},
-};
+RQ.SessionRecorder = {};
+RQ.SessionRecorder.isRecording = false;
+RQ.SessionRecorder.sendResponseCallbacks = {};
 
 RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.getRecordingConfig().then((config) => {
@@ -15,6 +14,9 @@ RQ.SessionRecorder.setup = () => {
       case RQ.CLIENT_MESSAGES.START_RECORDING:
         RQ.SessionRecorder.explicitRecordingFlag.set();
         RQ.SessionRecorder.startRecording();
+        if (message.notify) {
+          RQ.SessionRecorder.showToast();
+        }
         break;
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording");
@@ -148,13 +150,41 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
 
 RQ.SessionRecorder.explicitRecordingFlag = {
   IS_EXPLICIT_RECORDING: "__RQ__isExplicitRecording",
+  fallback: false, // use when window.sessionStorage is not supported
+
   set: () => {
-    window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
+    try {
+      window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
+    } catch (e) {
+      RQ.SessionRecorder.explicitRecordingFlag.fallback = true;
+    }
   },
   get: () => {
-    return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    try {
+      return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    } catch (e) {
+      return RQ.SessionRecorder.explicitRecordingFlag.fallback;
+    }
   },
   clear: () => {
-    window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    try {
+      window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
+    } catch (e) {
+      RQ.SessionRecorder.explicitRecordingFlag.fallback = false;
+    }
   },
+};
+
+RQ.SessionRecorder.showToast = () => {
+  const rqToast = document.createElement("rq-toast");
+  rqToast.classList.add("rq-element");
+  rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
+  rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  rqToast.innerHTML = `
+  <div slot="content">
+    You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
+  </div>
+  `;
+
+  document.documentElement.appendChild(rqToast);
 };

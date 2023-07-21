@@ -20,7 +20,7 @@ import isEmpty from "is-empty";
 import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast";
-import "../../mocksV2/MockEditor/Editor/index.css";
+import "../../mocksV2/MockEditorIndex/Editor/index.css";
 
 export const RESOURCE_TYPE_LIST = {
   HTML: "HTML",
@@ -377,7 +377,7 @@ const FileEditor = (props) => {
     if (contentType.startsWith("image")) {
       return (
         <Row>
-          <Col className="text-align-center" span={24} align="center">
+          <Col className="text-center" span={24} align="center">
             {<ImageViewer src={props.fileDetails.webContentLink} />}
           </Col>
         </Row>

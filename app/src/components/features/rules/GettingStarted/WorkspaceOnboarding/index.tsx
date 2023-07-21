@@ -6,6 +6,7 @@ import {
   getWorkspaceOnboardingStep,
   getAppMode,
   getWorkspaceOnboardingTeamDetails,
+  getUserPersonaSurveyDetails,
 } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -25,7 +26,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { actions } from "store";
-import { Invite } from "types";
+import { Invite, InviteUsage } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
@@ -46,6 +47,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
@@ -63,6 +65,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     []
   );
 
+  const isPendingEmailInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
+    pendingInvites,
+  ]);
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -77,38 +82,42 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   );
 
   const handleOnSurveyCompletion = useCallback(async () => {
-    if (pendingInvites !== null && pendingInvites.length === 0) {
-      isEmailVerified(user?.details?.profile?.uid).then((result) => {
-        if (result) {
-          if (!isCompanyEmail(user?.details?.profile?.email)) {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-            return;
-          }
+    if (isPendingEmailInvite) {
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      return;
+    }
 
-          const newTeamName = `${capitalize(userEmailDomain?.split(".")?.[0]) ?? "my-team"}`;
-          createTeam({
-            teamName: newTeamName,
-            generatePublicLink: true,
-          }).then((response: any) => {
-            setDefaultTeamData({ name: newTeamName, ...response?.data });
-            dispatch(
-              actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
-            );
-            trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
-          });
+    const verifiedUser = await isEmailVerified(user?.details?.profile?.uid);
+    if (verifiedUser && pendingInvites != null) {
+      if (!isCompanyEmail(user?.details?.profile?.email)) {
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+        return;
+      }
 
+      if (pendingInvites?.length === 0) {
+        const newTeamName = `${capitalize(userEmailDomain?.split(".")?.[0]) ?? "my-team"}`;
+        createTeam({
+          teamName: newTeamName,
+          generatePublicLink: true,
+        }).then((response: any) => {
+          setDefaultTeamData({ name: newTeamName, ...response?.data });
+          dispatch(
+            actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
+          );
+          trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
           }, 50);
-        } else {
-          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-        }
-      });
-    } else if (pendingInvites?.length > 0) {
-      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+        });
+      } else {
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+      }
+    } else {
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     }
   }, [
     pendingInvites,
+    isPendingEmailInvite,
     user?.details?.profile?.uid,
     user?.details?.profile?.email,
     userEmailDomain,
@@ -165,6 +174,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     };
   }, [toggle]);
 
+  useEffect(() => {
+    if (userPersona?.page > 2) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+  }, [dispatch, userPersona?.page]);
+
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
       case OnboardingSteps.AUTH:
@@ -203,9 +216,23 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       case OnboardingSteps.PERSONA_SURVEY:
         return <PersonaSurvey callback={handleOnSurveyCompletion} isSurveyModal={false} />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
-        return <WorkspaceOnboardingStep defaultTeamData={defaultTeamData} pendingInvites={pendingInvites} />;
+        return (
+          <WorkspaceOnboardingStep
+            defaultTeamData={defaultTeamData}
+            pendingInvites={pendingInvites}
+            isPendingInvite={isPendingEmailInvite}
+          />
+        );
     }
-  }, [step, handleOnSurveyCompletion, defaultTeamData, pendingInvites, handleAuthCompletion, dispatch]);
+  }, [
+    step,
+    handleOnSurveyCompletion,
+    defaultTeamData,
+    pendingInvites,
+    isPendingEmailInvite,
+    handleAuthCompletion,
+    dispatch,
+  ]);
 
   return (
     <Modal

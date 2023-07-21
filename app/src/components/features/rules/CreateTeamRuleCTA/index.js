@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Col, Button, Space } from "antd";
 //Sub Components
@@ -12,10 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import lottie from "lottie-web/build/player/lottie_light";
-import teamSolvingPuzzle from "assets/lottie/team-solving-puzzle.json";
 import APP_CONSTANTS from "config/constants";
-import Logger from "lib/logger";
+import TeamSolvingPuzzleAnimation from "components/misc/LottieAnimation/TeamSolvingPuzzleAnimation";
 
 const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
@@ -34,22 +32,6 @@ const CreateTeamRuleCTA = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
 
-  useEffect(() => {
-    try {
-      lottie.destroy("CreateTeamRuleCTA-teamSolvingPuzzle");
-    } catch (_e) {
-      Logger.log("Error Loading teamSolvingPuzzle");
-    }
-    lottie.loadAnimation({
-      name: "CreateTeamRuleCTA-teamSolvingPuzzle",
-      container: document.querySelector("#CreateTeamRuleCTA-teamSolvingPuzzle"),
-      animationData: teamSolvingPuzzle,
-      renderer: "svg", // "canvas", "html"
-      loop: true, // boolean
-      autoplay: true, // boolean
-    });
-  }, []);
-
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border">
@@ -57,7 +39,7 @@ const CreateTeamRuleCTA = () => {
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
               <center>
-                <div id="CreateTeamRuleCTA-teamSolvingPuzzle" style={{ height: 150, width: 150 }} />
+                <TeamSolvingPuzzleAnimation animationName="creating-team-rules" style={{ height: 150, width: 150 }} />
               </center>
               <br />
               <br />

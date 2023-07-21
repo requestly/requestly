@@ -7,6 +7,7 @@ import copy from "rollup-plugin-copy";
 import postcss from "rollup-plugin-postcss";
 import svgr from "@svgr/rollup";
 import { terser } from "rollup-plugin-terser";
+import svg from "rollup-plugin-svg";
 
 const OUTPUT_DIR = "dist";
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
@@ -104,5 +105,13 @@ export default [
       format: "iife",
     },
     plugins: [...commonPlugins, nodeResolve()],
+  },
+  {
+    input: "src/custom-elements/index.ts",
+    output: {
+      file: `${OUTPUT_DIR}/lib/customElements.js`,
+      format: "iife",
+    },
+    plugins: [...commonPlugins, postcss({ inject: false }), svg()],
   },
 ];

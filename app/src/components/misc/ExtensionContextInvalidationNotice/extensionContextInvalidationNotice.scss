@@ -1,0 +1,13 @@
+#extension-context-invalidation-notice {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  height: 48px;
+  width: 100vw;
+  background: #3700b3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}

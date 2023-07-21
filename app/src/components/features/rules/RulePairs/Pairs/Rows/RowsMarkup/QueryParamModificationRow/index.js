@@ -1,18 +1,13 @@
 import React, { useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Dropdown, Menu } from "antd";
 import { ImCross } from "react-icons/im";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
+import { actions } from "store";
 
-const QueryParamModificationRow = ({
-  rowIndex,
-  pairIndex,
-  helperFunctions,
-  modification,
-  modificationIndex,
-  isInputDisabled,
-}) => {
-  const { modifyPairAtGivenPath, deleteModification } = helperFunctions;
+const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modificationIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
 
   const modificationTypeMenuItems = useMemo(
     () => [
@@ -32,13 +27,21 @@ const QueryParamModificationRow = ({
     []
   );
 
-  const handleModificationTypeClick = (event, type) =>
-    modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].type`, type);
+  const handleModificationTypeClick = (type) => {
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`modifications[${modificationIndex}].type`]: type,
+        },
+      })
+    );
+  };
 
   const modificationTypeMenu = (
     <Menu>
       {modificationTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => handleModificationTypeClick(e, type)}>
+        <Menu.Item key={index} onClick={(e) => handleModificationTypeClick(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -71,7 +74,17 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Name"
           type="text"
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].param`)}
+          onChange={(event) => {
+            event?.preventDefault?.();
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                pairIndex,
+                updates: {
+                  [`modifications[${modificationIndex}].param`]: event?.target?.value,
+                },
+              })
+            );
+          }}
           value={modification.param}
           disabled={isInputDisabled ? true : modification.type === "Remove All" ? true : false}
           data-selectionid="query-param-name"
@@ -83,7 +96,17 @@ const QueryParamModificationRow = ({
           className="display-inline-block has-dark-text"
           placeholder="Param Value"
           type="text"
-          onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `modifications[${modificationIndex}].value`)}
+          onChange={(event) => {
+            event?.preventDefault?.();
+            dispatch(
+              actions.updateRulePairAtGivenPath({
+                pairIndex,
+                updates: {
+                  [`modifications[${modificationIndex}].value`]: event?.target?.value,
+                },
+              })
+            );
+          }}
           value={modification.value}
           disabled={isInputDisabled ? true : modification.type === "Add" ? false : true}
           data-selectionid="query-param-value"
@@ -93,7 +116,16 @@ const QueryParamModificationRow = ({
         <Tooltip title="Remove">
           <ImCross
             id="delete-pair"
-            onClick={(e) => deleteModification(e, pairIndex, modificationIndex)}
+            onClick={(event) => {
+              event?.preventDefault?.();
+              dispatch(
+                actions.removeValueInRulePairByIndex({
+                  pairIndex,
+                  arrayPath: "modifications",
+                  index: modificationIndex,
+                })
+              );
+            }}
             className="text-gray cursor-pointer"
           />
         </Tooltip>
