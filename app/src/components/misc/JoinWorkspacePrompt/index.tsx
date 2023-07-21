@@ -57,7 +57,6 @@ export const JoinWorkspacePrompt: React.FC = () => {
           modalName: "createWorkspaceModal",
           newValue: true,
           newProps: {
-            defaultWorkspaceName: `${userEmailDomain} <team name>`,
             callback: () => dispatch(actions.updateJoinWorkspacePromptVisible(false)),
             source: "workspace_organization_card",
           },
