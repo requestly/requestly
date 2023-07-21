@@ -78,8 +78,8 @@ import LINKS from "config/constants/sub/links";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
-import { FiCommand } from "react-icons/fi";
 import { isDesktopMode, isMacOs } from "utils/Misc";
+import AuthPopoverButton from "./AuthPopoverButtons";
 
 //Lodash
 const set = require("lodash/set");
@@ -1350,20 +1350,10 @@ const RulesTable = ({
                 ];
 
                 return buttonData.map(
-                  ({
-                    icon,
-                    shape,
-                    type = null,
-                    buttonText,
-                    authSource,
-                    isTooltipShown,
-                    onClickHandler,
-                    isDropdown = false,
-                    hasPopconfirm = false,
-                    tourId = null,
-                    trackClickEvent = () => {},
-                    overlay,
-                  }) => (
+                  (
+                    { icon, type = null, buttonText, isTooltipShown, onClickHandler, isDropdown = false, overlay },
+                    index
+                  ) => (
                     <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
@@ -1377,25 +1367,11 @@ const RulesTable = ({
                             {buttonText}
                           </Dropdown.Button>
                         ) : (
-                          <AuthConfirmationPopover
-                            title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-                            disabled={!hasPopconfirm}
-                            callback={onClickHandler}
-                            source={authSource}
-                          >
-                            <Button
-                              type={type || "default"}
-                              shape={isScreenSmall ? shape : null}
-                              onClick={() => {
-                                trackClickEvent();
-                                hasPopconfirm ? user?.details?.isLoggedIn && onClickHandler() : onClickHandler();
-                              }}
-                              icon={icon}
-                              data-tour-id={tourId}
-                            >
-                              {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
-                            </Button>
-                          </AuthConfirmationPopover>
+                          <AuthPopoverButton
+                            isScreenSmall={isScreenSmall}
+                            isLoggedIn={user?.details?.isLoggedIn}
+                            {...buttonData[index]}
+                          />
                         )}
                       </>
                     </Tooltip>
