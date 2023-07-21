@@ -113,3 +113,7 @@ export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
 export const updateLastSeenInvites = (prevState, action) => {
   prevState.misc.persist.lastSeenInvites = action.payload;
 };
+
+export const updateJoinWorkspacePromptClosed = (prevState) => {
+  prevState.misc.persist.isJoinWorkspacePromptClosed = true;
+};

@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "" }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -63,6 +63,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "" }
             isNewTeam: true,
           },
         });
+        callback?.();
         toggleModal();
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
       })

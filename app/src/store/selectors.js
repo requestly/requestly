@@ -270,3 +270,7 @@ export const getWorkspaceOnboardingTeamDetails = (state) => {
 export const getLastSeenInvites = (state) => {
   return getGlobalState(state).misc.persist?.lastSeenInvites;
 };
+
+export const getIsJoinWorkspacePromptClosed = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspacePromptClosed;
+};

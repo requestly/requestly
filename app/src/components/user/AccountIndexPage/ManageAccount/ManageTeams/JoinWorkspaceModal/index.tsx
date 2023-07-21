@@ -21,15 +21,17 @@ interface JoinWorkspaceModalProps {
   allowCreateNewWorkspace?: boolean;
   handleModalClose: () => void;
   handleCreateNewWorkspaceClick?: (e: React.MouseEvent) => void;
+  callback?: () => void;
 }
 
 interface InviteRowProps {
   index: number;
   team: TeamInviteMetadata;
   handleModalClose: () => void;
+  callback: () => void;
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ index, team, handleModalClose }) => {
+const InviteRow: React.FC<InviteRowProps> = ({ index, team, handleModalClose, callback }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -63,6 +65,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ index, team, handleModalClose }) 
         }
         setIsJoining(false);
         handleModalClose();
+        callback?.();
       })
       .catch((err) => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
@@ -101,6 +104,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
   allowCreateNewWorkspace = true,
   handleModalClose,
   handleCreateNewWorkspaceClick,
+  callback = () => {},
 }) => {
   const dispatch = useDispatch();
   const sortedInvites = useMemo(() => teamInvites.sort((a, b) => b.teamAccessCount - a.teamAccessCount), [teamInvites]);
@@ -122,7 +126,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
         {sortedInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {sortedInvites.map((team: TeamInviteMetadata, index) => {
-              return <InviteRow team={team} index={index} handleModalClose={handleModalClose} />;
+              return <InviteRow team={team} index={index} handleModalClose={handleModalClose} callback={callback} />;
             })}
           </ul>
         ) : (
