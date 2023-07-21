@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
 import { Modal, RadioChangeEvent } from "antd";
-import { DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
 import SessionDetails from "./SessionDetails";
@@ -11,6 +11,7 @@ import { RQSession } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import {
   compressEvents,
   downloadSession,
@@ -301,7 +302,7 @@ const DraftSessionViewer: React.FC = () => {
             className="text-bold session-viewer-save-action-btn"
             onClick={() => setIsSavePopupVisible((prev) => !prev)}
           >
-            Save Recording <DownOutlined />
+            Save Recording <DownArrow />
           </RQButton>
 
           {isSavePopupVisible && (

@@ -1,6 +1,13 @@
 .rq-split-buttons {
   .split-button {
     vertical-align: middle;
+
+    .down-arrow-icon {
+      width: 10px;
+      height: 10px;
+      margin-top: 1px;
+      margin-left: 5px;
+    }
   }
 
   .left-button {

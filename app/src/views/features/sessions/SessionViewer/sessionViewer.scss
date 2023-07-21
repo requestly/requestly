@@ -144,26 +144,18 @@
         height: 32px;
       }
 
-      .download-recording-btn.ant-btn {
-        .anticon svg {
-          width: 10px;
-          height: 10px;
-        }
-      }
-
       .session-viewer-save-action-btn.ant-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-
-        .anticon {
-          margin-top: 5px;
-        }
       }
 
-      .session-viewer-save-action-btn svg {
-        width: 12px;
-        height: 12px;
+      .download-recording-btn.ant-btn svg,
+      .session-viewer-save-action-btn.ant-btn svg {
+        width: 10px;
+        height: 10px;
+        margin-top: 1px;
+        margin-left: 5px;
       }
     }
   }
@@ -452,7 +444,7 @@
         padding: 16px 11px;
 
         svg {
-          font-size: 16px;
+          font-size: 15px;
         }
       }
     }
