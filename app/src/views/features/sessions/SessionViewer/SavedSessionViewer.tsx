@@ -45,6 +45,7 @@ import { defaultDebugInfo } from "./constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DebugInfo, SessionSaveMode } from "./types";
 import {
+  trackDraftSessionSaved,
   trackSavedSessionViewedFromApp,
   trackSavedSessionViewedFromLink,
 } from "modules/analytics/events/features/sessionRecording";
@@ -205,6 +206,11 @@ const SavedSessionViewer: React.FC = () => {
           toast.success("Recording downloaded successfully.");
           setIsSaving(false);
           setIsDownloadPopupVisible(false);
+          trackDraftSessionSaved(
+            sessionRecording.sessionAttributes?.duration,
+            sessionRecording.options,
+            SessionSaveMode.LOCAL
+          );
         });
     },
     [sessionEvents, sessionRecording]
