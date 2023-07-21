@@ -13,7 +13,7 @@ import { getUniqueTeamsFromInvites } from "utils/teams";
 import { isEmailVerified } from "utils/AuthUtils";
 import "./index.css";
 
-export const WorkspaceNudge: React.FC = () => {
+export const JoinWorkspacePrompt: React.FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [hasActiveWorkspace, setHasActiveWorkspace] = useState<boolean>(false);
@@ -48,7 +48,10 @@ export const WorkspaceNudge: React.FC = () => {
         actions.toggleActiveModal({
           modalName: "createWorkspaceModal",
           newValue: true,
-          newProps: { defaultWorkspaceName: `${userEmailDomain} <team name>` },
+          newProps: {
+            defaultWorkspaceName: `${userEmailDomain} <team name>`,
+            callback: () => dispatch(actions.updateJoinWorkspacePromptClosed()),
+          },
         })
       );
     }
@@ -57,7 +60,10 @@ export const WorkspaceNudge: React.FC = () => {
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
       if (result && isCompanyEmail(user?.details?.profile?.email)) setIsBusinessDomainUser(true);
-      else setIsBusinessDomainUser(false);
+      else {
+        setIsBusinessDomainUser(false);
+        dispatch(actions.updateJoinWorkspacePromptClosed());
+      }
     });
   }, [user?.details?.profile?.uid, user?.details?.profile?.email]);
 
@@ -101,7 +107,13 @@ export const WorkspaceNudge: React.FC = () => {
         <>
           <div className="nudge-container">
             <Row justify="end">
-              <RQButton type="default" className="nudge-close-icon" iconOnly icon={<CloseOutlined />} />
+              <RQButton
+                type="default"
+                className="nudge-close-icon"
+                iconOnly
+                icon={<CloseOutlined />}
+                onClick={() => dispatch(actions.updateJoinWorkspacePromptClosed())}
+              />
             </Row>
             <div className="avatar-row-container">
               <Avatar.Group maxCount={3}>
@@ -133,6 +145,7 @@ export const WorkspaceNudge: React.FC = () => {
               teamInvites={teamInvites}
               handleModalClose={() => setIsJoinWorkspaceModalVisible(false)}
               allowCreateNewWorkspace={false}
+              callback={() => dispatch(actions.updateJoinWorkspacePromptClosed())}
             />
           )}
         </>
