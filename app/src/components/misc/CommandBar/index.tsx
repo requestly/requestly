@@ -34,13 +34,15 @@ export const CommandBar = () => {
 
   useEffect(() => {
     const down = (e: any) => {
-      if (e.key === "k" && e.metaKey) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
         setOpen((open) => !open);
       }
     };
     const exit = (e: any) => {
       if (e.key === "Escape") {
         setOpen(false);
+        trackCommandPaletteClosed();
       }
     };
 
@@ -54,21 +56,9 @@ export const CommandBar = () => {
   }, []);
 
   useEffect(() => {
-    const exit = (e: any) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", exit);
-    return () => document.removeEventListener("keydown", exit);
-  }, []);
-
-  useEffect(() => {
     if (!open) {
       setPagesStack([Page.HOME]);
       setSearch("");
-      trackCommandPaletteClosed();
     } else {
       trackCommandPaletteOpened(getUserOS());
     }
@@ -120,6 +110,7 @@ export const CommandBar = () => {
             if (item?.action) {
               item.action({ navigate, dispatch, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
+              trackCommandPaletteClosed();
               setOpen(false);
             }
 
@@ -154,7 +145,13 @@ export const CommandBar = () => {
   return (
     <>
       {open && (
-        <div className="cmdk-overlay" onClick={() => setOpen(false)}>
+        <div
+          className="cmdk-overlay"
+          onClick={() => {
+            setOpen(false);
+            trackCommandPaletteClosed();
+          }}
+        >
           <Command
             onClick={(e) => e.stopPropagation()}
             label="Global Command Menu"
