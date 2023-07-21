@@ -44,7 +44,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
 
   const getOrganizationMembers = useMemo(() => httpsCallable(getFunctions(), "getOrganizationMembers"), []);
 
-  // const createOrgMap = useMemo(() => httpsCallable(getFunctions(), "createOrganizationMap"), []);
+  const createOrganizationMap = useMemo(() => httpsCallable(getFunctions(), "generateOrganizationMap"), []);
 
   const handleNudgeCTAClick = () => {
     if (hasActiveWorkspace) {
@@ -75,7 +75,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
         dispatch(actions.updateJoinWorkspacePromptClosed());
       }
     });
-  }, [user?.details?.profile?.uid, user?.details?.profile?.email]);
+  }, [user?.details?.profile?.uid, user?.details?.profile?.email, dispatch]);
 
   useEffect(() => {
     if (isBusinessDomainUser) {
@@ -110,7 +110,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
           setHasActiveWorkspace(false);
         });
     }
-  }, [dispatch, getPendingInvites, user?.loggedIn, isBusinessDomainUser]);
+  }, [dispatch, getPendingInvites, user?.loggedIn, isBusinessDomainUser, userEmailDomain]);
 
   return (
     <>
@@ -154,7 +154,10 @@ export const JoinWorkspacePrompt: React.FC = () => {
             <RQButton type="primary" className="mt-8 text-bold" onClick={handleNudgeCTAClick}>
               {hasActiveWorkspace ? "Join your teammates" : "Start collaborating"}
             </RQButton>
-            {/* <RQButton onClick={() => createOrgMap()}>TEST</RQButton> */}
+            {/* This Button triggers a function to create an organization node in firestore to maintain all business domain users accorrding to their email domain
+              This is a one time invokation function
+            */}
+            <RQButton onClick={() => createOrganizationMap()}>Create Org node(TEST)</RQButton>
           </div>
           {isJoinWorkspaceModalVisible && (
             <JoinWorkspaceModal

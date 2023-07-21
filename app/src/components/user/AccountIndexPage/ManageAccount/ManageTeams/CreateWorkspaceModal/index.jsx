@@ -78,7 +78,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", 
 
   useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed(source);
-  }, [isOpen]);
+  }, [isOpen, source]);
 
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
