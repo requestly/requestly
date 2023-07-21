@@ -6,7 +6,6 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { Typography, Input } from "antd";
 import { BiPencil } from "react-icons/bi";
 import { updateSessionName } from "../api";
-import { toast } from "utils/Toast";
 import { trackDraftSessionNamed } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
@@ -34,7 +33,6 @@ export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({ isReadOn
     } else {
       if (!sessionTitle.length) setSessionTitle(sessionRecordingName);
       else dispatch(sessionRecordingActions.setName(sessionTitle));
-      toast.success("Session name updated successfully");
       trackDraftSessionNamed();
     }
   };
