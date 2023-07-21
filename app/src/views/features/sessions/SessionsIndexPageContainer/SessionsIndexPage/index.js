@@ -165,7 +165,23 @@ const SessionsIndexPage = () => {
     }
   }, [filteredRecordings?.length, isWorkspaceMode]);
 
-  const toggleOpenDownloadedSessionModal = useCallback(() => setIsOpen((prev) => !prev), []);
+  const toggleDownloadSessionModal = useCallback(() => {
+    if (!user?.loggedIn) {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            callback: () => navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE),
+            eventSource: AUTH.SOURCE.SESSION_RECORDING,
+          },
+        })
+      );
+      return;
+    }
+
+    setIsOpen((prev) => !prev);
+  }, [user?.loggedIn, navigate, dispatch]);
 
   const onSessionRecordingFileDrop = useCallback(
     async (acceptedFiles) => {
@@ -173,8 +189,8 @@ const SessionsIndexPage = () => {
       const file = acceptedFiles[0];
       const reader = new FileReader();
 
-      reader.onabort = () => toggleOpenDownloadedSessionModal();
-      reader.onerror = () => toggleOpenDownloadedSessionModal();
+      reader.onabort = () => toggleDownloadSessionModal();
+      reader.onerror = () => toggleDownloadSessionModal();
       reader.onload = () => {
         try {
           setProcessingDataToImport(true);
@@ -196,7 +212,7 @@ const SessionsIndexPage = () => {
           const recordedSessionEvents = decompressEvents(parsedData.data.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
 
-          toggleOpenDownloadedSessionModal();
+          toggleDownloadSessionModal();
           trackSessionRecordingUpload("success");
           navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
         } catch (error) {
@@ -208,25 +224,25 @@ const SessionsIndexPage = () => {
       };
       reader.readAsText(file);
     },
-    [navigate, toggleOpenDownloadedSessionModal, dispatch]
+    [navigate, toggleDownloadSessionModal, dispatch]
   );
 
   const openDownloadedSessionModalBtn = useMemo(
     () => (
-      <RQButton type="default" onClick={toggleOpenDownloadedSessionModal}>
+      <RQButton type="default" onClick={toggleDownloadSessionModal}>
         Open downloaded session
       </RQButton>
     ),
-    [toggleOpenDownloadedSessionModal]
+    [toggleDownloadSessionModal]
   );
 
   if (isTableLoading) {
     return <PageLoader message="Loading sessions..." />;
   }
 
-  return user?.loggedIn && filteredRecordings?.length ? (
+  return (
     <>
-      <RQModal open={isOpen} onCancel={toggleOpenDownloadedSessionModal}>
+      <RQModal open={isOpen} onCancel={toggleDownloadSessionModal}>
         <div className="rq-modal-content">
           <div className="header mb-16 text-center">Import session</div>
 
@@ -239,68 +255,75 @@ const SessionsIndexPage = () => {
         </div>
       </RQModal>
 
-      <ProtectedRoute
-        component={() => (
-          <>
-            <RecordingsList
-              isTableLoading={isTableLoading}
-              filteredRecordings={filteredRecordings}
-              setSharingRecordId={setSharingRecordId}
-              setSelectedRowVisibility={setSelectedRowVisibility}
-              setIsShareModalVisible={setIsShareModalVisible}
-              fetchRecordings={fetchRecordings}
-              configureBtn={configureBtn}
-              openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
-              callbackOnDeleteSuccess={() => {
-                setSessionRecordings([]);
-                setReachedEnd(false);
-                fetchRecordings(null);
-              }}
-              _renderTableFooter={filteredRecordings.length > pageSize}
-              TableFooter={() => (
-                <>
-                  {
-                    <center>
-                      {reachedEnd ? (
-                        <span>- End of all recordings -</span>
-                      ) : (
-                        <Button
-                          onClick={(e) => {
-                            fetchRecordings(qs.docs[qs.docs.length - 1]);
-                          }}
-                          type="link"
-                        >
-                          View Past Recordings
-                        </Button>
-                      )}
-                    </center>
-                  }
-                </>
-              )}
-            />
-          </>
-        )}
-      />
-      {isShareModalVisible ? (
-        <ShareRecordingModal
-          isVisible={isShareModalVisible}
-          setVisible={setIsShareModalVisible}
-          recordingId={sharingRecordId}
-          currentVisibility={selectedRowVisibility}
-          onVisibilityChange={(newVisibility) => {
-            // Update local table
-            const foundIndex = sessionRecordings.findIndex((recording) => recording.id === sharingRecordId);
+      {user?.loggedIn && filteredRecordings?.length ? (
+        <>
+          <ProtectedRoute
+            component={() => (
+              <>
+                <RecordingsList
+                  isTableLoading={isTableLoading}
+                  filteredRecordings={filteredRecordings}
+                  setSharingRecordId={setSharingRecordId}
+                  setSelectedRowVisibility={setSelectedRowVisibility}
+                  setIsShareModalVisible={setIsShareModalVisible}
+                  fetchRecordings={fetchRecordings}
+                  configureBtn={configureBtn}
+                  openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
+                  callbackOnDeleteSuccess={() => {
+                    setSessionRecordings([]);
+                    setReachedEnd(false);
+                    fetchRecordings(null);
+                  }}
+                  _renderTableFooter={filteredRecordings.length > pageSize}
+                  TableFooter={() => (
+                    <>
+                      {
+                        <center>
+                          {reachedEnd ? (
+                            <span>- End of all recordings -</span>
+                          ) : (
+                            <Button
+                              onClick={(e) => {
+                                fetchRecordings(qs.docs[qs.docs.length - 1]);
+                              }}
+                              type="link"
+                            >
+                              View Past Recordings
+                            </Button>
+                          )}
+                        </center>
+                      }
+                    </>
+                  )}
+                />
+              </>
+            )}
+          />
+          {isShareModalVisible ? (
+            <ShareRecordingModal
+              isVisible={isShareModalVisible}
+              setVisible={setIsShareModalVisible}
+              recordingId={sharingRecordId}
+              currentVisibility={selectedRowVisibility}
+              onVisibilityChange={(newVisibility) => {
+                // Update local table
+                const foundIndex = sessionRecordings.findIndex((recording) => recording.id === sharingRecordId);
 
-            const recordings = _.cloneDeep(sessionRecordings);
-            recordings[foundIndex].visibility = newVisibility;
-            setSelectedRowVisibility(newVisibility);
-            setSessionRecordings(recordings);
-          }}
+                const recordings = _.cloneDeep(sessionRecordings);
+                recordings[foundIndex].visibility = newVisibility;
+                setSelectedRowVisibility(newVisibility);
+                setSessionRecordings(recordings);
+              }}
+            />
+          ) : null}
+        </>
+      ) : (
+        <OnboardingView
+          redirectToSettingsPage={redirectToSettingsPage}
+          openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
         />
-      ) : null}
+      )}
     </>
-  ) : (
-    <OnboardingView redirectToSettingsPage={redirectToSettingsPage} />
   );
 };
 
