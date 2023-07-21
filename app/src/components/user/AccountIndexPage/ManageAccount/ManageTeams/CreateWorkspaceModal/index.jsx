@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Col, Form, Input, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { redirectToTeam } from "utils/RedirectionUtils";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isEmailVerified } from "utils/AuthUtils";
+import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
@@ -15,19 +18,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", callback, source }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
 
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-
   const [isLoading, setIsLoading] = useState(false);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
-    workspaceName: defaultWorkspaceName,
+    workspaceName: "",
     description: "",
   });
+
+  const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0], [
+    user?.details?.profile?.email,
+  ]);
 
   const handleFormValuesChange = (_, data) => {
     setCreateWorkspaceFormData(data);
@@ -82,11 +89,22 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", 
     if (isOpen) trackAddWorkspaceNameModalViewed(source);
   }, [isOpen, source]);
 
+  useEffect(() => {
+    isEmailVerified(user?.details?.profile?.uid).then((result) => {
+      if (result && isCompanyEmail(user?.details?.profile?.email)) {
+        form.setFieldValue("workspaceName", `${userEmailDomain} <team name>`);
+        setCreateWorkspaceFormData((prev) => {
+          return { ...prev, workspaceName: `${userEmailDomain} <team name>` };
+        });
+      }
+    });
+  }, [user?.details?.profile?.uid, user?.details?.profile?.email, form, userEmailDomain]);
+
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <Form
+        form={form}
         layout="vertical"
-        initialValues={{ remember: true }}
         onFinish={handleFinishClick}
         onFinishFailed={handleFinishFailed}
         onValuesChange={handleFormValuesChange}
@@ -105,7 +123,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", 
             <Form.Item
               label="Workspace name"
               name="workspaceName"
-              initialValue={defaultWorkspaceName}
               rules={[
                 {
                   required: true,
