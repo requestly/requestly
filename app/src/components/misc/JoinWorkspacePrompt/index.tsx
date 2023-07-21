@@ -11,6 +11,12 @@ import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/M
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getUniqueTeamsFromInvites } from "utils/teams";
 import { isEmailVerified } from "utils/AuthUtils";
+import {
+  trackWorkspaceOrganizationCardViewed,
+  trackWorkspaceOrganizationCardCancelled,
+  trackWorkspaceOrganizationCardClicked,
+  trackWorkspaceJoiningModalOpened,
+} from "modules/analytics/events/features/teams";
 import "./index.css";
 
 export const JoinWorkspacePrompt: React.FC = () => {
@@ -43,6 +49,8 @@ export const JoinWorkspacePrompt: React.FC = () => {
   const handleNudgeCTAClick = () => {
     if (hasActiveWorkspace) {
       setIsJoinWorkspaceModalVisible(true);
+      trackWorkspaceJoiningModalOpened(teamInvites, "workspace_organization_card");
+      trackWorkspaceOrganizationCardClicked("join_teammates");
     } else {
       dispatch(
         actions.toggleActiveModal({
@@ -51,9 +59,11 @@ export const JoinWorkspacePrompt: React.FC = () => {
           newProps: {
             defaultWorkspaceName: `${userEmailDomain} <team name>`,
             callback: () => dispatch(actions.updateJoinWorkspacePromptClosed()),
+            source: "workspace_organization_card",
           },
         })
       );
+      trackWorkspaceOrganizationCardClicked("create_team");
     }
   };
 
@@ -92,7 +102,8 @@ export const JoinWorkspacePrompt: React.FC = () => {
               setHasActiveWorkspace(true);
               const uniqueInvites = getUniqueTeamsFromInvites(res.data.pendingInvites);
               setTeamInvites(uniqueInvites);
-            }
+              trackWorkspaceOrganizationCardViewed(userEmailDomain, "join_teammates");
+            } else trackWorkspaceOrganizationCardViewed(userEmailDomain, "create_team");
           }
         })
         .catch((e) => {
@@ -112,7 +123,13 @@ export const JoinWorkspacePrompt: React.FC = () => {
                 className="nudge-close-icon"
                 iconOnly
                 icon={<CloseOutlined />}
-                onClick={() => dispatch(actions.updateJoinWorkspacePromptClosed())}
+                onClick={() => {
+                  dispatch(actions.updateJoinWorkspacePromptClosed());
+                  trackWorkspaceOrganizationCardCancelled(
+                    userEmailDomain,
+                    hasActiveWorkspace ? "join_teammates" : "create_team"
+                  );
+                }}
               />
             </Row>
             <div className="avatar-row-container">
