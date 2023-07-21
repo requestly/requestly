@@ -29,6 +29,7 @@ import {
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getLastSeenInvites,
   getUserAuthDetails,
+  getIsJoinWorkspacePromptVisible,
 } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
@@ -66,6 +67,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites, teamInvites }) => {
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isJoinWorkspacePromptVisible = useSelector(getIsJoinWorkspacePromptVisible);
 
   const activeWorkspaceName = user.loggedIn
     ? isWorkspaceMode
@@ -110,7 +112,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites, teamInvites }) => {
         >
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-            {hasNewInvites ? <Badge dot={true} /> : null}
+            {hasNewInvites && !isJoinWorkspacePromptVisible ? <Badge dot={true} /> : null}
             <DownOutlined className="active-workspace-name-down-icon" />
           </span>
         </Tooltip>

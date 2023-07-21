@@ -271,6 +271,6 @@ export const getLastSeenInvites = (state) => {
   return getGlobalState(state).misc.persist?.lastSeenInvites;
 };
 
-export const getIsJoinWorkspacePromptClosed = (state) => {
-  return getGlobalState(state).misc.persist?.isJoinWorkspacePromptClosed;
+export const getIsJoinWorkspacePromptVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspacePromptVisible;
 };

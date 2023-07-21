@@ -191,7 +191,7 @@ const INITIAL_STATE = {
       },
 
       hasConnectedApp: false,
-      isJoinWorkspacePromptClosed: false,
+      isJoinWorkspacePromptVisible: true,
       lastSeenInvites: [],
     },
     nonPersist: {
