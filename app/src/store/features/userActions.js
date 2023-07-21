@@ -114,6 +114,6 @@ export const updateLastSeenInvites = (prevState, action) => {
   prevState.misc.persist.lastSeenInvites = action.payload;
 };
 
-export const updateJoinWorkspacePromptVisible = (prevState) => {
-  prevState.misc.persist.isJoinWorkspacePromptVisible = false;
+export const updateJoinWorkspacePromptVisible = (prevState, action) => {
+  prevState.misc.persist.isJoinWorkspacePromptVisible = action.payload;
 };

@@ -58,7 +58,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
           newValue: true,
           newProps: {
             defaultWorkspaceName: `${userEmailDomain} <team name>`,
-            callback: () => dispatch(actions.updateJoinWorkspacePromptVisible()),
+            callback: () => dispatch(actions.updateJoinWorkspacePromptVisible(false)),
             source: "workspace_organization_card",
           },
         })
@@ -72,7 +72,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
       if (result && isCompanyEmail(user?.details?.profile?.email)) setIsBusinessDomainUser(true);
       else {
         setIsBusinessDomainUser(false);
-        dispatch(actions.updateJoinWorkspacePromptVisible());
+        dispatch(actions.updateJoinWorkspacePromptVisible(false));
       }
     });
   }, [user?.details?.profile?.uid, user?.details?.profile?.email, dispatch]);
@@ -124,7 +124,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
                 iconOnly
                 icon={<CloseOutlined />}
                 onClick={() => {
-                  dispatch(actions.updateJoinWorkspacePromptVisible());
+                  dispatch(actions.updateJoinWorkspacePromptVisible(false));
                   trackWorkspaceOrganizationCardCancelled(
                     userEmailDomain,
                     hasActiveWorkspace ? "join_teammates" : "create_team"
@@ -165,7 +165,7 @@ export const JoinWorkspacePrompt: React.FC = () => {
               teamInvites={teamInvites}
               handleModalClose={() => setIsJoinWorkspaceModalVisible(false)}
               allowCreateNewWorkspace={false}
-              callback={() => dispatch(actions.updateJoinWorkspacePromptVisible())}
+              callback={() => dispatch(actions.updateJoinWorkspacePromptVisible(false))}
             />
           )}
         </>

@@ -47,6 +47,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ index, team, handleModalClose, ca
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully joined workspace");
+          dispatch(actions.updateJoinWorkspacePromptVisible(false));
           if (res?.data?.data?.invite.type === "teams") {
             switchWorkspace(
               {

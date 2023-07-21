@@ -9,6 +9,7 @@ import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/an
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { actions } from "store";
 import "./CreateWorkspaceModal.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
@@ -43,6 +44,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, defaultWorkspaceName = "", 
       .then((response) => {
         trackNewWorkspaceCreated();
         toast.info("Workspace Created");
+        dispatch(actions.updateJoinWorkspacePromptVisible(false));
 
         const teamId = response.data.teamId;
         switchWorkspace(
