@@ -19,6 +19,13 @@ var Logger = {
   },
 };
 
+let urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has("debug")) {
+  Logger.enabled = true;
+}
+
+window.rq_debug = () => (Logger.enabled = true);
+
 if (isReactApp) {
   module.exports = Logger;
 } else {

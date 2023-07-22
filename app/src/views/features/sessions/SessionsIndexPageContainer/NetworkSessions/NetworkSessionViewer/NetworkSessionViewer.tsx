@@ -20,6 +20,8 @@ import {
   trackDeleteNetworkSessionClicked,
   trackDownloadNetworkSessionClicked,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 
 const NetworkSessionViewer: React.FC<{}> = () => {
   const { id } = useParams();
@@ -72,6 +74,7 @@ const NetworkSessionViewer: React.FC<{}> = () => {
                 onClick={() => {
                   downloadHar(createLogsHar(recordedLogs), sessionName);
                   trackDownloadNetworkSessionClicked(ActionSource.Preview);
+                  trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                 }}
               >
                 Download HAR

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
-//SUB COMPONENTS
+import { actions } from "store";
 import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 //Icons
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
@@ -12,17 +13,9 @@ import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 
 const { Text } = Typography;
 
-const CustomScriptRow = ({
-  rowIndex,
-  pairIndex,
-  isLastIndex,
-  helperFunctions,
-  script,
-  scriptIndex,
-  ruleDetails,
-  isInputDisabled,
-}) => {
-  const { modifyPairAtGivenPath, deleteScript } = helperFunctions;
+const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, script, scriptIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
+
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
@@ -44,7 +37,15 @@ const CustomScriptRow = ({
 
   const handleFilePickerAction = (url) => {
     setIsFilePickerModalActive(false);
-    modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, url);
+
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].value`]: url,
+        },
+      })
+    );
   };
   /** Remove till here */
 
@@ -56,7 +57,14 @@ const CustomScriptRow = ({
 
   const handleMockPickerSelectionCallback = (url) => {
     setIsMockPickerVisible(false);
-    modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, url);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].value`]: url,
+        },
+      })
+    );
   };
 
   const renderURLInput = () => {
@@ -81,7 +89,16 @@ const CustomScriptRow = ({
               placeholder="Enter Source URL (relative or absolute)"
               type="text"
               disabled={isInputDisabled}
-              onChange={(event) => modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].value`)}
+              onChange={(event) =>
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [`scripts[${scriptIndex}].value`]: event?.target?.value,
+                    },
+                  })
+                )
+              }
               value={script.value}
             />
           </Col>
@@ -119,12 +136,15 @@ const CustomScriptRow = ({
   };
 
   const onCodeTypeChange = (codeType) => {
-    modifyPairAtGivenPath(null, pairIndex, `scripts[${scriptIndex}].codeType`, codeType, [
-      {
-        path: `scripts[${scriptIndex}].value`,
-        value: "",
-      },
-    ]);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].codeType`]: codeType,
+          [`scripts[${scriptIndex}].value`]: "",
+        },
+      })
+    );
   };
 
   const handleScriptDelete = (e) => {
@@ -133,7 +153,15 @@ const CustomScriptRow = ({
 
   const renderCodeEditor = () => {
     const scriptBodyChangeHandler = (value) => {
-      modifyPairAtGivenPath(undefined, pairIndex, `scripts[${scriptIndex}].value`, value, null, !isCodeFormatted);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          triggerUnsavedChangesIndication: !isCodeFormatted,
+          updates: {
+            [`scripts[${scriptIndex}].value`]: value,
+          },
+        })
+      );
     };
 
     const handleCodeFormattedFlag = () => {
@@ -184,13 +212,16 @@ const CustomScriptRow = ({
     );
   };
 
-  const scriptTypeChangeHandler = (event, newScriptType) => {
-    modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].type`, newScriptType, [
-      {
-        path: `scripts[${scriptIndex}].value`,
-        value: "",
-      },
-    ]);
+  const scriptTypeChangeHandler = (newScriptType) => {
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].type`]: newScriptType,
+          [`scripts[${scriptIndex}].value`]: "",
+        },
+      })
+    );
   };
 
   const loadTimeMenuItems = useMemo(
@@ -208,14 +239,22 @@ const CustomScriptRow = ({
   );
 
   const handleLoadTimeClick = useCallback(
-    (event, type) => modifyPairAtGivenPath(event, pairIndex, `scripts[${scriptIndex}].loadTime`, type),
-    [pairIndex, scriptIndex, modifyPairAtGivenPath]
+    (type) =>
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            [`scripts[${scriptIndex}].loadTime`]: type,
+          },
+        })
+      ),
+    [dispatch, pairIndex, scriptIndex]
   );
 
   const loadTimeMenu = (
     <Menu>
       {loadTimeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => handleLoadTimeClick(e, type)}>
+        <Menu.Item key={index} onClick={(e) => handleLoadTimeClick(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -239,7 +278,7 @@ const CustomScriptRow = ({
   const scriptTypeMenu = (
     <Menu>
       {scriptTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(e, type)}>
+        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(type)}>
           {title}
         </Menu.Item>
       ))}

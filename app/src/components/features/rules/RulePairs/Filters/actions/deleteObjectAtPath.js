@@ -1,4 +1,5 @@
-import { getFilterObjectPath } from "../../index";
+import { getFilterObjectPath } from "utils/rules/getFilterObjectPath";
+
 const omit = require("lodash/omit");
 
 const deleteObjectAtPath = (currentlySelectedRuleData, setCurrentlySelectedRule, targetPath, pairIndex, dispatch) => {
