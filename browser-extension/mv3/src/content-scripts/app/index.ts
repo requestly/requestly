@@ -6,6 +6,6 @@ document.documentElement.setAttribute("rq-ext-version", chrome.runtime.getManife
 document.documentElement.setAttribute("rq-ext-mv", "3");
 
 // extension id
-window.localStorage.setItem("extID", chrome.runtime.id);
+document.documentElement.setAttribute("rq-ext-id", chrome.runtime.id);
 
 initMessageHandler();

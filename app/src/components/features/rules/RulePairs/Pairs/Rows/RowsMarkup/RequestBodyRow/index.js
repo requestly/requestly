@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Button } from "antd";
-// Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-
 import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
+import { actions } from "store";
 
-const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetails, isInputDisabled }) => {
-  const { modifyPairAtGivenPath } = helperFunctions;
-
+const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  const dispatch = useDispatch();
   const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
@@ -33,12 +32,15 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
         setEditorStaticValue(value);
       }
 
-      modifyPairAtGivenPath(null, pairIndex, `request.type`, requestType, [
-        {
-          path: `request.value`,
-          value: value,
-        },
-      ]);
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          updates: {
+            "request.type": requestType,
+            "request.value": value,
+          },
+        })
+      );
     }
   };
 
@@ -54,18 +56,16 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, helperFunctions, ruleDetail
       setEditorStaticValue(value);
     }
 
-    modifyPairAtGivenPath(
-      null,
-      pairIndex,
-      `request.type`,
-      pair.request.type,
-      [
-        {
-          path: `request.value`,
-          value: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        updates: {
+          "request.type": pair.request.type,
+          "request.value":
+            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
         },
-      ],
-      !codeFormattedFlag.current
+      })
     );
   };
 

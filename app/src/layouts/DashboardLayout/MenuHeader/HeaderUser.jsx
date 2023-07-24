@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
-import { redirectToLicenseIndexPage, redirectToAccountDetails } from "utils/RedirectionUtils";
+import { redirectToAccountDetails, redirectToMyTeams } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -57,7 +57,7 @@ export default function HeaderUser() {
       <Menu.Item key={1} className="profile-menu-items" onClick={() => redirectToAccountDetails(navigate)}>
         Profile
       </Menu.Item>
-      <Menu.Item key={2} className="profile-menu-items" onClick={() => redirectToLicenseIndexPage(navigate)}>
+      <Menu.Item key={2} className="profile-menu-items" onClick={() => redirectToMyTeams(navigate)}>
         Manage Workspaces
       </Menu.Item>
       <Divider className="profile-divider" />

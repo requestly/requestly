@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useSearchParams, useRoutes } from "react-router-dom";
-import { routes } from "routes";
+import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import AuthModal from "components/authentication/AuthModal";
 import { actions } from "store";
@@ -25,10 +24,10 @@ import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
+import { usePrevious } from "hooks";
 
 const DashboardContent = () => {
   const location = useLocation();
-  const appRoutes = useRoutes(routes);
   const [searchParams] = useSearchParams();
   const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
@@ -63,14 +62,6 @@ const DashboardContent = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
 
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
-
   const prevProps = usePrevious({ location });
 
   useEffect(() => {
@@ -88,7 +79,10 @@ const DashboardContent = () => {
 
   return (
     <>
-      <div id="dashboardMainContent">{appRoutes}</div>
+      <div id="dashboardMainContent">
+        {/* Outlet renders all the children of the root route */}
+        <Outlet />
+      </div>
 
       {/* MODALS */}
       {activeModals.loadingModal.isActive ? (

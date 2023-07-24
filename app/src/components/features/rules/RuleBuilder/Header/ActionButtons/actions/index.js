@@ -2,18 +2,12 @@
 import { redirectToRules } from "../../../../../../../utils/RedirectionUtils";
 //EXTERNALS
 import { StorageService } from "../../../../../../../init";
-//REDUCER ACTION OBJECTS
-import { actions } from "../../../../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { parseExtensionRules } from "modules/extension/ruleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import Logger from "lib/logger";
-
-const clearCurrentlySelectedRuleAndConfig = (dispatch) => {
-  dispatch(actions.clearCurrentlySelectedRuleAndConfig());
-};
 
 export const saveRule = async (appMode, ruleObject, callback) => {
   //Set the modification date of rule
@@ -62,7 +56,6 @@ export const saveRule = async (appMode, ruleObject, callback) => {
 };
 
 export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
-  clearCurrentlySelectedRuleAndConfig(dispatch);
   trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
   redirectToRules(navigate);
 };

@@ -6,6 +6,8 @@ import { ClearOutlined, CodeOutlined, PlusCircleOutlined } from "@ant-design/ico
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import REQUEST_METHOD_COLORS from "constants/requestMethodColors";
 import "./apiClientSidebar.scss";
+import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { API_CLIENT } from "modules/analytics/events/features/constants";
 
 interface Props {
   history: RQAPI.Entry[];
@@ -26,6 +28,8 @@ const APIClientSidebar: React.FC<Props> = ({
     (index: number) => {
       onSelectionFromHistory(index);
       trackRequestSelectedFromHistory();
+      trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
+      trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
     [onSelectionFromHistory]
   );

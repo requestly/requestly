@@ -1,16 +1,22 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useDebounce } from "hooks/useDebounce";
 import { Command } from "cmdk";
 import fuzzysort from "fuzzysort";
-
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
 import { getAllRules, getUserAuthDetails, getAppMode } from "store/selectors";
-import { trackCommandBarToggled, trackCommandBarActionSelected } from "modules/analytics/events/misc/commandBar";
-import "./index.css";
+import {
+  trackCommandPaletteClosed,
+  trackCommandPaletteOpened,
+  trackCommandPaletteOptionSearched,
+  trackCommandPaletteOptionSelected,
+} from "modules/analytics/events/misc/commandBar";
 import { config } from "./config";
+import { getUserOS } from "utils/Misc";
 import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
+import "./index.css";
 
 export const CommandBar = () => {
   const [open, setOpen] = useState(false);
@@ -22,18 +28,21 @@ export const CommandBar = () => {
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
 
   let currentPage = pagesStack[pagesStack.length - 1];
 
   useEffect(() => {
     const down = (e: any) => {
-      if (e.key === "k" && e.metaKey) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
         setOpen((open) => !open);
       }
     };
     const exit = (e: any) => {
       if (e.key === "Escape") {
         setOpen(false);
+        trackCommandPaletteClosed();
       }
     };
 
@@ -47,22 +56,11 @@ export const CommandBar = () => {
   }, []);
 
   useEffect(() => {
-    const exit = (e: any) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", exit);
-    return () => document.removeEventListener("keydown", exit);
-  }, []);
-
-  useEffect(() => {
     if (!open) {
       setPagesStack([Page.HOME]);
       setSearch("");
     } else {
-      trackCommandBarToggled();
+      trackCommandPaletteOpened(getUserOS());
     }
   }, [open]);
 
@@ -111,7 +109,8 @@ export const CommandBar = () => {
           onSelect={() => {
             if (item?.action) {
               item.action({ navigate, dispatch, user, appMode, rules });
-              trackCommandBarActionSelected(item.id.split(" ").join("_"));
+              trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
+              trackCommandPaletteClosed();
               setOpen(false);
             }
 
@@ -138,10 +137,21 @@ export const CommandBar = () => {
     return renderItems(items);
   };
 
+  const handleValueChange = (value: string) => {
+    setSearch(value);
+    debouncedTrackOptionSearcedEvent();
+  };
+
   return (
     <>
       {open && (
-        <div className="cmdk-overlay" onClick={() => setOpen(false)}>
+        <div
+          className="cmdk-overlay"
+          onClick={() => {
+            setOpen(false);
+            trackCommandPaletteClosed();
+          }}
+        >
           <Command
             onClick={(e) => e.stopPropagation()}
             label="Global Command Menu"
@@ -164,7 +174,7 @@ export const CommandBar = () => {
               <Command.Input
                 autoFocus={true}
                 value={search}
-                onValueChange={setSearch}
+                onValueChange={handleValueChange}
                 placeholder="Explore Requestly"
               />
               <Command.List>

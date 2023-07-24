@@ -32,3 +32,7 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
 export const updateHasConnectedApp = (prevState, action) => {
   prevState.misc.persist.hasConnectedApp = action.payload;
 };
+
+export const updateIsExtensionEnabled = (prevState, action) => {
+  prevState.isExtensionEnabled = action.payload;
+};
