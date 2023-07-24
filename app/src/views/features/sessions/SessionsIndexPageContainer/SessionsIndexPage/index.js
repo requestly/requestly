@@ -165,7 +165,7 @@ const SessionsIndexPage = () => {
     }
   }, [filteredRecordings?.length, isWorkspaceMode]);
 
-  const toggleDownloadSessionModal = useCallback(() => {
+  const toggleImportSessionModal = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
         actions.toggleActiveModal({
@@ -188,8 +188,8 @@ const SessionsIndexPage = () => {
       const file = acceptedFiles[0];
       const reader = new FileReader();
 
-      reader.onabort = () => toggleDownloadSessionModal();
-      reader.onerror = () => toggleDownloadSessionModal();
+      reader.onabort = () => toggleImportSessionModal();
+      reader.onerror = () => toggleImportSessionModal();
       reader.onload = () => {
         try {
           setProcessingDataToImport(true);
@@ -211,7 +211,7 @@ const SessionsIndexPage = () => {
           const recordedSessionEvents = decompressEvents(parsedData.data.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
 
-          toggleDownloadSessionModal();
+          toggleImportSessionModal();
           trackSessionRecordingUpload("success");
           navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
         } catch (error) {
@@ -223,16 +223,16 @@ const SessionsIndexPage = () => {
       };
       reader.readAsText(file);
     },
-    [navigate, toggleDownloadSessionModal, dispatch]
+    [navigate, toggleImportSessionModal, dispatch]
   );
 
   const openDownloadedSessionModalBtn = useMemo(
     () => (
-      <RQButton type="default" onClick={toggleDownloadSessionModal}>
+      <RQButton type="default" onClick={toggleImportSessionModal}>
         Open downloaded session
       </RQButton>
     ),
-    [toggleDownloadSessionModal]
+    [toggleImportSessionModal]
   );
 
   if (isTableLoading) {
@@ -241,7 +241,7 @@ const SessionsIndexPage = () => {
 
   return (
     <>
-      <RQModal open={isOpen} onCancel={toggleDownloadSessionModal}>
+      <RQModal open={isOpen} onCancel={toggleImportSessionModal}>
         <div className="rq-modal-content">
           <div className="header mb-16 text-center">Import session</div>
 
