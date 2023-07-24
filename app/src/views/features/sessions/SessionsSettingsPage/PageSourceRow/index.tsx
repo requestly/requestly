@@ -1,21 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Col, Input, Row, Select, Switch, Tooltip } from "antd";
+import { Button, Col, Row, Switch, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
-import { capitalize } from "lodash";
-import { SourceKey, SourceOperator } from "types";
-import { PageSource } from "../../types";
+import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
 import { toast } from "utils/Toast";
+import { SourceConditionInput } from "components/common/SourceUrl";
 import "./pageSourceRow.css";
 
 interface Props {
   disabled: boolean;
-  source: PageSource;
+  source: SessionRecordingPageSource;
   openInCreateMode?: boolean;
   handleDeletePageSource: (id: string) => void;
   handlePageSourceStatusToggle: (id: string, status: boolean) => void;
-  handleSavePageSourceDetails: (source: PageSource, isCreateMode: boolean) => void;
-  getPageSourceLabel: (source: PageSource) => string;
+  handleSavePageSourceDetails: (source: SessionRecordingPageSource, isCreateMode: boolean) => void;
+  getPageSourceLabel: (source: SessionRecordingPageSource) => string;
 }
 
 export const PageSourceRow: React.FC<Props> = React.memo(
@@ -29,7 +28,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     getPageSourceLabel,
   }) => {
     const [isEditMode, setIsEditMode] = useState(false);
-    const [pageSourceDetails, setPageSourceDetails] = useState<PageSource>({
+    const [pageSourceDetails, setPageSourceDetails] = useState<SessionRecordingPageSource>({
       value: "",
       isActive: true,
       key: SourceKey.URL,
@@ -42,12 +41,12 @@ export const PageSourceRow: React.FC<Props> = React.memo(
       setPageSourceDetails(source);
     }, [isEditMode, source]);
 
-    const handlePageSourceDetailsChange = useCallback((key: keyof PageSource, value: PageSource[keyof PageSource]) => {
-      setPageSourceDetails((prevSource) => ({ ...prevSource, [key]: value }));
+    const handlePageSourceDetailsChange = useCallback((updatedSource: SessionRecordingPageSource) => {
+      setPageSourceDetails((prevSource) => ({ ...prevSource, ...updatedSource }));
     }, []);
 
     const handleSaveClick = useCallback(
-      (e: unknown) => {
+      (pageSourceDetails: SessionRecordingPageSource) => {
         if (pageSourceDetails.value.length === 0) {
           toast.warn("Please provide page source value!");
           return;
@@ -56,7 +55,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
         handleSavePageSourceDetails(pageSourceDetails, openInCreateMode);
         setIsEditMode(false);
       },
-      [pageSourceDetails, openInCreateMode, handleSavePageSourceDetails]
+      [openInCreateMode, handleSavePageSourceDetails]
     );
 
     return !isEditMode && !openInCreateMode ? (
@@ -90,53 +89,22 @@ export const PageSourceRow: React.FC<Props> = React.memo(
         </Col>
       </Row>
     ) : (
-      <Row align="middle" wrap={false} className="page-source-input-container">
-        <Select
-          disabled={disabled}
-          value={pageSourceDetails.key}
-          className="page-source-key-select"
-          onChange={(value) => handlePageSourceDetailsChange("key", value)}
-        >
-          {Object.entries(SourceKey).map(([key, value]) => (
-            <Select.Option key={value} value={value}>
-              {capitalize(value)}
-            </Select.Option>
-          ))}
-        </Select>
-
-        <Select
-          disabled={disabled}
-          value={pageSourceDetails.operator}
-          className="page-source-operator-select"
-          onChange={(value) => handlePageSourceDetailsChange("operator", value)}
-        >
-          {Object.entries(SourceOperator).map(([key, value]) => (
-            <Select.Option key={key} value={value}>
-              {capitalize(
-                value === SourceOperator.WILDCARD_MATCHES
-                  ? "Wildcard"
-                  : value === SourceOperator.MATCHES
-                  ? "RegEx"
-                  : value
-              )}
-            </Select.Option>
-          ))}
-        </Select>
-
-        <Input
-          autoFocus
-          type="text"
-          disabled={disabled}
-          className="page-source-input"
-          value={pageSourceDetails.value}
-          onChange={(e) => handlePageSourceDetailsChange("value", e.target.value)}
-          placeholder="Please enter the url here"
+      <>
+        <SourceConditionInput
+          source={pageSourceDetails}
+          onSourceChange={(updatedSource) => handlePageSourceDetailsChange(updatedSource as SessionRecordingPageSource)}
+          rightActions={
+            <Button
+              type="primary"
+              disabled={disabled}
+              className="save-btn"
+              onClick={() => handleSaveClick(pageSourceDetails)}
+            >
+              Save
+            </Button>
+          }
         />
-
-        <Button type="primary" disabled={disabled} className="save-btn" onClick={handleSaveClick}>
-          Save
-        </Button>
-      </Row>
+      </>
     );
   }
 );
