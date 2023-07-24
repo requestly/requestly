@@ -180,7 +180,7 @@ const SessionsSettingsPage: React.FC = () => {
 
   const handleSavePageSourceDetails = useCallback(
     (sourceDetails: SessionRecordingPageSource, isCreateMode?: boolean) => {
-      const updatedPageSources = isCreateMode
+      const updatedPageSources: SessionRecordingPageSource[] = isCreateMode
         ? [...(config.pageSources ?? []), { id: generateObjectId(), ...sourceDetails }]
         : config.pageSources?.map((source) =>
             source.id === sourceDetails.id ? { ...source, ...sourceDetails } : source
