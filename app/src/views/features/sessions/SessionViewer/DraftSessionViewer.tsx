@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getTabSession } from "actions/ExtensionActions";
-import { Modal, RadioChangeEvent } from "antd";
+import { Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,77 +9,32 @@ import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
 import PATHS from "config/constants/sub/paths";
-import { toast } from "utils/Toast";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import {
-  compressEvents,
-  downloadSession,
-  filterOutLargeNetworkResponses,
-  getRecordingOptionsToSave,
-  getSessionEventsToSave,
-  getSessionRecordingOptions,
-  prepareSessionToExport,
-} from "./sessionEventsUtils";
+import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
 import { getUserAuthDetails } from "store/selectors";
-import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
-import {
-  getSessionRecording,
-  getSessionRecordingAttributes,
-  getSessionRecordingEvents,
-  getSessionRecordingName,
-} from "store/features/session-recording/selectors";
+import { getSessionRecording } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
-import { saveRecording } from "backend/sessionRecording/saveRecording";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { DebugInfo, SessionSaveMode } from "./types";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import {
   trackDraftSessionDiscarded,
-  trackDraftSessionSaved,
-  trackDraftSessionSaveFailed,
   trackDraftSessionViewed,
   trackSessionRecordingFailed,
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
-const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
-
-export const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
-
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecording = useSelector(getSessionRecording);
-  const sessionEvents = useSelector(getSessionRecordingEvents);
-  const sessionAttributes = useSelector(getSessionRecordingAttributes);
-  const sessionRecordingName = useSelector(getSessionRecordingName);
-
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
-  const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
-
-  const importedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecording?.options), [
-    sessionRecording?.options,
-  ]);
-
-  const isIncludeNetworkLogsDisabled =
-    isImportedSession && !importedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
-  const isIncludeConsoleLogsDisabled =
-    isImportedSession && !importedSessionRecordingOptions.includes(DebugInfo.INCLUDE_CONSOLE_LOGS);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -108,7 +63,6 @@ const DraftSessionViewer: React.FC = () => {
     setIsLoading(true);
 
     if (tabId === "imported") {
-      setIncludedDebugInfo(importedSessionRecordingOptions);
       setIsLoading(false);
     } else if (tabId === "mock") {
       // TODO: remove mock flow
@@ -144,111 +98,7 @@ const DraftSessionViewer: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, importedSessionRecordingOptions]);
-
-  const saveDraftSession = useCallback(
-    (e: React.MouseEvent) => {
-      if (!user?.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: {
-              authMode: AUTH_ACTION_LABELS.SIGN_UP,
-              src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
-            },
-          })
-        );
-        return;
-      }
-      if (isSaving) {
-        return;
-      }
-
-      if (!sessionRecordingName) {
-        toast.error("Name is required to save the recording.");
-        return;
-      }
-
-      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-
-      setIsSaving(true);
-      saveRecording(
-        user?.details?.profile?.uid,
-        workspace?.id,
-        sessionRecording,
-        compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
-        recordingOptionsToSave
-      ).then((response) => {
-        if (response?.success) {
-          setSessionSaveMode(SessionSaveMode.ONLINE);
-          setIsSavePopupVisible(false);
-          toast.success("Recording saved successfully");
-          trackDraftSessionSaved(sessionAttributes.duration, recordingOptionsToSave, SessionSaveMode.ONLINE);
-          navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
-            replace: true,
-            state: { fromApp: true, viewAfterSave: true },
-          });
-        } else {
-          toast.error(response?.message);
-          trackDraftSessionSaveFailed(response?.message);
-          setIsSaving(false);
-        }
-      });
-    },
-    [
-      user?.loggedIn,
-      user?.details?.profile?.uid,
-      workspace?.id,
-      isSaving,
-      includedDebugInfo,
-      sessionEvents,
-      sessionRecording,
-      sessionRecordingName,
-      sessionAttributes,
-      dispatch,
-      navigate,
-    ]
-  );
-
-  const handleDownloadFileClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (!user?.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: {
-              authMode: AUTH_ACTION_LABELS.SIGN_UP,
-              src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
-            },
-          })
-        );
-        return;
-      }
-
-      setIsSaving(true);
-      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-      const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
-
-      prepareSessionToExport(events, { ...sessionRecording, options: recordingOptionsToSave })
-        .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
-        .finally(() => {
-          toast.success("Recording downloaded successfully.");
-          setIsSaving(false);
-          setSessionSaveMode(SessionSaveMode.ONLINE);
-          setIsSavePopupVisible(false);
-          trackDraftSessionSaved(
-            sessionRecording.sessionAttributes.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.LOCAL
-          );
-        });
-    },
-    [dispatch, user?.loggedIn, includedDebugInfo, sessionEvents, sessionRecording]
-  );
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
   const confirmDiscard = () => {
     Modal.confirm({
@@ -270,10 +120,6 @@ const DraftSessionViewer: React.FC = () => {
     }
   }, [loadingError]);
 
-  const handleSessionSaveModeChange = (e: RadioChangeEvent) => {
-    setSessionSaveMode(e.target.value);
-  };
-
   return isLoading ? (
     <PageLoader message="Loading session details..." />
   ) : loadingError ? (
@@ -294,20 +140,7 @@ const DraftSessionViewer: React.FC = () => {
             Save <DownArrow />
           </RQButton>
 
-          {isSavePopupVisible && (
-            <SaveRecordingConfigPopup
-              isSaving={isSaving}
-              onClose={() => setIsSavePopupVisible(false)}
-              includedDebugInfo={includedDebugInfo}
-              setIncludedDebugInfo={setIncludedDebugInfo}
-              sessionSaveMode={sessionSaveMode}
-              saveDraftSession={saveDraftSession}
-              handleDownloadFileClick={handleDownloadFileClick}
-              handleSessionSaveModeChange={handleSessionSaveModeChange}
-              isIncludeNetworkLogsDisabled={isIncludeNetworkLogsDisabled}
-              isIncludeConsoleLogsDisabled={isIncludeConsoleLogsDisabled}
-            />
-          )}
+          {isSavePopupVisible && <SaveRecordingConfigPopup onClose={() => setIsSavePopupVisible(false)} />}
         </div>
       </div>
       <SessionDetails key={tabId} />

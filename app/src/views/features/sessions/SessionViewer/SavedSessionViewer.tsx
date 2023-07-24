@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
@@ -14,25 +14,12 @@ import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";
-import {
-  compressEvents,
-  decompressEvents,
-  downloadSession,
-  getRecordingOptionsToSave,
-  getSessionEventsToSave,
-  getSessionRecordingOptions,
-  prepareSessionToExport,
-} from "./sessionEventsUtils";
+import { decompressEvents } from "./sessionEventsUtils";
 import ShareButton from "../ShareButton";
 import PageLoader from "components/misc/PageLoader";
 import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import {
-  getIsRequestedByOwner,
-  getSessionRecording,
-  getSessionRecordingEvents,
-  getSessionRecordingEventsFilePath,
-} from "store/features/session-recording/selectors";
+import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
@@ -40,12 +27,8 @@ import { deleteRecording } from "../api";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
-import { toast } from "utils/Toast";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { DebugInfo, SessionSaveMode } from "./types";
 import {
-  trackDraftSessionSaved,
   trackSavedSessionViewedFromApp,
   trackSavedSessionViewedFromLink,
 } from "modules/analytics/events/features/sessionRecording";
@@ -96,23 +79,12 @@ const SavedSessionViewer: React.FC = () => {
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
-  const sessionRecording = useSelector(getSessionRecording);
-  const sessionEvents = useSelector(getSessionRecordingEvents);
 
-  const [isSaving, setIsSaving] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
   const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
-  const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>([]);
-
-  const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecording?.options), [
-    sessionRecording?.options,
-  ]);
-
-  const isIncludeNetworkLogsDisabled = !savedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
-  const isIncludeConsoleLogsDisabled = !savedSessionRecordingOptions.includes(DebugInfo.INCLUDE_CONSOLE_LOGS);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
@@ -138,10 +110,6 @@ const SavedSessionViewer: React.FC = () => {
       },
     });
   }, [id, eventsFilePath, navigateToList]);
-
-  useEffect(() => {
-    setIncludedDebugInfo(savedSessionRecordingOptions);
-  }, [savedSessionRecordingOptions]);
 
   useEffect(() => {
     if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
@@ -194,33 +162,6 @@ const SavedSessionViewer: React.FC = () => {
     setShowOnboardingPrompt(false);
   };
 
-  const handleDownloadFileClick = useCallback(
-    (e: React.MouseEvent) => {
-      setIsSaving(true);
-      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-      const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
-      const recording = {
-        name: sessionRecording.name,
-        options: { ...recordingOptionsToSave },
-        sessionAttributes: { ...sessionRecording.sessionAttributes },
-      };
-
-      prepareSessionToExport(events, recording)
-        .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
-        .finally(() => {
-          toast.success("Recording downloaded successfully.");
-          setIsSaving(false);
-          setIsDownloadPopupVisible(false);
-          trackDraftSessionSaved(
-            sessionRecording.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.LOCAL
-          );
-        });
-    },
-    [sessionEvents, sessionRecording, includedDebugInfo]
-  );
-
   if (showPermissionError) return <PermissionError />;
   if (showNotFoundError) return <NotFoundError />;
 
@@ -254,18 +195,7 @@ const SavedSessionViewer: React.FC = () => {
                 </Button>
                 <RQButton type="default" icon={<DeleteOutlined />} onClick={confirmDeleteAction} />
               </Space>
-              {isDownloadPopupVisible && (
-                <SaveRecordingConfigPopup
-                  isSaving={isSaving}
-                  sessionSaveMode={SessionSaveMode.LOCAL}
-                  includedDebugInfo={includedDebugInfo}
-                  setIncludedDebugInfo={setIncludedDebugInfo}
-                  isIncludeNetworkLogsDisabled={isIncludeNetworkLogsDisabled}
-                  isIncludeConsoleLogsDisabled={isIncludeConsoleLogsDisabled}
-                  onClose={() => setIsDownloadPopupVisible(false)}
-                  handleDownloadFileClick={handleDownloadFileClick}
-                />
-              )}
+              {isDownloadPopupVisible && <SaveRecordingConfigPopup onClose={() => setIsDownloadPopupVisible(false)} />}
             </div>
           ) : null}
         </div>
