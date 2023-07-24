@@ -1,59 +1,70 @@
 RQ.SessionRecorder = {};
+RQ.SessionRecorder.isInitialized = false;
 RQ.SessionRecorder.isRecording = false;
+RQ.SessionRecorder.isExplicitRecording = false;
 RQ.SessionRecorder.sendResponseCallbacks = {};
 
 RQ.SessionRecorder.setup = () => {
-  RQ.SessionRecorder.getRecordingConfig().then((config) => {
-    if (config || RQ.SessionRecorder.explicitRecordingFlag.get()) {
-      RQ.SessionRecorder.startRecording(config);
-    }
-  });
-
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.START_RECORDING:
-        RQ.SessionRecorder.explicitRecordingFlag.set();
-        RQ.SessionRecorder.startRecording();
-        if (message.notify) {
-          RQ.SessionRecorder.showToast();
-        }
+        RQ.SessionRecorder.startRecording(message.payload);
         break;
+
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording");
         break;
+
+      case RQ.CLIENT_MESSAGES.IS_RECORDING_SESSION:
+        if (!RQ.SessionRecorder.isIframe()) {
+          sendResponse(RQ.SessionRecorder.isRecording);
+        }
+        break;
+
       case RQ.CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
-        sendResponse(RQ.SessionRecorder.explicitRecordingFlag.get());
+        if (!RQ.SessionRecorder.isIframe()) {
+          sendResponse(RQ.SessionRecorder.isExplicitRecording);
+        }
+        break;
+
+      case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
+        if (!RQ.SessionRecorder.isIframe()) {
+          RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
+          return true; // notify sender to wait for response and not resolve request immediately
+        }
         break;
     }
   });
 };
 
-RQ.SessionRecorder.getRecordingConfig = () => {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(
-      {
-        action: RQ.CLIENT_MESSAGES.GET_SESSION_RECORDING_CONFIG,
-      },
-      resolve
-    );
+RQ.SessionRecorder.startRecording = ({ config, previousSession, notify, explicit }) => {
+  RQ.SessionRecorder.initialize(() => {
+    RQ.SessionRecorder.sendMessageToClient("startRecording", {
+      relayEventsToTop: RQ.SessionRecorder.isIframe(),
+      console: true,
+      network: true,
+      maxDuration: (config?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+      previousSession: !RQ.SessionRecorder.isIframe() ? previousSession : null,
+    });
+
+    if (notify) {
+      RQ.SessionRecorder.showToast();
+    }
+
+    RQ.SessionRecorder.isExplicitRecording = explicit;
   });
 };
 
-RQ.SessionRecorder.startRecording = (sessionRecordingConfig) => {
-  const isIFrame = RQ.SessionRecorder.isIframe();
-
-  if (!isIFrame) {
-    RQ.SessionRecorder.addListeners();
+RQ.SessionRecorder.initialize = (callback) => {
+  if (RQ.SessionRecorder.isInitialized) {
+    callback();
   }
 
   RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/requestly-web-sdk.js"), () => {
     RQ.ClientUtils.executeJS(`(${RQ.SessionRecorder.bootstrapClient.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
-    RQ.SessionRecorder.sendMessageToClient("startRecording", {
-      relayEventsToTop: isIFrame,
-      console: true,
-      network: true,
-      maxDuration: (sessionRecordingConfig?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-    });
+    RQ.SessionRecorder.addMessageListeners();
+    RQ.SessionRecorder.isInitialized = true;
+    callback();
   });
 };
 
@@ -61,18 +72,10 @@ RQ.SessionRecorder.isIframe = () => {
   return window.top !== window;
 };
 
-RQ.SessionRecorder.addListeners = () => {
-  chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-    switch (message.action) {
-      case RQ.CLIENT_MESSAGES.IS_RECORDING_SESSION:
-        sendResponse(RQ.SessionRecorder.isRecording);
-        break;
-
-      case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
-        RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
-        return true; // notify sender to wait for response and not resolve request immediately
-    }
-  });
+RQ.SessionRecorder.addMessageListeners = () => {
+  if (RQ.SessionRecorder.isIframe()) {
+    return;
+  }
 
   window.addEventListener("message", function (event) {
     if (event.source !== window || event.data.source !== "requestly:client") {
@@ -88,11 +91,22 @@ RQ.SessionRecorder.addListeners = () => {
       });
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
-      RQ.SessionRecorder.explicitRecordingFlag.clear();
+      RQ.SessionRecorder.isExplicitRecording = false;
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
+  });
+
+  window.addEventListener("beforeunload", (event) => {
+    event.preventDefault();
+
+    RQ.SessionRecorder.sendMessageToClient("getSessionData", null, (session) => {
+      chrome.runtime.sendMessage({
+        action: RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
+        session,
+      });
+    });
   });
 };
 
@@ -146,33 +160,6 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
       }
     }
   });
-};
-
-RQ.SessionRecorder.explicitRecordingFlag = {
-  IS_EXPLICIT_RECORDING: "__RQ__isExplicitRecording",
-  fallback: false, // use when window.sessionStorage is not supported
-
-  set: () => {
-    try {
-      window.sessionStorage.setItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING, true);
-    } catch (e) {
-      RQ.SessionRecorder.explicitRecordingFlag.fallback = true;
-    }
-  },
-  get: () => {
-    try {
-      return window.sessionStorage.getItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
-    } catch (e) {
-      return RQ.SessionRecorder.explicitRecordingFlag.fallback;
-    }
-  },
-  clear: () => {
-    try {
-      window.sessionStorage.removeItem(RQ.SessionRecorder.explicitRecordingFlag.IS_EXPLICIT_RECORDING);
-    } catch (e) {
-      RQ.SessionRecorder.explicitRecordingFlag.fallback = false;
-    }
-  },
 };
 
 RQ.SessionRecorder.showToast = () => {
