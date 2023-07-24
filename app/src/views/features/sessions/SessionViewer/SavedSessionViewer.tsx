@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Modal, Space } from "antd";
+import { Button, Modal, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
 import {
   DeleteOutlined,
@@ -10,6 +10,7 @@ import {
   CloseOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";
@@ -26,6 +27,7 @@ import { deleteRecording } from "../api";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
+import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import {
   trackSavedSessionViewedFromApp,
   trackSavedSessionViewedFromLink,
@@ -70,16 +72,19 @@ const SavedSessionViewer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
+
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
+  const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
@@ -135,13 +140,7 @@ const SavedSessionViewer: React.FC = () => {
     getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
-
-        dispatch(
-          sessionRecordingActions.setSessionRecording({
-            id,
-            ...res.payload,
-          })
-        );
+        dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
 
         const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
         dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
@@ -187,8 +186,16 @@ const SavedSessionViewer: React.FC = () => {
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
+                <Button
+                  type="primary"
+                  className="download-recording-btn"
+                  onClick={() => setIsDownloadPopupVisible((prev) => !prev)}
+                >
+                  Download <DownArrow />
+                </Button>
                 <RQButton type="default" icon={<DeleteOutlined />} onClick={confirmDeleteAction} />
               </Space>
+              {isDownloadPopupVisible && <SaveRecordingConfigPopup onClose={() => setIsDownloadPopupVisible(false)} />}
             </div>
           ) : null}
         </div>
