@@ -3,10 +3,10 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { COLLECTION_NAME } from "./constants";
 import firebaseApp from "../../firebase";
 import { getFile } from "services/firebaseStorageService";
-import { SessionRecording } from "views/features/sessions/SessionViewer/types";
+import { SessionRecordingMetadata } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
 
-const isOwner = (recording: SessionRecording, uid: string) => {
+const isOwner = (recording: SessionRecordingMetadata, uid: string) => {
   if (uid === recording.ownerId) return true;
 
   return false;
@@ -36,7 +36,7 @@ export const getRecording = async (
     throw err;
   }
 
-  const data = snapshot.data() as SessionRecording;
+  const data = snapshot.data() as SessionRecordingMetadata;
 
   const response: any = {
     payload: {

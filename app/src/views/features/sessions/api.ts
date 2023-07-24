@@ -9,7 +9,7 @@ import {
   trackSessionRecordingStartTimeOffsetUpdated,
   trackSessionRecordingVisibilityUpdated,
 } from "modules/analytics/events/features/sessionRecording";
-import { SessionRecording, Visibility } from "./SessionViewer/types";
+import { SessionRecordingMetadata, Visibility } from "./SessionViewer/types";
 import Logger from "lib/logger";
 
 const COLLECTION_NAME = "session-recordings";
@@ -97,7 +97,7 @@ export const updateSessionName = async (userId: string, id: string, name: string
 export const updateSessionRecordingProperties = async (
   userId: string, // updater id
   id: string,
-  partialUpdateObject: Partial<SessionRecording>
+  partialUpdateObject: Partial<SessionRecordingMetadata>
 ) => {
   const db = getFirestore(firebaseApp);
   partialUpdateObject.updatedTs = Date.now();
