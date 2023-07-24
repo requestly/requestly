@@ -33,7 +33,8 @@
 
 .page-source-input-container .page-source-key-select .ant-select-selector,
 .page-source-input-container .page-source-operator-select .ant-select-selector {
-  padding: 8px;
+  padding: 1px;
+  padding-left: 14px;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
   background-color: var(--input-background) !important;
@@ -67,6 +68,8 @@
   flex-shrink: 0;
   margin-left: 4px;
   min-width: 5.12rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .page-source-row .action-btns-container .page-source-switch span.label {
