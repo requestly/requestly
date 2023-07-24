@@ -172,7 +172,6 @@ const SessionsIndexPage = () => {
           modalName: "authModal",
           newValue: true,
           newProps: {
-            callback: () => navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE),
             eventSource: AUTH.SOURCE.SESSION_RECORDING,
           },
         })
