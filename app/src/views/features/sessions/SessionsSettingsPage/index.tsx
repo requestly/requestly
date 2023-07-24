@@ -8,8 +8,8 @@ import { getAppMode } from "store/selectors";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./PageSourceRow";
-import { SourceKey, SourceOperator } from "types";
-import { AutoRecordingMode, PageSource, SessionRecordingConfig } from "../types";
+import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
+import { AutoRecordingMode, SessionRecordingConfig } from "../types";
 import { generateObjectId } from "utils/FormattingHelper";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
@@ -25,7 +25,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettingsPage.css";
 
-const emptyPageSourceData: PageSource = {
+const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
   key: SourceKey.URL,
   operator: SourceOperator.CONTAINS,
@@ -55,7 +55,7 @@ const SessionsSettingsPage: React.FC = () => {
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
 
-  const getPageSourceLabel = useCallback((source: PageSource): string => {
+  const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
 
     if (source.operator === SourceOperator.MATCHES) {
@@ -122,8 +122,11 @@ const SessionsSettingsPage: React.FC = () => {
           maxDuration: 5,
           autoRecording: autoRecordingConfig,
           pageSources:
-            config?.pageSources?.map((source: PageSource) => ({ ...source, id: generateObjectId(), isActive: true })) ??
-            [],
+            config?.pageSources?.map((source: SessionRecordingPageSource) => ({
+              ...source,
+              id: generateObjectId(),
+              isActive: true,
+            })) ?? [],
         };
 
         return migratedConfig;
@@ -176,7 +179,7 @@ const SessionsSettingsPage: React.FC = () => {
   }, []);
 
   const handleSavePageSourceDetails = useCallback(
-    (sourceDetails: PageSource, isCreateMode?: boolean) => {
+    (sourceDetails: SessionRecordingPageSource, isCreateMode?: boolean) => {
       const updatedPageSources = isCreateMode
         ? [...(config.pageSources ?? []), { id: generateObjectId(), ...sourceDetails }]
         : config.pageSources?.map((source) =>
@@ -276,14 +279,6 @@ const SessionsSettingsPage: React.FC = () => {
                   caption="Save up to last 5 minutes of activity on any tab."
                 />
               </Col>
-
-              {/* <Col span={10}>
-                <Row>
-                  <a href="/" target="_blank" rel="noreferrer" className="learn-more-link ml-auto">
-                    Recording all pages is safe & secure
-                  </a>
-                </Row>
-              </Col> */}
             </Row>
             <div className="specific-page-mode-container">
               <SessionSettingsRadioItem
