@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
-import { SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
+import { SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 
 export interface SessionRecordingState {
-  sessionRecording?: SessionRecording;
+  sessionRecording?: SessionRecordingMetadata;
   events?: RQSessionEvents;
 }
 
@@ -18,7 +18,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
-    setSessionRecording: (state, action: PayloadAction<SessionRecording>) => {
+    setSessionRecording: (state, action: PayloadAction<SessionRecordingMetadata>) => {
       state.sessionRecording = action.payload;
     },
     setEvents: (state, action: PayloadAction<RQSessionEvents>) => {

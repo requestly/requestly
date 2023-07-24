@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog, DebugInfo, RecordingOptions, SessionRecording } from "./types";
+import { ConsoleLog, DebugInfo, RecordingOptions, SessionRecordingMetadata } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "./constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
@@ -95,7 +95,7 @@ export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: 
   return filteredSessionEvents;
 };
 
-export const prepareSessionToExport = (events: string, recording: SessionRecording): Promise<string> => {
+export const prepareSessionToExport = (events: string, recording: SessionRecordingMetadata): Promise<string> => {
   const sessionToExport = {
     version: 1,
     type: SESSION_EXPORT_TYPE,

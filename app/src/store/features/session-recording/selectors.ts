@@ -1,7 +1,7 @@
 import { RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
 import { RootState } from "store/types";
-import { SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
+import { SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { SessionRecordingState } from "./slice";
 
 export const getSessionRecordingState = (state: RootState): SessionRecordingState => {
@@ -12,7 +12,7 @@ export const getSessionRecordingEvents = (state: RootState): RQSessionEvents => 
   return getSessionRecordingState(state).events;
 };
 
-export const getSessionRecording = (state: RootState): SessionRecording => {
+export const getSessionRecording = (state: RootState): SessionRecordingMetadata => {
   return getSessionRecordingState(state).sessionRecording;
 };
 

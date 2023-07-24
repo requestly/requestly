@@ -19,7 +19,7 @@ export enum Visibility {
   ORGANIZATION = "organization",
 }
 
-export interface SessionRecording {
+export interface SessionRecordingMetadata {
   id?: string;
   isRequestedByOwner?: boolean;
   eventsFilePath?: string;
