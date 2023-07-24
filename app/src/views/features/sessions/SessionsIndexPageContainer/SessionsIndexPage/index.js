@@ -180,7 +180,7 @@ const SessionsIndexPage = () => {
     }
 
     setIsOpen((prev) => !prev);
-  }, [user?.loggedIn, navigate, dispatch]);
+  }, [user?.loggedIn, dispatch]);
 
   const onSessionRecordingFileDrop = useCallback(
     async (acceptedFiles) => {
