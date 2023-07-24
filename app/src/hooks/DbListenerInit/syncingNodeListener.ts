@@ -41,37 +41,6 @@ resetSyncDebounceTimerStart();
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
 /**
- * This function applies an animation to the "sync-icon" element in the DOM.
- * The animation is "1s rotate infinite linear", and it lasts for 2.5 seconds.
- * If the "sync-icon" element is not found in the DOM, an error will be thrown and logged.
- *
- * @returns {void}
- * @throws Will throw an error if the "sync-icon" element is not found in the DOM.
- */
-const animateSyncIcon = (): void => {
-  try {
-    const syncIcon: HTMLElement | null = document.getElementById("sync-icon");
-    if (!syncIcon) {
-      throw new Error("Sync icon not found");
-    }
-
-    syncIcon.style.animation = "1s rotate infinite linear";
-
-    setTimeout(() => {
-      if (syncIcon) {
-        syncIcon.style.removeProperty("animation");
-      }
-    }, 2500);
-  } catch (e) {
-    if (e instanceof Error) {
-      Logger.error(e.message);
-    } else {
-      Logger.error("Unknown error occurred");
-    }
-  }
-};
-
-/**
  * This function sets the last sync target using sync target, user ID, and team ID.
  *
  * @param {('EXTENSION' | 'DESKTOP')} appMode Current mode of the app.
@@ -271,8 +240,6 @@ export const invokeSyncingIfRequired = async ({
   let updatedFirebaseRecords = latestFirebaseRecords
     ? latestFirebaseRecords
     : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
-
-  animateSyncIcon();
 
   if (!isLocalStoragePresent(appMode)) {
     // Just refresh the rules table in this case

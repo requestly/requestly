@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { actions } from "store";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -12,7 +12,18 @@ import {
 
 import "./popover.scss";
 
-export const AuthConfirmationPopover = ({
+interface Props {
+  title: string;
+  okText?: string;
+  cancelText?: string;
+  disabled?: boolean;
+  callback?: any;
+  source?: string;
+  children: any;
+  isChinaUser?: boolean;
+}
+
+export const AuthConfirmationPopover: React.FC<Props> = ({
   title,
   okText = "Continue",
   cancelText = "Cancel",
@@ -40,7 +51,7 @@ export const AuthConfirmationPopover = ({
     );
   };
 
-  const handleOpenChange = (open) => {
+  const handleOpenChange = (open: boolean) => {
     if (open) {
       trackPopoverForAuthShown(source);
     } else {
