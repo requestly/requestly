@@ -29,7 +29,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const isReadOnly = useSelector(getIsReadOnly);
   const sessionDescription = useSelector(getSessionRecordingDescription);
 
-  const recordingLengthInSeconds = useMemo(() => Math.floor(attributes?.duration ?? 0 / 1000), [attributes]);
+  const recordingLengthInSeconds = useMemo(() => Math.floor(attributes.duration / 1000), [attributes]);
 
   const saveStartTimeOffset = useMemo(
     () =>
