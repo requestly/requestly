@@ -4,13 +4,13 @@ import firebaseApp from "../../firebase";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
-import { RecordingOptions, SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
+import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
 
 export const saveRecording = async (
   uid: string,
   workspaceId: string | null,
-  payload: SessionRecording,
+  payload: SessionRecordingMetadata,
   events: any,
   options: RecordingOptions
 ): Promise<any> => {

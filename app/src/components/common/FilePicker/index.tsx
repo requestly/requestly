@@ -67,7 +67,9 @@ export const FilePicker: React.FC<FilePickerProps> = ({
               <div>or</div>
             </Space>
 
-            <Button onClick={open}>Browse</Button>
+            <Button type="primary" size="large" onClick={open}>
+              Browse
+            </Button>
           </>
         )}
       </div>

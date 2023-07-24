@@ -1,15 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { ReducerKeys } from "store/constants";
-import { SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
+import { SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 
 export interface SessionRecordingState {
-  sessionRecording?: SessionRecording;
+  metadata?: SessionRecordingMetadata;
   events?: RQSessionEvents;
 }
 
 const initialState: SessionRecordingState = {
-  sessionRecording: null,
+  metadata: null,
   events: null,
 };
 
@@ -18,23 +18,23 @@ const slice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
-    setSessionRecording: (state, action: PayloadAction<SessionRecording>) => {
-      state.sessionRecording = action.payload;
+    setSessionRecordingMetadata: (state, action: PayloadAction<SessionRecordingMetadata>) => {
+      state.metadata = action.payload;
     },
     setEvents: (state, action: PayloadAction<RQSessionEvents>) => {
       state.events = action.payload;
     },
     setVisibility: (state, action: PayloadAction<Visibility>) => {
-      state.sessionRecording.visibility = action.payload;
+      state.metadata.visibility = action.payload;
     },
     setName: (state, action: PayloadAction<string>) => {
-      state.sessionRecording.name = action.payload;
+      state.metadata.name = action.payload;
     },
     setStartTimeOffset: (state, action: PayloadAction<number>) => {
-      state.sessionRecording.startTimeOffset = action.payload;
+      state.metadata.startTimeOffset = action.payload;
     },
     setDescription: (state, action: PayloadAction<string>) => {
-      state.sessionRecording.description = action.payload;
+      state.metadata.description = action.payload;
     },
   },
 });

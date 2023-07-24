@@ -122,7 +122,6 @@ const ShareButton = ({ recordingId, showShareModal }) => {
   return (
     <>
       <SplitButtons
-        type="primary"
         left={{
           label: <span className="text-bold">{getVisibilityLabel(currentVisibility)}</span>,
           onClick: () => {

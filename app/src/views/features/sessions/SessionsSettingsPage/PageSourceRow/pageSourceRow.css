@@ -19,46 +19,6 @@
   color: var(--white);
 }
 
-.page-source-input-container {
-  padding: 4px 8px;
-  margin: 10px 0;
-  box-shadow: var(--input-box-shadow);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
-}
-
-.page-source-input-container .page-source-key-select {
-  margin-right: 4px;
-}
-
-.page-source-input-container .page-source-key-select .ant-select-selector,
-.page-source-input-container .page-source-operator-select .ant-select-selector {
-  padding: 8px;
-  border: 1px solid var(--border-dark);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--input-background) !important;
-}
-
-.page-source-input-container .page-source-key-select .ant-select-selector {
-  min-width: 79px;
-}
-
-.page-source-input-container .page-source-operator-select .ant-select-selector {
-  min-width: 113px;
-}
-
-.page-source-input-container .page-source-key-select .ant-select-selector .ant-select-selection-item,
-.page-source-input-container .page-source-operator-select .ant-select-selector .ant-select-selection-item {
-  text-transform: uppercase;
-}
-
-.page-source-input-container .page-source-input.ant-input {
-  width: 100%;
-  border: none;
-  box-shadow: none;
-  background-color: transparent;
-}
-
 .page-source-row .action-btns-container {
   column-gap: 8px;
 }
@@ -67,6 +27,8 @@
   flex-shrink: 0;
   margin-left: 4px;
   min-width: 5.12rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .page-source-row .action-btns-container .page-source-switch span.label {
