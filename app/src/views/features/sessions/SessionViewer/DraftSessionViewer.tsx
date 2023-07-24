@@ -30,7 +30,7 @@ const DraftSessionViewer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const sessionRecordingMetaData = useSelector(getSessionRecordingMetaData);
+  const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
@@ -52,10 +52,10 @@ const DraftSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if (isImportedSession && sessionRecordingMetaData === null) {
+    if (isImportedSession && sessionRecordingMetadata === null) {
       navigate(PATHS.SESSIONS.ABSOLUTE);
     }
-  }, [navigate, isImportedSession, sessionRecordingMetaData]);
+  }, [navigate, isImportedSession, sessionRecordingMetadata]);
 
   useEffect(() => {
     trackDraftSessionViewed();
