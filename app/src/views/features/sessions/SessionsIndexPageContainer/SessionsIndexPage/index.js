@@ -206,7 +206,7 @@ const SessionsIndexPage = () => {
             throw new Error("Invalid file format!");
           }
 
-          dispatch(sessionRecordingActions.setSessionRecording({ ...parsedData.data.recording }));
+          dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...parsedData.data.metadata }));
 
           const recordedSessionEvents = decompressEvents(parsedData.data.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));

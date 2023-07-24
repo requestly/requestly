@@ -14,7 +14,7 @@ import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
 import { getUserAuthDetails } from "store/selectors";
-import { getSessionRecording } from "store/features/session-recording/selectors";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
@@ -30,7 +30,7 @@ const DraftSessionViewer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const sessionRecording = useSelector(getSessionRecording);
+  const sessionRecordingMetaData = useSelector(getSessionRecordingMetaData);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
@@ -52,10 +52,10 @@ const DraftSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if (isImportedSession && sessionRecording === null) {
+    if (isImportedSession && sessionRecordingMetaData === null) {
       navigate(PATHS.SESSIONS.ABSOLUTE);
     }
-  }, [navigate, isImportedSession, sessionRecording]);
+  }, [navigate, isImportedSession, sessionRecordingMetaData]);
 
   useEffect(() => {
     trackDraftSessionViewed();
@@ -67,7 +67,7 @@ const DraftSessionViewer: React.FC = () => {
     } else if (tabId === "mock") {
       // TODO: remove mock flow
       dispatch(
-        sessionRecordingActions.setSessionRecording({
+        sessionRecordingActions.setSessionRecordingMetadata({
           sessionAttributes: mockSession.attributes,
           name: "Mock Session Recording",
         })
@@ -85,7 +85,7 @@ const DraftSessionViewer: React.FC = () => {
             setLoadingError("RRWeb events not captured");
           } else {
             dispatch(
-              sessionRecordingActions.setSessionRecording({
+              sessionRecordingActions.setSessionRecordingMetadata({
                 sessionAttributes: tabSession.attributes,
                 name: generateDraftSessionTitle(tabSession.attributes?.url),
               })

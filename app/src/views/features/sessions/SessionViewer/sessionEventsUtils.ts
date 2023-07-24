@@ -95,11 +95,11 @@ export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: 
   return filteredSessionEvents;
 };
 
-export const prepareSessionToExport = (events: string, recording: SessionRecordingMetadata): Promise<string> => {
+export const prepareSessionToExport = (events: string, metadata: SessionRecordingMetadata): Promise<string> => {
   const sessionToExport = {
     version: 1,
     type: SESSION_EXPORT_TYPE,
-    data: { events, recording },
+    data: { events, metadata },
   };
 
   return new Promise((resolve) => resolve(JSON.stringify(sessionToExport)));

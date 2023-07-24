@@ -13,7 +13,7 @@ import {
   getSessionRecordingOptions,
   prepareSessionToExport,
 } from "./sessionEventsUtils";
-import { getSessionRecording, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -41,7 +41,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const sessionRecording = useSelector(getSessionRecording);
+  const sessionRecordingMetaData = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
@@ -49,8 +49,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
   const isDraftSession = pathname.includes("draft");
   const isSessionLogOptionsAlreadySaved = tabId === "imported" || !isDraftSession;
 
-  const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecording?.options), [
-    sessionRecording?.options,
+  const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetaData?.options), [
+    sessionRecordingMetaData?.options,
   ]);
 
   const isIncludeNetworkLogsDisabled =
@@ -85,7 +85,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
         return;
       }
 
-      if (!sessionRecording?.name) {
+      if (!sessionRecordingMetaData?.name) {
         toast.error("Name is required to save the recording.");
         return;
       }
@@ -96,7 +96,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       saveRecording(
         user?.details?.profile?.uid,
         workspace?.id,
-        sessionRecording,
+        sessionRecordingMetaData,
         compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
         recordingOptionsToSave
       ).then((response) => {
@@ -104,7 +104,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
           onClose();
           toast.success("Recording saved successfully");
           trackDraftSessionSaved(
-            sessionRecording?.sessionAttributes?.duration,
+            sessionRecordingMetaData?.sessionAttributes?.duration,
             recordingOptionsToSave,
             SessionSaveMode.ONLINE
           );
@@ -126,7 +126,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       isSaving,
       includedDebugInfo,
       sessionEvents,
-      sessionRecording,
+      sessionRecordingMetaData,
       dispatch,
       navigate,
       onClose,
@@ -153,26 +153,26 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       setIsSaving(true);
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
       const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
-      const recording = {
-        name: sessionRecording.name,
+      const metadata = {
+        name: sessionRecordingMetaData.name,
         options: { ...recordingOptionsToSave },
-        sessionAttributes: { ...sessionRecording.sessionAttributes },
+        sessionAttributes: { ...sessionRecordingMetaData.sessionAttributes },
       };
 
-      prepareSessionToExport(events, recording)
-        .then((fileContent) => downloadSession(fileContent, sessionRecording.name))
+      prepareSessionToExport(events, metadata)
+        .then((fileContent) => downloadSession(fileContent, sessionRecordingMetaData.name))
         .finally(() => {
           toast.success("Recording downloaded successfully.");
           onClose();
           setIsSaving(false);
           trackDraftSessionSaved(
-            sessionRecording.sessionAttributes?.duration,
+            sessionRecordingMetaData.sessionAttributes?.duration,
             recordingOptionsToSave,
             SessionSaveMode.LOCAL
           );
         });
     },
-    [dispatch, user?.loggedIn, sessionEvents, sessionRecording, includedDebugInfo, onClose]
+    [dispatch, user?.loggedIn, sessionEvents, sessionRecordingMetaData, includedDebugInfo, onClose]
   );
 
   return (
