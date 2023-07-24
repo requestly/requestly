@@ -1,21 +1,13 @@
-import { SourceKey, SourceOperator } from "types";
+import { SessionRecordingPageSource } from "types/sessionRecording";
 
 export enum AutoRecordingMode {
   CUSTOM = "custom",
   ALL_PAGES = "allPages",
 }
 
-export type PageSource = {
-  id?: string;
-  key: SourceKey;
-  value: string;
-  isActive: boolean;
-  operator: SourceOperator;
-};
-
 export type SessionRecordingConfig = {
   maxDuration?: number;
-  pageSources?: PageSource[];
+  pageSources?: SessionRecordingPageSource[];
   autoRecording?: {
     isActive: boolean;
     mode: AutoRecordingMode;

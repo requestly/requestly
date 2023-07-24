@@ -7,8 +7,8 @@ import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@a
 import { isValidRegex } from "utils/rules/misc";
 import { isValidUrl } from "utils/FormattingHelper";
 import { isEqual } from "lodash";
-import { SourceOperator } from "types";
-import { Source } from "../SourceUrl/types";
+import { RulePairSource, SourceOperator } from "types";
+import { SessionRecordingPageSource } from "types/sessionRecording";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
 import {
@@ -19,10 +19,12 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 import "./index.scss";
 
+type Source = RulePairSource | SessionRecordingPageSource;
+
 interface ModalProps {
   isOpen: boolean;
   source: Source;
-  analyticsContext: string;
+  analyticsContext: Record<string, string>;
   onClose: (operator: SourceOperator) => void;
   onSave: (newSource: Source) => void;
 }
