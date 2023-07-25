@@ -194,6 +194,7 @@ const INITIAL_STATE = {
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      isCommandBarOpen: false,
     },
   },
 };
