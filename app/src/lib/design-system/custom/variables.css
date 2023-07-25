@@ -35,7 +35,7 @@
   --input-box-shadow: inset 0px -1px 2px #4f5154, inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
   /*feature specific colors*/
-  ---http-rules: #537ed2;
+  --http-rules: #537ed2;
   --api-client: #ca6199;
   --mock-server: #84bb4f;
   --session-recording: #ddb651cc;

@@ -55,6 +55,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
         display: true,
+        activeColor: "var(--http-rules)",
       },
       {
         id: 3,
@@ -70,6 +71,7 @@ export const PrimarySidebar: React.FC = () => {
           </Tooltip>
         ),
         display: true,
+        activeColor: "var(--session-recording)",
       },
       {
         id: 4,
@@ -77,6 +79,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
+        activeColor: "var(--mock-server)",
       },
       {
         id: 5,
@@ -89,6 +92,7 @@ export const PrimarySidebar: React.FC = () => {
         ),
         feature: FEATURES.API_CLIENT,
         display: true,
+        activeColor: "var(--api-client)",
       },
       {
         id: 6,
