@@ -119,15 +119,13 @@ const MenuHeader = () => {
               ) : (
                 <Col className="hidden-on-small-screen">
                   <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
-                    <Button
-                      style={{ display: "flex" }}
+                    <RQButton
                       type="default"
-                      size="small"
                       icon={<SlackOutlined />}
                       onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
                     >
                       Join Slack Community
-                    </Button>
+                    </RQButton>
                   </span>
                 </Col>
               )}
