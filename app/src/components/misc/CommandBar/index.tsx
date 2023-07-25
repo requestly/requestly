@@ -6,7 +6,7 @@ import { Command } from "cmdk";
 import fuzzysort from "fuzzysort";
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
-import { getAllRules, getUserAuthDetails, getAppMode } from "store/selectors";
+import { getAllRules, getUserAuthDetails, getAppMode, getUserAttributes } from "store/selectors";
 import {
   trackCommandPaletteClosed,
   trackCommandPaletteOpened,
@@ -29,6 +29,7 @@ export const CommandBar = () => {
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
   const availableTeams = useSelector(getAvailableTeams);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
@@ -84,7 +85,9 @@ export const CommandBar = () => {
   };
 
   const renderTitle = (item: CommandBarItem) =>
-    typeof item.title === "function" ? item.title({ user, appMode, rules, availableTeams }) : item.title;
+    typeof item.title === "function"
+      ? item.title({ user, appMode, rules, availableTeams, num_sessions: userAttributes.num_sessions })
+      : item.title;
 
   const renderGroupItem = (item: CommandBarItem): ReactNode | null => {
     if (typeof item.title === "function" && !item.title({ user, appMode })) {
