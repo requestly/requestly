@@ -4,7 +4,7 @@ import FeatureCard from "./FeatureCard";
 import { CloudOutlined, BugOutlined, MobileOutlined, CreditCardOutlined } from "@ant-design/icons";
 import "./index.scss";
 
-const Home = () => {
+const HomeV1 = () => {
   const user = useSelector(getUserAuthDetails);
 
   return (
@@ -50,4 +50,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomeV1;
