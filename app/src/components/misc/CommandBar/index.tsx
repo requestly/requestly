@@ -17,6 +17,7 @@ import { config } from "./config";
 import { getUserOS } from "utils/Misc";
 import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
 import "./index.css";
+import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 
 export const CommandBar = () => {
   const [open, setOpen] = useState(false);
@@ -28,7 +29,10 @@ export const CommandBar = () => {
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const availableTeams = useSelector(getAvailableTeams);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
+  console.log({ availableTeams });
 
   let currentPage = pagesStack[pagesStack.length - 1];
 
@@ -80,7 +84,7 @@ export const CommandBar = () => {
   };
 
   const renderTitle = (item: CommandBarItem) =>
-    typeof item.title === "function" ? item.title({ user, appMode, rules }) : item.title;
+    typeof item.title === "function" ? item.title({ user, appMode, rules, availableTeams }) : item.title;
 
   const renderGroupItem = (item: CommandBarItem): ReactNode | null => {
     if (typeof item.title === "function" && !item.title({ user, appMode })) {
@@ -108,7 +112,7 @@ export const CommandBar = () => {
           key={item.id}
           onSelect={() => {
             if (item?.action) {
-              item.action({ navigate, dispatch, user, appMode, rules });
+              item.action({ navigate, dispatch, isWorkspaceMode, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               trackCommandPaletteClosed();
               setOpen(false);
@@ -133,7 +137,7 @@ export const CommandBar = () => {
   };
 
   const renderAsyncPage = (fetcher: Function): ReactNode => {
-    const items = fetcher(rules);
+    const items = fetcher({ rules, availableTeams });
     return renderItems(items);
   };
 
