@@ -119,7 +119,7 @@ export const config: PageConfig[] = [
         children: [
           {
             id: "record a session",
-            title: "Record a session",
+            title: ({ num_sessions }: TitleProps) => (!num_sessions ? "Record a session" : "View recorded sessions"),
             icon: <BsCameraVideo />,
             action: ({ navigate }: ActionProps) => {
               redirectToSessionRecordingHome(navigate);

@@ -35,6 +35,7 @@ export interface TitleProps {
   appMode?: string;
   rules?: any;
   availableTeams?: Team[];
+  num_sessions?: number;
 }
 
 export interface ActionProps {
