@@ -7,6 +7,7 @@ import { MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
 import { TbArrowsDownUp } from "react-icons/tb";
 import { BiBook, BiShuffle } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
+import { HiOutlineUserGroup } from "react-icons/hi";
 import {
   redirectToFileMocksList,
   redirectToMocksList,
@@ -42,6 +43,14 @@ export const config: PageConfig[] = [
             title: "Switch workspace",
             icon: <BiShuffle />,
             nextPage: Page.SWITCH_WORKSPACE,
+          },
+          {
+            id: "create new workspace",
+            title: "Create new workspace",
+            icon: <HiOutlineUserGroup />,
+            action: ({ dispatch }) => {
+              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+            },
           },
         ],
       },
