@@ -1,31 +1,19 @@
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { actions } from "store";
-import {
-  AiOutlineHome,
-  AiOutlineStar,
-  AiOutlineFolderOpen,
-  AiOutlineUser,
-  AiOutlineSetting,
-  AiFillYoutube,
-} from "react-icons/ai";
+import { AiOutlineFolderOpen, AiFillYoutube } from "react-icons/ai";
 import { BsHandbag, BsCameraVideo } from "react-icons/bs";
-import { MdOutlineFileDownload, MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
+import { MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
 import { TbArrowsDownUp } from "react-icons/tb";
-import { BiRocket, BiBook } from "react-icons/bi";
+import { BiBook } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
 import {
-  redirectToDownloadPage,
   redirectToFileMocksList,
   redirectToMocksList,
-  redirectToRoot,
   redirectToSessionRecordingHome,
   redirectToSharedList,
   redirectToTemplates,
   redirectToTraffic,
-  redirectToAccountDetails,
-  redirectToPricingPlans,
-  redirectToSettings,
   redirectToUrl,
   redirectToRuleEditor,
   redirectToCreateNewRule,
@@ -42,30 +30,6 @@ export const config: PageConfig[] = [
   {
     id: Page.HOME,
     items: [
-      {
-        id: "home",
-        title: "Home",
-        icon: <AiOutlineHome />,
-        action: ({ navigate }: ActionProps) => {
-          redirectToRoot(navigate);
-        },
-      },
-      {
-        id: "download",
-        title: "Download",
-        icon: <MdOutlineFileDownload />,
-        action: (props: ActionProps) => {
-          redirectToDownloadPage();
-        },
-      },
-      {
-        id: "review chrome store",
-        title: "Review us on Chrome Store",
-        icon: <AiOutlineStar />,
-        action: (props: ActionProps) => {
-          redirectToUrl(APP_CONSTANTS.LINKS.CHROME_STORE_REVIEWS, true);
-        },
-      },
       {
         id: "rules",
         type: CommandItemType.GROUP,
@@ -151,37 +115,6 @@ export const config: PageConfig[] = [
             icon: <TbArrowsDownUp />,
             action: ({ navigate }: ActionProps) => {
               redirectToTraffic(navigate);
-            },
-          },
-        ],
-      },
-      {
-        id: "user",
-        type: CommandItemType.GROUP,
-        title: "User",
-        children: [
-          {
-            id: "my account",
-            title: ({ user }: TitleProps) => (!user?.loggedIn ? null : "My Account"),
-            icon: <AiOutlineUser />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToAccountDetails(navigate);
-            },
-          },
-          {
-            id: "upgrade plan",
-            title: ({ user }: TitleProps) => (user.loggedIn || user?.details?.isPremium ? null : "Upgrade Plan"),
-            icon: <BiRocket />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToPricingPlans(navigate);
-            },
-          },
-          {
-            id: "settings",
-            title: "Settings",
-            icon: <AiOutlineSetting />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToSettings(navigate);
             },
           },
         ],
