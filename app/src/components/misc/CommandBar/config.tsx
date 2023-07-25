@@ -92,19 +92,19 @@ export const config: PageConfig[] = [
       {
         id: "mock api",
         type: CommandItemType.GROUP,
-        title: "Mocks",
+        title: "Mock server",
         children: [
           {
-            id: "mock api",
-            title: "Mock API",
+            id: "create mock api",
+            title: "Create Mock API endpoint",
             icon: <Document />,
             action: ({ navigate }: ActionProps) => {
               redirectToMocksList(navigate);
             },
           },
           {
-            id: "file server",
-            title: "File server",
+            id: "host files",
+            title: "Host JS/CSS/HTML files",
             icon: <PaperUpload />,
             action: ({ navigate }: ActionProps) => {
               redirectToFileMocksList(navigate);
