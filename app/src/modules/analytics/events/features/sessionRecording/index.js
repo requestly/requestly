@@ -26,11 +26,13 @@ export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.dra
 
 export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength, options) => {
+export const trackDraftSessionSaved = (sessionLength, options, type) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
+    type,
     sessionLength,
     options,
   });
+
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
 };
 
@@ -100,4 +102,9 @@ export const trackStartRecordingOnExternalTarget = (url) => {
 };
 export const trackTriedRecordingForInvalidURL = (url) => {
   trackEvent(SESSION_RECORDING.ONBAORDING.invalid_recording_url, { url });
+};
+
+// UPLOAD SESSION
+export const trackSessionRecordingUpload = (status) => {
+  trackEvent(SESSION_RECORDING.session_recording_upload, { status });
 };

@@ -1,16 +1,25 @@
 import React from "react";
 import { Col, Select, Input } from "antd";
 import { capitalize } from "lodash";
-import { Source } from "./types";
-import { SourceKey, SourceOperator } from "types/rules";
+import { RulePairSource, SourceKey, SourceOperator } from "types/rules";
+import { SessionRecordingPageSource } from "types";
 import "./index.scss";
+
+type Source = RulePairSource | SessionRecordingPageSource;
 
 interface SourceProps {
   source: Source;
+  autoFocus?: boolean;
+  additionalActions?: React.ReactNode;
   onSourceChange: (updatedSource: Source) => void;
 }
 
-export const SourceConditionInput: React.FC<SourceProps> = ({ source, onSourceChange }) => {
+export const SourceConditionInput: React.FC<SourceProps> = ({
+  source,
+  autoFocus = false,
+  additionalActions = <></>,
+  onSourceChange,
+}) => {
   return (
     <div className="source-condition-input-wrapper mt-8">
       <Col className="shrink-0">
@@ -48,6 +57,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({ source, onSourceCh
         </Select>
       </Col>
       <Input
+        autoFocus={autoFocus}
         className="source-url-input"
         placeholder="Enter source URL"
         value={source.value}
@@ -55,6 +65,8 @@ export const SourceConditionInput: React.FC<SourceProps> = ({ source, onSourceCh
           onSourceChange({ ...source, value: e.target.value });
         }}
       />
+
+      {additionalActions}
     </div>
   );
 };
