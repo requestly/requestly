@@ -5,7 +5,7 @@ import { AiOutlineFolderOpen, AiFillYoutube } from "react-icons/ai";
 import { BsHandbag, BsCameraVideo } from "react-icons/bs";
 import { MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
 import { TbArrowsDownUp } from "react-icons/tb";
-import { BiBook } from "react-icons/bi";
+import { BiBook, BiShuffle } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
 import {
   redirectToFileMocksList,
@@ -19,8 +19,10 @@ import {
   redirectToCreateNewRule,
 } from "utils/RedirectionUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
+import { switchWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import { ActionProps, CommandBarItem, CommandItemType, PageConfig, Page, TitleProps } from "./types";
-import { Tag } from "antd";
+import { Team } from "types";
+import { Tag, Avatar, Row } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -30,6 +32,19 @@ export const config: PageConfig[] = [
   {
     id: Page.HOME,
     items: [
+      {
+        id: "workspaces",
+        type: CommandItemType.GROUP,
+        title: "Workspaces",
+        children: [
+          {
+            id: "switch workspace",
+            title: "Switch workspace",
+            icon: <BiShuffle />,
+            nextPage: Page.SWITCH_WORKSPACE,
+          },
+        ],
+      },
       {
         id: "rules",
         type: CommandItemType.GROUP,
@@ -205,7 +220,7 @@ config.push(newRulePage);
 const userRulesPage: PageConfig = {
   id: Page.MY_RULES,
   items: [],
-  itemsFetcher: (rules: any = []) => {
+  itemsFetcher: ({ rules }) => {
     const items: CommandBarItem[] = rules.map(
       (rule: any): CommandBarItem => {
         return {
@@ -227,3 +242,55 @@ const userRulesPage: PageConfig = {
   },
 };
 config.push(userRulesPage);
+
+/**** Page : Switch Workspace *****/
+
+const availableTeamsPage: PageConfig = {
+  id: Page.SWITCH_WORKSPACE,
+  items: [],
+  itemsFetcher: ({ availableTeams }) => {
+    const items: CommandBarItem[] = availableTeams.map(
+      (team: Team): CommandBarItem => {
+        return {
+          id: team.id,
+          title: (
+            <Row align="middle" justify="space-between" className="w-full">
+              <Row align="middle" style={{ flex: 1 }}>
+                <Avatar
+                  size={28}
+                  shape="square"
+                  icon={team.name?.[0]?.toUpperCase() ?? "P"}
+                  className="workspace-avatar"
+                />
+                <span>{team.name}</span>
+              </Row>
+              <span>{team.accessCount} members</span>
+            </Row>
+          ),
+          action: ({ dispatch, user, appMode, isWorkspaceMode }: ActionProps) =>
+            switchWorkspace(
+              {
+                teamId: team.id,
+                teamName: team.name,
+                teamMembersCount: team.accessCount,
+              },
+              dispatch,
+              {
+                isSyncEnabled: user?.details?.isSyncEnabled,
+                isWorkspaceMode,
+              },
+              appMode,
+              () => {
+                setTimeout(() => {
+                  showSwitchWorkspaceSuccessToast(team.name);
+                }, 2 * 1000);
+              }
+            ),
+        };
+      }
+    );
+    return items;
+  },
+};
+
+config.push(availableTeamsPage);
