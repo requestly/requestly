@@ -4,7 +4,7 @@ import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from 
 import { PrimarySidebarItem } from "../type";
 import PATHS from "config/constants/sub/paths";
 import { Tooltip } from "antd";
-import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
+import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
 import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
@@ -24,6 +24,8 @@ export const PrimarySidebar: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
+  //TODO: add growthbook exp check here
+  const isEcosystemExpEnabled = true;
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
@@ -35,20 +37,27 @@ export const PrimarySidebar: React.FC = () => {
     const items = [
       {
         id: 0,
+        title: "Home",
+        path: PATHS.HOME.RELATIVE,
+        icon: <HomeOutlined />,
+        display: isEcosystemExpEnabled,
+      },
+      {
+        id: 1,
         title: "Network traffic",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
-        id: 1,
+        id: 2,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
         display: true,
       },
       {
-        id: 2,
+        id: 3,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -63,14 +72,14 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
       },
       {
-        id: 3,
+        id: 4,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
       },
       {
-        id: 4,
+        id: 5,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
@@ -82,7 +91,7 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
       },
       {
-        id: 5,
+        id: 6,
         title: "Android Debugger",
         path: PATHS.MOBILE_DEBUGGER.INDEX,
         icon: <MobileOutlined />,
@@ -100,7 +109,7 @@ export const PrimarySidebar: React.FC = () => {
           .filter((item) => item.display)
           .map((item) => (
             <li key={item.id}>
-              <PrimarySidebarLink {...item} />
+              <PrimarySidebarLink {...item} isExperimentEnabled={isEcosystemExpEnabled} />
             </li>
           ))}
       </ul>
