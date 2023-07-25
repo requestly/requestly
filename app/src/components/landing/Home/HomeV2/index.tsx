@@ -2,15 +2,16 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
-import { Typography } from "antd";
+import { Row, Typography } from "antd";
 import { FeatureTag } from "components/common/FeatureTag";
 import developmentIcon from "../../../../assets/icons/system.svg";
 import testingIcon from "../../../../assets/icons/bug.svg";
 import debuggingIcon from "../../../../assets/icons/flask.svg";
+import { BsArrowRight } from "react-icons/bs";
 import FEATURES from "config/constants/sub/features";
 import PATHS from "config/constants/sub/paths";
-import "./index.scss";
 import { trackEcosystemFeatureClicked } from "modules/analytics/events/features/ecosystem";
+import "./index.scss";
 
 interface FeatureCardProps {
   title: string;
@@ -114,7 +115,13 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, tag, navi
     >
       <Typography.Title className="home-v2-grid-card-title">{title}</Typography.Title>
       <Typography.Text className="home-v2-grid-card-description">{description}</Typography.Text>
-      <FeatureTag feature={tag} />
+      <Row justify="space-between" align="middle" className="mt-16">
+        <FeatureTag feature={tag} />
+        <div className="display-row-center get-started-text">
+          Get started
+          <BsArrowRight />
+        </div>
+      </Row>
     </div>
   );
 };
