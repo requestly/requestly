@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "hooks/useDebounce";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SourceConditionInput } from "../SourceUrl";
+import { LearnMoreLink } from "../LearnMoreLink";
 import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { isValidRegex } from "utils/rules/misc";
@@ -182,19 +183,11 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
       </div>
       <div className="rq-modal-footer test-url-modal-footer">
         <Row className="w-full" justify="space-between">
-          <Row align="middle" className="text-gray">
-            <InfoCircleOutlined className="mr-8" />
-            <span className="subtitle">
-              Read more about source condition matching{" "}
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION}
-                className="external-link"
-              >
-                here
-              </a>
-            </span>
+          <Row align="middle">
+            <LearnMoreLink
+              linkText="Learn more about source condition matching"
+              href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION}
+            />
           </Row>
           {isEqual(source, updatedSource) ? (
             <RQButton type="default" onClick={() => onClose(updatedSource.operator)}>
