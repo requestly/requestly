@@ -184,7 +184,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         <Row className="w-full" justify="space-between">
           <Row align="middle" className="text-gray">
             <InfoCircleOutlined className="mr-8" />
-            <span>
+            <span className="subtitle">
               Read more about source condition matching{" "}
               <a
                 target="_blank"
