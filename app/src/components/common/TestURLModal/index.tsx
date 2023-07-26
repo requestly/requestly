@@ -180,7 +180,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
           </div>
         </div>
       </div>
-      <div className="rq-modal-footer">
+      <div className="rq-modal-footer test-url-modal-footer">
         <Row className="w-full" justify="space-between">
           <Row align="middle" className="text-gray">
             <InfoCircleOutlined className="mr-8" />
