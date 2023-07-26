@@ -229,3 +229,12 @@
   text-overflow: ellipsis;
   max-width: 90%;
 }
+.external-link {
+  color: var(--text-gray);
+  text-decoration: underline;
+  transition: 0.2s ease-in-out;
+}
+.external-link:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
