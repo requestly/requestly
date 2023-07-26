@@ -189,6 +189,7 @@
   color: var(--text-gray);
   font-weight: 500;
   opacity: 0.7;
+  margin-right: 4px;
 }
 .header-right-section .header-search-btn.ant-btn:hover,
 .header-right-section .header-search-btn.ant-btn:focus {

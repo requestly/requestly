@@ -20,14 +20,13 @@ import {
   redirectToCreateNewRule,
 } from "utils/RedirectionUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
-import { switchWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import { ActionProps, CommandBarItem, CommandItemType, PageConfig, Page, TitleProps } from "./types";
-import { Team } from "types";
-import { Tag, Avatar, Row } from "antd";
+import { Tag } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.css";
+// import { IoPersonAddOutline } from "react-icons/io5";
 
 export const config: PageConfig[] = [
   {
@@ -42,15 +41,22 @@ export const config: PageConfig[] = [
             id: "switch workspace",
             title: "Switch workspace",
             icon: <BiShuffle />,
-            nextPage: Page.SWITCH_WORKSPACE,
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: "true" })),
           },
+          // {
+          //   id: "join workspace",
+          //   title: "Join workspace",
+          //   icon: <IoPersonAddOutline />,
+          //   action: ({ dispatch }) =>
+          //     dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: "true" })),
+          // },
           {
             id: "create new workspace",
             title: "Create new workspace",
             icon: <HiOutlineUserGroup />,
-            action: ({ dispatch }) => {
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
-            },
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
           },
         ],
       },
@@ -253,53 +259,3 @@ const userRulesPage: PageConfig = {
 config.push(userRulesPage);
 
 /**** Page : Switch Workspace *****/
-
-const availableTeamsPage: PageConfig = {
-  id: Page.SWITCH_WORKSPACE,
-  items: [],
-  itemsFetcher: ({ availableTeams }) => {
-    const items: CommandBarItem[] = availableTeams.map(
-      (team: Team): CommandBarItem => {
-        return {
-          id: team.id,
-          title: (
-            <Row align="middle" justify="space-between" className="w-full">
-              <Row align="middle" style={{ flex: 1 }}>
-                <Avatar
-                  size={28}
-                  shape="square"
-                  icon={team.name?.[0]?.toUpperCase() ?? "P"}
-                  className="workspace-avatar"
-                />
-                <span>{team.name}</span>
-              </Row>
-              <span>{team.accessCount} members</span>
-            </Row>
-          ),
-          action: ({ dispatch, user, appMode, isWorkspaceMode }: ActionProps) =>
-            switchWorkspace(
-              {
-                teamId: team.id,
-                teamName: team.name,
-                teamMembersCount: team.accessCount,
-              },
-              dispatch,
-              {
-                isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode,
-              },
-              appMode,
-              () => {
-                setTimeout(() => {
-                  showSwitchWorkspaceSuccessToast(team.name);
-                }, 2 * 1000);
-              }
-            ),
-        };
-      }
-    );
-    return items;
-  },
-};
-
-config.push(availableTeamsPage);
