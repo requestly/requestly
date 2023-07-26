@@ -13,10 +13,19 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const RootComponent: React.FC = () => {
   const location = useLocation();
   const appMode = useSelector(getAppMode);
+  const isEcosystemExpEnabled = true;
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (
-    <Navigate to={isOpenedInDesktopMode ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE : PATHS.RULES.MY_RULES.ABSOLUTE} />
+    <Navigate
+      to={
+        isOpenedInDesktopMode
+          ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE
+          : isEcosystemExpEnabled
+          ? PATHS.HOME.RELATIVE
+          : PATHS.RULES.MY_RULES.ABSOLUTE
+      }
+    />
   );
 };
 
