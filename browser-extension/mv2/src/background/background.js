@@ -1017,7 +1017,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED:
-        BG.Methods.onContentScriptLoadedNotification(sender.tab, sender.frameId, message.payload);
+        BG.Methods.onContentScriptLoadedNotification(sender.tab, message.payload);
         break;
 
       case RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
@@ -1111,9 +1111,8 @@ BG.Methods.onAppLoadedNotification = () => {
   EventActions.sendExtensionEvents();
 };
 
-BG.Methods.onContentScriptLoadedNotification = async (tab, frameId, payload = {}) => {
-  if (frameId !== 0) {
-    // not the top frame
+BG.Methods.onContentScriptLoadedNotification = async (tab, payload = {}) => {
+  if (payload.isIframe) {
     return;
   }
 
@@ -1146,16 +1145,20 @@ BG.Methods.onContentScriptLoadedNotification = async (tab, frameId, payload = {}
   const sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (sessionRecordingData) {
-    chrome.tabs.sendMessage(tab.id, {
-      action: RQ.CLIENT_MESSAGES.START_RECORDING,
-      payload: sessionRecordingData,
-    });
-
-    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
-      ...sessionRecordingData,
-      notify: false,
-      previousSession: null,
-    });
+    chrome.tabs.sendMessage(
+      tab.id,
+      {
+        action: RQ.CLIENT_MESSAGES.START_RECORDING,
+        payload: sessionRecordingData,
+      },
+      () => {
+        window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
+          ...sessionRecordingData,
+          notify: false,
+          previousSession: null,
+        });
+      }
+    );
   }
 };
 

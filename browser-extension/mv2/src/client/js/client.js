@@ -15,6 +15,7 @@
     action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
     payload: {
       referrer: document.referrer,
+      isIframe: window.top !== window,
     },
   });
 })();

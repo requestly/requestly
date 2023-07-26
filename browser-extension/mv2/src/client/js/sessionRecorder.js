@@ -8,8 +8,13 @@ RQ.SessionRecorder.setup = () => {
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.START_RECORDING:
-        RQ.SessionRecorder.startRecording(message.payload);
-        break;
+        RQ.SessionRecorder.startRecording(message.payload).then(() => {
+          // recording starts in all the frames, but only the top document should send confirmation
+          if (!RQ.SessionRecorder.isIframe()) {
+            sendResponse();
+          }
+        });
+        return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording");
@@ -37,34 +42,36 @@ RQ.SessionRecorder.setup = () => {
   });
 };
 
-RQ.SessionRecorder.startRecording = ({ config, previousSession, notify, explicit }) => {
-  RQ.SessionRecorder.initialize(() => {
-    RQ.SessionRecorder.sendMessageToClient("startRecording", {
-      relayEventsToTop: RQ.SessionRecorder.isIframe(),
-      console: true,
-      network: true,
-      maxDuration: (config?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-      previousSession: !RQ.SessionRecorder.isIframe() ? previousSession : null,
-    });
+RQ.SessionRecorder.startRecording = async ({ config, previousSession, notify, explicit }) => {
+  await RQ.SessionRecorder.initialize();
 
-    if (notify) {
-      RQ.SessionRecorder.showToast();
-    }
-
-    RQ.SessionRecorder.isExplicitRecording = explicit;
+  RQ.SessionRecorder.sendMessageToClient("startRecording", {
+    relayEventsToTop: RQ.SessionRecorder.isIframe(),
+    console: true,
+    network: true,
+    maxDuration: (config?.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+    previousSession: !RQ.SessionRecorder.isIframe() ? previousSession : null,
   });
-};
 
-RQ.SessionRecorder.initialize = (callback) => {
-  if (RQ.SessionRecorder.isInitialized) {
-    callback();
+  if (notify) {
+    RQ.SessionRecorder.showToast();
   }
 
-  RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/requestly-web-sdk.js"), () => {
-    RQ.ClientUtils.executeJS(`(${RQ.SessionRecorder.bootstrapClient.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
-    RQ.SessionRecorder.addMessageListeners();
-    RQ.SessionRecorder.isInitialized = true;
-    callback();
+  RQ.SessionRecorder.isExplicitRecording = explicit;
+};
+
+RQ.SessionRecorder.initialize = () => {
+  return new Promise((resolve) => {
+    if (RQ.SessionRecorder.isInitialized) {
+      resolve();
+    }
+
+    RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/requestly-web-sdk.js"), () => {
+      RQ.ClientUtils.executeJS(`(${RQ.SessionRecorder.bootstrapClient.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
+      RQ.SessionRecorder.addMessageListeners();
+      RQ.SessionRecorder.isInitialized = true;
+      resolve();
+    });
   });
 };
 
