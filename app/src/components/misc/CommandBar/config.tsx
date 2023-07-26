@@ -8,6 +8,7 @@ import { TbArrowsDownUp } from "react-icons/tb";
 import { BiBook, BiShuffle } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import { IoPersonAddOutline } from "react-icons/io5";
 import {
   redirectToFileMocksList,
   redirectToMocksList,
@@ -26,7 +27,6 @@ import { Tag } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.css";
-// import { IoPersonAddOutline } from "react-icons/io5";
 
 export const config: PageConfig[] = [
   {
@@ -42,15 +42,15 @@ export const config: PageConfig[] = [
             title: "Switch workspace",
             icon: <BiShuffle />,
             action: ({ dispatch }) =>
-              dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: "true" })),
+              dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true })),
           },
-          // {
-          //   id: "join workspace",
-          //   title: "Join workspace",
-          //   icon: <IoPersonAddOutline />,
-          //   action: ({ dispatch }) =>
-          //     dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: "true" })),
-          // },
+          {
+            id: "join workspace",
+            title: "Join workspace",
+            icon: <IoPersonAddOutline />,
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true })),
+          },
           {
             id: "create new workspace",
             title: "Create new workspace",

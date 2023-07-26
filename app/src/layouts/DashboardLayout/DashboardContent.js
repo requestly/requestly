@@ -25,6 +25,7 @@ import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
+import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -153,6 +154,13 @@ const DashboardContent = () => {
         <SwitchWorkspaceModal
           isOpen={activeModals.switchWorkspaceModal.isActive}
           toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+          {...activeModals.switchWorkspaceModal.props}
+        />
+      ) : null}
+      {activeModals.joinWorkspaceModal.isActive ? (
+        <JoinWorkspaceModal
+          isOpen={activeModals.joinWorkspaceModal.isActive}
+          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
           {...activeModals.switchWorkspaceModal.props}
         />
       ) : null}

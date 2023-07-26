@@ -57,14 +57,6 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
-  // const getPendingInvites = useMemo(
-  //   () =>
-  //     httpsCallable<{ email: boolean; domain: boolean }, { pendingInvites: Invite[]; success: boolean }>(
-  //       getFunctions(),
-  //       "teams-getPendingTeamInvites"
-  //     ),
-  //   []
-  // );
 
   const isPendingEmailInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
     pendingInvites,
@@ -149,7 +141,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           setPendingInvites([]);
         });
     }
-  }, [dispatch, getPendingInvites, user?.loggedIn]);
+  }, [dispatch, user?.loggedIn]);
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {

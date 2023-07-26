@@ -1,36 +1,69 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { getUserAuthDetails } from "store/selectors";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
-import { TeamInvite, TeamInviteMetadata } from "types";
+import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import { actions } from "store";
+import { getPendingInvites } from "backend/workspace";
+import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
-  teamInvites: TeamInvite[];
-  handleModalClose: () => void;
-  handleCreateNewWorkspaceClick: (e: React.MouseEvent) => void;
+  toggleModal: () => void;
 }
 
-const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
-  isOpen,
-  teamInvites,
-  handleModalClose,
-  handleCreateNewWorkspaceClick,
-}) => {
+const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+  const [teamInvites, setTeamInvites] = useState<Invite[]>([]);
+
   const handleJoinClick = (teamId: string, inviteId: string) => {
-    handleModalClose();
+    toggleModal();
     navigate(`/invite/${inviteId}`);
     trackWorkspaceJoinClicked(teamId, "workspace_joining_modal");
   };
 
+  useEffect(() => {
+    if (user.loggedIn) {
+      getPendingInvites({ email: true, domain: false })
+        .then((res) => {
+          setTeamInvites(res);
+        })
+        .catch((e) => setTeamInvites([]));
+    }
+  }, [user.loggedIn]);
+
+  const handleCreateNewWorkspace = () => {
+    toggleModal();
+    if (user.loggedIn) {
+      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+    } else {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            callback: () => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
+            redirectURL: window.location.href,
+            src: APP_CONSTANTS.FEATURES.WORKSPACES,
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: "join_workspace_modal",
+          },
+        })
+      );
+    }
+  };
+
   return (
-    <RQModal centered open={isOpen} onCancel={handleModalClose} className="join-workspace-modal">
+    <RQModal centered open={isOpen} onCancel={toggleModal} className="join-workspace-modal">
       <div className="rq-modal-content">
         {teamInvites?.length > 0 && (
           <div className="join-workspace-modal-header header">You have access to these workspaces</div>
@@ -75,7 +108,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
           <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
         </Col>
         <Col>
-          <Button className="display-row-center" onClick={handleCreateNewWorkspaceClick}>
+          <Button className="display-row-center" onClick={handleCreateNewWorkspace}>
             <PlusOutlined /> Create new workspace
           </Button>
         </Col>
