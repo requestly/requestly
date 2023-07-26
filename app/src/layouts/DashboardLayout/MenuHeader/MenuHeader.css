@@ -207,6 +207,12 @@
   }
 }
 
+@media screen and (max-width: 860px) {
+  .header-right-section .header-search-btn.ant-btn {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .extension .header-left-section > a {
     display: none;
