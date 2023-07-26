@@ -18,7 +18,7 @@ export const getPendingInvites = async ({ email, domain }: { email: boolean; dom
   );
   return getInvites({ email, domain })
     .then((res) => {
-      return res?.data?.pendingInvites ?? [];
+      return res?.data;
     })
     .catch((e) => {
       console.log("error", e);
