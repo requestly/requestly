@@ -9,16 +9,15 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
   path,
   icon,
   activeColor = "var(--primary)",
-  isExperimentEnabled = false,
+  isEcosystemExperiment = false,
 }) => (
   <NavLink
     to={path}
     onClick={() => trackSidebarClicked(snakeCase(title))}
-    // className={({ isActive }) => `primary-sidebar-link ${isActive ? "primary-sidebar-active-link" : ""}`}
-    className="primary-sidebar-link"
+    className={({ isActive }) => `primary-sidebar-link ${isActive ? "primary-sidebar-active-link" : ""}`}
     style={({ isActive }) => {
       return {
-        borderLeftColor: isActive ? (isExperimentEnabled ? activeColor : "var(--primary)") : null,
+        borderLeftColor: isActive ? (isEcosystemExperiment ? activeColor : "var(--primary)") : null,
       };
     }}
   >
