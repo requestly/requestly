@@ -1,31 +1,31 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
-import { PrimarySidebarItem } from "../type";
-import PATHS from "config/constants/sub/paths";
 import { Tooltip } from "antd";
+import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
 import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
-import FEATURES from "config/constants/sub/features";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
-import "./PrimarySidebar.css";
+import { PrimarySidebarItem } from "../type";
 import InviteButton from "./InviteButton";
+import PATHS from "config/constants/sub/paths";
+import FEATURES from "config/constants/sub/features";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
-  //TODO: add growthbook exp check here
-  const isEcosystemExpEnabled = true;
+  const ecosystemExperiment = useFeatureValue("ecosystem-experiment", null);
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
@@ -40,7 +40,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: isEcosystemExpEnabled,
+        display: ecosystemExperiment === "ecosystem",
       },
       {
         id: 1,
@@ -104,7 +104,7 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     return items.filter((item) => !item.feature || isFeatureCompatible(item.feature));
-  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
+  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession, ecosystemExperiment]);
 
   return (
     <div className="primary-sidebar-container">
@@ -113,7 +113,7 @@ export const PrimarySidebar: React.FC = () => {
           .filter((item) => item.display)
           .map((item) => (
             <li key={item.id}>
-              <PrimarySidebarLink {...item} isExperimentEnabled={isEcosystemExpEnabled} />
+              <PrimarySidebarLink {...item} isEcosystemExperiment={ecosystemExperiment === "ecosystem"} />
             </li>
           ))}
       </ul>
