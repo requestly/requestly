@@ -10,7 +10,6 @@ export enum Page {
   HOME = "Home",
   NEW_RULES = "New Rule",
   MY_RULES = "My Rules",
-  SWITCH_WORKSPACE = "Switch Workspace",
 }
 
 export interface CommandBarItem {
