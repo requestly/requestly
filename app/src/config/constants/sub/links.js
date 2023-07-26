@@ -42,6 +42,9 @@ const LINKS = {
   REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES:
     "https://docs.requestly.io/desktop-app/mac/features/import-settings-from-charles",
 
+  // Docs - Test URL condition
+  REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/test-url-condition",
+
   /** LANDING PAGES **/
 
   // Home

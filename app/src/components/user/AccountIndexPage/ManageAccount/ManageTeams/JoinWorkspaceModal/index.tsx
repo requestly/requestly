@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
-import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
 import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { TeamInvite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 
 interface JoinWorkspaceModalProps {
@@ -72,7 +73,10 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({
       {/* footer */}
       <Row align="middle" justify="space-between" className="rq-modal-footer">
         <Col>
-          <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+          <LearnMoreLink
+            linkText="Learn more about team workspaces"
+            href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+          />
         </Col>
         <Col>
           <Button className="display-row-center" onClick={handleCreateNewWorkspaceClick}>

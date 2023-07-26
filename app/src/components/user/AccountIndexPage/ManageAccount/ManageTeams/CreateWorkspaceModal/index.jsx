@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { Button, Col, Form, Input, Row } from "antd";
-import { RQModal } from "lib/design-system/components";
-import { toast } from "utils/Toast";
-import { redirectToTeam } from "utils/RedirectionUtils";
-import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
-import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import "./CreateWorkspaceModal.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { Button, Col, Form, Input, Row } from "antd";
+import { RQModal } from "lib/design-system/components";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
+import { toast } from "utils/Toast";
+import { redirectToTeam } from "utils/RedirectionUtils";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
+import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
+import APP_CONSTANTS from "config/constants";
+import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
   const navigate = useNavigate();
@@ -130,7 +131,10 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
         {/* footer */}
         <Row align="middle" justify="space-between" className="rq-modal-footer">
           <Col>
-            <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+            <LearnMoreLink
+              linkText="Learn more about team workspaces"
+              href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+            />
           </Col>
           <Col>
             <Button
