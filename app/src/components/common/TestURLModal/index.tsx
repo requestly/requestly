@@ -164,7 +164,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         <div className="test-url-modal-section">
           <div className="text-bold white"> Enter URL to be checked</div>
           <Input
-            className="mt-8"
+            className="test-url-field"
             placeholder="https://www.example.com"
             value={testURL}
             onChange={(e) => {
