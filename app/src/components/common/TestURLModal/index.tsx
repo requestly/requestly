@@ -11,6 +11,7 @@ import { RulePairSource, SourceOperator } from "types";
 import { SessionRecordingPageSource } from "types/sessionRecording";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
+import LINKS from "config/constants/sub/links";
 import {
   trackURLConditionMatchingTried,
   trackURLConditionModalViewed,
@@ -180,7 +181,21 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         </div>
       </div>
       <div className="rq-modal-footer">
-        <Row className="w-full" justify="end">
+        <Row className="w-full" justify="space-between">
+          <Row align="middle" className="text-gray">
+            <InfoCircleOutlined className="mr-8" />
+            <span>
+              Read more about source condition matching{" "}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION}
+                className="external-link"
+              >
+                here
+              </a>
+            </span>
+          </Row>
           {isEqual(source, updatedSource) ? (
             <RQButton type="default" onClick={() => onClose(updatedSource.operator)}>
               Close
