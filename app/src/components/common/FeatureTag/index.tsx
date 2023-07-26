@@ -8,25 +8,25 @@ interface TagProps {
 
 const featureMap = {
   [FEATURES.API_CLIENT]: {
-    color: "#CA6199",
+    color: "var(--api-client)",
     backgroundColor: "#251420",
     border: "#4b2239",
     title: "API Client",
   },
   [FEATURES.RULES]: {
-    color: "#537ED2",
+    color: "var(--http-rules)",
     backgroundColor: "#141A2B",
     border: "#1F3158",
     title: "HTTP Rules",
   },
   [FEATURES.MOCK_V2]: {
-    color: "#84BB4F",
+    color: "var(--mock-server)",
     backgroundColor: "#1A2314",
     border: "#2E441C",
     title: "Mock Server",
   },
   [FEATURES.SESSION_RECORDING]: {
-    color: "#DDB651CC",
+    color: "var(--session-recording)",
     backgroundColor: "#292213",
     border: "#4F401B",
     title: "Sessions",
