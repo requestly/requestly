@@ -139,7 +139,7 @@ const WorkspaceSelector = () => {
 
     getPendingInvites({ email: true, domain: false })
       .then((res) => {
-        setTeamInvites(res);
+        setTeamInvites(res?.pendingInvites ?? []);
       })
       .catch((e) => setTeamInvites([]));
   }, [user.loggedIn]);
@@ -183,11 +183,11 @@ const WorkspaceSelector = () => {
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-      trackWorkspaceJoiningModalOpened(teamInvites.length);
+      trackWorkspaceJoiningModalOpened(teamInvites?.length);
     } else {
       promptUserSignupModal(() => {
         dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-        trackWorkspaceJoiningModalOpened(teamInvites.length);
+        trackWorkspaceJoiningModalOpened(teamInvites?.length);
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
@@ -341,7 +341,7 @@ const WorkspaceSelector = () => {
 
   const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
   const TeamsInviteCountBadge = (
-    <Badge color="#0361FF" count={teamInvites.length} className="join-workspace-invite-count-badge" />
+    <Badge color="#0361FF" count={teamInvites?.length} className="join-workspace-invite-count-badge" />
   );
 
   const joinWorkspaceDropdownItems = [
@@ -350,7 +350,7 @@ const WorkspaceSelector = () => {
       label: (
         <span className="join-existing-workspace-menu-item">
           <span>Join an existing workspace</span>
-          {teamInvites.length > 0 && TeamsInviteCountBadge}
+          {teamInvites?.length > 0 && TeamsInviteCountBadge}
         </span>
       ),
       onClick: () => {
@@ -467,7 +467,7 @@ const WorkspaceSelector = () => {
             <span>Join or create workspace</span>
 
             <div>
-              {teamInvites.length > 0 && TeamsInviteCountBadge}
+              {teamInvites?.length > 0 && TeamsInviteCountBadge}
               <RightOutlined />
             </div>
           </div>

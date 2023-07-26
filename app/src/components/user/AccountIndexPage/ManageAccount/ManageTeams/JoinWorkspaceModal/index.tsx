@@ -34,8 +34,8 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   useEffect(() => {
     if (user.loggedIn) {
       getPendingInvites({ email: true, domain: false })
-        .then((res) => {
-          setTeamInvites(res);
+        .then((res: any) => {
+          setTeamInvites(res?.pendingInvites ?? []);
         })
         .catch((e) => setTeamInvites([]));
     }
