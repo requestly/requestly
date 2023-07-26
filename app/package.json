@@ -128,7 +128,7 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.13.1",
+    "@requestly/web-sdk": "0.14.0",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
