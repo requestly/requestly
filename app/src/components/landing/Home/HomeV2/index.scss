@@ -1,8 +1,8 @@
 .home-v2-container {
   background: var(--background);
   //   background: #020409;
-  height: 100%;
   padding: 100px 80px;
+  padding-right: 20px;
 
   .welcome-title {
     font-size: 1.5rem;
@@ -10,11 +10,12 @@
   }
   .welcome-subtitle {
     font-size: 1rem;
+    color: var(--text-gray);
   }
 
   .home-v2-feature-grid-wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust minmax() values as needed */
     max-width: 1100px;
     margin-top: 1rem;
 
@@ -76,5 +77,10 @@
         }
       }
     }
+  }
+}
+@media (max-width: 860px) {
+  .home-v2-container {
+    padding: 50px 30px;
   }
 }
