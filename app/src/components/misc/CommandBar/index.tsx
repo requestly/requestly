@@ -7,7 +7,6 @@ import fuzzysort from "fuzzysort";
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
 import { getAllRules, getUserAuthDetails, getAppMode, getUserAttributes, getIsCommandBarOpen } from "store/selectors";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { actions } from "store";
 import {
   trackCommandPaletteClosed,
@@ -31,8 +30,6 @@ export const CommandBar = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
-  const availableTeams = useSelector(getAvailableTeams);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
 
   let currentPage = pagesStack[pagesStack.length - 1];
@@ -86,7 +83,7 @@ export const CommandBar = () => {
 
   const renderTitle = (item: CommandBarItem) =>
     typeof item.title === "function"
-      ? item.title({ user, appMode, rules, availableTeams, num_sessions: userAttributes.num_sessions })
+      ? item.title({ user, appMode, rules, num_sessions: userAttributes.num_sessions })
       : item.title;
 
   const renderGroupItem = (item: CommandBarItem): ReactNode | null => {
@@ -115,7 +112,7 @@ export const CommandBar = () => {
           key={item.id}
           onSelect={() => {
             if (item?.action) {
-              item.action({ navigate, dispatch, isWorkspaceMode, user, appMode, rules });
+              item.action({ navigate, dispatch, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               trackCommandPaletteClosed();
               dispatch(actions.updateIsCommandBarOpen(false));
@@ -140,7 +137,7 @@ export const CommandBar = () => {
   };
 
   const renderAsyncPage = (fetcher: Function): ReactNode => {
-    const items = fetcher({ rules, availableTeams });
+    const items = fetcher({ rules });
     return renderItems(items);
   };
 

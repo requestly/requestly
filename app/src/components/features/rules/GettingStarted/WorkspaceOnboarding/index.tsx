@@ -25,6 +25,7 @@ import { shouldShowOnboarding } from "components/misc/PersonaSurvey/utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getPendingInvites } from "backend/workspace";
 import { actions } from "store";
 import { Invite, InviteUsage } from "types";
 //@ts-ignore
@@ -56,14 +57,14 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
-  const getPendingInvites = useMemo(
-    () =>
-      httpsCallable<{ email: boolean; domain: boolean }, { pendingInvites: Invite[]; success: boolean }>(
-        getFunctions(),
-        "teams-getPendingTeamInvites"
-      ),
-    []
-  );
+  // const getPendingInvites = useMemo(
+  //   () =>
+  //     httpsCallable<{ email: boolean; domain: boolean }, { pendingInvites: Invite[]; success: boolean }>(
+  //       getFunctions(),
+  //       "teams-getPendingTeamInvites"
+  //     ),
+  //   []
+  // );
 
   const isPendingEmailInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
     pendingInvites,
@@ -141,8 +142,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     if (user?.loggedIn) {
       getPendingInvites({ email: true, domain: true })
         .then((res) => {
-          setPendingInvites(res?.data?.pendingInvites ?? []);
-          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.data?.pendingInvites }));
+          setPendingInvites(res);
+          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res }));
         })
         .catch((e) => {
           setPendingInvites([]);

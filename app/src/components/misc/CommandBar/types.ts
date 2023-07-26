@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Rule, Team } from "types";
+import { Rule } from "types";
 
 export enum CommandItemType {
   DIVIDER,
@@ -26,21 +26,19 @@ export interface CommandBarItem {
 export interface PageConfig {
   id: Page;
   items: CommandBarItem[];
-  itemsFetcher?: ({ rules, availableTeams }: any) => CommandBarItem[];
+  itemsFetcher?: ({ rules }: any) => CommandBarItem[];
 }
 
 export interface TitleProps {
   user?: any;
   appMode?: string;
   rules?: any;
-  availableTeams?: Team[];
   num_sessions?: number;
 }
 
 export interface ActionProps {
   navigate?: any;
   dispatch?: any;
-  isWorkspaceMode?: boolean;
   user?: any;
   appMode?: string;
   rules?: Rule[];

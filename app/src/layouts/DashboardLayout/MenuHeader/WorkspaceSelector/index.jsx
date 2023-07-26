@@ -35,8 +35,8 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
+import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
-import { getFunctions, httpsCallable } from "firebase/functions";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -135,19 +135,16 @@ const WorkspaceSelector = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
-  const loggedInUserEmail = user?.details?.profile?.email;
-
-  const getPendingInvites = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingTeamInvites"), []);
 
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getPendingInvites({ email: true })
+    getPendingInvites({ email: true, domain: false })
       .then((res) => {
-        setTeamInvites(res?.data?.pendingInvites ?? []);
+        setTeamInvites(res);
       })
       .catch((e) => setTeamInvites([]));
-  }, [user.loggedIn, loggedInUserEmail, getPendingInvites]);
+  }, [user.loggedIn]);
 
   useEffect(() => {
     if (availableTeams?.length > 0) {
