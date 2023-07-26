@@ -54,8 +54,8 @@
     "src/modules/PreDefinedFunctions.js",
     "src/modules/RuleMatcher.js",
     "src/modules/EventActions.js",
-    "src/background/SampleRules.js",
     "src/background/flags.js",
+    "src/background/ExtensionIconManager.js",
     "src/background/background.js"
   ]
 }

@@ -4,6 +4,11 @@
   };
 
   TabService.prototype = {
+    dataScope: {
+      TAB: "tabData",
+      PAGE: "pageData",
+    },
+
     construct: function () {
       this.map = {};
       this.initTabs();
@@ -17,7 +22,6 @@
         that.map = {};
         for (var i = 0; i < tabs.length; i++) {
           var tab = tabs[i];
-          tab.data = {};
           that.map[tab.id] = tab;
         }
       });
@@ -43,7 +47,14 @@
         if (!that.map.hasOwnProperty(tabId)) {
           return;
         }
-        that.map[tabId] = { ...tab, data: that.map[tabId].data || {} };
+        that.map[tabId] = {
+          ...tab,
+          [that.dataScope.TAB]: that.map[tabId][that.dataScope.TAB] || {},
+        };
+
+        if (changeInfo.status === "loading") {
+          that.map[tabId][that.dataScope.PAGE] = {};
+        }
       });
 
       chrome.webRequest.onBeforeRequest.addListener(
@@ -103,33 +114,120 @@
       chrome.tabs.onRemoved.addListener(listener);
     },
 
-    setData: function (tabId, key, value) {
+    ensureTabLoadingComplete: function (tabId) {
+      return new Promise((resolve, reject) => {
+        const tab = this.map[tabId];
+
+        if (tab) {
+          if (tab.status === "complete") {
+            resolve();
+          } else {
+            const handler = (currentTabId, tabChangeInfo) => {
+              if (currentTabId === tabId && tabChangeInfo.status === "complete") {
+                resolve();
+                chrome.tabs.onUpdated.removeListener(handler);
+              }
+            };
+            chrome.tabs.onUpdated.addListener(handler);
+          }
+        } else {
+          reject();
+        }
+      });
+    },
+
+    setDataForScope: function (scope, tabId, key, value) {
       if (!this.map.hasOwnProperty(tabId)) {
         return;
       }
+
       // null safe for firefox as in firefox get/set happen before tab updation whereas
       // in chrome get/set happens after tab updation
-      if (this.map[tabId].hasOwnProperty("data")) {
-        this.map[tabId].data[key] = value;
+      if (this.map[tabId].hasOwnProperty(scope)) {
+        this.map[tabId][scope][key] = value;
       } else {
-        this.map[tabId].data = { [key]: value };
+        this.map[tabId][scope] = { [key]: value };
       }
     },
 
-    getData: function (tabId, key, defaultValue) {
+    getDataForScope: function (scope, tabId, key, defaultValue) {
       if (!this.map.hasOwnProperty(tabId)) {
         return null;
       }
 
-      return this.map[tabId].data?.[key] || defaultValue;
+      return this.map[tabId][scope]?.[key] || defaultValue;
     },
 
-    removeData: function (tabId, key) {
+    removeDataForScope: function (scope, tabId, key) {
       if (!this.map.hasOwnProperty(tabId)) {
         return;
       }
 
-      delete this.map[tabId].data?.[key];
+      delete this.map[tabId][scope]?.[key];
+    },
+
+    getTabsWithDataFilterForScope: function (scope, dataFilter) {
+      return Object.values(this.getTabs()).filter((tab) => dataFilter(tab[scope] || {}));
+    },
+
+    setData: function (...args) {
+      this.setDataForScope(this.dataScope.TAB, ...args);
+    },
+
+    getData: function (...args) {
+      return this.getDataForScope(this.dataScope.TAB, ...args);
+    },
+
+    removeData: function (...args) {
+      this.removeDataForScope(this.dataScope.TAB, ...args);
+    },
+
+    getTabsWithDataFilter: function (dataFilter) {
+      return this.getTabsWithDataFilterForScope(this.dataScope.TAB, dataFilter);
+    },
+
+    setPageData: function (tabId, ...args) {
+      this.setDataForScope(this.dataScope.PAGE, tabId, ...args);
+    },
+
+    getPageData: function (tabId, ...args) {
+      return this.getDataForScope(this.dataScope.PAGE, tabId, ...args);
+    },
+
+    removePageData: function (tabId, ...args) {
+      return this.removeDataForScope(this.dataScope.PAGE, tabId, ...args);
+    },
+
+    getTabsWithPageDataFilter: function (dataFilter) {
+      return this.getTabsWithDataFilterForScope(this.dataScope.PAGE, dataFilter);
+    },
+
+    promisifiedSetIcon: function (tabId, path) {
+      return new Promise((resolve) => {
+        chrome.browserAction.setIcon({ tabId, path }, resolve);
+      });
+    },
+
+    // do not pass tabId to set icon globally
+    setExtensionIcon: async function (path, tabId) {
+      if (typeof tabId === "undefined") {
+        chrome.browserAction.setIcon({ path });
+        return;
+      }
+
+      await this.ensureTabLoadingComplete(tabId);
+
+      // on invoking setIcon multiple times simultaneously in a tab may lead to inconsistency without synchronization
+      let setIconSynchronizer = this.getPageData(tabId, "setIconSynchronizer");
+      if (!setIconSynchronizer) {
+        setIconSynchronizer = Promise.resolve();
+      }
+
+      this.setPageData(
+        tabId,
+        "setIconSynchronizer",
+        setIconSynchronizer.then(() => this.promisifiedSetIcon(tabId, path))
+      );
     },
   };
 

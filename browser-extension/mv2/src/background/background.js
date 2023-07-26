@@ -540,7 +540,8 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     // Requests which are fired from non-tab pages like background, chrome-extension page
     return;
   }
-  BG.Methods.setExtensionIconActive(requestDetails.tabId);
+
+  RQ.extensionIconManager.markRuleExecuted(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
   BG.Methods.sendLogToConsoleLogger(rule, requestDetails, modification);
@@ -677,7 +678,9 @@ BG.Methods.handleExtensionDisabled = function () {
     title: "Activate Requestly",
     onclick: BG.Methods.enableExtension,
   });
-  chrome.browserAction.setIcon({ path: RQ.RESOURCES.EXTENSION_ICON_GREYSCALE });
+
+  RQ.extensionIconManager.markExtensionDisabled();
+
   chrome.tabs.query({}, (tabs) => {
     tabs.forEach((tab) => {
       if (BG.Methods.isNonBrowserTab(tab.id)) {
@@ -697,7 +700,8 @@ BG.Methods.handleExtensionEnabled = function () {
     title: "Deactivate Requestly",
     onclick: BG.Methods.disableExtension,
   });
-  chrome.browserAction.setIcon({ path: RQ.RESOURCES.EXTENSION_ICON });
+
+  RQ.extensionIconManager.markExtensionEnabled();
   BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: true });
 
   Logger.log("Requestly enabled");
@@ -721,32 +725,6 @@ BG.Methods.toggleExtensionStatus = async function () {
   );
 
   return updatedStatus;
-};
-
-BG.Methods.setExtensionIconActive = function (tabId) {
-  var updateIcon = function () {
-    chrome.browserAction.setIcon({
-      path: RQ.RESOURCES.EXTENSION_ICON_GREEN,
-      tabId: tabId,
-    });
-  };
-
-  chrome.tabs.get(tabId, function (tab) {
-    if (!tab) return; // Do nothing if tab does not exist
-
-    if (tab.status === "complete") {
-      updateIcon();
-    } else {
-      // icon resets to default while tab is loading, so listen to onUpdated event
-      var handler = function (currentTabId, tabChangeInfo) {
-        if (currentTabId === tabId && tabChangeInfo.status === "complete") {
-          updateIcon();
-          chrome.tabs.onUpdated.removeListener(handler);
-        }
-      };
-      chrome.tabs.onUpdated.addListener(handler);
-    }
-  });
 };
 
 BG.Methods.readExtensionStatus = function () {
@@ -1059,12 +1037,11 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
 };
 
 BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  chrome.browserAction.setBadgeText({ tabId, text: "REC" });
-  chrome.browserAction.setBadgeBackgroundColor({ tabId, color: "#e34850" });
+  RQ.extensionIconManager.markRecording(tabId);
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
-  chrome.browserAction.setBadgeText({ tabId, text: "" });
+  RQ.extensionIconManager.markNotRecording(tabId);
 };
 
 BG.Methods.onAppLoadedNotification = () => {
