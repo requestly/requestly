@@ -8,7 +8,7 @@ import { SurveyConfig, OptionsConfig } from "./config";
 import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
 import { handleSurveyNavigation } from "./actions";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import { Option, PageConfig, QuestionnaireType, SurveyPage } from "./types";
+import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
@@ -38,75 +38,71 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     return shuffleOptions(options);
   }, [currentPage]);
 
-  const renderSkipButton = useMemo(() => {
-    return () => {
-      <div className="skip-recommendation-wrapper">
-        Existing user?
-        <RQButton
-          className="skip-recommendation-btn persona-login-btn"
-          type="link"
-          onClick={() => {
-            trackPersonaSurveySignInClicked();
-            dispatch(
-              actions.toggleActiveModal({
-                modalName: "authModal",
-                newProps: {
-                  callback: () => {
-                    dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                  },
-                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                  eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+  const skipButton = useMemo(() => {
+    <div className="skip-recommendation-wrapper">
+      Existing user?
+      <RQButton
+        className="skip-recommendation-btn persona-login-btn"
+        type="link"
+        onClick={() => {
+          trackPersonaSurveySignInClicked();
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newProps: {
+                callback: () => {
+                  dispatch(actions.updateIsPersonaSurveyCompleted(true));
                 },
-              })
-            );
-          }}
-        >
-          Sign in
-        </RQButton>
-      </div>;
-    };
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+              },
+            })
+          );
+        }}
+      >
+        Sign in
+      </RQButton>
+    </div>;
   }, [dispatch]);
 
-  const renderOptions = useMemo(
-    () => (options: Option[], questionnaire: QuestionnaireType) => {
-      return (
-        <div className="survey-options-container">
-          {options.map((option: Option, index: number) => (
-            <SurveyOption
-              key={index}
-              option={option}
-              action={OptionsConfig[questionnaire].questionResponseAction}
-              questionnaire={questionnaire}
-            />
-          ))}
-        </div>
-      );
-    },
-    []
-  );
+  const renderOptions = useCallback((options: Option[], questionnaire: QuestionnaireType) => {
+    console.log("OPTION");
+    return (
+      <div className="survey-options-container">
+        {options.map((option: Option, index: number) => (
+          <SurveyOption
+            key={index}
+            option={option}
+            action={OptionsConfig[questionnaire].questionResponseAction}
+            questionnaire={questionnaire}
+          />
+        ))}
+      </div>
+    );
+  }, []);
 
-  const renderQuestionnaire = useMemo(
-    () => (questionnaire: QuestionnaireType) => {
+  const renderQuestionnaire = useCallback(
+    (questionnaire: QuestionnaireType) => {
+      console.log("QUESTION");
       if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
     },
     [shuffledQuestionnaire, renderOptions]
   );
 
-  const renderPage = useMemo(
-    () => (page: PageConfig) => {
-      return (
-        <>
-          {currentPage === SurveyPage.GETTING_STARTED && renderSkipButton()}
-          <div className="text-center white text-bold survey-title">{page?.title}</div>
-          <div className="w-full survey-subtitle-wrapper">
-            <div className="text-gray text-center mt-8">{page?.subTitle}</div>
-          </div>
-          <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
-        </>
-      );
-    },
-    [renderQuestionnaire, renderSkipButton, currentPage]
-  );
+  const currentSurveyPage = useMemo(() => {
+    console.log("CURRENT");
+    const page = SurveyConfig[currentPage as SurveyPage];
+    return (
+      <>
+        {currentPage === SurveyPage.GETTING_STARTED && skipButton}
+        <div className="text-center white text-bold survey-title">{page?.title}</div>
+        <div className="w-full survey-subtitle-wrapper">
+          <div className="text-gray text-center mt-8">{page?.subTitle}</div>
+        </div>
+        <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
+      </>
+    );
+  }, [renderQuestionnaire, currentPage, skipButton]);
 
   const handleMoveToRecommendationScreen = useCallback(() => {
     const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;
@@ -163,13 +159,10 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     }
   }, [currentPage, dispatch]);
 
-  const renderSurveyPages = useCallback(() => {
-    return (
-      <>
-        {currentPage !== SurveyPage.RECOMMENDATIONS ? <>{renderPage(SurveyConfig[currentPage as SurveyPage])}</> : null}
-      </>
-    );
-  }, [renderPage, currentPage]);
+  const surveyPages = useMemo(
+    () => <>{currentPage !== SurveyPage.RECOMMENDATIONS ? <>{currentSurveyPage}</> : null}</>,
+    [currentSurveyPage, currentPage]
+  );
 
   return (
     <>
@@ -183,13 +176,13 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
           maskStyle={{ background: "#0D0D10" }}
         >
           <div className="persona-survey-container">
-            {renderSurveyPages()}
+            {surveyPages}
             <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
           </div>
         </RQModal>
       ) : (
         <div className="persona-survey-container">
-          {renderSurveyPages()}
+          {surveyPages}
           <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
         </div>
       )}
