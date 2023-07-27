@@ -13,5 +13,8 @@
 
   chrome.runtime.sendMessage({
     action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
+    payload: {
+      isIframe: window.top !== window,
+    },
   });
 })();
