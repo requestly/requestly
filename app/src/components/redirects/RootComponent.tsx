@@ -19,15 +19,19 @@ const RootComponent: React.FC = () => {
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (
-    <Navigate
-      to={
-        isOpenedInDesktopMode
-          ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE
-          : ecosystemExperiment === "ecosystem"
-          ? PATHS.HOME.RELATIVE
-          : PATHS.RULES.MY_RULES.ABSOLUTE
-      }
-    />
+    <>
+      {ecosystemExperiment && (
+        <Navigate
+          to={
+            isOpenedInDesktopMode
+              ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE
+              : ecosystemExperiment === "ecosystem"
+              ? PATHS.HOME.RELATIVE
+              : PATHS.RULES.MY_RULES.ABSOLUTE
+          }
+        />
+      )}
+    </>
   );
 };
 
