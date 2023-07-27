@@ -5,39 +5,45 @@ RQ.SessionRecorder.isExplicitRecording = false;
 RQ.SessionRecorder.sendResponseCallbacks = {};
 
 RQ.SessionRecorder.setup = () => {
+  const isTopDocument = !RQ.SessionRecorder.isIframe();
+
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+    // messages for all the frames
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.START_RECORDING:
         RQ.SessionRecorder.startRecording(message.payload).then(() => {
-          // recording starts in all the frames, but only the top document should send confirmation
-          if (!RQ.SessionRecorder.isIframe()) {
+          // only the top document should send confirmation
+          if (isTopDocument) {
             sendResponse();
           }
         });
         return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
-        RQ.SessionRecorder.sendMessageToClient("stopRecording");
-        break;
+        RQ.SessionRecorder.sendMessageToClient("stopRecording", null, () => {
+          // only the top document should send confirmation
+          if (isTopDocument) {
+            sendResponse();
+          }
+        });
+        return true;
+    }
 
-      case RQ.CLIENT_MESSAGES.IS_RECORDING_SESSION:
-        if (!RQ.SessionRecorder.isIframe()) {
+    // messages for only the top document
+    if (isTopDocument) {
+      switch (message.action) {
+        case RQ.CLIENT_MESSAGES.IS_RECORDING_SESSION:
           sendResponse(RQ.SessionRecorder.isRecording);
-        }
-        break;
+          break;
 
-      case RQ.CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
-        if (!RQ.SessionRecorder.isIframe()) {
+        case RQ.CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
           sendResponse(RQ.SessionRecorder.isExplicitRecording);
-        }
-        break;
+          break;
 
-      case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (!RQ.SessionRecorder.isIframe()) {
+        case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
           RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
-          return true; // notify sender to wait for response and not resolve request immediately
-        }
-        break;
+          return true;
+      }
     }
   });
 };

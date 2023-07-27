@@ -1130,19 +1130,16 @@ BG.Methods.onContentScriptLoadedNotification = async (tab, payload = {}) => {
     );
   }
 
-  if (!payload.referrer) {
+  let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+
+  if (!sessionRecordingData) {
     const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
     if (sessionRecordingConfig) {
-      window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
-        config: sessionRecordingConfig,
-      });
-    } else {
-      window.tabService.removeData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+      sessionRecordingData = { config: sessionRecordingConfig };
+      window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   }
-
-  const sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (sessionRecordingData) {
     chrome.tabs.sendMessage(
@@ -1180,8 +1177,9 @@ BG.Methods.launchUrlAndStartRecording = (url) => {
 };
 
 BG.Methods.stopRecording = (tabId) => {
-  window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
-  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING });
+  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
+    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  });
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {
