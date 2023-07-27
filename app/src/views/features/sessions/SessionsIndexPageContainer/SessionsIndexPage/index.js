@@ -243,7 +243,7 @@ const SessionsIndexPage = () => {
     <>
       <RQModal open={isOpen} onCancel={toggleImportSessionModal}>
         <div className="rq-modal-content">
-          <div className="header mb-16 text-center">Import session</div>
+          <div className="header mb-16 text-center">Open downloaded session</div>
 
           <FilePicker
             onFilesDrop={onSessionRecordingFileDrop}
