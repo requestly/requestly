@@ -18,11 +18,21 @@
     margin-top: 1rem;
 
     .home-v2-feature-grid-item {
-      border: 1px solid #ffffff11;
       padding: 1.5rem 1rem;
+      box-sizing: border-box;
+      border: 1px solid var(--border-dark);
     }
-    .home-v2-feature-grid-item:not(:last-child) {
-      border-width: 1px 0px 1px 1px;
+    .home-v2-feature-grid-item:nth-child(2n) {
+      border-right: none;
+      border-left: none;
+
+      @media (max-width: 940px) {
+        border-right: 1px solid var(--border-dark);
+      }
+      @media (max-width: 650px) {
+        border-left: 1px solid var(--border-dark);
+        border-width: 0px 1px 0px 1px;
+      }
     }
 
     .home-v2-grid-header {
