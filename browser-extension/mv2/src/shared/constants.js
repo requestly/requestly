@@ -24,13 +24,6 @@ RQ.CONSTANTS.MESSAGE_HANDLER_ACTIONS = {
 };
 
 // Variables exposed directly on RQ object
-
-RQ.RESOURCES = {
-  EXTENSION_ICON: "/resources/images/48x48.png",
-  EXTENSION_ICON_GREYSCALE: "/resources/images/48x48_greyscale.png",
-  EXTENSION_ICON_GREEN: "/resources/images/48x48_green.png",
-};
-
 RQ.CLIENT_MESSAGES = {
   ADD_EVENT: "addEvent",
   GET_SCRIPT_RULES: "getScriptRules",
