@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import { Row, Typography } from "antd";
 import { FeatureTag } from "components/common/FeatureTag";
@@ -13,14 +13,14 @@ import PATHS from "config/constants/sub/paths";
 import { trackEcosystemFeatureClicked } from "modules/analytics/events/features/ecosystem";
 import "./index.scss";
 
-interface FeatureCardProps {
+interface FeatureCardDetails {
   title: string;
   description: string;
   tag: string;
   navigateTo: string;
   analyticsContext: string;
 }
-interface GridHeaderProps {
+interface FeatureHeaderDetails {
   title: string;
   description: string;
   icon: string;
@@ -38,7 +38,7 @@ export const HomeV2: React.FC = () => {
       </div>
       <div className="home-v2-feature-grid-wrapper">
         <div className="home-v2-feature-grid-item">
-          <GridHeader
+          <FeatureHeader
             title="Development"
             description="Use the requestly tools to work with private servers and public APIs"
             icon={developmentIcon}
@@ -59,7 +59,7 @@ export const HomeV2: React.FC = () => {
           />
         </div>
         <div className="home-v2-feature-grid-item">
-          <GridHeader
+          <FeatureHeader
             title="Testing"
             description="Edit incoming & outgoing request headers & bodies "
             icon={testingIcon}
@@ -73,7 +73,7 @@ export const HomeV2: React.FC = () => {
           />
         </div>
         <div className="home-v2-feature-grid-item">
-          <GridHeader
+          <FeatureHeader
             title="Debugging"
             description="Validate your solutions using screen recording, delaying responses & more"
             icon={debuggingIcon}
@@ -91,7 +91,7 @@ export const HomeV2: React.FC = () => {
   );
 };
 
-const GridHeader: React.FC<GridHeaderProps> = ({ title, description, icon }) => {
+const FeatureHeader: React.FC<FeatureHeaderDetails> = ({ title, description, icon }) => {
   return (
     <div className="home-v2-grid-header">
       <img className="home-v2-grid-header-icon" src={icon} alt={title} />
@@ -103,25 +103,25 @@ const GridHeader: React.FC<GridHeaderProps> = ({ title, description, icon }) => 
   );
 };
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, tag, navigateTo, analyticsContext }) => {
-  const navigate = useNavigate();
+const FeatureCard: React.FC<FeatureCardDetails> = ({ title, description, tag, navigateTo, analyticsContext }) => {
   return (
-    <div
-      className="home-v2-grid-card"
+    <Link
+      to={navigateTo}
       onClick={() => {
         trackEcosystemFeatureClicked(analyticsContext);
-        navigate(navigateTo);
       }}
     >
-      <Typography.Title className="home-v2-grid-card-title">{title}</Typography.Title>
-      <Typography.Text className="home-v2-grid-card-description">{description}</Typography.Text>
-      <Row justify="space-between" align="middle" className="mt-16">
-        <FeatureTag feature={tag} />
-        <div className="display-row-center get-started-text">
-          Get started
-          <BsArrowRight />
-        </div>
-      </Row>
-    </div>
+      <div className="home-v2-grid-card">
+        <Typography.Title className="home-v2-grid-card-title">{title}</Typography.Title>
+        <Typography.Text className="home-v2-grid-card-description">{description}</Typography.Text>
+        <Row justify="space-between" align="middle" className="mt-16">
+          <FeatureTag feature={tag} />
+          <div className="display-row-center get-started-text">
+            Get started
+            <BsArrowRight />
+          </div>
+        </Row>
+      </div>
+    </Link>
   );
 };

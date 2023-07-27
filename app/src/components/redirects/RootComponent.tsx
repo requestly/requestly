@@ -16,8 +16,6 @@ const RootComponent: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const ecosystemExperiment = useFeatureValue("ecosystem-experiment", null);
 
-  console.log("test", { ecosystemExperiment, appMode });
-  console.log("DEBUG");
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (

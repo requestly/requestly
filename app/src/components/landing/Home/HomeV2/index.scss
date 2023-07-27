@@ -22,7 +22,7 @@
       padding: 1.5rem 1rem;
     }
     .home-v2-feature-grid-item:not(:last-child) {
-      border-width: 1px 0.5px 1px 1px;
+      border-width: 1px 0px 1px 1px;
     }
 
     .home-v2-grid-header {
@@ -67,12 +67,14 @@
         font-size: 13px;
         gap: 4px;
         opacity: 0;
+        color: var(--white);
         transition: 0.25s opacity ease-in-out;
       }
       &:hover {
         background-color: var(--border-dark);
         .get-started-text {
           opacity: 1;
+          color: var(--white);
         }
       }
     }
