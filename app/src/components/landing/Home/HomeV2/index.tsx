@@ -26,6 +26,64 @@ interface FeatureHeaderDetails {
   icon: string;
 }
 
+const HOME_FEATURES = [
+  {
+    featureHeader: {
+      title: "Development",
+      description: "Use the requestly tools to work with private servers and public APIs",
+      icon: developmentIcon,
+    },
+    featureCards: [
+      {
+        title: "Make an API request",
+        description: "Make a request to an API by specifying endpoint and other request attributes or import from cURL",
+        tag: FEATURES.API_CLIENT,
+        navigateTo: PATHS.API_CLIENT.RELATIVE,
+        analyticsContext: "api_client",
+      },
+      {
+        title: "Create a mock API",
+        description: "Generate custom API responses without actually having a pre-built API or backend server",
+        tag: FEATURES.MOCK_V2,
+        navigateTo: PATHS.MOCK_SERVER_V2.RELATIVE,
+        analyticsContext: "mock server",
+      },
+    ],
+  },
+  {
+    featureHeader: {
+      title: "Testing",
+      description: "Edit incoming & outgoing request headers & bodies",
+      icon: testingIcon,
+    },
+    featureCards: [
+      {
+        title: "Modify network requests",
+        description: "Create rules to modify HTTP requests & responses - URL redirects, Modify APIs or Headers",
+        tag: FEATURES.RULES,
+        navigateTo: PATHS.RULES.MY_RULES.ABSOLUTE,
+        analyticsContext: "http_rules",
+      },
+    ],
+  },
+  {
+    featureHeader: {
+      title: "Debug faster with Session Recording",
+      description: "Validate your solutions using screen recording, delaying responses & more",
+      icon: debuggingIcon,
+    },
+    featureCards: [
+      {
+        title: "Modify network requests",
+        description: "Create rules to modify HTTP requests & responses - URL redirects, Modify APIs or Headers",
+        tag: FEATURES.SESSION_RECORDING,
+        navigateTo: PATHS.SESSIONS.RELATIVE,
+        analyticsContext: "session_recording",
+      },
+    ],
+  },
+];
+
 export const HomeV2: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   return (
@@ -37,55 +95,29 @@ export const HomeV2: React.FC = () => {
         <Typography.Text className="welcome-subtitle">Where do you want to start today?</Typography.Text>
       </div>
       <div className="home-v2-feature-grid-wrapper">
-        <div className="home-v2-feature-grid-item">
-          <FeatureHeader
-            title="Development"
-            description="Use the requestly tools to work with private servers and public APIs"
-            icon={developmentIcon}
-          />
-          <FeatureCard
-            title="Make an API request"
-            description="Make a request to an API by specifying endpoint and other request attributes or import from cURL"
-            tag={FEATURES.API_CLIENT}
-            navigateTo={PATHS.API_CLIENT.RELATIVE}
-            analyticsContext="api_client"
-          />
-          <FeatureCard
-            title="Create a mock API"
-            description="Generate custom API responses without actually having a pre-built API or backend server"
-            tag={FEATURES.MOCK_V2}
-            navigateTo={PATHS.MOCK_SERVER_V2.RELATIVE}
-            analyticsContext="mock server"
-          />
-        </div>
-        <div className="home-v2-feature-grid-item">
-          <FeatureHeader
-            title="Testing"
-            description="Edit incoming & outgoing request headers & bodies "
-            icon={testingIcon}
-          />
-          <FeatureCard
-            title="Modify network requests"
-            description="Create rules to modify HTTP requests & responses - URL redirects, Modify APIs or Headers"
-            tag={FEATURES.RULES}
-            navigateTo={PATHS.RULES.MY_RULES.ABSOLUTE}
-            analyticsContext="http_rules"
-          />
-        </div>
-        <div className="home-v2-feature-grid-item">
-          <FeatureHeader
-            title="Debugging"
-            description="Validate your solutions using screen recording, delaying responses & more"
-            icon={debuggingIcon}
-          />
-          <FeatureCard
-            title="Debug faster with Session Recording"
-            description="Capture screen, mouse movement, network, console and more of any browser session."
-            tag={FEATURES.SESSION_RECORDING}
-            navigateTo={PATHS.SESSIONS.RELATIVE}
-            analyticsContext="session_recording"
-          />
-        </div>
+        {HOME_FEATURES.map(({ featureHeader, featureCards }, index) => {
+          return (
+            <div className="home-v2-feature-grid-item" key={index}>
+              <FeatureHeader
+                title={featureHeader.title}
+                description={featureHeader.description}
+                icon={featureHeader.icon}
+              />
+              {featureCards.map(({ title, description, tag, navigateTo, analyticsContext }, index) => {
+                return (
+                  <FeatureCard
+                    key={index}
+                    title={title}
+                    description={description}
+                    tag={tag}
+                    navigateTo={navigateTo}
+                    analyticsContext={analyticsContext}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
