@@ -45,7 +45,7 @@ const DesktopSignIn = () => {
       const code = params.get("ot-auth-code");
       const source = params.get("source").replace(/ /g, "_");
       const functions = getFunctions();
-      const createAuthToken = httpsCallable(functions, "createAuthToken");
+      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
 
       let uid = firebaseUser?.uid || null;
       let email = firebaseUser?.email || null;
