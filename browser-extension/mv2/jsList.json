@@ -48,7 +48,7 @@
     "../../common/logger.js",
     "../common/dist/utils.js",
     "src/external/CircularQueue.js",
-    "src/external/chromeTabService.js",
+    "src/external/tabService.js",
     "src/modules/StorageService.js",
     "src/modules/PreDefinedFunction.js",
     "src/modules/PreDefinedFunctions.js",

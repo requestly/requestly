@@ -3,8 +3,8 @@
     map = {};
 
     dataScope = {
-      TAB: "tabData",
-      PAGE: "pageData",
+      TAB: "tabData", // tab-level data
+      PAGE: "pageData", // page-level data, will wipe out when page unloads
     };
 
     constructor() {
