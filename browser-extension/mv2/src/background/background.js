@@ -683,14 +683,7 @@ BG.Methods.handleExtensionDisabled = function () {
     onclick: BG.Methods.enableExtension,
   });
   chrome.browserAction.setIcon({ path: RQ.RESOURCES.EXTENSION_ICON_GREYSCALE });
-  chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
-      if (BG.Methods.isNonBrowserTab(tab.id)) {
-        return;
-      }
-      chrome.tabs.sendMessage(tab.id, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 });
-    });
-  });
+  BG.Methods.stopRecordingOnAllTabs();
   BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: false });
 
   Logger.log("Requestly disabled");
@@ -763,29 +756,14 @@ BG.Methods.readExtensionStatus = function () {
   });
 };
 
-BG.Methods.createContextMenu = function (title, contexts, handler) {
-  return chrome.contextMenus.create({
-    title: title,
-    type: "normal",
-    contexts: contexts,
-    onclick:
-      typeof handler === "function" ||
-      function () {
-        console.log("Requestly Default handler executed");
-      },
-  });
+BG.Methods.createContextMenu = function (title, contexts) {
+  return chrome.contextMenus.create({ title, contexts, type: "normal" });
 };
 
-BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
-  callback =
-    callback ||
-    function () {
-      console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
-    };
-
+BG.Methods.sendMessageToAllAppTabs = function (messageObject) {
   BG.Methods.getAppTabs().then((tabs) => {
     tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id, messageObject, callback);
+      chrome.tabs.sendMessage(tab.id, messageObject);
     });
   });
 };
@@ -1179,6 +1157,14 @@ BG.Methods.launchUrlAndStartRecording = (url) => {
 BG.Methods.stopRecording = (tabId) => {
   chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
     window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  });
+};
+
+BG.Methods.stopRecordingOnAllTabs = () => {
+  Object.values(window.tabService.getTabs()).forEach(({ id: tabId }) => {
+    if (tabId && window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING)) {
+      BG.Methods.stopRecording(tabId);
+    }
   });
 };
 
