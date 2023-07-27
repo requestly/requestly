@@ -17,7 +17,8 @@ export const EXTENSION_MESSAGES = {
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
   INIT_SESSION_RECORDING_WITH_NEW_CONFIG: "initSessionRecordingWithNewConfig",
-  UPDATE_SESSION_RECORDING_CONFIG: "updateSessionRecordingConfig",
+  START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
+  STOP_RECORDING: "stopRecording",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
 };
