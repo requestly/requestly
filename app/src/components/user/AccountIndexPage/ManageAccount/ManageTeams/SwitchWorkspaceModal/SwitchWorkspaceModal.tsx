@@ -1,15 +1,16 @@
 import React from "react";
-import { Avatar, Button, Col, Row } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { RQModal } from "lib/design-system/components";
-import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
-import { getUniqueColorForWorkspace } from "utils/teams";
-import { Team } from "types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
-import { actions } from "store";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAvailableTeams } from "store/features/teams/selectors";
+import { Avatar, Button, Col, Row } from "antd";
+import { RQModal } from "lib/design-system/components";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
+import { PlusOutlined } from "@ant-design/icons";
+import { getUniqueColorForWorkspace } from "utils/teams";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { Team } from "types";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
 
 interface SwitchWorkspaceModalProps {
@@ -99,7 +100,10 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       {/* footer */}
       <Row align="middle" justify="space-between" className="rq-modal-footer">
         <Col>
-          <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+          <LearnMoreLink
+            linkText="Learn more about team workspaces"
+            href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+          />
         </Col>
         <Col>
           <Button className="display-row-center" onClick={handleCreateNewWorkspaceClick}>

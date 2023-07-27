@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Typography } from "antd";
 import config from "../../../config";
-import { CLIENT_MESSAGES } from "../../../constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
 import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
 import { EVENT, sendEvent } from "../../events";
@@ -14,9 +14,12 @@ const SessionRecordingView: React.FC = () => {
 
   const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED);
-    chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.START_RECORDING }, { frameId: 0 }, () =>
-      setIsRecordingSession(true)
-    );
+    chrome.runtime.sendMessage({
+      action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
+      tabId: currentTabId,
+    });
+    setIsManualMode(true);
+    setIsRecordingSession(true);
   }, [currentTabId]);
 
   const openRecordedSession = useCallback(() => {
@@ -27,16 +30,17 @@ const SessionRecordingView: React.FC = () => {
     (stopRecording?: boolean) => {
       if (isManualMode || stopRecording) {
         sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
-        chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
-          setIsRecordingSession(false);
-          openRecordedSession();
+        chrome.runtime.sendMessage({
+          action: EXTENSION_MESSAGES.STOP_RECORDING,
+          tabId: currentTabId,
         });
+        setIsRecordingSession(false);
       } else {
         sendEvent(EVENT.VIEW_RECORDING_CLICKED);
-        openRecordedSession();
       }
+      openRecordedSession();
     },
-    [openRecordedSession, isManualMode]
+    [openRecordedSession, isManualMode, currentTabId]
   );
 
   useEffect(() => {
@@ -62,7 +66,7 @@ const SessionRecordingView: React.FC = () => {
         setIsManualMode
       );
     }
-  }, [isRecordingSession]);
+  }, [currentTabId]);
 
   return (
     <Row
