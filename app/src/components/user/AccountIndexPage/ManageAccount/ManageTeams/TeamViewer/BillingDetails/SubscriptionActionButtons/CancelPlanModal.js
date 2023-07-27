@@ -1,8 +1,9 @@
 import React from "react";
 import { Row } from "antd";
 import { RQModal } from "lib/design-system/components";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
+import APP_CONSTANTS from "config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import LearnMoreAboutWorkspace from "../../common/LearnMoreAboutWorkspace";
 
 const CancelPlanModal = ({ isOpen, handleToggleModal }) => {
   return (
@@ -16,7 +17,10 @@ const CancelPlanModal = ({ isOpen, handleToggleModal }) => {
         .
       </div>
       <Row align="middle" className="rq-modal-footer">
-        <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+        <LearnMoreLink
+          linkText="Learn more about team workspaces"
+          href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+        />
       </Row>
     </RQModal>
   );
