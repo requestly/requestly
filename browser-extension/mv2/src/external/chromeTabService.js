@@ -1,122 +1,108 @@
 (function (window, chrome) {
-  var TabService = function () {
-    this.construct.apply(this, arguments);
-  };
+  class TabService {
+    map = {};
 
-  TabService.prototype = {
-    dataScope: {
+    dataScope = {
       TAB: "tabData",
       PAGE: "pageData",
-    },
+    };
 
-    construct: function () {
-      this.map = {};
+    constructor() {
       this.initTabs();
-      this.registerBinders();
       this.addEventListeners();
-    },
+    }
 
-    initTabs: function () {
-      var that = this;
-      chrome.tabs.query({}, function (tabs) {
-        that.map = {};
-        for (var i = 0; i < tabs.length; i++) {
-          var tab = tabs[i];
-          that.map[tab.id] = tab;
-        }
+    initTabs() {
+      chrome.tabs.query({}, (tabs) => {
+        this.map = {};
+        tabs.forEach((tab) => this.addOrUpdateTab(tab));
       });
-    },
+    }
 
-    addEventListeners: function () {
-      var that = this;
+    addOrUpdateTab(tab) {
+      // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
+      if (tab.id !== chrome.tabs.TAB_ID_NONE) {
+        this.map[tab.id] = tab;
+      }
+    }
 
-      chrome.tabs.onCreated.addListener(function (tab) {
-        that.map[tab.id] = tab;
+    removeTab(tabId) {
+      delete this.map[tabId];
+    }
+
+    addEventListeners() {
+      chrome.tabs.onCreated.addListener((tab) => this.addOrUpdateTab(tab));
+
+      chrome.tabs.onRemoved.addListener((tabId) => this.removeTab(tabId));
+
+      chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+        this.removeTab(removedTabId);
+        chrome.tabs.get(addedTabId, (tab) => this.addOrUpdateTab(tab));
       });
 
-      this.addOnClosedListener(this.handleTabClosed);
+      chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+        const existingTab = this.getTab(tabId);
 
-      chrome.tabs.onReplaced.addListener(function (addedTabId, removedTabId) {
-        that.map.hasOwnProperty(removedTabId) && delete that.map[removedTabId];
-        chrome.tabs.get(addedTabId, function (tab) {
-          that.map[tab.id] = tab;
-        });
-      });
-
-      chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-        if (!that.map.hasOwnProperty(tabId)) {
+        if (!existingTab) {
           return;
         }
-        that.map[tabId] = {
+
+        const newTabState = {
           ...tab,
-          [that.dataScope.TAB]: that.map[tabId][that.dataScope.TAB] || {},
+          [this.dataScope.TAB]: existingTab[this.dataScope.TAB] || {},
         };
 
         if (changeInfo.status === "loading") {
-          that.map[tabId][that.dataScope.PAGE] = {};
+          newTabState[this.dataScope.PAGE] = {};
         }
+
+        this.addOrUpdateTab(newTabState);
       });
 
       chrome.webRequest.onBeforeRequest.addListener(
-        function (details) {
+        (details) => {
           if (details.type === "main_frame") {
-            that.map[details.tabId] = that.map[details.tabId] || {};
-            that.map[details.tabId]["url"] = details.url;
+            const tab = this.getTab(details.tabId) || { id: details.tabId };
+            this.addOrUpdateTab({ ...tab, url: details.url });
           }
         },
         { urls: ["<all_urls>"] }
       );
-    },
+    }
 
-    registerBinders: function () {
-      this.handleTabClosed = this.handleTabClosed.bind(this);
-    },
-
-    getTabs: function () {
+    getTabs() {
       return this.map;
-    },
+    }
 
-    getTab: function (tabId) {
+    getTab(tabId) {
       return this.map[tabId];
-    },
+    }
 
-    getTabUrl: function (tabId) {
+    getTabUrl(tabId) {
       var tab = this.getTab(tabId);
       return tab && tab.url;
-    },
+    }
 
-    focusTab: function (tabId) {
-      var tab = this.map[tabId];
+    focusTab(tabId) {
+      var tab = this.getTab(tabId);
 
       if (tab && tab.windowId) {
-        chrome.windows.update(tab.windowId, { focused: true }, function () {
+        chrome.windows.update(tab.windowId, { focused: true }, () => {
           chrome.tabs.highlight({ windowId: tab.windowId, tabs: tab.index });
         });
         return true;
       }
 
       return false;
-    },
+    }
 
-    closeTab: function (tabId) {
+    closeTab(tabId) {
       chrome.tabs.remove(tabId);
-    },
+    }
 
-    handleTabClosed: function (tabId) {
-      this.map.hasOwnProperty(tabId) && delete this.map[tabId];
-    },
-
-    addOnClosedListener: function (listener) {
-      if (typeof listener !== "function") {
-        console.error("Chrome Tab Service: Invalid listener passed as onClosedListener ", listener);
-      }
-
-      chrome.tabs.onRemoved.addListener(listener);
-    },
-
-    ensureTabLoadingComplete: function (tabId) {
+    ensureTabLoadingComplete(tabId) {
       return new Promise((resolve, reject) => {
-        const tab = this.map[tabId];
+        const tab = this.getTab(tabId);
 
         if (tab) {
           if (tab.status === "complete") {
@@ -134,82 +120,88 @@
           reject();
         }
       });
-    },
+    }
 
-    setDataForScope: function (scope, tabId, key, value) {
-      if (!this.map.hasOwnProperty(tabId)) {
+    setDataForScope(scope, tabId, key, value) {
+      const tab = this.getTab(tabId);
+
+      if (!tab) {
         return;
       }
 
       // null safe for firefox as in firefox get/set happen before tab updation whereas
       // in chrome get/set happens after tab updation
-      if (this.map[tabId].hasOwnProperty(scope)) {
-        this.map[tabId][scope][key] = value;
+      if (tab[scope]) {
+        tab[scope][key] = value;
       } else {
-        this.map[tabId][scope] = { [key]: value };
+        tab[scope] = { [key]: value };
       }
-    },
+    }
 
-    getDataForScope: function (scope, tabId, key, defaultValue) {
-      if (!this.map.hasOwnProperty(tabId)) {
-        return null;
-      }
+    getDataForScope(scope, tabId, key, defaultValue) {
+      const tab = this.getTab(tabId);
 
-      return this.map[tabId][scope]?.[key] || defaultValue;
-    },
-
-    removeDataForScope: function (scope, tabId, key) {
-      if (!this.map.hasOwnProperty(tabId)) {
+      if (!tab) {
         return;
       }
 
-      delete this.map[tabId][scope]?.[key];
-    },
+      return tab[scope]?.[key] || defaultValue;
+    }
 
-    getTabsWithDataFilterForScope: function (scope, dataFilter) {
+    removeDataForScope(scope, tabId, key) {
+      const tab = this.getTab(tabId);
+
+      if (!tab || !tab[scope]) {
+        return;
+      }
+
+      delete tab[scope][key];
+    }
+
+    getTabsWithDataFilterForScope(scope, dataFilter) {
       return Object.values(this.getTabs()).filter((tab) => dataFilter(tab[scope] || {}));
-    },
+    }
 
-    setData: function (...args) {
+    setData(...args) {
       this.setDataForScope(this.dataScope.TAB, ...args);
-    },
+    }
 
-    getData: function (...args) {
+    getData(...args) {
       return this.getDataForScope(this.dataScope.TAB, ...args);
-    },
+    }
 
-    removeData: function (...args) {
+    removeData(...args) {
       this.removeDataForScope(this.dataScope.TAB, ...args);
-    },
+    }
 
-    getTabsWithDataFilter: function (dataFilter) {
+    getTabsWithDataFilter(dataFilter) {
       return this.getTabsWithDataFilterForScope(this.dataScope.TAB, dataFilter);
-    },
+    }
 
-    setPageData: function (tabId, ...args) {
+    setPageData(tabId, ...args) {
       this.setDataForScope(this.dataScope.PAGE, tabId, ...args);
-    },
+    }
 
-    getPageData: function (tabId, ...args) {
+    getPageData(tabId, ...args) {
       return this.getDataForScope(this.dataScope.PAGE, tabId, ...args);
-    },
+    }
 
-    removePageData: function (tabId, ...args) {
+    removePageData(tabId, ...args) {
       return this.removeDataForScope(this.dataScope.PAGE, tabId, ...args);
-    },
+    }
 
-    getTabsWithPageDataFilter: function (dataFilter) {
+    getTabsWithPageDataFilter(dataFilter) {
       return this.getTabsWithDataFilterForScope(this.dataScope.PAGE, dataFilter);
-    },
+    }
 
-    promisifiedSetIcon: function (tabId, path) {
+    promisifiedSetIcon(tabId, path) {
       return new Promise((resolve) => {
         chrome.browserAction.setIcon({ tabId, path }, resolve);
       });
-    },
+    }
 
     // do not pass tabId to set icon globally
-    setExtensionIcon: async function (path, tabId) {
+    async setExtensionIcon(path, tabId) {
       if (typeof tabId === "undefined") {
         chrome.browserAction.setIcon({ path });
         return;
@@ -228,8 +220,8 @@
         "setIconSynchronizer",
         setIconSynchronizer.then(() => this.promisifiedSetIcon(tabId, path))
       );
-    },
-  };
+    }
+  }
 
   // Create only single instance of TabService
   if (typeof window.tabService === "undefined") {

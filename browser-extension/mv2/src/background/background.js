@@ -684,9 +684,9 @@ BG.Methods.handleExtensionDisabled = function () {
     onclick: BG.Methods.enableExtension,
   });
 
-  RQ.extensionIconManager.markExtensionDisabled();
   BG.Methods.stopRecordingOnAllTabs();
   BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: false });
+  RQ.extensionIconManager.markExtensionDisabled();
 
   Logger.log("Requestly disabled");
 };

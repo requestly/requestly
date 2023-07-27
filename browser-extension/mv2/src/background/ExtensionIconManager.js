@@ -17,10 +17,6 @@ class ExtensionIconManager {
   }
 
   #getIcon(config) {
-    if (this.#isExtensionDisabled) {
-      return this.#icons.DISABLED;
-    }
-
     if (config.ruleExecuted) {
       if (config.isRecording) {
         return this.#icons.RULE_EXECUTED_WITH_REC;
@@ -34,19 +30,6 @@ class ExtensionIconManager {
     }
 
     return this.#icons.DEFAULT;
-  }
-
-  #setGlobalIcon(path, resetConfig) {
-    window.tabService.setExtensionIcon(path);
-
-    // Chrome does not update icon for tabs where it was already customized
-    const tabsWithCustomIcon = window.tabService.getTabsWithPageDataFilter((data) => !!data.extensionIconConfig);
-    tabsWithCustomIcon.forEach((tab) => {
-      if (resetConfig) {
-        window.tabService.removePageData(tab.id, "extensionIconConfig");
-      }
-      window.tabService.setExtensionIcon(path, tab.id);
-    });
   }
 
   async #updateConfig(tabId, key, value) {
@@ -64,12 +47,12 @@ class ExtensionIconManager {
 
   markExtensionEnabled = () => {
     this.#isExtensionDisabled = false;
-    this.#setGlobalIcon(this.#icons.DEFAULT);
+    window.tabService.setExtensionIcon(this.#icons.DEFAULT);
   };
 
   markExtensionDisabled = () => {
     this.#isExtensionDisabled = true;
-    this.#setGlobalIcon(this.#icons.DISABLED, true);
+    window.tabService.setExtensionIcon(this.#icons.DISABLED);
   };
 
   markRuleExecuted(tabId) {
