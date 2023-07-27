@@ -1172,7 +1172,7 @@ BG.Methods.startRecordingExplicitly = (tabId) => {
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
   chrome.tabs.create({ url }, (tab) => {
-    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notifyOnStart: true });
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true });
   });
 };
 
