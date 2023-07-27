@@ -126,7 +126,7 @@ export async function signUp(name, email, password, refCode, source) {
       })
         .then(() => {
           const functions = getFunctions();
-          const addUserToCRM = httpsCallable(functions, "addUserToCRM");
+          const addUserToCRM = httpsCallable(functions, "external-addUserToCRM");
           addUserToCRM({});
           const authData = getAuthData(result.user);
           const database = getDatabase();
