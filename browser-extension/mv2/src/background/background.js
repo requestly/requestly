@@ -18,6 +18,11 @@ BG = window.BG = {
   modifiedRequestsPool: new Queue(1000),
 };
 
+BG.TAB_SERVICE_DATA = {
+  SESSION_RECORDING: "sessionRecording",
+  APPLIED_RULE_DETAILS: "appliedRuleDetails",
+};
+
 /**
  * Applies replace rule on given url
  * @param rule definition
@@ -678,14 +683,7 @@ BG.Methods.handleExtensionDisabled = function () {
     onclick: BG.Methods.enableExtension,
   });
   chrome.browserAction.setIcon({ path: RQ.RESOURCES.EXTENSION_ICON_GREYSCALE });
-  chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
-      if (BG.Methods.isNonBrowserTab(tab.id)) {
-        return;
-      }
-      chrome.tabs.sendMessage(tab.id, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 });
-    });
-  });
+  BG.Methods.stopRecordingOnAllTabs();
   BG.Methods.sendMessageToAllAppTabs({ isExtensionEnabled: false });
 
   Logger.log("Requestly disabled");
@@ -758,29 +756,14 @@ BG.Methods.readExtensionStatus = function () {
   });
 };
 
-BG.Methods.createContextMenu = function (title, contexts, handler) {
-  return chrome.contextMenus.create({
-    title: title,
-    type: "normal",
-    contexts: contexts,
-    onclick:
-      typeof handler === "function" ||
-      function () {
-        console.log("Requestly Default handler executed");
-      },
-  });
+BG.Methods.createContextMenu = function (title, contexts) {
+  return chrome.contextMenus.create({ title, contexts, type: "normal" });
 };
 
-BG.Methods.sendMessageToAllAppTabs = function (messageObject, callback) {
-  callback =
-    callback ||
-    function () {
-      console.log("DefaultHandler: Sending Message to Runtime: ", messageObject);
-    };
-
+BG.Methods.sendMessageToAllAppTabs = function (messageObject) {
   BG.Methods.getAppTabs().then((tabs) => {
     tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id, messageObject, callback);
+      chrome.tabs.sendMessage(tab.id, messageObject);
     });
   });
 };
@@ -979,10 +962,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
         sendResponse(RQ.flags);
         break;
 
-      case RQ.CLIENT_MESSAGES.GET_SESSION_RECORDING_CONFIG:
-        BG.Methods.getSessionRecordingConfig(sender.tab.url).then(sendResponse);
-        return true;
-
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
         BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
         break;
@@ -994,6 +973,14 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
         BG.Methods.sendMessageToApp({ action: RQ.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED });
         return true;
+
+      case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
+        BG.Methods.startRecordingExplicitly(message.tabId);
+        break;
+
+      case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
+        BG.Methods.stopRecording(message.tabId);
+        break;
 
       case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
         BG.Methods.getTabSession(message.tabId, sendResponse);
@@ -1008,7 +995,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED:
-        BG.Methods.onContentScriptLoadedNotification(sender.tab.id);
+        BG.Methods.onContentScriptLoadedNotification(sender.tab, message.payload);
         break;
 
       case RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
@@ -1024,7 +1011,11 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_ON_URL:
-        BG.Methods.startRecordingOnUrl(message.url);
+        BG.Methods.launchUrlAndStartRecording(message.url);
+        break;
+
+      case RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
+        BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.session);
         break;
     }
   });
@@ -1067,6 +1058,17 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   chrome.browserAction.setBadgeText({ tabId, text: "" });
 };
 
+BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, session) => {
+  const sessionRecordingData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+
+  if (sessionRecordingData) {
+    window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
+      ...sessionRecordingData,
+      previousSession: session,
+    });
+  }
+};
+
 BG.Methods.onAppLoadedNotification = () => {
   BG.isAppOnline = true;
 
@@ -1087,31 +1089,82 @@ BG.Methods.onAppLoadedNotification = () => {
   EventActions.sendExtensionEvents();
 };
 
-BG.Methods.onContentScriptLoadedNotification = async (tabId) => {
-  const cachedAppliesRules = BG.Methods.getCachedAppliedRuleDetails(tabId);
+BG.Methods.onContentScriptLoadedNotification = async (tab, payload = {}) => {
+  if (payload.isIframe) {
+    return;
+  }
+
+  const cachedAppliesRules = BG.Methods.getCachedAppliedRuleDetails(tab.id);
 
   if (cachedAppliesRules?.length > 0) {
     chrome.tabs.sendMessage(
-      tabId,
+      tab.id,
       {
         action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
         appliedRuleDetails: cachedAppliesRules,
         isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
       },
-      () => window.tabService.removeData(tabId, "appliedRuleDetails")
+      () => window.tabService.removeData(tab.id, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS)
     );
   }
 
-  if (window.tabService.getData(tabId, "recordSession") === true) {
-    chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.START_RECORDING, notify: true }, () => {
-      window.tabService.removeData(tabId, "recordSession");
-    });
+  let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+
+  if (!sessionRecordingData) {
+    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
+
+    if (sessionRecordingConfig) {
+      sessionRecordingData = { config: sessionRecordingConfig };
+      window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+    }
+  }
+
+  if (sessionRecordingData) {
+    chrome.tabs.sendMessage(
+      tab.id,
+      {
+        action: RQ.CLIENT_MESSAGES.START_RECORDING,
+        payload: sessionRecordingData,
+      },
+      () => {
+        window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
+          ...sessionRecordingData,
+          notify: false,
+          previousSession: null,
+        });
+      }
+    );
   }
 };
 
-BG.Methods.startRecordingOnUrl = (url) => {
+BG.Methods.startRecordingExplicitly = (tabId) => {
+  const sessionRecordingData = { explicit: true };
+
+  window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+
+  chrome.tabs.sendMessage(tabId, {
+    action: RQ.CLIENT_MESSAGES.START_RECORDING,
+    payload: sessionRecordingData,
+  });
+};
+
+BG.Methods.launchUrlAndStartRecording = (url) => {
   chrome.tabs.create({ url }, (tab) => {
-    window.tabService.setData(tab.id, "recordSession", true);
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true });
+  });
+};
+
+BG.Methods.stopRecording = (tabId) => {
+  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
+    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  });
+};
+
+BG.Methods.stopRecordingOnAllTabs = () => {
+  Object.values(window.tabService.getTabs()).forEach(({ id: tabId }) => {
+    if (tabId && window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING)) {
+      BG.Methods.stopRecording(tabId);
+    }
   });
 };
 
@@ -1132,7 +1185,7 @@ BG.Methods.getExecutedRules = async (tabId, callback) => {
 };
 
 BG.Methods.getCachedAppliedRuleDetails = (tabId) => {
-  const appliedRuleDetails = window.tabService.getData(tabId, "appliedRuleDetails", []);
+  const appliedRuleDetails = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, []);
 
   return appliedRuleDetails;
 };
@@ -1399,13 +1452,13 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
 
   // Cache execution details until content script loads
   if (BG.Methods.isTopDocumentRequest(requestDetails)) {
-    const appliedRuleDetails = window.tabService.getData(tabId, "appliedRuleDetails", []);
+    const appliedRuleDetails = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, []);
     appliedRuleDetails?.push({
       rule,
       requestDetails,
     });
 
-    window.tabService.setData(tabId, "appliedRuleDetails", appliedRuleDetails);
+    window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   }
 };
 

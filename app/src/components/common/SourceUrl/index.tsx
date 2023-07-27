@@ -22,7 +22,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
 }) => {
   return (
     <div className="source-condition-input-wrapper mt-8">
-      <Col className="shrink-0">
+      <Col className="shrink-0 source-condition-input-select">
         <Select
           value={source.key}
           className="source-condition-selector cursor-pointer uppercase"
@@ -37,7 +37,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
           ))}
         </Select>
       </Col>
-      <Col className="shrink-0">
+      <Col className="shrink-0 source-condition-input-select">
         <Select
           value={source.operator}
           className="source-condition-selector cursor-pointer"

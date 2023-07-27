@@ -139,6 +139,8 @@ CONSTANTS.EXTENSION_MESSAGES = {
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
+  START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
+  STOP_RECORDING: "stopRecording",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",
