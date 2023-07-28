@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog, DebugInfo, RecordingOptions, SessionRecordingMetadata } from "./types";
+import { ConsoleLog, DebugInfo, PageNavigationLog, RecordingOptions, SessionRecordingMetadata } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "./constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
@@ -35,6 +35,19 @@ const isConsoleLogEvent = (rrwebEvent: RRWebEventData): boolean => {
   }
 
   return false;
+};
+
+export const getPageNavigationLogs = (rrwebEvents: RRWebEventData[], startTime: number): PageNavigationLog[] => {
+  return rrwebEvents
+    .filter((event) => event.type === EventType.Meta && event.data.href)
+    .map((metaEvent) => {
+      return {
+        // @ts-ignore
+        ...metaEvent.data,
+        timestamp: metaEvent.timestamp,
+        timeOffset: Math.ceil((metaEvent.timestamp - startTime) / 1000),
+      };
+    });
 };
 
 export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number): ConsoleLog[] => {

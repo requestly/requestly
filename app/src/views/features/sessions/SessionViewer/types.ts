@@ -50,3 +50,11 @@ export interface ConsoleLog extends LogData {
 export interface NetworkLog extends NetworkEventData {
   timeOffset: number;
 }
+
+export interface PageNavigationLog {
+  href: string;
+  width: number;
+  height: number;
+  timestamp: number;
+  timeOffset: number;
+}
