@@ -151,6 +151,7 @@ const DraftSessionViewer: React.FC = () => {
       </div>
       <SessionDetails key={tabId} />
       <ProductWalkthrough
+        completeTourOnUnmount={false}
         startWalkthrough={!userAttributes?.num_sessions && !isMiscTourCompleted?.firstDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
