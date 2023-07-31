@@ -102,7 +102,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         </>
       );
     } else handleSurveyNavigation(currentPage, dispatch);
-  }, [renderQuestionnaire, currentPage, skipButton]);
+  }, [renderQuestionnaire, currentPage, skipButton, dispatch, userPersona]);
 
   const handleMoveToRecommendationScreen = useCallback(() => {
     const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;

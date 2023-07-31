@@ -47,7 +47,7 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
     ],
   },
   [QuestionnaireType.INDUSTRY]: {
-    questionResponseAction: (dispatch, value, doClear) =>
+    questionResponseAction: (dispatch, value, doClear = false) =>
       setUserPersona(dispatch, value, doClear, QuestionnaireType.INDUSTRY),
     options: [
       {
@@ -76,6 +76,10 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
       },
       {
         title: "Travel",
+      },
+      {
+        type: "other",
+        title: null,
       },
     ],
   },
