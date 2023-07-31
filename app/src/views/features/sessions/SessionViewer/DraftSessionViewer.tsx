@@ -141,7 +141,12 @@ const DraftSessionViewer: React.FC = () => {
             data-tour-id="save-draft-session-btn"
             type="primary"
             className="text-bold session-viewer-save-action-btn"
-            onClick={() => setIsSavePopupVisible((prev) => !prev)}
+            onClick={() => {
+              setIsSavePopupVisible((prev) => !prev);
+              dispatch(
+                actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+              );
+            }}
           >
             Save <DownArrow />
           </RQButton>
