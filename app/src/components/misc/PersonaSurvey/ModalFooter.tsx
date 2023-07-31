@@ -44,7 +44,13 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
         break;
+
+      case QuestionnaireType.INDUSTRY:
+        trackPersonaQ1Completed(userPersona.industry);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry);
+        break;
     }
+
     if (isSurveyModal || index !== surveyLength - 1) {
       handleSurveyNavigation(currentPage, dispatch);
 
@@ -82,7 +88,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
               className={`text-bold ${disableContinue && "survey-disable-continue"}`}
               onClick={handleMoveToNextPage}
             >
-              {currentQuestionnaire === QuestionnaireType.PERSONA ? "Get started" : "Continue"}
+              {currentQuestionnaire === QuestionnaireType.INDUSTRY ? "Get started" : "Continue"}
             </RQButton>
           </Col>
         </Row>
