@@ -1,51 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
 import Split from "react-split";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
-import { getAppMode } from "store/selectors";
-import APP_CONSTANTS from "config/constants";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getIsExtensionEnabled } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { StorageService } from "init";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
-import Logger from "lib/logger";
 import "./RuleEditor.css";
 
 const INITIAL_PANE_SIZES = [92, 8];
 
 const RuleEditor = () => {
   const location = useLocation();
-  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
-
-  // Component State
-  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState(true);
-
-  //Global State
   const appMode = useSelector(getAppMode);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      Logger.log("Reading storage in RuleEditor useEffect");
-      StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-        .then((value) => {
-          if (value) {
-            setIsExtensionEnabled(value.isExtensionEnabled);
-          } else {
-            setIsExtensionEnabled(true);
-          }
-        });
-    }
-  }, [appMode]);
+  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
+  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
 
   const expandRulePane = () => setRulePaneSizes([30, 70]);
-
   const collapseRulesPlane = () => setRulePaneSizes(INITIAL_PANE_SIZES);
+
+  useEffect(() => {
+    const unloadListener = (e) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure?";
+    };
+
+    if (isCurrentlySelectedRuleHasUnsavedChanges) {
+      window.addEventListener("beforeunload", unloadListener);
+    }
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, [isCurrentlySelectedRuleHasUnsavedChanges]);
+
+  unstable_usePrompt({
+    message: "Discard changes? Changes you made may not be saved.",
+    when: isCurrentlySelectedRuleHasUnsavedChanges,
+  });
 
   const renderRuleEditor = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {

@@ -874,6 +874,18 @@ BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
     if (shouldOpenUpdatesPage) {
       chrome.tabs.create({ url: RQ.CONSTANTS.UPDATES_PAGE_URL });
     }
+
+    BG.Methods.getAppTabs().then((tabs) => {
+      tabs.forEach((tab) => {
+        chrome.tabs.executeScript(tab.id, {
+          code: `window.postMessage({
+            action: "${RQ.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED}",
+            oldVersion: "${details.previousVersion}",
+            newVersion: "${chrome.runtime.getManifest().version}"
+          }, "*")`,
+        });
+      });
+    });
   }
 
   Logger.log("Requestly: " + details.reason);

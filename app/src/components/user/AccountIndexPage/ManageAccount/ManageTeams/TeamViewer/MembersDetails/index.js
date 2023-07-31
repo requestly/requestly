@@ -58,23 +58,25 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   }, [dispatch, doRefreshTeamMembersTable, isNewTeam, teamId]);
 
   useEffect(() => {
-    const functions = getFunctions();
-    const getTeamBillingUsers = httpsCallable(functions, "getTeamBillingUsers");
+    if (refreshTeamMembersTable) {
+      const functions = getFunctions();
+      const getTeamBillingUsers = httpsCallable(functions, "teams-getTeamBillingUsers");
 
-    getTeamBillingUsers({
-      teamId,
-    })
-      .then((res) => {
-        const seatsData = res.data;
-        if (seatsData.success) {
-          setSeats({
-            billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
-            actualBillQuantity: seatsData.actualBillQuantity, // total number of users
-          });
-          setShowSeatStatus(true);
-        }
+      getTeamBillingUsers({
+        teamId,
       })
-      .catch(() => setShowSeatStatus(false));
+        .then((res) => {
+          const seatsData = res.data;
+          if (seatsData.success) {
+            setSeats({
+              billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
+              actualBillQuantity: seatsData.actualBillQuantity, // total number of users
+            });
+            setShowSeatStatus(true);
+          }
+        })
+        .catch(() => setShowSeatStatus(false));
+    }
   }, [teamId, refreshTeamMembersTable]);
 
   return (

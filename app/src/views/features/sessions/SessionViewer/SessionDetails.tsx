@@ -37,12 +37,12 @@ const SessionDetails: React.FC = () => {
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
 
   const consoleLogs = useMemo<ConsoleLog[]>(() => {
-    const rrwebEvents = events[RQSessionEventType.RRWEB] as RRWebEventData[];
+    const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
     return getConsoleLogs(rrwebEvents, startTime);
   }, [events, startTime]);
 
   const networkLogs = useMemo<NetworkLog[]>(() => {
-    const networkEvents = events[RQSessionEventType.NETWORK] || [];
+    const networkEvents = events?.[RQSessionEventType.NETWORK] || [];
     return networkEvents.map((networkEvent: NetworkEventData) => ({
       ...networkEvent,
       timeOffset: Math.floor((networkEvent.timestamp - startTime) / 1000),
@@ -66,6 +66,10 @@ const SessionDetails: React.FC = () => {
             width: playerContainer.current.clientWidth,
             height: 400,
             autoPlay: true,
+            // prevents elements inside rrweb-player to steal focus
+            // The elements inside the player were stealing the focus from the inputs in the session viewer pages
+            // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
+            triggerFocus: false,
           },
         })
       );
@@ -150,13 +154,13 @@ const SessionDetails: React.FC = () => {
             Environment
           </span>
         ),
-        children: <EnvironmentDetailsPanel environment={attributes.environment} />,
+        children: <EnvironmentDetailsPanel environment={attributes?.environment} />,
       },
     ];
 
     return tabItems;
   }, [
-    attributes.environment,
+    attributes?.environment,
     consoleLogs,
     networkLogs,
     playerTimeOffset,

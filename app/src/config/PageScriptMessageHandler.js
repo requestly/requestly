@@ -6,10 +6,8 @@ const PageScriptMessageHandler = {
   requestId: 1,
 
   constants: {
-    CONTENT_SCRIPT: "content_script",
-    PAGE_SCRIPT: "page_script",
+    SOURCE: "page_script",
     DOMAIN: window.location.origin,
-    SOURCE_FIELD: "source",
   },
 
   addMessageListener: function (messageAction, listener) {
@@ -18,10 +16,6 @@ const PageScriptMessageHandler = {
 
   removeMessageListener: function (messageName) {
     delete this.messageListeners[messageName];
-  },
-
-  getSource: function () {
-    return this.constants.PAGE_SCRIPT;
   },
 
   registerCallback: function (message, callback) {
@@ -51,7 +45,7 @@ const PageScriptMessageHandler = {
 
     this.registerCallback(message, callback);
 
-    message[this.constants.SOURCE_FIELD] = this.getSource();
+    message.source = this.constants.SOURCE;
     window.postMessage(message, this.constants.DOMAIN);
   },
 
@@ -62,7 +56,7 @@ const PageScriptMessageHandler = {
       response: response,
     };
 
-    message[this.constants.SOURCE_FIELD] = this.constants.PAGE_SCRIPT;
+    message.source = this.constants.SOURCE;
     window.postMessage(message, this.constants.DOMAIN);
   },
 
@@ -73,13 +67,10 @@ const PageScriptMessageHandler = {
       return;
     }
 
-    if (event && event.data && event.data.source === this.constants.CONTENT_SCRIPT) {
+    if (event?.data?.source !== this.constants.SOURCE) {
       Logger.log("Received message:", event.data);
 
-      if (
-        event.data.requestId &&
-        this.eventCallbackMap.hasOwnProperty(`${event.data.action}_${event.data.requestId}`)
-      ) {
+      if (event.data.requestId && this.eventCallbackMap[`${event.data.action}_${event.data.requestId}`]) {
         this.invokeCallback(event.data);
       } else {
         this.messageHandler(event.data);

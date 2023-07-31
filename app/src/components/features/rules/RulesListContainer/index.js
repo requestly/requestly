@@ -165,9 +165,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const handleImportRulesOnClick = (e) => {
     trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
     trackRulesImportStarted();
-    user.loggedIn
-      ? verifyImportRulesLimitAndContinue()
-      : promptUserToSignup(() => verifyImportRulesLimitAndContinue(), "Sign up to import rules", "import_rules");
+    verifyImportRulesLimitAndContinue();
   };
 
   const verifyImportRulesLimitAndContinue = () => {
@@ -175,9 +173,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleExportRulesOnClick = () => {
-    user.loggedIn
-      ? verifyExportRulesLimitAndContinue()
-      : promptUserToSignup(() => verifyExportRulesLimitAndContinue(), "Sign up to export rules", "export rules");
+    verifyExportRulesLimitAndContinue();
   };
 
   const verifyExportRulesLimitAndContinue = () => {

@@ -14,6 +14,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getIsNetworkTooltipShown } from "store/selectors";
+import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 
 interface Props {
   har: Har;
@@ -60,6 +62,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
       }, 2500);
     }
     trackNetworkSessionSaved();
+    trackRQDesktopLastActivity(SESSION_RECORDING.network.save.saved);
     closeModal();
   }, [closeModal, dispatch, navigate, har, name, networkSessionTooltipShown, onSave]);
 
@@ -68,6 +71,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
       open={isVisible}
       onCancel={() => {
         trackNetworkSessionSaveCanceled();
+        trackRQDesktopLastActivity(SESSION_RECORDING.network.save.canceled);
         closeModal();
       }}
       wrapClassName="network-session-modal"

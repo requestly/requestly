@@ -26,11 +26,13 @@ export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.dra
 
 export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength, options) => {
+export const trackDraftSessionSaved = (sessionLength, options, type) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
+    type,
     sessionLength,
     options,
   });
+
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
 };
 
@@ -91,7 +93,8 @@ export const trackSampleSessionClicked = (log_type) => {
 };
 
 /* ONBOARDING */
-export const trackOnboardingYTVideoClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.youtube_link_clicked);
+export const trackOnboardingPageViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.onboarding_page_viewed);
+export const trackOnboardingSampleSessionViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.sample_session_viewed);
 export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
 export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
 export const trackStartRecordingOnExternalTarget = (url) => {
@@ -99,4 +102,9 @@ export const trackStartRecordingOnExternalTarget = (url) => {
 };
 export const trackTriedRecordingForInvalidURL = (url) => {
   trackEvent(SESSION_RECORDING.ONBAORDING.invalid_recording_url, { url });
+};
+
+// UPLOAD SESSION
+export const trackSessionRecordingUpload = (status) => {
+  trackEvent(SESSION_RECORDING.session_recording_upload, { status });
 };

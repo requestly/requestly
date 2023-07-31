@@ -1,7 +1,7 @@
 import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
 import { BsShieldCheck } from "react-icons/bs";
-import { Button, Divider, Input, Row, Col, Typography, InputRef } from "antd";
-import React, { useState, useCallback, useRef } from "react";
+import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
@@ -13,7 +13,8 @@ import { getUserAuthDetails } from "store/selectors";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
-  trackOnboardingYTVideoClicked,
+  trackOnboardingSampleSessionViewed,
+  trackOnboardingPageViewed,
   trackStartRecordingOnExternalTarget,
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
@@ -26,7 +27,6 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
-
 import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
 
 const { Text, Title } = Typography;
@@ -58,6 +58,7 @@ const GreenVerifiedCheck: React.FC<{}> = () => {
 
 interface SessionOnboardProps {
   redirectToSettingsPage?: () => void;
+  openDownloadedSessionModalBtn?: React.ReactNode;
 }
 
 export enum OnboardingTypes {
@@ -111,7 +112,10 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   );
 };
 
-const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
+const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({
+  redirectToSettingsPage,
+  openDownloadedSessionModalBtn,
+}) => {
   const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
   const openInstallExtensionModal = useCallback(() => {
     setIsInstallExtensionModalVisible(true);
@@ -140,28 +144,31 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSet
         <div>and Share with others for offline review or debugging.</div>
       </Typography.Text>
       <div>
-        <AuthConfirmationPopover
-          title="You need to sign up to configure webpages"
-          callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
-          source={AUTH.SOURCE.SESSION_RECORDING}
-        >
-          <Button
-            type="primary"
-            onClick={
-              user?.details?.isLoggedIn
-                ? isExtensionInstalled()
-                  ? redirectToSettingsPage
-                  : openInstallExtensionModal
-                : null
-            }
-            style={{ margin: "24px" }}
+        <Space>
+          <AuthConfirmationPopover
+            title="You need to sign up to configure webpages"
+            callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
+            source={AUTH.SOURCE.SESSION_RECORDING}
           >
-            Configure webpages
-          </Button>
-        </AuthConfirmationPopover>
-        <TutorialButton>
-          See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
-        </TutorialButton>
+            <Button
+              type="primary"
+              onClick={
+                user?.details?.isLoggedIn
+                  ? isExtensionInstalled()
+                    ? redirectToSettingsPage
+                    : openInstallExtensionModal
+                  : null
+              }
+              style={{ margin: "24px 0" }}
+            >
+              Configure webpages
+            </Button>
+          </AuthConfirmationPopover>
+          {openDownloadedSessionModalBtn}
+          <TutorialButton className="session-tutorial-btn">
+            See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
+          </TutorialButton>
+        </Space>
       </div>
       <Divider />
       <Typography.Text type="secondary">
@@ -189,9 +196,16 @@ const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSet
   );
 };
 
-const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettingsPage }) => {
+const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
+  redirectToSettingsPage,
+  openDownloadedSessionModalBtn,
+}) => {
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    trackOnboardingPageViewed();
+  }, []);
 
   const openInstallExtensionModal = useCallback(() => {
     const modalProps = {
@@ -238,9 +252,12 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
   return (
     <div className="onboarding-content-container">
       <Row justify="end" align="middle" className="settings-row">
-        <span onClick={handleSettingsNavigation} className="settings-btn">
-          <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-        </span>
+        <Space size={20}>
+          {openDownloadedSessionModalBtn}
+          <span onClick={handleSettingsNavigation} className="settings-btn">
+            <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+          </span>
+        </Space>
       </Row>
       <Row justify="space-between" className="onboarding-banner">
         <Col span={12} className="banner-text-container">
@@ -285,7 +302,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
           <Row justify="end">
             <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
           </Row>
-          <Row onClick={trackOnboardingYTVideoClicked}>
+          <Row onClick={trackOnboardingSampleSessionViewed}>
             <a
               href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
               target="__blank"
@@ -301,15 +318,22 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({ redirectToSettin
     </div>
   );
 };
-const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage }) => {
+const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
   const shownNewOnboarding = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
+
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
     return shownNewOnboarding ? (
-      <SessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />
+      <SessionOnboardingView
+        redirectToSettingsPage={redirectToSettingsPage}
+        openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
+      />
     ) : (
-      <OldSessionOnboardingView redirectToSettingsPage={redirectToSettingsPage} />
+      <OldSessionOnboardingView
+        redirectToSettingsPage={redirectToSettingsPage}
+        openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
+      />
     );
   }
 };

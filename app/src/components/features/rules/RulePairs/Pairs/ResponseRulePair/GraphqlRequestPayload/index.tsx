@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { Input, Row, Col, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
 import { debounce, snakeCase } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
 import {
@@ -30,45 +29,30 @@ interface GraphqlRequestPayloadProps {
   pairIndex: number;
   gqlOperationFilter: RequestPayload;
   setGqlOperationFilter: React.Dispatch<React.SetStateAction<RequestPayload>>;
-  modifyPairAtGivenPath: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    pairIndex: number,
-    payloadPath: string,
-    customValue?: string | unknown,
-    otherValuesToModify?: { path: string; value: string | unknown }[],
-    triggerUnsavedChangesIndication?: boolean
-  ) => void;
 }
 
 const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   pairIndex,
   gqlOperationFilter,
   setGqlOperationFilter,
-  modifyPairAtGivenPath = () => {},
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const isRequestPayloadFilterCompatible = isFeatureCompatible(FEATURES.REQUEST_PAYLOAD_FILTER);
 
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
-      modifyPairAtGivenPath(
-        null,
-        pairIndex,
-        SOURCE_REQUEST_PAYLOAD_KEY,
-        gqlOperationFilter.key,
-        [
-          {
-            path: "source.filters[0].requestPayload.value",
-            value: gqlOperationFilter.value,
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          triggerUnsavedChangesIndication: false,
+          updates: {
+            [SOURCE_REQUEST_PAYLOAD_KEY]: gqlOperationFilter.key,
+            "source.filters.requestPayload.value": gqlOperationFilter.value,
           },
-        ],
-        false
+        })
       );
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gqlOperationFilter]);
+  }, [dispatch, pairIndex, gqlOperationFilter.key, gqlOperationFilter.value]);
 
   const clearRequestPayload = () => {
     deleteObjectAtPath(
@@ -81,7 +65,12 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   const handleRequestPayloadKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: e?.target?.value },
+      })
+    );
     const key = e.target.value;
 
     if (key === "" && gqlOperationFilter.value === "") {
@@ -96,7 +85,12 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   const handleRequestPayloadValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    modifyPairAtGivenPath(e, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: e?.target?.value },
+      })
+    );
     const value = e.target.value;
 
     if (value === "" && gqlOperationFilter.key === "") {
@@ -110,7 +104,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     );
   };
 
-  return isRequestPayloadFilterCompatible ? (
+  return (
     <Col span={24} data-tour-id="rule-editor-response-graphql-payload">
       <label className="subtitle graphql-operation-label">
         GraphQL Operation (Request Payload Filter)
@@ -149,7 +143,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         />
       </Row>
     </Col>
-  ) : null;
+  );
 };
 
 export default GraphqlRequestPayload;

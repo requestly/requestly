@@ -78,6 +78,8 @@ import LINKS from "config/constants/sub/links";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
+import { isDesktopMode, isMacOs } from "utils/Misc";
+import AuthPopoverButton from "./AuthPopoverButtons";
 
 //Lodash
 const set = require("lodash/set");
@@ -98,7 +100,7 @@ const isGroupSwitchDisabled = (record, groupwiseRulesToPopulate) => {
 
   if (!record.groupId) return false;
   if (!groupwiseRulesToPopulate[record.groupId]) return false;
-  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE)
+  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] !== GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE)
     return true;
   return false;
 };
@@ -704,7 +706,7 @@ const RulesTable = ({
           return (
             <Switch
               size="small"
-              // We Rule's group is OFF, this switch must be disabled
+              // When Rule's group is OFF, this switch must be disabled
               disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
               checked={checkIfRuleIsActive(record)}
               onClick={(_, event) => toggleRuleStatus(event, record)}
@@ -748,7 +750,7 @@ const RulesTable = ({
             return (
               <ReactHoverObserver>
                 {({ isHovering }) => (
-                  <div className={hideActionButtons ? "group-action-buttons hidden-element" : "group-action-buttons"}>
+                  <div className={hideActionButtons ? "group-action-buttons not-visible" : "group-action-buttons"}>
                     <Space>
                       {isFavouritingAllowed && showGroupPinIcon && (
                         <Text
@@ -825,7 +827,7 @@ const RulesTable = ({
 
         if (areActionsEnabled) {
           return (
-            <div className={hideActionButtons ? "rule-action-buttons hidden-element" : "rule-action-buttons"}>
+            <div className={hideActionButtons ? "rule-action-buttons not-visible" : "rule-action-buttons"}>
               <ReactHoverObserver>
                 {({ isHovering }) => (
                   <Space>
@@ -1282,6 +1284,7 @@ const RulesTable = ({
                   setSearchValue(e.target.value);
                 }}
                 prefix={<SearchOutlined />}
+                suffix={isDesktopMode() || isMacOs() ? <Typography.Text type="secondary">⌘+K</Typography.Text> : null}
                 style={{ width: 240, marginLeft: "8px" }}
               />
             </>
@@ -1347,20 +1350,10 @@ const RulesTable = ({
                 ];
 
                 return buttonData.map(
-                  ({
-                    icon,
-                    shape,
-                    type = null,
-                    buttonText,
-                    authSource,
-                    isTooltipShown,
-                    onClickHandler,
-                    isDropdown = false,
-                    hasPopconfirm = false,
-                    tourId = null,
-                    trackClickEvent = () => {},
-                    overlay,
-                  }) => (
+                  (
+                    { icon, type = null, buttonText, isTooltipShown, onClickHandler, isDropdown = false, overlay },
+                    index
+                  ) => (
                     <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
@@ -1374,25 +1367,11 @@ const RulesTable = ({
                             {buttonText}
                           </Dropdown.Button>
                         ) : (
-                          <AuthConfirmationPopover
-                            title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-                            disabled={!hasPopconfirm}
-                            callback={onClickHandler}
-                            source={authSource}
-                          >
-                            <Button
-                              type={type || "default"}
-                              shape={isScreenSmall ? shape : null}
-                              onClick={() => {
-                                trackClickEvent();
-                                hasPopconfirm ? user?.details?.isLoggedIn && onClickHandler() : onClickHandler();
-                              }}
-                              icon={icon}
-                              data-tour-id={tourId}
-                            >
-                              {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
-                            </Button>
-                          </AuthConfirmationPopover>
+                          <AuthPopoverButton
+                            isScreenSmall={isScreenSmall}
+                            isLoggedIn={user?.details?.isLoggedIn}
+                            {...buttonData[index]}
+                          />
                         )}
                       </>
                     </Tooltip>
