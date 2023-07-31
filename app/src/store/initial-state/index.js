@@ -11,11 +11,11 @@ const INITIAL_STATE = {
   },
 
   userPersona: {
-    page: 0,
+    page: "getting_started",
     persona: "",
-    useCases: [],
-    referralChannel: "",
-    numberOfEmployees: "",
+    // useCases: [],
+    // referralChannel: "",
+    // numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 

@@ -1,10 +1,11 @@
 RQ.SessionRecorder = {};
-RQ.SessionRecorder.isInitialized = false;
-RQ.SessionRecorder.isRecording = false;
-RQ.SessionRecorder.isExplicitRecording = false;
-RQ.SessionRecorder.sendResponseCallbacks = {};
 
 RQ.SessionRecorder.setup = () => {
+  RQ.SessionRecorder.isInitialized = false;
+  RQ.SessionRecorder.isRecording = false;
+  RQ.SessionRecorder.isExplicitRecording = false;
+  RQ.SessionRecorder.sendResponseCallbacks = {};
+
   const isTopDocument = !RQ.SessionRecorder.isIframe();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
@@ -48,7 +49,8 @@ RQ.SessionRecorder.setup = () => {
   });
 };
 
-RQ.SessionRecorder.startRecording = async ({ config, previousSession, notify, explicit }) => {
+RQ.SessionRecorder.startRecording = async (options = {}) => {
+  const { config, previousSession, notify, explicit = false } = options;
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
