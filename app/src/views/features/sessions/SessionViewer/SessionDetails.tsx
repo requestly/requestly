@@ -8,9 +8,9 @@ import ConsoleLogsPanel from "./ConsoleLogs/ConsoleLogsPanel";
 import NetworkLogsPanel from "./NetworkLogs/NetworkLogsPanel";
 import EnvironmentDetailsPanel from "./EnvironmentDetailsPanel";
 import { ApiOutlined, CodeOutlined, ProfileOutlined } from "@ant-design/icons";
-import { ConsoleLog, NetworkLog } from "./types";
+import { ConsoleLog, NetworkLog, PageNavigationLog } from "./types";
 import SessionPropertiesPanel from "./SessionPropertiesPanel";
-import CopyButton from "components/misc/CopyButton";
+import PageURLInfo from "./PageURLInfo";
 import {
   getSessionRecordingAttributes,
   getSessionRecordingEvents,
@@ -18,7 +18,7 @@ import {
 } from "store/features/session-recording/selectors";
 import { useSelector } from "react-redux";
 import { cloneDeep } from "lodash";
-import { getConsoleLogs } from "./sessionEventsUtils";
+import { getConsoleLogs, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
@@ -35,6 +35,11 @@ const SessionDetails: React.FC = () => {
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
+
+  const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
+    const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
+    return getPageNavigationLogs(rrwebEvents, startTime);
+  }, [events, startTime]);
 
   const consoleLogs = useMemo<ConsoleLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -171,15 +176,7 @@ const SessionDetails: React.FC = () => {
   return (
     <>
       <div className="session-properties-wrapper">
-        {attributes?.url && (
-          <Input
-            readOnly
-            addonBefore="Page URL"
-            value={attributes?.url}
-            className="session-page-url-property"
-            suffix={<CopyButton showIcon={true} copyText={attributes?.url} title="" />}
-          />
-        )}
+        <PageURLInfo sessionUrl={attributes?.url} logs={pageNavigationLogs} playerTimeOffset={playerTimeOffset} />
         {events?.rrweb?.length && attributes?.duration && (
           <Input
             readOnly
