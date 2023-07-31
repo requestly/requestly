@@ -7,6 +7,7 @@ export interface UserPersona {
   referralChannel?: string;
   useCases?: string[];
   numberOfEmployees?: string;
+  industry?: string;
 }
 
 export interface Option {
@@ -15,8 +16,11 @@ export interface Option {
   icon?: string | ReactNode;
 }
 
+export interface Visibility {
+  userPersona: UserPersona;
+}
 export interface PageConfig {
-  page: number;
+  page?: number;
   pageId: SurveyPage;
   title: string;
   subTitle: string;
@@ -25,6 +29,7 @@ export interface PageConfig {
    */
   skip?: boolean;
   render?: QuestionnaireType | (() => ReactNode);
+  visibility: ({ userPersona }: Visibility) => boolean;
 }
 
 export interface SurveyOptionsConfig {
@@ -44,10 +49,12 @@ export enum PersonaType {
 
 export enum QuestionnaireType {
   PERSONA = "persona",
+  INDUSTRY = "industry",
 }
 
 export enum SurveyPage {
   GETTING_STARTED = "getting_started",
   PERSONA = "persona",
+  INDUSTRY = "industry",
   RECOMMENDATIONS = "recommendations",
 }
