@@ -1,7 +1,7 @@
 .persona-survey-container {
   width: 550px;
   min-height: 480px;
-  background: var(--body-background);
+  background: var(--component-background);
   border-radius: var(--border-radius-md);
   padding: 40px 20px;
   position: relative;
