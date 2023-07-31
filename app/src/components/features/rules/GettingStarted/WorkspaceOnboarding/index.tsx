@@ -162,7 +162,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
       shouldShowOnboarding(appMode).then((result) => {
         if (result && isExtensionInstalled()) {
           trackWorkspaceOnboardingViewed();
-          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
+          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal", newValue: true }));
         }
       });
     }
