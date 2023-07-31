@@ -1,23 +1,26 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
-import { useNavigate, useParams } from "react-router-dom";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
-import PATHS from "config/constants/sub/paths";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
-import { getUserAuthDetails } from "store/selectors";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
+import { actions } from "store";
+import PATHS from "config/constants/sub/paths";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
@@ -30,7 +33,9 @@ const DraftSessionViewer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
@@ -133,6 +138,7 @@ const DraftSessionViewer: React.FC = () => {
             Discard
           </RQButton>
           <RQButton
+            data-tour-id="save-draft-session-btn"
             type="primary"
             className="text-bold session-viewer-save-action-btn"
             onClick={() => setIsSavePopupVisible((prev) => !prev)}
@@ -144,6 +150,13 @@ const DraftSessionViewer: React.FC = () => {
         </div>
       </div>
       <SessionDetails key={tabId} />
+      <ProductWalkthrough
+        startWalkthrough={!userAttributes?.num_sessions && !isMiscTourCompleted?.firstDraftSession}
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))
+        }
+      />
     </div>
   );
 };
