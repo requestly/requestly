@@ -26,11 +26,17 @@ export const shouldShowOnboarding = async (appMode: string) => {
 };
 
 export const shuffleOptions = (options: Option[]) => {
-  for (let i = options.length - 1; i > 0; i--) {
+  const otherOption = options.find((option) => option.type === "other");
+  const filteredOptions = options.filter((option) => option.type !== "other");
+
+  for (let i = filteredOptions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [options[i], options[j]] = [options[j], options[i]];
+    [filteredOptions[i], filteredOptions[j]] = [filteredOptions[j], filteredOptions[i]];
   }
-  return options;
+  if (otherOption) {
+    filteredOptions.push(otherOption);
+  }
+  return filteredOptions;
 };
 
 export const syncUserPersona = async (uid: string, dispatch: any, userPersona: UserPersona) => {

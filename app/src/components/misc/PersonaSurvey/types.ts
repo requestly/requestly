@@ -10,9 +10,14 @@ export interface UserPersona {
   industry?: string;
 }
 
+export type OtherOption = {
+  type: "other";
+  value: string;
+};
+
 export interface Option {
-  type?: string;
-  title: string;
+  type?: "other" | "select";
+  title: string | null;
   icon?: string | ReactNode;
 }
 
@@ -33,7 +38,7 @@ export interface PageConfig {
 }
 
 export interface SurveyOptionsConfig {
-  questionResponseAction?: (dispatch: any, value: string, doClear: boolean) => void;
+  questionResponseAction?: (dispatch: any, value: string | OtherOption, doClear: boolean) => void;
   options?: Option[];
 }
 
