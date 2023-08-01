@@ -32,8 +32,10 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
 
   const disableContinue = useMemo(() => {
     if (currentPage === SurveyPage.GETTING_STARTED) return false;
-    if (userPersona[currentQuestionnaire as QuestionnaireType]?.length) return false;
-    return true;
+    const questionnaireResponse = userPersona[currentQuestionnaire as QuestionnaireType];
+
+    if (typeof questionnaireResponse === "string") return !questionnaireResponse.length;
+    else return !questionnaireResponse.value.length;
   }, [currentPage, currentQuestionnaire, userPersona]);
 
   const handleMoveToNextPage = () => {

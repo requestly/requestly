@@ -1,3 +1,6 @@
+.persona-survey-container .survey-input-option {
+  width: 100%;
+}
 .persona-survey-container .survey-input-option .ant-input-affix-wrapper,
 .persona-survey-container .survey-input-option .ant-input-affix-wrapper:focus {
   background: none;

@@ -16,7 +16,10 @@ export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionna
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const [otherValue, setOtherValue] = useState<OtherOption>({ type: "other", value: "" });
   const { title, icon, type } = option;
-  const isActive = type === "other" ? otherValue === userPersona[questionnaire] : title === userPersona[questionnaire];
+  const isActive =
+    type === "other" && otherValue.value.length
+      ? otherValue === userPersona[questionnaire]
+      : title === userPersona[questionnaire];
 
   useEffect(() => {
     if (typeof userPersona[questionnaire] === "object") {
@@ -27,10 +30,7 @@ export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionna
   return (
     <>
       {type === "other" ? (
-        <div
-          className={`survey-option survey-input-option ${isActive && "outline-active-option"}`}
-          style={{ width: "100%" }}
-        >
+        <div className={`survey-option survey-input-option ${isActive && "outline-active-option"}`}>
           <RQInput
             prefix={<span className="text-bold">Other : </span>}
             value={otherValue.value}
