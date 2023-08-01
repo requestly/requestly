@@ -1,17 +1,19 @@
 import React, { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import { getAppMode } from "store/selectors";
+import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
-import { SlackOutlined } from "@ant-design/icons";
+import { SearchOutlined, SlackOutlined } from "@ant-design/icons";
 import { redirectToSettings } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import { RQButton } from "lib/design-system/components";
 import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
@@ -25,6 +27,7 @@ const PATHS_WITHOUT_HEADER = ["/pricing", "/invite"];
 
 const MenuHeader = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
@@ -89,6 +92,16 @@ const MenuHeader = () => {
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
+              <RQButton
+                type="default"
+                className="header-search-btn"
+                onClick={() => dispatch(actions.updateIsCommandBarOpen(true))}
+              >
+                <div>
+                  <SearchOutlined style={{ marginRight: "2px" }} /> Search
+                </div>
+                <div>⌘+K</div>
+              </RQButton>
               {randomNumberBetween1And2 === 1 ? (
                 <Col className="hidden-on-small-screen">
                   <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
@@ -106,15 +119,13 @@ const MenuHeader = () => {
               ) : (
                 <Col className="hidden-on-small-screen">
                   <span className="join-slack-button" onClick={() => trackHeaderClicked("join_slack_button")}>
-                    <Button
-                      style={{ display: "flex" }}
+                    <RQButton
                       type="default"
-                      size="small"
                       icon={<SlackOutlined />}
                       onClick={() => window.open("https://bit.ly/requestly-slack", "_blank")}
                     >
                       Join Slack Community
-                    </Button>
+                    </RQButton>
                   </span>
                 </Col>
               )}

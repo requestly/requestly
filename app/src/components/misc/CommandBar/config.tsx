@@ -1,31 +1,21 @@
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { actions } from "store";
-import {
-  AiOutlineHome,
-  AiOutlineStar,
-  AiOutlineFolderOpen,
-  AiOutlineUser,
-  AiOutlineSetting,
-  AiFillYoutube,
-} from "react-icons/ai";
+import { AiOutlineFolderOpen, AiFillYoutube } from "react-icons/ai";
 import { BsHandbag, BsCameraVideo } from "react-icons/bs";
-import { MdOutlineFileDownload, MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
+import { MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
 import { TbArrowsDownUp } from "react-icons/tb";
-import { BiRocket, BiBook } from "react-icons/bi";
+import { BiBook, BiShuffle } from "react-icons/bi";
 import { Document, PaperUpload } from "react-iconly";
+import { HiOutlineUserGroup } from "react-icons/hi";
+import { IoPersonAddOutline } from "react-icons/io5";
 import {
-  redirectToDownloadPage,
   redirectToFileMocksList,
   redirectToMocksList,
-  redirectToRoot,
   redirectToSessionRecordingHome,
   redirectToSharedList,
   redirectToTemplates,
   redirectToTraffic,
-  redirectToAccountDetails,
-  redirectToPricingPlans,
-  redirectToSettings,
   redirectToUrl,
   redirectToRuleEditor,
   redirectToCreateNewRule,
@@ -43,28 +33,32 @@ export const config: PageConfig[] = [
     id: Page.HOME,
     items: [
       {
-        id: "home",
-        title: "Home",
-        icon: <AiOutlineHome />,
-        action: ({ navigate }: ActionProps) => {
-          redirectToRoot(navigate);
-        },
-      },
-      {
-        id: "download",
-        title: "Download",
-        icon: <MdOutlineFileDownload />,
-        action: (props: ActionProps) => {
-          redirectToDownloadPage();
-        },
-      },
-      {
-        id: "review chrome store",
-        title: "Review us on Chrome Store",
-        icon: <AiOutlineStar />,
-        action: (props: ActionProps) => {
-          redirectToUrl(APP_CONSTANTS.LINKS.CHROME_STORE_REVIEWS, true);
-        },
+        id: "workspaces",
+        type: CommandItemType.GROUP,
+        title: "Workspaces",
+        children: [
+          {
+            id: "switch workspace",
+            title: "Switch workspace",
+            icon: <BiShuffle />,
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true })),
+          },
+          {
+            id: "join workspace",
+            title: "Join workspace",
+            icon: <IoPersonAddOutline />,
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true })),
+          },
+          {
+            id: "create new workspace",
+            title: "Create new workspace",
+            icon: <HiOutlineUserGroup />,
+            action: ({ dispatch }) =>
+              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
+          },
+        ],
       },
       {
         id: "rules",
@@ -104,19 +98,19 @@ export const config: PageConfig[] = [
       {
         id: "mock api",
         type: CommandItemType.GROUP,
-        title: "Mocks",
+        title: "Mock server",
         children: [
           {
-            id: "mock api",
-            title: "Mock API",
+            id: "create mock api",
+            title: "Create Mock API endpoint",
             icon: <Document />,
             action: ({ navigate }: ActionProps) => {
               redirectToMocksList(navigate);
             },
           },
           {
-            id: "file server",
-            title: "File server",
+            id: "host files",
+            title: "Host JS/CSS/HTML files",
             icon: <PaperUpload />,
             action: ({ navigate }: ActionProps) => {
               redirectToFileMocksList(navigate);
@@ -131,7 +125,7 @@ export const config: PageConfig[] = [
         children: [
           {
             id: "record a session",
-            title: "Record a session",
+            title: ({ num_sessions }: TitleProps) => (!num_sessions ? "Record a session" : "View recorded sessions"),
             icon: <BsCameraVideo />,
             action: ({ navigate }: ActionProps) => {
               redirectToSessionRecordingHome(navigate);
@@ -151,37 +145,6 @@ export const config: PageConfig[] = [
             icon: <TbArrowsDownUp />,
             action: ({ navigate }: ActionProps) => {
               redirectToTraffic(navigate);
-            },
-          },
-        ],
-      },
-      {
-        id: "user",
-        type: CommandItemType.GROUP,
-        title: "User",
-        children: [
-          {
-            id: "my account",
-            title: ({ user }: TitleProps) => (!user?.loggedIn ? null : "My Account"),
-            icon: <AiOutlineUser />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToAccountDetails(navigate);
-            },
-          },
-          {
-            id: "upgrade plan",
-            title: ({ user }: TitleProps) => (user.loggedIn || user?.details?.isPremium ? null : "Upgrade Plan"),
-            icon: <BiRocket />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToPricingPlans(navigate);
-            },
-          },
-          {
-            id: "settings",
-            title: "Settings",
-            icon: <AiOutlineSetting />,
-            action: ({ navigate }: ActionProps) => {
-              redirectToSettings(navigate);
             },
           },
         ],
@@ -272,7 +235,7 @@ config.push(newRulePage);
 const userRulesPage: PageConfig = {
   id: Page.MY_RULES,
   items: [],
-  itemsFetcher: (rules: any = []) => {
+  itemsFetcher: ({ rules }) => {
     const items: CommandBarItem[] = rules.map(
       (rule: any): CommandBarItem => {
         return {
@@ -294,3 +257,5 @@ const userRulesPage: PageConfig = {
   },
 };
 config.push(userRulesPage);
+
+/**** Page : Switch Workspace *****/
