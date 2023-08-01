@@ -10,5 +10,6 @@ export const MISC_TOURS = {
   APP_ENGAGEMENT: {
     FIRST_RULE: "first_rule_created",
     FIFTH_RULE: "fifth_rule_created",
+    FIRST_DRAFT_SESSION: "first_draft_session",
   },
 };

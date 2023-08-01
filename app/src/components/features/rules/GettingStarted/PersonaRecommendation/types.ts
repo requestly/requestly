@@ -1,5 +1,10 @@
 import React from "react";
 
+export enum FeatureReleaseTag {
+  NEW = "NEW",
+  BETA = "BETA",
+}
+
 export type Feature = {
   id: string;
   icon: React.FC;
@@ -7,6 +12,7 @@ export type Feature = {
   subTitle: string;
   link?: string;
   disabled?: boolean;
+  tag?: FeatureReleaseTag;
 };
 
 export type FeatureSection = {
