@@ -17,4 +17,17 @@
       isIframe: window.top !== window,
     },
   });
+
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      chrome.runtime.sendMessage({
+        action: RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
+        payload: {
+          isIframe: window.top !== window,
+          hasExecutedRules: RQ.RuleExecutionHandler.hasExecutedRules(),
+          isRecordingSession: RQ.SessionRecorder.isRecording,
+        },
+      });
+    }
+  });
 })();

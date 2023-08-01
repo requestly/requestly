@@ -125,6 +125,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    joinWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -194,6 +198,7 @@ const INITIAL_STATE = {
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      isCommandBarOpen: false,
     },
   },
 };
