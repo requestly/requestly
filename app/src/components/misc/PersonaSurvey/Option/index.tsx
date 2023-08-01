@@ -32,7 +32,7 @@ export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionna
           style={{ width: "100%" }}
         >
           <RQInput
-            prefix="Other:"
+            prefix={<span className="text-bold">Other : </span>}
             value={otherValue.value}
             onChange={(e) => {
               const value = e.target.value;

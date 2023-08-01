@@ -1,3 +1,17 @@
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper,
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper:focus {
+  background: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper .ant-input {
+  border-bottom: 1px solid var(--border-dark);
+  background: none;
+  border-radius: 0;
+  margin-left: 6px;
+}
+
 .persona-survey-container .survey-option {
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
