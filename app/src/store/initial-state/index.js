@@ -192,6 +192,7 @@ const INITIAL_STATE = {
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,
+        firstDraftSession: false,
       },
 
       hasConnectedApp: false,
