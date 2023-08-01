@@ -956,7 +956,11 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
-        BG.Methods.stopRecording(message.tabId);
+        BG.Methods.stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
+        break;
+
+      case RQ.EXTENSION_MESSAGES.WATCH_RECORDING:
+        BG.Methods.watchRecording(message.tabId ?? sender.tab.id);
         break;
 
       case RQ.EXTENSION_MESSAGES.GET_TAB_SESSION:
@@ -1153,14 +1157,22 @@ BG.Methods.startRecordingExplicitly = (tabId) => {
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
   chrome.tabs.create({ url }, (tab) => {
-    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true });
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true, explicit: true });
   });
 };
 
-BG.Methods.stopRecording = (tabId) => {
+BG.Methods.stopRecording = (tabId, openRecording) => {
   chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
     window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   });
+
+  if (openRecording) {
+    BG.Methods.watchRecording(tabId);
+  }
+};
+
+BG.Methods.watchRecording = (tabId) => {
+  chrome.tabs.create({ url: `${RQ.configs.WEB_URL}/sessions/draft/${tabId}` });
 };
 
 BG.Methods.stopRecordingOnAllTabs = () => {

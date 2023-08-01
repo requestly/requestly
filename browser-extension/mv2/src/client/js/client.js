@@ -3,7 +3,9 @@
     return;
   }
 
-  RQ.RegisterCustomElements.init();
+  // register custom elements
+  RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/customElements.js"));
+
   RQ.ConsoleLogger.setup();
   RQ.RuleExecutionHandler.setup();
   RQ.ScriptRuleHandler.setup();

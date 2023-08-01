@@ -3,7 +3,6 @@
   z-index: 2147483647;
   width: 100%;
   top: 0;
-  right: 0;
 }
 
 ::slotted(*) {
