@@ -35,11 +35,14 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
     if (user.loggedIn) {
       getPendingInvites({ email: true, domain: false })
         .then((res: any) => {
-          setTeamInvites(res?.pendingInvites ?? []);
+          const pendingInvites = res?.pendingInvites ?? [];
+          const invites = pendingInvites.map((invite: TeamInviteMetadata) => invite.inviteId);
+          setTeamInvites(pendingInvites);
+          dispatch(actions.updateLastSeenInvites(invites));
         })
         .catch((e) => setTeamInvites([]));
     }
-  }, [user.loggedIn]);
+  }, [user.loggedIn, dispatch]);
 
   const handleCreateNewWorkspace = () => {
     toggleModal();
