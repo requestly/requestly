@@ -20,6 +20,10 @@
   margin-bottom: 6px;
 }
 
+.feature-title-container .rq-badge {
+  margin-left: -7px;
+}
+
 .feature-title-container .right-chevron svg {
   flex-shrink: 0;
   width: 15px;
