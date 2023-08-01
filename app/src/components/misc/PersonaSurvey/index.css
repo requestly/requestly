@@ -4,6 +4,7 @@
   background: var(--component-background);
   border-radius: var(--border-radius-md);
   padding: 40px 20px;
+  padding-bottom: 0;
   position: relative;
 }
 .persona-survey-container .survey-title {

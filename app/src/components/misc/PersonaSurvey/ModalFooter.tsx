@@ -36,7 +36,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
 
     if (typeof questionnaireResponse === "string") return !questionnaireResponse.length;
     //response is pre-defined option
-    else return !questionnaireResponse.value.length; // response is other option
+    else return !questionnaireResponse?.value?.length; // response is other option
   }, [currentPage, currentQuestionnaire, userPersona]);
 
   const handleMoveToNextPage = () => {
