@@ -1,5 +1,4 @@
 import { Avatar, Col, Row } from "antd";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +10,7 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
 
@@ -32,11 +32,8 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
   const [inProgress, setInProgress] = useState(false);
 
   const handleAcceptInvitation = () => {
-    const functions = getFunctions();
-    const acceptInvite = httpsCallable(functions, "invites-acceptInvite");
-
     setInProgress(true);
-    acceptInvite({ inviteId })
+    acceptTeamInvite(inviteId)
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully accepted invite");

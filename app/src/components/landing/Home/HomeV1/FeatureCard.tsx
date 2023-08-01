@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { trackHomeFeatureCardClicked } from "../../../modules/analytics/screens/home";
+import { trackHomeFeatureCardClicked } from "../../../../modules/analytics/screens/home";
 import "./index.scss";
 
 interface FeatureCardProps {

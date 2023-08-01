@@ -179,6 +179,23 @@
   margin-top: -2px;
 }
 
+.header-right-section .header-search-btn.ant-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 150px;
+  border: none;
+  background: var(--input-background);
+  color: var(--text-gray);
+  font-weight: 500;
+  opacity: 0.8;
+  margin-right: 4px;
+}
+.header-right-section .header-search-btn.ant-btn:hover,
+.header-right-section .header-search-btn.ant-btn:focus {
+  border: none !important;
+}
+
 @media screen and (max-width: 1300px) {
   .desktop .header-left-section > a {
     display: none;
@@ -187,6 +204,12 @@
 
 @media screen and (max-width: 1028px) {
   .header-middle-section {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .header-right-section .header-search-btn.ant-btn {
     display: none;
   }
 }

@@ -211,3 +211,7 @@ export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",
 };
+
+export const ECOSYSTEM = {
+  ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
+};
