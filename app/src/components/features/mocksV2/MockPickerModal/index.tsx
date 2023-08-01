@@ -1,7 +1,8 @@
-import { Modal } from "antd";
 import React from "react";
 import MockListIndex from "../MockList";
 import { MockListSource } from "../types";
+import { RQModal } from "lib/design-system/components";
+import "./mockPickerModal.scss";
 
 interface Props {
   isVisible: boolean;
@@ -10,25 +11,19 @@ interface Props {
 }
 
 const MockPickerModal: React.FC<Props> = ({ isVisible, onVisibilityChange, mockSelectionCallback }) => {
-  const renderMockList = () => {
-    return <MockListIndex mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />;
-  };
-
   return (
-    //fix picker modal in v1
-    <Modal
-      style={{ maxWidth: "900px" }}
-      visible={isVisible}
+    <RQModal
+      open={isVisible}
       centered
       onCancel={() => {
         onVisibilityChange(false);
       }}
-      footer={null}
-      width="100%"
-      // title={titleBar}
+      width={900}
     >
-      {renderMockList()}
-    </Modal>
+      <div className="mock-picker-modal-body">
+        <MockListIndex mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />
+      </div>
+    </RQModal>
   );
 };
 
