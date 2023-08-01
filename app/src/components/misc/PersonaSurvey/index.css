@@ -4,7 +4,6 @@
   background: var(--component-background);
   border-radius: var(--border-radius-md);
   padding: 40px 20px;
-  padding-bottom: 0;
   position: relative;
 }
 .persona-survey-container .survey-title {
@@ -53,6 +52,10 @@
   opacity: 0.4;
   pointer-events: none;
   cursor: not-allowed;
+}
+.persona-survey-container .survey-lottie-animation-container {
+  position: relative;
+  top: 50px;
 }
 .persona-survey-banner .survey-lottie-animation-container {
   width: 100%;
