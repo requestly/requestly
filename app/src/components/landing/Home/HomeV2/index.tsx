@@ -68,14 +68,14 @@ const HOME_FEATURES = [
   },
   {
     featureHeader: {
-      title: "Debug faster with Session Recording",
+      title: "Debugging",
       description: "Validate your solutions using screen recording, delaying responses & more",
       icon: debuggingIcon,
     },
     featureCards: [
       {
-        title: "Modify network requests",
-        description: "Create rules to modify HTTP requests & responses - URL redirects, Modify APIs or Headers",
+        title: "Debug faster with Session Recording",
+        description: "Capture screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
         analyticsContext: "session_recording",
