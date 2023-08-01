@@ -45,7 +45,7 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
       {
         title: "Test HTTP Proxy",
         status: "process",
-        description: <TestProxyInstructions />,
+        description: <TestProxyInstructions device="ios" />,
       },
       {
         title: "Download certificate",
