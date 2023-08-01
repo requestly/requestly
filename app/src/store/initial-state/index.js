@@ -196,6 +196,7 @@ const INITIAL_STATE = {
       },
 
       hasConnectedApp: false,
+      lastSeenInvites: [],
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
