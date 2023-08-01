@@ -975,6 +975,10 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.onContentScriptLoadedNotification(sender.tab, message.payload);
         break;
 
+      case RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE:
+        BG.Methods.onPageLoadedFromCacheNotification(sender.tab, message.payload);
+        break;
+
       case RQ.EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
         BG.Methods.checkIfExtensionEnabled().then(sendResponse);
         return true;
@@ -1080,10 +1084,33 @@ BG.Methods.onContentScriptLoadedNotification = async (tab, payload = {}) => {
         appliedRuleDetails: cachedAppliesRules,
         isConsoleLoggerEnabled: await RQ.StorageService.getRecord(RQ.CONSOLE_LOGGER_ENABLED),
       },
-      () => window.tabService.removeData(tab.id, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS)
+      () => {
+        window.tabService.removeData(tab.id, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS);
+        RQ.extensionIconManager.markRuleExecuted(tab.id);
+      }
     );
   }
 
+  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
+};
+
+BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
+  if (payload.isIframe) {
+    return;
+  }
+
+  if (payload.hasExecutedRules) {
+    RQ.extensionIconManager.markRuleExecuted(tab.id);
+  }
+
+  if (payload.isRecordingSession) {
+    RQ.extensionIconManager.markRecording(tab.id);
+  }
+
+  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
+};
+
+BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (!sessionRecordingData) {
