@@ -7,7 +7,7 @@ export interface UserPersona {
   referralChannel?: string;
   useCases?: string[];
   numberOfEmployees?: string;
-  industry?: string;
+  industry?: string | OtherOption;
 }
 
 export type OtherOption = {
