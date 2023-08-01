@@ -5,6 +5,7 @@ import { generateRuleEditorTour, getTourTarget } from "./utils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
 import { MISC_TOURS } from "./constants";
+import LINKS from "config/constants/sub/links";
 
 const tourTooltipPresets = {
   disableBeacon: true,
@@ -349,6 +350,34 @@ export const productTours: Record<string, CustomSteps[]> = {
       content: "Organize your rules into logical groups and enable/disable in one go!",
       placement: "bottom",
       spotlightPadding: 0,
+      customNextButtonText: "Got it!",
+    },
+  ],
+  [MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION]: [
+    {
+      ...tourTooltipPresets,
+      title: "Click here to save your recording",
+      target: getTourTarget("save-draft-session-btn"),
+      content: (
+        <>
+          You can save online or download locally as a file. You can learn more about how we ensure the safety and
+          security of your session recordings by visiting this{" "}
+          <a
+            className="external-link"
+            href={LINKS.REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE}
+            target="_blank"
+            rel="noreferrer"
+          >
+            link
+          </a>
+          .
+        </>
+      ),
+      placement: "bottom",
+      spotlightPadding: 0,
+      offset: 20,
+      disableOverlay: true,
+      pointerPlacement: PointerPlacement.TOP_100,
       customNextButtonText: "Got it!",
     },
   ],
