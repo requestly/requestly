@@ -8,7 +8,7 @@ import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
 import { TeamInviteMetadata } from "types";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { acceptTeamInvite } from "backend/workspace";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -27,10 +27,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
 
   const handleJoinWorkspace = () => {
     setIsJoining(true);
-    const functions = getFunctions();
-    const acceptInvite = httpsCallable(functions, "invites-acceptInvite");
-
-    acceptInvite({ inviteId: team.inviteId })
+    acceptTeamInvite(team.inviteId)
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully accepted invite");

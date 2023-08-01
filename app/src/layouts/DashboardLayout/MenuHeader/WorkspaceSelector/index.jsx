@@ -29,14 +29,13 @@ import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
+import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
-import { getFunctions, httpsCallable } from "firebase/functions";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -133,21 +132,17 @@ const WorkspaceSelector = () => {
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
-  const loggedInUserEmail = user?.details?.profile?.email;
-
-  const getPendingInvites = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingTeamInvites"), []);
 
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getPendingInvites({ email: true })
+    getPendingInvites({ email: true, domain: false })
       .then((res) => {
-        setTeamInvites(res?.data?.pendingInvites ?? []);
+        setTeamInvites(res?.pendingInvites ?? []);
       })
       .catch((e) => setTeamInvites([]));
-  }, [user.loggedIn, loggedInUserEmail, getPendingInvites]);
+  }, [user.loggedIn]);
 
   useEffect(() => {
     if (availableTeams?.length > 0) {
@@ -169,10 +164,6 @@ const WorkspaceSelector = () => {
     setIsModalOpen(false);
   };
 
-  const handleJoinWorkspaceModalClose = () => {
-    setIsJoinWorkspaceModalOpen(false);
-  };
-
   const promptUserSignupModal = (callback = () => {}, source) => {
     dispatch(
       actions.toggleActiveModal({
@@ -191,19 +182,14 @@ const WorkspaceSelector = () => {
 
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
-      setIsJoinWorkspaceModalOpen(true);
-      trackWorkspaceJoiningModalOpened(teamInvites.length);
+      dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
+      trackWorkspaceJoiningModalOpened(teamInvites?.length);
     } else {
       promptUserSignupModal(() => {
-        setIsJoinWorkspaceModalOpen(true);
-        trackWorkspaceJoiningModalOpened(teamInvites.length);
+        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
+        trackWorkspaceJoiningModalOpened(teamInvites?.length);
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
-  };
-
-  const handleCreateWorkspaceFromJoinModal = () => {
-    handleJoinWorkspaceModalClose();
-    handleCreateNewWorkspaceRedirect();
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
@@ -355,7 +341,7 @@ const WorkspaceSelector = () => {
 
   const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
   const TeamsInviteCountBadge = (
-    <Badge color="#0361FF" count={teamInvites.length} className="join-workspace-invite-count-badge" />
+    <Badge color="#0361FF" count={teamInvites?.length} className="join-workspace-invite-count-badge" />
   );
 
   const joinWorkspaceDropdownItems = [
@@ -364,7 +350,7 @@ const WorkspaceSelector = () => {
       label: (
         <span className="join-existing-workspace-menu-item">
           <span>Join an existing workspace</span>
-          {teamInvites.length > 0 && TeamsInviteCountBadge}
+          {teamInvites?.length > 0 && TeamsInviteCountBadge}
         </span>
       ),
       onClick: () => {
@@ -481,7 +467,7 @@ const WorkspaceSelector = () => {
             <span>Join or create workspace</span>
 
             <div>
-              {teamInvites.length > 0 && TeamsInviteCountBadge}
+              {teamInvites?.length > 0 && TeamsInviteCountBadge}
               <RightOutlined />
             </div>
           </div>
@@ -528,13 +514,6 @@ const WorkspaceSelector = () => {
       <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
-
-      <JoinWorkspaceModal
-        teamInvites={teamInvites}
-        isOpen={isJoinWorkspaceModalOpen}
-        handleModalClose={handleJoinWorkspaceModalClose}
-        handleCreateNewWorkspaceClick={handleCreateWorkspaceFromJoinModal}
-      />
     </>
   );
 };
