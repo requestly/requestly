@@ -78,7 +78,6 @@ import LINKS from "config/constants/sub/links";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
-import { isDesktopMode, isMacOs } from "utils/Misc";
 import AuthPopoverButton from "./AuthPopoverButtons";
 
 //Lodash
@@ -1284,7 +1283,6 @@ const RulesTable = ({
                   setSearchValue(e.target.value);
                 }}
                 prefix={<SearchOutlined />}
-                suffix={isDesktopMode() || isMacOs() ? <Typography.Text type="secondary">⌘+K</Typography.Text> : null}
                 style={{ width: 240, marginLeft: "8px" }}
               />
             </>

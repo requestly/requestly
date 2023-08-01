@@ -6,7 +6,8 @@ import { Command } from "cmdk";
 import fuzzysort from "fuzzysort";
 import { BreadCrumb } from "./BreadCrumb";
 import { Footer } from "./Footer";
-import { getAllRules, getUserAuthDetails, getAppMode } from "store/selectors";
+import { getAllRules, getUserAuthDetails, getAppMode, getUserAttributes, getIsCommandBarOpen } from "store/selectors";
+import { actions } from "store";
 import {
   trackCommandPaletteClosed,
   trackCommandPaletteOpened,
@@ -19,15 +20,16 @@ import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
 import "./index.css";
 
 export const CommandBar = () => {
-  const [open, setOpen] = useState(false);
   const [pagesStack, setPagesStack] = useState<Page[]>([Page.HOME]);
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isCommandBarOpen = useSelector(getIsCommandBarOpen);
   const rules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
   const debouncedTrackOptionSearcedEvent = useDebounce(trackCommandPaletteOptionSearched);
 
   let currentPage = pagesStack[pagesStack.length - 1];
@@ -36,12 +38,12 @@ export const CommandBar = () => {
     const down = (e: any) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        dispatch(actions.updateIsCommandBarOpen(!isCommandBarOpen));
       }
     };
     const exit = (e: any) => {
       if (e.key === "Escape") {
-        setOpen(false);
+        dispatch(actions.updateIsCommandBarOpen(false));
         trackCommandPaletteClosed();
       }
     };
@@ -53,16 +55,16 @@ export const CommandBar = () => {
       document.removeEventListener("keydown", down);
       document.removeEventListener("keydown", exit);
     };
-  }, []);
+  }, [dispatch, isCommandBarOpen]);
 
   useEffect(() => {
-    if (!open) {
+    if (!isCommandBarOpen) {
       setPagesStack([Page.HOME]);
       setSearch("");
     } else {
       trackCommandPaletteOpened(getUserOS());
     }
-  }, [open]);
+  }, [isCommandBarOpen]);
 
   const renderItems = (items: CommandBarItem[]) => {
     return items.map((item, index) => {
@@ -80,7 +82,9 @@ export const CommandBar = () => {
   };
 
   const renderTitle = (item: CommandBarItem) =>
-    typeof item.title === "function" ? item.title({ user, appMode, rules }) : item.title;
+    typeof item.title === "function"
+      ? item.title({ user, appMode, rules, num_sessions: userAttributes.num_sessions })
+      : item.title;
 
   const renderGroupItem = (item: CommandBarItem): ReactNode | null => {
     if (typeof item.title === "function" && !item.title({ user, appMode })) {
@@ -111,7 +115,7 @@ export const CommandBar = () => {
               item.action({ navigate, dispatch, user, appMode, rules });
               trackCommandPaletteOptionSelected(item.id.split(" ").join("_"));
               trackCommandPaletteClosed();
-              setOpen(false);
+              dispatch(actions.updateIsCommandBarOpen(false));
             }
 
             if (item?.nextPage) {
@@ -133,7 +137,7 @@ export const CommandBar = () => {
   };
 
   const renderAsyncPage = (fetcher: Function): ReactNode => {
-    const items = fetcher(rules);
+    const items = fetcher({ rules });
     return renderItems(items);
   };
 
@@ -144,11 +148,11 @@ export const CommandBar = () => {
 
   return (
     <>
-      {open && (
+      {isCommandBarOpen && (
         <div
           className="cmdk-overlay"
           onClick={() => {
-            setOpen(false);
+            dispatch(actions.updateIsCommandBarOpen(false));
             trackCommandPaletteClosed();
           }}
         >
