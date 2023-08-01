@@ -13,6 +13,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 const RootComponent: React.FC = () => {
   const location = useLocation();
   const appMode = useSelector(getAppMode);
+
   const isOpenedInDesktopMode = PATHS.ROOT === location.pathname && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (

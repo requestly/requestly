@@ -54,3 +54,7 @@ RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleL
     });
   });
 };
+
+RQ.RuleExecutionHandler.hasExecutedRules = () => {
+  return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
+};

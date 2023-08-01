@@ -266,3 +266,7 @@ export const getIsSecondarySidebarCollapsed = (state) => {
 export const getWorkspaceOnboardingTeamDetails = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.workspace;
 };
+
+export const getIsCommandBarOpen = (state) => {
+  return getGlobalState(state).misc.nonPersist?.isCommandBarOpen;
+};

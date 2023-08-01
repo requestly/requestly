@@ -52,7 +52,7 @@
 }
 
 .primary-sidebar-container .primary-sidebar-active-link {
-  border-left: 2px solid var(--primary);
+  border-left-color: var(--primary);
 }
 
 .primary-sidebar-link .icon__wrapper svg {
