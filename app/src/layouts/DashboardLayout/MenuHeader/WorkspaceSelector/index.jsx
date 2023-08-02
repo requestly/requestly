@@ -28,7 +28,7 @@ import {
   getAppMode,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAuthDetails,
-  getLastSeenInvites,
+  getLastSeenInvitesTs,
 } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
@@ -135,7 +135,7 @@ const WorkspaceSelector = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const lastSeenInvites = useSelector(getLastSeenInvites);
+  const lastSeenInvitesTs = useSelector(getLastSeenInvitesTs);
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -143,10 +143,10 @@ const WorkspaceSelector = () => {
 
   const hasNewInvites = useMemo(() => {
     if (user?.loggedIn && teamInvites?.length) {
-      return teamInvites.some((invite) => !lastSeenInvites.includes(invite.inviteId));
+      return teamInvites.some((invite) => invite.createdTs > lastSeenInvitesTs);
     }
     return false;
-  }, [lastSeenInvites, teamInvites, user?.loggedIn]);
+  }, [lastSeenInvitesTs, teamInvites, user?.loggedIn]);
 
   useEffect(() => {
     if (!user.loggedIn) return;

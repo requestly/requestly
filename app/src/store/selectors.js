@@ -271,6 +271,6 @@ export const getIsCommandBarOpen = (state) => {
   return getGlobalState(state).misc.nonPersist?.isCommandBarOpen;
 };
 
-export const getLastSeenInvites = (state) => {
+export const getLastSeenInvitesTs = (state) => {
   return getGlobalState(state).misc.persist?.lastSeenInvites;
 };
