@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MocksTable from "../MockList/MocksTable";
 import { MockEditorDataSchema } from "../MockEditorIndex/types";
 import MockEditorIndex from "../MockEditorIndex/MockEditorIndex";
@@ -41,6 +41,7 @@ const MockPickerIndex: React.FC<Props> = ({
   const [isNewMock, setIsNewMock] = useState<boolean>(false);
   const [selectedMockData, setSelectedMockData] = useState<MockEditorDataSchema>(null);
   const [showFileTypeSelector, setShowFileTypeSelector] = useState<boolean>(false);
+  const [showCreateMockState, setShowCreateMockState] = useState<boolean>(false);
 
   const user = useSelector(getUserAuthDetails);
 
@@ -56,7 +57,6 @@ const MockPickerIndex: React.FC<Props> = ({
   };
 
   const handleTypeSelection = (type: string) => {
-    console.log("!!!debug", "type", type);
     switch (type) {
       case FileType.CSS:
         setSelectedMockData(defaultCssEditorMock);
@@ -78,6 +78,10 @@ const MockPickerIndex: React.FC<Props> = ({
     setSelectedMockData(null);
   };
 
+  useEffect(() => {
+    setShowCreateMockState(!mocks?.length);
+  }, [mocks?.length]);
+
   if (showFileTypeSelector) {
     return <NewFileTypeSelector handleTypeSelection={handleTypeSelection} />;
   }
@@ -94,21 +98,21 @@ const MockPickerIndex: React.FC<Props> = ({
     );
   }
 
-  if (mocks.length) {
+  if (mocks.length && !showCreateMockState) {
     return (
       <MocksTable
         mocks={mocks}
         handleItemSelect={handleItemSelect}
-        handleCreateNew={handleCreateNewMock}
+        handleCreateNew={() => setShowCreateMockState(true)}
         handleNameClick={handleNameClick}
         handleSelectAction={handleSelectAction}
       />
     );
-  } else {
+  } else if (showCreateMockState) {
     return (
       <Row className="empty-mocks-picker-container">
         <div className="text-center">
-          <Typography.Title level={4}>No mocks created yet</Typography.Title>
+          <Typography.Title level={4}>{mocks?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
           <Typography.Text type="secondary" className="mt-8">
             Create mocks APIs or files with different status codes, delay, response headers or body.
           </Typography.Text>
@@ -128,21 +132,21 @@ const MockPickerIndex: React.FC<Props> = ({
               </RQButton>
             </AuthConfirmationPopover>
             <AuthConfirmationPopover
-              title="You need to sign up to create API mocks"
-              callback={handleCreateNewMock}
-              source={AUTH.SOURCE.CREATE_API_MOCK}
-            >
-              <RQButton type="default" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewMock}>
-                Create new mock API
-              </RQButton>
-            </AuthConfirmationPopover>
-            <AuthConfirmationPopover
               title="You need to sign up to create file mocks"
               callback={handleCreateNewFile}
               source={AUTH.SOURCE.CREATE_FILE_MOCK}
             >
               <RQButton type="default" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewFile}>
                 Create new mock file
+              </RQButton>
+            </AuthConfirmationPopover>
+            <AuthConfirmationPopover
+              title="You need to sign up to create API mocks"
+              callback={handleCreateNewMock}
+              source={AUTH.SOURCE.CREATE_API_MOCK}
+            >
+              <RQButton type="primary" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewMock}>
+                Create new mock API
               </RQButton>
             </AuthConfirmationPopover>
           </Space>
