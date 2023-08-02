@@ -22,7 +22,7 @@
   width: 10px;
   height: 10px;
   top: 5px;
-  background: #ff6905;
+  background: var(--primary);
   animation: blink 2.5s infinite;
 }
 @keyframes blink {
