@@ -172,6 +172,7 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type })
             mockType={type}
             visible={uploadModalVisibility}
             toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
+            selectMockOnUpload={handleSelectAction}
           />
         </>
       );
