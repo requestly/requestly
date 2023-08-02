@@ -147,7 +147,6 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type })
 
   const handleUploadAction = () => {
     trackMockUploadWorkflowStarted(type);
-    console.log("!!!debug", "upload");
     setUploadModalVisibility(true);
   };
 
