@@ -1,3 +1,11 @@
 .rq-modal .mock-picker-modal-body {
   padding: 20px;
+
+  .empty-mocks-picker-container .upload-btn {
+    gap: 4px;
+
+    svg {
+      transform: scale(1.2);
+    }
+  }
 }

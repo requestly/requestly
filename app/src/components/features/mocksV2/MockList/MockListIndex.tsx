@@ -20,6 +20,7 @@ import NewFileModal from "../NewFileModal";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks";
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import MockPickerIndex from "../MockPickerModal/MockPickerIndex";
 
 interface Props {
   source?: MockListSource;
@@ -146,6 +147,7 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type })
 
   const handleUploadAction = () => {
     trackMockUploadWorkflowStarted(type);
+    console.log("!!!debug", "upload");
     setUploadModalVisibility(true);
   };
 
@@ -157,7 +159,24 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type })
   if (isLoading) {
     return <SpinnerCard customLoadingMessage="Loading Mocks" />;
   } else {
-    if (mocksList.length + oldMocksList.length === 0) {
+    if (source === MockListSource.PICKER_MODAL) {
+      return (
+        <>
+          <MockPickerIndex
+            mocks={[...mocksList, ...oldMocksList]}
+            handleUploadAction={handleUploadAction}
+            handleItemSelect={handleItemSelect}
+            handleSelectAction={handleSelectAction}
+            handleNameClick={handleNameClick}
+          />
+          <MockUploaderModal
+            mockType={type}
+            visible={uploadModalVisibility}
+            toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
+          />
+        </>
+      );
+    } else if (mocksList.length + oldMocksList.length === 0) {
       return (
         <>
           <GettingStartedWithMocks
@@ -175,18 +194,6 @@ const MockListIndex: React.FC<Props> = ({ source, mockSelectionCallback, type })
             toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
           />
         </>
-      );
-    }
-    if (source === MockListSource.PICKER_MODAL) {
-      return (
-        <MocksTable
-          mocks={[...mocksList, ...oldMocksList]}
-          mockType={type}
-          handleItemSelect={handleItemSelect}
-          handleCreateNew={handleCreateNewMock}
-          handleNameClick={handleNameClick}
-          handleSelectAction={handleSelectAction}
-        />
       );
     } else {
       return (

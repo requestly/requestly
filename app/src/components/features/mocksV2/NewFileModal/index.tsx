@@ -1,7 +1,7 @@
 import React from "react";
 import { RQModal } from "lib/design-system/components";
 import "./NewFileModal.css";
-import NewFileSelector from "./NewFileSelector";
+import NewFileTypeSelector from "./NewFileTypeSelector";
 
 interface Props {
   toggleModalVisiblity: (visible: boolean) => void;
@@ -20,7 +20,7 @@ const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
       bodyStyle={{ padding: "1.875rem" }}
       width={800}
     >
-      <NewFileSelector />
+      <NewFileTypeSelector />
     </RQModal>
   );
 };
