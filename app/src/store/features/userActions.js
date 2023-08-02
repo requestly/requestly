@@ -114,6 +114,6 @@ export const updateIsCommandBarOpen = (prevState, action) => {
   prevState.misc.nonPersist.isCommandBarOpen = action.payload;
 };
 
-export const updateLastSeenInvites = (prevState, action) => {
+export const updateLastSeenInvitesTs = (prevState, action) => {
   prevState.misc.persist.lastSeenInvites = action.payload;
 };
