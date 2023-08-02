@@ -1,8 +1,6 @@
 :host {
   position: fixed;
   z-index: 2147483647;
-  bottom: 30px;
-  left: 30px;
 }
 
 #container {
@@ -17,6 +15,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  white-space: nowrap;
+  cursor: move;
   display: none;
 }
 
@@ -28,6 +28,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 0 0 auto;
 }
 
 .stop-recording:hover {

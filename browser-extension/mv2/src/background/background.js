@@ -1000,7 +1000,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
-        BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.session);
+        BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
     }
   });
@@ -1042,13 +1042,14 @@ BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
   RQ.extensionIconManager.markNotRecording(tabId);
 };
 
-BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, session) => {
+BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
   const sessionRecordingData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (sessionRecordingData) {
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
       ...sessionRecordingData,
-      previousSession: session,
+      previousSession: payload.session,
+      widgetPosition: payload.widgetPosition,
     });
   }
 };
