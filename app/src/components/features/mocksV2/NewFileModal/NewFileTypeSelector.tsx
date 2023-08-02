@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { Button, Card, Col, Row } from "antd";
+import { Button, Card, Col, Row, Typography } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -79,22 +79,27 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
 
   return (
     <>
-      <div className="new-file-modal-title">Host new file</div>
-      <p className="new-file-modal-description">
-        You can use File Server to host static files like HTML, CSS, JS & Images only.
-      </p>
-      <p className="new-file-modal-description">
-        To host JSON or mock API responses, you can use our Mock Server&nbsp;
-        <Link
-          to={"#"}
-          onClick={(e) => {
-            e.preventDefault();
-            redirectToMocksList(navigate);
-          }}
-        >
-          here
-        </Link>
-      </p>
+      <Typography.Title level={4} className="new-file-modal-title">
+        Host new file
+      </Typography.Title>
+      <div className="mb-16">
+        <Typography.Text type="secondary" className="new-file-modal-description">
+          You can use File Server to host static files like HTML, CSS, JS & Images only.
+        </Typography.Text>
+        <br />
+        <Typography.Text type="secondary" className="new-file-modal-description">
+          To host JSON or mock API responses, you can use our Mock Server&nbsp;
+          <Link
+            to={"#"}
+            onClick={(e) => {
+              e.preventDefault();
+              redirectToMocksList(navigate);
+            }}
+          >
+            here.
+          </Link>
+        </Typography.Text>
+      </div>
       <Row gutter={[16, 16]}>
         {Object.entries(FILE_TYPES_CONFIG).map(([key, config]) => renderFileTypeCard(key, config))}
       </Row>
