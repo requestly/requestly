@@ -145,7 +145,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
 
               <div className="title mt-16">Email address</div>
               <div className="display-flex" style={{ marginTop: "6px" }}>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1 }} className="emails-input-wrapper">
                   <ReactMultiEmail
                     className="members-email-input"
                     placeholder="Email Address"
@@ -162,19 +162,19 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                       </div>
                     )}
                   />
-                  <Row justify="end">
+                  <div className="access-dropdown-container">
                     <MemberRoleDropdown
                       placement="bottomRight"
                       isAdmin={makeUserAdmin}
                       handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
                     />
-                  </Row>
+                  </div>
                 </div>
                 {isTeamAdmin && (
                   <RQButton
                     size="small"
                     style={{ height: "37px", marginLeft: "10px" }}
-                    type="primary"
+                    type={userEmail.length ? "primary" : "default"}
                     htmlType="submit"
                     onClick={handleAddMember}
                     loading={isProcessing}
