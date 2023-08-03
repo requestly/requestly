@@ -7,7 +7,8 @@
 }
 
 .members-email-input {
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
+  max-width: 390px;
 }
 
 div.members-email-input > input {
