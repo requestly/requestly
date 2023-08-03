@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { Typography, Row, Col } from "antd";
+import { Typography, Row, Col, Alert } from "antd";
 import { FaSpinner } from "react-icons/fa";
 import { HiArrowLeft } from "react-icons/hi";
 import { isEmailValid } from "utils/FormattingHelper";
@@ -40,6 +40,7 @@ import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/a
 //STYLES
 import { AuthFormHero } from "./AuthFormHero";
 import "./AuthForm.css";
+import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -67,7 +68,7 @@ const AuthForm = ({
   const [showEmailSecondStep, setShowEmailSecondStep] = useState(false);
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
-
+  const [isLoginLinkSent, setIsLoginLinkSent] = useState(false);
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
   useEffect(() => {
@@ -219,16 +220,23 @@ const AuthForm = ({
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
         return (
-          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignInButtonClick}>
-            Sign In with Email
-          </RQButton>
+          <GenerateLoginLinkBtn
+            email={email}
+            callback={() => {
+              toast.info("Please check your email for the login link");
+            }}
+          />
         );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
         return (
-          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignUpButtonClick}>
-            Create Account
-          </RQButton>
+          <GenerateLoginLinkBtn
+            text="Create Account"
+            email={email}
+            timerEndCallback={() => {
+              setIsLoginLinkSent(true);
+            }}
+          />
         );
       case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
         return (
@@ -437,6 +445,22 @@ const AuthForm = ({
     setShowEmailSecondStep(false);
   };
 
+  const renderCheckEmailMessage = () => {
+    return (
+      <div className="form-elements-margin">
+        {isLoginLinkSent ? (
+          <Alert
+            message="Login steps sent"
+            description="Check your email for the login link. If you don't see it, check your spam folder."
+            type="info"
+            closable
+            onClose={() => setIsLoginLinkSent(false)}
+          />
+        ) : null}
+      </div>
+    );
+  };
+
   return (
     <Row className="bg-secondary shadow border-0 auth-modal">
       {MODE === AUTH_ACTION_LABELS.SIGN_UP ? (
@@ -484,8 +508,8 @@ const AuthForm = ({
                   <>
                     {renderNameField()}
                     {renderEmailField()}
-                    {renderPasswordField()}
                     <FormSubmitButton />
+                    {renderCheckEmailMessage()}
                     <div className="auth-modal-divider w-full">or</div>
                     <SocialAuthButtons />
                   </>
@@ -528,7 +552,6 @@ const AuthForm = ({
                 {renderEmailField()}
                 {!isOnboardingForm ? (
                   <>
-                    {renderPasswordField()}
                     <FormSubmitButton />
                   </>
                 ) : (

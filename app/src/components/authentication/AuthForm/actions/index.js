@@ -11,6 +11,7 @@ import {
   verifyOobCode,
   resetPassword,
   googleSignInDesktopApp,
+  sendEmailLinkForSignin,
 } from "../../../../actions/FirebaseActions";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -30,6 +31,14 @@ const showWarning = (err) => {
 };
 const showInfo = (err) => {
   toast.info(err, { hideProgressBar: true, autoClose: 5000 });
+};
+
+export const handleEmailOnlySigin = (email, userName) => {
+  if (isEmpty(email) || !isEmail(email)) {
+    showWarning("Please enter a valid email");
+    return null;
+  }
+  return sendEmailLinkForSignin(email, userName);
 };
 
 export const handleEmailSignIn = (email, password, isSignUp, eventSource) => {

@@ -18,6 +18,7 @@ import {
   confirmPasswordReset,
   signOut as signOutFirebaseFunction,
   sendEmailVerification,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -64,6 +65,7 @@ import {
   trackLogoutFailed,
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
+import { toast } from "utils/Toast";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -194,6 +196,22 @@ export async function signUp(name, email, password, refCode, source) {
       });
       // var errorMessage = error.message;
       return Promise.reject({ status: false, errorCode });
+    });
+}
+
+export async function sendEmailLinkForSignin(email) {
+  const auth = getAuth(firebaseApp);
+  return sendSignInLinkToEmail(auth, email, {
+    url: window.location.href,
+    handleCodeInApp: true,
+  })
+    .then((res) => {
+      window.localStorage.setItem("RQEmailForSignIn", email);
+      toast.info("Please check your email for instructions to login.");
+    })
+    .catch((err) => {
+      toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
+      console.log(err);
     });
 }
 

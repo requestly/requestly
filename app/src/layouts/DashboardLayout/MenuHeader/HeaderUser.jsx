@@ -139,6 +139,7 @@ export default function HeaderUser() {
   let showUserDropdown = true;
 
   Object.values(APP_CONSTANTS.PATHS.AUTH).forEach((AUTH_PATH) => {
+    // SO THAT USER CANNOT TRIGGER OTHER AUTH ACTIONS DURING CURRENT AUTH FLOW
     if (window.location.pathname === AUTH_PATH.ABSOLUTE) {
       showUserDropdown = false;
     }
