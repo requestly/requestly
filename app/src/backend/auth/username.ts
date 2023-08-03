@@ -2,37 +2,6 @@ import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore, runTransaction } from "firebase/firestore";
 import Logger from "lib/logger";
 
-export const createNewUsername = async (uid: string) => {
-  if (!uid) {
-    return;
-  }
-
-  const username = `user${Date.now()}`;
-  const db = getFirestore(firebaseApp);
-
-  try {
-    const usernameDocRef = doc(db, "usernames", username);
-    const userDocRef = doc(db, "users", uid);
-
-    await runTransaction(db, async (transaction) => {
-      const usernameDoc = await transaction.get(usernameDocRef);
-
-      if (usernameDoc.exists()) {
-        const uid = usernameDoc.data()?.uid;
-        if (uid) {
-          throw Error(`username=${username} already in use`);
-        }
-      }
-
-      transaction.set(userDocRef, { username: username }, { merge: true });
-      transaction.set(usernameDocRef, { uid: uid }, { merge: true });
-    });
-  } catch (e) {
-    Logger.error("Error while creating new username");
-    throw e;
-  }
-};
-
 export const updateUsername = async (uid: string, newUsername: string): Promise<any> => {
   if (!uid) {
     return null;
