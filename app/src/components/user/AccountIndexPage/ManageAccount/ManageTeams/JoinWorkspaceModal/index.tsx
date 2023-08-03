@@ -37,7 +37,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
         .then((res: any) => {
           const pendingInvites = res?.pendingInvites ?? [];
           setTeamInvites(pendingInvites);
-          dispatch(actions.updateLastSeenInvitesTs(new Date().getTime()));
+          dispatch(actions.updateLastSeenInviteTs(new Date().getTime()));
         })
         .catch((e) => setTeamInvites([]));
     }
