@@ -6,11 +6,17 @@
   white-space: nowrap;
 }
 
+.email-invites-wrapper {
+  display: flex;
+  margin-top: 6px;
+}
+
 .emails-input-wrapper {
   background: var(--component-dark-background);
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
   display: flex;
+  flex: 1;
   /* align-items: center; */
 }
 .emails-input-wrapper div.react-multi-email.focused,
@@ -66,4 +72,8 @@ div.members-email-input > input {
   align-items: center;
   justify-content: center;
   row-gap: 1rem;
+}
+
+.create-invite-link-btn {
+  height: 30px;
 }
