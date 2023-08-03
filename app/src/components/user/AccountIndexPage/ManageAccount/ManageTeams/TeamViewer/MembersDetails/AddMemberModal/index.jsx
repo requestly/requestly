@@ -29,7 +29,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const [isDomainJoiningEnabled, setIsDomainJoiningEnabled] = useState(false);
   const [publicInviteId, setPublicInviteId] = useState(null);
   const [isInviteGenerating, setIsInviteGenerating] = useState(false);
-
+  const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
   // Global state
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
@@ -41,13 +41,28 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
-
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
+  const getTeamPublicInvite = useMemo(() => httpsCallable(getFunctions(), "invites-getTeamPublicInvite"), []);
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
     toggleModal();
   };
+
+  const fetchPublicInvites = useCallback(() => {
+    setPublicInviteLoading(true);
+    getTeamPublicInvite({ teamId: teamId })
+      .then((res) => {
+        if (res?.data?.success) {
+          setPublicInviteId(res?.data?.inviteId);
+          setIsDomainJoiningEnabled(res?.data?.domains?.length > 0);
+        }
+        setPublicInviteLoading(false);
+      })
+      .catch((err) => {
+        setPublicInviteLoading(false);
+      });
+  }, [teamId, getTeamPublicInvite]);
 
   const handleAddMember = () => {
     if (!userEmail || userEmail.length === 0) {
@@ -129,6 +144,12 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      fetchPublicInvites();
+    }
+  }, [isOpen, fetchPublicInvites]);
+
   return (
     <>
       <RQModal width={580} centered open={isOpen} onCancel={toggleModal}>
@@ -209,7 +230,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 </div>
               )}
             </>
-          ) : isLoading ? (
+          ) : isLoading || isPublicInviteLoading ? (
             <PageLoader />
           ) : (
             <div className="title empty-message">
@@ -218,13 +239,14 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
             </div>
           )}
         </div>
-
-        <Row align="middle" className="rq-modal-footer">
-          <Checkbox value={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
-          <span className="ml-2 text-gray">
-            Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
-          </span>
-        </Row>
+        {!isLoading && !isPublicInviteLoading && (
+          <Row align="middle" className="rq-modal-footer">
+            <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+            <span className="ml-2 text-gray">
+              Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+            </span>
+          </Row>
+        )}
       </RQModal>
 
       <InviteErrorModal
