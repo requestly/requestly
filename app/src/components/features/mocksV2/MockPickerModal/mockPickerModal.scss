@@ -13,9 +13,20 @@
       }
     }
   }
+  .mock-editor-title-container {
+    margin-left: -100px;
+  }
+
   .mock-editor-container {
     height: auto;
     overflow: auto;
+
+    .mock-editor-container-col {
+      margin-left: 36px;
+      .mock-editor-body {
+        width: 700px;
+      }
+    }
   }
 
   .mock-table-container {
