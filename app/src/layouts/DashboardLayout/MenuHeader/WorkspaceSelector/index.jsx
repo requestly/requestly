@@ -28,7 +28,7 @@ import {
   getAppMode,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAuthDetails,
-  getLastSeenInvitesTs,
+  getLastSeenInviteTs,
 } from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
@@ -137,25 +137,18 @@ const WorkspaceSelector = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const lastSeenInvitesTs = useSelector(getLastSeenInvitesTs);
+  const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
 
-  const getOrganizationMembers = useMemo(() => httpsCallable(getFunctions(), "getOrganizationUsersData"), []);
   const hasNewInvites = useMemo(() => {
     if (user?.loggedIn && teamInvites?.length) {
-      return teamInvites.some((invite) => invite.createdTs > lastSeenInvitesTs);
+      return teamInvites.some((invite) => invite.createdTs > lastSeenInviteTs);
     }
     return false;
-  }, [lastSeenInvitesTs, teamInvites, user?.loggedIn]);
-
-  useEffect(() => {
-    getOrganizationMembers({ domain: getDomainFromEmail(user?.details?.profile?.email), size: 3 }).then((res) => {
-      console.log({ res });
-    });
-  }, [user?.details?.profile?.email, getOrganizationMembers]);
+  }, [lastSeenInviteTs, teamInvites, user?.loggedIn]);
 
   useEffect(() => {
     if (!user.loggedIn) return;
