@@ -13,6 +13,7 @@ const DEFAULT_POSITION = { left: 30, bottom: 30 };
 
 class RQSessionRecordingWidget extends HTMLElement {
   #shadowRoot;
+  #isDragging = false;
 
   constructor() {
     super();
@@ -46,35 +47,49 @@ class RQSessionRecordingWidget extends HTMLElement {
 
     this.addEventListener("hide", this.hide);
 
-    this.addEventListener("dragstart", (evt) => {
-      evt.dataTransfer.setData("id", TAG_NAME);
+    // allow widget to be draggable using mouse events
+    this.addEventListener("mousedown", (evt: MouseEvent) => {
+      evt.preventDefault();
 
-      const boundingRect = this.getBoundingClientRect();
-      const offset = {
-        x: evt.clientX - boundingRect.left,
-        y: evt.clientY - boundingRect.top,
-        width: boundingRect.width,
-        height: boundingRect.height,
+      let x = evt.clientX;
+      let y = evt.clientY;
+
+      const onMouseMove = (evt: MouseEvent) => {
+        evt.preventDefault();
+
+        this.#isDragging = true;
+
+        const dX = evt.clientX - x;
+        const dY = evt.clientY - y;
+
+        x = evt.clientX;
+        y = evt.clientY;
+
+        const xPos = Math.min(Math.max(this.offsetLeft + dX, 0), window.innerWidth - this.offsetWidth);
+        const yPos = Math.min(Math.max(this.offsetTop + dY, 0), window.innerHeight - this.offsetHeight);
+        this.moveToPostion({ top: yPos, left: xPos });
       };
 
-      evt.dataTransfer.setData("offset", JSON.stringify(offset));
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
     });
 
-    document.documentElement.addEventListener("dragover", (evt) => {
-      evt.preventDefault();
-      evt.dataTransfer.dropEffect = "move";
-    });
-
-    document.documentElement.addEventListener("drop", (evt) => {
-      evt.preventDefault();
-
-      if (evt.dataTransfer.getData("id") === TAG_NAME) {
-        const offset = JSON.parse(evt.dataTransfer.getData("offset"));
-        const xPos = Math.min(Math.max(evt.clientX - offset.x, 0), window.innerWidth - offset.width);
-        const yPos = Math.min(Math.max(evt.clientY - offset.y, 0), window.innerHeight - offset.height);
-        this.moveToPostion({ top: yPos, left: xPos });
-      }
-    });
+    this.#shadowRoot.addEventListener(
+      "click",
+      (evt) => {
+        if (this.#isDragging) {
+          // disable all clicks while widget is dragging
+          evt.stopPropagation();
+          this.#isDragging = false;
+        }
+      },
+      true
+    );
 
     window.addEventListener("resize", () => {
       const boundingRect = this.getBoundingClientRect();
@@ -122,11 +137,15 @@ class RQSessionRecordingWidget extends HTMLElement {
   show(position = DEFAULT_POSITION) {
     this.moveToPostion(position);
     this.setAttribute("draggable", "true");
-    this.#shadowRoot.getElementById("container").classList.add("visible");
+    this.getContainer().classList.add("visible");
   }
 
   hide() {
-    this.#shadowRoot.getElementById("container").classList.remove("visible");
+    this.getContainer().classList.remove("visible");
+  }
+
+  getContainer() {
+    return this.#shadowRoot.getElementById("container");
   }
 }
 
