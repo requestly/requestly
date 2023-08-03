@@ -9,6 +9,7 @@ import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
+import CopyButton from "components/misc/CopyButton";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
@@ -17,7 +18,6 @@ import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
-import CopyButton from "components/misc/CopyButton";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
   //Component State
@@ -165,8 +165,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
               <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
               <div className="title mt-16">Email address</div>
-              <div className="display-flex" style={{ marginTop: "6px" }}>
-                <div style={{ flex: 1 }} className="emails-input-wrapper">
+              <div className="email-invites-wrapper">
+                <div className="emails-input-wrapper">
                   <ReactMultiEmail
                     className="members-email-input"
                     placeholder="Email Address"
@@ -194,7 +194,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 {isTeamAdmin && (
                   <RQButton
                     size="small"
-                    style={{ height: "37px", marginLeft: "10px" }}
+                    style={{ height: "37px", marginLeft: "4px" }}
                     type={userEmail.length ? "primary" : "default"}
                     htmlType="submit"
                     onClick={handleAddMember}
@@ -221,7 +221,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                   <RQButton
                     loading={isInviteGenerating}
                     size="small"
-                    style={{ height: "30px" }}
+                    className="create-invite-link-btn"
                     type="primary"
                     onClick={handleCreateInviteLink}
                   >
