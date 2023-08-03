@@ -1,3 +1,2 @@
-import { registerRQToast } from "./toast";
-
-registerRQToast();
+import "./toast";
+import "./session-recording-widget";
