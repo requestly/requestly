@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
-import { Row, Col, Checkbox } from "antd";
+import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
@@ -17,6 +17,7 @@ import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
+import CopyButton from "components/misc/CopyButton";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
   //Component State
@@ -26,6 +27,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
   const [isDomainJoiningEnabled, setIsDomainJoiningEnabled] = useState(false);
+  const [publicInviteId, setPublicInviteId] = useState(null);
+  const [isInviteGenerating, setIsInviteGenerating] = useState(false);
 
   // Global state
   const user = useSelector(getUserAuthDetails);
@@ -38,6 +41,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
+
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
@@ -92,7 +97,6 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
     (event) => {
       const isEnabled = event.target.checked;
       setIsDomainJoiningEnabled(isEnabled);
-      const upsertTeamCommonInvite = httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite");
 
       upsertTeamCommonInvite({ teamId, domainEnabled: isEnabled })
         .then((res) => {
@@ -106,8 +110,20 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
           toast.error("Couldn't update this setting. Please contact support.");
         });
     },
-    [teamId]
+    [teamId, upsertTeamCommonInvite]
   );
+
+  const handleCreateInviteLink = useCallback(() => {
+    setIsInviteGenerating(true);
+    upsertTeamCommonInvite({ teamId: teamId, publicEnabled: true }).then((res) => {
+      if (res?.data?.success) {
+        setPublicInviteId(res?.data?.inviteId);
+      } else {
+        toast.error("Only admins can invite people");
+      }
+      setIsInviteGenerating(false);
+    });
+  }, [teamId, upsertTeamCommonInvite]);
 
   useEffect(() => {
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
@@ -126,28 +142,39 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
               </div>
               <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
-              <div className="display-flex">
-                <ReactMultiEmail
-                  className="members-email-input"
-                  placeholder="Email Address"
-                  type="email"
-                  value={userEmail}
-                  onChange={setUserEmail}
-                  validateEmail={validateEmail}
-                  getLabel={(email, index, removeEmail) => (
-                    <div data-tag key={index} className="multi-email-tag">
-                      {email}
-                      <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                        <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                      </span>
-                    </div>
-                  )}
-                />
+
+              <div className="title mt-16">Email address</div>
+              <div className="display-flex" style={{ marginTop: "6px" }}>
+                <div style={{ flex: 1 }}>
+                  <ReactMultiEmail
+                    className="members-email-input"
+                    placeholder="Email Address"
+                    type="email"
+                    value={userEmail}
+                    onChange={setUserEmail}
+                    validateEmail={validateEmail}
+                    getLabel={(email, index, removeEmail) => (
+                      <div data-tag key={index} className="multi-email-tag">
+                        {email}
+                        <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
+                          <img alt="remove" src="/assets/img/workspaces/cross.svg" />
+                        </span>
+                      </div>
+                    )}
+                  />
+                  <Row justify="end">
+                    <MemberRoleDropdown
+                      placement="bottomRight"
+                      isAdmin={makeUserAdmin}
+                      handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                    />
+                  </Row>
+                </div>
                 {isTeamAdmin && (
                   <RQButton
                     size="small"
                     style={{ height: "37px", marginLeft: "10px" }}
-                    type="default"
+                    type="primary"
                     htmlType="submit"
                     onClick={handleAddMember}
                     loading={isProcessing}
@@ -156,25 +183,31 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                   </RQButton>
                 )}
               </div>
-              <Row className="access-dropdown-container">
-                <Col span={24} align="right">
-                  <MemberRoleDropdown
-                    placement="bottomRight"
-                    isAdmin={makeUserAdmin}
-                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+              <div className="title mt-16">Invite link</div>
+              {publicInviteId ? (
+                <div className="display-flex items-center mt-8">
+                  <RQInput
+                    disabled
+                    value={`${window.location.origin}/invite/${publicInviteId}`}
+                    suffix={
+                      <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
+                    }
                   />
-                </Col>
-              </Row>
-              {/* <div className="text-gray add-members-modal-info-text">
-                <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
-              </div> */}
-              <div className="title">Invite link</div>
-              <div className="display-flex items-center">
-                <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
-                <RQButton size="small" style={{ height: "30px" }} type="primary">
-                  Generate link
-                </RQButton>
-              </div>
+                </div>
+              ) : (
+                <div className="display-flex items-center">
+                  <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+                  <RQButton
+                    loading={isInviteGenerating}
+                    size="small"
+                    style={{ height: "30px" }}
+                    type="primary"
+                    onClick={handleCreateInviteLink}
+                  >
+                    Create link
+                  </RQButton>
+                </div>
+              )}
             </>
           ) : isLoading ? (
             <PageLoader />
