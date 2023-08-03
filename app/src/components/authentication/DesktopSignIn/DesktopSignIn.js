@@ -16,7 +16,6 @@ import {
   signInWithRedirect,
 } from "firebase/auth";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import { createNewUsername } from "backend/auth/username";
 //UTILS
 import { getEmailType } from "utils/FormattingHelper";
 //EVENTS
@@ -132,13 +131,6 @@ const DesktopSignIn = () => {
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
           let isNewUser = getAdditionalUserInfo(result).isNewUser || false;
-          if (isNewUser) {
-            createNewUsername(result?.user?.uid)
-              .then((username) => {
-                // Do Nothing
-              })
-              .catch((e) => Logger.error(e));
-          }
           // User just signed in. we can get the result.credential or result.user
           await handleDoneSignIn(result.user, isNewUser);
         } else if (auth.currentUser) {
