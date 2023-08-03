@@ -41,6 +41,8 @@ import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/featu
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -141,12 +143,19 @@ const WorkspaceSelector = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
 
+  const getOrganizationMembers = useMemo(() => httpsCallable(getFunctions(), "getOrganizationUsersData"), []);
   const hasNewInvites = useMemo(() => {
     if (user?.loggedIn && teamInvites?.length) {
       return teamInvites.some((invite) => invite.createdTs > lastSeenInvitesTs);
     }
     return false;
   }, [lastSeenInvitesTs, teamInvites, user?.loggedIn]);
+
+  useEffect(() => {
+    getOrganizationMembers({ domain: getDomainFromEmail(user?.details?.profile?.email), size: 3 }).then((res) => {
+      console.log({ res });
+    });
+  }, [user?.details?.profile?.email, getOrganizationMembers]);
 
   useEffect(() => {
     if (!user.loggedIn) return;

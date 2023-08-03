@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
-import { Row, Col } from "antd";
+import { Row, Col, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -13,6 +14,7 @@ import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 
@@ -23,14 +25,19 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
+  const [isDomainJoiningEnabled, setIsDomainJoiningEnabled] = useState(false);
 
   // Global state
+  const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
-  const teamId = currentTeamId ?? activeWorkspaceId;
+  const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
+  const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
+    user?.details?.profile?.email,
+  ]);
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
@@ -81,13 +88,34 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
       });
   };
 
+  const handleAllowDomainUsers = useCallback(
+    (event) => {
+      const isEnabled = event.target.checked;
+      setIsDomainJoiningEnabled(isEnabled);
+      const upsertTeamCommonInvite = httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite");
+
+      upsertTeamCommonInvite({ teamId, domainEnabled: isEnabled })
+        .then((res) => {
+          if (!res?.data?.success) {
+            setIsDomainJoiningEnabled(false);
+            toast.error("Couldn't update this setting. Please contact support.");
+          }
+        })
+        .catch(() => {
+          setIsDomainJoiningEnabled(false);
+          toast.error("Couldn't update this setting. Please contact support.");
+        });
+    },
+    [teamId]
+  );
+
   useEffect(() => {
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
   }, [isOpen]);
 
   return (
     <>
-      <RQModal centered open={isOpen} onCancel={toggleModal}>
+      <RQModal width={580} centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
           {isTeamAdmin ? (
             <>
@@ -98,23 +126,36 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
               </div>
               <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
-
-              <ReactMultiEmail
-                className="members-email-input"
-                placeholder="Email Address"
-                type="email"
-                value={userEmail}
-                onChange={setUserEmail}
-                validateEmail={validateEmail}
-                getLabel={(email, index, removeEmail) => (
-                  <div data-tag key={index} className="multi-email-tag">
-                    {email}
-                    <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                      <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                    </span>
-                  </div>
+              <div className="display-flex">
+                <ReactMultiEmail
+                  className="members-email-input"
+                  placeholder="Email Address"
+                  type="email"
+                  value={userEmail}
+                  onChange={setUserEmail}
+                  validateEmail={validateEmail}
+                  getLabel={(email, index, removeEmail) => (
+                    <div data-tag key={index} className="multi-email-tag">
+                      {email}
+                      <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
+                        <img alt="remove" src="/assets/img/workspaces/cross.svg" />
+                      </span>
+                    </div>
+                  )}
+                />
+                {isTeamAdmin && (
+                  <RQButton
+                    size="small"
+                    style={{ height: "37px", marginLeft: "10px" }}
+                    type="default"
+                    htmlType="submit"
+                    onClick={handleAddMember}
+                    loading={isProcessing}
+                  >
+                    Invite People
+                  </RQButton>
                 )}
-              />
+              </div>
               <Row className="access-dropdown-container">
                 <Col span={24} align="right">
                   <MemberRoleDropdown
@@ -124,8 +165,15 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                   />
                 </Col>
               </Row>
-              <div className="text-gray add-members-modal-info-text">
+              {/* <div className="text-gray add-members-modal-info-text">
                 <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
+              </div> */}
+              <div className="title">Invite link</div>
+              <div className="display-flex items-center">
+                <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+                <RQButton size="small" style={{ height: "30px" }} type="primary">
+                  Generate link
+                </RQButton>
               </div>
             </>
           ) : isLoading ? (
@@ -138,13 +186,12 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
           )}
         </div>
 
-        {isTeamAdmin && (
-          <Row align="middle" justify="end" className="rq-modal-footer">
-            <RQButton type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
-              Invite People
-            </RQButton>
-          </Row>
-        )}
+        <Row align="middle" className="rq-modal-footer">
+          <Checkbox value={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+          <span className="ml-2 text-gray">
+            Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+          </span>
+        </Row>
       </RQModal>
 
       <InviteErrorModal
