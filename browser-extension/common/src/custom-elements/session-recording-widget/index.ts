@@ -104,7 +104,7 @@ class RQSessionRecordingWidget extends HTMLElement {
   }
 
   moveToPostion(position: { top?: number; bottom?: number; left?: number; right?: number }) {
-    const getCSSPostionValue = (num?: number) => (num ? `${num}px` : "auto");
+    const getCSSPostionValue = (num?: number) => (typeof num !== "undefined" ? `${num}px` : "auto");
 
     this.style.left = getCSSPostionValue(position.left);
     this.style.top = getCSSPostionValue(position.top);

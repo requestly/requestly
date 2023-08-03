@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Typography } from "antd";
-// import config from "../../../config";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
 import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
