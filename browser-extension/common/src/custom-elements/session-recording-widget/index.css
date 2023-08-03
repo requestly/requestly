@@ -1,0 +1,70 @@
+:host {
+  position: fixed;
+  z-index: 2147483647;
+}
+
+#container {
+  background-color: #295ff6;
+  border-radius: 24px;
+  padding: 12px 18px;
+  margin: auto;
+  color: #fff;
+  font-family: system-ui;
+  font-size: 13px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  cursor: move;
+  display: none;
+}
+
+#container.visible {
+  display: flex;
+}
+
+#container > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.stop-recording:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  display: inline-block;
+  height: 20px;
+  width: 1px;
+  background: #fff;
+}
+
+.discard-recording {
+  margin-top: 2px;
+}
+
+.action {
+  cursor: pointer;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.recording-icon {
+  display: inline-block;
+  height: 4px;
+  width: 4px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: #ea3323;
+  animation: blink 1s cubic-bezier(0.5, 0, 1, 1) infinite alternate;
+}

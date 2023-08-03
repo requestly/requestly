@@ -19,6 +19,7 @@ export const EXTENSION_MESSAGES = {
   INIT_SESSION_RECORDING_WITH_NEW_CONFIG: "initSessionRecordingWithNewConfig",
   START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
   STOP_RECORDING: "stopRecording",
+  WATCH_RECORDING: "watchRecording",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
 };
