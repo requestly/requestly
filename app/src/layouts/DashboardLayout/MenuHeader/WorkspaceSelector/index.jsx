@@ -41,8 +41,6 @@ import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/featu
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
-import { httpsCallable, getFunctions } from "firebase/functions";
-import { getDomainFromEmail } from "utils/FormattingHelper";
 
 const { PATHS } = APP_CONSTANTS;
 
