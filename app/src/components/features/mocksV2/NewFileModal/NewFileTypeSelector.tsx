@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useMemo } from "react";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Typography } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -38,44 +38,39 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
 
-  const renderFileTypeCard = useCallback(
-    (type: string, data: any) => {
-      return (
-        <Col xs={12} lg={8} key={type} className="file-type-cards-container">
-          <Card
-            loading={false}
-            size="small"
-            className="new-file-modal-card"
-            actions={[
-              <AuthConfirmationPopover
-                title={`You need to sign up to create a ${data.TYPE} file`}
-                callback={() =>
-                  handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type)
+  const fileTypeCard = useMemo(() => {
+    return Object.entries(FILE_TYPES_CONFIG).map(([type, data]) => (
+      <Col xs={12} lg={8} key={type} className="file-type-cards-container">
+        <Card
+          loading={false}
+          size="small"
+          className="new-file-modal-card"
+          actions={[
+            <AuthConfirmationPopover
+              title={`You need to sign up to create a ${data.TYPE} file`}
+              callback={() =>
+                handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type)
+              }
+              source={AUTH.SOURCE.CREATE_FILE_MOCK}
+            >
+              <Button
+                onClick={() =>
+                  user?.details?.isLoggedIn &&
+                  (handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type))
                 }
-                source={AUTH.SOURCE.CREATE_FILE_MOCK}
+                className="create-file-btn"
+                type="primary"
               >
-                <Button
-                  onClick={() =>
-                    user?.details?.isLoggedIn &&
-                    (handleTypeSelection
-                      ? handleTypeSelection(type)
-                      : redirectToFileMockEditorCreateMock(navigate, type))
-                  }
-                  className="create-file-btn"
-                  type="primary"
-                >
-                  Create new {`${data.TYPE}`} file <ArrowRightOutlined />
-                </Button>
-              </AuthConfirmationPopover>,
-            ]}
-          >
-            <Card.Meta className="file-card-meta" avatar={<>{React.createElement(data.ICON)}</>} title={data.NAME} />
-          </Card>
-        </Col>
-      );
-    },
-    [handleTypeSelection, navigate, user?.details?.isLoggedIn]
-  );
+                Create new {`${data.TYPE}`} file <ArrowRightOutlined />
+              </Button>
+            </AuthConfirmationPopover>,
+          ]}
+        >
+          <Card.Meta className="file-card-meta" avatar={<>{React.createElement(data.ICON)}</>} title={data.NAME} />
+        </Card>
+      </Col>
+    ));
+  }, [handleTypeSelection, navigate, user?.details?.isLoggedIn]);
 
   return (
     <>
@@ -100,9 +95,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
           </Link>
         </Typography.Text>
       </div>
-      <Row gutter={[16, 16]}>
-        {Object.entries(FILE_TYPES_CONFIG).map(([key, config]) => renderFileTypeCard(key, config))}
-      </Row>
+      <Row gutter={[16, 16]}>{fileTypeCard}</Row>
     </>
   );
 };

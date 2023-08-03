@@ -17,4 +17,11 @@
     height: auto;
     overflow: auto;
   }
+
+  .mock-table-container {
+    .mocks-table {
+      overflow: auto;
+      max-height: 75vh;
+    }
+  }
 }
