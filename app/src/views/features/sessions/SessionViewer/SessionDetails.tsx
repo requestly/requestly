@@ -23,6 +23,7 @@ import { getConsoleLogs, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { RQButton } from "lib/design-system/components";
 import { removeElement } from "utils/removeElement";
+import { isAppOpenedInIframe } from "utils/isAppOpenedInIframe";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
@@ -67,29 +68,20 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   }, [startTime]);
 
   useEffect(() => {
-    const handleSessionOpenedInIframe = () => {
-      removeElement(".session-viewer-header .back-button");
-      removeElement(".session-properties-wrapper");
+    if (!isAppOpenedInIframe()) return;
 
-      setTimeout(() => {
-        removeElement(".rr-controller__btns button:last-child");
+    removeElement(".session-viewer-header .back-button");
+    removeElement(".session-properties-wrapper");
 
-        const rrwebPlayerContainer = document.querySelector(
-          ".session-recording-player-container > .rr-player"
-        ) as HTMLElement;
+    setTimeout(() => {
+      removeElement(".rr-controller__btns button:last-child");
 
-        if (rrwebPlayerContainer) rrwebPlayerContainer.style.border = "none";
-      }, 0);
-    };
+      const rrwebPlayerContainer = document.querySelector(
+        ".session-recording-player-container > .rr-player"
+      ) as HTMLElement;
 
-    try {
-      if (window.self !== window.top) {
-        handleSessionOpenedInIframe();
-      }
-    } catch (error) {
-      // Browsers can block access to window.top due to same origin policy.
-      handleSessionOpenedInIframe();
-    }
+      if (rrwebPlayerContainer) rrwebPlayerContainer.style.border = "none";
+    }, 0);
   }, []);
 
   useEffect(() => {

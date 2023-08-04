@@ -36,13 +36,9 @@ const DashboardLayout = () => {
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
-    const handleSessionOpenedInIframe = () => {
-      removeElement(".app-sidebar");
-      removeElement(".app-header");
-      removeElement(".app-footer");
-    };
-
-    handleSessionOpenedInIframe();
+    removeElement(".app-sidebar");
+    removeElement(".app-header");
+    removeElement(".app-footer");
   }, []);
 
   return (
