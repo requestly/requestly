@@ -6,12 +6,42 @@
   white-space: nowrap;
 }
 
+.email-invites-wrapper {
+  display: flex;
+  margin-top: 6px;
+}
+
+.emails-input-wrapper {
+  background: var(--component-dark-background);
+  box-shadow: var(--input-box-shadow);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  flex: 1;
+  /* align-items: center; */
+}
+.emails-input-wrapper div.react-multi-email.focused,
+.emails-input-wrapper div.react-multi-email {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+.emails-input-wrapper div.react-multi-email span {
+  padding-left: 0;
+}
+
 .members-email-input {
-  margin-bottom: 1rem;
+  max-width: 254px;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 div.members-email-input > input {
   width: 100% !important;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .add-member-modal-email-label {
@@ -31,7 +61,8 @@ div.members-email-input > input {
 }
 
 .access-dropdown-container {
-  margin: -10px 0px 4px 0px;
+  margin: 0 5px;
+  margin-top: 7px;
 }
 
 .empty-message {
@@ -41,4 +72,8 @@ div.members-email-input > input {
   align-items: center;
   justify-content: center;
   row-gap: 1rem;
+}
+
+.create-invite-link-btn {
+  height: 30px;
 }
