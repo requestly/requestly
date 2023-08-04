@@ -26,6 +26,7 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
+import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -168,6 +169,8 @@ const DashboardContent = () => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
+
+      <JoinWorkspaceCard />
     </>
   );
 };
