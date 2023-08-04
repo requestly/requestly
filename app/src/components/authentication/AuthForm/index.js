@@ -17,7 +17,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 //UTILS
 // import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
-import { getAuthErrorMessage, AuthTypes } from "../utils";
+// import { getAuthErrorMessage, AuthTypes } from "../utils";
 
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
@@ -25,8 +25,8 @@ import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  handleEmailSignIn,
-  handleEmailSignUp,
+  // handleEmailSignIn,
+  // handleEmailSignUp,
   handleForgotPasswordButtonOnClick,
   handleGoogleSignIn,
   handleResetPasswordOnClick,
@@ -103,62 +103,62 @@ const AuthForm = ({
       });
   };
 
-  const handleEmailSignUpButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignUp(name, email, password, referralCode, eventSource)
-      .then(({ status, errorCode }) => {
-        if (status) {
-          handleEmailSignIn(email, password, true, eventSource)
-            .then(({ result }) => {
-              if (result.user.uid) {
-                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-                setEmail("");
-                setPassword("");
-                // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-                onSignInSuccess && onSignInSuccess(result.user.uid, true);
-              }
-            })
-            .catch(({ errorCode }) => {
-              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-              setActionPending(false);
-              setEmail("");
-              setPassword("");
-            });
-        } else {
-          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-          setActionPending(false);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-        setActionPending(false);
-      });
-  };
+  // const handleEmailSignUpButtonClick = (event) => {
+  //   event.preventDefault();
+  //   setActionPending(true);
+  //   handleEmailSignUp(name, email, password, referralCode, eventSource)
+  //     .then(({ status, errorCode }) => {
+  //       if (status) {
+  //         handleEmailSignIn(email, password, true, eventSource)
+  //           .then(({ result }) => {
+  //             if (result.user.uid) {
+  //               !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+  //               setEmail("");
+  //               setPassword("");
+  //               // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+  //               onSignInSuccess && onSignInSuccess(result.user.uid, true);
+  //             }
+  //           })
+  //           .catch(({ errorCode }) => {
+  //             toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //             setActionPending(false);
+  //             setEmail("");
+  //             setPassword("");
+  //           });
+  //       } else {
+  //         toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //         setActionPending(false);
+  //       }
+  //     })
+  //     .catch(({ errorCode }) => {
+  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //       setActionPending(false);
+  //     });
+  // };
 
-  const handleEmailSignInButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignIn(email, password, false, eventSource)
-      .then(({ result }) => {
-        if (result.user.uid) {
-          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-          setEmail("");
-          setPassword("");
-          // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-          onSignInSuccess && onSignInSuccess(result.user.uid, false);
-        } else {
-          toast.error("Sorry we couldn't log you in. Can you please retry?");
-          setActionPending(true);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
-        setActionPending(false);
-        setEmail("");
-        setPassword("");
-      });
-  };
+  // const handleEmailSignInButtonClick = (event) => {
+  //   event.preventDefault();
+  //   setActionPending(true);
+  //   handleEmailSignIn(email, password, false, eventSource)
+  //     .then(({ result }) => {
+  //       if (result.user.uid) {
+  //         !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+  //         setEmail("");
+  //         setPassword("");
+  //         // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+  //         onSignInSuccess && onSignInSuccess(result.user.uid, false);
+  //       } else {
+  //         toast.error("Sorry we couldn't log you in. Can you please retry?");
+  //         setActionPending(true);
+  //       }
+  //     })
+  //     .catch(({ errorCode }) => {
+  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+  //       setActionPending(false);
+  //       setEmail("");
+  //       setPassword("");
+  //     });
+  // };
 
   const SocialAuthButtons = () => {
     switch (MODE) {
