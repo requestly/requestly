@@ -186,7 +186,7 @@ const SavedSessionViewer: React.FC = () => {
             />
             <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
           </div>
-          {isRequestedByOwner ? (
+          {isRequestedByOwner && !isInsideIframe ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
