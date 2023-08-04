@@ -24,6 +24,7 @@ export const JoinWorkspaceCard = () => {
   const [isBusinessDomainUser, setIsBusinessDomainUser] = useState(false);
   const [organizationMembers, setOrganizationMembers] = useState(null);
   const [hasActiveWorkspace, setHasActiveWorkspace] = useState(false);
+  const [hasEmailInvite, setHasEmailInvite] = useState(false);
 
   const handleNudgeCTAClick = () => {
     if (hasActiveWorkspace) {
@@ -56,7 +57,9 @@ export const JoinWorkspaceCard = () => {
     if (organizationMembers && organizationMembers.total >= 3) {
       getPendingInvites({ email: true, domain: true })
         .then((res: any) => {
+          console.log({ res });
           if (res?.pendingInvites) {
+            setHasEmailInvite(res.pendingInvites.some((invite: Invite) => !invite.domains?.length));
             const hasActiveMembers = res?.pendingInvites?.some(
               (invite: Invite) => (invite.metadata.teamAccessCount as number) > 1
             );
@@ -71,10 +74,10 @@ export const JoinWorkspaceCard = () => {
     }
   }, [organizationMembers]);
 
-  console.log({ isBusinessDomainUser, organizationMembers, hasActiveWorkspace });
+  console.log({ isBusinessDomainUser, organizationMembers, hasActiveWorkspace, hasEmailInvite });
   return (
     <>
-      {organizationMembers && organizationMembers.total >= 3 ? (
+      {organizationMembers && organizationMembers.total >= 3 && user.loggedIn ? (
         <div className="workspace-card-container">
           <Row justify="end">
             <RQButton
@@ -91,23 +94,30 @@ export const JoinWorkspaceCard = () => {
               //   }}
             />
           </Row>
-          <div className="workspace-card-avatar-row-container">
-            <Avatar.Group maxCount={3}>
-              {organizationMembers.users.map((member: User) => (
-                <Avatar
-                  src={member.photoURL.length ? member.photoURL : "https://www.gravatar.com/avatar/000?d=mp&f=y"}
-                  alt="organization member"
-                />
-              ))}
-            </Avatar.Group>
-            <div className="other-users-avatar">+{organizationMembers.total - 3}</div>
-          </div>
+          {!hasEmailInvite && (
+            <div className="workspace-card-avatar-row-container">
+              <Avatar.Group maxCount={3}>
+                {organizationMembers.users.map((member: User) => (
+                  <Avatar
+                    src={member.photoURL.length ? member.photoURL : "https://www.gravatar.com/avatar/000?d=mp&f=y"}
+                    alt="organization member"
+                  />
+                ))}
+              </Avatar.Group>
+              {organizationMembers.total - 3 > 0 ? (
+                <div className="other-users-avatar">+{organizationMembers.total - 3}</div>
+              ) : null}
+            </div>
+          )}
+
           <Typography.Text className="display-block workspace-card-text">
-            {hasActiveWorkspace ? (
+            {hasEmailInvite ? (
+              <>You have pending workspace invites.</>
+            ) : hasActiveWorkspace ? (
               <>
                 {organizationMembers.total} users from{" "}
                 <span className="text-white text-bold">{capitalize(userEmailDomain)} </span>
-                are collaborating on a team workspace
+                are using Requestly and collaborating on a team workspace.
               </>
             ) : (
               <>
@@ -117,7 +127,7 @@ export const JoinWorkspaceCard = () => {
             )}
           </Typography.Text>
           <RQButton type="primary" className="mt-8 text-bold" onClick={handleNudgeCTAClick}>
-            {hasActiveWorkspace ? "Join your teammates" : "Start collaborating"}
+            {hasEmailInvite ? "Show invites" : hasActiveWorkspace ? "Join your teammates" : "Start collaborating"}
           </RQButton>
         </div>
       ) : null}
