@@ -26,7 +26,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotifyAllChecked, setIsNotifyAllChecked] = useState(true);
+  const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(true);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
     workspaceName: "",
     description: "",
@@ -52,7 +52,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
-        if (isNotifyAllChecked) {
+        if (isNotifyAllSelected) {
           createOrgTeamInvite({ domain: getDomainFromEmail(user?.details?.profile?.email), teamId })
             .then((res) => {
               if (res.data.success)
@@ -82,7 +82,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
         );
         redirectToTeam(navigate, teamId, {
           state: {
-            isNewTeam: !isNotifyAllChecked,
+            isNewTeam: !isNotifyAllSelected,
           },
         });
         toggleModal();
@@ -160,7 +160,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
           <Col>
             {isVerifiedBusinessUser ? (
               <>
-                <Checkbox checked={isNotifyAllChecked} onChange={(e) => setIsNotifyAllChecked(e.target.checked)} />
+                <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
                 <span className="ml-2 text-gray text-sm">
                   Notify all{" "}
                   <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
