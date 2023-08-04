@@ -1,5 +1,5 @@
 import styles from "./index.css";
-import { registerCustomElement } from "../registerCustomElement";
+import { registerCustomElement, setInnerHTML } from "../utils";
 import BinIcon from "../../../resources/icons/bin.svg";
 
 enum RQSessionRecordingWidgetEvent {
@@ -18,7 +18,7 @@ class RQSessionRecordingWidget extends HTMLElement {
   constructor() {
     super();
     this.#shadowRoot = this.attachShadow({ mode: "closed" });
-    this.#shadowRoot.innerHTML = this._getDefaultMarkup();
+    setInnerHTML(this.#shadowRoot, this._getDefaultMarkup());
 
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
