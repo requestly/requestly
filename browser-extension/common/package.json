@@ -49,7 +49,7 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.2.1",
     "@devtools-ds/themes": "^1.2.1",
-    "antd": "^5.0.4",
+    "antd": "^5.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-split": "^2.0.14",
