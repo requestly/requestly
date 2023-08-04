@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails, getAppMode } from "store/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
 import { actions } from "store";
-import { getPendingInvites } from "backend/workspace";
+import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
+import { toast } from "utils/Toast";
 import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import APP_CONSTANTS from "config/constants";
@@ -19,24 +21,92 @@ interface JoinWorkspaceModalProps {
   toggleModal: () => void;
 }
 
+interface InviteRowProps {
+  index: number;
+  team: TeamInviteMetadata;
+}
+
+const InviteRow: React.FC<InviteRowProps> = ({ index, team }) => {
+  const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const [isJoining, setIsJoining] = useState<boolean>(false);
+
+  const handleJoinClick = (team: TeamInviteMetadata) => {
+    trackWorkspaceJoinClicked(team?.teamId, "workspace_joining_modal");
+    setIsJoining(true);
+
+    acceptTeamInvite(team?.inviteId)
+      .then((res: any) => {
+        if (res?.data?.success) {
+          toast.success("Successfully joined workspace");
+          if (res?.data?.data?.invite.type === "teams") {
+            switchWorkspace(
+              {
+                teamId: team?.teamId,
+                teamName: team?.teamName,
+                teamMembersCount: team?.teamAccessCount,
+              },
+              dispatch,
+              {
+                isWorkspaceMode,
+                isSyncEnabled: true,
+              },
+              appMode
+            );
+          }
+        }
+        setIsJoining(false);
+        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
+      })
+      .catch((err) => {
+        toast.error("Error while accepting invitation. Please contact workspace admin");
+        setIsJoining(false);
+        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
+      });
+  };
+
+  return (
+    <li key={team.inviteId}>
+      <div className="w-full team-invite-row">
+        <Col>
+          <Avatar
+            size={28}
+            shape="square"
+            className="workspace-avatar"
+            icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
+            style={{
+              backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
+            }}
+          />
+          <div>{team.teamName}</div>
+        </Col>
+        <div className="text-gray">{team.teamAccessCount} members</div>
+        <Button loading={isJoining} type={index === 0 ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
+          {isJoining ? "Joining" : "Join"}
+        </Button>
+      </div>
+    </li>
+  );
+};
+
 const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [teamInvites, setTeamInvites] = useState<Invite[]>([]);
 
-  const handleJoinClick = (teamId: string, inviteId: string) => {
-    toggleModal();
-    navigate(`/invite/${inviteId}`);
-    trackWorkspaceJoinClicked(teamId, "workspace_joining_modal");
-  };
-
   useEffect(() => {
     if (user.loggedIn) {
-      getPendingInvites({ email: true, domain: false })
+      getPendingInvites({ email: true, domain: true })
         .then((res: any) => {
           const pendingInvites = res?.pendingInvites ?? [];
-          setTeamInvites(pendingInvites);
+          const sortedInvites = pendingInvites
+            ? pendingInvites.sort(
+                (a: Invite, b: Invite) =>
+                  (b.metadata.teamAccessCount as number) - (a.metadata.teamAccessCount as number)
+              )
+            : [];
+          setTeamInvites(sortedInvites);
           dispatch(actions.updateLastSeenInviteTs(new Date().getTime()));
         })
         .catch((e) => setTeamInvites([]));
@@ -73,28 +143,9 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
 
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
-            {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata) => (
-              <li key={team.inviteId}>
-                <Row wrap={false} align="middle" justify="space-between" className="w-full team-invite-row">
-                  <Col>
-                    <Avatar
-                      size={28}
-                      shape="square"
-                      className="workspace-avatar"
-                      icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
-                      style={{
-                        backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
-                      }}
-                    />
-                    <div>{team.teamName}</div>
-                  </Col>
-
-                  <Button type="primary" onClick={() => handleJoinClick(team.teamId, team.inviteId)}>
-                    Join
-                  </Button>
-                </Row>
-              </li>
-            ))}
+            {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata, index) => {
+              return <InviteRow team={team} index={index} />;
+            })}
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
