@@ -6,12 +6,15 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToTeam } from "utils/RedirectionUtils";
+import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
+import APP_CONSTANTS from "config/constants";
 import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
@@ -23,11 +26,12 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotifyAllChecked, setIsNotifyAllChecked] = useState(false);
+  const [isNotifyAllChecked, setIsNotifyAllChecked] = useState(true);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
     workspaceName: "",
     description: "",
   });
+  const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
 
@@ -94,6 +98,12 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
   const handleFinishFailed = () => toast.error("Please enter valid details");
 
   useEffect(() => {
+    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) =>
+      setIsVerifiedBusinessUser(isVerified)
+    );
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
+
+  useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed();
   }, [isOpen]);
 
@@ -148,12 +158,21 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
         {/* footer */}
         <Row align="middle" justify="space-between" className="rq-modal-footer">
           <Col>
-            <Checkbox checked={isNotifyAllChecked} onChange={(e) => setIsNotifyAllChecked(e.target.checked)} />
-            <span className="ml-2 text-gray text-sm">
-              Notify all{" "}
-              <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span> users to
-              join this workspace
-            </span>
+            {isVerifiedBusinessUser ? (
+              <>
+                <Checkbox checked={isNotifyAllChecked} onChange={(e) => setIsNotifyAllChecked(e.target.checked)} />
+                <span className="ml-2 text-gray text-sm">
+                  Notify all{" "}
+                  <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
+                  users to join this workspace
+                </span>
+              </>
+            ) : (
+              <LearnMoreLink
+                linkText="Learn more about team workspaces"
+                href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+              />
+            )}
           </Col>
           <Col>
             <Button
