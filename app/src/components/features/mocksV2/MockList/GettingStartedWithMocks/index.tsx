@@ -70,7 +70,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
         return "No mock APIs created yet";
 
       default:
-        return "No mock APIs created yet"; //for mock picker modal
+        return "No mocks created yet"; //for mock picker modal
     }
   };
 
