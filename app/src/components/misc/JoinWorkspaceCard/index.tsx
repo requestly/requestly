@@ -35,7 +35,9 @@ export const JoinWorkspaceCard = () => {
           modalName: "createWorkspaceModal",
           newValue: true,
           newProps: {
-            callback: () => {},
+            callback: () => {
+              dispatch(actions.updateJoinWorkspaceCardVisible(false));
+            },
           },
         })
       );
@@ -85,13 +87,13 @@ export const JoinWorkspaceCard = () => {
               className="nudge-close-icon"
               iconOnly
               icon={<CloseOutlined />}
-              //   onClick={() => {
-              //     dispatch(actions.updateJoinWorkspacePromptVisible(false));
-              //     trackWorkspaceOrganizationCardCancelled(
-              //       userEmailDomain,
-              //       hasActiveWorkspace ? "join_teammates" : "create_team"
-              //     );
-              //   }}
+              onClick={() => {
+                dispatch(actions.updateJoinWorkspaceCardVisible(false));
+                //   trackWorkspaceOrganizationCardCancelled(
+                //     userEmailDomain,
+                //     hasActiveWorkspace ? "join_teammates" : "create_team"
+                //   );
+              }}
             />
           </Row>
           {!hasEmailInvite && (

@@ -274,3 +274,7 @@ export const getIsCommandBarOpen = (state) => {
 export const getLastSeenInviteTs = (state) => {
   return getGlobalState(state).misc.persist?.lastSeenInviteTs;
 };
+
+export const getIsJoinWorkspaceCardVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};

@@ -15,7 +15,7 @@ import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modu
 import APP_CONSTANTS from "config/constants";
 import "./CreateWorkspaceModal.css";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -64,6 +64,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal }) => {
             isNewTeam: true,
           },
         });
+        callback?.();
         toggleModal();
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
       })
