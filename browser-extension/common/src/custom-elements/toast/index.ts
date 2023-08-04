@@ -1,5 +1,5 @@
 import styles from "./index.css";
-import { registerCustomElement } from "../registerCustomElement";
+import { registerCustomElement, setInnerHTML } from "../utils";
 import CloseIcon from "../../../resources/icons/close.svg";
 
 class RQToast extends HTMLElement {
@@ -9,7 +9,7 @@ class RQToast extends HTMLElement {
   constructor() {
     super();
     this.#shadowRoot = this.attachShadow({ mode: "closed" });
-    this.#shadowRoot.innerHTML = this._getDefaultMarkup();
+    setInnerHTML(this.#shadowRoot, this._getDefaultMarkup());
 
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);

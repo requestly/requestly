@@ -1,14 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Row, Layout, Col, Tooltip } from "antd";
 import { ExperimentOutlined } from "@ant-design/icons";
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
-import { redirectToFileMocksList, redirectToMocksList } from "utils/RedirectionUtils";
 import "./index.css";
 import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { useLocation } from "react-router-dom";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -27,17 +26,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleSave,
   handleTest,
 }) => {
-  const navigate = useNavigate();
-
-  const handleCloseEditor = () => {
-    trackMockEditorClosed(mockType, "back_button");
-    if (mockType === MockType.API) {
-      redirectToMocksList(navigate);
-    } else {
-      redirectToFileMocksList(navigate);
-    }
-  };
-
+  const location = useLocation();
   return (
     <Layout.Header className="mock-editor-layout-header">
       <Row className="w-full">
@@ -47,10 +36,13 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
               iconOnly
               type="text"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={handleCloseEditor}
+              onClick={() => {
+                trackMockEditorClosed(mockType, "back_button");
+                handleClose();
+              }}
             />
           </Tooltip>
-          <RQBreadcrumb />
+          {!location.pathname.includes("rules") && <RQBreadcrumb />}
         </Col>
         <Col className="header-right-section">
           {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
@@ -58,7 +50,13 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
               Test
             </RQButton>
           )}
-          <RQButton type="default" onClick={() => handleClose()}>
+          <RQButton
+            type="default"
+            onClick={() => {
+              trackMockEditorClosed(mockType, "cancel_button");
+              handleClose();
+            }}
+          >
             Cancel
           </RQButton>
           <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
