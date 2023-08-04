@@ -13,8 +13,9 @@
     "dist/generated/shared.js",
     "src/client/js/utils.js",
     "src/modules/StorageService.js",
+    "src/pages/init.js",
     "src/client/js/sessionRecorder.js",
-    "src/pages/init.js"
+    "src/client/js/client.js"
   ],
   "client": [
     "../config/dist/config.js",
