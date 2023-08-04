@@ -1,0 +1,38 @@
+.rq-modal .mock-picker-modal-body {
+  padding: 20px;
+  min-height: 200px;
+
+  .empty-mocks-picker-container {
+    margin: 48px auto;
+
+    .upload-btn {
+      gap: 4px;
+
+      svg {
+        transform: scale(1.2);
+      }
+    }
+  }
+  .mock-editor-title-container {
+    margin-left: -100px;
+  }
+
+  .mock-editor-container {
+    height: auto;
+    overflow: auto;
+
+    .mock-editor-container-col {
+      margin-left: 36px;
+      .mock-editor-body {
+        width: 700px;
+      }
+    }
+  }
+
+  .mock-table-container {
+    .mocks-table {
+      overflow: auto;
+      max-height: 75vh;
+    }
+  }
+}

@@ -7,14 +7,7 @@ const AddCustomScriptRow = ({ rowIndex, addEmptyScript }) => {
   return (
     <Row className="margin-top-one" key={rowIndex}>
       <Col span={24}>
-        <Button
-          block
-          size="large"
-          type="dashed"
-          onClick={addEmptyScript}
-          icon={<PlusOutlined />}
-          className="add-custom-script-btn"
-        >
+        <Button block type="dashed" onClick={addEmptyScript} icon={<PlusOutlined />} className="add-custom-script-btn">
           <span className="text-white">Insert Custom Script</span>
           (scripts are executed serially)
         </Button>
