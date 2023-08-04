@@ -10,12 +10,15 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
 import CopyButton from "components/misc/CopyButton";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isVerifiedBusinessDomainUser } from "utils/Misc";
+import APP_CONSTANTS from "config/constants";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 
@@ -30,6 +33,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const [publicInviteId, setPublicInviteId] = useState(null);
   const [isInviteGenerating, setIsInviteGenerating] = useState(false);
   const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
+  const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
   // Global state
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
@@ -141,6 +145,12 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   }, [teamId, upsertTeamCommonInvite]);
 
   useEffect(() => {
+    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) =>
+      setIsVerifiedBusinessUser(isVerified)
+    );
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
+
+  useEffect(() => {
     if (isOpen) trackAddMembersInWorkspaceModalViewed();
   }, [isOpen]);
 
@@ -239,14 +249,25 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
             </div>
           )}
         </div>
-        {!isLoading && !isPublicInviteLoading && (
-          <Row align="middle" className="rq-modal-footer">
-            <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
-            <span className="ml-2 text-gray">
-              Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
-            </span>
-          </Row>
-        )}
+        <Row align="middle" className="rq-modal-footer">
+          {isVerifiedBusinessUser ? (
+            <>
+              {!isLoading && !isPublicInviteLoading && (
+                <>
+                  <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+                  <span className="ml-2 text-gray">
+                    Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+                  </span>
+                </>
+              )}
+            </>
+          ) : (
+            <LearnMoreLink
+              linkText="Learn more about team workspaces"
+              href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+            />
+          )}
+        </Row>
       </RQModal>
 
       <InviteErrorModal
