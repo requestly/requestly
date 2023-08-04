@@ -1,6 +1,6 @@
 :host {
-  position: fixed;
-  z-index: 2147483647;
+  position: fixed !important;
+  z-index: 2147483647 !important;
 }
 
 #container {
