@@ -37,8 +37,10 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
-        teamId: teamId,
-        callback: doRefreshTeamMembersTable,
+        newProps: {
+          teamId: teamId,
+          callback: doRefreshTeamMembersTable,
+        },
       })
     );
     trackAddMemberClicked();
@@ -50,8 +52,10 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         actions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
-          teamId: teamId,
-          callback: doRefreshTeamMembersTable,
+          newProps: {
+            teamId: teamId,
+            callback: doRefreshTeamMembersTable,
+          },
         })
       );
     }
