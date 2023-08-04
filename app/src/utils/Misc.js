@@ -6,6 +6,8 @@ import { getAttrFromFirebase, submitAttrUtil } from "./AnalyticsUtils";
 import { dateObjToDateString, getOldestDate } from "./DateTimeUtils";
 import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installation";
 import { getValueAsPromise } from "actions/FirebaseActions";
+import { isEmailVerified } from "./AuthUtils";
+import { isCompanyEmail } from "./FormattingHelper";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -170,4 +172,14 @@ export const getSignupDate = async (uid) => {
 
 export const getConnectedAppsCount = (appsListArray) => {
   return appsListArray?.filter((app) => app.isActive).length;
+};
+
+export const isVerifiedBusinessDomainUser = async (email, uid) => {
+  if (!email || !uid) return false;
+
+  return isEmailVerified(uid).then((result) => {
+    if (result && isCompanyEmail(email)) {
+      return true;
+    } else return false;
+  });
 };
