@@ -112,7 +112,7 @@ const SignInViaEmailLink = () => {
             }}
             loading={userEmail && isProcessing}
           >
-            LOGIN
+            Login
           </RQButton>
         </Row>
       </div>
