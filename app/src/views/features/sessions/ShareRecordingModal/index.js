@@ -9,7 +9,10 @@ import firebaseApp from "../../../../firebase";
 import { FiLock, FiUsers } from "react-icons/fi";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { ReactMultiEmail, isEmail } from "react-multi-email";
-import { trackSessionRecordingShareLinkCopied } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackIframeEmbedCopied,
+  trackSessionRecordingShareLinkCopied,
+} from "modules/analytics/events/features/sessionRecording";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
@@ -59,7 +62,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
 
   const publicURL = getSessionRecordingSharedLink(recordingId);
   // Component State
-  const [copiedText, setCopiedText] = useState("");
+  const [isTextCopied, setIsTextCopied] = useState("");
   const [isAnyListChangePending, setIsAnyListChangePending] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [currentEmails, setCurrentEmails] = useState([]);
@@ -72,11 +75,32 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
   };
 
   const onCopyHandler = () => {
-    trackSessionRecordingShareLinkCopied();
-    setCopiedText(publicURL);
+    trackSessionRecordingShareLinkCopied("app");
+    setIsTextCopied(true);
     navigator.clipboard.writeText(publicURL); //copy to clipboard
     setTimeout(() => {
-      setCopiedText("");
+      setIsTextCopied(false);
+    }, 700);
+  };
+
+  const handleIframeEmbedCopy = () => {
+    trackIframeEmbedCopied();
+    setIsTextCopied(true);
+
+    const iframeEmbed = `<iframe
+    width="700"
+    height="615"
+    frameBorder="0"
+    allowFullscreen
+    title="Requestly session"
+    style="border:0; border-radius: 8px; overflow:hidden;"
+    src="${publicURL}"
+  />`;
+
+    navigator.clipboard.writeText(iframeEmbed);
+
+    setTimeout(() => {
+      setIsTextCopied(false);
     }, 700);
   };
 
@@ -243,7 +267,18 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
                     Copy Link
                   </div>
                 </Button>
-                {copiedText && (
+                <Button shape="default" onClick={handleIframeEmbedCopy}>
+                  <div
+                    style={{
+                      gap: "0.5rem",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Copy Iframe Embed
+                  </div>
+                </Button>
+                {isTextCopied && (
                   <Typography.Text style={{ alignSelf: "center" }} type="secondary">
                     Copied!
                   </Typography.Text>
