@@ -1,14 +1,10 @@
-.form-input {
+.email-entry-form-input {
   box-shadow: var(--input-box-shadow);
-  border: 0 !important;
   min-height: 38px;
   width: 80%;
 }
 
-.container {
+.email-entry-form-container {
   margin: 20px 50px;
   padding: 0 50px;
-}
-.mb-20 {
-  margin-bottom: 20px;
 }

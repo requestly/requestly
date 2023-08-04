@@ -16,8 +16,6 @@ import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions
 import { toast } from "utils/Toast.js";
 import { redirectToRules } from "utils/RedirectionUtils";
 
-import { FaSpinner } from "react-icons/fa";
-
 import "./index.css";
 
 const SignInViaEmailLink = () => {
@@ -82,8 +80,8 @@ const SignInViaEmailLink = () => {
 
   const renderEmailInputForm = () => {
     return (
-      <div className="container">
-        <Row className="w-100 mb-20">
+      <div className="email-entry-form-container">
+        <Row className="w-100 mb-16">
           <Col span={6}>
             <label htmlFor="SignInViaEmailLinkInputField" className="text-bold auth-modal-input-label">
               <Typography.Title level={3}>Confirm email address</Typography.Title>
@@ -92,7 +90,7 @@ const SignInViaEmailLink = () => {
           <Col span={18}>
             <RQInput
               id="SignInViaEmailLinkInputField"
-              className="form-input"
+              className="email-entry-form-input"
               placeholder="name@example.com"
               type="email"
               required
@@ -112,9 +110,9 @@ const SignInViaEmailLink = () => {
               e.preventDefault();
               handleLogin();
             }}
-            disabled={userEmail && isProcessing}
+            loading={userEmail && isProcessing}
           >
-            {userEmail && isProcessing ? <FaSpinner className="icon-spin mr-2" /> : "Login"}
+            LOGIN
           </RQButton>
         </Row>
       </div>

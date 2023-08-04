@@ -14,7 +14,6 @@ export default function GenerateLoginLinkBtn({
 }) {
   const [isWaiting, setIsWaiting] = useState(false);
   const [remainingTime, setRemainingTime] = useState(timer);
-  const [progress, setProgress] = useState(100);
 
   const startResetTimerAndAnimation = useCallback(() => {
     setIsWaiting(true);
@@ -31,22 +30,6 @@ export default function GenerateLoginLinkBtn({
         return prev - 1;
       });
     }, 1000);
-
-    // button animation
-    setProgress(100);
-    const start = performance.now();
-    const updateProgress = () => {
-      const now = performance.now();
-      const elapsed = now - start;
-      const newProgress = 100 - (elapsed / (timer * 1000)) * 100;
-      setProgress(newProgress);
-
-      if (elapsed < timer * 1000) {
-        requestAnimationFrame(updateProgress);
-      }
-    };
-
-    requestAnimationFrame(updateProgress);
   }, [timer, timerEndCallback]);
 
   const handleBtnClick = useCallback(() => {
@@ -54,7 +37,6 @@ export default function GenerateLoginLinkBtn({
       toast.warn("Please enter a valid email");
     } else {
       startResetTimerAndAnimation();
-      console.log(sendEmailLinkForSignin);
       callback && callback();
       sendEmailLinkForSignin(email)
         .then((res) => {
@@ -69,13 +51,8 @@ export default function GenerateLoginLinkBtn({
   return isWaiting ? (
     <RQButton
       title="please check your email for the login link"
-      className="form-elements-margin w-full"
+      className="form-elements-margin w-full generate-login-link-btn-animation"
       disabled
-      style={{
-        zIndex: 1,
-        background: `linear-gradient(100deg, transparent ${progress}%, var(--hover-color) ${progress}%)`,
-        transition: `transparent 1s, var(--hover-color) 1s;`,
-      }}
     >
       Send link again in {remainingTime} seconds
     </RQButton>
