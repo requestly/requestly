@@ -28,7 +28,15 @@ export const JoinWorkspaceCard = () => {
 
   const handleNudgeCTAClick = () => {
     if (hasActiveWorkspace) {
-      dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "joinWorkspaceModal",
+          newValue: true,
+          newProps: {
+            callback: () => dispatch(actions.updateJoinWorkspaceCardVisible(false)),
+          },
+        })
+      );
     } else {
       dispatch(
         actions.toggleActiveModal({

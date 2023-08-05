@@ -164,7 +164,7 @@ const DashboardContent = () => {
         <JoinWorkspaceModal
           isOpen={activeModals.joinWorkspaceModal.isActive}
           toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
-          {...activeModals.switchWorkspaceModal.props}
+          {...activeModals.joinWorkspaceModal.props}
         />
       ) : null}
 
