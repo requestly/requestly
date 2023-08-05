@@ -112,8 +112,15 @@ const SavedSessionViewer: React.FC = () => {
   }, [id, eventsFilePath, navigateToList]);
 
   const hasUserCreatedSessions = useMemo(
-    () => userAttributes?.num_sessions_saved_online > 0 || userAttributes?.num_sessions_saved_offline > 0,
-    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+    () =>
+      userAttributes?.num_sessions > 0 ||
+      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_offline > 0,
+    [
+      userAttributes?.num_sessions,
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+    ]
   );
 
   useEffect(() => {
