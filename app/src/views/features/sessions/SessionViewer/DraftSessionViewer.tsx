@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
@@ -48,6 +48,11 @@ const DraftSessionViewer: React.FC = () => {
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
     return `${hostname}@${formattedDate}`;
   }, []);
+
+  const hasUserCreatedSessions = useMemo(
+    () => userAttributes?.num_sessions_saved_online > 0 || userAttributes?.num_sessions_saved_offline > 0,
+    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+  );
 
   useEffect(
     () => () => {
@@ -157,7 +162,7 @@ const DraftSessionViewer: React.FC = () => {
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}
-        startWalkthrough={!userAttributes?.num_sessions && !isMiscTourCompleted?.firstDraftSession}
+        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))

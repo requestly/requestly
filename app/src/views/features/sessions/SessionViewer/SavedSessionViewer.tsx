@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
@@ -111,11 +111,16 @@ const SavedSessionViewer: React.FC = () => {
     });
   }, [id, eventsFilePath, navigateToList]);
 
+  const hasUserCreatedSessions = useMemo(
+    () => userAttributes?.num_sessions_saved_online > 0 || userAttributes?.num_sessions_saved_offline > 0,
+    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+  );
+
   useEffect(() => {
-    if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
+    if ((location.state as NavigationState)?.viewAfterSave && hasUserCreatedSessions) {
       setShowOnboardingPrompt(true);
     }
-  }, [location.state, userAttributes?.num_sessions]);
+  }, [location.state, hasUserCreatedSessions]);
 
   useEffect(
     () => () => {
