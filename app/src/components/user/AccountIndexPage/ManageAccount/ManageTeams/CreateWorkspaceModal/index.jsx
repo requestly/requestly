@@ -20,6 +20,7 @@ import "./CreateWorkspaceModal.css";
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
 
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -99,10 +100,14 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   const handleFinishFailed = () => toast.error("Please enter valid details");
 
   useEffect(() => {
-    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) =>
-      setIsVerifiedBusinessUser(isVerified)
-    );
-  }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
+    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) => {
+      setIsVerifiedBusinessUser(isVerified);
+      form.setFieldValue(
+        "workspaceName",
+        `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`
+      );
+    });
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid, form]);
 
   useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed();
@@ -111,8 +116,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <Form
+        form={form}
         layout="vertical"
-        initialValues={{ remember: true }}
         onFinish={handleFinishClick}
         onFinishFailed={handleFinishFailed}
         onValuesChange={handleFormValuesChange}
