@@ -30,12 +30,13 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
+  setIsSaveSessionClicked?: (value: boolean) => void;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
@@ -109,6 +110,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
 
       setIsSaving(true);
+      setIsSaveSessionClicked?.(true);
       saveRecording(
         user?.details?.profile?.uid,
         workspace?.id,
@@ -144,6 +146,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       includedDebugInfo,
       sessionEvents,
       sessionRecordingMetadata,
+      setIsSaveSessionClicked,
       dispatch,
       navigate,
       onClose,
