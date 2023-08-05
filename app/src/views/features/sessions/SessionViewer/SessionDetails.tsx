@@ -103,7 +103,10 @@ const SessionDetails: React.FC = () => {
     }
 
     player.goto(startTimeOffset * 1000, true);
-  }, [player, startTimeOffset]);
+    // player should start playing from the start time offset only on the
+    // first load and not when the user changes time offset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player]);
 
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
