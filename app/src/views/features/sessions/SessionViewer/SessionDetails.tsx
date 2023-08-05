@@ -32,6 +32,7 @@ const SessionDetails: React.FC = () => {
   const [player, setPlayer] = useState<Replayer>();
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
+  const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
@@ -102,10 +103,9 @@ const SessionDetails: React.FC = () => {
       return;
     }
 
-    player.goto(startTimeOffset * 1000, true);
     // player should start playing from the start time offset only on the
     // first load and not when the user changes time offset.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    player.goto(offsetTimeRef.current * 1000, true);
   }, [player]);
 
   const getSessionPanelTabs = useMemo(() => {
