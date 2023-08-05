@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Modal } from "antd";
@@ -40,6 +40,7 @@ const DraftSessionViewer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
+  const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -48,6 +49,27 @@ const DraftSessionViewer: React.FC = () => {
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
     return `${hostname}@${formattedDate}`;
   }, []);
+
+  useEffect(() => {
+    const unloadListener = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
+    };
+
+    if (!isSaveSessionClicked) {
+      // It is fired only if there was ANY interaction of the user with the site.
+      // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
+      // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+      window.addEventListener("beforeunload", unloadListener);
+    }
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, [isSaveSessionClicked]);
+
+  unstable_usePrompt({
+    when: !isSaveSessionClicked,
+    message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+  });
 
   useEffect(
     () => () => {
@@ -151,7 +173,12 @@ const DraftSessionViewer: React.FC = () => {
             Save <DownArrow />
           </RQButton>
 
-          {isSavePopupVisible && <SaveRecordingConfigPopup onClose={() => setIsSavePopupVisible(false)} />}
+          {isSavePopupVisible && (
+            <SaveRecordingConfigPopup
+              onClose={() => setIsSavePopupVisible(false)}
+              setIsSaveSessionClicked={setIsSaveSessionClicked}
+            />
+          )}
         </div>
       </div>
       <SessionDetails key={tabId} />
