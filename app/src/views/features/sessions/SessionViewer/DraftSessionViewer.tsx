@@ -56,15 +56,13 @@ const DraftSessionViewer: React.FC = () => {
       e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
     };
 
-    if (!isSaveSessionClicked) {
-      // It is fired only if there was ANY interaction of the user with the site.
-      // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
-      // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
-      window.addEventListener("beforeunload", unloadListener);
-    }
+    // It is fired only if there was ANY interaction of the user with the site.
+    // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
+    // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+    window.addEventListener("beforeunload", unloadListener);
 
     return () => window.removeEventListener("beforeunload", unloadListener);
-  }, [isSaveSessionClicked]);
+  }, []);
 
   unstable_usePrompt({
     when: !isSaveSessionClicked,
