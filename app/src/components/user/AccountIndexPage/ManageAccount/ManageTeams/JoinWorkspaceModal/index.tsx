@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
@@ -9,12 +10,11 @@ import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/tea
 import { actions } from "store";
 import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
+import { toast } from "utils/Toast";
 import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
-import { toast } from "utils/Toast";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -23,12 +23,11 @@ interface JoinWorkspaceModalProps {
 }
 
 interface InviteRowProps {
-  index: number;
+  isPrimary: boolean;
   team: TeamInviteMetadata;
-  callback: () => void;
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ index, team, callback }) => {
+const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -58,7 +57,6 @@ const InviteRow: React.FC<InviteRowProps> = ({ index, team, callback }) => {
             );
           }
         }
-        callback?.();
         setIsJoining(false);
         dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
       })
@@ -85,7 +83,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ index, team, callback }) => {
           <div>{team.teamName}</div>
         </Col>
         <div className="text-gray">{team.teamAccessCount} members</div>
-        <Button loading={isJoining} type={index === 0 ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
+        <Button loading={isJoining} type={isPrimary ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
           {isJoining ? "Joining" : "Join"}
         </Button>
       </div>
@@ -93,7 +91,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ index, team, callback }) => {
   );
 };
 
-const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal, callback }) => {
+const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [teamInvites, setTeamInvites] = useState<Invite[]>([]);
@@ -147,7 +145,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata, index) => {
-              return <InviteRow team={team} index={index} callback={callback} />;
+              return <InviteRow team={team} isPrimary={index === 0} />;
             })}
           </ul>
         ) : (

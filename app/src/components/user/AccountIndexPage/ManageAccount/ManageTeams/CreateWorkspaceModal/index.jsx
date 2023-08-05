@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { Button, Col, Form, Input, Row } from "antd";
+import { Button, Checkbox, Col, Form, Input, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { toast } from "utils/Toast";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToTeam } from "utils/RedirectionUtils";
+import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
@@ -24,10 +26,14 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(true);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
     workspaceName: "",
     description: "",
   });
+  const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
+
+  const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
 
   const handleFormValuesChange = (_, data) => {
     setCreateWorkspaceFormData(data);
@@ -46,6 +52,21 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
+        if (isNotifyAllSelected) {
+          createOrgTeamInvite({ domain: getDomainFromEmail(user?.details?.profile?.email), teamId })
+            .then((res) => {
+              if (res.data.success)
+                toast.success(
+                  `All users from ${getDomainFromEmail(
+                    user?.details?.profile?.email
+                  )} have been invited to join this workspace.`
+                );
+              else toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+            })
+            .catch((error) => {
+              toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+            });
+        }
         switchWorkspace(
           {
             teamId: teamId,
@@ -61,7 +82,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
         );
         redirectToTeam(navigate, teamId, {
           state: {
-            isNewTeam: true,
+            isNewTeam: !isNotifyAllSelected,
           },
         });
         callback?.();
@@ -76,6 +97,12 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   };
 
   const handleFinishFailed = () => toast.error("Please enter valid details");
+
+  useEffect(() => {
+    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) =>
+      setIsVerifiedBusinessUser(isVerified)
+    );
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
 
   useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed();
@@ -132,10 +159,21 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
         {/* footer */}
         <Row align="middle" justify="space-between" className="rq-modal-footer">
           <Col>
-            <LearnMoreLink
-              linkText="Learn more about team workspaces"
-              href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
-            />
+            {isVerifiedBusinessUser ? (
+              <>
+                <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
+                <span className="ml-2 text-gray text-sm">
+                  Notify all{" "}
+                  <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
+                  users to join this workspace
+                </span>
+              </>
+            ) : (
+              <LearnMoreLink
+                linkText="Learn more about team workspaces"
+                href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+              />
+            )}
           </Col>
           <Col>
             <Button
