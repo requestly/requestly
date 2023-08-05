@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import ProCard from "@ant-design/pro-card";
 import { InputNumber, Input, Tooltip } from "antd";
 import { AimOutlined } from "@ant-design/icons";
@@ -28,7 +28,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
   const isReadOnly = useSelector(getIsReadOnly);
   const sessionDescription = useSelector(getSessionRecordingDescription);
-  const [currentSavedDescription, setCurrentSavedDescription] = useState(sessionDescription);
+  const savedDescriptionRef = useRef(sessionDescription);
 
   const recordingLengthInSeconds = useMemo(() => Math.floor(attributes?.duration ?? 0 / 1000), [attributes]);
 
@@ -52,12 +52,12 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
 
   const saveDescription = useCallback(
     (value: string) => {
-      if (recordingId && value !== currentSavedDescription) {
+      if (recordingId && value !== savedDescriptionRef.current) {
         updateDescription(user?.details?.profile?.uid, recordingId, value);
+        savedDescriptionRef.current = value;
       }
-      setCurrentSavedDescription(value);
     },
-    [recordingId, user, currentSavedDescription]
+    [recordingId, user]
   );
 
   const onDescriptionChange = useCallback(
