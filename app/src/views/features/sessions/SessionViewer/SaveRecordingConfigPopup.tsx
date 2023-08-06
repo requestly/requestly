@@ -15,7 +15,7 @@ import {
 } from "./sessionEventsUtils";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -26,6 +26,7 @@ import {
   trackDraftSessionSaveFailed,
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -41,6 +42,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
   const { tabId } = useParams();
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
@@ -64,6 +66,20 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       setIncludedDebugInfo(savedSessionRecordingOptions);
     }
   }, [isSessionLogOptionsAlreadySaved, savedSessionRecordingOptions]);
+
+  const trackSessionsCreatedCount = useCallback(
+    (didCreateLocally = false) => {
+      const numSessionsSavedOffline = userAttributes?.num_sessions_saved_offline || 0;
+      const numSessionsSavedOnline = userAttributes?.num_sessions_saved_online || 0;
+
+      if (didCreateLocally) {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_OFFLINE, numSessionsSavedOffline + 1);
+      } else {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_ONLINE, numSessionsSavedOnline + 1);
+      }
+    },
+    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+  );
 
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
@@ -110,6 +126,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
             recordingOptionsToSave,
             SessionSaveMode.ONLINE
           );
+          trackSessionsCreatedCount();
           navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
             replace: true,
             state: { fromApp: true, viewAfterSave: true },
@@ -133,6 +150,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       dispatch,
       navigate,
       onClose,
+      trackSessionsCreatedCount,
     ]
   );
 
@@ -173,9 +191,18 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
             recordingOptionsToSave,
             SessionSaveMode.LOCAL
           );
+          trackSessionsCreatedCount(true);
         });
     },
-    [dispatch, user?.loggedIn, sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose]
+    [
+      dispatch,
+      user?.loggedIn,
+      sessionEvents,
+      sessionRecordingMetadata,
+      includedDebugInfo,
+      onClose,
+      trackSessionsCreatedCount,
+    ]
   );
 
   return (
