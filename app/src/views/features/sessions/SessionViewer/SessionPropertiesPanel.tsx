@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import ProCard from "@ant-design/pro-card";
 import { InputNumber, Input, Tooltip } from "antd";
 import { AimOutlined } from "@ant-design/icons";
@@ -30,24 +30,27 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const sessionDescription = useSelector(getSessionRecordingDescription);
   const savedDescriptionRef = useRef(sessionDescription);
 
+  const [startOffset, setStartOffset] = useState<number>(startTimeOffset);
+
   const recordingLengthInSeconds = useMemo(() => Math.floor(attributes?.duration ?? 0 / 1000), [attributes]);
 
   const saveStartTimeOffset = useMemo(
     () =>
       debounce((value: number) => {
+        dispatch(sessionRecordingActions.setStartTimeOffset(value));
         if (recordingId) {
           updateStartTimeOffset(user?.details?.profile?.uid, recordingId, value);
         }
       }, 1000),
-    [recordingId, user]
+    [dispatch, recordingId, user?.details?.profile?.uid]
   );
 
   const onStartTimeOffsetChange = useCallback(
     (newOffset: number) => {
+      setStartOffset(newOffset);
       saveStartTimeOffset(newOffset);
-      dispatch(sessionRecordingActions.setStartTimeOffset(newOffset));
     },
-    [dispatch, saveStartTimeOffset]
+    [saveStartTimeOffset]
   );
 
   const saveDescription = useCallback(
@@ -79,7 +82,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
               addonAfter="seconds"
               min={0}
               max={recordingLengthInSeconds}
-              value={startTimeOffset}
+              value={startOffset}
               onChange={onStartTimeOffsetChange}
             />
           </div>
