@@ -69,7 +69,7 @@
     "craco-less": "^2.0.0",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
-    "firebase": "^9.6.8",
+    "firebase": "^9.23.0",
     "fuzzysort": "^2.0.4",
     "is-empty": "^1.2.0",
     "javascript-1flow-sdk": "^1.0.2",
