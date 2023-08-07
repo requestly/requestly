@@ -25,20 +25,10 @@ interface SurveyProps {
   isOpen?: boolean;
 }
 
-export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
+const SkipButton = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
-  const shuffledQuestionnaire = useMemo(() => {
-    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
-    const options = OptionsConfig[currentPage]?.options;
-    return shuffleOptions(options);
-  }, [currentPage]);
-
-  const skipButton = useMemo(() => {
+  return (
     <div className="skip-recommendation-wrapper">
       Existing user?
       <RQButton
@@ -62,8 +52,22 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
       >
         Sign in
       </RQButton>
-    </div>;
-  }, [dispatch]);
+    </div>
+  );
+};
+
+export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const appMode = useSelector(getAppMode);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
+
+  const shuffledQuestionnaire = useMemo(() => {
+    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
+    const options = OptionsConfig[currentPage]?.options;
+    return shuffleOptions(options);
+  }, [currentPage]);
 
   const renderOptions = useCallback((options: Option[], questionnaire: QuestionnaireType) => {
     return (
@@ -93,7 +97,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     if (shouldShowPage) {
       return (
         <>
-          {currentPage === SurveyPage.GETTING_STARTED && skipButton}
+          {currentPage === SurveyPage.GETTING_STARTED && <SkipButton />}
           <div className="text-center white text-bold survey-title">{page?.title}</div>
           <div className="w-full survey-subtitle-wrapper">
             <div className="text-gray text-center mt-8">{page?.subTitle}</div>
@@ -102,7 +106,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         </>
       );
     } else handleSurveyNavigation(currentPage, dispatch);
-  }, [renderQuestionnaire, currentPage, skipButton, dispatch, userPersona]);
+  }, [renderQuestionnaire, currentPage, dispatch, userPersona]);
 
   const handleMoveToRecommendationScreen = useCallback(() => {
     const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;
