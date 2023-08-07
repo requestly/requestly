@@ -12,7 +12,7 @@ import { QuestionnaireType, SurveyPage } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
-import { trackPersonaQ1Completed } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaQ1Completed, trackPersonaQ2Completed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
 interface FooterProps {
@@ -49,8 +49,13 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
         break;
 
       case QuestionnaireType.INDUSTRY:
-        trackPersonaQ1Completed(userPersona.industry);
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry);
+        if (typeof userPersona.industry === "object") {
+          trackPersonaQ2Completed(userPersona.industry.value);
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry.value);
+        } else {
+          trackPersonaQ2Completed(userPersona.industry);
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry);
+        }
         break;
     }
 
