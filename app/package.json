@@ -81,7 +81,7 @@
     "md5": "^2.3.0",
     "moment": "^2.29.1",
     "monaco-editor": "^0.34.1",
-    "posthog-js": "^1.35.0",
+    "posthog-js": "^1.71.0",
     "prettier": "^2.8.1",
     "react": "^18.2.0",
     "react-calendly": "^3.0.0",
