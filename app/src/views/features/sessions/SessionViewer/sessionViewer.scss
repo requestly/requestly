@@ -5,6 +5,11 @@
   flex-direction: column;
   padding: 24px;
 
+  &.inside-iframe {
+    position: relative;
+    overflow: hidden;
+  }
+
   .session-recording-player-row {
     display: flex;
     width: 100%;
@@ -112,6 +117,7 @@
         color: var(--white);
         font-size: 1.25rem;
         font-weight: 500;
+
         svg {
           align-self: center;
           cursor: pointer;
@@ -120,8 +126,17 @@
           min-width: 16px;
           color: var(--text-gray);
         }
+
+        &.inside-iframe {
+          width: 100%;
+
+          svg {
+            color: inherit;
+          }
+        }
       }
     }
+
     .editor-title-container {
       .session-title-name {
         min-height: 33px;
@@ -168,6 +183,21 @@
   .session-panels-container {
     > div {
       padding-top: 0;
+    }
+
+    &.inside-iframe,
+    &.expand-panels-container {
+      max-width: 94vw;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      z-index: 10;
+      transform: translate(-50%, calc(100% - 50px));
+    }
+
+    &.expand-panels-container {
+      bottom: 20px;
+      transform: translate(-50%, 0);
     }
 
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
@@ -516,7 +546,7 @@ body.dark {
     .ant-pro-card,
     .rr-player {
       background: var(--component-background) !important;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-dark);
       border-radius: var(--border-radius-sm);
       box-sizing: content-box;
     }
