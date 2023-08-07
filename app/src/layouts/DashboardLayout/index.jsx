@@ -10,7 +10,7 @@ import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
 import { removeElement } from "utils/removeElement";
-import { isAppOpenedInIframe } from "utils/isAppOpenedInIframe";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {

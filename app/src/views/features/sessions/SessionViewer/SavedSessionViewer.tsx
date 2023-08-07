@@ -29,7 +29,7 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
-import { isAppOpenedInIframe } from "utils/isAppOpenedInIframe";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
 
 interface NavigationState {

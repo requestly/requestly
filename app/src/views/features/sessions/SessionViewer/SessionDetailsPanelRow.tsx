@@ -2,7 +2,7 @@ import React, { ReactNode, useMemo } from "react";
 import { Divider, Typography } from "antd";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { isAppOpenedInIframe } from "utils/isAppOpenedInIframe";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 
 interface Props {
   timeOffset: number;

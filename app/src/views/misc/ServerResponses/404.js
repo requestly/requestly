@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button, Row, Col } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import graphic404 from "assets/images/pages/error/404.svg";
-import { isAppOpenedInIframe } from "utils/isAppOpenedInIframe";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 
 const Error404 = () => {
   return (
