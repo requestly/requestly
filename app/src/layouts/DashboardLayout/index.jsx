@@ -9,7 +9,7 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
-import { removeElement } from "utils/removeElement";
+import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./DashboardLayout.css";
 

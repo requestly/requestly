@@ -22,7 +22,7 @@ import { cloneDeep } from "lodash";
 import { getConsoleLogs, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { RQButton } from "lib/design-system/components";
-import { removeElement } from "utils/removeElement";
+import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
