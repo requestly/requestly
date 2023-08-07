@@ -9,7 +9,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
-const PermissionError = () => {
+const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -64,11 +64,17 @@ const PermissionError = () => {
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
-              <h1 className="display-3">You need permission</h1>
-              <p className="lead">
-                Want in? Ask for access to owner of this recording, or switch to an account with permission.
-              </p>
-              {renderAuthOptions()}
+              {isInsideIframe ? (
+                <h1 className="display-3">Please check the iframe source URL.</h1>
+              ) : (
+                <>
+                  <h1 className="display-3">You need permission</h1>
+                  <p className="lead">
+                    Want in? Ask for access to owner of this recording, or switch to an account with permission.
+                  </p>
+                  {renderAuthOptions()}
+                </>
+              )}
             </Jumbotron>
           </Col>
         </Row>
