@@ -17,7 +17,7 @@ import { trackNewWorkspaceCreated, trackAddWorkspaceNameModalViewed } from "modu
 import APP_CONSTANTS from "config/constants";
 import "./CreateWorkspaceModal.css";
 
-const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
+const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -110,8 +110,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback }) => {
   }, [user?.details?.profile?.email, user?.details?.profile?.uid, form]);
 
   useEffect(() => {
-    if (isOpen) trackAddWorkspaceNameModalViewed();
-  }, [isOpen]);
+    if (isOpen) trackAddWorkspaceNameModalViewed(source);
+  }, [isOpen, source]);
 
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
