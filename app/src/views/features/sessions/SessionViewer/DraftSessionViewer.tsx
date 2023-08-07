@@ -50,7 +50,6 @@ const DraftSessionViewer: React.FC = () => {
     return `${hostname}@${formattedDate}`;
   }, []);
 
-
   const hasUserCreatedSessions = useMemo(
     () =>
       userAttributes?.num_sessions > 0 ||
