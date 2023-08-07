@@ -12,7 +12,7 @@ import { QuestionnaireType, SurveyPage } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
-import { trackPersonaQ1Completed } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaQ1Completed, trackPersonaQ2Completed } from "modules/analytics/events/misc/personaSurvey";
 import "./index.css";
 
 interface FooterProps {
@@ -32,8 +32,11 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
 
   const disableContinue = useMemo(() => {
     if (currentPage === SurveyPage.GETTING_STARTED) return false;
-    if (userPersona[currentQuestionnaire as QuestionnaireType]?.length) return false;
-    return true;
+    const questionnaireResponse = userPersona[currentQuestionnaire as QuestionnaireType];
+
+    if (typeof questionnaireResponse === "string") return !questionnaireResponse.length;
+    //response is pre-defined option
+    else return !questionnaireResponse?.value?.length; // response is other option
   }, [currentPage, currentQuestionnaire, userPersona]);
 
   const handleMoveToNextPage = () => {
@@ -44,7 +47,18 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
         break;
+
+      case QuestionnaireType.INDUSTRY:
+        if (typeof userPersona.industry === "object") {
+          trackPersonaQ2Completed(userPersona.industry.value);
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry.value);
+        } else {
+          trackPersonaQ2Completed(userPersona.industry);
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry);
+        }
+        break;
     }
+
     if (isSurveyModal || index !== surveyLength - 1) {
       handleSurveyNavigation(currentPage, dispatch);
 
@@ -82,7 +96,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
               className={`text-bold ${disableContinue && "survey-disable-continue"}`}
               onClick={handleMoveToNextPage}
             >
-              {currentQuestionnaire === QuestionnaireType.PERSONA ? "Get started" : "Continue"}
+              {currentQuestionnaire === QuestionnaireType.INDUSTRY ? "Get started" : "Continue"}
             </RQButton>
           </Col>
         </Row>
