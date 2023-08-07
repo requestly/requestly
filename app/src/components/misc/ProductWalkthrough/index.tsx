@@ -68,7 +68,7 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
         onTourComplete();
       }
     };
-  }, [hasReachedLastStep, onTourComplete, tourFor]);
+  }, [hasReachedLastStep, onTourComplete, tourFor, completeTourOnUnmount]);
 
   return (
     <>

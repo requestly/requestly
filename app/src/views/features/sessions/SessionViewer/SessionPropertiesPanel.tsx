@@ -1,8 +1,8 @@
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import ProCard from "@ant-design/pro-card";
 import { InputNumber, Input, Tooltip } from "antd";
 import { AimOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
-import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import {
@@ -28,6 +28,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
   const isReadOnly = useSelector(getIsReadOnly);
   const sessionDescription = useSelector(getSessionRecordingDescription);
+  const savedDescriptionRef = useRef(sessionDescription);
 
   const [startOffset, setStartOffset] = useState<number>(startTimeOffset);
 
@@ -54,8 +55,9 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
 
   const saveDescription = useCallback(
     (value: string) => {
-      if (recordingId) {
+      if (recordingId && value !== savedDescriptionRef.current) {
         updateDescription(user?.details?.profile?.uid, recordingId, value);
+        savedDescriptionRef.current = value;
       }
     },
     [recordingId, user]

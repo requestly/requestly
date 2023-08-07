@@ -15,7 +15,7 @@ import {
 } from "./sessionEventsUtils";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -26,20 +26,23 @@ import {
   trackDraftSessionSaveFailed,
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
+  setIsSaveSessionClicked?: (value: boolean) => void;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
@@ -63,6 +66,20 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       setIncludedDebugInfo(savedSessionRecordingOptions);
     }
   }, [isSessionLogOptionsAlreadySaved, savedSessionRecordingOptions]);
+
+  const trackSessionsCreatedCount = useCallback(
+    (didCreateLocally = false) => {
+      const numSessionsSavedOffline = userAttributes?.num_sessions_saved_offline || 0;
+      const numSessionsSavedOnline = userAttributes?.num_sessions_saved_online || 0;
+
+      if (didCreateLocally) {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_OFFLINE, numSessionsSavedOffline + 1);
+      } else {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_ONLINE, numSessionsSavedOnline + 1);
+      }
+    },
+    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+  );
 
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
@@ -93,6 +110,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
 
       setIsSaving(true);
+      setIsSaveSessionClicked?.(true);
       saveRecording(
         user?.details?.profile?.uid,
         workspace?.id,
@@ -108,6 +126,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
             recordingOptionsToSave,
             SessionSaveMode.ONLINE
           );
+          trackSessionsCreatedCount();
           navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
             replace: true,
             state: { fromApp: true, viewAfterSave: true },
@@ -127,9 +146,11 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
       includedDebugInfo,
       sessionEvents,
       sessionRecordingMetadata,
+      setIsSaveSessionClicked,
       dispatch,
       navigate,
       onClose,
+      trackSessionsCreatedCount,
     ]
   );
 
@@ -170,9 +191,18 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
             recordingOptionsToSave,
             SessionSaveMode.LOCAL
           );
+          trackSessionsCreatedCount(true);
         });
     },
-    [dispatch, user?.loggedIn, sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose]
+    [
+      dispatch,
+      user?.loggedIn,
+      sessionEvents,
+      sessionRecordingMetadata,
+      includedDebugInfo,
+      onClose,
+      trackSessionsCreatedCount,
+    ]
   );
 
   return (
