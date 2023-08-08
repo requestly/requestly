@@ -5,6 +5,10 @@ export const VERSION_NEXT = "next";
 const changeLogs: VersionedChangeLogs[] = [
   {
     version: VERSION_NEXT,
+    logs: [],
+  },
+  {
+    version: "23.8.8",
     logs: [
       "Stitch sessions across pages while navigation or reload.",
       "Floating widget for session recording when it is manually started from extension popup.",
