@@ -11,6 +11,12 @@ import { isEmailVerified } from "utils/AuthUtils";
 import { actions } from "store";
 import { capitalize } from "lodash";
 import { Invite, User } from "types";
+import {
+  trackWorkspaceOrganizationCardCancelled,
+  trackWorkspaceOrganizationCardClicked,
+  trackWorkspaceOrganizationCardViewed,
+} from "modules/analytics/events/common/teams";
+import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import "./index.css";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
@@ -22,13 +28,20 @@ export const JoinWorkspaceCard = () => {
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0], [
     user?.details?.profile?.email,
   ]);
-
+  const [teamInvites, setTeamInvites] = useState([]);
   const [organizationMembers, setOrganizationMembers] = useState(null);
   const [hasActiveWorkspace, setHasActiveWorkspace] = useState(false);
   const [hasEmailInvite, setHasEmailInvite] = useState(false);
 
+  const cardCTA = useMemo(
+    () => (hasEmailInvite ? "Show invites" : hasActiveWorkspace ? "Join your teammates" : "Start collaborating"),
+    [hasEmailInvite, hasActiveWorkspace]
+  );
+
   const handleNudgeCTAClick = () => {
-    if (hasActiveWorkspace) {
+    if (hasActiveWorkspace || hasEmailInvite) {
+      trackWorkspaceOrganizationCardClicked("join_teammates");
+      trackWorkspaceJoiningModalOpened(teamInvites.length, "join_workspace_card");
       dispatch(
         actions.toggleActiveModal({
           modalName: "joinWorkspaceModal",
@@ -39,6 +52,7 @@ export const JoinWorkspaceCard = () => {
         })
       );
     } else {
+      trackWorkspaceOrganizationCardClicked("create_team");
       dispatch(
         actions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -47,6 +61,7 @@ export const JoinWorkspaceCard = () => {
             callback: () => {
               dispatch(actions.updateJoinWorkspaceCardVisible(false));
             },
+            source: "join_workspace_card",
           },
         })
       );
@@ -56,7 +71,10 @@ export const JoinWorkspaceCard = () => {
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
       if (result && isCompanyEmail(user?.details?.profile?.email)) {
-        getOrganizationUsers({ domain: getDomainFromEmail(user?.details?.profile?.email), size: 3 }).then((res) => {
+        getOrganizationUsers({
+          domain: getDomainFromEmail(user?.details?.profile?.email),
+          size: MIN_MEMBERS_IN_WORKSPACE,
+        }).then((res) => {
           setOrganizationMembers(res.data);
         });
       }
@@ -68,6 +86,7 @@ export const JoinWorkspaceCard = () => {
       getPendingInvites({ email: true, domain: true })
         .then((res: any) => {
           if (res?.pendingInvites) {
+            setTeamInvites(res.pendingInvites);
             setHasEmailInvite(res.pendingInvites.some((invite: Invite) => !invite.domains?.length));
             const hasActiveMembers = res.pendingInvites.some(
               (invite: Invite) => (invite.metadata.teamAccessCount as number) > 1
@@ -83,6 +102,12 @@ export const JoinWorkspaceCard = () => {
     }
   }, [organizationMembers]);
 
+  useEffect(() => {
+    if (organizationMembers?.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn) {
+      trackWorkspaceOrganizationCardViewed(getDomainFromEmail(user?.details?.profile?.email), cardCTA);
+    }
+  }, [cardCTA, organizationMembers?.total, user.loggedIn, user?.details?.profile?.email]);
+
   return (
     <>
       {organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn ? (
@@ -93,7 +118,10 @@ export const JoinWorkspaceCard = () => {
               className="nudge-close-icon"
               iconOnly
               icon={<CloseOutlined />}
-              onClick={() => dispatch(actions.updateJoinWorkspaceCardVisible(false))}
+              onClick={() => {
+                dispatch(actions.updateJoinWorkspaceCardVisible(false));
+                trackWorkspaceOrganizationCardCancelled(getDomainFromEmail(user?.details?.profile?.email), cardCTA);
+              }}
             />
           </Row>
           {!hasEmailInvite && (
@@ -132,7 +160,7 @@ export const JoinWorkspaceCard = () => {
           )}
 
           <RQButton type="primary" className="mt-8 text-bold" onClick={handleNudgeCTAClick}>
-            {hasEmailInvite ? "Show invites" : hasActiveWorkspace ? "Join your teammates" : "Start collaborating"}
+            {cardCTA}
           </RQButton>
         </div>
       ) : null}

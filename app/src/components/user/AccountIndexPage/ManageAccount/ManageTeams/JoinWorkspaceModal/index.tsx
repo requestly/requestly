@@ -119,14 +119,27 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   const handleCreateNewWorkspace = () => {
     toggleModal();
     if (user.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "join_workspace_modal" },
+        })
+      );
     } else {
       dispatch(
         actions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
-            callback: () => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
+            callback: () =>
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: { source: "join_workspace_modal" },
+                })
+              ),
             redirectURL: window.location.href,
             src: APP_CONSTANTS.FEATURES.WORKSPACES,
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,

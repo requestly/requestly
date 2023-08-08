@@ -31,6 +31,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       actions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
+        newProps: { source: "switch_workspace_modal" },
       })
     );
   };
