@@ -16,23 +16,45 @@
 
   RQ.SessionRecorder.setup();
 
-  chrome.runtime.sendMessage({
-    action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
-    payload: {
-      isIframe: window.top !== window,
-    },
-  });
+  if (window.top === window) {
+    chrome.runtime.sendMessage({
+      action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
+      payload: {
+        url: location.href,
+      },
+    });
 
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-      chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
-        payload: {
-          isIframe: window.top !== window,
-          hasExecutedRules: RQ.RuleExecutionHandler.hasExecutedRules(),
-          isRecordingSession: RQ.SessionRecorder.isRecording,
-        },
-      });
-    }
-  });
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        chrome.runtime.sendMessage({
+          action: RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
+          payload: {
+            url: location.href,
+            hasExecutedRules: RQ.RuleExecutionHandler.hasExecutedRules(),
+            isRecordingSession: RQ.SessionRecorder.isRecording,
+          },
+        });
+      }
+    });
+
+    chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+      if (message.action === "ping") {
+        console.log("### ping received", message.ctr);
+        window.pings = window.pings || [];
+        window.pings.push(message.ctr);
+        sendResponse();
+      }
+    });
+
+    chrome.runtime.sendMessage(
+      {
+        action: "pong",
+        href: location.href,
+      },
+      () => {
+        window.pongs = window.pongs || [];
+        window.pongs.push(100);
+      }
+    );
+  }
 })();

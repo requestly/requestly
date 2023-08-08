@@ -9,6 +9,12 @@ class ExtensionIconManager {
     RULE_EXECUTED_WITH_REC: "/resources/images/48x48_green_rec.png",
   };
 
+  constructor() {
+    chrome.tabs.onUpdated.addListener((tabId) => {
+      this.#updateConfig(tabId);
+    });
+  }
+
   #getDefaultConfig() {
     return {
       ruleExecuted: false,
@@ -37,7 +43,7 @@ class ExtensionIconManager {
 
     let config = window.tabService.getPageData(tabId, "extensionIconConfig") || this.#getDefaultConfig();
 
-    if (config[key] !== value) {
+    if (key && config[key] !== value) {
       config = { ...config, [key]: value };
       window.tabService.setPageData(tabId, "extensionIconConfig", config);
     }
