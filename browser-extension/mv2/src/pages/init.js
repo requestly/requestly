@@ -16,5 +16,3 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
       return true;
   }
 });
-
-RQ.SessionRecorder.setup();

@@ -35,14 +35,14 @@ class ExtensionIconManager {
   async #updateConfig(tabId, key, value) {
     await window.tabService.ensureTabLoadingComplete(tabId);
 
-    const existingConfig = window.tabService.getPageData(tabId, "extensionIconConfig") || this.#getDefaultConfig();
+    let config = window.tabService.getPageData(tabId, "extensionIconConfig") || this.#getDefaultConfig();
 
-    if (existingConfig[key] !== value) {
-      const newConfig = { ...existingConfig, [key]: value };
-
-      window.tabService.setPageData(tabId, "extensionIconConfig", newConfig);
-      window.tabService.setExtensionIcon(this.#getIcon(newConfig), tabId);
+    if (config[key] !== value) {
+      config = { ...config, [key]: value };
+      window.tabService.setPageData(tabId, "extensionIconConfig", config);
     }
+
+    window.tabService.setExtensionIcon(this.#getIcon(config), tabId);
   }
 
   markExtensionEnabled = () => {
