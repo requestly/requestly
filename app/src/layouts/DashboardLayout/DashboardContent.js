@@ -10,6 +10,7 @@ import {
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getIsWorkspaceOnboardingCompleted,
+  getIsJoinWorkspaceCardVisible,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -26,6 +27,7 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
+import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -38,6 +40,7 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
+  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
 
   const toggleSpinnerModal = () => {
@@ -161,13 +164,14 @@ const DashboardContent = () => {
         <JoinWorkspaceModal
           isOpen={activeModals.joinWorkspaceModal.isActive}
           toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
-          {...activeModals.switchWorkspaceModal.props}
+          {...activeModals.joinWorkspaceModal.props}
         />
       ) : null}
 
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
+      {isJoinWorkspaceCardVisible ? <JoinWorkspaceCard /> : null}
     </>
   );
 };

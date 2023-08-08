@@ -198,6 +198,7 @@ const INITIAL_STATE = {
 
       hasConnectedApp: false,
       lastSeenInviteTs: 0,
+      isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
