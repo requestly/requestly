@@ -5,7 +5,7 @@ import Popup from "./components/Popup";
 import { RecordsProvider } from "./contexts/RecordsContext";
 import "./index.css";
 
-const token = {
+const aliasToken = {
   fontSize: 13,
   borderRadius: 4,
   controlHeight: 30,
@@ -15,7 +15,7 @@ const token = {
 
 const App: React.FC = () => {
   return (
-    <ConfigProvider theme={{ token, algorithm: [theme.darkAlgorithm] }}>
+    <ConfigProvider theme={{ token: aliasToken, algorithm: [theme.darkAlgorithm] }}>
       <RecordsProvider>
         <Popup />
       </RecordsProvider>

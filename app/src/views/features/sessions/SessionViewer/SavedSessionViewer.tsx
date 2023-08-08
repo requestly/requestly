@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
@@ -28,10 +28,8 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import {
-  trackSavedSessionViewedFromApp,
-  trackSavedSessionViewedFromLink,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
 
 interface NavigationState {
@@ -85,6 +83,7 @@ const SavedSessionViewer: React.FC = () => {
   const [showNotFoundError, setShowNotFoundError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
   const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
 
@@ -111,11 +110,23 @@ const SavedSessionViewer: React.FC = () => {
     });
   }, [id, eventsFilePath, navigateToList]);
 
+  const hasUserCreatedSessions = useMemo(
+    () =>
+      userAttributes?.num_sessions > 0 ||
+      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_offline > 0,
+    [
+      userAttributes?.num_sessions,
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+    ]
+  );
+
   useEffect(() => {
-    if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
+    if ((location.state as NavigationState)?.viewAfterSave && hasUserCreatedSessions) {
       setShowOnboardingPrompt(true);
     }
-  }, [location.state, userAttributes?.num_sessions]);
+  }, [location.state, hasUserCreatedSessions]);
 
   useEffect(
     () => () => {
@@ -125,12 +136,17 @@ const SavedSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if ((location.state as NavigationState)?.fromApp) {
-      trackSavedSessionViewedFromApp();
-    } else {
-      trackSavedSessionViewedFromLink();
+    if (isInsideIframe) {
+      trackSavedSessionViewed("embed");
+      return;
     }
-  }, [id, location.state]);
+
+    if ((location.state as NavigationState)?.fromApp) {
+      trackSavedSessionViewed("app");
+    } else {
+      trackSavedSessionViewed("link");
+    }
+  }, [id, location.state, isInsideIframe]);
 
   useEffect(() => {
     if (!hasAuthInitialized) return;
@@ -162,14 +178,14 @@ const SavedSessionViewer: React.FC = () => {
     setShowOnboardingPrompt(false);
   };
 
-  if (showPermissionError) return <PermissionError />;
+  if (showPermissionError) return <PermissionError isInsideIframe={isInsideIframe} />;
   if (showNotFoundError) return <NotFoundError />;
 
   return isFetching ? (
     <PageLoader message="Fetching session details..." />
   ) : (
     <>
-      <div className="session-viewer-page">
+      <div className={`session-viewer-page ${isInsideIframe ? "inside-iframe" : ""}`}>
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
@@ -180,9 +196,9 @@ const SavedSessionViewer: React.FC = () => {
               onClick={() => redirectToSessionRecordingHome(navigate)}
               className="back-button"
             />
-            <SessionViewerTitle isReadOnly={!isRequestedByOwner} />
+            <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
           </div>
-          {isRequestedByOwner ? (
+          {isRequestedByOwner && !isInsideIframe ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
@@ -199,7 +215,7 @@ const SavedSessionViewer: React.FC = () => {
             </div>
           ) : null}
         </div>
-        <SessionDetails key={id} />
+        <SessionDetails key={id} isInsideIframe={isInsideIframe} />
       </div>
     </>
   );
