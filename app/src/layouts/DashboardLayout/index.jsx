@@ -20,7 +20,9 @@ const DashboardLayout = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
-  promptOneTapOnLoad();
+  if (!isAppOpenedInIframe()) {
+    promptOneTapOnLoad();
+  }
 
   const isPersonaRecommendationScreen = useMemo(
     () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
