@@ -39,23 +39,20 @@ export const trackDraftSessionSaved = (sessionLength, options, type) => {
 export const trackDraftSessionSaveFailed = (reason) =>
   trackEvent(SESSION_RECORDING.draft_session_recording_save_failed, { reason });
 
-export const trackSavedSessionViewedFromApp = () =>
-  trackEvent(SESSION_RECORDING.saved_session_recording_viewed, {
-    source: "app",
-  });
-
-export const trackSavedSessionViewedFromLink = () =>
-  trackEvent(SESSION_RECORDING.saved_session_recording_viewed, {
-    source: "link",
-  });
+export const trackSavedSessionViewed = (source) =>
+  trackEvent(SESSION_RECORDING.saved_session_recording_viewed, { source });
 
 export const trackSessionRecordingShareClicked = () => {
   trackEvent(SESSION_RECORDING.session_recording_share_clicked);
   trackRQLastActivity(SESSION_RECORDING.session_recording_share_clicked);
 };
 
-export const trackSessionRecordingShareLinkCopied = () =>
-  trackEvent(SESSION_RECORDING.session_recording_share_link_copied);
+export const trackSessionRecordingShareLinkCopied = (source = "app") =>
+  trackEvent(SESSION_RECORDING.session_recording_share_link_copied, { source });
+
+export const trackIframeEmbedCopied = () => {
+  trackEvent(SESSION_RECORDING.session_recording_iframe_embed_copied);
+};
 
 export const trackSessionRecordingVisibilityUpdated = (visibility) => {
   trackEvent(SESSION_RECORDING.session_recording_visibility_updated, {
@@ -79,9 +76,10 @@ export const trackSessionRecordingNameUpdated = () => {
   trackEvent(SESSION_RECORDING.session_recording_name_updated);
 };
 
-export const trackSessionRecordingPanelTabClicked = (tab, session_type) => {
+export const trackSessionRecordingPanelTabClicked = (tab, session_type, source = "app") => {
   trackEvent(SESSION_RECORDING.session_recording_panel_tab_clicked, {
     tab,
+    source,
     session_type,
   });
 };

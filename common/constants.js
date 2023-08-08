@@ -141,6 +141,7 @@ CONSTANTS.EXTENSION_MESSAGES = {
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
   STOP_RECORDING: "stopRecording",
+  WATCH_RECORDING: "watchRecording",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",

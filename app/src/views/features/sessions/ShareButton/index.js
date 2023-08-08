@@ -113,7 +113,7 @@ const ShareButton = ({ recordingId, showShareModal }) => {
   }, [currentVisibility, isWorkspaceMode]);
 
   const onCopyLinkClicked = useCallback(() => {
-    trackSessionRecordingShareLinkCopied();
+    trackSessionRecordingShareLinkCopied("app");
     navigator.clipboard.writeText(sharedLink).then(() => {
       setLinkCopied(true);
     });

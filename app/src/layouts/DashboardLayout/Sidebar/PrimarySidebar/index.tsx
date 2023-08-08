@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
 import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
@@ -25,7 +24,6 @@ export const PrimarySidebar: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
-  const ecosystemExperiment = useFeatureValue("ecosystem-experiment", null);
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
@@ -40,7 +38,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: ecosystemExperiment === "ecosystem",
+        display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
         id: 1,
@@ -104,7 +102,7 @@ export const PrimarySidebar: React.FC = () => {
     ];
 
     return items.filter((item) => !item.feature || isFeatureCompatible(item.feature));
-  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession, ecosystemExperiment]);
+  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
 
   return (
     <div className="primary-sidebar-container">
@@ -113,7 +111,7 @@ export const PrimarySidebar: React.FC = () => {
           .filter((item) => item.display)
           .map((item) => (
             <li key={item.id}>
-              <PrimarySidebarLink {...item} isEcosystemExperiment={ecosystemExperiment === "ecosystem"} />
+              <PrimarySidebarLink {...item} />
             </li>
           ))}
       </ul>

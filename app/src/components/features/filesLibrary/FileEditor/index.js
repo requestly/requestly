@@ -420,7 +420,13 @@ const FileEditor = (props) => {
       />
 
       <Row className="mock-editor-container">
-        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
+        <Col
+          span={22}
+          offset={1}
+          md={{ offset: 2, span: 20 }}
+          lg={{ offset: 4, span: 16 }}
+          className="mock-editor-container-col"
+        >
           <Row className="mock-editor-body">
             <Row className="mock-editor-meta-data-row" gutter={16}>
               {mockType === RESOURCE_TYPE_LIST.MOCK ? (

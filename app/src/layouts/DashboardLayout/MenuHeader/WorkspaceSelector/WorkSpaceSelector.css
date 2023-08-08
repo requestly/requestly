@@ -18,10 +18,29 @@
   white-space: nowrap;
 }
 
+.active-workspace-name .ant-badge .ant-badge-dot {
+  width: 10px;
+  height: 10px;
+  top: 5px;
+  background: var(--primary);
+  animation: blink 2.5s infinite;
+}
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .active-workspace-name-down-icon.anticon {
   font-size: 9px;
   margin-top: 1px;
-  margin-left: 4px;
+  margin-left: 10px;
 }
 
 .workspace-divider.ant-divider {
@@ -33,7 +52,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 8px;
+  margin-right: 4px;
 }
 
 .ant-dropdown .ant-dropdown-placement-bottomLeft {

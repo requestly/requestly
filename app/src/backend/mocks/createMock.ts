@@ -56,8 +56,7 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
     updatedTs: Timestamp.now().toMillis(),
   })
     .then((docRef) => {
-      // TODO: Remove this. Only for testing the mocks bug in VPN
-      console.log(`Mock document created ${docRef.id}`);
+      Logger.log(`Mock document created ${docRef.id}`);
       updateDoc(docRef, {
         id: docRef.id,
       });

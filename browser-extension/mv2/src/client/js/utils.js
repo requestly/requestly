@@ -80,3 +80,8 @@ RQ.ClientUtils.sendExecutionEventToBackground = (eventName, eventParams) => {
     },
   });
 };
+
+RQ.ClientUtils.isAppPage = () => {
+  const webURLsSet = new Set([RQ.configs.WEB_URL, ...RQ.configs.OTHER_WEB_URLS]);
+  return [...webURLsSet].some((webURL) => location.href.includes(webURL));
+};

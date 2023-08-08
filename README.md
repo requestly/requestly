@@ -1,7 +1,7 @@
 <p align="center">
 <p align="center">
   <a target="_blank" href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/3108399/10cda4ec-ede7-4b2b-9ef3-ea025c951bb9" alt="Requestly Logo" width="40%"/>
+    <img src="https://github.com/requestly/requestly/assets/16779465/652552db-c867-44cb-9bb5-94a2026e04ca" alt="Requestly Logo" width="40%"/>
   </a>
 </p>
 

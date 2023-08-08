@@ -113,3 +113,11 @@ export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
 export const updateIsCommandBarOpen = (prevState, action) => {
   prevState.misc.nonPersist.isCommandBarOpen = action.payload;
 };
+
+export const updateLastSeenInviteTs = (prevState, action) => {
+  prevState.misc.persist.lastSeenInviteTs = action.payload;
+};
+
+export const updateJoinWorkspaceCardVisible = (prevState, action) => {
+  prevState.misc.persist.isJoinWorkspaceCardVisible = action.payload;
+};

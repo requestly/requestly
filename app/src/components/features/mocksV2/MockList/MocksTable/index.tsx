@@ -31,7 +31,7 @@ import "./index.css";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
-  mockType: string;
+  mockType?: string;
   handleCreateNew: () => void;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;

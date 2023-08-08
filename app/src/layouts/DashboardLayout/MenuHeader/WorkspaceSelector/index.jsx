@@ -24,7 +24,12 @@ import {
   trackWorkspaceDropdownClicked,
 } from "modules/analytics/events/common/teams";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getUserAuthDetails } from "store/selectors";
+import {
+  getAppMode,
+  getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getUserAuthDetails,
+  getLastSeenInviteTs,
+} from "store/selectors";
 import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
@@ -33,6 +38,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
@@ -55,7 +61,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ menu }) => {
+const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -104,6 +110,7 @@ const WorkSpaceDropDown = ({ menu }) => {
         >
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+            {hasNewInvites ? <Badge dot={true} /> : null}
             <DownOutlined className="active-workspace-name-down-icon" />
           </span>
         </Tooltip>
@@ -129,15 +136,27 @@ const WorkspaceSelector = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
 
   // Local State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamInvites, setTeamInvites] = useState([]);
 
+  const hasNewInvites = useMemo(() => {
+    if (user?.loggedIn && teamInvites?.length) {
+      return teamInvites.some((invite) => invite.createdTs > lastSeenInviteTs);
+    }
+    return false;
+  }, [lastSeenInviteTs, teamInvites, user?.loggedIn]);
+
+  useEffect(() => {
+    if (hasNewInvites) trackWorkspaceInviteAnimationViewed();
+  }, [hasNewInvites]);
+
   useEffect(() => {
     if (!user.loggedIn) return;
 
-    getPendingInvites({ email: true, domain: false })
+    getPendingInvites({ email: true, domain: true })
       .then((res) => {
         setTeamInvites(res?.pendingInvites ?? []);
       })
@@ -183,21 +202,33 @@ const WorkspaceSelector = () => {
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-      trackWorkspaceJoiningModalOpened(teamInvites?.length);
+      trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
         dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-        trackWorkspaceJoiningModalOpened(teamInvites?.length);
+        trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "workspaces_dropdown" },
+        })
+      );
     } else {
       promptUserSignupModal(() => {
-        dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "createWorkspaceModal",
+            newValue: true,
+            newProps: { source: "workspaces_dropdown" },
+          })
+        );
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
@@ -511,7 +542,7 @@ const WorkspaceSelector = () => {
 
   return (
     <>
-      <WorkSpaceDropDown menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
+      <WorkSpaceDropDown hasNewInvites={hasNewInvites} menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
     </>
