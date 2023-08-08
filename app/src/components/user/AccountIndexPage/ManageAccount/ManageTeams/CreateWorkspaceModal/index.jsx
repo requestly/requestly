@@ -35,7 +35,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
-  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"));
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
   const handleFormValuesChange = (_, data) => {
     setCreateWorkspaceFormData(data);
