@@ -5,7 +5,14 @@ export const VERSION_NEXT = "next";
 const changeLogs: VersionedChangeLogs[] = [
   {
     version: VERSION_NEXT,
-    logs: [],
+    logs: [
+      "Stitch sessions across pages while navigation or reload.",
+      "Floating widget for session recording when it is manually started from extension popup.",
+      "Updated extension icon for session recording state.",
+      "Bug fix in Session recorder where few events were being dropped.",
+      "Stop session recording in all tabs on deactivating extension.",
+      "Prompt to reload application if the extension is manually updated.",
+    ],
   },
   {
     version: "23.7.12",
