@@ -58,7 +58,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           createOrgTeamInvite({ domain: getDomainFromEmail(user?.details?.profile?.email), teamId })
             .then((res) => {
               if (res.data.success) {
-                upsertTeamCommonInvite({ teamId: teamId, domainEnabled: isNotifyAllSelected });
                 toast.success(
                   `All users from ${getDomainFromEmail(
                     user?.details?.profile?.email
@@ -67,28 +66,34 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
               } else
                 toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
             })
+            .then(() => {
+              upsertTeamCommonInvite({ teamId: teamId, domainEnabled: isNotifyAllSelected });
+            })
             .catch((error) => {
               toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+            })
+            .finally(() => {
+              switchWorkspace(
+                {
+                  teamId: teamId,
+                  teamName: newTeamName,
+                  teamMembersCount: 1,
+                },
+                dispatch,
+                {
+                  isSyncEnabled: user?.details?.isSyncEnabled,
+                  isWorkspaceMode,
+                },
+                appMode
+              );
+              redirectToTeam(navigate, teamId, {
+                state: {
+                  isNewTeam: !isNotifyAllSelected,
+                },
+              });
             });
         }
-        switchWorkspace(
-          {
-            teamId: teamId,
-            teamName: newTeamName,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isSyncEnabled: user?.details?.isSyncEnabled,
-            isWorkspaceMode,
-          },
-          appMode
-        );
-        redirectToTeam(navigate, teamId, {
-          state: {
-            isNewTeam: !isNotifyAllSelected,
-          },
-        });
+
         callback?.();
         toggleModal();
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
