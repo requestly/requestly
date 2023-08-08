@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails, getAppMode } from "store/selectors";
+import { getUserAuthDetails, getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
@@ -32,6 +32,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
@@ -58,6 +59,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
             );
           }
         }
+        if (isJoinWorkspaceCardVisible) dispatch(actions.updateJoinWorkspaceCardVisible(false));
         callback?.();
         setIsJoining(false);
         dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));

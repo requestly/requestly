@@ -35,6 +35,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"));
 
   const handleFormValuesChange = (_, data) => {
     setCreateWorkspaceFormData(data);
@@ -56,13 +57,15 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         if (isNotifyAllSelected) {
           createOrgTeamInvite({ domain: getDomainFromEmail(user?.details?.profile?.email), teamId })
             .then((res) => {
-              if (res.data.success)
+              if (res.data.success) {
+                upsertTeamCommonInvite({ teamId: teamId, domainEnabled: isNotifyAllSelected });
                 toast.success(
                   `All users from ${getDomainFromEmail(
                     user?.details?.profile?.email
                   )} have been invited to join this workspace.`
                 );
-              else toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+              } else
+                toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
             })
             .catch((error) => {
               toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
@@ -101,11 +104,13 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
 
   useEffect(() => {
     isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) => {
-      setIsVerifiedBusinessUser(isVerified);
-      form.setFieldValue(
-        "workspaceName",
-        `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`
-      );
+      if (isVerified) {
+        setIsVerifiedBusinessUser(isVerified);
+        form.setFieldValue(
+          "workspaceName",
+          `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`
+        );
+      }
     });
   }, [user?.details?.profile?.email, user?.details?.profile?.uid, form]);
 
