@@ -31,6 +31,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   const [inviteErrors, setInviteErrors] = useState([]);
   const [isDomainJoiningEnabled, setIsDomainJoiningEnabled] = useState(false);
   const [publicInviteId, setPublicInviteId] = useState(null);
+  const [isInvitePublic, setIsInvitePublic] = useState(false);
   const [isInviteGenerating, setIsInviteGenerating] = useState(false);
   const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
@@ -59,6 +60,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
       .then((res) => {
         if (res?.data?.success) {
           setPublicInviteId(res?.data?.inviteId);
+          setIsInvitePublic(res?.data?.public);
           setIsDomainJoiningEnabled(res?.data?.domains?.length > 0);
         }
         setPublicInviteLoading(false);
@@ -137,6 +139,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
     upsertTeamCommonInvite({ teamId: teamId, publicEnabled: true }).then((res) => {
       if (res?.data?.success) {
         setPublicInviteId(res?.data?.inviteId);
+        setIsInvitePublic(true);
       } else {
         toast.error("Only admins can invite people");
       }
@@ -215,7 +218,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
                 )}
               </div>
               <div className="title mt-16">Invite link</div>
-              {publicInviteId ? (
+              {isInvitePublic ? (
                 <div className="display-flex items-center mt-8">
                   <RQInput
                     disabled
