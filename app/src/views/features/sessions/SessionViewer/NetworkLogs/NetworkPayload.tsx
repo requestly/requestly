@@ -6,9 +6,10 @@ import { ObjectInspector } from "@devtools-ds/object-inspector";
 type Props = {
   label: string;
   payload: any;
+  isPayloadTooLarge?: boolean;
 };
 
-const NetworkPayload: React.FC<Props> = ({ label, payload }) => {
+const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) => {
   const parsedPayload = useMemo(() => {
     if (typeof payload === "string") {
       try {
@@ -20,7 +21,7 @@ const NetworkPayload: React.FC<Props> = ({ label, payload }) => {
     return payload;
   }, [payload]);
 
-  if (!parsedPayload) {
+  if (!parsedPayload && !isPayloadTooLarge) {
     return null;
   }
 
@@ -36,7 +37,7 @@ const NetworkPayload: React.FC<Props> = ({ label, payload }) => {
 
   return (
     <NetworkLogProperty label={label} isCodeBlock>
-      {parsedPayload}
+      {isPayloadTooLarge ? "Payload too large to display" : parsedPayload}
     </NetworkLogProperty>
   );
 };
