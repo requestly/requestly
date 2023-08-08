@@ -17,7 +17,9 @@ import {
   trackWorkspaceOrganizationCardViewed,
 } from "modules/analytics/events/common/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import PATHS from "config/constants/sub/paths";
 import "./index.css";
+import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
 
@@ -36,6 +38,12 @@ export const JoinWorkspaceCard = () => {
   const cardCTA = useMemo(
     () => (hasEmailInvite ? "Show invites" : hasActiveWorkspace ? "Join your teammates" : "Start collaborating"),
     [hasEmailInvite, hasActiveWorkspace]
+  );
+
+  const hideCard = useMemo(
+    () =>
+      window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) || window.location.href.includes("/invite"),
+    []
   );
 
   const handleNudgeCTAClick = () => {
@@ -110,7 +118,7 @@ export const JoinWorkspaceCard = () => {
 
   return (
     <>
-      {organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn ? (
+      {!hideCard && organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn ? (
         <div className="workspace-card-container">
           <Row justify="end">
             <RQButton
@@ -124,7 +132,20 @@ export const JoinWorkspaceCard = () => {
               }}
             />
           </Row>
-          {!hasEmailInvite && (
+          {hasEmailInvite ? (
+            <div className="workspace-card-avatar-row-container">
+              <Avatar.Group maxCount={3}>
+                {getUniqueTeamsFromInvites(teamInvites).map((team, index) => (
+                  <Avatar
+                    icon={<>{team?.teamName?.charAt(0)?.toUpperCase()}</>}
+                    style={{
+                      backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
+                    }}
+                  />
+                ))}
+              </Avatar.Group>
+            </div>
+          ) : (
             <div className="workspace-card-avatar-row-container">
               <Avatar.Group maxCount={MIN_MEMBERS_IN_WORKSPACE}>
                 {organizationMembers.users.map((member: User) => (
@@ -142,24 +163,31 @@ export const JoinWorkspaceCard = () => {
 
           {hasEmailInvite && (
             <Typography.Text className="display-block workspace-card-text">
-              You have pending workspace invites.
+              Your teammates have invited you to join team workspace.
             </Typography.Text>
           )}
 
-          {!hasEmailInvite && hasActiveWorkspace ? (
-            <Typography.Text className="display-block workspace-card-text">
-              {organizationMembers.total} users from{" "}
-              <span className="text-white text-bold">{capitalize(userEmailDomain)} </span>
-              are using Requestly and collaborating on a team workspace.
-            </Typography.Text>
-          ) : (
-            <Typography.Text className="display-block workspace-card-text">
-              {organizationMembers.total} users from{" "}
-              <span className="text-white text-bold">{capitalize(userEmailDomain)}</span> are using Requestly.
-            </Typography.Text>
-          )}
+          {!hasEmailInvite ? (
+            hasActiveWorkspace ? (
+              <Typography.Text className="display-block workspace-card-text">
+                {organizationMembers.total} users from{" "}
+                <span className="text-white text-bold">{capitalize(userEmailDomain)} </span>
+                are using Requestly and collaborating on a team workspace.
+              </Typography.Text>
+            ) : (
+              <Typography.Text className="display-block workspace-card-text">
+                {organizationMembers.total} users from{" "}
+                <span className="text-white text-bold">{capitalize(userEmailDomain)}</span> are using Requestly.
+              </Typography.Text>
+            )
+          ) : null}
 
-          <RQButton type="primary" className="mt-8 text-bold" onClick={handleNudgeCTAClick}>
+          <RQButton
+            type="primary"
+            className="mt-8 text-bold"
+            style={{ display: "block" }}
+            onClick={handleNudgeCTAClick}
+          >
             {cardCTA}
           </RQButton>
         </div>
