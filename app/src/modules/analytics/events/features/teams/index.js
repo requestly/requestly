@@ -41,8 +41,8 @@ export const trackWorkspaceInviteScreenError = (error_type, team_id, invite_id) 
   trackEvent(TEAMS.WORKSPACE_INVITE_SCREEN_ERROR, params);
 };
 
-export const trackWorkspaceJoiningModalOpened = (pending_invites) => {
-  const params = { pending_invites };
+export const trackWorkspaceJoiningModalOpened = (pending_invites, source) => {
+  const params = { pending_invites, source };
   trackEvent(TEAMS.WORKSPACE_JOINING_MODAL_OPENED, params);
 };
 
