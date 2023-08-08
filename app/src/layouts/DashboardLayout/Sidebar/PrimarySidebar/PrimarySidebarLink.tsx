@@ -9,7 +9,6 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
   path,
   icon,
   activeColor = "var(--primary)",
-  isEcosystemExperiment = false,
 }) => (
   <NavLink
     to={path}
@@ -17,7 +16,7 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
     className={({ isActive }) => `primary-sidebar-link ${isActive ? "primary-sidebar-active-link" : ""}`}
     style={({ isActive }) => {
       return {
-        borderLeftColor: isActive ? (isEcosystemExperiment ? activeColor : "var(--primary)") : null,
+        borderLeftColor: isActive ? activeColor : null,
       };
     }}
   >
