@@ -41,69 +41,70 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     setCreateWorkspaceFormData(data);
   };
 
-  const handleFinishClick = (details) => {
+  const handlePostTeamCreation = (teamId, newTeamName) => {
+    switchWorkspace(
+      {
+        teamId: teamId,
+        teamName: newTeamName,
+        teamMembersCount: 1,
+      },
+      dispatch,
+      {
+        isSyncEnabled: user?.details?.isSyncEnabled,
+        isWorkspaceMode,
+      },
+      appMode
+    );
+    redirectToTeam(navigate, teamId, {
+      state: {
+        isNewTeam: !isNotifyAllSelected || !isVerifiedBusinessUser,
+      },
+    });
+  };
+
+  const handleFinishClick = async (details) => {
     setIsLoading(true);
     const newTeamName = details.workspaceName;
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
-    createTeam({
-      teamName: newTeamName,
-    })
-      .then((response) => {
-        trackNewWorkspaceCreated();
-        toast.info("Workspace Created");
+    try {
+      const response = await createTeam({
+        teamName: newTeamName,
+      });
 
-        const teamId = response.data.teamId;
-        if (isNotifyAllSelected) {
-          createOrgTeamInvite({ domain: getDomainFromEmail(user?.details?.profile?.email), teamId })
-            .then((res) => {
-              if (res.data.success) {
-                toast.success(
-                  `All users from ${getDomainFromEmail(
-                    user?.details?.profile?.email
-                  )} have been invited to join this workspace.`
-                );
-              } else
-                toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
-            })
-            .then(() => {
-              upsertTeamCommonInvite({ teamId: teamId, domainEnabled: isNotifyAllSelected });
-            })
-            .catch((error) => {
-              toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
-            })
-            .finally(() => {
-              switchWorkspace(
-                {
-                  teamId: teamId,
-                  teamName: newTeamName,
-                  teamMembersCount: 1,
-                },
-                dispatch,
-                {
-                  isSyncEnabled: user?.details?.isSyncEnabled,
-                  isWorkspaceMode,
-                },
-                appMode
-              );
-              redirectToTeam(navigate, teamId, {
-                state: {
-                  isNewTeam: !isNotifyAllSelected,
-                },
-              });
-            });
+      trackNewWorkspaceCreated();
+      toast.info("Workspace Created");
+
+      const teamId = response.data.teamId;
+      if (isNotifyAllSelected && isVerifiedBusinessUser) {
+        try {
+          const domain = getDomainFromEmail(user?.details?.profile?.email);
+          const inviteRes = await createOrgTeamInvite({ domain, teamId });
+
+          if (inviteRes.data.success) {
+            toast.success(`All users from ${domain} have been invited to join this workspace.`);
+          } else {
+            toast.error(`Could not invite all users from ${domain}.`);
+          }
+        } catch (error) {
+          toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+        } finally {
+          await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
         }
+      }
 
-        callback?.();
-        toggleModal();
-        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
-        trackNewWorkspaceCreated(isNotifyAllSelected);
-      })
-      .catch((err) => {
-        toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
-      })
-      .finally(() => setIsLoading(false));
+      handlePostTeamCreation(teamId, newTeamName);
+
+      callback?.();
+      toggleModal();
+      trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
+      trackNewWorkspaceCreated(isNotifyAllSelected);
+    } catch (err) {
+      toast.error("Unable to Create Team");
+      trackNewTeamCreateFailure(newTeamName);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFinishFailed = () => toast.error("Please enter valid details");
