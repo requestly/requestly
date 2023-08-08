@@ -37,7 +37,7 @@ class ExtensionIconManager {
 
     let config = window.tabService.getPageData(tabId, "extensionIconConfig") || this.#getDefaultConfig();
 
-    if (config[key] !== value) {
+    if (key && config[key] !== value) {
       config = { ...config, [key]: value };
       window.tabService.setPageData(tabId, "extensionIconConfig", config);
     }

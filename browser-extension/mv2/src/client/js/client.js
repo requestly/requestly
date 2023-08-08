@@ -16,23 +16,25 @@
 
   RQ.SessionRecorder.setup();
 
-  chrome.runtime.sendMessage({
-    action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
-    payload: {
-      isIframe: window.top !== window,
-    },
-  });
+  if (window.top === window) {
+    chrome.runtime.sendMessage({
+      action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
+      payload: {
+        url: location.href,
+      },
+    });
 
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-      chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
-        payload: {
-          isIframe: window.top !== window,
-          hasExecutedRules: RQ.RuleExecutionHandler.hasExecutedRules(),
-          isRecordingSession: RQ.SessionRecorder.isRecording,
-        },
-      });
-    }
-  });
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        chrome.runtime.sendMessage({
+          action: RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
+          payload: {
+            url: location.href,
+            hasExecutedRules: RQ.RuleExecutionHandler.hasExecutedRules(),
+            isRecordingSession: RQ.SessionRecorder.isRecording,
+          },
+        });
+      }
+    });
+  }
 })();
