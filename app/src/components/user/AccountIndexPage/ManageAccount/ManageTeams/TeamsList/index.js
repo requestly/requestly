@@ -129,7 +129,13 @@ const TeamsList = ({ teams = [] }) => {
             type="primary"
             onClick={() => {
               trackCreateNewWorkspaceClicked("my_teams");
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: { source: "my_teams" },
+                })
+              );
             }}
             icon={<PlusOutlined />}
           >

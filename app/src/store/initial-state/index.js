@@ -13,6 +13,7 @@ const INITIAL_STATE = {
   userPersona: {
     page: "getting_started",
     persona: "",
+    industry: "",
     // useCases: [],
     // referralChannel: "",
     // numberOfEmployees: "",
@@ -196,6 +197,8 @@ const INITIAL_STATE = {
       },
 
       hasConnectedApp: false,
+      lastSeenInviteTs: 0,
+      isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,

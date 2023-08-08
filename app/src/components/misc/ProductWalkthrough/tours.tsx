@@ -376,7 +376,6 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "bottom",
       spotlightPadding: 0,
       offset: 20,
-      disableOverlay: true,
       pointerPlacement: PointerPlacement.TOP_100,
       customNextButtonText: "Got it!",
     },

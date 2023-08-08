@@ -270,3 +270,11 @@ export const getWorkspaceOnboardingTeamDetails = (state) => {
 export const getIsCommandBarOpen = (state) => {
   return getGlobalState(state).misc.nonPersist?.isCommandBarOpen;
 };
+
+export const getLastSeenInviteTs = (state) => {
+  return getGlobalState(state).misc.persist?.lastSeenInviteTs;
+};
+
+export const getIsJoinWorkspaceCardVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};
