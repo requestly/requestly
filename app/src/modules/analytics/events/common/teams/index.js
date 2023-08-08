@@ -24,8 +24,9 @@ export const trackCreateNewWorkspaceClicked = (source) => {
   trackEvent(TEAMS.CREATE_NEW_WORKSPACE_CLICKED, params);
 };
 
-export const trackNewWorkspaceCreated = () => {
-  trackEvent(TEAMS.NEW_WORKSPACE_CREATED);
+export const trackNewWorkspaceCreated = (notify_all_teammates) => {
+  const params = { notify_all_teammates };
+  trackEvent(TEAMS.NEW_WORKSPACE_CREATED, params);
 };
 
 export const trackWorkspaceDeleteClicked = () => {
@@ -67,8 +68,9 @@ export const trackUpgradeWorkspaceClicked = () => {
   trackEvent(TEAMS.UPGRADE_WORKSPACE_CLICKED);
 };
 
-export const trackAddWorkspaceNameModalViewed = () => {
-  trackEvent(TEAMS.ADD_WORKSPACE_NAME_MODAL_VIEWED);
+export const trackAddWorkspaceNameModalViewed = (source) => {
+  const params = { source };
+  trackEvent(TEAMS.ADD_WORKSPACE_NAME_MODAL_VIEWED, params);
 };
 
 export const trackAddMembersInWorkspaceModalViewed = () => {
@@ -88,4 +90,21 @@ export const trackWorkspaceInviteLinkCopied = (source) => {
 export const trackOnboardingWorkspaceSkip = (step) => {
   const params = { step };
   trackEvent(TEAMS.ONBOARDING_WORKSPACE_SKIP, params);
+};
+
+export const trackWorkspaceOrganizationCardViewed = (domain, cta) => {
+  const params = { domain, cta };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED, params);
+};
+
+export const trackWorkspaceOrganizationCardCancelled = (domain, cta) => {
+  const params = { domain, cta };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED, params);
+};
+export const trackWorkspaceOrganizationCardClicked = (action) => {
+  const params = { action };
+  trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED, params);
+};
+export const trackWorkspaceInviteAnimationViewed = () => {
+  trackEvent(TEAMS.WORKSPACE_INVITE_ANIMATION_VIEWED);
 };

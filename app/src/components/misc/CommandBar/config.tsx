@@ -56,7 +56,15 @@ export const config: PageConfig[] = [
             title: "Create new workspace",
             icon: <HiOutlineUserGroup />,
             action: ({ dispatch }) =>
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: {
+                    source: "command_palette",
+                  },
+                })
+              ),
           },
         ],
       },
