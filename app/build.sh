@@ -9,7 +9,7 @@ npm run build
 
 echo "GITHUB_COMMIT_SHA=${GITHUB_COMMIT_SHA}"
 if [[ "$env" == "prod" ]]; then
-    echo "Skipping sourcemaps for $env"
+    sh ./sourcemaps.sh
 else
     echo "Skipping sourcemaps for $env"
 fi
