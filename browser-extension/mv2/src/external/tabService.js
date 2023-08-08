@@ -44,17 +44,15 @@
         const existingTab = this.getTab(tabId);
 
         if (!existingTab) {
+          this.addOrUpdateTab(tab);
           return;
         }
 
         const newTabState = {
           ...tab,
           [this.dataScope.TAB]: existingTab[this.dataScope.TAB] || {},
+          [this.dataScope.PAGE]: existingTab[this.dataScope.PAGE] || {}, // TODO: use webNavigation API to keep in sync with page
         };
-
-        if (changeInfo.status === "loading") {
-          newTabState[this.dataScope.PAGE] = {};
-        }
 
         this.addOrUpdateTab(newTabState);
       });
@@ -110,8 +108,8 @@
           } else {
             const handler = (currentTabId, tabChangeInfo) => {
               if (currentTabId === tabId && tabChangeInfo.status === "complete") {
-                resolve();
                 chrome.tabs.onUpdated.removeListener(handler);
+                resolve();
               }
             };
             chrome.tabs.onUpdated.addListener(handler);
@@ -187,7 +185,15 @@
     }
 
     removePageData(tabId, ...args) {
-      return this.removeDataForScope(this.dataScope.PAGE, tabId, ...args);
+      this.removeDataForScope(this.dataScope.PAGE, tabId, ...args);
+    }
+
+    resetPageData(tabId) {
+      const tab = this.getTab(tabId);
+
+      if (tab?.[this.dataScope.PAGE]) {
+        tab[this.dataScope.PAGE] = {};
+      }
     }
 
     getTabsWithPageDataFilter(dataFilter) {
