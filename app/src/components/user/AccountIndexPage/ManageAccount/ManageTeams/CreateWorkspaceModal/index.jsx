@@ -27,7 +27,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(true);
+  const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
   const [createWorkspaceFormData, setCreateWorkspaceFormData] = useState({
     workspaceName: "",
     description: "",
@@ -57,7 +57,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     );
     redirectToTeam(navigate, teamId, {
       state: {
-        isNewTeam: !isNotifyAllSelected || !isVerifiedBusinessUser,
+        isNewTeam: !isNotifyAllSelected,
       },
     });
   };
@@ -76,10 +76,11 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       toast.info("Workspace Created");
 
       const teamId = response.data.teamId;
-      if (isNotifyAllSelected && isVerifiedBusinessUser) {
+      if (isNotifyAllSelected) {
         try {
           const domain = getDomainFromEmail(user?.details?.profile?.email);
           const inviteRes = await createOrgTeamInvite({ domain, teamId });
+          await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
 
           if (inviteRes.data.success) {
             toast.success(`All users from ${domain} have been invited to join this workspace.`);
@@ -88,8 +89,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           }
         } catch (error) {
           toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
-        } finally {
-          await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
         }
       }
 
@@ -113,6 +112,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) => {
       if (isVerified) {
         setIsVerifiedBusinessUser(isVerified);
+        setIsNotifyAllSelected(true);
         form.setFieldValue(
           "workspaceName",
           `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`
