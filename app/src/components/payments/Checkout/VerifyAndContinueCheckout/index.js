@@ -118,7 +118,7 @@ const VerifyAndContinueCheckout = ({
           const teamInfo = response.data;
 
           // Handle case where an active subscription already exists
-          if (teamInfo.subscriptionStatus === "active") {
+          if (teamInfo.subscriptionStatus === "active" || teamInfo.subscriptionStatus === "trialing") {
             throw new Error("You are already premium");
           }
 

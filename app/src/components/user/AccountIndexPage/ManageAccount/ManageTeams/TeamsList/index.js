@@ -19,6 +19,7 @@ const TeamsList = ({ teams = [] }) => {
   const renderSubscriptionStatus = (subscriptionStatus, teamId) => {
     switch (subscriptionStatus) {
       case "active":
+      case "trialing":
         return (
           <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
             <Badge status="success" /> Active
