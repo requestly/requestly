@@ -24,8 +24,9 @@ export const trackCreateNewWorkspaceClicked = (source) => {
   trackEvent(TEAMS.CREATE_NEW_WORKSPACE_CLICKED, params);
 };
 
-export const trackNewWorkspaceCreated = () => {
-  trackEvent(TEAMS.NEW_WORKSPACE_CREATED);
+export const trackNewWorkspaceCreated = (notify_all_teammates) => {
+  const params = { notify_all_teammates };
+  trackEvent(TEAMS.NEW_WORKSPACE_CREATED, params);
 };
 
 export const trackWorkspaceDeleteClicked = () => {
@@ -103,4 +104,7 @@ export const trackWorkspaceOrganizationCardCancelled = (domain, cta) => {
 export const trackWorkspaceOrganizationCardClicked = (action) => {
   const params = { action };
   trackEvent(TEAMS.TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED, params);
+};
+export const trackWorkspaceInviteAnimationViewed = () => {
+  trackEvent(TEAMS.WORKSPACE_INVITE_ANIMATION_VIEWED);
 };
