@@ -16,8 +16,10 @@
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
   display: flex;
+  justify-content: space-between;
   flex: 1;
-  /* align-items: center; */
+  width: 100%;
+  padding: 0 4px;
 }
 .emails-input-wrapper div.react-multi-email.focused,
 .emails-input-wrapper div.react-multi-email {

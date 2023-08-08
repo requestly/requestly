@@ -165,7 +165,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
 
   return (
     <>
-      <RQModal width={580} centered open={isOpen} onCancel={toggleModal}>
+      <RQModal width={620} centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
           {isTeamAdmin ? (
             <>
