@@ -97,6 +97,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         callback?.();
         toggleModal();
         trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
+        trackNewWorkspaceCreated(isNotifyAllSelected);
       })
       .catch((err) => {
         toast.error("Unable to Create Team");

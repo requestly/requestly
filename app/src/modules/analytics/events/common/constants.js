@@ -167,6 +167,7 @@ export const TEAMS = {
   TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED: "team_workspace_organization_card_viewed",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
+  WORKSPACE_INVITE_ANIMATION_VIEWED: "workspace_invite_animation_viewed",
 };
 
 export const TRAFFIC_TABLE = {

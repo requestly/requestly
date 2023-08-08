@@ -38,6 +38,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
@@ -60,7 +61,7 @@ const getWorkspaceIcon = (workspaceName) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkSpaceDropDown = ({ menu, hasNewInvites, inviteCount }) => {
+const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -74,7 +75,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites, inviteCount }) => {
 
   const handleWorkspaceDropdownClick = (open) => {
     if (open) {
-      trackTopbarClicked("workspace", inviteCount);
+      trackTopbarClicked("workspace");
     }
   };
 
@@ -147,6 +148,10 @@ const WorkspaceSelector = () => {
     }
     return false;
   }, [lastSeenInviteTs, teamInvites, user?.loggedIn]);
+
+  useEffect(() => {
+    if (hasNewInvites) trackWorkspaceInviteAnimationViewed();
+  }, [hasNewInvites]);
 
   useEffect(() => {
     if (!user.loggedIn) return;
@@ -537,11 +542,7 @@ const WorkspaceSelector = () => {
 
   return (
     <>
-      <WorkSpaceDropDown
-        hasNewInvites={hasNewInvites}
-        inviteCount={teamInvites.length}
-        menu={user.loggedIn ? menu : unauthenticatedUserMenu}
-      />
+      <WorkSpaceDropDown hasNewInvites={hasNewInvites} menu={user.loggedIn ? menu : unauthenticatedUserMenu} />
 
       {isModalOpen ? <LoadingModal isModalOpen={isModalOpen} closeModal={closeModal} /> : null}
     </>
