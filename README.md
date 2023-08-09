@@ -140,7 +140,7 @@ Start working on individual modules:
 
 Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
-For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io)
+For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io).
 
 ## 🎯 Our Mission
 
