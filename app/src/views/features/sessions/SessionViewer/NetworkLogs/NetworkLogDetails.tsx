@@ -21,7 +21,7 @@ const NetworkLogDetails: React.FC<Props> = ({
   status,
   statusText,
   responseTime,
-  rqNetworkEventErrorCodes,
+  errors,
   onClose,
 }) => {
   const closeAction = useMemo(
@@ -46,7 +46,7 @@ const NetworkLogDetails: React.FC<Props> = ({
             <NetworkPayload
               label="Payload"
               payload={requestData}
-              isPayloadTooLarge={rqNetworkEventErrorCodes?.includes(RQNetworkEventErrorCodes.REQUEST_TOO_LARGE)}
+              isPayloadTooLarge={errors?.includes(RQNetworkEventErrorCodes.REQUEST_TOO_LARGE)}
             />
           </div>
         </Tabs.TabPane>
@@ -60,7 +60,7 @@ const NetworkLogDetails: React.FC<Props> = ({
             <NetworkPayload
               label="Body"
               payload={response}
-              isPayloadTooLarge={rqNetworkEventErrorCodes?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)}
+              isPayloadTooLarge={errors?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)}
             />
           </div>
         </Tabs.TabPane>

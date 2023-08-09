@@ -37,7 +37,7 @@ const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) 
 
   return (
     <NetworkLogProperty label={label} isCodeBlock>
-      {isPayloadTooLarge ? "Payload too large to display" : parsedPayload}
+      {isPayloadTooLarge ? "Payload too large to capture" : parsedPayload}
     </NetworkLogProperty>
   );
 };
