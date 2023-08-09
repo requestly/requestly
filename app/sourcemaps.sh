@@ -1,5 +1,5 @@
 echo "Installing sentry-cli"
-curl -sL https://sentry.io/get-cli/ | sh
+curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="2.20.3" sh
 
 echo "Injecting sentry debug ids"
 sentry-cli sourcemaps inject ./build
