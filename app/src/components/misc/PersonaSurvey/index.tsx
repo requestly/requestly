@@ -159,8 +159,10 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
 
   useEffect(() => {
     if (!(currentPage in SurveyConfig)) {
-      if (isSurveyModal) dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
-      else callback?.();
+      if (isSurveyModal) {
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        else dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+      } else callback?.();
     }
   }, [currentPage, dispatch, callback, isSurveyModal]);
 
