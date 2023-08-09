@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import SessionsHomeView from "views/features/sessions";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
@@ -34,5 +34,12 @@ export const sessionRoutes: RouteObject[] = [
   {
     path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
     element: <NetworkSessionViewer />,
+  },
+  {
+    /**
+     * Avoids multiple redirects when user directly visits /sessions/saved/:id
+     */
+    path: "/r" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
+    element: <Navigate to={window.location.pathname.replace("/r", "")} />,
   },
 ];
