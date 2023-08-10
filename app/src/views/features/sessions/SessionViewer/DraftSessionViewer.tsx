@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
@@ -11,9 +11,9 @@ import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
+import { compressEvents, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
-import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
@@ -27,6 +27,10 @@ import {
   trackSessionRecordingFailed,
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
+import { StorageService } from "init";
+import APP_CONSTANTS from "config/constants";
+
+const MAX_CACHED_DRAFT_SESSIONS = 3;
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
@@ -35,12 +39,14 @@ const DraftSessionViewer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+  const isInitialRenderRef = useRef(true);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -61,6 +67,27 @@ const DraftSessionViewer: React.FC = () => {
       userAttributes?.num_sessions_saved_offline,
     ]
   );
+
+  const handleCacheDraftSession = useCallback(async () => {
+    const sessionToCache = {
+      metadata: sessionRecordingMetadata,
+      events: compressEvents(sessionEvents),
+    };
+    const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    if (!draftSessions) {
+      StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } });
+    } else {
+      if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
+        const oldestDraftKey = Object.keys(draftSessions)[0];
+        delete draftSessions[oldestDraftKey];
+      }
+      StorageService().saveRecord({
+        [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
+      });
+    }
+    // const neww = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    // console.log({ neww });
+  }, [sessionRecordingMetadata, sessionEvents, tabId]);
 
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
@@ -87,6 +114,18 @@ const DraftSessionViewer: React.FC = () => {
     },
     [dispatch]
   );
+
+  useEffect(() => {
+    if (!isInitialRenderRef.current) {
+      return () => {
+        if (!isSaveSessionClicked) {
+          handleCacheDraftSession();
+        }
+      };
+    } else {
+      isInitialRenderRef.current = false;
+    }
+  }, [isSaveSessionClicked, handleCacheDraftSession]);
 
   useEffect(() => {
     if (isImportedSession && sessionRecordingMetadata === null) {
