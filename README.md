@@ -140,7 +140,7 @@ Start working on individual modules:
 
 Read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
 
-For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io)
+For **payment/billing related issues**, feel free to contact us at [contact@requestly.io](mailto:contact@requestly.io).
 
 ## 🎯 Our Mission
 
@@ -187,3 +187,7 @@ Our mission is to help developers ship web and mobile apps faster and with confi
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## Special Mentions
+A big shoutout to these amazing Open Source Projects hat have helped make Requestly possible.
+- [rrweb](https://github.com/rrweb-io/rrweb)
