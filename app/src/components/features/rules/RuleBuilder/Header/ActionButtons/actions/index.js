@@ -8,6 +8,7 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
   //Set the modification date of rule
@@ -28,8 +29,6 @@ export const saveRule = async (appMode, ruleObject, callback) => {
   return StorageService(appMode)
     .getRecord(ruleToSave.groupId)
     .then((result_1) => {
-      const exit = () => {};
-
       //Set the modification date of group
       if (result_1 && result_1.objectType === "group") {
         const groupToSave = {
@@ -40,18 +39,20 @@ export const saveRule = async (appMode, ruleObject, callback) => {
         Logger.log("Writing to storage in saveRule");
         StorageService(appMode)
           .saveRuleOrGroup(groupToSave)
-          .then(() => {
-            // Execute callback
-            callback && callback();
-            //Continue exit
-            exit();
+          .catch(() => {
+            throw new Error("Error in saving rule");
           });
-      } else {
-        // Execute callback
-        callback && callback();
-        //If group doesnt exist, exit anyway
-        exit();
       }
+    })
+    .then(() => {
+      const exit = () => {};
+      // Execute callback
+      callback && callback();
+      //Continue exit
+      exit();
+    })
+    .catch(() => {
+      toast.error("Error in saving rule. Please contact support.");
     });
 };
 

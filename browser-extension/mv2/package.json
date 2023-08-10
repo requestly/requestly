@@ -26,7 +26,7 @@
     "createReleaseBuild": "BUILD_MODE='production' npm run build && node scripts/createReleaseBuild"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.14.0",
+    "@requestly/web-sdk": "0.14.1",
     "archiver": "^5.3.1",
     "babel-polyfill": "^6.26.0",
     "chokidar-cli": "^3.0.0",
