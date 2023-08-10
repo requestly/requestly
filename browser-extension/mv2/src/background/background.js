@@ -19,7 +19,8 @@ BG = window.BG = {
 };
 
 BG.TAB_SERVICE_DATA = {
-  IS_CONTENT_SCRIPT_LOADED: "isContentScriptLoaded",
+  CLIENT_PORT: "clientPort",
+  CLIENT_LOAD_SUBSCRIBERS: "clientLoadSubscribers",
   SESSION_RECORDING: "sessionRecording",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
 };
@@ -741,7 +742,7 @@ BG.Methods.createContextMenu = function (title, contexts) {
 BG.Methods.sendMessageToAllAppTabs = function (messageObject) {
   BG.Methods.getAppTabs().then((tabs) => {
     tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id, messageObject);
+      BG.Methods.sendMessageToClient(tab.id, messageObject);
     });
   });
 };
@@ -772,7 +773,7 @@ BG.Methods.getAppTabs = async () => {
 BG.Methods.sendMessageToApp = async (messageObject, timeout = 2000) => {
   const sendMessageToTab = (messageObject, tabId) => {
     return new Promise((resolve) => {
-      chrome.tabs.sendMessage(tabId, messageObject, (response) => {
+      BG.Methods.sendMessageToClient(tabId, messageObject, (response) => {
         resolve(response);
       });
     });
@@ -1007,6 +1008,54 @@ BG.Methods.addListenerForExtensionMessages = function () {
   });
 };
 
+BG.Methods.handleClientPortConnections = () => {
+  chrome.runtime.onConnect.addListener((port) => {
+    const tabId = port.sender.tab.id;
+
+    if (port.sender.documentLifecycle === "active") {
+      window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
+
+      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
+      clientLoadSubscribers.forEach((subscriber) => subscriber());
+    }
+
+    port.onDisconnect.addListener(() => {
+      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+
+      if (!BG.Methods.isConnectedToClient(tabId)) {
+        chrome.tabs.executeScript(
+          tabId,
+          {
+            code: "chrome.runtime.connect()",
+          },
+          () => {
+            if (chrome.runtime.lastError) {
+              // ignore
+            }
+          }
+        );
+      }
+    });
+  });
+};
+
+BG.Methods.isConnectedToClient = (tabId) => {
+  return window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+};
+
+BG.Methods.sendMessageToClient = (tabId, ...restArgs) => {
+  const send = () => chrome.tabs.sendMessage(tabId, ...restArgs);
+
+  if (BG.Methods.isConnectedToClient(tabId)) {
+    send();
+  } else {
+    const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+    clientLoadSubscribers.push(send);
+    window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS, clientLoadSubscribers);
+  }
+};
+
 BG.Methods.getSessionRecordingConfig = async (url) => {
   const sessionRecordingConfig = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG);
   const isAutoRecordingActive = sessionRecordingConfig?.autoRecording?.isActive;
@@ -1077,7 +1126,6 @@ BG.Methods.onAppLoadedNotification = () => {
 
 BG.Methods.onContentScriptLoadedNotification = (tab, payload = {}) => {
   window.tabService.resetPageData(tab.id);
-  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.IS_CONTENT_SCRIPT_LOADED, true);
 
   Promise.all([
     BG.Methods.handleRuleExecutionsOnClientPageLoad(tab),
@@ -1091,7 +1139,7 @@ BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
   if (cachedAppliedRules?.length > 0) {
     RQ.extensionIconManager.markRuleExecuted(tab.id);
 
-    chrome.tabs.sendMessage(
+    BG.Methods.sendMessageToClient(
       tab.id,
       {
         action: RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES,
@@ -1107,7 +1155,7 @@ BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
 
 BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
   window.tabService.resetPageData(tab.id);
-  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.IS_CONTENT_SCRIPT_LOADED, true);
+
   if (payload.hasExecutedRules) {
     RQ.extensionIconManager.markRuleExecuted(tab.id);
   }
@@ -1132,7 +1180,7 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab, payload) => {
   }
 
   if (sessionRecordingData) {
-    chrome.tabs.sendMessage(
+    BG.Methods.sendMessageToClient(
       tab.id,
       {
         action: RQ.CLIENT_MESSAGES.START_RECORDING,
@@ -1154,7 +1202,7 @@ BG.Methods.startRecordingExplicitly = (tabId) => {
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
-  chrome.tabs.sendMessage(tabId, {
+  BG.Methods.sendMessageToClient(tabId, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
     payload: sessionRecordingData,
   });
@@ -1167,7 +1215,7 @@ BG.Methods.launchUrlAndStartRecording = (url) => {
 };
 
 BG.Methods.stopRecording = (tabId, openRecording) => {
-  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
+  BG.Methods.sendMessageToClient(tabId, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
     window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   });
 
@@ -1189,7 +1237,7 @@ BG.Methods.stopRecordingOnAllTabs = () => {
 };
 
 BG.Methods.getExecutedRules = async (tabId, callback) => {
-  chrome.tabs.sendMessage(
+  BG.Methods.sendMessageToClient(
     tabId,
     {
       action: RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS,
@@ -1337,7 +1385,7 @@ BG.Methods.sendLogToConsoleLogger = async function (rule, requestDetails, modifi
   const storageKey = RQ.CONSOLE_LOGGER_ENABLED;
   const isConsoleLoggerEnabled = await RQ.StorageService.getRecord(storageKey);
 
-  chrome.tabs.sendMessage(
+  BG.Methods.sendMessageToClient(
     requestDetails.tabId,
     {
       action: RQ.CLIENT_MESSAGES.PRINT_CONSOLE_LOGS,
@@ -1390,7 +1438,7 @@ BG.Methods.saveExecutionCount = async function (rule) {
 };
 
 BG.Methods.getTabSession = (tabId, callback) => {
-  chrome.tabs.sendMessage(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
+  BG.Methods.sendMessageToClient(tabId, { action: RQ.CLIENT_MESSAGES.GET_TAB_SESSION }, { frameId: 0 }, callback);
 };
 
 BG.Methods.getAPIResponse = async (apiRequest) => {
@@ -1464,10 +1512,9 @@ BG.Methods.getAPIResponse = async (apiRequest) => {
 
 BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
   const { tabId } = requestDetails;
-  const isContentScriptLoaded = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.IS_CONTENT_SCRIPT_LOADED);
 
   // Cache execution details until content script loads
-  if (!isContentScriptLoaded || BG.Methods.isTopDocumentRequest(requestDetails)) {
+  if (BG.Methods.isTopDocumentRequest(requestDetails)) {
     const appliedRuleDetails = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, []);
     appliedRuleDetails?.push({
       rule,
@@ -1476,7 +1523,7 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
 
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   } else {
-    chrome.tabs.sendMessage(tabId, {
+    BG.Methods.sendMessageToClient(tabId, {
       action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
       rule,
     });
@@ -1506,6 +1553,8 @@ BG.Methods.init = function () {
 
   // Add Listener to reply to requests from extension content scripts or popup
   BG.Methods.addListenerForExtensionMessages();
+
+  BG.Methods.handleClientPortConnections();
 
   BG.Methods.listenDevtools();
 
