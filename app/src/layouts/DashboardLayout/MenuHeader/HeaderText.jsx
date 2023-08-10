@@ -7,7 +7,7 @@ import RQ_LOGO_LIGHT_BLUE from "assets/img/brand/rq-full-logo-light-blue.svg";
 import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { FaStackOverflow } from "react-icons/fa";
+import { FaStackOverflow } from "@react-icons/all-files/fa/FaStackOverflow";
 import MobileDebuggerAppSelector from "components/features/mobileDebugger/components/AppSelector";
 import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
