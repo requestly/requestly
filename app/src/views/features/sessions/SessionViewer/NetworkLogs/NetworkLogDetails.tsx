@@ -5,6 +5,7 @@ import { NetworkLog } from "../types";
 import NetworkLogProperty from "./NetworkLogProperty";
 import NetworkStatusField from "./NetworkStatusField";
 import NetworkPayload from "./NetworkPayload";
+import { RQNetworkEventErrorCodes } from "@requestly/web-sdk";
 
 type Props = NetworkLog & {
   onClose?: () => void;
@@ -20,6 +21,7 @@ const NetworkLogDetails: React.FC<Props> = ({
   status,
   statusText,
   responseTime,
+  errors,
   onClose,
 }) => {
   const closeAction = useMemo(
@@ -41,7 +43,11 @@ const NetworkLogDetails: React.FC<Props> = ({
             <NetworkLogProperty label="URL">{url}</NetworkLogProperty>
             {responseURL !== url ? <NetworkLogProperty label="Redirected URL">{responseURL}</NetworkLogProperty> : null}
             <NetworkLogProperty label="Method">{method?.toUpperCase() ?? "GET"}</NetworkLogProperty>
-            <NetworkPayload label="Payload" payload={requestData} />
+            <NetworkPayload
+              label="Payload"
+              payload={requestData}
+              isPayloadTooLarge={errors?.includes(RQNetworkEventErrorCodes.REQUEST_TOO_LARGE)}
+            />
           </div>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Response" key="response">
@@ -51,7 +57,11 @@ const NetworkLogDetails: React.FC<Props> = ({
             </NetworkLogProperty>
             <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
             <NetworkLogProperty label="Content Type">{contentType}</NetworkLogProperty>
-            <NetworkPayload label="Body" payload={response} />
+            <NetworkPayload
+              label="Body"
+              payload={response}
+              isPayloadTooLarge={errors?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)}
+            />
           </div>
         </Tabs.TabPane>
       </Tabs>
