@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
 import Favicon from "components/misc/Favicon";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -60,9 +61,19 @@ const RecordingsList = ({
         width: "30%",
         render: (name, record) => {
           return (
-            <Link to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
-              {name}
-            </Link>
+            <div className="display-flex">
+              <Link
+                to={
+                  record.isDraft
+                    ? `${PATHS.SESSIONS.DRAFT.ABSOLUTE}/${record.id}?saved`
+                    : `${PATHS.SESSIONS.SAVED.ABSOLUTE}/${record.id}`
+                }
+                state={{ fromApp: true }}
+              >
+                {name}
+              </Link>
+              {record.isDraft && <RQBadge badgeText="Draft" />}
+            </div>
           );
         },
       },

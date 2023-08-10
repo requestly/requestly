@@ -35,6 +35,8 @@ import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
 import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
+import { StorageService } from "init";
+import { Visibility } from "../../SessionViewer/types";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -58,11 +60,37 @@ const SessionsIndexPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
 
-  const fetchRecordings = (lastDoc = null) => {
+  const fetchDraftRecordings = async () => {
+    const drafts = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    if (drafts) {
+      const formtttedRecords = Object.keys(drafts).map((key) => {
+        const recordData = drafts[key];
+        return {
+          id: key,
+          isDraft: true,
+          name: recordData.metadata.name,
+          duration: recordData.metadata.sessionAttributes.duration,
+          startTime: recordData.metadata.sessionAttributes.startTime,
+          url: recordData.metadata.sessionAttributes.url,
+          visibility: Visibility.ONLY_ME,
+          // createdBy: recordData.createdBy || recordData.author,
+        };
+      });
+      return formtttedRecords;
+    }
+
+    return null;
+  };
+
+  const fetchRecordings = async (lastDoc = null) => {
     if (unsubscribeListener) unsubscribeListener();
 
     setIsTableLoading(true);
     const records = [];
+    const drafts = await fetchDraftRecordings();
+    if (drafts.length) {
+      records.push(...drafts);
+    }
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
     const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
@@ -92,6 +120,7 @@ const SessionsIndexPage = () => {
           const recordData = doc.data();
           records.push({
             id: doc.id,
+            isDraft: false,
             name: recordData.name,
             duration: recordData.sessionAttributes.duration,
             startTime: recordData.sessionAttributes.startTime,
