@@ -1023,19 +1023,17 @@ BG.Methods.handleClientPortConnections = () => {
     port.onDisconnect.addListener(() => {
       window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
 
-      if (!BG.Methods.isConnectedToClient(tabId)) {
-        chrome.tabs.executeScript(
-          tabId,
-          {
-            code: "chrome.runtime.connect()",
-          },
-          () => {
-            if (chrome.runtime.lastError) {
-              // ignore
-            }
+      chrome.tabs.executeScript(
+        tabId,
+        {
+          code: "chrome.runtime.connect()",
+        },
+        () => {
+          if (chrome.runtime.lastError) {
+            // ignore
           }
-        );
-      }
+        }
+      );
     });
   });
 };
