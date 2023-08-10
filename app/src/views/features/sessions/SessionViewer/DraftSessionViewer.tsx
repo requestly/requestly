@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
+import { unstable_usePrompt, useNavigate, useParams, useLocation } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
+import { StorageService } from "init";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
@@ -11,7 +12,7 @@ import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import { compressEvents, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
+import { compressEvents, decompressEvents, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
 import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
@@ -19,6 +20,7 @@ import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
+import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
@@ -27,13 +29,13 @@ import {
   trackSessionRecordingFailed,
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
-import { StorageService } from "init";
-import APP_CONSTANTS from "config/constants";
 
 const MAX_CACHED_DRAFT_SESSIONS = 3;
 
 const DraftSessionViewer: React.FC = () => {
   const { tabId } = useParams();
+  const location = useLocation();
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -69,11 +71,15 @@ const DraftSessionViewer: React.FC = () => {
   );
 
   const handleCacheDraftSession = useCallback(async () => {
+    if (!sessionRecordingMetadata) return;
+
     const sessionToCache = {
       metadata: sessionRecordingMetadata,
       events: compressEvents(sessionEvents),
     };
+
     const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    if (tabId in draftSessions) return;
     if (!draftSessions) {
       StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } });
     } else {
@@ -150,6 +156,23 @@ const DraftSessionViewer: React.FC = () => {
       );
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
+    } else if (queryParams.has("saved")) {
+      StorageService()
+        .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
+        .then((sessions) => {
+          console.log({ sessions });
+          const session = sessions[tabId];
+          const sessionEvents = decompressEvents(session.events);
+          dispatch(
+            sessionRecordingActions.setSessionRecordingMetadata({
+              sessionAttributes: session.metadata.sessionAttributes,
+              name: generateDraftSessionTitle(session.metadata.sessionAttributes?.url),
+            })
+          );
+          filterOutLargeNetworkResponses(sessionEvents);
+          dispatch(sessionRecordingActions.setEvents(sessionEvents));
+          setIsLoading(false);
+        });
     } else {
       getTabSession(parseInt(tabId)).then((payload: unknown) => {
         if (typeof payload === "string") {
@@ -174,7 +197,7 @@ const DraftSessionViewer: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, queryParams]);
 
   const confirmDiscard = () => {
     Modal.confirm({

@@ -14,6 +14,7 @@ import {
   prepareSessionToExport,
 } from "./sessionEventsUtils";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import { StorageService } from "init";
 import { toast } from "utils/Toast";
 import { getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -81,6 +82,14 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
     [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
   );
 
+  const handleClearDraftSessionCache = useCallback(async () => {
+    const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    if (tabId in draftSessions) {
+      delete draftSessions[tabId];
+      StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions } });
+    }
+  }, [tabId]);
+
   const saveDraftSession = useCallback(
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
@@ -120,6 +129,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       ).then((response) => {
         if (response?.success) {
           onClose();
+          handleClearDraftSessionCache();
           toast.success("Recording saved successfully");
           trackDraftSessionSaved(
             sessionRecordingMetadata?.sessionAttributes?.duration,
@@ -147,6 +157,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       sessionEvents,
       sessionRecordingMetadata,
       setIsSaveSessionClicked,
+      handleClearDraftSessionCache,
       dispatch,
       navigate,
       onClose,
