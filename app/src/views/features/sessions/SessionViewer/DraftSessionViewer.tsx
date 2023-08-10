@@ -108,6 +108,14 @@ const DraftSessionViewer: React.FC = () => {
     [tabId, generateDraftSessionTitle]
   );
 
+  const handleClearDraftSessionCache = useCallback(async () => {
+    const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+    if (draftSessions && tabId in draftSessions) {
+      delete draftSessions[tabId];
+      StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions } });
+    }
+  }, [tabId]);
+
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -210,6 +218,7 @@ const DraftSessionViewer: React.FC = () => {
       okText: "Yes",
       cancelText: "No",
       onOk() {
+        handleClearDraftSessionCache();
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
@@ -252,6 +261,7 @@ const DraftSessionViewer: React.FC = () => {
             <SaveRecordingConfigPopup
               onClose={() => setIsSavePopupVisible(false)}
               setIsSaveSessionClicked={setIsSaveSessionClicked}
+              clearSavedDraft={handleClearDraftSessionCache}
             />
           )}
         </div>
