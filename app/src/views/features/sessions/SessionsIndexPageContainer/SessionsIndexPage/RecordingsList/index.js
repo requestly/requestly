@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { DeleteOutlined, ExclamationCircleOutlined, InfoCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import { Modal, Space, Tag, Tooltip, Typography } from "antd";

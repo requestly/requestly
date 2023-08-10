@@ -63,7 +63,7 @@ const SessionsIndexPage = () => {
   const fetchDraftRecordings = async () => {
     const drafts = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
     if (drafts) {
-      const formtttedRecords = Object.keys(drafts).map((key) => {
+      const formattedRecords = Object.keys(drafts).map((key) => {
         const recordData = drafts[key];
         return {
           id: key,
@@ -75,7 +75,7 @@ const SessionsIndexPage = () => {
           visibility: Visibility.ONLY_ME,
         };
       });
-      return formtttedRecords;
+      return formattedRecords;
     }
 
     return [];
@@ -86,10 +86,13 @@ const SessionsIndexPage = () => {
 
     setIsTableLoading(true);
     const records = [];
-    const drafts = await fetchDraftRecordings();
-    if (drafts.length) {
-      records.push(...drafts);
-    }
+    fetchDraftRecordings().then((drafts) => {
+      if (drafts.length) {
+        drafts.reverse();
+        records.push(...drafts);
+      }
+    });
+
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
     const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);

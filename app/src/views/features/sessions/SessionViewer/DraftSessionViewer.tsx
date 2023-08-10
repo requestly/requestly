@@ -79,7 +79,6 @@ const DraftSessionViewer: React.FC = () => {
       };
 
       const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
-      console.log({ draftSessions });
       if (!draftSessions) {
         StorageService()
           .saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } })
@@ -102,8 +101,6 @@ const DraftSessionViewer: React.FC = () => {
           })
           .catch((e) => console.log(e));
       }
-      // const neww = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
-      // console.log({ neww });
     },
     [tabId, generateDraftSessionTitle]
   );
@@ -170,7 +167,6 @@ const DraftSessionViewer: React.FC = () => {
       StorageService()
         .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
         .then((sessions) => {
-          console.log({ sessions });
           const session = sessions[tabId];
           const sessionEvents = decompressEvents(session.events);
           dispatch(
