@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams, useLocation } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
@@ -9,12 +9,12 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
-import { RQSession } from "@requestly/web-sdk";
+import { RQSession, RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { compressEvents, decompressEvents, filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
-import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
@@ -41,14 +41,12 @@ const DraftSessionViewer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
-  const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
-  const isInitialRenderRef = useRef(true);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -70,30 +68,34 @@ const DraftSessionViewer: React.FC = () => {
     ]
   );
 
-  const handleCacheDraftSession = useCallback(async () => {
-    if (!sessionRecordingMetadata) return;
+  const handleCacheDraftSession = useCallback(
+    async (attributes: RQSessionAttributes, events: RQSessionEvents) => {
+      if (!attributes && !events) return;
 
-    const sessionToCache = {
-      metadata: sessionRecordingMetadata,
-      events: compressEvents(sessionEvents),
-    };
+      const sessionToCache = {
+        metadata: { name: generateDraftSessionTitle(attributes.url), ...attributes },
+        events: compressEvents(events),
+      };
 
-    const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
-    if (tabId in draftSessions) return;
-    if (!draftSessions) {
-      StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } });
-    } else {
-      if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
-        const oldestDraftKey = Object.keys(draftSessions)[0];
-        delete draftSessions[oldestDraftKey];
+      const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+      console.log({ draftSessions });
+      if (!draftSessions) {
+        StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } });
+      } else if (tabId in draftSessions) return;
+      else {
+        if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
+          const oldestDraftKey = Object.keys(draftSessions)[0];
+          delete draftSessions[oldestDraftKey];
+        }
+        StorageService().saveRecord({
+          [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
+        });
       }
-      StorageService().saveRecord({
-        [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
-      });
-    }
-    // const neww = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
-    // console.log({ neww });
-  }, [sessionRecordingMetadata, sessionEvents, tabId]);
+      // const neww = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
+      // console.log({ neww });
+    },
+    [tabId, generateDraftSessionTitle]
+  );
 
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
@@ -122,18 +124,6 @@ const DraftSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!isInitialRenderRef.current) {
-      return () => {
-        if (!isSaveSessionClicked) {
-          handleCacheDraftSession();
-        }
-      };
-    } else {
-      isInitialRenderRef.current = false;
-    }
-  }, [isSaveSessionClicked, handleCacheDraftSession]);
-
-  useEffect(() => {
     if (isImportedSession && sessionRecordingMetadata === null) {
       navigate(PATHS.SESSIONS.ABSOLUTE);
     }
@@ -154,6 +144,7 @@ const DraftSessionViewer: React.FC = () => {
           name: "Mock Session Recording",
         })
       );
+
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
     } else if (queryParams.has("saved")) {
@@ -165,8 +156,8 @@ const DraftSessionViewer: React.FC = () => {
           const sessionEvents = decompressEvents(session.events);
           dispatch(
             sessionRecordingActions.setSessionRecordingMetadata({
-              sessionAttributes: session.metadata.sessionAttributes,
-              name: generateDraftSessionTitle(session.metadata.sessionAttributes?.url),
+              sessionAttributes: session.metadata,
+              name: generateDraftSessionTitle(session.metadata?.url),
             })
           );
           filterOutLargeNetworkResponses(sessionEvents);
@@ -192,12 +183,13 @@ const DraftSessionViewer: React.FC = () => {
 
             filterOutLargeNetworkResponses(tabSession.events);
             dispatch(sessionRecordingActions.setEvents(tabSession.events));
+            handleCacheDraftSession(tabSession.attributes, tabSession.events);
           }
         }
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, queryParams]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, queryParams, handleCacheDraftSession]);
 
   const confirmDiscard = () => {
     Modal.confirm({

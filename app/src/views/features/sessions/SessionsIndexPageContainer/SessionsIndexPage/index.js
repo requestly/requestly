@@ -69,9 +69,9 @@ const SessionsIndexPage = () => {
           id: key,
           isDraft: true,
           name: recordData.metadata.name,
-          duration: recordData.metadata.sessionAttributes.duration,
-          startTime: recordData.metadata.sessionAttributes.startTime,
-          url: recordData.metadata.sessionAttributes.url,
+          duration: recordData.metadata.duration,
+          startTime: recordData.metadata.startTime,
+          url: recordData.metadata.url,
           visibility: Visibility.ONLY_ME,
           // createdBy: recordData.createdBy || recordData.author,
         };
@@ -79,7 +79,7 @@ const SessionsIndexPage = () => {
       return formtttedRecords;
     }
 
-    return null;
+    return [];
   };
 
   const fetchRecordings = async (lastDoc = null) => {
