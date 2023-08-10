@@ -187,3 +187,7 @@ Our mission is to help developers ship web and mobile apps faster and with confi
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## Special Mentions
+A big shoutout to these amazing Open Source Projects hat have helped make Requestly possible.
+- [rrweb](https://github.com/rrweb-io/rrweb)
