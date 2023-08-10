@@ -15,7 +15,6 @@ import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
 import Favicon from "components/misc/Favicon";
-import "./index.css";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -62,7 +61,7 @@ const RecordingsList = ({
         width: "30%",
         render: (name, record) => {
           return (
-            <div className="table-row-session-name">
+            <div className="display-flex">
               <Link
                 to={
                   record.isDraft
@@ -73,7 +72,16 @@ const RecordingsList = ({
               >
                 {name}
               </Link>
-              {record.isDraft && <InfoTag title="DRAFT" />}
+              {record.isDraft && (
+                <span style={{ marginLeft: "8px" }}>
+                  <InfoTag
+                    title="DRAFT"
+                    description="Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the
+        data."
+                    tooltipWidth="300px"
+                  />
+                </span>
+              )}
             </div>
           );
         },
@@ -205,11 +213,6 @@ const RecordingsList = ({
 
   return (
     <ProCard className="primary-card github-like-border rules-table-container" title={null}>
-      <div className="draft-session-info-banner">
-        <InfoCircleOutlined />
-        Note: Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the
-        data.
-      </div>
       <ProTable
         className="records-table"
         loading={isTableLoading}
