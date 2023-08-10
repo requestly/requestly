@@ -217,8 +217,8 @@ const DraftSessionViewer: React.FC = () => {
       content: "Are you sure you want to discard this draft recording?",
       okText: "Yes",
       cancelText: "No",
-      onOk() {
-        handleClearDraftSessionCache();
+      onOk: async () => {
+        await handleClearDraftSessionCache();
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },

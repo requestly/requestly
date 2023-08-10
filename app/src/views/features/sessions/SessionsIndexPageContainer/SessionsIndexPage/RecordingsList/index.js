@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleOutlined, InfoCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import { Modal, Space, Tag, Tooltip, Typography } from "antd";
@@ -9,12 +9,13 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecordingModal";
+import { InfoTag } from "components/misc/InfoTag";
 import { deleteRecording } from "../../../api";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
 import Favicon from "components/misc/Favicon";
-import { RQBadge } from "lib/design-system/components/RQBadge";
+import "./index.css";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -61,7 +62,7 @@ const RecordingsList = ({
         width: "30%",
         render: (name, record) => {
           return (
-            <div className="display-flex">
+            <div className="table-row-session-name">
               <Link
                 to={
                   record.isDraft
@@ -72,7 +73,7 @@ const RecordingsList = ({
               >
                 {name}
               </Link>
-              {record.isDraft && <RQBadge badgeText="Draft" />}
+              {record.isDraft && <InfoTag title="DRAFT" />}
             </div>
           );
         },
@@ -136,45 +137,49 @@ const RecordingsList = ({
         render: (id, record) => {
           return (
             <>
-              <div className="rule-action-buttons">
-                <ReactHoverObserver>
-                  {({ isHovering }) => (
-                    <Space>
-                      <Text
-                        type={isHovering ? "primary" : "secondary"}
-                        style={{
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          setSharingRecordId(id);
-                          setSelectedRowVisibility(record.visibility);
-                          setIsShareModalVisible(true);
-                        }}
-                      >
-                        <Tooltip title="Share with your Teammates">
-                          <Tag>
-                            <ShareAltOutlined />
-                          </Tag>
-                        </Tooltip>
-                      </Text>
+              {!record?.isDraft && (
+                <div className="rule-action-buttons">
+                  <ReactHoverObserver>
+                    {({ isHovering }) => (
+                      <Space>
+                        <Text
+                          type={isHovering ? "primary" : "secondary"}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            setSharingRecordId(id);
+                            setSelectedRowVisibility(record.visibility);
+                            setIsShareModalVisible(true);
+                          }}
+                        >
+                          <Tooltip title="Share with your Teammates">
+                            <Tag>
+                              <ShareAltOutlined />
+                            </Tag>
+                          </Tooltip>
+                        </Text>
 
-                      <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
-                        <Tooltip title="Delete" placement="bottom">
-                          <Tag onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}>
-                            <DeleteOutlined
-                              style={{
-                                padding: "5px 0px",
-                                fontSize: "12px",
-                                cursor: "pointer",
-                              }}
-                            />
-                          </Tag>
-                        </Tooltip>
-                      </Text>
-                    </Space>
-                  )}
-                </ReactHoverObserver>
-              </div>
+                        <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
+                          <Tooltip title="Delete" placement="bottom">
+                            <Tag
+                              onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}
+                            >
+                              <DeleteOutlined
+                                style={{
+                                  padding: "5px 0px",
+                                  fontSize: "12px",
+                                  cursor: "pointer",
+                                }}
+                              />
+                            </Tag>
+                          </Tooltip>
+                        </Text>
+                      </Space>
+                    )}
+                  </ReactHoverObserver>
+                </div>
+              )}
             </>
           );
         },
@@ -200,6 +205,11 @@ const RecordingsList = ({
 
   return (
     <ProCard className="primary-card github-like-border rules-table-container" title={null}>
+      <div className="draft-session-info-banner">
+        <InfoCircleOutlined />
+        Note: Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the
+        data.
+      </div>
       <ProTable
         className="records-table"
         loading={isTableLoading}

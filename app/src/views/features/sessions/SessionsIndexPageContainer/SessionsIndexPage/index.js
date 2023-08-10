@@ -73,7 +73,6 @@ const SessionsIndexPage = () => {
           startTime: recordData.metadata.startTime,
           url: recordData.metadata.url,
           visibility: Visibility.ONLY_ME,
-          // createdBy: recordData.createdBy || recordData.author,
         };
       });
       return formtttedRecords;
