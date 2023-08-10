@@ -10,6 +10,7 @@ export const SESSION_RECORDING = {
   draft_session_recording_named: "draft_session_recording_named",
   draft_session_recording_saved: "draft_session_recording_saved",
   draft_session_recording_save_failed: "draft_session_recording_save_failed",
+  draft_session_auto_saved: "draft_session_auto_saved",
   saved_session_recording_viewed: "saved_session_recording_viewed",
   session_recording_share_clicked: "session_recording_share_clicked",
   session_recording_share_link_copied: "session_recording_share_link_copied",

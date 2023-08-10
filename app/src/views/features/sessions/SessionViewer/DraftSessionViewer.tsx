@@ -24,6 +24,7 @@ import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
+  trackDraftSessionAutoSaved,
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
   trackSessionRecordingFailed,
@@ -80,16 +81,26 @@ const DraftSessionViewer: React.FC = () => {
       const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
       console.log({ draftSessions });
       if (!draftSessions) {
-        StorageService().saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } });
+        StorageService()
+          .saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } })
+          .then(() => {
+            trackDraftSessionAutoSaved();
+          })
+          .catch((e) => console.log(e));
       } else if (tabId in draftSessions) return;
       else {
         if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
           const oldestDraftKey = Object.keys(draftSessions)[0];
           delete draftSessions[oldestDraftKey];
         }
-        StorageService().saveRecord({
-          [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
-        });
+        StorageService()
+          .saveRecord({
+            [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
+          })
+          .then(() => {
+            trackDraftSessionAutoSaved();
+          })
+          .catch((e) => console.log(e));
       }
       // const neww = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
       // console.log({ neww });
