@@ -17,7 +17,7 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system/components";
 import LINKS from "config/constants/sub/links";

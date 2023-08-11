@@ -10,7 +10,7 @@ import {
   DownloadOutlined,
   FilterOutlined,
 } from "@ant-design/icons";
-import { VscRegex } from "react-icons/vsc";
+import { VscRegex } from "@react-icons/all-files/vsc/VscRegex";
 import { RQButton } from "lib/design-system/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";

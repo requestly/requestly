@@ -7,7 +7,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import { redirectToFileMockEditorCreateMock, redirectToMocksList } from "utils/RedirectionUtils";
 import { FileType } from "../types";
-import { IoLogoCss3, IoLogoHtml5, IoLogoJavascript } from "react-icons/io5";
+import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
+import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";
+import { IoLogoJavascript } from "@react-icons/all-files/io5/IoLogoJavascript";
 import { AUTH } from "modules/analytics/events/common/constants";
 
 const FILE_TYPES_CONFIG = {

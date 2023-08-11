@@ -13,7 +13,7 @@ import {
   defaultJsEditorMock,
 } from "../MockEditorIndex/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { AiOutlineCloudUpload } from "react-icons/ai";
+import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { Row, Space, Typography } from "antd";
 import { getUserAuthDetails } from "store/selectors";

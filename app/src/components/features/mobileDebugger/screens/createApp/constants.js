@@ -1,5 +1,6 @@
-import { AiFillAndroid } from "react-icons/ai";
-import { FaAppStore, FaReact } from "react-icons/fa";
+import { AiFillAndroid } from "@react-icons/all-files/ai/AiFillAndroid";
+import { FaAppStore } from "@react-icons/all-files/fa/FaAppStore";
+import { FaReact } from "@react-icons/all-files/fa/FaReact";
 
 export const APP_PLATFORMS = [
   {

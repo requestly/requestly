@@ -1,4 +1,6 @@
-import { IoLogoHtml5, IoLogoCss3, IoLogoJavascript } from "react-icons/io5";
+import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";
+import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
+import { IoLogoJavascript } from "@react-icons/all-files/io5/IoLogoJavascript";
 
 const MOCK_TYPES_CONFIG = {
   // API: {

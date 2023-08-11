@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FaCheck, FaExclamationCircle, FaSpinner } from "react-icons/fa";
+import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
+import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";

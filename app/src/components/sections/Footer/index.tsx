@@ -5,7 +5,7 @@ import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
 import { MessageOutlined, NotificationOutlined, PicRightOutlined, ReadOutlined } from "@ant-design/icons";
-import { FaYCombinator } from "react-icons/fa";
+import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
 import { redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { Footer } from "antd/lib/layout/layout";

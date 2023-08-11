@@ -1,7 +1,7 @@
 import { LinkOutlined, LockOutlined } from "@ant-design/icons";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FiUsers } from "react-icons/fi";
-import { IoEarth } from "react-icons/io5";
+import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
+import { IoEarth } from "@react-icons/all-files/io5/IoEarth";
 import ShareRecordingModal from "../ShareRecordingModal";
 import {
   trackSessionRecordingShareClicked,
