@@ -1,3 +1,9 @@
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 .home-v2-container {
   padding: 100px 80px;
   padding-right: 20px;
@@ -66,7 +72,7 @@
       border: 1px solid var(--border-dark);
       cursor: pointer;
       transition: 0.25s all ease-in-out;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius-md);
 
       &-title {
         font-size: 1rem;
@@ -94,18 +100,19 @@
     }
 
     .highlight-feature-card {
+      --angle: 0deg;
       position: relative;
-      padding: 2px;
-      border-radius: var(--border-radius-sm);
-      background: linear-gradient(45deg, #ffde00 0%, #ff6711 118.62%);
-      animation: animatedgradient 1s ease alternate infinite;
-      background-size: 300% 300%;
       transition: 0.25s all ease-in-out;
+      padding: 2.5px;
+      border-radius: var(--border-radius-md);
+      background: linear-gradient(var(--angle), #ffde00 0%, #ff6105 108.62%, #ffe600 20%, #ff9d00e6 28%);
+      animation: 2s animateBorder ease-in-out infinite;
     }
     .highlighted-feature-card-badge {
       position: absolute;
       top: -10px;
       right: -5px;
+      border-radius: var(--border-radius-md);
 
       & .rq-badge {
         background: #343434;
@@ -113,15 +120,13 @@
         font-size: 12px;
       }
     }
-    @keyframes animatedgradient {
+
+    @keyframes animateBorder {
       0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
+        --angle: 0deg;
       }
       100% {
-        background-position: 0% 50%;
+        --angle: 360deg;
       }
     }
   }
