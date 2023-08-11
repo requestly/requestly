@@ -11,6 +11,7 @@ export enum EVENT {
   STOP_RECORDING_CLICKED = "stop_recording_clicked",
   VIEW_RECORDING_CLICKED = "view_recording_clicked",
   WATCH_DEMO_VIDEO_CLICKED = "watch_demo_video_clicked",
+  PRODUCT_HUNT_BANNER_CLICKED = "product_hunt_banner_clicked",
 }
 
 export const sendEvent = (eventName: EVENT, eventParams: Record<string, any> = {}) => {

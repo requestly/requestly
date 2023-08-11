@@ -11,11 +11,11 @@ import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetail
 import { unselectAllRules } from "../../rules/actions";
 
 //ICONS
-import { AiOutlineWarning } from "react-icons/ai";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { EditFilled, ShareAltOutlined } from "@ant-design/icons";
-import { IoEarthOutline } from "react-icons/io5";
-import { FiUsers } from "react-icons/fi";
-import { BsBuilding } from "react-icons/bs";
+import { IoEarthOutline } from "@react-icons/all-files/io5/IoEarthOutline";
+import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
+import { BsBuilding } from "@react-icons/all-files/bs/BsBuilding";
 
 import { Visibility } from "utils/sharedListUtils";
 

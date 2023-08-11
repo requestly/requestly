@@ -1,5 +1,5 @@
 import { Col } from "antd";
-import { FcAndroidOs } from "react-icons/fc";
+import { FcAndroidOs } from "@react-icons/all-files/fc/FcAndroidOs";
 import APP_CONSTANTS from "config/constants";
 export default function AndroidInterceptorLaunchHeader() {
   return (

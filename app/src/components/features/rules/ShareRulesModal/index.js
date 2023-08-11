@@ -7,8 +7,8 @@ import SpinnerColumn from "../../../misc/SpinnerColumn";
 //UTILS
 import { getIsRefreshRulesPending } from "../../../../store/selectors";
 //ICONS
-import { AiOutlineWarning } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 //ACTIONS
 import { deleteRulesFromStorage } from "./actions";
 import { actions } from "../../../../store";

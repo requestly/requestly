@@ -49,7 +49,7 @@ export const useGoogleOneTapLogin = () => {
   }, [user?.loggedIn, appMode]);
 
   const listener = useEffect(() => {
-    if (script === "ready" && !config.disabled) {
+    if (script === "ready" && !config.disabled && window.google) {
       window.google.accounts.id.initialize({ ...config });
       window.google.accounts.id.prompt((notification: any) => {
         if (notification.isDisplayed()) {
