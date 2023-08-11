@@ -48,6 +48,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   }, [supportedBrowsers]);
 
   const handleDownloadExtensionClick = () => {
+    window.localStorage.setItem("extension_install_source", window.location.pathname);
     setIsReloadPagePromptVisible(true);
     trackExtensionInstallationButtonClicked(eventPage);
   };
