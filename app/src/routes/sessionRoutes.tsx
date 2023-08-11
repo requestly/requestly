@@ -37,7 +37,7 @@ export const sessionRoutes: RouteObject[] = [
   },
   {
     /**
-     * Avoids multiple redirects when user directly visits /sessions/saved/:id
+     * Avoids circular redirects
      */
     path: "/r" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
     element: <Navigate to={window.location.pathname.replace("/r", "")} />,
