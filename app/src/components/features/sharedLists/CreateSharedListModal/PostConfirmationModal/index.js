@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import { AiFillInfoCircle } from "react-icons/ai";
+import { AiFillInfoCircle } from "@react-icons/all-files/ai/AiFillInfoCircle";
 import SpinnerColumn from "../../../../misc/SpinnerColumn";
 import { getUserAuthDetails } from "store/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";

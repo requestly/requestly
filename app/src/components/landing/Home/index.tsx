@@ -7,7 +7,7 @@ import { FeatureTag } from "components/common/FeatureTag";
 import developmentIcon from "../../../assets/icons/system.svg";
 import testingIcon from "../../../assets/icons/bug.svg";
 import debuggingIcon from "../../../assets/icons/flask.svg";
-import { BsArrowRight } from "react-icons/bs";
+import { BsArrowRight } from "@react-icons/all-files/bs/BsArrowRight";
 import FEATURES from "config/constants/sub/features";
 import PATHS from "config/constants/sub/paths";
 import { trackEcosystemFeatureClicked } from "modules/analytics/events/features/ecosystem";
