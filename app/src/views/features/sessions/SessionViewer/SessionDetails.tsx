@@ -108,14 +108,22 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     }
   }, [events]);
 
-  // destroy player on unmount
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    const pauseVideo = () => {
+      player?.pause();
+    };
+
+    // no rrweb listener on the player works when focus is shifted from the tab
+    // The player keeps playing even when the tab is not in focus.
+    // so we add a listener on the window to pause the player when the tab is blurred
+    window.addEventListener("blur", pauseVideo);
+
+    return () => {
       // @ts-ignore
-      player?.$destroy();
-    },
-    [player]
-  );
+      player?.$destroy(); // destroy player on unmount
+      window.removeEventListener("blur", pauseVideo);
+    };
+  }, [player]);
 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
