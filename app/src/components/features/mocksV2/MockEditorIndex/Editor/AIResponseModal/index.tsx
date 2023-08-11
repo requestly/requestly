@@ -2,7 +2,7 @@ import { Button, Col, Input, Row } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQModal } from "lib/design-system/components";
-import { ImMagicWand } from "react-icons/im";
+import { ImMagicWand } from "@react-icons/all-files/im/ImMagicWand";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 import "./index.css";
