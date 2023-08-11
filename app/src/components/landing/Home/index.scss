@@ -53,16 +53,20 @@
         color: var(--text-gray);
       }
     }
-
+    .home-feature-card-wrapper {
+      transition: 0.15s all ease-in-out;
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+      }
+    }
     .home-v2-grid-card {
-      //   background: #0e1116;
       background: var(--app-secondary-sidebar-background);
       padding: 16px;
       border: 1px solid var(--border-dark);
-      border-radius: var(--border-radius-sm);
-      margin-top: 1rem;
       cursor: pointer;
-      transition: 0.25s background ease-in-out;
+      transition: 0.25s all ease-in-out;
+      border-radius: var(--border-radius-sm);
 
       &-title {
         font-size: 1rem;
@@ -78,14 +82,46 @@
         gap: 4px;
         opacity: 0;
         color: var(--white);
-        transition: 0.25s opacity ease-in-out;
+        transition: 0.25s all ease-in-out;
       }
       &:hover {
-        background-color: var(--border-dark);
+        background: var(--border-dark);
         .get-started-text {
           opacity: 1;
           color: var(--white);
         }
+      }
+    }
+
+    .highlight-feature-card {
+      position: relative;
+      padding: 2px;
+      border-radius: var(--border-radius-sm);
+      background: linear-gradient(45deg, #ffde00 0%, #ff6711 118.62%);
+      animation: animatedgradient 1s ease alternate infinite;
+      background-size: 300% 300%;
+      transition: 0.25s all ease-in-out;
+    }
+    .highlighted-feature-card-badge {
+      position: absolute;
+      top: -10px;
+      right: -5px;
+
+      & .rq-badge {
+        background: #343434;
+        box-shadow: 0px 1px 0px 0px #ffffff14 inset;
+        font-size: 12px;
+      }
+    }
+    @keyframes animatedgradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
       }
     }
   }

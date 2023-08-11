@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import { Row, Typography } from "antd";
 import { FeatureTag } from "components/common/FeatureTag";
+import { RQBadge } from "lib/design-system/components/RQBadge";
 import developmentIcon from "../../../assets/icons/system.svg";
 import testingIcon from "../../../assets/icons/bug.svg";
 import debuggingIcon from "../../../assets/icons/flask.svg";
@@ -13,11 +14,16 @@ import PATHS from "config/constants/sub/paths";
 import { trackEcosystemFeatureClicked } from "modules/analytics/events/features/ecosystem";
 import "./index.scss";
 
+interface HomeFeature {
+  featureHeader: FeatureHeaderDetails;
+  featureCards: FeatureCardDetails[];
+}
 interface FeatureCardDetails {
   title: string;
   description: string;
   tag: string;
   navigateTo: string;
+  highlightFeature?: boolean;
   analyticsContext: string;
 }
 interface FeatureHeaderDetails {
@@ -26,7 +32,7 @@ interface FeatureHeaderDetails {
   icon: string;
 }
 
-const HOME_FEATURES = [
+const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Development",
@@ -78,6 +84,7 @@ const HOME_FEATURES = [
         description: "Capture screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
+        highlightFeature: true,
         analyticsContext: "session_recording",
       },
     ],
@@ -103,18 +110,21 @@ export const Home: React.FC = () => {
                 description={featureHeader.description}
                 icon={featureHeader.icon}
               />
-              {featureCards.map(({ title, description, tag, navigateTo, analyticsContext }, index) => {
-                return (
-                  <FeatureCard
-                    key={index}
-                    title={title}
-                    description={description}
-                    tag={tag}
-                    navigateTo={navigateTo}
-                    analyticsContext={analyticsContext}
-                  />
-                );
-              })}
+              {featureCards.map(
+                ({ title, description, tag, navigateTo, highlightFeature, analyticsContext }, index) => {
+                  return (
+                    <FeatureCard
+                      key={index}
+                      title={title}
+                      description={description}
+                      tag={tag}
+                      navigateTo={navigateTo}
+                      highlightFeature={highlightFeature}
+                      analyticsContext={analyticsContext}
+                    />
+                  );
+                }
+              )}
             </div>
           );
         })}
@@ -135,7 +145,14 @@ const FeatureHeader: React.FC<FeatureHeaderDetails> = ({ title, description, ico
   );
 };
 
-const FeatureCard: React.FC<FeatureCardDetails> = ({ title, description, tag, navigateTo, analyticsContext }) => {
+const FeatureCard: React.FC<FeatureCardDetails> = ({
+  title,
+  description,
+  tag,
+  navigateTo,
+  highlightFeature,
+  analyticsContext,
+}) => {
   return (
     <Link
       to={navigateTo}
@@ -143,16 +160,23 @@ const FeatureCard: React.FC<FeatureCardDetails> = ({ title, description, tag, na
         trackEcosystemFeatureClicked(analyticsContext);
       }}
     >
-      <div className="home-v2-grid-card">
-        <Typography.Title className="home-v2-grid-card-title">{title}</Typography.Title>
-        <Typography.Text className="home-v2-grid-card-description">{description}</Typography.Text>
-        <Row justify="space-between" align="middle" className="mt-16">
-          <FeatureTag feature={tag} />
-          <div className="display-row-center get-started-text">
-            Get started
-            <BsArrowRight />
+      <div className={`${highlightFeature ? "highlight-feature-card" : null} home-feature-card-wrapper mt-16`}>
+        {highlightFeature && (
+          <div className="highlighted-feature-card-badge">
+            <RQBadge badgeText="NEW" />
           </div>
-        </Row>
+        )}
+        <div className="home-v2-grid-card">
+          <Typography.Title className="home-v2-grid-card-title">{title}</Typography.Title>
+          <Typography.Text className="home-v2-grid-card-description">{description}</Typography.Text>
+          <Row justify="space-between" align="middle" className="mt-16">
+            <FeatureTag feature={tag} />
+            <div className="display-row-center get-started-text">
+              Get started
+              <BsArrowRight />
+            </div>
+          </Row>
+        </div>
       </div>
     </Link>
   );
