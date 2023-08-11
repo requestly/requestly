@@ -49,6 +49,7 @@
     "@devtools-ds/themes": "^1.2.1",
     "@growthbook/growthbook-react": "^0.13.0",
     "@monaco-editor/react": "^4.4.6",
+    "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v4.10.1/react-icons-all-files-4.10.1.tgz",
     "@reduxjs/toolkit": "^1.9.0",
     "@requestly/mock-server": "^0.0.1",
     "@requestly/requestly-core": "file:..",
@@ -92,7 +93,6 @@
     "react-github-btn": "^1.3.0",
     "react-hover-observer": "^2.1.1",
     "react-iconly": "^2.2.5",
-    "react-icons": "^4.3.1",
     "react-joyride": "^2.5.3",
     "react-medium-image-zoom": "^5.1.3",
     "react-microsoft-clarity": "^1.2.0",
@@ -128,7 +128,7 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.14.0",
+    "@requestly/web-sdk": "0.14.1",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",

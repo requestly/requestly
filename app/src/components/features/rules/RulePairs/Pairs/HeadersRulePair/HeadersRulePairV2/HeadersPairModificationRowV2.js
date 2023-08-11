@@ -4,7 +4,7 @@ import { AutoComplete, Col, Dropdown, Input, Menu, Row, Tooltip } from "antd";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { ImCross } from "react-icons/im";
+import { ImCross } from "@react-icons/all-files/im/ImCross";
 import HEADER_SUGGESTIONS from "../../../../../../../config/constants/sub/header-suggestions";
 import { actions } from "store";
 

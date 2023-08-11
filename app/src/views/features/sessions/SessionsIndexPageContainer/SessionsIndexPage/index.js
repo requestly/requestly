@@ -280,7 +280,7 @@ const SessionsIndexPage = () => {
             onFilesDrop={onSessionRecordingFileDrop}
             isProcessing={processingDataToImport}
             loaderMessage="Importing session..."
-            title="Drag and drop your downloaded session recording file"
+            title="Drag and drop your downloaded session replay file"
           />
         </div>
       </RQModal>
