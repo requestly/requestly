@@ -51,7 +51,7 @@
         const newTabState = {
           ...tab,
           [this.dataScope.TAB]: existingTab[this.dataScope.TAB] || {},
-          [this.dataScope.PAGE]: existingTab[this.dataScope.PAGE] || {}, // TODO: use webNavigation API to keep in sync with page
+          [this.dataScope.PAGE]: existingTab[this.dataScope.PAGE] || {},
         };
 
         this.addOrUpdateTab(newTabState);
@@ -207,13 +207,11 @@
     }
 
     // do not pass tabId to set icon globally
-    async setExtensionIcon(path, tabId) {
+    setExtensionIcon(path, tabId) {
       if (typeof tabId === "undefined") {
         chrome.browserAction.setIcon({ path });
         return;
       }
-
-      await this.ensureTabLoadingComplete(tabId);
 
       // on invoking setIcon multiple times simultaneously in a tab may lead to inconsistency without synchronization
       let setIconSynchronizer = this.getPageData(tabId, "setIconSynchronizer");
