@@ -75,7 +75,7 @@ const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using screen recording, delaying responses & more",
+      description: "Validate your solution with tools like session recording",
       icon: debuggingIcon,
     },
     featureCards: [
