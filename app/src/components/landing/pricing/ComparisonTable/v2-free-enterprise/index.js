@@ -161,7 +161,7 @@ const FreeAndEnterprisePlanTable = () => {
                   <span>
                     Everything <img src={underlineIcon} alt="highlight" />
                   </span>{" "}
-                  in Basic plan, and
+                  in Free plan, and
                 </div>
                 <div>
                   {Plans["session-replay"].pro.map((feature, index) => (
