@@ -8,7 +8,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
   const workEmailsBenefits = [
     "Use Requestly with your colleagues",
     "Access to Team Workspaces",
-    "Access to Session Recording",
+    "Access to Session Replay",
     "Organization level access controls",
   ];
 

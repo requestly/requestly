@@ -74,7 +74,7 @@ const HOME_FEATURES = [
     },
     featureCards: [
       {
-        title: "Debug faster with Session Recording",
+        title: "Debug faster with Session Replay",
         description: "Capture screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
