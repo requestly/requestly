@@ -55,7 +55,7 @@ const FreeAndEnterprisePlanTable = () => {
                 <img src={sessionImg} alt="rules" />
               </div>
               <div className="pricing-table-product-view-para">
-                <h3>Session Recording</h3>
+                <h3>Session Replay</h3>
                 <p>Capture Screen , mouse movement, network ,console and more of any browser session</p>
               </div>
             </div>
