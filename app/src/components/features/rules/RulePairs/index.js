@@ -4,7 +4,7 @@ import { Collapse, Tooltip } from "antd";
 import { actions } from "store";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
 import "./RulePairs.css";

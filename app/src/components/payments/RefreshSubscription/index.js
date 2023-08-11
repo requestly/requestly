@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaExclamationCircle } from "react-icons/fa";
-import { FiRefreshCcw } from "react-icons/fi";
+import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
+import { FiRefreshCcw } from "@react-icons/all-files/fi/FiRefreshCcw";
 import { Row, Col, Container, Card, CardBody, Button } from "reactstrap";
 import { toast } from "utils/Toast.js";
 // CONSTANTS

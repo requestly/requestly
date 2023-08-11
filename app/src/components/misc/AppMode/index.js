@@ -6,7 +6,7 @@ import { getPrettyAppModeName } from "../../../utils/FormattingHelper";
 import { getAppMode } from "../../../store/selectors";
 // DATA
 import { AppModesConfig } from "../../sections/Navbars/components/sub/AppModeSelector/data";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaExternalLinkAlt } from "@react-icons/all-files/fa/FaExternalLinkAlt";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 
 const AppMode = () => {

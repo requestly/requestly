@@ -10,7 +10,7 @@ import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BsStars } from "react-icons/bs";
+import { BsStars } from "@react-icons/all-files/bs/BsStars";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType } from "../../types";
