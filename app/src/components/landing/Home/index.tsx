@@ -75,7 +75,7 @@ const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using session replays, delaying responses & more",
+      description: "Validate your solutions using tools like session replay",
       icon: debuggingIcon,
     },
     featureCards: [
