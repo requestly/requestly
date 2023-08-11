@@ -9,6 +9,18 @@ class ExtensionIconManager {
     RULE_EXECUTED_WITH_REC: "/resources/images/48x48_green_rec.png",
   };
 
+  #CONSTANTS = {
+    PAGE_DATA_ICON_CONFIG: "extensionIconConfig",
+  };
+
+  constructor() {
+    chrome.tabs.onUpdated.addListener((tabId) => {
+      if (window.tabService.getPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG)) {
+        this.#updateIconState(tabId);
+      }
+    });
+  }
+
   #getDefaultConfig() {
     return {
       ruleExecuted: false,
@@ -17,6 +29,10 @@ class ExtensionIconManager {
   }
 
   #getIcon(config) {
+    if (this.#isExtensionDisabled) {
+      return this.#icons.DISABLED;
+    }
+
     if (config.ruleExecuted) {
       if (config.isRecording) {
         return this.#icons.RULE_EXECUTED_WITH_REC;
@@ -32,39 +48,47 @@ class ExtensionIconManager {
     return this.#icons.DEFAULT;
   }
 
-  async #updateConfig(tabId, key, value) {
-    await window.tabService.ensureTabLoadingComplete(tabId);
+  #updateIconState(tabId, newConfigKey, newConfigValue) {
+    let config =
+      window.tabService.getPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG) || this.#getDefaultConfig();
 
-    let config = window.tabService.getPageData(tabId, "extensionIconConfig") || this.#getDefaultConfig();
-
-    if (key && config[key] !== value) {
-      config = { ...config, [key]: value };
-      window.tabService.setPageData(tabId, "extensionIconConfig", config);
+    if (newConfigKey && config[newConfigKey] !== newConfigValue) {
+      config = { ...config, [newConfigKey]: newConfigValue };
+      window.tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
     }
 
     window.tabService.setExtensionIcon(this.#getIcon(config), tabId);
   }
 
+  #updateIconStateForAllTabs() {
+    const tabsWithIconConfig = window.tabService.getTabsWithPageDataFilter((pageData) => {
+      return !!pageData[this.#CONSTANTS.PAGE_DATA_ICON_CONFIG];
+    });
+    tabsWithIconConfig.forEach((tab) => this.#updateIconState(tab.id));
+  }
+
   markExtensionEnabled = () => {
     this.#isExtensionDisabled = false;
     window.tabService.setExtensionIcon(this.#icons.DEFAULT);
+    this.#updateIconStateForAllTabs();
   };
 
   markExtensionDisabled = () => {
     this.#isExtensionDisabled = true;
     window.tabService.setExtensionIcon(this.#icons.DISABLED);
+    this.#updateIconStateForAllTabs();
   };
 
   markRuleExecuted(tabId) {
-    this.#updateConfig(tabId, "ruleExecuted", true);
+    this.#updateIconState(tabId, "ruleExecuted", true);
   }
 
   markRecording(tabId) {
-    this.#updateConfig(tabId, "isRecording", true);
+    this.#updateIconState(tabId, "isRecording", true);
   }
 
   markNotRecording(tabId) {
-    this.#updateConfig(tabId, "isRecording", false);
+    this.#updateIconState(tabId, "isRecording", false);
   }
 }
 
