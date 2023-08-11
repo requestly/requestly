@@ -86,8 +86,11 @@ const DraftSessionViewer: React.FC = () => {
             trackDraftSessionAutoSaved();
           })
           .catch((e) => console.log(e));
-      } else if (tabId in draftSessions) return;
-      else {
+      } else {
+        if (tabId in draftSessions) {
+          delete draftSessions[tabId];
+        }
+
         if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
           const oldestDraftKey = Object.keys(draftSessions)[0];
           delete draftSessions[oldestDraftKey];
