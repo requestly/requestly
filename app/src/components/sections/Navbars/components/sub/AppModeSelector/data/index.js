@@ -1,7 +1,9 @@
 import React from "react";
 // ICONS
-import { FaChrome, FaDesktop, FaWordpress } from "react-icons/fa";
-import { SiCloudflare } from "react-icons/si";
+import { FaChrome } from "@react-icons/all-files/fa/FaChrome";
+import { FaDesktop } from "@react-icons/all-files/fa/FaDesktop";
+import { FaWordpress } from "@react-icons/all-files/fa/FaWordpress";
+import { SiCloudflare } from "@react-icons/all-files/si/SiCloudflare";
 // UTILS
 import { getShortAppModeName, getPrettyAppModeName } from "../../../../../../../utils/FormattingHelper";
 // CONSTANTS

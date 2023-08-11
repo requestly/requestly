@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Dropdown, Menu } from "antd";
-import { ImCross } from "react-icons/im";
+import { ImCross } from "@react-icons/all-files/im/ImCross";
 import Text from "antd/lib/typography/Text";
 import { DownOutlined } from "@ant-design/icons";
 import { actions } from "store";

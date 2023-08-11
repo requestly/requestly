@@ -1,5 +1,5 @@
 import { Typography } from "antd";
-import { HiArrowRight } from "react-icons/hi";
+import { HiArrowRight } from "@react-icons/all-files/hi/HiArrowRight";
 import underlineIcon from "../../../../../../../../assets/img/icons/common/underline.svg";
 
 export const WorkspaceOnboardingBanner = () => {
