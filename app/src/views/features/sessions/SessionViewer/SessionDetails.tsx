@@ -68,10 +68,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     return Math.floor((currentTimeRef.current - startTime) / 1000);
   }, [startTime]);
 
-  const onBlurListener = useCallback(() => {
-    player?.pause();
-  }, [player]);
-
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -112,15 +108,22 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     }
   }, [events]);
 
-  // destroy player on unmount
-  useEffect(
-    () => () => {
-      window.removeEventListener("blur", onBlurListener);
+  useEffect(() => {
+    const pauseVideo = () => {
+      player?.pause();
+    };
+
+    // no rrweb listener on the player works when focus is shifted from the tab
+    // The player keeps playing even when the tab is not in focus.
+    // so we add a listener on the window to pause the player when the tab is blurred
+    window.addEventListener("blur", pauseVideo);
+
+    return () => {
       // @ts-ignore
-      player?.$destroy();
-    },
-    [onBlurListener, player]
-  );
+      player?.$destroy(); // destroy player on unmount
+      window.removeEventListener("blur", pauseVideo);
+    };
+  }, [player]);
 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
@@ -134,15 +137,10 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       return;
     }
 
-    // no rrweb listener on the player works when focus is shifted from the tab
-    // The player keeps playing even when the tab is not in focus.
-    // so we add a listener on the window to pause the player when the tab is blurred
-    window.addEventListener("blur", onBlurListener);
-
     // player should start playing from the start time offset only on the
     // first load and not when the user changes time offset.
     player.goto(offsetTimeRef.current * 1000, true);
-  }, [onBlurListener, player]);
+  }, [player]);
 
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
