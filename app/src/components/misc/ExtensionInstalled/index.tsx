@@ -4,13 +4,13 @@ import { trackExtensionInstalled } from "modules/analytics/events/misc/installat
 import PATHS from "config/constants/sub/paths";
 
 const ExtensionInstalled: React.FC = () => {
-  const navigateToPage = window.localStorage.getItem("extension_install_source");
+  const installSourcePage = window.localStorage.getItem("extension_install_source");
 
   useEffect(() => {
     trackExtensionInstalled();
   }, []);
 
-  return <Navigate to={navigateToPage ?? PATHS.RULES.MY_RULES.ABSOLUTE} />;
+  return <Navigate to={installSourcePage ?? PATHS.RULES.MY_RULES.ABSOLUTE} />;
 };
 
 export default ExtensionInstalled;

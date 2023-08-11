@@ -1,6 +1,8 @@
 import React, { useCallback, useRef, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
@@ -21,8 +23,6 @@ import {
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
 
 const { Text, Title } = Typography;
 
