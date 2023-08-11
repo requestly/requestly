@@ -124,12 +124,12 @@ class RQSessionRecordingWidget extends HTMLElement {
       <div id="container">
         <div>
           <span class="recording-icon"></span>
-          <span class="action stop-recording">Stop & Watch recording</span>
+          <span class="action stop-recording">Stop & Watch Replay</span>
         </div>
-        <div>  
+        <div>
           <span class="divider"></span>
           <span class="action discard-recording" title="Discard">${BinIcon}</span>
-        </div>  
+        </div>
       </div>
     `;
   }
