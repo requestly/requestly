@@ -69,7 +69,7 @@ const HOME_FEATURES = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using screen recording, delaying responses & more",
+      description: "Validate your solutions using session replays, delaying responses & more",
       icon: debuggingIcon,
     },
     featureCards: [

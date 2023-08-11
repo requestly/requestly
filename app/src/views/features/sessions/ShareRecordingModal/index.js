@@ -244,7 +244,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
     <Modal
       title={
         <span>
-          <ShareAltOutlined style={{ marginRight: 5 }} /> Share Recording
+          <ShareAltOutlined style={{ marginRight: 5 }} /> Share Replay
         </span>
       }
       open={isVisible}
