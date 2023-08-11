@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Typography } from "antd";
-import config from "../../../config";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
 import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
@@ -22,10 +21,6 @@ const SessionRecordingView: React.FC = () => {
     setIsRecordingSession(true);
   }, [currentTabId]);
 
-  const openRecordedSession = useCallback(() => {
-    window.open(`${config.WEB_URL}/sessions/draft/${currentTabId}`, "_blank");
-  }, [currentTabId]);
-
   const viewRecordingOnClick = useCallback(
     (stopRecording?: boolean) => {
       if (isManualMode || stopRecording) {
@@ -33,14 +28,18 @@ const SessionRecordingView: React.FC = () => {
         chrome.runtime.sendMessage({
           action: EXTENSION_MESSAGES.STOP_RECORDING,
           tabId: currentTabId,
+          openRecording: true,
         });
         setIsRecordingSession(false);
       } else {
         sendEvent(EVENT.VIEW_RECORDING_CLICKED);
+        chrome.runtime.sendMessage({
+          action: EXTENSION_MESSAGES.WATCH_RECORDING,
+          tabId: currentTabId,
+        });
       }
-      openRecordedSession();
     },
-    [openRecordedSession, isManualMode, currentTabId]
+    [isManualMode, currentTabId]
   );
 
   useEffect(() => {
@@ -92,7 +91,7 @@ const SessionRecordingView: React.FC = () => {
                 </Typography.Text>
                 <br />
                 <Typography.Text className="custom-mode-caption">
-                  This tab is being recorded by session recorder
+                  This tab is being recorded by session Replay
                 </Typography.Text>
               </>
             ) : (
@@ -138,7 +137,7 @@ const SessionRecordingView: React.FC = () => {
             className="session-view-link-button"
             onClick={() => viewRecordingOnClick()}
           >
-            <EyeOutlined /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
+            <EyeOutlined /> <span>{isManualMode ? "Stop & watch replay" : "Watch replay"}</span>
           </Button>
         ) : (
           <Typography.Link

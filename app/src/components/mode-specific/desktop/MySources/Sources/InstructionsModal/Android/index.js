@@ -45,7 +45,7 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
       {
         title: "Test HTTP Proxy",
         status: "process",
-        description: <TestProxyInstructions />,
+        description: <TestProxyInstructions device="android" />,
       },
       {
         title: "Download certificate",

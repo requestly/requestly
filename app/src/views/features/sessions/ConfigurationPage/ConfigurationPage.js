@@ -250,7 +250,7 @@ const ConfigurationPage = () => {
                   icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
                   onClick={() => redirectToSessionRecordingHome(navigate)}
                 />
-                <span>Session Recording Settings</span>
+                <span>Session Replay Settings</span>
               </div>
 
               <Button type="primary" onClick={savePageSource} className="ml-auto">

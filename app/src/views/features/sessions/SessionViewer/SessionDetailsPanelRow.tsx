@@ -1,7 +1,8 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { Divider, Typography } from "antd";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { ClockCircleOutlined } from "@ant-design/icons";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 
 interface Props {
   timeOffset: number;
@@ -20,6 +21,8 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
   className = "",
   onClick,
 }) => {
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+
   return (
     <>
       <div className={`session-details-panel-row ${className}`} onClick={onClick}>
@@ -42,10 +45,10 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
               <div className="primary-message" style={{ display: "flex", alignItems: "start" }}>
                 {children}
               </div>
-              {secondaryMessage && <div className="secondary-message">{secondaryMessage}</div>}
+              {!isInsideIframe && secondaryMessage && <div className="secondary-message">{secondaryMessage}</div>}
             </div>
           </div>
-          <div className="right-info">{rightInfo}</div>
+          {!isInsideIframe && <div className="right-info">{rightInfo}</div>}
         </div>
       </div>
       <Divider style={{ margin: 0 }} />

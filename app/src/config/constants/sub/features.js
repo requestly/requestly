@@ -61,5 +61,6 @@ FEATURES.API_CLIENT = "api-client";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";
+FEATURES.SESSION_RECORDING = "session_recording";
 
 export default FEATURES;

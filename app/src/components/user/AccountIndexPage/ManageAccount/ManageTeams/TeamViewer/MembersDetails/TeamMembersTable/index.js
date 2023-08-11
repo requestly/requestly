@@ -237,7 +237,10 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
     getTeamSubscriptionInfo({ teamId: teamId })
       .then((res) => {
         const response = res.data;
-        setIsTeamPlanActive(response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE);
+        setIsTeamPlanActive(
+          response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
+            response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+        );
       })
       .catch((err) => new Error(err));
   };

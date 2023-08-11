@@ -38,7 +38,7 @@ RQ.RuleExecutionHandler.setup = () => {
       case RQ.CLIENT_MESSAGES.SYNC_APPLIED_RULES:
         RQ.RuleExecutionHandler.syncCachedAppliedRules(message.appliedRuleDetails, message.isConsoleLoggerEnabled);
         sendResponse();
-        return true;
+        break;
     }
     return false;
   });
@@ -53,4 +53,8 @@ RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleL
       isConsoleLoggerEnabled,
     });
   });
+};
+
+RQ.RuleExecutionHandler.hasExecutedRules = () => {
+  return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
 };

@@ -10,17 +10,15 @@ import { toast } from "utils/Toast";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { isValidUrl } from "utils/FormattingHelper";
 import { cloneDeep, isEmpty } from "lodash";
-import {
-  FaBan,
-  FaClock,
-  FaMinusCircle,
-  FaPlusCircle,
-  FaRandom,
-  FaTools,
-  FaMobileAlt,
-  FaCodeBranch,
-  FaCode,
-} from "react-icons/fa";
+import { FaBan } from "@react-icons/all-files/fa/FaBan";
+import { FaClock } from "@react-icons/all-files/fa/FaClock";
+import { FaMinusCircle } from "@react-icons/all-files/fa/FaMinusCircle";
+import { FaPlusCircle } from "@react-icons/all-files/fa/FaPlusCircle";
+import { FaRandom } from "@react-icons/all-files/fa/FaRandom";
+import { FaTools } from "@react-icons/all-files/fa/FaTools";
+import { FaMobileAlt } from "@react-icons/all-files/fa/FaMobileAlt";
+import { FaCodeBranch } from "@react-icons/all-files/fa/FaCodeBranch";
+import { FaCode } from "@react-icons/all-files/fa/FaCode";
 import { v4 as uuidv4 } from "uuid";
 import RuleSimulatorModal from "components/features/rules/RuleSimulatorModal";
 import { trackSimulateRulesEvent } from "modules/analytics/events/features/ruleSimulator";

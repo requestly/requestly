@@ -25,20 +25,10 @@ interface SurveyProps {
   isOpen?: boolean;
 }
 
-export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
+const SkipButton = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
-  const shuffledQuestionnaire = useMemo(() => {
-    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
-    const options = OptionsConfig[currentPage]?.options;
-    return shuffleOptions(options);
-  }, [currentPage]);
-
-  const skipButton = useMemo(() => {
+  return (
     <div className="skip-recommendation-wrapper">
       Existing user?
       <RQButton
@@ -62,11 +52,24 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
       >
         Sign in
       </RQButton>
-    </div>;
-  }, [dispatch]);
+    </div>
+  );
+};
+
+export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const appMode = useSelector(getAppMode);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
+
+  const shuffledQuestionnaire = useMemo(() => {
+    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
+    const options = OptionsConfig[currentPage]?.options;
+    return shuffleOptions(options);
+  }, [currentPage]);
 
   const renderOptions = useCallback((options: Option[], questionnaire: QuestionnaireType) => {
-    console.log("OPTION");
     return (
       <div className="survey-options-container">
         {options.map((option: Option, index: number) => (
@@ -83,26 +86,27 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
 
   const renderQuestionnaire = useCallback(
     (questionnaire: QuestionnaireType) => {
-      console.log("QUESTION");
       if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
     },
     [shuffledQuestionnaire, renderOptions]
   );
 
   const currentSurveyPage = useMemo(() => {
-    console.log("CURRENT");
     const page = SurveyConfig[currentPage as SurveyPage];
-    return (
-      <>
-        {currentPage === SurveyPage.GETTING_STARTED && skipButton}
-        <div className="text-center white text-bold survey-title">{page?.title}</div>
-        <div className="w-full survey-subtitle-wrapper">
-          <div className="text-gray text-center mt-8">{page?.subTitle}</div>
-        </div>
-        <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
-      </>
-    );
-  }, [renderQuestionnaire, currentPage, skipButton]);
+    const shouldShowPage = page?.visibility({ userPersona });
+    if (shouldShowPage) {
+      return (
+        <>
+          {currentPage === SurveyPage.GETTING_STARTED && <SkipButton />}
+          <div className="text-center white text-bold survey-title">{page?.title}</div>
+          <div className="w-full survey-subtitle-wrapper">
+            <div className="text-gray text-center mt-8">{page?.subTitle}</div>
+          </div>
+          <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
+        </>
+      );
+    } else handleSurveyNavigation(currentPage, dispatch);
+  }, [renderQuestionnaire, currentPage, dispatch, userPersona]);
 
   const handleMoveToRecommendationScreen = useCallback(() => {
     const isRecommendationScreen = currentPage === SurveyPage.RECOMMENDATIONS;
@@ -155,9 +159,12 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
 
   useEffect(() => {
     if (!(currentPage in SurveyConfig)) {
-      dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+      if (isSurveyModal) {
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        else dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+      } else callback?.();
     }
-  }, [currentPage, dispatch]);
+  }, [currentPage, dispatch, callback, isSurveyModal]);
 
   const surveyPages = useMemo(
     () => <>{currentPage !== SurveyPage.RECOMMENDATIONS ? <>{currentSurveyPage}</> : null}</>,

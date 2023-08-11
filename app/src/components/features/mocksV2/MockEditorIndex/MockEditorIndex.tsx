@@ -10,7 +10,7 @@ import {
 import { toast } from "utils/Toast";
 import MockEditor from "./Editor/index";
 import { MockEditorDataSchema } from "./types";
-import { editorDataToMockDataConverter, mockDataToEditorDataAdapter } from "../utils";
+import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAdapter } from "../utils";
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
 import { FileType, MockType } from "../types";
 import { getMock } from "backend/mocks/getMock";
@@ -18,20 +18,19 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
-import {
-  trackCreateMockEvent,
-  trackMockEditorClosed,
-  trackUpdateMockEvent,
-} from "modules/analytics/events/features/mocksV2";
+import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 interface Props {
   isNew?: boolean;
   mockType?: MockType;
   fileType?: FileType;
+  //for mockpicker
+  selectOnSave?: (url: string) => void;
+  handleCloseEditorFromPicker?: () => void;
 }
 
-const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
+const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnSave, handleCloseEditorFromPicker }) => {
   const { mockId } = useParams();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -70,6 +69,11 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
         if (mockId) {
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
+          if (selectOnSave) {
+            const url = generateFinalUrl(finalMockData.endpoint, user?.details?.profile?.uid, null, teamId);
+            selectOnSave(url);
+            return;
+          }
           if (mockType === MockType.FILE) {
             return redirectToFileMockEditorEditMock(navigate, mockId);
           }
@@ -93,8 +97,6 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
   };
 
   const handleOnClose = () => {
-    // TODO: Create a constant for this
-    trackMockEditorClosed(mockType, "cancel_button");
     if (mockType === MockType.FILE) {
       return redirectToFileMocksList(navigate);
     }
@@ -126,7 +128,7 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
         onSave={onMockSave}
         isNew
         mockType={mockType}
-        onClose={handleOnClose}
+        onClose={handleCloseEditorFromPicker ?? handleOnClose}
         mockData={mockData}
         savingInProgress={savingInProgress}
       />
@@ -144,7 +146,7 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
         mockType={mockType}
         onSave={onMockSave}
         mockData={mockEditorData}
-        onClose={handleOnClose}
+        onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
       />
     );

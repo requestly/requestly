@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
@@ -9,6 +9,8 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
+import { removeElement } from "utils/domUtils";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
@@ -18,7 +20,9 @@ const DashboardLayout = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
-  promptOneTapOnLoad();
+  if (!isAppOpenedInIframe()) {
+    promptOneTapOnLoad();
+  }
 
   const isPersonaRecommendationScreen = useMemo(
     () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
@@ -30,6 +34,14 @@ const DashboardLayout = () => {
       !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen),
     [pathname, isPersonaRecommendationScreen]
   );
+
+  useEffect(() => {
+    if (!isAppOpenedInIframe()) return;
+
+    removeElement(".app-sidebar");
+    removeElement(".app-header");
+    removeElement(".app-footer");
+  }, []);
 
   return (
     <>

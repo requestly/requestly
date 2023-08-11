@@ -31,3 +31,12 @@ export const isProductionUI =
 export const isLocalStoragePresent = (appMode) => {
   return !(appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled());
 };
+
+export const isAppOpenedInIframe = () => {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // Browsers can block access to window.top due to same origin policy.
+    return true;
+  }
+};

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
@@ -10,6 +10,7 @@ import {
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getIsWorkspaceOnboardingCompleted,
+  getIsJoinWorkspaceCardVisible,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
@@ -25,6 +26,9 @@ import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
+import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
+import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -37,7 +41,9 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
+  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -84,82 +90,94 @@ const DashboardContent = () => {
         <Outlet />
       </div>
 
-      {/* MODALS */}
-      {activeModals.loadingModal.isActive ? (
-        <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
-      ) : null}
-      {activeModals.authModal.isActive ? (
-        <AuthModal
-          isOpen={activeModals.authModal.isActive}
-          toggle={() => toggleAuthModal()}
-          {...activeModals.authModal.props}
-        />
-      ) : null}
-      {activeModals.extensionModal.isActive ? (
-        <InstallExtensionModal
-          open={activeModals.extensionModal.isActive}
-          onCancel={() => toggleExtensionModal()}
-          eventPage="dashboard_content"
-          {...activeModals.extensionModal.props}
-        />
-      ) : null}
-      {activeModals.freeTrialExpiredModal.isActive ? (
-        <FreeTrialExpiredModal
-          isOpen={activeModals.freeTrialExpiredModal.isActive}
-          {...activeModals.freeTrialExpiredModal.props}
-        />
-      ) : null}
-      {activeModals.syncConsentModal.isActive ? (
-        <SyncConsentModal
-          isOpen={activeModals.syncConsentModal.isActive}
-          toggle={toggleSyncConsentModal}
-          {...activeModals.syncConsentModal.props}
-        />
-      ) : null}
-      {activeModals.connectedAppsModal.isActive ? (
-        <ConnectedAppsModal
-          isOpen={activeModals.connectedAppsModal.isActive}
-          toggle={toggleConnectedAppsModal}
-          {...activeModals.connectedAppsModal.props}
-        />
-      ) : null}
-      {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
-        <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
-      ) : null}
-      {appOnboardingExp === "workspace_onboarding" &&
-      !isWorkspaceOnboardingCompleted &&
-      !userPersona.isSurveyCompleted ? (
-        <WorkspaceOnboarding
-          isOpen={activeModals.workspaceOnboardingModal.isActive}
-          handleUploadRulesModalClick={toggleImportRulesModal}
-          toggle={toggleWorkspaceOnboardingModal}
-        />
-      ) : null}
-      {activeModals.createWorkspaceModal.isActive ? (
-        <CreateWorkspaceModal
-          isOpen={activeModals.createWorkspaceModal.isActive}
-          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
-          {...activeModals.createWorkspaceModal.props}
-        />
-      ) : null}
-      {activeModals.inviteMembersModal.isActive ? (
-        <AddMemberModal
-          isOpen={activeModals.inviteMembersModal.isActive}
-          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
-          {...activeModals.inviteMembersModal.props}
-        />
-      ) : null}
-      {activeModals.switchWorkspaceModal.isActive ? (
-        <SwitchWorkspaceModal
-          isOpen={activeModals.switchWorkspaceModal.isActive}
-          toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
-          {...activeModals.switchWorkspaceModal.props}
-        />
-      ) : null}
+      {isInsideIframe ? null : (
+        <>
+          {/* MODALS */}
+          {activeModals.loadingModal.isActive ? (
+            <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
+          ) : null}
+          {activeModals.authModal.isActive ? (
+            <AuthModal
+              isOpen={activeModals.authModal.isActive}
+              toggle={() => toggleAuthModal()}
+              {...activeModals.authModal.props}
+            />
+          ) : null}
+          {activeModals.extensionModal.isActive ? (
+            <InstallExtensionModal
+              open={activeModals.extensionModal.isActive}
+              onCancel={() => toggleExtensionModal()}
+              eventPage="dashboard_content"
+              {...activeModals.extensionModal.props}
+            />
+          ) : null}
+          {activeModals.freeTrialExpiredModal.isActive ? (
+            <FreeTrialExpiredModal
+              isOpen={activeModals.freeTrialExpiredModal.isActive}
+              {...activeModals.freeTrialExpiredModal.props}
+            />
+          ) : null}
+          {activeModals.syncConsentModal.isActive ? (
+            <SyncConsentModal
+              isOpen={activeModals.syncConsentModal.isActive}
+              toggle={toggleSyncConsentModal}
+              {...activeModals.syncConsentModal.props}
+            />
+          ) : null}
+          {activeModals.connectedAppsModal.isActive ? (
+            <ConnectedAppsModal
+              isOpen={activeModals.connectedAppsModal.isActive}
+              toggle={toggleConnectedAppsModal}
+              {...activeModals.connectedAppsModal.props}
+            />
+          ) : null}
+          {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
+            <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
+          ) : null}
+          {appOnboardingExp === "workspace_onboarding" &&
+          !isWorkspaceOnboardingCompleted &&
+          !userPersona.isSurveyCompleted ? (
+            <WorkspaceOnboarding
+              isOpen={activeModals.workspaceOnboardingModal.isActive}
+              handleUploadRulesModalClick={toggleImportRulesModal}
+              toggle={toggleWorkspaceOnboardingModal}
+            />
+          ) : null}
+          {activeModals.createWorkspaceModal.isActive ? (
+            <CreateWorkspaceModal
+              isOpen={activeModals.createWorkspaceModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+              {...activeModals.createWorkspaceModal.props}
+            />
+          ) : null}
+          {activeModals.inviteMembersModal.isActive ? (
+            <AddMemberModal
+              isOpen={activeModals.inviteMembersModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal" }))}
+              {...activeModals.inviteMembersModal.props}
+            />
+          ) : null}
+          {activeModals.switchWorkspaceModal.isActive ? (
+            <SwitchWorkspaceModal
+              isOpen={activeModals.switchWorkspaceModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+              {...activeModals.switchWorkspaceModal.props}
+            />
+          ) : null}
+          {activeModals.joinWorkspaceModal.isActive ? (
+            <JoinWorkspaceModal
+              isOpen={activeModals.joinWorkspaceModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
+              {...activeModals.joinWorkspaceModal.props}
+            />
+          ) : null}
 
-      {isImportRulesModalActive ? (
-        <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
-      ) : null}
+          {isImportRulesModalActive ? (
+            <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
+          ) : null}
+          {isJoinWorkspaceCardVisible ? <JoinWorkspaceCard /> : null}
+        </>
+      )}
     </>
   );
 };

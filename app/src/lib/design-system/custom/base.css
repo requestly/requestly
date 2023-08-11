@@ -230,7 +230,7 @@
   max-width: 90%;
 }
 .external-link {
-  color: var(--text-gray);
+  color: var(--white);
   text-decoration: underline;
   transition: 0.2s ease-in-out;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { BiPencil } from "react-icons/bi";
+import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { TextAreaRef } from "antd/lib/input/TextArea";
 import "./RQEditorTitle.css";
 

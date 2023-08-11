@@ -21,6 +21,7 @@ export const SESSION_RECORDING = {
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
   session_recording_upload: "session_recording_upload",
+  session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -210,4 +211,8 @@ export const RULE_EDITOR = {
 export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",
+};
+
+export const ECOSYSTEM = {
+  ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
 };

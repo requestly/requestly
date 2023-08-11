@@ -13,8 +13,9 @@
     "dist/generated/shared.js",
     "src/client/js/utils.js",
     "src/modules/StorageService.js",
+    "src/pages/init.js",
     "src/client/js/sessionRecorder.js",
-    "src/pages/init.js"
+    "src/client/js/client.js"
   ],
   "client": [
     "../config/dist/config.js",
@@ -23,7 +24,6 @@
     "src/shared/constants.js",
     "src/client/js/utils.js",
     "src/client/js/ruleMatcher.js",
-    "src/client/js/registerCustomElements.js",
     "src/client/js/scriptRuleHandler.js",
     "src/client/js/userAgentRuleHandler.js",
     "src/client/js/requestResponseRuleHandler.js",

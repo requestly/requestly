@@ -1,23 +1,26 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
+import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
-import { useNavigate, useParams } from "react-router-dom";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
-import PATHS from "config/constants/sub/paths";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
-import { getUserAuthDetails } from "store/selectors";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
+import { actions } from "store";
+import PATHS from "config/constants/sub/paths";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
@@ -30,11 +33,14 @@ const DraftSessionViewer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
+  const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -43,6 +49,37 @@ const DraftSessionViewer: React.FC = () => {
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
     return `${hostname}@${formattedDate}`;
   }, []);
+
+  const hasUserCreatedSessions = useMemo(
+    () =>
+      userAttributes?.num_sessions > 0 ||
+      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_offline > 0,
+    [
+      userAttributes?.num_sessions,
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+    ]
+  );
+
+  useEffect(() => {
+    const unloadListener = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
+    };
+
+    // It is fired only if there was ANY interaction of the user with the site.
+    // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
+    // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+    window.addEventListener("beforeunload", unloadListener);
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, []);
+
+  unstable_usePrompt({
+    when: !isSaveSessionClicked,
+    message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+  });
 
   useEffect(
     () => () => {
@@ -133,17 +170,36 @@ const DraftSessionViewer: React.FC = () => {
             Discard
           </RQButton>
           <RQButton
+            data-tour-id="save-draft-session-btn"
             type="primary"
             className="text-bold session-viewer-save-action-btn"
-            onClick={() => setIsSavePopupVisible((prev) => !prev)}
+            onClick={() => {
+              setIsSavePopupVisible((prev) => !prev);
+              dispatch(
+                actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+              );
+            }}
           >
             Save <DownArrow />
           </RQButton>
 
-          {isSavePopupVisible && <SaveRecordingConfigPopup onClose={() => setIsSavePopupVisible(false)} />}
+          {isSavePopupVisible && (
+            <SaveRecordingConfigPopup
+              onClose={() => setIsSavePopupVisible(false)}
+              setIsSaveSessionClicked={setIsSaveSessionClicked}
+            />
+          )}
         </div>
       </div>
       <SessionDetails key={tabId} />
+      <ProductWalkthrough
+        completeTourOnUnmount={false}
+        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession}
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
+        onTourComplete={() =>
+          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))
+        }
+      />
     </div>
   );
 };

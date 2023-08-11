@@ -1,23 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
-import { PrimarySidebarItem } from "../type";
-import PATHS from "config/constants/sub/paths";
 import { Tooltip } from "antd";
-import { ApiOutlined, MobileOutlined } from "@ant-design/icons";
+import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
+import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
 import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
-import FEATURES from "config/constants/sub/features";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
-import "./PrimarySidebar.css";
+import { PrimarySidebarItem } from "../type";
 import InviteButton from "./InviteButton";
+import PATHS from "config/constants/sub/paths";
+import FEATURES from "config/constants/sub/features";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
@@ -35,20 +35,28 @@ export const PrimarySidebar: React.FC = () => {
     const items = [
       {
         id: 0,
+        title: "Home",
+        path: PATHS.HOME.RELATIVE,
+        icon: <HomeOutlined />,
+        display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+      },
+      {
+        id: 1,
         title: "Network traffic",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
-        id: 1,
+        id: 2,
         title: "HTTP Rules",
         path: PATHS.RULES.INDEX,
         icon: <HttpRulesIcon />,
         display: true,
+        activeColor: "var(--http-rules)",
       },
       {
-        id: 2,
+        id: 3,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
         icon: (
@@ -61,16 +69,18 @@ export const PrimarySidebar: React.FC = () => {
           </Tooltip>
         ),
         display: true,
+        activeColor: "var(--session-recording)",
       },
       {
-        id: 3,
+        id: 4,
         title: "Mock server",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
+        activeColor: "var(--mock-server)",
       },
       {
-        id: 4,
+        id: 5,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
@@ -80,9 +90,10 @@ export const PrimarySidebar: React.FC = () => {
         ),
         feature: FEATURES.API_CLIENT,
         display: true,
+        activeColor: "var(--api-client)",
       },
       {
-        id: 5,
+        id: 6,
         title: "Android Debugger",
         path: PATHS.MOBILE_DEBUGGER.INDEX,
         icon: <MobileOutlined />,

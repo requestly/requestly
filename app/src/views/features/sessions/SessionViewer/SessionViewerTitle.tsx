@@ -3,23 +3,36 @@ import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getSessionRecordingName, getSessionRecordingId } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import { Typography, Input } from "antd";
-import { BiPencil } from "react-icons/bi";
+import { Typography, Input, Row, Tooltip } from "antd";
+import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { updateSessionName } from "../api";
-import { trackDraftSessionNamed } from "modules/analytics/events/features/sessionRecording";
+// @ts-ignore
+import CopyToClipboard from "react-copy-to-clipboard";
+import { ReactComponent as ExportOutlined } from "assets/icons/export-outlined.svg";
+import {
+  trackDraftSessionNamed,
+  trackSavedSessionViewed,
+  trackSessionRecordingShareLinkCopied,
+} from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
+import { CopyOutlined } from "@ant-design/icons";
 
 interface SessionViewerTitleProps {
   isReadOnly?: boolean;
+  isInsideIframe?: boolean;
 }
 
-export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({ isReadOnly = false }) => {
+export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({
+  isReadOnly = false,
+  isInsideIframe = false,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const sessionRecordingName = useSelector(getSessionRecordingName);
   const recordingId = useSelector(getSessionRecordingId);
   const [isTitleEditable, setIsTitleEditable] = useState<boolean>(false);
   const [sessionTitle, setSessionTitle] = useState<string>(sessionRecordingName);
+  const [sessionLinkCopyText, setSessionLinkCopyText] = useState<string>("Copy session link");
 
   const handleOnNameInputBlur = () => {
     setIsTitleEditable(false);
@@ -55,9 +68,44 @@ export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({ isReadOn
             />
           </div>
         ) : (
-          <div className="session-title">
+          <div className={`session-title ${isInsideIframe ? "inside-iframe" : ""}`}>
             {isReadOnly ? (
-              <Typography.Text ellipsis={true}>{sessionRecordingName}</Typography.Text>
+              <Row align="middle" className="w-full" wrap={false} justify="space-between">
+                <div>
+                  <Typography.Text ellipsis={true}>{sessionRecordingName}</Typography.Text>
+                  {isInsideIframe && (
+                    <Tooltip title="View Session" placement="right">
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${window.location.origin}/sessions/saved/${recordingId}`}
+                        style={{ fontSize: "14px", display: "inline-flex", alignItems: "center", marginLeft: "8px" }}
+                        onClick={() => trackSavedSessionViewed("embed")}
+                      >
+                        <ExportOutlined />
+                      </a>
+                    </Tooltip>
+                  )}
+                </div>
+                {isInsideIframe && (
+                  <div className="ml-left">
+                    <CopyToClipboard text={`${window.location.origin}/sessions/saved/${recordingId}`}>
+                      <Tooltip title={sessionLinkCopyText} placement="left">
+                        <CopyOutlined
+                          style={{ color: sessionLinkCopyText === "Link copied" ? "var(--success)" : "var(--white)" }}
+                          onClick={() => {
+                            setSessionLinkCopyText("Link copied");
+                            trackSessionRecordingShareLinkCopied("embed");
+                            setTimeout(() => {
+                              setSessionLinkCopyText("Copy session link");
+                            }, 1000);
+                          }}
+                        />
+                      </Tooltip>
+                    </CopyToClipboard>
+                  </div>
+                )}
+              </Row>
             ) : (
               <>
                 <Typography.Text ellipsis={true} onClick={() => setIsTitleEditable(true)}>
