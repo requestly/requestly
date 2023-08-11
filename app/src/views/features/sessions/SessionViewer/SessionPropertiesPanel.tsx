@@ -102,7 +102,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
       {!isReadOnly ? (
         <Input.TextArea
           rows={7}
-          placeholder={"Add a description for the recording"}
+          placeholder={"Add a description for the session replay"}
           onChange={(e) => onDescriptionChange(e.target.value)}
           onBlur={(e) => saveDescription(e.target.value)}
           value={sessionDescription}
