@@ -51,8 +51,8 @@ const Popup: React.FC = () => {
         <div
           className="support-requestly-btn"
           onClick={() => {
-            window.open("https://www.producthunt.com/posts/requestly-session-replays", "_blank");
             sendEvent(EVENT.PRODUCT_HUNT_BANNER_CLICKED);
+            window.open("https://www.producthunt.com/posts/requestly-session-replays", "_blank");
           }}
         >
           <CaretUpOutlined /> <span>Support Requestly</span>
