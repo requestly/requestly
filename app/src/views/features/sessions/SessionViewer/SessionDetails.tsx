@@ -129,6 +129,13 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       return;
     }
 
+    // no rrweb listener on the player works when focus is shifted from the tab
+    // The player keeps playing even when the tab is not in focus.
+    // so we add a listener on the window to pause the player when the tab is blurred
+    window.addEventListener("blur", () => {
+      player.pause();
+    });
+
     // player should start playing from the start time offset only on the
     // first load and not when the user changes time offset.
     player.goto(offsetTimeRef.current * 1000, true);
