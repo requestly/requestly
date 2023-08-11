@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, FormGroup, Input } from "reactstrap";
 import { Col, Row, Container, Card, Button, CardBody } from "reactstrap";
 // ICONS
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 //UTILS
 import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";

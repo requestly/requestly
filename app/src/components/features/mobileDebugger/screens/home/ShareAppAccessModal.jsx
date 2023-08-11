@@ -1,5 +1,5 @@
 import { Button, Col, Modal, Row, Typography } from "antd";
-import { FiUsers } from "react-icons/fi";
+import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
 import { ReactMultiEmail, isEmail } from "react-multi-email";
 
 import { useState } from "react";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, FormGroup, Input, InputGroup } from "reactstrap";
 import { getFunctions, httpsCallable } from "firebase/functions";
 //ICONS
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { trackCouponAppliedFailure, trackCouponAppliedSuccess } from "modules/analytics/events/misc/coupon";
 
 const ApplyCouponBox = ({ setCouponDiscountValue, couponCodeText, setCouponCodeText }) => {

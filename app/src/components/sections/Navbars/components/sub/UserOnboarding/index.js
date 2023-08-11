@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Button, Tooltip } from "reactstrap";
-import { BsCardChecklist } from "react-icons/bs";
+import { BsCardChecklist } from "@react-icons/all-files/bs/BsCardChecklist";
 import { redirectToOnboardingPage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 //UTILS
