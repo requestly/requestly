@@ -4,7 +4,7 @@
   font-size: 12px;
   display: flex;
   align-items: center;
-  padding: 0 14px 0 8px;
+  padding: 0 13px 0 8px;
   background-color: #000000;
   color: var(--color-primary);
   line-height: 16px;
@@ -24,6 +24,9 @@
   align-items: center;
   margin-left: auto;
   transition: 0.2s color;
+  border: 1px solid #ff6005;
+  padding: 4px 5px 4px 3px;
+  border-radius: 4px;
 }
 
 .ph-launch-banner .support-requestly-btn .anticon.anticon-caret-up {
@@ -31,13 +34,10 @@
   margin-right: 2px;
 }
 
-.ph-launch-banner .support-requestly-btn .support-text {
-  text-decoration: underline;
-}
-
 .ph-launch-banner .support-requestly-btn:hover {
   cursor: pointer;
   color: rgba(255, 97, 5, 0.8);
+  border: 1px solid rgba(255, 97, 5, 0.8);
 }
 
 /* popup */

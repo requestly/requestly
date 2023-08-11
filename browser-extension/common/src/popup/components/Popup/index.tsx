@@ -43,11 +43,9 @@ const Popup: React.FC = () => {
 
         <div style={{ marginLeft: "-3px" }}>
           <div style={{ fontWeight: "600" }}>
-            Requestly is Now Live on <span style={{ color: "#ff6005" }}>Product Hunt!</span>
+            Requestly is now Live on <span style={{ color: "#ff6005" }}>Product Hunt</span>
           </div>
-          <div style={{ color: "rgb(255, 255, 255, 0.8)" }}>
-            Show your support by upvoting us on Product Hunt today!
-          </div>
+          <div style={{ color: "rgb(255, 255, 255, 0.8)" }}>Check out the launch and show you support</div>
         </div>
 
         <div
@@ -57,7 +55,7 @@ const Popup: React.FC = () => {
             sendEvent(EVENT.PRODUCT_HUNT_BANNER_CLICKED);
           }}
         >
-          <CaretUpOutlined /> <span className="support-text">Support Requestly</span>
+          <CaretUpOutlined /> <span>Support Requestly</span>
         </div>
       </div>
     ) : null;
