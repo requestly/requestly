@@ -71,7 +71,7 @@
       padding: 16px;
       border: 1px solid var(--border-dark);
       cursor: pointer;
-      transition: 0.25s all ease-in-out;
+      transition: 0.15s all ease-in-out;
       border-radius: var(--border-radius-md);
 
       &-title {
@@ -88,7 +88,7 @@
         gap: 4px;
         opacity: 0;
         color: var(--white);
-        transition: 0.25s all ease-in-out;
+        transition: 0.15s all ease-in-out;
       }
       &:hover {
         background: var(--border-dark);
