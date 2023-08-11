@@ -7,7 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { RedirectDestinationType } from "types/rules";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";

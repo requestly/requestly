@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Col } from "antd";
 import { Modal } from "antd";
 //ICONS
-import { AiOutlineWarning } from "react-icons/ai";
-import { FaDownload } from "react-icons/fa";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { FaDownload } from "@react-icons/all-files/fa/FaDownload";
 //ACTIONS
 import { prepareContentToExport, initiateDownload } from "./actions";
 import SpinnerColumn from "../../../misc/SpinnerColumn";

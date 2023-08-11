@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
 import { Row, Col, Input, Badge, Menu, Typography } from "antd";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter } from "@react-icons/all-files/fa/FaFilter";
 import { ExperimentOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
