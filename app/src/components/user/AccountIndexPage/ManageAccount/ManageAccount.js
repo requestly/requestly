@@ -23,7 +23,7 @@ import ProCard from "@ant-design/pro-card";
 import { Dropdown, Menu } from "antd";
 
 import isEmpty from "is-empty";
-import { RiArrowDropDownLine } from "react-icons/ri";
+import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { useDispatch, useSelector } from "react-redux";
 import "./index.css";
 

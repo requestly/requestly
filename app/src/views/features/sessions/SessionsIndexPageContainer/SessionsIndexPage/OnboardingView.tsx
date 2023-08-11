@@ -1,5 +1,5 @@
 import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
-import { BsShieldCheck } from "react-icons/bs";
+import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { actions } from "store";
