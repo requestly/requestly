@@ -68,6 +68,10 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     return Math.floor((currentTimeRef.current - startTime) / 1000);
   }, [startTime]);
 
+  const onBlurListener = useCallback(() => {
+    player?.pause();
+  }, [player]);
+
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -111,10 +115,11 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   // destroy player on unmount
   useEffect(
     () => () => {
+      window.removeEventListener("blur", onBlurListener);
       // @ts-ignore
       player?.$destroy();
     },
-    [player]
+    [onBlurListener, player]
   );
 
   useEffect(() => {
@@ -132,14 +137,12 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     // no rrweb listener on the player works when focus is shifted from the tab
     // The player keeps playing even when the tab is not in focus.
     // so we add a listener on the window to pause the player when the tab is blurred
-    window.addEventListener("blur", () => {
-      player.pause();
-    });
+    window.addEventListener("blur", onBlurListener);
 
     // player should start playing from the start time offset only on the
     // first load and not when the user changes time offset.
     player.goto(offsetTimeRef.current * 1000, true);
-  }, [player]);
+  }, [onBlurListener, player]);
 
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
