@@ -17,6 +17,8 @@
   RQ.SessionRecorder.setup();
 
   if (window.top === window) {
+    chrome.runtime.connect(); // connect to background
+
     chrome.runtime.sendMessage({
       action: RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED,
       payload: {
