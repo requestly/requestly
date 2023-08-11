@@ -31,11 +31,10 @@ const Popup: React.FC = () => {
   }, []);
 
   const productHuntLaunchBanner = useMemo(() => {
-    const currentDate = new Date();
+    const currentDate = new Date().getTime();
+    const startDate = new Date(Date.UTC(2023, 7, 16, 7, 0, 0)).getTime();
+    const endDate = new Date(Date.UTC(2023, 7, 19, 7, 0, 0)).getTime();
 
-    // PDT timezone is 12.5 hours behind IST
-    const startDate = new Date("2023-08-16T12:30:00"); // year-month-day T hour:minute:second
-    const endDate = new Date("2023-08-19T12:30:00");
     const isBannerVisible = startDate <= currentDate && currentDate <= endDate;
 
     return isBannerVisible ? (
