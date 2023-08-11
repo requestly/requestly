@@ -19,7 +19,10 @@ export const UNINSTALLATION = {
   EXTENSION_UNINSTALLED: "extension_uninstalled",
 };
 
-export const EXTENSION_CONTEXT_INVALIDATED = "extension_context_invalidated";
+export const EXTENSION_CONTEXT_INVALIDATION = {
+  MESSAGE_SEEN: "extension_context_invalidated",
+  APP_RELOADED_FROM_MESSAGE: "app_reloaded_from_extension_context_invalidated_message",
+};
 
 export const ORGANIZATION = {
   VIEW_MORE_USERS_CLICKED: "organization_view_more_users_clicked",
