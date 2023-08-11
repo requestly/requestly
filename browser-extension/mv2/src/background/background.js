@@ -1172,8 +1172,16 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab, payload) => {
     const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(payload.url);
 
     if (sessionRecordingConfig) {
-      sessionRecordingData = { config: sessionRecordingConfig };
+      sessionRecordingData = { config: sessionRecordingConfig, url: payload.url };
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+    }
+  } else if (!sessionRecordingData.explicit) {
+    // stop recording if config was changed to turn off auto-recording for the session URL
+    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(sessionRecordingData.url);
+
+    if (!sessionRecordingConfig) {
+      BG.Methods.stopRecording(tab.id);
+      return;
     }
   }
 
