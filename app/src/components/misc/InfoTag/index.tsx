@@ -16,7 +16,7 @@ export const InfoTag: React.FC<TagProps> = ({ title, description, tooltipWidth }
       overlayInnerStyle={{
         width: tooltipWidth,
         textAlign: "center",
-        color: "var(--white)",
+        color: "var(--text-gray)",
       }}
     >
       <div className="mode-specific-tag">{title}</div>

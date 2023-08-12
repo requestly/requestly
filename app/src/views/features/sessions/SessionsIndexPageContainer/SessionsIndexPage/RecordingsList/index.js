@@ -65,7 +65,7 @@ const RecordingsList = ({
               <Link
                 to={
                   record.isDraft
-                    ? `${PATHS.SESSIONS.DRAFT.ABSOLUTE}/${record.id}?saved`
+                    ? `${PATHS.SESSIONS.DRAFT.ABSOLUTE}/${record.id}?savedDraft`
                     : `${PATHS.SESSIONS.SAVED.ABSOLUTE}/${record.id}`
                 }
                 state={{ fromApp: true }}
@@ -76,8 +76,7 @@ const RecordingsList = ({
                 <span style={{ marginLeft: "8px" }}>
                   <InfoTag
                     title="DRAFT"
-                    description="Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the
-        data."
+                    description="Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the data."
                     tooltipWidth="300px"
                   />
                 </span>

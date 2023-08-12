@@ -75,6 +75,7 @@ const SessionsIndexPage = () => {
           visibility: Visibility.ONLY_ME,
         };
       });
+      console.log({ formattedRecords });
       return formattedRecords;
     }
 
