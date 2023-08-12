@@ -1,6 +1,5 @@
-RQ.RuleExecutionHandler = {
-  appliedRuleIds: new Set(),
-};
+RQ.RuleExecutionHandler = {};
+RQ.RuleExecutionHandler.appliedRuleIds = new Set();
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -29,6 +28,7 @@ RQ.RuleExecutionHandler.setup = () => {
     switch (message.action) {
       case RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED:
         RQ.RuleExecutionHandler.handleAppliedRule(message.rule);
+        sendResponse();
         break;
 
       case RQ.CLIENT_MESSAGES.GET_APPLIED_RULE_IDS:
@@ -40,6 +40,7 @@ RQ.RuleExecutionHandler.setup = () => {
         sendResponse();
         break;
     }
+
     return false;
   });
 };
