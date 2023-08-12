@@ -111,14 +111,13 @@ const SessionsIndexPage = () => {
           });
         });
 
-        setSessionRecordings(records);
         if (records.length > 0) {
           setQs(documentSnapshots); // Handles pagination
         }
       } else {
-        setSessionRecordings([]);
         setReachedEnd(true);
       }
+      setSessionRecordings(records);
       setIsTableLoading(false);
     });
   };
