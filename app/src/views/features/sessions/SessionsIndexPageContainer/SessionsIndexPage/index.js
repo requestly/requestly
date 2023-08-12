@@ -26,6 +26,7 @@ import { actions } from "../../../../../store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
+import { fetchDraftRecordings } from "./actions";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
 import { RQButton, RQModal } from "lib/design-system/components";
@@ -35,8 +36,6 @@ import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
 import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
-import { StorageService } from "init";
-import { Visibility } from "../../SessionViewer/types";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -59,28 +58,6 @@ const SessionsIndexPage = () => {
   const [reachedEnd, setReachedEnd] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
-
-  const fetchDraftRecordings = async () => {
-    const drafts = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
-    if (drafts) {
-      const formattedRecords = Object.keys(drafts).map((key) => {
-        const recordData = drafts[key];
-        return {
-          id: key,
-          isDraft: true,
-          name: recordData.metadata.name,
-          duration: recordData.metadata.duration,
-          startTime: recordData.metadata.startTime,
-          url: recordData.metadata.url,
-          visibility: Visibility.ONLY_ME,
-        };
-      });
-      console.log({ formattedRecords });
-      return formattedRecords;
-    }
-
-    return [];
-  };
 
   const fetchRecordings = async (lastDoc = null) => {
     if (unsubscribeListener) unsubscribeListener();

@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams, useLocation } from "react-router-dom";
-import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getIsMiscTourCompleted, getUserAttributes } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { StorageService } from "init";
 import { Modal } from "antd";
@@ -9,7 +9,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
-import { RQSession } from "@requestly/web-sdk";
+import { RQSession, RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { decompressEvents, filterOutLargeNetworkResponses, generateDraftSessionTitle } from "./sessionEventsUtils";
@@ -37,7 +37,6 @@ const DraftSessionViewer: React.FC = () => {
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
@@ -58,6 +57,60 @@ const DraftSessionViewer: React.FC = () => {
       userAttributes?.num_sessions_saved_offline,
     ]
   );
+
+  const populateSessionData = useCallback(
+    (attributes: RQSessionAttributes, events: RQSessionEvents, tabId?: string) => {
+      dispatch(
+        sessionRecordingActions.setSessionRecordingMetadata({
+          sessionAttributes: attributes,
+          name: tabId === "mock" ? "Mock session replay" : generateDraftSessionTitle(attributes?.url),
+        })
+      );
+      filterOutLargeNetworkResponses(events);
+      dispatch(sessionRecordingActions.setEvents(events));
+    },
+    [dispatch]
+  );
+
+  const handleGetSavedDraftReplay = useCallback(() => {
+    StorageService()
+      .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
+      .then((sessions) => {
+        const session = sessions[tabId];
+        const sessionEvents = decompressEvents(session.events);
+        populateSessionData(session.metadata, sessionEvents);
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [tabId, populateSessionData]);
+
+  const handleGetNewDraftReplay = useCallback(() => {
+    getTabSession(parseInt(tabId))
+      .then((payload) => {
+        if (typeof payload === "string") {
+          setLoadingError(payload);
+        } else {
+          const tabSession = payload as RQSession;
+
+          if (tabSession.events.rrweb?.length < 2) {
+            setLoadingError("RRWeb events not captured");
+          } else {
+            populateSessionData(tabSession.attributes, tabSession.events);
+            cacheDraftSession(tabSession.attributes, tabSession.events, tabId);
+          }
+        }
+      })
+      .catch((error) => {
+        setLoadingError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [tabId, populateSessionData]);
 
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
@@ -93,64 +146,19 @@ const DraftSessionViewer: React.FC = () => {
 
   useEffect(() => {
     trackDraftSessionViewed();
-
     setIsLoading(true);
 
     if (tabId === "imported") {
       setIsLoading(false);
     } else if (tabId === "mock") {
-      // TODO: remove mock flow
-      dispatch(
-        sessionRecordingActions.setSessionRecordingMetadata({
-          sessionAttributes: mockSession.attributes,
-          name: "Mock Session Recording",
-        })
-      );
-
-      dispatch(sessionRecordingActions.setEvents(mockSession.events));
+      populateSessionData(mockSession.attributes, mockSession.events, tabId);
       setIsLoading(false);
     } else if (queryParams.has("savedDraft")) {
-      StorageService()
-        .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
-        .then((sessions) => {
-          const session = sessions[tabId];
-          const sessionEvents = decompressEvents(session.events);
-          dispatch(
-            sessionRecordingActions.setSessionRecordingMetadata({
-              sessionAttributes: session.metadata,
-              name: generateDraftSessionTitle(session.metadata?.url),
-            })
-          );
-          filterOutLargeNetworkResponses(sessionEvents);
-          dispatch(sessionRecordingActions.setEvents(sessionEvents));
-          setIsLoading(false);
-        });
+      handleGetSavedDraftReplay();
     } else {
-      getTabSession(parseInt(tabId)).then((payload: unknown) => {
-        if (typeof payload === "string") {
-          setLoadingError(payload);
-        } else {
-          const tabSession = payload as RQSession;
-
-          if (tabSession.events.rrweb?.length < 2) {
-            setLoadingError("RRWeb events not captured");
-          } else {
-            dispatch(
-              sessionRecordingActions.setSessionRecordingMetadata({
-                sessionAttributes: tabSession.attributes,
-                name: generateDraftSessionTitle(tabSession.attributes?.url),
-              })
-            );
-
-            filterOutLargeNetworkResponses(tabSession.events);
-            dispatch(sessionRecordingActions.setEvents(tabSession.events));
-            cacheDraftSession(tabSession.attributes, tabSession.events, tabId);
-          }
-        }
-        setIsLoading(false);
-      });
+      handleGetNewDraftReplay();
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, queryParams]);
+  }, [dispatch, tabId, queryParams, handleGetSavedDraftReplay, handleGetNewDraftReplay, populateSessionData]);
 
   const confirmDiscard = () => {
     Modal.confirm({
