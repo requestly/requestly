@@ -45,7 +45,7 @@ const Popup: React.FC = () => {
           <div style={{ fontWeight: "600" }}>
             Requestly is now Live on <span style={{ color: "#ff6005" }}>Product Hunt</span>
           </div>
-          <div style={{ color: "rgb(255, 255, 255, 0.8)" }}>Check out the launch and show you support</div>
+          <div style={{ color: "rgb(255, 255, 255, 0.8)" }}>Check out the launch and show your support</div>
         </div>
 
         <div

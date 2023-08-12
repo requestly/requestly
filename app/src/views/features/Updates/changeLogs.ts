@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.8.12",
+    logs: [
+      "Ignore large request/response payloads in Session replay",
+      "Bug fix: Session recording does not start automatically on pages cached by the browser",
+      "Bug fix: Disabling automatic recording keeps recording existing tabs even on page reload/navigation",
+    ],
+  },
+  {
     version: "23.8.8",
     logs: [
       "Stitch sessions across pages while navigation or reload.",
