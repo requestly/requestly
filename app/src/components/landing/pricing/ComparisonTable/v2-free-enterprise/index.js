@@ -8,7 +8,7 @@ import APP_CONSTANTS from "config/constants";
 import FeatureRepresentation from "../../FeatureRepresentation";
 import GitHubButton from "react-github-btn";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import Plans from "./PricingPlan.json";
+import { Plans } from "./pricingPlan";
 import underlineIcon from "../../../../../assets/img/icons/common/underline.svg";
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
@@ -21,10 +21,8 @@ const FreeAndEnterprisePlanTable = () => {
   //   );
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
-  const [product, setProduct] = useState("http-rules");
-
+  const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
-
   return (
     <>
       <div className="pricing-table-wrapper">
@@ -32,9 +30,11 @@ const FreeAndEnterprisePlanTable = () => {
           <div className="pricing-table-product-view">
             <h1>Products</h1>
             <div
-              className={`pricing-table-product-view-item ${product === "http-rules" && "active"}`}
+              className={`pricing-table-product-view-item ${
+                product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && "active"
+              }`}
               onClick={() => {
-                setProduct("http-rules");
+                setProduct(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
               }}
             >
               <div className="pricing-table-product-view-icon">
@@ -42,135 +42,89 @@ const FreeAndEnterprisePlanTable = () => {
               </div>
               <div className="pricing-table-product-view-para">
                 <h3>HTTP Rules</h3>
-                <p>Capture Screen , mouse movement, network ,console and more of any browser session</p>
+                <p>
+                  Intercept & Modify HTTP Requests & Responses. Redirect URLs, Modify Headers, API Request/Response
+                  Body, etc
+                </p>
               </div>
             </div>
             <div
-              className={`pricing-table-product-view-item ${product === "session-replay" && "active"}`}
+              className={`pricing-table-product-view-item ${
+                product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && "active"
+              }`}
               onClick={() => {
-                setProduct("session-replay");
+                setProduct(APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY);
               }}
             >
               <div className="pricing-table-product-view-icon">
-                <img src={sessionImg} alt="rules" />
+                <img src={sessionImg} alt="session replay" />
               </div>
               <div className="pricing-table-product-view-para">
                 <h3>Session Replay</h3>
-                <p>Capture Screen , mouse movement, network ,console and more of any browser session</p>
+                <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
               </div>
             </div>
           </div>
-          {product === "http-rules" && (
-            <div className="pricing-table-row">
-              <div className="pricing-table-col">
-                <div className="pricing-col-header">
-                  <p className="text-gray plan-for">For individuals</p>
-                  <div className="header text-left">
-                    <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]}</span> plan
-                  </div>
-                  <div className="price text-left price-container">$0</div>
-                  {isExtensionInstalled() ? (
-                    <button disabled className="current-plan">
-                      Current Plan
-                    </button>
-                  ) : (
-                    <RQButton type="primary">Use now</RQButton>
-                  )}
+          <div className="pricing-table-row">
+            <div className="pricing-table-col">
+              <div className="pricing-col-header">
+                <p className="text-gray plan-for">For individuals</p>
+                <div className="header text-left">
+                  <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]}</span> plan
                 </div>
-                <div>
-                  {Plans["http-rules"].free.map((feature, index) => (
-                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                  ))}
-                </div>
-                <div>
-                  <div className="basic-use-with-text text-left">Use Requestly with</div>
-                  <div>
-                    {useRQwith.map((title, index) => (
-                      <div className="rq-use-with" key={index}>
-                        <img src="/assets/icons/leftArrow.svg" alt="right arrow" />
-                        <div>{title}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <div className="price text-left price-container">$0</div>
+                {isExtensionInstalled() ? (
+                  <button disabled className="current-plan">
+                    Current Plan
+                  </button>
+                ) : (
+                  <RQButton type="primary">Use now</RQButton>
+                )}
               </div>
-              <div className="pricing-table-col">
-                <div className="pricing-col-header">
-                  <p className="text-gray plan-for">For collaboration in QA & developer teams</p>
-                  <div className="header text-left">
-                    <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]}</span>
-                  </div>
-                  <div className="text-gray text-left price-container">
-                    <span className="price">$25</span> per member, per month
-                  </div>
-                  <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
-                    Contact us
-                  </RQButton>
-                </div>
-                <div className="pro-basic-feature-title text-left">
-                  <span>
-                    Everything <img src={underlineIcon} alt="highlight" />
-                  </span>{" "}
-                  in Free plan, and
-                </div>
+              <div>
+                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC].map((feature, index) => (
+                  <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                ))}
+              </div>
+              <div>
+                <div className="basic-use-with-text text-left">Use Requestly with</div>
                 <div>
-                  {Plans["http-rules"].pro.map((feature, index) => (
-                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                  {useRQwith.map((title, index) => (
+                    <div className="rq-use-with" key={index}>
+                      <img src="/assets/icons/leftArrow.svg" alt="right arrow" />
+                      <div>{title}</div>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
-          )}
-          {product === "session-replay" && (
-            <div className="pricing-table-row">
-              <div className="pricing-table-col">
-                <div className="pricing-col-header">
-                  <p className="text-gray plan-for">For individuals</p>
-                  <div className="header text-left">
-                    <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]}</span> plan
-                  </div>
-                  <div className="price text-left price-container">$0</div>
-                  {isExtensionInstalled() ? (
-                    <button disabled className="current-plan">
-                      Current Plan
-                    </button>
-                  ) : (
-                    <RQButton type="primary">Use now</RQButton>
-                  )}
+            <div className="pricing-table-col">
+              <div className="pricing-col-header">
+                <p className="text-gray plan-for">For collaboration in QA & developer teams</p>
+                <div className="header text-left">
+                  <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]}</span>
                 </div>
-                <div>
-                  {Plans["session-replay"].free.map((feature, index) => (
-                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                  ))}
+                <div className="text-gray text-left price-container">
+                  <span className="price">{APP_CONSTANTS.PRICING.PLAN_PRICES.PROFESSIONAL[product]}</span> per member,
+                  per month
                 </div>
+                <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
+                  Contact us
+                </RQButton>
               </div>
-              <div className="pricing-table-col">
-                <div className="pricing-col-header">
-                  <p className="text-gray plan-for">For collaboration in QA & developer teams</p>
-                  <div className="header text-left">
-                    <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]}</span>
-                  </div>
-                  <div className="text-gray text-left price-container">
-                    <span className="price">$5</span> per member, per month
-                  </div>
-                  <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
-                    Contact us
-                  </RQButton>
-                </div>
-                <div className="pro-basic-feature-title text-left">
-                  <span>
-                    Everything <img src={underlineIcon} alt="highlight" />
-                  </span>{" "}
-                  in Free plan, and
-                </div>
-                <div>
-                  {Plans["session-replay"].pro.map((feature, index) => (
-                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                  ))}
-                </div>
+              <div className="pro-basic-feature-title text-left">
+                <span>
+                  Everything <img src={underlineIcon} alt="highlight" />
+                </span>{" "}
+                in Free plan, and
+              </div>
+              <div>
+                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC].map((feature, index) => (
+                  <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                ))}
               </div>
             </div>
-          )}
+          </div>
         </div>
         <div className="note-container text-gray text-center">
           <span>

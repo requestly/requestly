@@ -16,8 +16,7 @@
 .pricing-table-product-view {
   display: flex;
   flex-direction: column;
-  min-width: 300px;
-  max-width: 300px;
+  width: 300px;
 }
 
 .pricing-table-product-view-item {
@@ -39,6 +38,7 @@
 
 .pricing-table-product-view-para p {
   color: var(--text-gray);
+  text-align: justify;
 }
 .pricing-table-row {
   justify-content: flex-start;
@@ -156,6 +156,6 @@
     justify-content: center;
   }
   .pricing-table-col {
-    min-width: 100% !important;
+    width: 100%;
   }
 }
