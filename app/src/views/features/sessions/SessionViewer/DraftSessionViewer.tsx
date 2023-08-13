@@ -72,7 +72,7 @@ const DraftSessionViewer: React.FC = () => {
     [dispatch]
   );
 
-  const handleGetSavedDraftReplay = useCallback(() => {
+  const getSavedDraftReplay = useCallback(() => {
     StorageService()
       .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
       .then((sessions) => {
@@ -80,15 +80,15 @@ const DraftSessionViewer: React.FC = () => {
         const sessionEvents = decompressEvents(session.events);
         populateSessionData(session.metadata, sessionEvents);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch((error) => {
+        setLoadingError(error.message);
       })
       .finally(() => {
         setIsLoading(false);
       });
   }, [tabId, populateSessionData]);
 
-  const handleGetNewDraftReplay = useCallback(() => {
+  const getNewDraftReplay = useCallback(() => {
     getTabSession(parseInt(tabId))
       .then((payload) => {
         if (typeof payload === "string") {
@@ -154,11 +154,11 @@ const DraftSessionViewer: React.FC = () => {
       populateSessionData(mockSession.attributes, mockSession.events, tabId);
       setIsLoading(false);
     } else if (queryParams.has("savedDraft")) {
-      handleGetSavedDraftReplay();
+      getSavedDraftReplay();
     } else {
-      handleGetNewDraftReplay();
+      getNewDraftReplay();
     }
-  }, [dispatch, tabId, queryParams, handleGetSavedDraftReplay, handleGetNewDraftReplay, populateSessionData]);
+  }, [dispatch, tabId, queryParams, getSavedDraftReplay, getNewDraftReplay, populateSessionData]);
 
   const confirmDiscard = () => {
     Modal.confirm({

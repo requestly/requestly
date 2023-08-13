@@ -23,7 +23,6 @@ export const fetchDraftRecordings = async () => {
       } else return [];
     })
     .catch((e) => {
-      console.log(e);
       return [];
     });
 };
