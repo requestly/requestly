@@ -1,5 +1,5 @@
-// import lazyload from "utils/lazyload";
+import lazyWithRetry from "utils/lazyWithRetry";
 
-// export default lazyload(() => import(/* webpackChunkName: "AstronautAnimation" */ "./AstronautAnimation"), null);
+export default lazyWithRetry(() => import(/* webpackChunkName: "AstronautAnimation" */ "./AstronautAnimation"), null);
 
-export { default } from "./AstronautAnimation";
+// export { default } from "./AstronautAnimation";
