@@ -1,8 +1,8 @@
-// import lazyload from "utils/lazyload";
+import lazyWithRetry from "utils/lazyWithRetry";
 
-// export default lazyload(
-//   () => import(/* webpackChunkName: "TeamSolvingPuzzleAnimation" */ "./TeamSolvingPuzzleAnimation"),
-//   null
-// );
+export default lazyWithRetry(
+  () => import(/* webpackChunkName: "TeamSolvingPuzzleAnimation" */ "./TeamSolvingPuzzleAnimation"),
+  null
+);
 
-export { default } from "./TeamSolvingPuzzleAnimation";
+// export { default } from "./TeamSolvingPuzzleAnimation";
