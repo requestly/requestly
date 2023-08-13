@@ -221,6 +221,10 @@ export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
 };
 
+export const getIsProductHuntBannerVisible = (state) => {
+  return getGlobalState(state).misc?.persist?.isProductHuntBannerVisible;
+};
+
 export const getIsRedirectRuleTourCompleted = (state) => {
   return getGlobalState(state).misc?.persist?.isRedirectRuleTourCompleted;
 };
