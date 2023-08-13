@@ -1,5 +1,8 @@
-// import lazyload from "utils/lazyload";
+import lazyWithRetry from "utils/lazyWithRetry";
 
-// export default lazyload(() => import(/* webpackChunkName: "InviteAcceptAnimation" */ "./InviteAcceptAnimation"), null);
+export default lazyWithRetry(
+  () => import(/* webpackChunkName: "InviteAcceptAnimation" */ "./InviteAcceptAnimation"),
+  null
+);
 
-export { default } from "./InviteAcceptAnimation";
+// export { default } from "./InviteAcceptAnimation";
