@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getIsProductHuntBannerVisible, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
@@ -11,6 +11,7 @@ import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { AppBanner } from "./AppBanner";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
@@ -18,6 +19,7 @@ const DashboardLayout = () => {
   const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isProductHuntBannerVisible = useSelector(getIsProductHuntBannerVisible);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
   if (!isAppOpenedInIframe()) {
@@ -45,6 +47,7 @@ const DashboardLayout = () => {
 
   return (
     <>
+      {!isAppOpenedInIframe() && isProductHuntBannerVisible && <AppBanner />}
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
