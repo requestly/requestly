@@ -29,6 +29,7 @@ const CodeEditor = ({
   validation = "editable",
   isResizable = true,
 }) => {
+  console.log("test");
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
   const [editorHeight, setEditorHeight] = useState(height);
