@@ -22,7 +22,7 @@ const ChromeStoreStats = () => {
       <div className="stat-wrapper">
         <div className="text-gray">
           <img src={usersIcon} alt="users" />
-          <span className="stat">170,000+</span> Happy users
+          <span className="stat">200,000+</span> Happy users
         </div>
       </div>
     </div>
