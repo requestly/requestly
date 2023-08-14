@@ -119,7 +119,7 @@ const FreeAndEnterprisePlanTable = () => {
                 in Free plan, and
               </div>
               <div>
-                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.FREE].map((feature, index) => (
+                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL].map((feature, index) => (
                   <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
                 ))}
               </div>
