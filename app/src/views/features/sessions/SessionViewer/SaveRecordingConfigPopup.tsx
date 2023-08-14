@@ -71,7 +71,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
   const activateSessionReplayLifetimePro = useCallback(() => {
     if (!userAttributes?.num_sessions_saved_online && !userAttributes?.num_sessions_saved_offline) {
       submitAttrUtil("session_replay_lifetime_pro", new Date().getTime());
-      toast.success("Successfully activated Session Replay Pro Lifetime Deal!! 🎉");
+      toast.success("Successfully activated Session Replay Pro Lifetime Deal!! 🎉", 7);
     }
   }, [userAttributes]);
 
