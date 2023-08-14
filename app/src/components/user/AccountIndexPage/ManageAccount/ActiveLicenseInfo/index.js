@@ -25,7 +25,10 @@ const ActiveLicenseInfo = ({
 
   useEffect(() => {
     getAttrFromFirebase("session_replay_lifetime_pro").then((val) => {
-      setIsSessionReplayLifetimeActive(true);
+      console.log("session_replay_lifetime_pro", val);
+      if (val) {
+        setIsSessionReplayLifetimeActive(true);
+      }
     });
   });
 
@@ -59,16 +62,19 @@ const ActiveLicenseInfo = ({
   const renderSessionReplayProSubscription = () => {
     if (isSessionReplayLifetimeActive) {
       return (
-        <SubscriptionInfo
-          hideShadow={hideShadow}
-          subscriptionDetails={{
-            validFrom: new Date("2023-08-16T00:00:00Z").getTime(),
-            validTill: new Date("2099-08-16T00:00:00Z").getTime(),
-            status: "active",
-            type: "unlock",
-            planName: "Session Replay Pro",
-          }}
-        />
+        <>
+          <br />
+          <SubscriptionInfo
+            hideShadow={hideShadow}
+            subscriptionDetails={{
+              validFrom: new Date("2023-08-16T00:00:00Z").getTime(),
+              validTill: new Date("2099-08-16T00:00:00Z").getTime(),
+              status: "active",
+              type: "unlock",
+              planName: "Session Replay Pro",
+            }}
+          />
+        </>
       );
     }
 
@@ -78,7 +84,6 @@ const ActiveLicenseInfo = ({
   return (
     <ProCard title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>} className="primary-card github-like-border">
       {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
-      <br />
       {renderSessionReplayProSubscription()}
     </ProCard>
   );
