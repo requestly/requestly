@@ -182,7 +182,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
       <Row justify="space-between" className="onboarding-banner">
         <Col span={12} className="banner-text-container">
           <Row className="banner-header">
-            <Title className="banner-title">Debug issues faster with Sessions</Title>
+            <Title className="banner-title">Debug issues faster with Session Replay</Title>
           </Row>
           <Row className="banner-description">
             <Text type="secondary" className="banner-text">
@@ -198,7 +198,8 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
             </Text>
 
             <Text type="secondary" className="banner-message banner-text">
-              <GreenVerifiedCheck /> Recordings are not automatically saved to the cloud; they require manual saving
+              <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
+              saving
             </Text>
           </Row>
           <Row className="record-label">
@@ -229,7 +230,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
               className="sample-link-container"
             >
               <Row justify="end" align="middle" className="sample-link">
-                <Text underline>View sample recording</Text>
+                <Text underline>View sample replay</Text>
               </Row>
             </a>
           </Row>
