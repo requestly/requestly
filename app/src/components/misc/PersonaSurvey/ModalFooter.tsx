@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { Col, Row } from "antd";
@@ -23,6 +24,8 @@ interface FooterProps {
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback, isSurveyModal }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const refParam = useMemo(() => new URLSearchParams(location.search).get("ref"), [location.search]);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appMode = useSelector(getAppMode);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
@@ -63,7 +66,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
       handleSurveyNavigation(currentPage, dispatch);
 
       if (isSurveyModal && index === surveyLength - 1) {
-        if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || refParam === "producthunt") {
           //don’t show recommendation screen for shared list users or desktop users
           dispatch(actions.updateIsPersonaSurveyCompleted(true));
           return;
