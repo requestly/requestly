@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getIsProductHuntBannerVisible, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getIsProductHuntBannerClosed, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
@@ -19,7 +19,7 @@ const DashboardLayout = () => {
   const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isProductHuntBannerVisible = useSelector(getIsProductHuntBannerVisible);
+  const isProductHuntBannerClosed = useSelector(getIsProductHuntBannerClosed);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
   if (!isAppOpenedInIframe()) {
@@ -47,7 +47,7 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {!isAppOpenedInIframe() && isProductHuntBannerVisible && <AppBanner />}
+      {!isAppOpenedInIframe() && !isProductHuntBannerClosed && <AppBanner />}
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
