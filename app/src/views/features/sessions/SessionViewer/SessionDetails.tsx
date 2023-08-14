@@ -144,8 +144,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
   useEffect(() => {
     const togglePlay = (e: KeyboardEvent) => {
-      e.preventDefault();
-      if (e.code === "Space") {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
         player?.toggle();
       }
     };
