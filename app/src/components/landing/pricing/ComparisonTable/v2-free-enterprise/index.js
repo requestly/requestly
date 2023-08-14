@@ -73,13 +73,10 @@ const FreeAndEnterprisePlanTable = () => {
                   <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]}</span> plan
                 </div>
                 <div className="price text-left price-container">$0</div>
-                {isExtensionInstalled() ? (
-                  <button disabled className="current-plan">
-                    Current Plan
-                  </button>
-                ) : (
-                  <RQButton type="primary">Use now</RQButton>
-                )}
+
+                <RQButton onClick={() => (window.location.href = "/")} type="primary">
+                  Use now
+                </RQButton>
               </div>
               <div>
                 {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.FREE].map((feature, index) => (
