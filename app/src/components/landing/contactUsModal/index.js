@@ -9,7 +9,7 @@ const ContactUsModal = ({ isOpen, handleToggleModal }) => {
         <div className="title">Contact us by scheduling a meeting</div>
         <InlineWidget
           styles={{ height: "602px", marginTop: "4px" }}
-          url="https://calendly.com/requestly-product-team/30min"
+          url="https://calendly.com/requestly/sagar"
           pageSettings={{
             hideEventTypeDetails: true,
             hideLandingPageDetails: true,
