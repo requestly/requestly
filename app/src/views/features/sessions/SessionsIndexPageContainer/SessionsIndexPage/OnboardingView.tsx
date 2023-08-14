@@ -1,15 +1,16 @@
-import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
+import React, { useCallback, useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
-import React, { useState, useCallback, useRef, useEffect } from "react";
 import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
-import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import "./index.scss";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
+import { isValidUrl } from "utils/FormattingHelper";
+import { toast } from "utils/Toast";
+import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -19,15 +20,7 @@ import {
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
-import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
-import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import TutorialButton from "./TutorialButton";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
-import { isValidUrl } from "utils/FormattingHelper";
-import { toast } from "utils/Toast";
-import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
+import "./index.scss";
 
 const { Text, Title } = Typography;
 
@@ -108,90 +101,6 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
           <CheckItem label="Strict Privacy" />
         </div>
       </Text>
-    </div>
-  );
-};
-
-const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({
-  redirectToSettingsPage,
-  openDownloadedSessionModalBtn,
-}) => {
-  const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
-  const openInstallExtensionModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(true);
-    trackInstallExtensionDialogShown();
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(false);
-  }, []);
-
-  const user = useSelector(getUserAuthDetails);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        textAlign: "center",
-        height: "100%",
-        margin: "30px",
-      }}
-    >
-      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
-      <Typography.Text type="secondary">
-        <div>Record your browsing sessions on specified domains (or webpages)</div>
-        <div>and Share with others for offline review or debugging.</div>
-      </Typography.Text>
-      <div>
-        <Space>
-          <AuthConfirmationPopover
-            title="You need to sign up to configure webpages"
-            callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
-            source={AUTH.SOURCE.SESSION_RECORDING}
-          >
-            <Button
-              type="primary"
-              onClick={
-                user?.details?.isLoggedIn
-                  ? isExtensionInstalled()
-                    ? redirectToSettingsPage
-                    : openInstallExtensionModal
-                  : null
-              }
-              style={{ margin: "24px 0" }}
-            >
-              Configure webpages
-            </Button>
-          </AuthConfirmationPopover>
-          {openDownloadedSessionModalBtn}
-          <TutorialButton className="session-tutorial-btn">
-            See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
-          </TutorialButton>
-        </Space>
-      </div>
-      <Divider />
-      <Typography.Text type="secondary">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            fontWeight: "bold",
-          }}
-        >
-          <CheckItem label="Faster Debugging" />
-          <CheckItem label="No need to reproduce" />
-          <CheckItem label="Strict Privacy" />
-        </div>
-      </Typography.Text>
-
-      <InstallExtensionModal
-        open={isInstallExtensionModalVisible}
-        onCancel={closeModal}
-        heading="Install Browser extension to record sessions for faster debugging and bug reporting"
-        subHeading="Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser."
-        eventPage="session_recording_page"
-      />
     </div>
   );
 };
@@ -324,18 +233,11 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   );
 };
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
-
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return shownNewOnboarding ? (
+    return (
       <SessionOnboardingView
-        redirectToSettingsPage={redirectToSettingsPage}
-        openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
-      />
-    ) : (
-      <OldSessionOnboardingView
         redirectToSettingsPage={redirectToSettingsPage}
         openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
       />
