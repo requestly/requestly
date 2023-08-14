@@ -67,18 +67,37 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
     }
   }, [isSessionLogOptionsAlreadySaved, savedSessionRecordingOptions]);
 
+  // TODO: @wrongsahil Remove this after PH launch
+  const activateSessionReplayLifetimePro = useCallback(() => {
+    const currentDate = new Date().getTime();
+    const startDate = new Date(Date.UTC(2023, 7, 16, 7, 0, 0)).getTime();
+    if (
+      !userAttributes?.num_sessions_saved_online &&
+      !userAttributes?.num_sessions_saved_offline &&
+      currentDate > startDate
+    ) {
+      submitAttrUtil("session_replay_lifetime_pro", new Date().getTime());
+      toast.success("Successfully activated Session Replay Pro Lifetime Deal!! 🎉", 7);
+    }
+  }, [userAttributes]);
+
   const trackSessionsCreatedCount = useCallback(
     (didCreateLocally = false) => {
       const numSessionsSavedOffline = userAttributes?.num_sessions_saved_offline || 0;
       const numSessionsSavedOnline = userAttributes?.num_sessions_saved_online || 0;
 
+      activateSessionReplayLifetimePro();
       if (didCreateLocally) {
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_OFFLINE, numSessionsSavedOffline + 1);
       } else {
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_ONLINE, numSessionsSavedOnline + 1);
       }
     },
-    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+    [
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+      activateSessionReplayLifetimePro,
+    ]
   );
 
   const saveDraftSession = useCallback(
