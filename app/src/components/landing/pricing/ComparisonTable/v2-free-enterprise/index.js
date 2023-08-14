@@ -105,7 +105,7 @@ const FreeAndEnterprisePlanTable = () => {
                   <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]}</span>
                 </div>
                 <div className="text-gray text-left price-container">
-                  <span className="price">{APP_CONSTANTS.PRICING.PLAN_PRICES.PROFESSIONAL[product]}</span> per member,
+                  <span className="price">${APP_CONSTANTS.PRICING.PLAN_PRICES.PROFESSIONAL[product]}</span> per member,
                   per month
                 </div>
                 <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
