@@ -32,9 +32,9 @@ const SessionsHomeView = () => {
           newValue: true,
         })
       );
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      dispatch(actions.updateIsPersonaSurveyCompleted(true));
     }
-    dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-    dispatch(actions.updateIsPersonaSurveyCompleted(true));
   }, [dispatch, refParam]);
 
   if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) {
