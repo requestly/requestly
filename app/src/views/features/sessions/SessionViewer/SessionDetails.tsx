@@ -142,6 +142,20 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     player.goto(offsetTimeRef.current * 1000, true);
   }, [player]);
 
+  useEffect(() => {
+    const togglePlay = (e: KeyboardEvent) => {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        player?.toggle();
+      }
+    };
+
+    document.addEventListener("keydown", togglePlay);
+    return () => {
+      document.removeEventListener("keydown", togglePlay);
+    };
+  }, [player]);
+
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
       {
