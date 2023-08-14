@@ -185,7 +185,7 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
-      isProductHuntBannerClosed: false,
+      isProductHuntLaunchingSoonBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
