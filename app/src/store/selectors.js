@@ -282,3 +282,7 @@ export const getLastSeenInviteTs = (state) => {
 export const getIsJoinWorkspaceCardVisible = (state) => {
   return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
 };
+
+export const getExtensionInsallSource = (state) => {
+  return getGlobalState(state).misc.persist?.extensionInstallSource;
+};
