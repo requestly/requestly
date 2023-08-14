@@ -109,7 +109,7 @@ const FreeAndEnterprisePlanTable = () => {
                   per month
                 </div>
                 <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
-                  Contact us
+                  Start 30 days free trial
                 </RQButton>
               </div>
               <div className="pro-basic-feature-title text-left">
