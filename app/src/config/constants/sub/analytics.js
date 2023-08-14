@@ -123,6 +123,7 @@ export const GA_EVENTS = {
     COUPON_VALUE: "coupon_value",
     LICENSE: "licensekey",
     COMPANY: "company",
+    REF: "ref",
 
     PROFILE: "profile",
 
