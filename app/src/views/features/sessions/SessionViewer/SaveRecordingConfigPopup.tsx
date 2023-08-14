@@ -69,7 +69,13 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
 
   // TODO: @wrongsahil Remove this after PH launch
   const activateSessionReplayLifetimePro = useCallback(() => {
-    if (!userAttributes?.num_sessions_saved_online && !userAttributes?.num_sessions_saved_offline) {
+    const currentDate = new Date().getTime();
+    const startDate = new Date(Date.UTC(2023, 7, 16, 7, 0, 0)).getTime();
+    if (
+      !userAttributes?.num_sessions_saved_online &&
+      !userAttributes?.num_sessions_saved_offline &&
+      currentDate > startDate
+    ) {
       submitAttrUtil("session_replay_lifetime_pro", new Date().getTime());
       toast.success("Successfully activated Session Replay Pro Lifetime Deal!! 🎉", 7);
     }
