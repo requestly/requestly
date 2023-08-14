@@ -41,6 +41,7 @@ const DraftSessionViewer: React.FC = () => {
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+  const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -77,7 +78,7 @@ const DraftSessionViewer: React.FC = () => {
   }, []);
 
   unstable_usePrompt({
-    when: !isSaveSessionClicked,
+    when: !isSaveSessionClicked && !isDiscardSessionClicked,
     message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
   });
 
@@ -138,6 +139,7 @@ const DraftSessionViewer: React.FC = () => {
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
   const confirmDiscard = () => {
+    setIsDiscardSessionClicked(true);
     Modal.confirm({
       title: "Confirm Discard",
       icon: <ExclamationCircleOutlined />,
@@ -147,6 +149,9 @@ const DraftSessionViewer: React.FC = () => {
       onOk() {
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
+      },
+      onCancel() {
+        setIsDiscardSessionClicked(false);
       },
     });
   };
