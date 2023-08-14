@@ -289,7 +289,11 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
           </Row>
           <Row>
             <Col span={15} className="input-container">
-              <Input ref={inputRef} placeholder="Enter Page URL eg. https://ebay.com" />
+              <Input
+                ref={inputRef}
+                placeholder="Enter Page URL eg. https://ebay.com"
+                onPressEnter={handleStartRecordingBtnClicked}
+              />
             </Col>
             <Col span={3} className="start-btn-container">
               <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
