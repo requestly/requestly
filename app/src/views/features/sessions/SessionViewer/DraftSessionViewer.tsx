@@ -45,6 +45,9 @@ const DraftSessionViewer: React.FC = () => {
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+  const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
+
+  const exitMessage = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -57,6 +60,8 @@ const DraftSessionViewer: React.FC = () => {
       userAttributes?.num_sessions_saved_offline,
     ]
   );
+
+  console.log("DEBUG", !(!isSaveSessionClicked || !isDiscardSessionClicked));
 
   const populateSessionData = useCallback(
     (attributes: RQSessionAttributes, events: RQSessionEvents, tabId?: string) => {
@@ -115,9 +120,8 @@ const DraftSessionViewer: React.FC = () => {
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
+      e.returnValue = exitMessage;
     };
-
     // It is fired only if there was ANY interaction of the user with the site.
     // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
     // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
@@ -127,8 +131,8 @@ const DraftSessionViewer: React.FC = () => {
   }, []);
 
   unstable_usePrompt({
-    when: !isSaveSessionClicked,
-    message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+    when: !isSaveSessionClicked && !isDiscardSessionClicked,
+    message: exitMessage,
   });
 
   useEffect(
@@ -161,6 +165,7 @@ const DraftSessionViewer: React.FC = () => {
   }, [dispatch, tabId, queryParams, getSavedDraftReplay, getNewDraftReplay, populateSessionData]);
 
   const confirmDiscard = () => {
+    setIsDiscardSessionClicked(true);
     Modal.confirm({
       title: "Confirm Discard",
       icon: <ExclamationCircleOutlined />,
