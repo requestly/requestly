@@ -12,7 +12,7 @@ export const AppBanner = () => {
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(actions.updateProductHuntBannerVisible(false));
+    dispatch(actions.updateIsProductHuntBannerClosed(true));
   };
 
   return (
