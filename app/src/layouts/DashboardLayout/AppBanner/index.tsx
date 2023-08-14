@@ -24,8 +24,8 @@ export const AppBanner = () => {
       href="https://www.producthunt.com/posts/requestly-session-replays"
     >
       <span>
-        🚀 Requestly will be going live on <b>Product Hunt</b> on <b>August 16th</b>. Please Check out the launch and
-        show your support.
+        🚀 <b>We are launching Requestly Session Replay on Product Hunt on 16th August.</b> Get access to{" "}
+        <b>Lifetime Session Replay Pro</b> for <b>Free</b> by supporting us.
       </span>
       <RightArrow className="right-arrow-icon" />
       <RQButton

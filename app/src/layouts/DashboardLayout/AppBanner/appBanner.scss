@@ -1,14 +1,14 @@
 .app-banner + .app-layout {
-  height: calc(100vh - 24px);
+  height: calc(100vh - 48px);
 }
 
 .app-banner {
   padding: 2px;
   width: 100%;
-  height: 24px;
+  height: 48px;
   font-size: 13px;
   color: var(--white) !important;
-  background-color: var(--primary);
+  background-color: #ff6005;
   position: relative;
   display: flex;
   align-items: center;
