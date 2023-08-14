@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../store";
 // UTILS
@@ -27,6 +27,11 @@ import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
 import { useHasChanged } from "./useHasChanged";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { saveNetworkSession } from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/actions";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
+import PATHS from "config/constants/sub/paths";
 
 let hasAppModeBeenSet = false;
 
@@ -137,6 +142,50 @@ const AppModeInitializer = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
+      });
+    }
+  }, []);
+
+  const closeConnectedAppsModal = useCallback(
+    (props = {}) => {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "connectedAppsModal",
+          newValue: false,
+        })
+      );
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (payload) => {
+        if (payload?.extension === ".rqly" || payload?.extension === ".har") {
+          let fileData;
+          const fileName = payload?.name;
+          try {
+            fileData = JSON.parse(payload?.contents);
+          } catch (error) {
+            console.error("could not parse .rqly to json");
+            return;
+          }
+
+          // close connect app modal that opens on launch
+          closeConnectedAppsModal();
+
+          if (payload?.extension === ".rqly") {
+            dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
+            const recordedSessionEvents = decompressEvents(fileData?.data?.events);
+            dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+            navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
+          } else if (payload?.extension === ".har") {
+            const savedSessionId = await saveNetworkSession(fileName, fileData);
+            redirectToNetworkSession(navigate, savedSessionId);
+          }
+        } else {
+          console.log("unknown file type detected");
+        }
       });
     }
   }, []);
