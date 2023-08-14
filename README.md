@@ -189,5 +189,5 @@ Our mission is to help developers ship web and mobile apps faster and with confi
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## Special Mentions
-A big shoutout to these amazing Open Source Projects hat have helped make Requestly possible.
+A big shoutout to these amazing Open Source projects that have helped make Requestly possible.
 - [rrweb](https://github.com/rrweb-io/rrweb)
