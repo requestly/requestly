@@ -2,7 +2,7 @@ import APP_CONSTANTS from "config/constants";
 
 export const Plans = {
   [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: [
+    [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: [
       {
         title: "10 rules (3 active)",
         enabled: true,
@@ -48,7 +48,7 @@ export const Plans = {
     ],
   },
   [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: [
+    [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: [
       {
         title: "10 sessions",
         enabled: true,
