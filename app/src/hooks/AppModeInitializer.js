@@ -164,10 +164,11 @@ const AppModeInitializer = () => {
         if (payload?.extension === ".rqly" || payload?.extension === ".har") {
           let fileData;
           const fileName = payload?.name;
+          const filePath = payload?.path;
           try {
             fileData = JSON.parse(payload?.contents);
           } catch (error) {
-            console.error("could not parse .rqly to json");
+            console.error("could not parse the user's file to json");
             return;
           }
 
@@ -175,12 +176,13 @@ const AppModeInitializer = () => {
           closeConnectedAppsModal();
 
           if (payload?.extension === ".rqly") {
+            // opening recording inside draft view
             dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
             const recordedSessionEvents = decompressEvents(fileData?.data?.events);
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
             navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
           } else if (payload?.extension === ".har") {
-            const savedSessionId = await saveNetworkSession(fileName, fileData);
+            const savedSessionId = await saveNetworkSession(fileName, fileData, filePath);
             redirectToNetworkSession(navigate, savedSessionId);
           }
         } else {
