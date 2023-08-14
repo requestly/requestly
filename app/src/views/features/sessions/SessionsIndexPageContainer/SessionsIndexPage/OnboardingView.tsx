@@ -1,8 +1,6 @@
-import React, { useCallback, useRef, useEffect, useMemo } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { useNavigate } from "react-router-dom";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
@@ -113,9 +111,6 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
 }) => {
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const location = useLocation();
-  const refParam = useMemo(() => new URLSearchParams(location.search).get("ref"), [location.search]);
 
   useEffect(() => {
     trackOnboardingPageViewed();
@@ -162,12 +157,6 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     trackOnboardingToSettingsNavigate();
     redirectToSettingsPage();
   }, [redirectToSettingsPage]);
-
-  useEffect(() => {
-    if (user.loggedIn && refParam === "producthunt" && !isExtensionInstalled()) {
-      openInstallExtensionModal();
-    }
-  }, [user.loggedIn, refParam, openInstallExtensionModal]);
 
   return (
     <div className="onboarding-content-container">
