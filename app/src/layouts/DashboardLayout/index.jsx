@@ -22,9 +22,7 @@ const DashboardLayout = () => {
   const isProductHuntBannerVisible = useSelector(getIsProductHuntBannerVisible);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
-  if (!isAppOpenedInIframe()) {
-    promptOneTapOnLoad();
-  }
+  promptOneTapOnLoad();
 
   const isPersonaRecommendationScreen = useMemo(
     () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
