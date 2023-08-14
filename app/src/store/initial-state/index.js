@@ -191,6 +191,7 @@ const INITIAL_STATE = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,

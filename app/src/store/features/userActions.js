@@ -125,3 +125,7 @@ export const updateJoinWorkspaceCardVisible = (prevState, action) => {
 export const updateProductHuntBannerVisible = (prevState, action) => {
   prevState.misc.persist.isProductHuntBannerVisible = action.payload;
 };
+
+export const updateExtensionInstallSource = (prevState, action) => {
+  prevState.misc.persist.extensionInstallSource = action.payload;
+};
