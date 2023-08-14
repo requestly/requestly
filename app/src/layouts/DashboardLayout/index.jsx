@@ -19,7 +19,7 @@ const DashboardLayout = () => {
   const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isProductHuntBannerClosed = useSelector(getIsProductHuntBannerClosed);
+  const isProductHuntLaunchingSoonBannerClosed = useSelector(getIsProductHuntBannerClosed);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
   promptOneTapOnLoad();
@@ -45,7 +45,7 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {!isAppOpenedInIframe() && !isProductHuntBannerClosed && <AppBanner />}
+      {!isAppOpenedInIframe() && !isProductHuntLaunchingSoonBannerClosed && <AppBanner />}
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
