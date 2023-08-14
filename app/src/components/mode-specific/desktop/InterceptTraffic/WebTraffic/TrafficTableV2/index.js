@@ -38,7 +38,6 @@ import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode"
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels } from "./utils";
-import { track } from "@amplitude/analytics-browser";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 
