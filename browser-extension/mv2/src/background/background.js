@@ -548,7 +548,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     return;
   }
 
-  RQ.extensionIconManager.markRuleExecuted(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
   BG.Methods.sendLogToConsoleLogger(rule, requestDetails, modification);
@@ -977,10 +976,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.getExecutedRules(message.tabId, sendResponse);
         return true;
 
-      case RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED:
-        BG.Methods.onContentScriptLoadedNotification(sender.tab, message.payload);
-        break;
-
       case RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE:
         BG.Methods.onPageLoadedFromCacheNotification(sender.tab, message.payload);
         break;
@@ -1010,14 +1005,24 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
 BG.Methods.handleClientPortConnections = () => {
   chrome.runtime.onConnect.addListener((port) => {
-    const tabId = port.sender.tab.id;
+    const senderTab = port.sender.tab;
+
+    // for devtools and blocked pages, senderTab is not available
+    if (!senderTab) {
+      return;
+    }
+
+    const tabId = senderTab.id;
 
     if (port.sender.documentLifecycle === "active") {
+      window.tabService.resetPageData(senderTab.id);
       window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
       const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
       window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
       clientLoadSubscribers.forEach((subscriber) => subscriber());
+
+      BG.Methods.onClientPageLoad(senderTab);
     }
 
     port.onDisconnect.addListener(() => {
@@ -1039,7 +1044,7 @@ BG.Methods.handleClientPortConnections = () => {
 };
 
 BG.Methods.isConnectedToClient = (tabId) => {
-  return window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+  return !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
 };
 
 BG.Methods.sendMessageToClient = (tabId, ...restArgs) => {
@@ -1122,13 +1127,9 @@ BG.Methods.onAppLoadedNotification = () => {
   EventActions.sendExtensionEvents();
 };
 
-BG.Methods.onContentScriptLoadedNotification = (tab, payload = {}) => {
-  window.tabService.resetPageData(tab.id);
-
-  Promise.all([
-    BG.Methods.handleRuleExecutionsOnClientPageLoad(tab),
-    BG.Methods.handleSessionRecordingOnClientPageLoad(tab, payload),
-  ]);
+BG.Methods.onClientPageLoad = (tab) => {
+  BG.Methods.handleRuleExecutionsOnClientPageLoad(tab);
+  BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
 BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
@@ -1152,8 +1153,6 @@ BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
 };
 
 BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
-  window.tabService.resetPageData(tab.id);
-
   if (payload.hasExecutedRules) {
     RQ.extensionIconManager.markRuleExecuted(tab.id);
   }
@@ -1162,17 +1161,17 @@ BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
     RQ.extensionIconManager.markRecording(tab.id);
   }
 
-  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab, payload);
+  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
-BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab, payload) => {
+BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (!sessionRecordingData) {
-    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(payload.url);
+    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
     if (sessionRecordingConfig) {
-      sessionRecordingData = { config: sessionRecordingConfig, url: payload.url };
+      sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1529,10 +1528,18 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
 
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   } else {
-    BG.Methods.sendMessageToClient(tabId, {
-      action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
-      rule,
-    });
+    BG.Methods.sendMessageToClient(
+      tabId,
+      {
+        action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
+        rule,
+      },
+      () => {
+        if (!chrome.runtime.lastError) {
+          RQ.extensionIconManager.markRuleExecuted(tabId);
+        }
+      }
+    );
   }
 };
 

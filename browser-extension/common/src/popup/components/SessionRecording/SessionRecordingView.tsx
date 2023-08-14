@@ -91,7 +91,7 @@ const SessionRecordingView: React.FC = () => {
                 </Typography.Text>
                 <br />
                 <Typography.Text className="custom-mode-caption">
-                  This tab is being recorded by session recorder
+                  This tab is being recorded by session Replay
                 </Typography.Text>
               </>
             ) : (
@@ -137,7 +137,7 @@ const SessionRecordingView: React.FC = () => {
             className="session-view-link-button"
             onClick={() => viewRecordingOnClick()}
           >
-            <EyeOutlined /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
+            <EyeOutlined /> <span>{isManualMode ? "Stop & watch replay" : "Watch replay"}</span>
           </Button>
         ) : (
           <Typography.Link

@@ -141,6 +141,7 @@ export const ONBOARDING = {
   HELPDESK_CLICKED: "helpdesk_clicked",
   FOOTER_CLICKED: "footer_clicked",
   DESKTOP_APP_PROMO_CLICKED: "desktop_app_download_promo_clicked",
+  PRODUCT_HUNT_BANNER_CLICKED: "product_hunt_banner_clicked",
 };
 
 export const TEAMS = {
