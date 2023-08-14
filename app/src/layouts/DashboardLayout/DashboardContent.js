@@ -29,7 +29,6 @@ import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import PATHS from "config/constants/sub/paths";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -38,7 +37,6 @@ const DashboardContent = () => {
 
   //Global state
   const dispatch = useDispatch();
-  const refParam = useMemo(() => new URLSearchParams(location.search).get("ref"), [location.search]);
   const user = useSelector(getUserAuthDetails);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -84,17 +82,6 @@ const DashboardContent = () => {
       trackPageViewEvent(getRouteFromCurrentPath(location.pathname), Object.fromEntries(searchParams));
     }
   }, [location, prevProps, searchParams]);
-
-  useEffect(() => {
-    if (window.location.href.includes(PATHS.SESSIONS.RELATIVE) && refParam === "producthunt") {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-        })
-      );
-    }
-  }, [dispatch, refParam]);
 
   return (
     <>
