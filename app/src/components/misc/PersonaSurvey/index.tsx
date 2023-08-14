@@ -164,7 +164,7 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         else dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
       } else callback?.();
     }
-  }, [currentPage, dispatch, callback, isSurveyModal]);
+  }, [currentPage, dispatch, callback, isSurveyModal, appMode]);
 
   const surveyPages = useMemo(
     () => <>{currentPage !== SurveyPage.RECOMMENDATIONS ? <>{currentSurveyPage}</> : null}</>,
