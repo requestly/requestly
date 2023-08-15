@@ -102,7 +102,7 @@ export const JoinWorkspace: React.FC<{
           Join your teams workspace and get access to shared rules, mock APIs & session replays.
         </div>
       </div>
-      <div className="mt-20">
+      <div className="mt-20 onboarding-invites-list">
         {availableTeams.map((team) => (
           <Workspace team={team} />
         ))}
