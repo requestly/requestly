@@ -7,7 +7,7 @@ import ContactUsModal from "components/landing/contactUsModal";
 import APP_CONSTANTS from "config/constants";
 import FeatureRepresentation from "../../FeatureRepresentation";
 import GitHubButton from "react-github-btn";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+// import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Plans } from "./pricingPlan";
 import underlineIcon from "../../../../../assets/img/icons/common/underline.svg";
 import "./index.css";
