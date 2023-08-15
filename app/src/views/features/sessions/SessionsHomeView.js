@@ -33,7 +33,6 @@ const SessionsHomeView = () => {
         })
       );
       dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-      dispatch(actions.updateIsPersonaSurveyCompleted(true));
     }
   }, [dispatch, refParam]);
 
