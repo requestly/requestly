@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
-import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
+import { Button, Divider, Input, Row, Col, Typography, InputRef, Space, Alert } from "antd";
 import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
@@ -158,6 +158,28 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     redirectToSettingsPage();
   }, [redirectToSettingsPage]);
 
+  // TODO: @wrongsahil remove this after PH launch
+  const lifetimeSessionRecordingAlert = () => {
+    const currentDate = new Date().getTime();
+    const startDate = new Date(Date.UTC(2023, 7, 16, 7, 0, 0)).getTime();
+    if (currentDate > startDate) {
+      return (
+        <Row className="lifetime-alert-container">
+          <Col>
+            <Alert
+              className="lifetime-alert"
+              message="Get lifetime access to Session Replay Pro for free by creating and saving your first session."
+              type="warning"
+              closable
+              onClose={() => {}}
+            />
+          </Col>
+        </Row>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="onboarding-content-container">
       <Row justify="end" align="middle" className="settings-row">
@@ -169,65 +191,68 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
         </Space>
       </Row>
       <Row justify="space-between" className="onboarding-banner">
-        <Col span={12} className="banner-text-container">
-          <Row className="banner-header">
-            <Title className="banner-title">Debug issues faster with Session Replay</Title>
-          </Row>
-          <Row className="banner-description">
-            <Text type="secondary" className="banner-text">
-              <div>
-                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
-                <Text strong>network</Text> &
-              </div>
-              <div>
-                {" "}
-                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
-              </div>
-              <div> debugging </div>
-            </Text>
+        {lifetimeSessionRecordingAlert()}
+        <Row>
+          <Col span={12} className="banner-text-container">
+            <Row className="banner-header">
+              <Title className="banner-title">Debug issues faster with Session Replay</Title>
+            </Row>
+            <Row className="banner-description">
+              <Text type="secondary" className="banner-text">
+                <div>
+                  Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                  <Text strong>network</Text> &
+                </div>
+                <div>
+                  {" "}
+                  <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+                </div>
+                <div> debugging </div>
+              </Text>
 
-            <Text type="secondary" className="banner-message banner-text">
-              <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
-              saving
-            </Text>
-          </Row>
-          <Row className="record-label">
-            <Text type="secondary" className="banner-text">
-              Record your first session
-            </Text>
-          </Row>
-          <Row>
-            <Col span={15} className="input-container">
-              <Input
-                ref={inputRef}
-                placeholder="Enter Page URL eg. https://ebay.com"
-                onPressEnter={handleStartRecordingBtnClicked}
-              />
-            </Col>
-            <Col span={3} className="start-btn-container">
-              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                {" "}
-                Start Recording
-              </Button>
-            </Col>
-          </Row>
-        </Col>
-        <Col span={12} className="banner-demo-video">
-          <Row justify="end">
-            <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
-          </Row>
-          <Row onClick={trackOnboardingSampleSessionViewed}>
-            <a
-              href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
-              target="__blank"
-              className="sample-link-container"
-            >
-              <Row justify="end" align="middle" className="sample-link">
-                <Text underline>View sample replay</Text>
-              </Row>
-            </a>
-          </Row>
-        </Col>
+              <Text type="secondary" className="banner-message banner-text">
+                <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
+                saving
+              </Text>
+            </Row>
+            <Row className="record-label">
+              <Text type="secondary" className="banner-text">
+                Record your first session
+              </Text>
+            </Row>
+            <Row>
+              <Col span={15} className="input-container">
+                <Input
+                  ref={inputRef}
+                  placeholder="Enter Page URL eg. https://ebay.com"
+                  onPressEnter={handleStartRecordingBtnClicked}
+                />
+              </Col>
+              <Col span={3} className="start-btn-container">
+                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                  {" "}
+                  Start Recording
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+          <Col span={12} className="banner-demo-video">
+            <Row justify="end">
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+            </Row>
+            <Row onClick={trackOnboardingSampleSessionViewed}>
+              <a
+                href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+                target="__blank"
+                className="sample-link-container"
+              >
+                <Row justify="end" align="middle" className="sample-link">
+                  <Text underline>View sample replay</Text>
+                </Row>
+              </a>
+            </Row>
+          </Col>
+        </Row>
       </Row>
     </div>
   );
