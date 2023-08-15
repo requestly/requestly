@@ -44,6 +44,7 @@
 }
 .persona-survey-banner .survey-banner-footer {
   text-align: center;
+  bottom: 0;
 }
 .persona-survey-container .survey-footer {
   margin-top: 40px;
