@@ -83,17 +83,19 @@ const FreeAndEnterprisePlanTable = () => {
                   <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
                 ))}
               </div>
-              <div>
-                <div className="basic-use-with-text text-left">Use Requestly with</div>
+              {product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && (
                 <div>
-                  {useRQwith.map((title, index) => (
-                    <div className="rq-use-with" key={index}>
-                      <img src="/assets/icons/leftArrow.svg" alt="right arrow" />
-                      <div>{title}</div>
-                    </div>
-                  ))}
+                  <div className="basic-use-with-text text-left">Use Requestly with</div>
+                  <div>
+                    {useRQwith.map((title, index) => (
+                      <div className="rq-use-with" key={index}>
+                        <img src="/assets/icons/leftArrow.svg" alt="right arrow" />
+                        <div>{title}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="pricing-table-col">
               <div className="pricing-col-header">
