@@ -18,10 +18,24 @@
     font-size: 0.8rem;
   }
 
+  .lifetime-alert-container {
+    margin-bottom: 32px;
+  }
+
+  .lifetime-alert {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border-color: #dc6803;
+    border-radius: 12px;
+    background-color: #00000000;
+  }
+
   .onboarding-banner {
     margin-left: 128px;
     margin-right: 128px;
-    margin-top: 80px;
+    margin-top: 16px;
 
     .banner-header {
       width: 100%;
