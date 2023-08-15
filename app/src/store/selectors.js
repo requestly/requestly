@@ -222,7 +222,7 @@ export const getUserAttributes = (state) => {
 };
 
 export const getIsProductHuntBannerClosed = (state) => {
-  return getGlobalState(state).misc?.persist?.isProductHuntBannerClosed;
+  return getGlobalState(state).misc?.persist?.isProductHuntLaunchingSoonBannerClosed;
 };
 
 export const getIsRedirectRuleTourCompleted = (state) => {
@@ -281,4 +281,8 @@ export const getLastSeenInviteTs = (state) => {
 
 export const getIsJoinWorkspaceCardVisible = (state) => {
   return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};
+
+export const getExtensionInsallSource = (state) => {
+  return getGlobalState(state).misc.persist?.extensionInstallSource;
 };

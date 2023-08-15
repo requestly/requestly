@@ -185,12 +185,13 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
-      isProductHuntBannerClosed: false,
+      isProductHuntLaunchingSoonBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,
