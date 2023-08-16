@@ -70,7 +70,7 @@ const ActiveLicenseInfo = ({
               validFrom: new Date("2023-08-16T00:00:00Z").getTime(),
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
-              type: "unlock",
+              type: "producthunt",
               planName: "Session Replay Pro",
             }}
           />
