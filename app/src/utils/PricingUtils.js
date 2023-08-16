@@ -129,7 +129,7 @@ export const beautifySubscriptionType = (subscriptionType) => {
     case "trial":
       return "Free Trial";
     case "producthunt":
-      return "Producthunt";
+      return "Producthunt Unlock";
     default:
       return "Premium Plan";
   }
