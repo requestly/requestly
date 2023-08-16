@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getIsProductHuntBannerClosed, getUserPersonaSurveyDetails } from "store/selectors";
+import { getAppMode, getIsProductHuntLaunchedBannerClosed, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
@@ -19,7 +19,7 @@ const DashboardLayout = () => {
   const { pathname, state } = location;
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isProductHuntLaunchingSoonBannerClosed = useSelector(getIsProductHuntBannerClosed);
+  const isProductHuntLaunchedBannerClosed = useSelector(getIsProductHuntLaunchedBannerClosed);
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
 
   promptOneTapOnLoad();
@@ -45,7 +45,7 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {!isAppOpenedInIframe() && !isProductHuntLaunchingSoonBannerClosed && <AppBanner />}
+      {!isAppOpenedInIframe() && !isProductHuntLaunchedBannerClosed && <AppBanner />}
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
