@@ -83,8 +83,8 @@ const ActiveLicenseInfo = ({
 
   return (
     <ProCard title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>} className="primary-card github-like-border">
-      {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
       {renderSessionReplayProSubscription()}
+      {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
     </ProCard>
   );
 };
