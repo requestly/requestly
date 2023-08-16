@@ -102,7 +102,24 @@ const MenuHeader = () => {
                 </div>
                 <div>⌘+K</div>
               </RQButton>
-              {randomNumberBetween1And2 === 1 ? (
+              <Col className="hidden-on-small-screen">
+                <span className="github-star-button" onClick={() => trackHeaderClicked("product_hunt_button")}>
+                  <a
+                    href="https://www.producthunt.com/posts/requestly-session-replays?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-requestly&#0045;session&#0045;replays"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=409192&theme=light"
+                      alt="Requestly&#0032;Session&#0032;Replays - Debug&#0032;web&#0032;apps&#0032;faster&#0032;with&#0032;record&#0032;&#0038;&#0032;replay&#0032;user&#0032;sessions | Product Hunt"
+                      style={{ width: "250px", height: "38px" }}
+                      width="250"
+                      height="38"
+                    />
+                  </a>
+                </span>
+              </Col>
+              {/* {randomNumberBetween1And2 === 1 ? (
                 <Col className="hidden-on-small-screen">
                   <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                     <GitHubButton
@@ -128,7 +145,7 @@ const MenuHeader = () => {
                     </RQButton>
                   </span>
                 </Col>
-              )}
+              )} */}
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
