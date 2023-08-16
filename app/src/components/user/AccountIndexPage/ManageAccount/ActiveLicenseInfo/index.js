@@ -63,7 +63,6 @@ const ActiveLicenseInfo = ({
     if (isSessionReplayLifetimeActive) {
       return (
         <>
-          <br />
           <SubscriptionInfo
             hideShadow={hideShadow}
             subscriptionDetails={{
@@ -74,6 +73,7 @@ const ActiveLicenseInfo = ({
               planName: "Session Replay Pro",
             }}
           />
+          <br />
         </>
       );
     }
