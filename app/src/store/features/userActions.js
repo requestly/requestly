@@ -122,8 +122,8 @@ export const updateJoinWorkspaceCardVisible = (prevState, action) => {
   prevState.misc.persist.isJoinWorkspaceCardVisible = action.payload;
 };
 
-export const updateIsProductHuntBannerClosed = (prevState, action) => {
-  prevState.misc.persist.isProductHuntLaunchingSoonBannerClosed = action.payload;
+export const updateIsProductHuntLaunchedBannerClosed = (prevState, action) => {
+  prevState.misc.persist.isProductHuntLaunchedBannerClosed = action.payload;
 };
 
 export const updateExtensionInstallSource = (prevState, action) => {

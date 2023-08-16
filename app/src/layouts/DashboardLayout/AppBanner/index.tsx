@@ -12,7 +12,7 @@ export const AppBanner = () => {
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(actions.updateIsProductHuntBannerClosed(true));
+    dispatch(actions.updateIsProductHuntLaunchedBannerClosed(true));
   };
 
   return (
@@ -24,8 +24,8 @@ export const AppBanner = () => {
       href="https://www.producthunt.com/posts/requestly-session-replays"
     >
       <span>
-        🚀 <b>We are launching Requestly Session Replay on Product Hunt on 16th August.</b> Get access to{" "}
-        <b>Lifetime Session Replay Pro</b> for <b>Free</b> by supporting us.
+        🚀 <b>Requestly Session Replay is now live on Product Hunt.</b> Get access to <b>Lifetime Session Replay Pro</b>{" "}
+        for <b>Free</b> by supporting us.
       </span>
       <RightArrow className="right-arrow-icon" />
       <RQButton
