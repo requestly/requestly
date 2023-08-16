@@ -112,9 +112,9 @@ const MenuHeader = () => {
                     <img
                       src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=409192&theme=light"
                       alt="Requestly&#0032;Session&#0032;Replays - Debug&#0032;web&#0032;apps&#0032;faster&#0032;with&#0032;record&#0032;&#0038;&#0032;replay&#0032;user&#0032;sessions | Product Hunt"
-                      style={{ width: "250px", height: "38px" }}
+                      style={{ width: "250px", height: "35px", marginLeft: "-26px", marginRight: "-36px" }}
                       width="250"
-                      height="38"
+                      height="35"
                     />
                   </a>
                 </span>
