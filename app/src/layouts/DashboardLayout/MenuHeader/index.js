@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
@@ -32,7 +32,7 @@ const MenuHeader = () => {
   const appMode = useSelector(getAppMode);
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
-  const randomNumberBetween1And2 = useMemo(() => Math.floor(Math.random() * 2) + 1, []);
+  const randomNumberBetween1And2 = useRef(Math.floor(Math.random() * 2) + 1);
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
 
   const handleDesktopAppPromoClicked = useCallback(() => {
@@ -103,7 +103,7 @@ const MenuHeader = () => {
                 <div>⌘+K</div>
               </RQButton>
 
-              {randomNumberBetween1And2 === 1 ? (
+              {randomNumberBetween1And2.current === 1 ? (
                 <Col className="hidden-on-small-screen">
                   <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                     <GitHubButton
