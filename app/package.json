@@ -37,7 +37,7 @@
     "extends": "react-app"
   },
   "dependencies": {
-    "@amplitude/analytics-browser": "^1.8.0",
+    "@amplitude/analytics-browser": "^1.12.1",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
