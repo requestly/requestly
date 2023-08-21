@@ -43,7 +43,6 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {/* {!isAppOpenedInIframe() && !isProductHuntLaunchedBannerClosed && <AppBanner />} */}
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
 
