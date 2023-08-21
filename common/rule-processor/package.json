@@ -16,9 +16,9 @@
   "devDependencies": {
     "@types/jasmine": "^3.6.9",
     "jasmine": "^3.7.0",
-    "karma": "^6.3.2",
+    "karma": "^6.4.2",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-jasmine": "^4.0.1",
+    "karma-jasmine": "^5.1.0",
     "karma-sourcemap-loader": "^0.3.8",
     "karma-webpack": "^5.0.0",
     "ts-loader": "^8.1.0",
