@@ -45,6 +45,6 @@
     "karma-coverage": "^2.2.0",
     "karma-jasmine": "^0.1.6",
     "karma-junit-reporter": "^2.0.1",
-    "web-ext": "^7.5.0"
+    "web-ext": "^7.6.2"
   }
 }
