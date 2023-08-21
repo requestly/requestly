@@ -18,7 +18,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   const user = useSelector(getUserAuthDetails);
   const navigate = useNavigate();
   const { validFrom, validTill, status, type, planName } = subscriptionDetails;
-  const isUserPremium = user.details?.isPremium;
+  const isUserPremium = user.details?.isPremium || status === "active";
 
   const handleRenewOnClick = (e) => {
     e.preventDefault();
