@@ -114,7 +114,7 @@
     "redux-persist": "^6.0.0",
     "rrweb": "2.0.0-alpha.9",
     "rrweb-player": "2.0.0-alpha.9",
-    "semver": "^7.3.5",
+    "semver": "^7.5.4",
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
     "ts-loader": "^9.3.0",
