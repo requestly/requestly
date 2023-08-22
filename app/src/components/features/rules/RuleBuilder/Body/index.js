@@ -10,6 +10,7 @@ import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
 import "./RuleBuilderBody.css";
+import { TestThisRuleRow } from "../../TestThisRule";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   //Global State
@@ -74,6 +75,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                 </Col>
               </Row>
             ) : null}
+            <TestThisRuleRow />
           </CardBody>
         </Col>
       </Row>
