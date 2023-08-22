@@ -44,4 +44,5 @@ RQ.CLIENT_MESSAGES = {
   SYNC_APPLIED_RULES: "syncAppliedRules",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
+  SHOW_TEST_RULE_WIDGET: "showTestRuleWidget",
 };

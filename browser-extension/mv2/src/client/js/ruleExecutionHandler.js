@@ -39,6 +39,10 @@ RQ.RuleExecutionHandler.setup = () => {
         RQ.RuleExecutionHandler.syncCachedAppliedRules(message.appliedRuleDetails, message.isConsoleLoggerEnabled);
         sendResponse();
         break;
+
+      case RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET:
+        // RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
+        break;
     }
 
     return false;
