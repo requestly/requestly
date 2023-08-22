@@ -40,7 +40,7 @@
     "src/devtools/libs/jquery-3.5.1.js",
     "src/devtools/libs/handlebars.runtime-v4.7.7.js",
     "src/devtools/panel/js/handlebarHelpers.js",
-    "dist/generated/devtools/panel/templates.hbs.js",
+    "dist/devtools/panel/templates.hbs.js",
     "src/devtools/panel/js/main.js"
   ],
   "background": [
