@@ -47,7 +47,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
           descriptionChangeCallback={handleDescriptionChange}
         />
       )}
-      <Row className="rule-builder-body">
+      <Row className="rule-builder-body" id="rule-builder-body">
         <Col
           span={22}
           offset={1}
@@ -75,7 +75,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                 </Col>
               </Row>
             ) : null}
-            <TestThisRuleRow />
+            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && <TestThisRuleRow />}
           </CardBody>
         </Col>
       </Row>
