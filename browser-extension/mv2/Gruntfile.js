@@ -8,6 +8,7 @@ const { env, browser, WEB_URL, OTHER_WEB_URLS } = require("../config/dist/config
 const { version } = require("./package.json");
 const jsList = require("./jsList.json");
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
+const isNewDevtoolsPanelEnabled = false; // TODO: cleanup old panel's code when new panel is stable
 
 const generateUrlPattern = (urlString) => {
   try {
@@ -51,7 +52,7 @@ const processManifest = (content) => {
 };
 
 module.exports = function (grunt) {
-  grunt.initConfig({
+  const gruntConfig = {
     concat: {
       options: {
         separator: "\n",
@@ -61,7 +62,6 @@ module.exports = function (grunt) {
           "dist/generated/shared.js": jsList["shared"],
           "dist/generated/pages/main.js": jsList["pages"],
           "dist/generated/client/client.js": jsList["client"],
-          "dist/generated/devtools/panel/panel.js": jsList["devtools-panel"],
           "dist/generated/background/background-bundled.js": jsList["background"],
         },
       },
@@ -83,27 +83,6 @@ module.exports = function (grunt) {
       },
     },
 
-    /**
-     * Task handlebars: Pre-Compile template files, concat them and save output to templates.hbs.js
-     */
-    handlebars: {
-      compile: {
-        options: {
-          namespace: "RQ.Templates",
-          partialsUseNamespace: true,
-          processName: function (filePath) {
-            var pieces = filePath.split("/"),
-              fileName = pieces[pieces.length - 1];
-
-            return fileName.replace(/(\.hbs)/gi, "");
-          },
-        },
-        files: {
-          "dist/generated/devtools/panel/templates.hbs.js": ["src/devtools/panel/templates/**/*.hbs"],
-        },
-      },
-    },
-
     karma: {
       unit: {
         configFile: "karma.conf.js",
@@ -111,10 +90,6 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      templates: {
-        files: ["**/*.hbs"],
-        tasks: ["handlebars"],
-      },
       scripts: {
         files: ["**/*.js"],
         tasks: ["concat"],
@@ -186,46 +161,77 @@ module.exports = function (grunt) {
       devtools: {
         files: [
           {
-            src: "src/devtools/devtools.html",
-            dest: "dist/generated/devtools/devtools.html",
+            cwd: "../common/dist/devtools",
+            src: "**/*",
+            dest: "dist/devtools",
+            expand: true,
           },
-          {
-            src: "src/devtools/bootstrap.js",
-            dest: "dist/generated/devtools/bootstrap.js",
-          },
-          {
-            src: "src/devtools/panel/panel.html",
-            dest: "dist/generated/devtools/panel/panel.html",
-          },
-          {
-            src: "src/devtools/panel/css/main.css",
-            dest: "dist/generated/devtools/panel/panel.css",
-          },
-          // {
-          //   src: "../common/dist/devtools/index.html",
-          //   dest: "dist/generated/devtools/network-panel/index.html",
-          // },
-          // {
-          //   src: "../common/dist/devtools/index.js",
-          //   dest: "dist/generated/devtools/network-panel/index.js",
-          // },
-          // {
-          //   src: "../common/dist/devtools/index.css",
-          //   dest: "dist/generated/devtools/network-panel/index.css",
-          // },
         ],
       },
     },
-  });
+  };
 
-  grunt.loadNpmTasks("grunt-contrib-handlebars");
+  const gruntDistTasks = ["concat", "copy:popup", "copy:devtools", "copy:static_content"];
+
+  if (!isNewDevtoolsPanelEnabled) {
+    gruntConfig.concat.dist.files["dist/devtools/panel/panel.js"] = jsList["devtools-panel"];
+
+    gruntConfig.handlebars = {
+      compile: {
+        options: {
+          namespace: "RQ.Templates",
+          partialsUseNamespace: true,
+          processName: function (filePath) {
+            var pieces = filePath.split("/"),
+              fileName = pieces[pieces.length - 1];
+
+            return fileName.replace(/(\.hbs)/gi, "");
+          },
+        },
+        files: {
+          "dist/devtools/panel/templates.hbs.js": ["src/devtools/panel/templates/**/*.hbs"],
+        },
+      },
+    };
+
+    gruntConfig.copy.devtools = {
+      files: [
+        {
+          src: "src/devtools/devtools.html",
+          dest: "dist/devtools/devtools.html",
+        },
+        {
+          src: "src/devtools/bootstrap.js",
+          dest: "dist/devtools/bootstrap.js",
+        },
+        {
+          src: "src/devtools/panel/panel.html",
+          dest: "dist/devtools/panel/panel.html",
+        },
+        {
+          src: "src/devtools/panel/css/main.css",
+          dest: "dist/devtools/panel/panel.css",
+        },
+      ],
+    };
+
+    gruntConfig.watch.templates = {
+      files: ["**/*.hbs"],
+      tasks: ["handlebars"],
+    };
+
+    gruntDistTasks.unshift("handlebars");
+    grunt.loadNpmTasks("grunt-contrib-handlebars");
+  }
+
+  grunt.initConfig(gruntConfig);
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-karma");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-uglify");
 
-  grunt.registerTask("dist", ["handlebars", "concat", "copy:popup", "copy:devtools", "copy:static_content"]);
+  grunt.registerTask("dist", gruntDistTasks);
 
   grunt.registerTask("build", ["dist", `copy:manifest_${browser}`]);
 
