@@ -999,6 +999,14 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
+
+      case RQ.EXTENSION_MESSAGES.TEST_RULE_ON_URL:
+        BG.Methods.launchUrlAndShowTestRuleWidget(message, sender.tab.id);
+        break;
+
+      case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
+        BG.Methods.onSaveTestRuleResult(message, sender.tab);
+        break;
     }
   });
 };
@@ -1202,6 +1210,57 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   }
 };
 
+BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
+  const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
+
+  const ruleTestReports = Object.entries(testReports)
+    .map(([key, value]) => {
+      if (value.ruleId === ruleId) {
+        return {
+          ...value,
+          id: key,
+        };
+      }
+    })
+    .sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0));
+
+  if (ruleTestReports.length > 2) {
+    delete testReports[ruleTestReports[2].id];
+  }
+
+  const newTestReportId = RQ.commonUtils.generateUUID();
+  testReports[newTestReportId] = {
+    timestamp: Date.now(),
+    ruleId,
+    appliedStatus,
+    url,
+  };
+
+  await RQ.StorageService.saveRecord({
+    test_reports: testReports,
+  });
+
+  return newTestReportId;
+};
+
+BG.Methods.launchUrlAndShowTestRuleWidget = (payload, openerTabId) => {
+  BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET,
+      ruleId: payload.ruleId,
+    });
+  });
+};
+
+BG.Methods.onSaveTestRuleResult = (payload, senderTab) => {
+  BG.Methods.saveTestReport(payload.ruleId, senderTab.url, payload.appliedStatus).then((test_id) => {
+    chrome.tabs.update(senderTab.openerTabId, {
+      active: true,
+      url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}?test_id=${test_id}`,
+    });
+  });
+};
+
 BG.Methods.startRecordingExplicitly = (tabId) => {
   const sessionRecordingData = { explicit: true };
 
@@ -1214,8 +1273,16 @@ BG.Methods.startRecordingExplicitly = (tabId) => {
 };
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
-  chrome.tabs.create({ url }, (tab) => {
+  BG.Methods.launchUrl(url).then((tab) => {
     window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true, explicit: true });
+  });
+};
+
+BG.Methods.launchUrl = (url, openerTabId) => {
+  return new Promise((resolve) => {
+    chrome.tabs.create({ url, openerTabId }, (tab) => {
+      resolve(tab);
+    });
   });
 };
 
