@@ -1,6 +1,17 @@
 .test-this-rule-row {
+  position: relative;
+  margin-top: 4px;
+  margin-bottom: 2rem;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
+}
+.disabled-test-this-rule-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #303030a7;
+  border-radius: var(--border-radius-md);
+  cursor: not-allowed;
 }
 .test-this-rule-row-header {
   padding: 1rem 1.25rem;
