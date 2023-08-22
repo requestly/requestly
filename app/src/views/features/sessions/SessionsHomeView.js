@@ -1,6 +1,5 @@
-import React, { useMemo, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
+import React from "react";
+import { useSelector } from "react-redux";
 import { getAppMode } from "../../../store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -12,30 +11,13 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import DesktopAppError from "./errors/DesktopAppError";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { actions } from "store";
 
 const SessionsHomeView = () => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const refParam = useMemo(() => new URLSearchParams(location.search).get("ref"), [location.search]);
 
   //Global State
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-
-  useEffect(() => {
-    if (refParam === "producthunt") {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-        })
-      );
-      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
-      dispatch(actions.updateIsPersonaSurveyCompleted(true));
-    }
-  }, [dispatch, refParam]);
 
   if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) {
     return <NetworkSessionsIndexPage />;
