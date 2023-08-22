@@ -29,8 +29,6 @@ import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import APP_CONSTANTS from "config/constants";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -82,8 +80,6 @@ const DashboardContent = () => {
     // ANALYTICS
     if (!prevProps || prevProps.location !== location) {
       trackPageViewEvent(getRouteFromCurrentPath(location.pathname), Object.fromEntries(searchParams));
-      const refParam = searchParams.get("ref");
-      if (refParam === "producthunt") submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.REF, "producthunt");
     }
   }, [location, prevProps, searchParams]);
 
