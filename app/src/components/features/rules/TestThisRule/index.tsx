@@ -1,17 +1,45 @@
-import React from "react";
-import { Row } from "antd";
+import React, { useState } from "react";
+import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { isValidUrl } from "utils/FormattingHelper";
+import { redirectToUrl } from "utils/RedirectionUtils";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import "./index.css";
 
 export const TestThisRuleRow: React.FC = () => {
+  const [pageUrl, setPageUrl] = useState("");
+  const [error, setError] = useState(null);
+
+  const handleStartTestRule = () => {
+    if (!pageUrl.length) {
+      setError("Enter a page URL");
+      return;
+    }
+    if (!isValidUrl(pageUrl)) {
+      setError("Enter a valid page URL");
+      return;
+    }
+    if (error) setError(null);
+    redirectToUrl(pageUrl, true);
+  };
+
   return (
     <div className="test-this-rule-row w-full">
       <div className="test-this-rule-row-header text-bold subtitle">Test this rule</div>
       <div className="test-this-rule-row-body">
         <Row>
-          <RQInput style={{ flex: 1 }} placeholder="Enter the URL you want to test" />
-          <RQButton type="primary" size="large" className="start-test-rule-btn">
+          <div style={{ flex: 1 }}>
+            <RQInput
+              placeholder="Enter the URL you want to test"
+              value={pageUrl}
+              onChange={(e) => setPageUrl(e.target.value)}
+              status={error ? "error" : ""}
+            />
+            <Typography.Text type="danger" className="caption">
+              {error}
+            </Typography.Text>
+          </div>
+          <RQButton type="primary" size="large" className="start-test-rule-btn" onClick={handleStartTestRule}>
             <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
           </RQButton>
         </Row>
