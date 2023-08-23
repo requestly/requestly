@@ -27,7 +27,7 @@
 .test-this-rule-row-body {
   padding: 1.25rem;
   background: var(--component-background);
-  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  /* border-radius: 0 0 var(--border-radius-md) var(--border-radius-md); */
 }
 
 .test-this-rule-row-body .start-test-rule-btn {
@@ -54,4 +54,27 @@
 .test-this-rule-warning {
   border: 1px solid var(--warning);
   background: #95860231;
+}
+
+.test-this-rule-results-header {
+  border-top: 1px solid #5c5b5b80;
+  border-bottom: 1px solid #5c5b5b80;
+}
+
+.test-this-rule-report-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 1rem 1.25rem;
+  background: var(--component-background);
+}
+
+.test-this-rule-report-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.test-this-rule-report-status .anticon {
+  color: var(--success);
 }

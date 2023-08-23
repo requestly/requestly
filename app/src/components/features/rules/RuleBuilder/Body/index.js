@@ -75,7 +75,9 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                 </Col>
               </Row>
             ) : null}
-            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && <TestThisRuleRow />}
+            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && (
+              <TestThisRuleRow ruleId={currentlySelectedRuleData.id} />
+            )}
           </CardBody>
         </Col>
       </Row>

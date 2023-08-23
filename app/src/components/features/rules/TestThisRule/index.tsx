@@ -4,14 +4,18 @@ import { useLocation } from "react-router-dom";
 import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { TestReports } from "./TestReports";
 import { isValidUrl } from "utils/FormattingHelper";
-import { redirectToUrl } from "utils/RedirectionUtils";
+import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import "./index.css";
 
-export const TestThisRuleRow: React.FC = () => {
+interface TestRuleProps {
+  ruleId: string;
+}
+export const TestThisRuleRow: React.FC<TestRuleProps> = ({ ruleId }) => {
   const location = useLocation();
   const { state } = location;
   const isNewRuleCreated = useMemo(() => state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE, [
@@ -32,7 +36,7 @@ export const TestThisRuleRow: React.FC = () => {
       return;
     }
     if (error) setError(null);
-    redirectToUrl(pageUrl, true);
+    testRuleOnUrl(pageUrl, ruleId);
   };
 
   const FeedbackMessage = () => {
@@ -115,6 +119,7 @@ export const TestThisRuleRow: React.FC = () => {
           </Row>
           {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
         </div>
+        <TestReports />
       </div>
     </div>
   );
