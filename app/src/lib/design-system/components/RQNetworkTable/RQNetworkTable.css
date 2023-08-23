@@ -1,0 +1,4 @@
+.rq-network-table-container {
+  height: inherit;
+  overflow-y: auto;
+}

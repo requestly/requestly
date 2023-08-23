@@ -1,13 +1,15 @@
-import { Empty, Typography } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { Empty, Typography } from "antd";
 import { NetworkLog } from "../types";
-import NetworkLogRow from "./NetworkLogRow";
+// import NetworkLogRow from "./NetworkLogRow";
 import Split from "react-split";
 import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
-import { useSelector } from "react-redux";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
+import { RQNetworkTable } from "lib/design-system/components/RQNetworkTable";
+import { mockRQNetworkLogs } from "lib/design-system/components/RQNetworkTable/data";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -34,19 +36,28 @@ const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, upda
   const networkLogsTable = useMemo(
     () => (
       <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
-        {visibleNetworkLogs.map((log, i) => (
-          <NetworkLogRow
-            key={i}
-            {...log}
-            onClick={() => setSelectedLogIndex(i)}
-            isSelected={i === selectedLogIndex}
-            showResponseTime={selectedLogIndex === -1}
-          />
-        ))}
+        {<RQNetworkTable logs={mockRQNetworkLogs} />}
       </div>
     ),
-    [visibleNetworkLogs, selectedLogIndex, containerRef, onScroll]
+    [containerRef, onScroll]
   );
+
+  // const networkLogsTable = useMemo(
+  //   () => (
+  //     <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
+  //       {visibleNetworkLogs.map((log, i) => (
+  //         <NetworkLogRow
+  //           key={i}
+  //           {...log}
+  //           onClick={() => setSelectedLogIndex(i)}
+  //           isSelected={i === selectedLogIndex}
+  //           showResponseTime={selectedLogIndex === -1}
+  //         />
+  //       ))}
+  //     </div>
+  //   ),
+  //   [visibleNetworkLogs, selectedLogIndex, containerRef, onScroll]
+  // );
 
   return (
     <div className="session-panel-content network-logs-panel">
