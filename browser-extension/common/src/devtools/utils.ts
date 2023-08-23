@@ -18,7 +18,7 @@ export const createRule = <T extends Rule>(
   initRuleData: (rule: T) => void,
   inputSelectorToFocus?: string
 ) => {
-  const editorUrl = `${config.WEB_URL}/rules/editor/create/${ruleTypeUrlFragment}`;
+  const editorUrl = `${config.WEB_URL}/rules/editor/create/${ruleTypeUrlFragment}?source=devtool`;
   let editorWindow: Window;
   const onMessageReceived = (event: MessageEvent<PostMessageData>) => {
     const { author, action, payload } = event.data;
