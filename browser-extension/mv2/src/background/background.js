@@ -1213,15 +1213,8 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
 
-  const ruleTestReports = Object.entries(testReports)
-    .map(([key, value]) => {
-      if (value.ruleId === ruleId) {
-        return {
-          ...value,
-          id: key,
-        };
-      }
-    })
+  const ruleTestReports = Object.values(testReports)
+    .filter((testReport) => testReport.ruleId === ruleId)
     .sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0));
 
   if (ruleTestReports.length > 2) {
@@ -1234,6 +1227,7 @@ BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
     ruleId,
     appliedStatus,
     url,
+    id: newTestReportId,
   };
 
   await RQ.StorageService.saveRecord({
