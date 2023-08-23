@@ -1231,7 +1231,7 @@ BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   };
 
   await RQ.StorageService.saveRecord({
-    test_reports: testReports,
+    [RQ.STORAGE_KEYS.TEST_REPORTS]: testReports,
   });
 
   return newTestReportId;
