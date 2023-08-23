@@ -4,8 +4,8 @@ import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { StorageService } from "init";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { TestReport } from "./types";
-// //@ts-ignore
-// import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
 
 export const TestReports: React.FC = () => {
@@ -30,7 +30,7 @@ export const TestReports: React.FC = () => {
 
   useEffect(() => {
     StorageService(appMode)
-      .getRecord("test_reports") //TODO: Use the storage key constant after its fixed
+      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS)
       .then((data) => {
         if (data) {
           const reports = Object.values(data).filter(
@@ -39,14 +39,7 @@ export const TestReports: React.FC = () => {
           if (reports.length) setTestReports(reports);
         }
       });
-    StorageService(appMode)
-      .getAllRecords() //TODO: Use the storage key constant after its fixed
-      .then((data) => {
-        console.log({ data });
-      });
   }, [appMode, currentlySelectedRuleData.id]);
-
-  console.log({ testReports });
 
   return (
     <>
