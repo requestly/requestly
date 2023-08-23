@@ -80,18 +80,24 @@ interface HarMapEntry {
 }
 
 /* RQ LOG */
+export enum RQNetworkLogType {
+  DESKTOP = "desktop",
+  SESSION_RECORDING = "sessionRecording",
+}
+
 export interface RQNetworkLog {
   id: string;
-  timestamp: number;
+  timestamp: number | string;
   url: string;
   request: LogRequest;
   response: LogResponse;
   requestShellCurl: string;
-  requestState: string;
-  actions: any; // array of applied actions
+  requestState?: string;
+  actions?: any; // array of applied actions
   consoleLogs: any; // array of logs generated in script based rules
   domain?: string;
   app?: string;
+  logType?: RQNetworkLogType;
 }
 
 interface LogRequest {

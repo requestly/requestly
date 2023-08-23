@@ -127,6 +127,7 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
+    "@requestly-ui/resource-table": "^0.1.0",
     "@requestly/web-sdk": "0.14.1",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
