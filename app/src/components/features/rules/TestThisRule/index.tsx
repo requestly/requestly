@@ -69,6 +69,7 @@ export const TestThisRuleRow: React.FC = () => {
                 placeholder="Enter the URL you want to test"
                 value={pageUrl}
                 onChange={(e) => setPageUrl(e.target.value)}
+                onPressEnter={handleStartTestRule}
                 status={error ? "error" : ""}
               />
               <Typography.Text type="danger" className="caption">
