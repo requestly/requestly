@@ -1,6 +1,7 @@
 .rq-resource-table-container {
   display: flex;
   height: 100%;
+  overflow: auto;
 
   > div {
     overflow: auto;
