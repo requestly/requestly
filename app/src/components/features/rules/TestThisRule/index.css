@@ -1,18 +1,22 @@
+.test-this-rule-row-wrapper {
+  margin-top: 30px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 2rem;
+}
+
 .test-this-rule-row {
   position: relative;
-  margin-top: 4px;
-  margin-bottom: 2rem;
-  border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
 }
 
-.disabled-test-this-rule-row::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #303030a7;
-  border-radius: var(--border-radius-md);
-  cursor: not-allowed;
+.test-this-rule-message {
+  margin: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .test-this-rule-row-header {
@@ -23,6 +27,7 @@
 .test-this-rule-row-body {
   padding: 1.25rem;
   background: var(--component-background);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 
 .test-this-rule-row-body .start-test-rule-btn {
@@ -39,4 +44,14 @@
 
 .test-this-rule-row-body .ant-input {
   background: var(--component-dark-background);
+}
+
+.test-this-rule-success {
+  border: 1px solid var(--success);
+  background: #0b7f4315;
+}
+
+.test-this-rule-warning {
+  border: 1px solid var(--warning);
+  background: #95860231;
 }
