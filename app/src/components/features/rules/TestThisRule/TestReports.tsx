@@ -33,9 +33,10 @@ export const TestReports: React.FC = () => {
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS)
       .then((data) => {
         if (data) {
-          const reports = Object.values(data).filter(
-            (report: TestReport) => report.ruleId === currentlySelectedRuleData.id
-          );
+          const reports = Object.values(data)
+            .filter((report: TestReport) => report.ruleId === currentlySelectedRuleData.id)
+            .sort((report1: TestReport, report2: TestReport) => report2.timestamp - report1.timestamp);
+
           if (reports.length) setTestReports(reports);
         }
       });
