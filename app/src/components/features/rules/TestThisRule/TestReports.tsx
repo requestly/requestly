@@ -48,23 +48,25 @@ export const TestReports: React.FC = () => {
           <div className="test-this-rule-row-header test-this-rule-results-header text-bold subtitle">
             Previous results
           </div>
-          {testReports.map((report: TestReport, index: number) => (
-            <div className="test-this-rule-report-row" key={index}>
-              <div className="text-white text-bold">{report.url}</div>
-              <div className="text-gray">{getFormattedReportCreatedTime(report.timestamp)}</div>
-              <div className="text-gray test-this-rule-report-status">
-                {report.appliedStatus ? (
-                  <>
-                    <CheckOutlined style={{ color: "var(--success" }} /> Rule executed
-                  </>
-                ) : (
-                  <>
-                    <CloseOutlined style={{ color: "var(--danger" }} /> Failed
-                  </>
-                )}
+          <div className="test-this-rule-report-row-wrapper">
+            {testReports.map((report: TestReport, index: number) => (
+              <div className="test-this-rule-report-row" key={index}>
+                <div className="text-white text-bold">{report.url}</div>
+                <div className="text-gray">{getFormattedReportCreatedTime(report.timestamp)}</div>
+                <div className="text-gray test-this-rule-report-status">
+                  {report.appliedStatus ? (
+                    <>
+                      <CheckOutlined style={{ color: "var(--success" }} /> Rule executed
+                    </>
+                  ) : (
+                    <>
+                      <CloseOutlined style={{ color: "var(--danger" }} /> Failed
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       )}
     </>

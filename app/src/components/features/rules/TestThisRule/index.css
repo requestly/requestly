@@ -74,3 +74,8 @@
   align-items: center;
   gap: 4px;
 }
+
+.test-this-rule-report-row-wrapper > .test-this-rule-report-row:nth-child(even) {
+  border-top: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
+}
