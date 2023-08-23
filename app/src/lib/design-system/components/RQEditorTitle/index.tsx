@@ -119,6 +119,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             ) : (
               <div className="editor-description">
                 <Typography.Paragraph
+                  style={{ width: "100%" }}
                   ellipsis={{
                     rows: 3,
                   }}
