@@ -74,7 +74,3 @@
   align-items: center;
   gap: 4px;
 }
-
-.test-this-rule-report-status .anticon {
-  color: var(--success);
-}
