@@ -42,7 +42,7 @@ class RQTestRuleWidget extends HTMLElement {
 				<div id="rule-status-icon" class="cross-icon">
 					${CrossIcon}
 				</div>
-				Rule not applied
+				Rule not yet applied
 			`;
     } else if (appliedStatus === "true") {
       ruleStatusContainer.innerHTML = `

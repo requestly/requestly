@@ -6,11 +6,14 @@ import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { TestReports } from "./TestReports";
 import { isValidUrl } from "utils/FormattingHelper";
-import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import "./index.css";
+import { testRuleOnUrl } from "actions/ExtensionActions";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
@@ -75,6 +78,16 @@ export const TestThisRuleRow: React.FC = () => {
       return () => clearTimeout(scrollTimeout);
     }
   }, [isNewRuleCreated]);
+
+  useEffect(() => {
+    PageScriptMessageHandler.addMessageListener(
+      GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+      (message: { testReportId: string }) => {
+        //TODO @RuntimeTerror10: Handle this message
+        console.log("!!!debug", "message on test rule updated::", message);
+      }
+    );
+  }, []);
 
   return (
     <div
