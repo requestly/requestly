@@ -60,8 +60,45 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
         "content-type": "text/html; charset=utf-8",
         date: "Wed, 23 Aug 2023 05:27:09 GMT",
       },
-      body: "",
-      queryParams: [],
+      body: "test body",
+      queryParams: [
+        {
+          name: "a",
+          value: "1588759528",
+        },
+        {
+          name: "sa",
+          value: "1",
+        },
+        {
+          name: "v",
+          value: "1.236.0",
+        },
+        {
+          name: "t",
+          value: "Unnamed%20Transaction",
+        },
+        {
+          name: "rst",
+          value: "316879",
+        },
+        {
+          name: "ck",
+          value: "0",
+        },
+        {
+          name: "s",
+          value: "376c478a41bdb377",
+        },
+        {
+          name: "ref",
+          value: "https://www.flipkart.com/",
+        },
+        {
+          name: "ri",
+          value: "%7B%22fk-cp-zion%22:%225.44.1%22%7D",
+        },
+      ],
     },
     response: {
       statusCode: 200,
@@ -95,7 +132,24 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
         "content-type": "text/html; charset=utf-8",
       },
       body: "",
-      queryParams: [],
+      queryParams: [
+        {
+          name: "a",
+          value: "1588759528",
+        },
+        {
+          name: "sa",
+          value: "1",
+        },
+        {
+          name: "v",
+          value: "1.236.0",
+        },
+        {
+          name: "t",
+          value: "Unnamed%20Transaction",
+        },
+      ],
     },
     response: {
       statusCode: 200,
@@ -128,7 +182,12 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
         date: "Wed, 23 Aug 2023 05:27:09 GMT",
       },
       body: "",
-      queryParams: [],
+      queryParams: [
+        {
+          name: "a",
+          value: "1588759528",
+        },
+      ],
     },
     response: {
       statusCode: 200,
@@ -162,7 +221,24 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
         date: "Wed, 23 Aug 2023 05:27:09 GMT",
       },
       body: "",
-      queryParams: [],
+      queryParams: [
+        {
+          name: "a",
+          value: "1588759528",
+        },
+        {
+          name: "sa",
+          value: "1",
+        },
+        {
+          name: "v",
+          value: "1.236.0",
+        },
+        {
+          name: "t",
+          value: "Unnamed%20Transaction",
+        },
+      ],
     },
     response: {
       statusCode: 200,

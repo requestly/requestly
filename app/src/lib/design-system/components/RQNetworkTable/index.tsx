@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ColorScheme, ResourceTable } from "@requestly-ui/resource-table";
-import { rqNetworkLogColumns } from "./rqNetworkLogColumns";
+import { rqNetworkLogColumns } from "./columns";
+import { detailsTabs } from "./detailsTabs";
 import {
   RQNetworkLog,
   RQNetworkLogType,
@@ -32,14 +33,11 @@ interface RQNetworkTableProps {
 }
 
 export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs }) => {
-  /**
-   * [] Generic column renderer [done]
-   * [] Generic details renderer
-   */
-
+  // @ts-ignore
+  const [selectedLog, setSelectedLog] = useState<RQNetworkLog | null>(null);
   const logType = logs?.[0]?.logType;
 
-  const columns = useMemo(() => {
+  const filteredColumns = useMemo(() => {
     if (logType === RQNetworkLogType.SESSION_RECORDING) {
       const columnsToExclude = ["rulesApplied"];
       return rqNetworkLogColumns.filter((column) => !columnsToExclude.includes(column.key));
@@ -47,9 +45,28 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs }) => {
     return rqNetworkLogColumns;
   }, [logType]);
 
+  // const filteredDetailsTabs = useMemo(() => {
+  //   if (
+  //     selectedLog &&
+  //     selectedLog.request.queryParams?.length === 0 &&
+  //     (selectedLog.request.method?.toLocaleLowerCase() ?? "get") === "get"
+  //   ) {
+  //     return detailsTabs.filter((tab) => tab.key !== "payload");
+  //   }
+
+  //   return detailsTabs;
+  // }, [selectedLog]);
+
   return (
     <div className="rq-network-table-container">
-      <ResourceTable colorScheme={ColorScheme.DARK} resources={logs} columns={columns} />
+      <ResourceTable
+        resources={logs}
+        columns={filteredColumns}
+        detailsTabs={detailsTabs}
+        primaryColumnKeys={["url"]}
+        colorScheme={ColorScheme.DARK}
+        onRowSelection={setSelectedLog}
+      />
     </div>
   );
 };
