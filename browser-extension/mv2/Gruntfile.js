@@ -8,7 +8,7 @@ const { env, browser, WEB_URL, OTHER_WEB_URLS } = require("../config/dist/config
 const { version } = require("./package.json");
 const jsList = require("./jsList.json");
 const isProductionBuildMode = process.env.BUILD_MODE === "production";
-const isNewDevtoolsPanelEnabled = false; // TODO: cleanup old panel's code when new panel is stable
+const isNewDevtoolsPanelEnabled = true; // TODO: cleanup old panel's code when new panel is stable
 
 const generateUrlPattern = (urlString) => {
   try {

@@ -1,4 +1,4 @@
-import { Column } from "../../components/ResourceTable";
+import { Column } from "@requestly-ui/resource-table";
 import { ExecutionEvent } from "../../types";
 
 export enum EXECUTION_TABLE_COLUMN_IDS {

@@ -1,5 +1,5 @@
 import React from "react";
-import { DetailsTab } from "../../../components/ResourceTable";
+import { DetailsTab } from "@requestly-ui/resource-table";
 import { NetworkEvent } from "../../../types";
 import GeneralTabContent from "./GeneralTabContent/GeneralTabContent";
 import HeadersTabContent from "./HeadersTabContent/HeadersTabContent";

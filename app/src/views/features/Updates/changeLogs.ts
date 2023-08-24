@@ -8,6 +8,13 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.8.24",
+    logs: [
+      "Revamped Requestly devtools panel in browser inspect with support of rule creation from network traffic",
+      "Bug fix: Script rule does not execute in HTML documents which don't have doctype defined",
+    ],
+  },
+  {
     version: "23.8.12",
     logs: [
       "Ignore large request/response payloads in Session replay",
