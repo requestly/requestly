@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 
 interface Props {
-  label: string;
+  label?: string;
   children: ReactNode;
   isCodeBlock?: boolean;
 }
@@ -15,7 +15,7 @@ const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock }) =
         wordBreak: "break-all",
       }}
     >
-      <span style={{ fontWeight: "bold", marginRight: 8 }}>{label}:</span>
+      {label ? <span style={{ fontWeight: "bold", marginRight: 8 }}>{label}:</span> : null}
       {isCodeBlock ? <pre style={{ fontSize: 11 }}>{children}</pre> : children}
     </div>
   ) : null;
