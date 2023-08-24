@@ -1001,7 +1001,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.EXTENSION_MESSAGES.TEST_RULE_ON_URL:
-        BG.Methods.launchUrlAndShowTestRuleWidget(message, sender.tab.id);
+        BG.Methods.launchUrlAndStartRuleTesting(message, sender.tab.id);
         break;
 
       case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
@@ -1237,10 +1237,10 @@ BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   return newTestReportId;
 };
 
-BG.Methods.launchUrlAndShowTestRuleWidget = (payload, openerTabId) => {
+BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
     BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET,
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
       ruleId: payload.ruleId,
     });
   });

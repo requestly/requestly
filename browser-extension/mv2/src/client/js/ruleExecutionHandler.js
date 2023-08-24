@@ -42,7 +42,7 @@ RQ.RuleExecutionHandler.setup = () => {
         sendResponse();
         break;
 
-      case RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET:
+      case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
         RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
         break;
     }
