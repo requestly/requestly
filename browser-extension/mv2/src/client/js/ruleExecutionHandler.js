@@ -12,6 +12,8 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
+  RQ.RuleExecutionHandler.notifyRuleAppliedToWidget(rule.id);
+
   const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(rule.id);
   if (isFirstExecution) {
     RQ.RuleExecutionHandler.appliedRuleIds.add(rule.id);
@@ -73,6 +75,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
 
   const testRuleWidget = document.createElement("rq-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
+  testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
   testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
@@ -86,4 +89,18 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
       appliedStatus: RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId),
     });
   });
+};
+
+RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
+  const testRuleWidget = document.querySelector("rq-test-rule-widget");
+
+  if (testRuleWidget?.getAttribute("applied-status") === "false") {
+    testRuleWidget.dispatchEvent(
+      new CustomEvent("new-rule-applied", {
+        detail: {
+          appliedRuleId: ruleId,
+        },
+      })
+    );
+  }
 };
