@@ -53,12 +53,8 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
     }
   }, [newReportId, scrollToTestRule]);
 
-  console.log({ newReportId });
-
   useEffect(() => {
-    console.log("LIST");
     if (refreshTestReports) {
-      console.log("LIST2");
       StorageService(appMode)
         .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS)
         .then((data) => {
