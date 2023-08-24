@@ -23,6 +23,7 @@ BG.TAB_SERVICE_DATA = {
   CLIENT_LOAD_SUBSCRIBERS: "clientLoadSubscribers",
   SESSION_RECORDING: "sessionRecording",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
+  TEST_RULE_URL: "testRuleUrl",
 };
 
 /**
@@ -1001,11 +1002,11 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.EXTENSION_MESSAGES.TEST_RULE_ON_URL:
-        BG.Methods.launchUrlAndShowTestRuleWidget(message, sender.tab.id);
+        BG.Methods.launchUrlAndStartRuleTesting(message, sender.tab.id);
         break;
 
       case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
-        BG.Methods.onSaveTestRuleResult(message, sender.tab);
+        BG.Methods.saveTestRuleResult(message, sender.tab);
         break;
     }
   });
@@ -1237,34 +1238,32 @@ BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   return newTestReportId;
 };
 
-BG.Methods.launchUrlAndShowTestRuleWidget = (payload, openerTabId) => {
+BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_URL, payload.url);
     BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET,
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
       ruleId: payload.ruleId,
     });
   });
 };
 
-BG.Methods.onSaveTestRuleResult = (payload, senderTab) => {
-  BG.Methods.saveTestReport(payload.ruleId, senderTab.url, payload.appliedStatus).then((test_id) => {
-    // using tabs.update instead of tabService.focus (tabs.highlight) because
-    // highlight API throws error if tab index doesnot exist.
-    // tabs.update updates the current focussed tab if the tab index does not exist.
-    chrome.tabs.update(
-      senderTab.openerTabId,
-      {
-        active: true,
-      },
-      (tab) => {
-        chrome.tabs.executeScript(tab.id, {
-          code: `window.postMessage({
-          action: "${RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED}",
-          testReportId: "${test_id}"
-        }, "*")`,
-        });
-      }
-    );
+BG.Methods.saveTestRuleResult = (payload, senderTab) => {
+  const testRuleUrl = window.tabService.getData(senderTab.id, BG.TAB_SERVICE_DATA.TEST_RULE_URL, senderTab.url);
+
+  BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
+    const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
+    if (!isParentTabFocussed) {
+      // update the current tab with URL if opener tab does not exist
+      chrome.tabs.update({
+        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}?test_id=${test_id}`,
+      });
+    } else {
+      BG.Methods.sendMessageToClient(senderTab.openerTabId, {
+        action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+        testReportId: test_id,
+      });
+    }
   });
 };
 

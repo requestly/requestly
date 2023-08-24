@@ -42,7 +42,7 @@ RQ.RuleExecutionHandler.setup = () => {
         sendResponse();
         break;
 
-      case RQ.CLIENT_MESSAGES.SHOW_TEST_RULE_WIDGET:
+      case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
         RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
         break;
     }
@@ -86,7 +86,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
     chrome.runtime.sendMessage({
       action: RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT,
       ruleId,
-      appliedStatus: RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId),
+      appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
     });
   });
 };
