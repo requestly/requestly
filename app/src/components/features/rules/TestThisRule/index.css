@@ -3,6 +3,7 @@
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
   margin-bottom: 2rem;
+  overflow: hidden;
 }
 
 .test-this-rule-row {
@@ -27,7 +28,6 @@
 .test-this-rule-row-body {
   padding: 1.25rem;
   background: var(--component-background);
-  /* border-radius: 0 0 var(--border-radius-md) var(--border-radius-md); */
 }
 
 .test-this-rule-row-body .start-test-rule-btn {
