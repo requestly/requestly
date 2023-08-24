@@ -23,6 +23,7 @@ BG.TAB_SERVICE_DATA = {
   CLIENT_LOAD_SUBSCRIBERS: "clientLoadSubscribers",
   SESSION_RECORDING: "sessionRecording",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
+  TEST_RULE_URL: "testRuleUrl",
 };
 
 /**
@@ -1005,7 +1006,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
-        BG.Methods.onSaveTestRuleResult(message, sender.tab);
+        BG.Methods.saveTestRuleResult(message, sender.tab);
         break;
     }
   });
@@ -1239,6 +1240,7 @@ BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
 
 BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_URL, payload.url);
     BG.Methods.sendMessageToClient(tab.id, {
       action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
       ruleId: payload.ruleId,
@@ -1246,8 +1248,10 @@ BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   });
 };
 
-BG.Methods.onSaveTestRuleResult = (payload, senderTab) => {
-  BG.Methods.saveTestReport(payload.ruleId, senderTab.url, payload.appliedStatus).then((test_id) => {
+BG.Methods.saveTestRuleResult = (payload, senderTab) => {
+  const testRuleUrl = window.tabService.getData(senderTab.id, BG.TAB_SERVICE_DATA.TEST_RULE_URL, senderTab.url);
+
+  BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
     const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
     if (!isParentTabFocussed) {
       // update the current tab with URL if opener tab does not exist
