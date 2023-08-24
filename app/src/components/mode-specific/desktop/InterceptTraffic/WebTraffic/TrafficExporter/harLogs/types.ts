@@ -100,7 +100,7 @@ export interface RQNetworkLog {
   logType?: RQNetworkLogType;
 }
 
-interface LogRequest {
+interface LogRequest extends Record<string, unknown> {
   method: string;
   path: string;
   host: string;
@@ -110,7 +110,7 @@ interface LogRequest {
   queryParams: HarMapEntry[];
 }
 
-interface LogResponse {
+interface LogResponse extends Record<string, unknown> {
   statusCode: number;
   headers: HeaderMap;
   contentType: string;

@@ -1,19 +1,7 @@
-/**
- *
- * 1. timestamp
- * 2. URL
- * 3. Method
- * 4. Content-Type
- * 5. Actions (optional)
- * 6. Status
- *
- * for each column know how to render data in each cell
- * now we may not have all the column data so filter those parts and then render
- */
-
+import { Column } from "@requestly-ui/resource-table";
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 
-export const rqNetworkLogColumns = [
+export const rqNetworkLogColumns: Column<RQNetworkLog>[] = [
   {
     key: "time",
     header: "Time",
