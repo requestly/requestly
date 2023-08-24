@@ -9,7 +9,11 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import "./index.css";
 
-export const TestReports: React.FC = () => {
+interface TestReportsProps {
+  scrollToTestRule: () => void;
+}
+
+export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) => {
   const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const [testReports, setTestReports] = useState(null);
@@ -40,6 +44,14 @@ export const TestReports: React.FC = () => {
       }
     );
   }, []);
+
+  useEffect(() => {
+    if (newReportId) {
+      const scrollTimeout = setTimeout(scrollToTestRule, 500);
+
+      return () => clearTimeout(scrollTimeout);
+    }
+  }, [newReportId, scrollToTestRule]);
 
   console.log({ newReportId });
 

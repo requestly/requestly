@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
@@ -56,25 +56,27 @@ export const TestThisRuleRow: React.FC = () => {
     }
   };
 
+  const handleScrollToTestThisRule = useCallback(() => {
+    if (testThisRuleBoxRef.current) {
+      const ruleBuilderBody = document.querySelector("#rule-builder-body");
+      const parentRect = ruleBuilderBody.getBoundingClientRect();
+      const childRect = testThisRuleBoxRef.current.getBoundingClientRect();
+      const scrollPosition = childRect.top - parentRect.top + ruleBuilderBody.scrollTop;
+
+      ruleBuilderBody.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (testThisRuleBoxRef.current && isNewRuleCreated) {
-      const scrollToChild = () => {
-        const ruleBuilderBody = document.querySelector("#rule-builder-body");
-        const parentRect = ruleBuilderBody.getBoundingClientRect();
-        const childRect = testThisRuleBoxRef.current.getBoundingClientRect();
-        const scrollPosition = childRect.top - parentRect.top + ruleBuilderBody.scrollTop;
-
-        ruleBuilderBody.scrollTo({
-          top: scrollPosition,
-          behavior: "smooth",
-        });
-      };
-
-      const scrollTimeout = setTimeout(scrollToChild, 500);
+      const scrollTimeout = setTimeout(handleScrollToTestThisRule, 500);
 
       return () => clearTimeout(scrollTimeout);
     }
-  }, [isNewRuleCreated]);
+  }, [isNewRuleCreated, handleScrollToTestThisRule]);
 
   return (
     <div
@@ -117,7 +119,7 @@ export const TestThisRuleRow: React.FC = () => {
           </Row>
           {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
         </div>
-        <TestReports />
+        <TestReports scrollToTestRule={handleScrollToTestThisRule} />
       </div>
     </div>
   );
