@@ -79,3 +79,16 @@
   border-top: 1px solid var(--border-dark);
   border-bottom: 1px solid var(--border-dark);
 }
+
+.highlight-new-report {
+  animation: highlight-report 4s ease-in-out;
+}
+
+@keyframes highlight-report {
+  0% {
+    background: #5c5b5b80;
+  }
+  100% {
+    background: var(--component-background);
+  }
+}

@@ -73,7 +73,10 @@ export const TestReports: React.FC = () => {
           </div>
           <div className="test-this-rule-report-row-wrapper">
             {testReports.map((report: TestReport, index: number) => (
-              <div className="test-this-rule-report-row" key={index}>
+              <div
+                className={`test-this-rule-report-row ${report.id === newReportId && "highlight-new-report"}`}
+                key={index}
+              >
                 <div className="text-white text-bold">{report.url}</div>
                 <div className="text-gray">{getFormattedReportCreatedTime(report.timestamp)}</div>
                 <div className="text-gray test-this-rule-report-status">
