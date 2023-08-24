@@ -14,44 +14,38 @@ export const detailsTabs: DetailsTab<RQNetworkLog>[] = [
     label: "Headers",
     render: (log: RQNetworkLog) => {
       return (
-        <div>
-          <Collapse defaultActiveKey={[0, 1, 2]}>
-            <Panel header="General" key={0}>
-              <div className="network-log-details-tab-content">
-                <NetworkLogProperty label="Request URL">{log.url}</NetworkLogProperty>
+        <Collapse defaultActiveKey={[0, 1, 2]}>
+          <Panel header="General" key={0}>
+            <NetworkLogProperty label="Request URL">{log.url}</NetworkLogProperty>
 
-                {!!log.response.url && log.response.url !== log.url ? (
-                  <NetworkLogProperty label="Redirected URL">{log.response.url as string}</NetworkLogProperty>
-                ) : null}
+            {!!log.response.url && log.response.url !== log.url ? (
+              <NetworkLogProperty label="Redirected URL">{log.response.url as string}</NetworkLogProperty>
+            ) : null}
 
-                <NetworkLogProperty label="Request Method">
-                  {log.request.method?.toUpperCase() ?? "GET"}
-                </NetworkLogProperty>
+            <NetworkLogProperty label="Request Method">{log.request.method?.toUpperCase() ?? "GET"}</NetworkLogProperty>
 
-                <NetworkLogProperty label="Status Code">
-                  <NetworkStatusField
-                    status={log.response.statusCode}
-                    statusText={(log.response?.statusText as string) ?? ""}
-                  />
-                </NetworkLogProperty>
-              </div>
-            </Panel>
-            <Panel header="Response Headers" key={1}>
-              {Object.entries(log.response.headers).map(([header, value]) => (
-                <NetworkLogProperty key={header} label={header}>
-                  {value}
-                </NetworkLogProperty>
-              ))}
-            </Panel>
-            <Panel header="Request Headers" key={2}>
-              {Object.entries(log.request.headers).map(([header, value]) => (
-                <NetworkLogProperty key={header} label={header}>
-                  {value}
-                </NetworkLogProperty>
-              ))}
-            </Panel>
-          </Collapse>
-        </div>
+            <NetworkLogProperty label="Status Code">
+              <NetworkStatusField
+                status={log.response.statusCode}
+                statusText={(log.response?.statusText as string) ?? ""}
+              />
+            </NetworkLogProperty>
+          </Panel>
+          <Panel header="Response Headers" key={1}>
+            {Object.entries(log.response.headers).map(([header, value]) => (
+              <NetworkLogProperty key={header} label={header}>
+                {value}
+              </NetworkLogProperty>
+            ))}
+          </Panel>
+          <Panel header="Request Headers" key={2}>
+            {Object.entries(log.request.headers).map(([header, value]) => (
+              <NetworkLogProperty key={header} label={header}>
+                {value}
+              </NetworkLogProperty>
+            ))}
+          </Panel>
+        </Collapse>
       );
     },
   },
@@ -59,16 +53,14 @@ export const detailsTabs: DetailsTab<RQNetworkLog>[] = [
     key: "payload",
     label: "Payload",
     render: (log: RQNetworkLog) => (
-      <Collapse defaultActiveKey={[0, 1]} ghost>
-        <Panel header="Query String Parameters" key={0}>
-          <div>
-            {log.request.queryParams?.length > 0 &&
-              log.request.queryParams.map(({ name, value }) => (
-                <NetworkLogProperty key={value} label={name}>
-                  {value}
-                </NetworkLogProperty>
-              ))}
-          </div>
+      <Collapse defaultActiveKey={[0, 1]}>
+        <Panel header="Query String" key={0}>
+          {log.request.queryParams?.length > 0 &&
+            log.request.queryParams.map(({ name, value }) => (
+              <NetworkLogProperty key={value} label={name}>
+                {value}
+              </NetworkLogProperty>
+            ))}
         </Panel>
         {log.request.body && (
           <Panel header="Request Payload" key={1}>
@@ -97,7 +89,7 @@ export const detailsTabs: DetailsTab<RQNetworkLog>[] = [
         : null;
 
       return (
-        <div className="network-log-details-tab-content">
+        <>
           {!!responseTimeInSeconds && (
             <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
           )}
@@ -107,7 +99,7 @@ export const detailsTabs: DetailsTab<RQNetworkLog>[] = [
             payload={log.response.body}
             isPayloadTooLarge={(log.response?.errors as any)?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)}
           />
-        </div>
+        </>
       );
     },
   },
