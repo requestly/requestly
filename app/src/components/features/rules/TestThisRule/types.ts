@@ -1,8 +1,7 @@
 export type TestReport = {
   id: string;
-  ruleId: string;
   url: string;
-  sessionLink: string;
+  ruleId: string;
   timestamp: number;
   appliedStatus: boolean;
 };
