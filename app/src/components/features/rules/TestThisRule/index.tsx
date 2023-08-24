@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { TestReports } from "./TestReports";
@@ -12,16 +12,14 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
 import "./index.css";
 
-interface TestRuleProps {
-  ruleId: string;
-}
-export const TestThisRuleRow: React.FC<TestRuleProps> = ({ ruleId }) => {
+export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
   const { state } = location;
   const isNewRuleCreated = useMemo(() => state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE, [
     state?.source,
   ]);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const ruleId = useSelector(getCurrentlySelectedRuleData).id;
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
