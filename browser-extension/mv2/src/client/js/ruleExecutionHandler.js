@@ -86,7 +86,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
     chrome.runtime.sendMessage({
       action: RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT,
       ruleId,
-      appliedStatus: RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId),
+      appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
     });
   });
 };
