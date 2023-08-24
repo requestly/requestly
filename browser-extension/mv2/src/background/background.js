@@ -1248,10 +1248,20 @@ BG.Methods.launchUrlAndShowTestRuleWidget = (payload, openerTabId) => {
 
 BG.Methods.onSaveTestRuleResult = (payload, senderTab) => {
   BG.Methods.saveTestReport(payload.ruleId, senderTab.url, payload.appliedStatus).then((test_id) => {
-    chrome.tabs.update(senderTab.openerTabId, {
-      active: true,
-      url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}?test_id=${test_id}`,
-    });
+    chrome.tabs.update(
+      senderTab.openerTabId,
+      {
+        active: true,
+      },
+      (tab) => {
+        chrome.tabs.executeScript(tab.id, {
+          code: `window.postMessage({
+          action: "${RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED}",
+          testReportId: "${test_id}"
+        }, "*")`,
+        });
+      }
+    );
   });
 };
 
