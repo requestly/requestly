@@ -108,7 +108,7 @@
     "react-virtualized-auto-sizer": "^1.0.7",
     "react-window": "^1.8.8",
     "react-youtube": "^10.1.0",
-    "reactstrap": "9.0.1",
+    "reactstrap": "9.2.0",
     "redux-deep-persist": "^1.0.6",
     "redux-persist": "^6.0.0",
     "rrweb": "2.0.0-alpha.9",
