@@ -4,7 +4,7 @@ import { ThemeProvider } from "@devtools-ds/themes";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 
 type Props = {
-  label: string;
+  label?: string;
   payload: any;
   isPayloadTooLarge?: boolean;
 };
