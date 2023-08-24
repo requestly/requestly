@@ -1248,6 +1248,9 @@ BG.Methods.launchUrlAndShowTestRuleWidget = (payload, openerTabId) => {
 
 BG.Methods.onSaveTestRuleResult = (payload, senderTab) => {
   BG.Methods.saveTestReport(payload.ruleId, senderTab.url, payload.appliedStatus).then((test_id) => {
+    // using tabs.update instead of tabService.focus (tabs.highlight) because
+    // highlight API throws error if tab index doesnot exist.
+    // tabs.update updates the current focussed tab if the tab index does not exist.
     chrome.tabs.update(
       senderTab.openerTabId,
       {
