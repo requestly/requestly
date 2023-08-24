@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { StorageService } from "init";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { TestReport } from "./types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -19,21 +20,6 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   const [testReports, setTestReports] = useState(null);
   const [newReportId, setNewReportId] = useState(null);
   const [refreshTestReports, setRefreshTestReports] = useState(true);
-
-  const getFormattedReportCreatedTime = useCallback((timestamp: number) => {
-    const date = new Date(timestamp);
-
-    const day = date.getDate();
-    const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
-    const year = date.getFullYear();
-
-    const hours = date.getHours() % 12 || 12;
-    const ampm = date.getHours() >= 12 ? "PM" : "AM";
-    const minutes = date.getMinutes();
-
-    const formattedDate = `${day} ${month} ${year} - ${hours}:${minutes < 10 ? "0" : ""}${minutes}${ampm}`;
-    return formattedDate;
-  }, []);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
@@ -86,7 +72,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                 key={index}
               >
                 <div className="text-white text-bold">{report.url}</div>
-                <div className="text-gray">{getFormattedReportCreatedTime(report.timestamp)}</div>
+                <div className="text-gray">{getFormattedTimestamp(report.timestamp)}</div>
                 <div className="text-gray test-this-rule-report-status">
                   {report.appliedStatus ? (
                     <>
