@@ -13,6 +13,7 @@ const DEFAULT_POSITION = { right: 10, top: 10 };
 class RQTestRuleWidget extends HTMLElement {
   #shadowRoot;
   #isDragging = false;
+  #testRuleId: string;
 
   constructor() {
     super();
@@ -23,6 +24,8 @@ class RQTestRuleWidget extends HTMLElement {
   connectedCallback() {
     this.setAttribute("draggable", "true");
     this.addListeners();
+
+    this.#testRuleId = this.attributes.getNamedItem("rule-id")?.value;
 
     const ruleName = this.#shadowRoot.getElementById("rule-name");
     ruleName.textContent = "Testing " + this.attributes.getNamedItem("rule-name")?.value ?? null;
@@ -36,28 +39,20 @@ class RQTestRuleWidget extends HTMLElement {
     }
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
-    const ruleStatusContainer = this.#shadowRoot.getElementById("rule-status");
-    if (appliedStatus === "false") {
-      ruleStatusContainer.innerHTML = `
-				<div id="rule-status-icon" class="cross-icon">
-					${CrossIcon}
-				</div>
-				Rule not yet applied
-			`;
-    } else if (appliedStatus === "true") {
-      ruleStatusContainer.innerHTML = `
-				<div id="rule-status-icon" class="tick-icon">
-					${TickIcon}
-				</div>
-				Rule applied
-			`;
-    }
+    this.showRuleAppliedStatus(appliedStatus === "true");
   }
 
   addListeners() {
     this.#shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
       evt.stopPropagation();
       this.triggerEvent(RQTestRuleWidgetEvent.VIEW_RESULTS);
+    });
+
+    this.addEventListener("new-rule-applied", (evt: CustomEvent) => {
+      if (evt.detail?.appliedRuleId === this.#testRuleId) {
+        this.setAttribute("applied-status", "true");
+        this.showRuleAppliedStatus(true);
+      }
     });
 
     this.addEventListener("mousedown", (evt: MouseEvent) => {
@@ -126,6 +121,25 @@ class RQTestRuleWidget extends HTMLElement {
 
   triggerEvent(name: RQTestRuleWidgetEvent, detail?: unknown) {
     this.dispatchEvent(new CustomEvent(name, { detail }));
+  }
+
+  showRuleAppliedStatus(appliedStatus: boolean) {
+    const ruleStatusContainer = this.#shadowRoot.getElementById("rule-status");
+    if (appliedStatus) {
+      ruleStatusContainer.innerHTML = `
+				<div id="rule-status-icon" class="tick-icon">
+					${TickIcon}
+				</div>
+				Rule applied
+			`;
+    } else {
+      ruleStatusContainer.innerHTML = `
+				<div id="rule-status-icon" class="cross-icon">
+					${CrossIcon}
+				</div>
+				Rule not yet applied
+			`;
+    }
   }
 
   _getDefaultMarkup() {
