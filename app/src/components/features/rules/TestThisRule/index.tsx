@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { isValidUrl } from "utils/FormattingHelper";
-import { redirectToUrl } from "utils/RedirectionUtils";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import "./index.css";
+import { testRuleOnUrl } from "actions/ExtensionActions";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
@@ -18,6 +21,7 @@ export const TestThisRuleRow: React.FC = () => {
     state?.source,
   ]);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const ruleId = useSelector(getCurrentlySelectedRuleData).id;
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
@@ -32,7 +36,7 @@ export const TestThisRuleRow: React.FC = () => {
       return;
     }
     if (error) setError(null);
-    redirectToUrl(pageUrl, true);
+    testRuleOnUrl(pageUrl, ruleId);
   };
 
   const FeedbackMessage = () => {
@@ -73,6 +77,16 @@ export const TestThisRuleRow: React.FC = () => {
       return () => clearTimeout(scrollTimeout);
     }
   }, [isNewRuleCreated]);
+
+  useEffect(() => {
+    PageScriptMessageHandler.addMessageListener(
+      GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+      (message: { testReportId: string }) => {
+        //TODO @RuntimeTerror10: Handle this message
+        console.log("!!!debug", "message on test rule updated::", message);
+      }
+    );
+  }, []);
 
   return (
     <div

@@ -150,6 +150,7 @@ CONSTANTS.EXTENSION_MESSAGES = {
   NOTIFY_EXTENSION_UPDATED: "notifyExtensionUpdated",
   TEST_RULE_ON_URL: "testRuleOnUrl",
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
 };
 
 CONSTANTS.HEADERS_TARGET = {
