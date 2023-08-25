@@ -7,7 +7,9 @@ interface Props {
 }
 
 const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock }) => {
-  return children ? (
+  const updatedChildren = children === "" ? <span>&Prime; &Prime;</span> : children;
+
+  return updatedChildren ? (
     <div
       style={{
         marginBottom: 4,
@@ -16,7 +18,7 @@ const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock }) =
       }}
     >
       {label ? <span style={{ fontWeight: "bold", marginRight: 8 }}>{label}:</span> : null}
-      {isCodeBlock ? <pre style={{ fontSize: 11 }}>{children}</pre> : children}
+      {isCodeBlock ? <pre style={{ fontSize: 11 }}>{updatedChildren}</pre> : updatedChildren}
     </div>
   ) : null;
 };
