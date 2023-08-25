@@ -6,6 +6,7 @@ import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { TestReports } from "./TestReports";
 import { isValidUrl } from "utils/FormattingHelper";
+import { prefixUrlWithHttps } from "utils/URLUtils";
 import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -29,12 +30,15 @@ export const TestThisRuleRow: React.FC = () => {
       setError("Enter a page URL");
       return;
     }
-    if (!isValidUrl(pageUrl)) {
+    const urlToTest = prefixUrlWithHttps(pageUrl);
+
+    if (!isValidUrl(urlToTest)) {
       setError("Enter a valid page URL");
       return;
     }
     if (error) setError(null);
-    testRuleOnUrl(pageUrl, ruleId);
+    setPageUrl(urlToTest);
+    testRuleOnUrl(urlToTest, ruleId);
   };
 
   const FeedbackMessage = () => {
