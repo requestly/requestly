@@ -8,8 +8,8 @@ import { TestReport } from "./types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
-import "./index.css";
 import { trackTestRuleReportGenerated } from "modules/analytics/events/features/ruleEditor";
+import "./index.css";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
