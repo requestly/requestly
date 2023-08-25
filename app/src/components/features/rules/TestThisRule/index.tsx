@@ -11,8 +11,9 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
-import "./index.css";
 import LINKS from "config/constants/sub/links";
+import { trackTestRuleClicked } from "modules/analytics/events/features/ruleEditor";
+import "./index.css";
 
 export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
@@ -21,12 +22,14 @@ export const TestThisRuleRow: React.FC = () => {
     state?.source,
   ]);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const ruleId = useSelector(getCurrentlySelectedRuleData).id;
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
 
   const handleStartTestRule = () => {
+    trackTestRuleClicked(currentlySelectedRuleData.ruleType);
+
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
@@ -39,7 +42,7 @@ export const TestThisRuleRow: React.FC = () => {
     }
     if (error) setError(null);
     setPageUrl(urlToTest);
-    testRuleOnUrl(urlToTest, ruleId);
+    testRuleOnUrl(urlToTest, currentlySelectedRuleData.id);
   };
 
   const FeedbackMessage = () => {
