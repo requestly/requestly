@@ -12,7 +12,6 @@ const TAG_NAME = "rq-test-rule-widget";
 const DEFAULT_POSITION = { right: 10, top: 10 };
 
 class RQTestRuleWidget extends RQDraggableWidget {
-  isDragging: boolean = false;
   #shadowRoot;
   #testRuleId: string;
 
@@ -24,8 +23,7 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
   connectedCallback() {
     this.setAttribute("draggable", "true");
-    super.addDragListeners();
-
+    super.connectedCallback();
     this.addListeners();
 
     this.#testRuleId = this.attributes.getNamedItem("rule-id")?.value;
@@ -61,10 +59,10 @@ class RQTestRuleWidget extends RQDraggableWidget {
     this.#shadowRoot.addEventListener(
       "click",
       (evt) => {
-        if (this.isDragging) {
+        if (super.isDragging) {
           // disable all clicks while widget is dragging
           evt.stopPropagation();
-          this.isDragging = false;
+          super.isDragging = false;
         }
       },
       true
