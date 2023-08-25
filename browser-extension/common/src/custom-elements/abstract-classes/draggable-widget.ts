@@ -1,10 +1,14 @@
 export abstract class RQDraggableWidget extends HTMLElement {
-  abstract isDragging: boolean;
+  isDragging: boolean;
   #defaultPosition;
 
   constructor(defaultPosition: { top?: number; bottom?: number; left?: number; right?: number }) {
     super();
     this.#defaultPosition = defaultPosition;
+  }
+
+  connectedCallback() {
+    this.addDragListeners();
   }
 
   addDragListeners() {
