@@ -3,45 +3,6 @@ import {
   RQNetworkLogType,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 
-interface HarMapEntry {
-  name: string;
-  value: string;
-  comment?: string;
-}
-
-interface LogRequest {
-  method: string;
-  path: string;
-  host: string;
-  port: string;
-  headers: HeaderMap;
-  body: any;
-  queryParams: HarMapEntry[];
-}
-
-interface LogResponse {
-  statusCode: number;
-  headers: HeaderMap;
-  contentType: string;
-  body: string;
-}
-
-type HeaderMap = Record<string, string>; // {[name] : value}
-
-export interface RQNetworkLogt {
-  id: string;
-  timestamp: number;
-  url: string;
-  request: LogRequest;
-  response: LogResponse;
-  requestShellCurl: string;
-  requestState: string;
-  actions: any; // array of applied actions
-  consoleLogs: any; // array of logs generated in script based rules
-  domain?: string;
-  app?: string;
-}
-
 export const mockRQNetworkLogs: RQNetworkLog[] = [
   {
     id: "1",
