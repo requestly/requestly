@@ -1286,9 +1286,7 @@ BG.Methods.launchUrlAndStartRecording = (url) => {
 
 BG.Methods.launchUrl = (url, openerTabId) => {
   return new Promise((resolve) => {
-    chrome.tabs.create({ url, openerTabId }, (tab) => {
-      resolve(tab);
-    });
+    window.tabService.createNewTab(url, openerTabId, resolve);
   });
 };
 
