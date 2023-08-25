@@ -11,6 +11,8 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import APP_CONSTANTS from "config/constants";
+import LINKS from "config/constants/sub/links";
+import { trackTestRuleClicked } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
 
 export const TestThisRuleRow: React.FC = () => {
@@ -20,12 +22,14 @@ export const TestThisRuleRow: React.FC = () => {
     state?.source,
   ]);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const ruleId = useSelector(getCurrentlySelectedRuleData).id;
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
 
   const handleStartTestRule = () => {
+    trackTestRuleClicked(currentlySelectedRuleData.ruleType);
+
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
@@ -38,7 +42,7 @@ export const TestThisRuleRow: React.FC = () => {
     }
     if (error) setError(null);
     setPageUrl(urlToTest);
-    testRuleOnUrl(urlToTest, ruleId);
+    testRuleOnUrl(urlToTest, currentlySelectedRuleData.id);
   };
 
   const FeedbackMessage = () => {
@@ -83,47 +87,61 @@ export const TestThisRuleRow: React.FC = () => {
   }, [isNewRuleCreated, handleScrollToTestThisRule]);
 
   return (
-    <div
-      className={`test-this-rule-row-wrapper ${
-        isCurrentlySelectedRuleHasUnsavedChanges
-          ? "test-this-rule-warning"
-          : isNewRuleCreated
-          ? "test-this-rule-success"
-          : null
-      }`}
-      ref={testThisRuleBoxRef}
-    >
-      <FeedbackMessage />
-      <div className="test-this-rule-row w-full">
-        <div className="test-this-rule-row-header text-bold subtitle">Test this rule</div>
-        <div className="test-this-rule-row-body">
-          <Row>
-            <div style={{ flex: 1 }}>
-              <RQInput
-                placeholder="Enter the URL you want to test"
-                value={pageUrl}
-                onChange={(e) => setPageUrl(e.target.value)}
-                onPressEnter={handleStartTestRule}
-                status={error ? "error" : ""}
+    <div style={{ marginBottom: "2rem" }}>
+      <div
+        className={`test-this-rule-row-wrapper ${
+          isCurrentlySelectedRuleHasUnsavedChanges
+            ? "test-this-rule-warning"
+            : isNewRuleCreated
+            ? "test-this-rule-success"
+            : null
+        }`}
+        ref={testThisRuleBoxRef}
+      >
+        <FeedbackMessage />
+        <div className="test-this-rule-row w-full">
+          <div className="test-this-rule-row-header text-bold subtitle">Test this rule</div>
+          <div className="test-this-rule-row-body">
+            <Row>
+              <div style={{ flex: 1 }}>
+                <RQInput
+                  placeholder="Enter the URL you want to test"
+                  value={pageUrl}
+                  onChange={(e) => setPageUrl(e.target.value)}
+                  onPressEnter={handleStartTestRule}
+                  status={error ? "error" : ""}
+                  disabled={isCurrentlySelectedRuleHasUnsavedChanges}
+                />
+                <Typography.Text type="danger" className="caption">
+                  {error}
+                </Typography.Text>
+              </div>
+              <RQButton
+                type="primary"
+                size="large"
+                className="start-test-rule-btn"
+                onClick={handleStartTestRule}
                 disabled={isCurrentlySelectedRuleHasUnsavedChanges}
-              />
-              <Typography.Text type="danger" className="caption">
-                {error}
-              </Typography.Text>
-            </div>
-            <RQButton
-              type="primary"
-              size="large"
-              className="start-test-rule-btn"
-              onClick={handleStartTestRule}
-              disabled={isCurrentlySelectedRuleHasUnsavedChanges}
-            >
-              <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
-            </RQButton>
-          </Row>
-          {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
+              >
+                <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
+              </RQButton>
+            </Row>
+            {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
+          </div>
+          <TestReports scrollToTestRule={handleScrollToTestThisRule} />
         </div>
-        <TestReports scrollToTestRule={handleScrollToTestThisRule} />
+      </div>
+      <div className="mt-8 text-gray">
+        Rules not working as expected? Checkout our{" "}
+        <a
+          className="external-link"
+          href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
+          target="_blank"
+          rel="noreferrer"
+        >
+          troubleshooting guide
+        </a>
+        .
       </div>
     </div>
   );
