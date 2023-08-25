@@ -8,6 +8,7 @@ import { TestReport } from "./types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
+import { trackTestRuleReportGenerated } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
 
 interface TestReportsProps {
@@ -27,9 +28,10 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
       (message: { testReportId: string }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
+        trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType);
       }
     );
-  }, []);
+  }, [currentlySelectedRuleData.ruleType]);
 
   useEffect(() => {
     if (newReportId) {
