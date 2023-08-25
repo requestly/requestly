@@ -26,6 +26,12 @@
       }
     }
 
+    createNewTab(url, openerTabId, callback) {
+      chrome.tabs.create({ url, openerTabId }, (tab) => {
+        callback(tab);
+      });
+    }
+
     removeTab(tabId) {
       delete this.map[tabId];
     }
