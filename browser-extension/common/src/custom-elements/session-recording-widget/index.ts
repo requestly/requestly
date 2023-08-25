@@ -14,7 +14,6 @@ const DEFAULT_POSITION = { left: 30, bottom: 30 };
 
 class RQSessionRecordingWidget extends RQDraggableWidget {
   #shadowRoot;
-  isDragging = false;
 
   constructor() {
     super(DEFAULT_POSITION);
@@ -26,8 +25,8 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     this.addListeners();
-    super.addDragListeners();
     this.show();
   }
 
@@ -52,10 +51,10 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     this.#shadowRoot.addEventListener(
       "click",
       (evt) => {
-        if (this.isDragging) {
+        if (super.isDragging) {
           // disable all clicks while widget is dragging
           evt.stopPropagation();
-          this.isDragging = false;
+          super.isDragging = false;
         }
       },
       true
