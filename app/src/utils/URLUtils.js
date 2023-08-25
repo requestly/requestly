@@ -13,3 +13,11 @@ export const getRouteFromCurrentPath = (path) => {
   const route = significantPathParts.join("/");
   return route;
 };
+
+export const prefixUrlWithHttps = (url) => {
+  let newUrl = url.trim();
+  if (newUrl && !newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+    newUrl = "https://" + newUrl;
+  }
+  return newUrl;
+};
