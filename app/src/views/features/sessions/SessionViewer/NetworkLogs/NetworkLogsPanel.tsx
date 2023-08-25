@@ -1,15 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Empty, Typography } from "antd";
 import { NetworkLog } from "../types";
-// import NetworkLogRow from "./NetworkLogRow";
-import Split from "react-split";
-import NetworkLogDetails from "./NetworkLogDetails";
 import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 import { RQNetworkTable } from "lib/design-system/components/RQNetworkTable";
-import { mockRQNetworkLogs } from "lib/design-system/components/RQNetworkTable/data";
+import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./helpers";
 
 interface Props {
   networkLogs: NetworkLog[];
@@ -24,10 +21,13 @@ const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, upda
     });
   }, [networkLogs, playerTimeOffset]);
 
+  const convertedLogs = useMemo(() => convertSessionRecordingNetworkLogsToRQNetworkLogs(visibleNetworkLogs), [
+    visibleNetworkLogs,
+  ]);
+
   const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(visibleNetworkLogs);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
-  const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
   useEffect(() => {
     updateCount(visibleNetworkLogs.length);
@@ -36,7 +36,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, upda
   const networkLogsTable = useMemo(
     () => (
       <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
-        {<RQNetworkTable logs={mockRQNetworkLogs} />}
+        {<RQNetworkTable logs={convertedLogs} />}
       </div>
     ),
     [containerRef, onScroll]
@@ -61,24 +61,8 @@ const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, upda
 
   return (
     <div className="session-panel-content network-logs-panel">
-      {visibleNetworkLogs.length ? (
-        selectedLogIndex === -1 ? (
-          networkLogsTable
-        ) : (
-          <Split
-            direction="horizontal"
-            cursor="col-resize"
-            sizes={[60, 40]}
-            minSize={[400, 200]}
-            gutterSize={4}
-            gutterAlign="center"
-            style={{ display: "flex", height: "100%" }}
-            snapOffset={30}
-          >
-            {networkLogsTable}
-            <NetworkLogDetails {...visibleNetworkLogs[selectedLogIndex]} onClose={() => setSelectedLogIndex(-1)} />
-          </Split>
-        )
+      {visibleNetworkLogs.length > 0 ? (
+        networkLogsTable
       ) : includeNetworkLogs === false ? (
         <div>
           <Typography.Text className="recording-options-message">

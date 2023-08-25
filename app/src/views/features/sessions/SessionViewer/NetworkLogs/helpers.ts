@@ -29,7 +29,8 @@ const getResponseObject = (networkLog: NetworkLog) => {
     statusText: networkLog.statusText,
     contentType: networkLog.contentType,
     body: networkLog.response,
-    timestamp: networkLog.responseTime,
+    errors: networkLog.errors,
+    responseTime: networkLog.responseTime,
     url: networkLog.responseURL,
   } as RQNetworkLog["response"];
 };
@@ -42,7 +43,6 @@ export const convertSessionRecordingNetworkLogsToRQNetworkLogs = (networkLogs: N
         url: networkLog.url,
         timestamp: networkLog.timestamp,
         timeOffset: networkLog.timeOffset,
-        errors: networkLog.errors,
         request: getRequestObject(networkLog),
         response: getResponseObject(networkLog),
         requestShellCurl: "",
