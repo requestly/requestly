@@ -1256,7 +1256,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
     if (!isParentTabFocussed) {
       // update the current tab with URL if opener tab does not exist
       chrome.tabs.update({
-        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}?test_id=${test_id}`,
+        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
       });
     } else {
       BG.Methods.sendMessageToClient(senderTab.openerTabId, {
