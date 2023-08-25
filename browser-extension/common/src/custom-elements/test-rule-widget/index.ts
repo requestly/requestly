@@ -12,13 +12,12 @@ const TAG_NAME = "rq-test-rule-widget";
 const DEFAULT_POSITION = { right: 10, top: 10 };
 
 class RQTestRuleWidget extends RQDraggableWidget {
-  #shadowRoot;
   #testRuleId: string;
 
   constructor() {
     super(DEFAULT_POSITION);
-    this.#shadowRoot = this.attachShadow({ mode: "closed" });
-    setInnerHTML(this.#shadowRoot, this._getDefaultMarkup());
+    this.shadowRoot = this.attachShadow({ mode: "closed" });
+    setInnerHTML(this.shadowRoot, this._getDefaultMarkup());
   }
 
   connectedCallback() {
@@ -28,12 +27,12 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
     this.#testRuleId = this.attributes.getNamedItem("rule-id")?.value;
 
-    const ruleName = this.#shadowRoot.getElementById("rule-name");
+    const ruleName = this.shadowRoot.getElementById("rule-name");
     ruleName.textContent = "Testing " + this.attributes.getNamedItem("rule-name")?.value ?? null;
 
     const iconPath = this.attributes.getNamedItem("icon-path")?.value;
     if (iconPath) {
-      const iconContainer = this.#shadowRoot.getElementById("icon-container");
+      const iconContainer = this.shadowRoot.getElementById("icon-container");
       const icon = document.createElement("img");
       icon.setAttribute("src", iconPath);
       iconContainer?.appendChild(icon);
@@ -44,7 +43,7 @@ class RQTestRuleWidget extends RQDraggableWidget {
   }
 
   addListeners() {
-    this.#shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
+    this.shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
       evt.stopPropagation();
       this.triggerEvent(RQTestRuleWidgetEvent.VIEW_RESULTS);
     });
@@ -55,18 +54,6 @@ class RQTestRuleWidget extends RQDraggableWidget {
         this.showRuleAppliedStatus(true);
       }
     });
-
-    this.#shadowRoot.addEventListener(
-      "click",
-      (evt) => {
-        if (super.isDragging) {
-          // disable all clicks while widget is dragging
-          evt.stopPropagation();
-          super.isDragging = false;
-        }
-      },
-      true
-    );
   }
 
   triggerEvent(name: RQTestRuleWidgetEvent, detail?: unknown) {
@@ -74,7 +61,7 @@ class RQTestRuleWidget extends RQDraggableWidget {
   }
 
   showRuleAppliedStatus(appliedStatus: boolean) {
-    const ruleStatusContainer = this.#shadowRoot.getElementById("rule-status");
+    const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
     if (appliedStatus) {
       ruleStatusContainer.innerHTML = `
 				<div id="rule-status-icon" class="tick-icon">

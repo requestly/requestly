@@ -13,12 +13,10 @@ const TAG_NAME = "rq-session-recording-widget";
 const DEFAULT_POSITION = { left: 30, bottom: 30 };
 
 class RQSessionRecordingWidget extends RQDraggableWidget {
-  #shadowRoot;
-
   constructor() {
     super(DEFAULT_POSITION);
-    this.#shadowRoot = this.attachShadow({ mode: "closed" });
-    setInnerHTML(this.#shadowRoot, this._getDefaultMarkup());
+    this.shadowRoot = this.attachShadow({ mode: "closed" });
+    setInnerHTML(this.shadowRoot, this._getDefaultMarkup());
 
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
@@ -31,12 +29,12 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   }
 
   addListeners() {
-    this.#shadowRoot.querySelector(".stop-recording").addEventListener("click", (evt) => {
+    this.shadowRoot.querySelector(".stop-recording").addEventListener("click", (evt) => {
       evt.stopPropagation();
       this.triggerEvent(RQSessionRecordingWidgetEvent.STOP_RECORDING);
     });
 
-    this.#shadowRoot.querySelector(".discard-recording").addEventListener("click", (evt) => {
+    this.shadowRoot.querySelector(".discard-recording").addEventListener("click", (evt) => {
       evt.stopPropagation();
       this.triggerEvent(RQSessionRecordingWidgetEvent.DISCARD_RECORDING);
       this.hide();
@@ -47,18 +45,6 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     });
 
     this.addEventListener("hide", this.hide);
-
-    this.#shadowRoot.addEventListener(
-      "click",
-      (evt) => {
-        if (super.isDragging) {
-          // disable all clicks while widget is dragging
-          evt.stopPropagation();
-          super.isDragging = false;
-        }
-      },
-      true
-    );
   }
 
   triggerEvent(name: RQSessionRecordingWidgetEvent, detail?: unknown) {
@@ -92,7 +78,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   }
 
   getContainer() {
-    return this.#shadowRoot.getElementById("container");
+    return this.shadowRoot.getElementById("container");
   }
 }
 

@@ -1,6 +1,7 @@
 export abstract class RQDraggableWidget extends HTMLElement {
-  isDragging: boolean;
+  #isDragging: boolean;
   #defaultPosition;
+  shadowRoot: HTMLElement["shadowRoot"];
 
   constructor(defaultPosition: { top?: number; bottom?: number; left?: number; right?: number }) {
     super();
@@ -22,7 +23,7 @@ export abstract class RQDraggableWidget extends HTMLElement {
       const onMouseMove = (evt: MouseEvent) => {
         evt.preventDefault();
 
-        this.isDragging = true;
+        this.#isDragging = true;
 
         const dX = evt.clientX - x;
         const dY = evt.clientY - y;
@@ -54,6 +55,18 @@ export abstract class RQDraggableWidget extends HTMLElement {
         this.moveToPostion(this.#defaultPosition);
       }
     });
+
+    this.shadowRoot.addEventListener(
+      "click",
+      (evt) => {
+        if (this.#isDragging) {
+          // disable all clicks while widget is dragging
+          evt.stopPropagation();
+          this.#isDragging = false;
+        }
+      },
+      true
+    );
   }
 
   moveToPostion(position: { top?: number; bottom?: number; left?: number; right?: number }) {
