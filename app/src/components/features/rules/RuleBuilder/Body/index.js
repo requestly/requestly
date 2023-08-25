@@ -5,6 +5,7 @@ import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
@@ -75,9 +76,10 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                 </Col>
               </Row>
             ) : null}
-            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && (
+            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT &&
+            appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? (
               <TestThisRuleRow ruleId={currentlySelectedRuleData.id} />
-            )}
+            ) : null}
           </CardBody>
         </Col>
       </Row>
