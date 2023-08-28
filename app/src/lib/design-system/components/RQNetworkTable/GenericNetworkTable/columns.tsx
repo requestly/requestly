@@ -1,5 +1,5 @@
 import { Column } from "@requestly-ui/resource-table";
-import { NetworkEntry } from "../types";
+import { NetworkEntry } from "./types";
 
 export const getDefaultColumns = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
   const harColumns: Column<NetworkLog>[] = [
