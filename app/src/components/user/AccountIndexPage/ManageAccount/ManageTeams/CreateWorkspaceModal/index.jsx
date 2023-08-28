@@ -113,10 +113,11 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       if (isVerified) {
         setIsVerifiedBusinessUser(isVerified);
         setIsNotifyAllSelected(true);
-        form.setFieldValue(
-          "workspaceName",
-          `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`
-        );
+        const defaultTeamName = `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`;
+        form.setFieldValue("workspaceName", defaultTeamName);
+        setCreateWorkspaceFormData((prev) => {
+          return { ...prev, workspaceName: defaultTeamName };
+        });
       }
     });
   }, [user?.details?.profile?.email, user?.details?.profile?.uid, form]);
