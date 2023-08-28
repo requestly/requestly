@@ -5,13 +5,14 @@ import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import FEATURES from "config/constants/sub/features";
 import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
-import "./RuleBuilderBody.css";
 import { TestThisRuleRow } from "../../TestThisRule";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   //Global State
@@ -76,8 +77,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                 </Col>
               </Row>
             ) : null}
-            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT &&
-            appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? (
+            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) ? (
               <TestThisRuleRow ruleId={currentlySelectedRuleData.id} />
             ) : null}
           </CardBody>
