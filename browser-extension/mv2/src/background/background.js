@@ -1014,7 +1014,8 @@ BG.Methods.handleClientPortConnections = () => {
 
     const tabId = senderTab.id;
 
-    if (port.sender.documentLifecycle === "active") {
+    // documentLifeCycle is only used by chrome and not firefox
+    if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
       window.tabService.resetPageData(senderTab.id);
       window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
