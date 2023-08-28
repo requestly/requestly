@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { TestReports } from "./TestReports";
 import { isValidUrl } from "utils/FormattingHelper";
+import { prefixUrlWithHttps } from "utils/URLUtils";
+import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
+import LINKS from "config/constants/sub/links";
+import { trackTestRuleClicked } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
-import { testRuleOnUrl } from "actions/ExtensionActions";
-import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
@@ -21,22 +22,27 @@ export const TestThisRuleRow: React.FC = () => {
     state?.source,
   ]);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const ruleId = useSelector(getCurrentlySelectedRuleData).id;
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
 
   const handleStartTestRule = () => {
+    trackTestRuleClicked(currentlySelectedRuleData.ruleType);
+
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
     }
-    if (!isValidUrl(pageUrl)) {
+    const urlToTest = prefixUrlWithHttps(pageUrl);
+
+    if (!isValidUrl(urlToTest)) {
       setError("Enter a valid page URL");
       return;
     }
     if (error) setError(null);
-    testRuleOnUrl(pageUrl, ruleId);
+    setPageUrl(urlToTest);
+    testRuleOnUrl(urlToTest, currentlySelectedRuleData.id);
   };
 
   const FeedbackMessage = () => {
@@ -58,77 +64,84 @@ export const TestThisRuleRow: React.FC = () => {
     }
   };
 
+  const handleScrollToTestThisRule = useCallback(() => {
+    if (testThisRuleBoxRef.current) {
+      const ruleBuilderBody = document.querySelector("#rule-builder-body");
+      const parentRect = ruleBuilderBody.getBoundingClientRect();
+      const childRect = testThisRuleBoxRef.current.getBoundingClientRect();
+      const scrollPosition = childRect.top - parentRect.top + ruleBuilderBody.scrollTop;
+
+      ruleBuilderBody.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (testThisRuleBoxRef.current && isNewRuleCreated) {
-      const scrollToChild = () => {
-        const ruleBuilderBody = document.querySelector("#rule-builder-body");
-        const parentRect = ruleBuilderBody.getBoundingClientRect();
-        const childRect = testThisRuleBoxRef.current.getBoundingClientRect();
-        const scrollPosition = childRect.top - parentRect.top + ruleBuilderBody.scrollTop;
-
-        ruleBuilderBody.scrollTo({
-          top: scrollPosition,
-          behavior: "smooth",
-        });
-      };
-
-      const scrollTimeout = setTimeout(scrollToChild, 500);
+      const scrollTimeout = setTimeout(handleScrollToTestThisRule, 500);
 
       return () => clearTimeout(scrollTimeout);
     }
-  }, [isNewRuleCreated]);
-
-  useEffect(() => {
-    PageScriptMessageHandler.addMessageListener(
-      GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
-      (message: { testReportId: string }) => {
-        //TODO @RuntimeTerror10: Handle this message
-        console.log("!!!debug", "message on test rule updated::", message);
-      }
-    );
-  }, []);
+  }, [isNewRuleCreated, handleScrollToTestThisRule]);
 
   return (
-    <div
-      className={`test-this-rule-row-wrapper ${
-        isCurrentlySelectedRuleHasUnsavedChanges
-          ? "test-this-rule-warning"
-          : isNewRuleCreated
-          ? "test-this-rule-success"
-          : null
-      }`}
-      ref={testThisRuleBoxRef}
-    >
-      <FeedbackMessage />
-      <div className="test-this-rule-row w-full">
-        <div className="test-this-rule-row-header text-bold subtitle">Test this rule</div>
-        <div className="test-this-rule-row-body">
-          <Row>
-            <div style={{ flex: 1 }}>
-              <RQInput
-                placeholder="Enter the URL you want to test"
-                value={pageUrl}
-                onChange={(e) => setPageUrl(e.target.value)}
-                onPressEnter={handleStartTestRule}
-                status={error ? "error" : ""}
+    <div style={{ marginBottom: "2rem" }}>
+      <div
+        className={`test-this-rule-row-wrapper ${
+          isCurrentlySelectedRuleHasUnsavedChanges
+            ? "test-this-rule-warning"
+            : isNewRuleCreated
+            ? "test-this-rule-success"
+            : null
+        }`}
+        ref={testThisRuleBoxRef}
+      >
+        <FeedbackMessage />
+        <div className="test-this-rule-row w-full">
+          <div className="test-this-rule-row-header text-bold subtitle">Test this rule</div>
+          <div className="test-this-rule-row-body">
+            <Row>
+              <div style={{ flex: 1 }}>
+                <RQInput
+                  placeholder="Enter the URL you want to test"
+                  value={pageUrl}
+                  onChange={(e) => setPageUrl(e.target.value)}
+                  onPressEnter={handleStartTestRule}
+                  status={error ? "error" : ""}
+                  disabled={isCurrentlySelectedRuleHasUnsavedChanges}
+                />
+                <Typography.Text type="danger" className="caption">
+                  {error}
+                </Typography.Text>
+              </div>
+              <RQButton
+                type="primary"
+                size="large"
+                className="start-test-rule-btn"
+                onClick={handleStartTestRule}
                 disabled={isCurrentlySelectedRuleHasUnsavedChanges}
-              />
-              <Typography.Text type="danger" className="caption">
-                {error}
-              </Typography.Text>
-            </div>
-            <RQButton
-              type="primary"
-              size="large"
-              className="start-test-rule-btn"
-              onClick={handleStartTestRule}
-              disabled={isCurrentlySelectedRuleHasUnsavedChanges}
-            >
-              <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
-            </RQButton>
-          </Row>
-          {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
+              >
+                <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
+              </RQButton>
+            </Row>
+            {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
+          </div>
+          <TestReports scrollToTestRule={handleScrollToTestThisRule} />
         </div>
+      </div>
+      <div className="mt-8 text-gray">
+        Rules not working as expected? Checkout our{" "}
+        <a
+          className="external-link"
+          href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
+          target="_blank"
+          rel="noreferrer"
+        >
+          troubleshooting guide
+        </a>
+        .
       </div>
     </div>
   );
