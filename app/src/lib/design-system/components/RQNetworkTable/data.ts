@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { RQNetworkLog } from "./types";
+import { RQNetworkLog } from "./GenericNetworkTable/types";
 
 export const mockRQNetworkLogs: RQNetworkLog[] = [
   {

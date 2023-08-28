@@ -1,7 +1,12 @@
 import React from "react";
 import { GenericNetworkTable } from "./GenericNetworkTable";
-import { RQNetworkLog } from "./types";
+import { NetworkEntry } from "./GenericNetworkTable/types";
 import "./RQNetworkTable.css";
+
+export interface RQNetworkLog {
+  id: number;
+  entry: NetworkEntry;
+}
 
 interface RQNetworkTableProps {
   logs: RQNetworkLog[];
