@@ -4,7 +4,7 @@ import { NetworkEntry } from "./GenericNetworkTable/types";
 import "./RQNetworkTable.css";
 
 export interface RQNetworkLog {
-  id: number;
+  id: string;
   entry: NetworkEntry;
 }
 
