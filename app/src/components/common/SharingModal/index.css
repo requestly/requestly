@@ -15,9 +15,9 @@
   color: var(--white);
 }
 
-.sharing-modal-body {
+/* .sharing-modal-body {
   margin: 1rem 0;
-}
+} */
 
 .sharing-modal-wrapper .ant-tabs {
   margin-top: 4px;
@@ -30,4 +30,38 @@
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
   color: var(--white);
   font-weight: 500;
+}
+
+.share-link-radio-btn-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-radio-wrapper > span:nth-child(2) {
+  width: 100%;
+}
+
+.sharing-modal-wrapper .shared-list-name-input-wrapper {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.sharing-modal-wrapper .shared-list-name-input-wrapper .ant-btn,
+.sharing-modal-email-input-wrapper .ant-btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.sharing-modal-email-input {
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+}
+
+.sharing-modal-wrapper .ant-input {
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+  background-color: var(--component-dark-background);
 }

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { RQModal } from "lib/design-system/components";
 import { Tabs } from "antd";
+import { ShareLinkView } from "./ShareLinkView";
 import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
@@ -17,7 +18,7 @@ export const SharingModal: React.FC = () => {
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: "SHARE SHARED LIST HERE",
+        children: <ShareLinkView />,
       },
       {
         key: SharingOptions.DOWNLOAD,
