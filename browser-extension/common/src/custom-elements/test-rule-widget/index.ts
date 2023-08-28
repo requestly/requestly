@@ -44,6 +44,7 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
   addListeners() {
     this.shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
+      evt.preventDefault();
       evt.stopPropagation();
       this.triggerEvent(RQTestRuleWidgetEvent.VIEW_RESULTS);
     });
