@@ -1,9 +1,9 @@
 import { ReactElement, useState } from "react";
 import { ColorScheme, ResourceTable, Column, DetailsTab } from "@requestly-ui/resource-table";
-import "./RQNetworkTable.css";
 import { NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
+import "./RQNetworkTable.css";
 
 interface NetworkTableProps<NetworkLog> {
   logs: NetworkLog[];

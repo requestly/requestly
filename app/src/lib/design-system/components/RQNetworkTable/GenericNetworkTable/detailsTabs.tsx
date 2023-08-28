@@ -1,9 +1,9 @@
 import { Collapse } from "antd";
 import { DetailsTab } from "@requestly-ui/resource-table";
 import { NetworkEntry } from "./types";
-import { NetworkLogProperty } from "./utils/NetworkLogProperty";
-import NetworkStatusField from "./utils/NetworkStatusField";
-import NetworkPayload from "./utils/NetworkPayload";
+import { NetworkLogProperty } from "./components/NetworkLogProperty";
+import NetworkStatusField from "./components/NetworkStatusField";
+import NetworkPayload from "./components/NetworkPayload";
 
 export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
   const detailsTabs: DetailsTab<NetworkLog>[] = [
