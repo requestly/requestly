@@ -1,0 +1,33 @@
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content {
+  padding: 1rem;
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-footer {
+  padding: 1rem;
+}
+
+.sharing-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 1.125rem;
+  color: var(--white);
+}
+
+.sharing-modal-body {
+  margin: 1rem 0;
+}
+
+.sharing-modal-wrapper .ant-tabs {
+  margin-top: 4px;
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top > .ant-tabs-nav::before {
+  border-bottom: 1px solid var(--border);
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--white);
+  font-weight: 500;
+}
