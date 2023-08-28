@@ -82,11 +82,6 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
       },
     },
     {
-      key: "preview",
-      label: "Preview",
-      render: (log: NetworkLog) => <></>,
-    },
-    {
       key: "response",
       label: "Response",
       render: (log: NetworkLog) => {
