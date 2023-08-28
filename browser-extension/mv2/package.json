@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.8.12",
+  "version": "23.8.24",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,
@@ -40,11 +40,11 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-karma": "^4.0.2",
     "jasmine-core": "^3.1.0",
-    "karma": "^6.4.1",
+    "karma": "^6.4.2",
     "karma-chrome-launcher": "^3.1.1",
     "karma-coverage": "^2.2.0",
     "karma-jasmine": "^0.1.6",
     "karma-junit-reporter": "^2.0.1",
-    "web-ext": "^7.5.0"
+    "web-ext": "^7.6.2"
   }
 }

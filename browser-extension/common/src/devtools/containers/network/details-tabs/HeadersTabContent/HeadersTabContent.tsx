@@ -5,7 +5,7 @@ import { SourceKey, SourceOperator } from "../../../../../types";
 import { NetworkEvent, NetworkHeader, RuleEditorUrlFragment } from "../../../../types";
 import { createRule, generateRuleName } from "../../../../utils";
 import IconButton from "../../../../components/IconButton/IconButton";
-import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
+import { PropertyRow } from "@requestly-ui/resource-table";
 import "./headersTabContent.scss";
 
 interface Props {
