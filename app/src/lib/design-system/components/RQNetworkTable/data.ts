@@ -1,10 +1,9 @@
 // @ts-nocheck
-
-import { RQNetworkLog } from ".";
+import { RQNetworkLog } from "./types";
 
 export const mockRQNetworkLogs: RQNetworkLog[] = [
   {
-    har: {
+    entry: {
       _initiator: "other",
       _priority: "VeryHigh",
       _resourceType: "document",
@@ -86,7 +85,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 0,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "other",
       },
@@ -419,7 +418,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 1,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "other",
       },
@@ -592,7 +591,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 2,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -817,7 +816,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 3,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -1043,7 +1042,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 4,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -1268,7 +1267,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 5,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -1493,7 +1492,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 6,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -1718,7 +1717,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 7,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
@@ -1943,7 +1942,7 @@ export const mockRQNetworkLogs: RQNetworkLog[] = [
     id: 8,
   },
   {
-    har: {
+    entry: {
       _initiator: {
         type: "parser",
         url: "https://requestly.io/",
