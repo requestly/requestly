@@ -97,7 +97,6 @@ export interface RQNetworkLog {
   consoleLogs: any; // array of logs generated in script based rules
   domain?: string;
   app?: string;
-  logType?: RQNetworkLogType;
 }
 
 interface LogRequest extends Record<string, unknown> {
