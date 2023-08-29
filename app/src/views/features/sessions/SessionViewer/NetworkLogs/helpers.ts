@@ -38,9 +38,8 @@ export const convertSessionRecordingNetworkLogsToRQNetworkLogs = (networkLogs: N
       ({
         id: uuidv4(),
         errors: networkLog.errors,
-        timeOffset: networkLog.timeOffset,
-        startedDateTime: networkLog.timestamp,
         entry: {
+          startedDateTime: String(networkLog.timestamp),
           request: getRequestObject(networkLog),
           response: getResponseObject(networkLog),
         },
