@@ -13,6 +13,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { CheckCircleFilled } from "@ant-design/icons";
 import { SharedLinkVisibility } from "../types";
 import { Rule } from "types";
+import Logger from "lib/logger";
 import "../index.css";
 
 interface ShareLinkProps {
@@ -82,7 +83,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         </label>
         <ReactMultiEmail
           className="sharing-modal-email-input"
-          placeholder="john@example.com"
+          // placeholder="john@example.com"
           //@ts-ignore
           type="email"
           emails={permittedEmailsList}
@@ -134,6 +135,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
               if (res.data.success) setIsMailSent(true);
             })
             .catch((err) => {
+              Logger.log("send shared list email failed : ", err);
               toast.error("Opps! Couldn't send the notification");
             });
         }
