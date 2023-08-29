@@ -1168,6 +1168,7 @@ BG.Methods.onAppLoadedNotification = () => {
 BG.Methods.onClientPageLoad = (tab) => {
   BG.Methods.handleRuleExecutionsOnClientPageLoad(tab);
   BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
+  BG.Methods.handleTestRuleOnClientPageLoad(tab);
 };
 
 BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
@@ -1240,6 +1241,17 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   }
 };
 
+BG.Methods.handleTestRuleOnClientPageLoad = (tab) => {
+  const testRuleData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA);
+
+  if (testRuleData) {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      ruleId: testRuleData.ruleId,
+    });
+  }
+};
+
 BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
 
@@ -1271,9 +1283,6 @@ BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
     window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA, {
       url: payload.url,
-    });
-    BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
       ruleId: payload.ruleId,
     });
   });
