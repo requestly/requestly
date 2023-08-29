@@ -20,7 +20,7 @@
 #rule-name {
   font-size: 12px;
   margin: 4px 0;
-  font-weight: 600;
+  font-weight: bolder;
   line-height: 1.4;
 }
 
@@ -91,30 +91,4 @@
   flex-wrap: nowrap;
   justify-content: center;
   gap: 4px;
-}
-
-#rule-status-icon {
-  border-radius: 100px;
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
-  box-shadow: 0px -1px 2px 0px #4f5154 inset, 0px 0px 4px 0px rgba(0, 0, 0, 0.15) inset;
-}
-
-#rule-status-icon.tick-icon {
-  background: #3cbc1a;
-}
-
-#rule-status-icon.tick-icon svg {
-  margin-left: 3px;
-  margin-bottom: 1px;
-}
-
-#rule-status-icon.cross-icon {
-  background: #ca2c2c;
-}
-
-#rule-status-icon.cross-icon svg {
-  margin-left: 4px;
-  margin-bottom: 2px;
 }

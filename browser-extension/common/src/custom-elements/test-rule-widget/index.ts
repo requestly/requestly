@@ -1,7 +1,5 @@
 import styles from "./index.css";
 import { registerCustomElement, setInnerHTML } from "../utils";
-import TickIcon from "../../../resources/icons/tick.svg";
-import CrossIcon from "../../../resources/icons/close.svg";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 
 enum RQTestRuleWidgetEvent {
@@ -65,17 +63,11 @@ class RQTestRuleWidget extends RQDraggableWidget {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
     if (appliedStatus) {
       ruleStatusContainer.innerHTML = `
-				<div id="rule-status-icon" class="tick-icon">
-					${TickIcon}
-				</div>
-				Rule applied
+				✅ Rule applied
 			`;
     } else {
       ruleStatusContainer.innerHTML = `
-				<div id="rule-status-icon" class="cross-icon">
-					${CrossIcon}
-				</div>
-				Rule not yet applied
+				❌ Rule not applied yet
 			`;
     }
   }
