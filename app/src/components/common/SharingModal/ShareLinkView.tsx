@@ -11,10 +11,10 @@ import { getSharedListURL } from "utils/PathUtils";
 import { toast } from "utils/Toast";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { CheckCircleFilled } from "@ant-design/icons";
-import { SharedLinkVisibility } from "../types";
+import { SharedLinkVisibility } from "./types";
 import { Rule } from "types";
 import Logger from "lib/logger";
-import "../index.css";
+import "./index.css";
 
 interface ShareLinkProps {
   rulesToShare: string[];
