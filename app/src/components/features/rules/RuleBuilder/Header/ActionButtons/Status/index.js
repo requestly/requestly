@@ -15,7 +15,7 @@ import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 
-const Status = ({ disabled = false, location, isRuleEditorModal }) => {
+const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -96,7 +96,7 @@ const Status = ({ disabled = false, location, isRuleEditorModal }) => {
         className="ml-3"
         checked={isChecked}
         onChange={toggleRuleStatus}
-        disabled={disabled}
+        disabled={isDisabled}
         onClick={() => {
           trackRuleEditorHeaderClicked(
             "toggle_status",
