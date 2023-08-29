@@ -196,6 +196,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
         ),
         children: (
           <NetworkLogsPanel
+            startTime={attributes?.startTime ?? 0}
             networkLogs={networkLogs}
             playerTimeOffset={playerTimeOffset}
             updateCount={setVisibleNetworkLogsCount}
@@ -217,6 +218,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     return tabItems;
   }, [
     attributes?.environment,
+    attributes?.startTime,
     consoleLogs,
     networkLogs,
     playerTimeOffset,

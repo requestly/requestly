@@ -10,6 +10,11 @@ interface NetworkTableProps<NetworkLog> {
   extraDetailsTabs?: DetailsTab<NetworkLog>[];
 
   /**
+   * If true then highlights the row with red color.
+   */
+  isFailed?: (log: NetworkLog) => boolean;
+
+  /**
    * List of colunm keys to be excluded or hide from the table.
    */
   excludeColumns?: string[];
@@ -28,6 +33,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   extraColumns = [],
   extraDetailsTabs = [],
   excludeColumns = [],
+  isFailed = (log: NetworkLog) => false,
   networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
 }: NetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
@@ -48,6 +54,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   return (
     <ResourceTable
       resources={logs}
+      isFailed={isFailed}
       columns={finalColumns}
       detailsTabs={finalDetailsTabs}
       primaryColumnKeys={["url"]}

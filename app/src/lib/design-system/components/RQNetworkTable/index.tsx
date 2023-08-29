@@ -20,6 +20,10 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs, sessionRec
     <div className="rq-network-table-container">
       <GenericNetworkTable
         logs={logs}
+        isFailed={(log: RQNetworkLog) => {
+          const { status } = log.entry.response;
+          return !status || (status >= 400 && status <= 599);
+        }}
         networkEntrySelector={(log: RQNetworkLog) => log.entry}
         excludeColumns={["time", "contentType"]}
         extraColumns={[
@@ -32,7 +36,6 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs, sessionRec
               const offset = Math.floor(
                 (new Date(Number(log.entry.startedDateTime)).getTime() - sessionRecordingStartTime) / 1000
               );
-
               return secToMinutesAndSeconds(offset);
             },
           },
