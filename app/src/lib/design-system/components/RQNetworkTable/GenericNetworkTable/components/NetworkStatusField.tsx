@@ -1,12 +1,12 @@
-import StatusLight, { StatusLightType } from "components/misc/StatusLight";
 import React, { useMemo } from "react";
+import StatusLight, { StatusLightType } from "components/misc/StatusLight";
 
 interface Props {
   status: number;
   statusText?: string;
 }
 
-const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
+export const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
   const statusLightType = useMemo<StatusLightType>(() => {
     if (!status) {
       return StatusLightType.ERROR;
@@ -34,5 +34,3 @@ const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
     </StatusLight>
   );
 };
-
-export default NetworkStatusField;

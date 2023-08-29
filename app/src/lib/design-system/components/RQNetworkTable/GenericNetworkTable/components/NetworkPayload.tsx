@@ -10,7 +10,7 @@ type Props = {
   isPayloadTooLarge?: boolean;
 };
 
-const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) => {
+export const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) => {
   const parsedPayload = useMemo(() => {
     if (typeof payload === "string") {
       try {
@@ -42,5 +42,3 @@ const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) 
     </NetworkLogProperty>
   );
 };
-
-export default NetworkPayload;
