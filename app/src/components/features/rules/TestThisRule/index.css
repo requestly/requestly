@@ -55,6 +55,11 @@
   background: #95860231;
 }
 
+.test-this-rule-disabled {
+  border: 1px solid var(--border-dark);
+  background: var(--gray-dark);
+}
+
 .test-this-rule-results-header {
   border-top: 1px solid #5c5b5b80;
   border-bottom: 1px solid #5c5b5b80;

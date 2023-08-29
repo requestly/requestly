@@ -10,6 +10,8 @@ import { prefixUrlWithHttps } from "utils/URLUtils";
 import { testRuleOnUrl } from "actions/ExtensionActions";
 import { BsFillLightningChargeFill } from "@react-icons/all-files/bs/BsFillLightningChargeFill";
 import { InfoCircleOutlined } from "@ant-design/icons";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import LINKS from "config/constants/sub/links";
 import { trackTestRuleClicked } from "modules/analytics/events/features/ruleEditor";
@@ -26,6 +28,14 @@ export const TestThisRuleRow: React.FC = () => {
   const testThisRuleBoxRef = useRef(null);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
+
+  const isRuleCurrentlyActive = useMemo(() => {
+    return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
+  }, [currentlySelectedRuleData.status]);
+
+  const isTestRuleDisabled = useMemo(() => {
+    return isCurrentlySelectedRuleHasUnsavedChanges || !isRuleCurrentlyActive;
+  }, [isCurrentlySelectedRuleHasUnsavedChanges, isRuleCurrentlyActive]);
 
   const handleStartTestRule = () => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType);
@@ -51,6 +61,15 @@ export const TestThisRuleRow: React.FC = () => {
         <div className="test-this-rule-message">
           <InfoCircleOutlined />
           <Typography.Text>Please save your changes first to test this rule</Typography.Text>
+        </div>
+      );
+    }
+
+    if (!isRuleCurrentlyActive) {
+      return (
+        <div className="test-this-rule-message">
+          <InfoCircleOutlined />
+          <Typography.Text>Please enable the rule to test</Typography.Text>
         </div>
       );
     }
@@ -94,6 +113,8 @@ export const TestThisRuleRow: React.FC = () => {
             ? "test-this-rule-warning"
             : isNewRuleCreated
             ? "test-this-rule-success"
+            : !isRuleCurrentlyActive
+            ? "test-this-rule-disabled"
             : null
         }`}
         ref={testThisRuleBoxRef}
@@ -110,7 +131,7 @@ export const TestThisRuleRow: React.FC = () => {
                   onChange={(e) => setPageUrl(e.target.value)}
                   onPressEnter={handleStartTestRule}
                   status={error ? "error" : ""}
-                  disabled={isCurrentlySelectedRuleHasUnsavedChanges}
+                  disabled={isTestRuleDisabled}
                 />
                 <Typography.Text type="danger" className="caption">
                   {error}
@@ -121,7 +142,7 @@ export const TestThisRuleRow: React.FC = () => {
                 size="large"
                 className="start-test-rule-btn"
                 onClick={handleStartTestRule}
-                disabled={isCurrentlySelectedRuleHasUnsavedChanges}
+                disabled={isTestRuleDisabled}
               >
                 <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
               </RQButton>
