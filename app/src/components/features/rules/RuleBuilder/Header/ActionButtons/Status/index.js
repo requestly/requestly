@@ -15,15 +15,13 @@ import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 
-const Status = ({ location, isRuleEditorModal }) => {
+const Status = ({ disabled = false, location, isRuleEditorModal }) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-
-  const isDisabled = currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
@@ -98,7 +96,7 @@ const Status = ({ location, isRuleEditorModal }) => {
         className="ml-3"
         checked={isChecked}
         onChange={toggleRuleStatus}
-        disabled={isDisabled}
+        disabled={disabled}
         onClick={() => {
           trackRuleEditorHeaderClicked(
             "toggle_status",
