@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllRules } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { createSharedList } from "components/features/sharedLists/CreateSharedListModal/actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
+import { getSharedListURL } from "utils/PathUtils";
 import { SharedLinkVisibility } from "../types";
-import "../index.css";
 import { Rule } from "types";
+import "../index.css";
 
 interface ShareLinkProps {
   rulesToShare: string[];
@@ -16,14 +18,20 @@ interface ShareLinkProps {
 // TODO: handle copy changes for session replay in V1
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
+  const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRules);
-
+  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [userEmails, setUserEmails] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
+  const [shareableLink, setShareableLink] = useState(null);
+  const [isLinkGenerating, setIsLinkGenerating] = useState(false);
+
+  console.log({ shareableLink });
 
   const singleRuleData = useMemo(
-    () => (rulesToShare.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
+    () => (rulesToShare && rulesToShare?.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
     [rules, rulesToShare]
   );
 
@@ -88,6 +96,33 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     );
   }, [userEmails]);
 
+  const handleSharedListCreation = useCallback(() => {
+    try {
+      setIsLinkGenerating(true);
+      createSharedList(
+        appMode,
+        rulesToShare,
+        sharedListName,
+        groupwiseRulesToPopulate,
+        sharedLinkVisibility,
+        [],
+        user?.details?.profile?.uid
+      ).then(({ sharedListId, sharedListName }) => {
+        setShareableLink(getSharedListURL(sharedListId, sharedListName));
+        setIsLinkGenerating(false);
+      });
+    } catch (e) {
+      setIsLinkGenerating(false);
+    }
+  }, [
+    appMode,
+    rulesToShare,
+    sharedListName,
+    groupwiseRulesToPopulate,
+    sharedLinkVisibility,
+    user?.details?.profile?.uid,
+  ]);
+
   useEffect(() => {
     if (rulesToShare) {
       if (rulesToShare.length > 1) {
@@ -115,7 +150,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
                 <>
                   {renderSharedListNameField()}
                   {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField()}</>}
-                  <RQButton type="primary" className="mt-8">
+                  <RQButton
+                    type="primary"
+                    className="mt-8"
+                    onClick={handleSharedListCreation}
+                    loading={isLinkGenerating}
+                  >
                     Create list
                   </RQButton>
                 </>
