@@ -12,6 +12,8 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
+  RQ.RuleExecutionHandler.notifyRuleAppliedToWidget(rule.id);
+
   const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(rule.id);
   if (isFirstExecution) {
     RQ.RuleExecutionHandler.appliedRuleIds.add(rule.id);
@@ -39,6 +41,10 @@ RQ.RuleExecutionHandler.setup = () => {
         RQ.RuleExecutionHandler.syncCachedAppliedRules(message.appliedRuleDetails, message.isConsoleLoggerEnabled);
         sendResponse();
         break;
+
+      case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
+        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
+        break;
     }
 
     return false;
@@ -58,4 +64,43 @@ RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleL
 
 RQ.RuleExecutionHandler.hasExecutedRules = () => {
   return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
+};
+
+RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
+  if (document.querySelector("rq-test-rule-widget")) {
+    return;
+  }
+
+  const ruleName = (await RQ.RulesStore.getRule(ruleId)).name;
+
+  const testRuleWidget = document.createElement("rq-test-rule-widget");
+  testRuleWidget.classList.add("rq-element");
+  testRuleWidget.setAttribute("rule-id", ruleId);
+  testRuleWidget.setAttribute("rule-name", ruleName);
+  testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
+
+  document.documentElement.appendChild(testRuleWidget);
+
+  testRuleWidget.addEventListener("view-results", () => {
+    chrome.runtime.sendMessage({
+      action: RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT,
+      ruleId,
+      appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
+    });
+  });
+};
+
+RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
+  const testRuleWidget = document.querySelector("rq-test-rule-widget");
+
+  if (testRuleWidget?.getAttribute("applied-status") === "false") {
+    testRuleWidget.dispatchEvent(
+      new CustomEvent("new-rule-applied", {
+        detail: {
+          appliedRuleId: ruleId,
+        },
+      })
+    );
+  }
 };
