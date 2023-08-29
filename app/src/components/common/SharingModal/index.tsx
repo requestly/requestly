@@ -60,7 +60,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
           onChange={handleSharingOptionsChange}
         />
       </div>
-      <div className="rq-modal-footer">FOOTER</div>
+      {/* <div className="rq-modal-footer">FOOTER</div> */}
     </RQModal>
   );
 };

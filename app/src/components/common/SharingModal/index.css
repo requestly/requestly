@@ -1,5 +1,5 @@
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content {
-  padding: 1rem;
+  padding: 0;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-footer {
@@ -13,14 +13,24 @@
   font-weight: 500;
   font-size: 1.125rem;
   color: var(--white);
+  padding: 1.5rem;
+  padding-bottom: 0;
 }
 
-/* .sharing-modal-body {
-  margin: 1rem 0;
-} */
+.sharing-modal-body {
+  padding: 1.5rem;
+}
 
 .sharing-modal-wrapper .ant-tabs {
   margin-top: 4px;
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top .ant-tabs-nav-wrap {
+  margin-left: 1.5rem;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top > .ant-tabs-nav::before {
