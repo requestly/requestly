@@ -34,20 +34,26 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
                 />
               </NetworkLogProperty>
             </Collapse.Panel>
-            <Collapse.Panel header="Response Headers" key={1}>
-              {harEntry.response.headers.map(({ name, value }) => (
-                <NetworkLogProperty key={name} label={name}>
-                  {value}
-                </NetworkLogProperty>
-              ))}
-            </Collapse.Panel>
-            <Collapse.Panel header="Request Headers" key={2}>
-              {harEntry.request.headers.map(({ name, value }) => (
-                <NetworkLogProperty key={name} label={name}>
-                  {value}
-                </NetworkLogProperty>
-              ))}
-            </Collapse.Panel>
+
+            {harEntry.response.headers.length > 0 && (
+              <Collapse.Panel header="Response Headers" key={1}>
+                {harEntry.response.headers.map(({ name, value }) => (
+                  <NetworkLogProperty key={name} label={name}>
+                    {value}
+                  </NetworkLogProperty>
+                ))}
+              </Collapse.Panel>
+            )}
+
+            {harEntry.request.headers.length > 0 && (
+              <Collapse.Panel header="Request Headers" key={2}>
+                {harEntry.request.headers.map(({ name, value }) => (
+                  <NetworkLogProperty key={name} label={name}>
+                    {value}
+                  </NetworkLogProperty>
+                ))}
+              </Collapse.Panel>
+            )}
           </Collapse>
         );
       },
@@ -69,12 +75,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
             </Collapse.Panel>
             {harEntry.request.postData && harEntry.request.postData.text && (
               <Collapse.Panel header="Request Payload" key={1}>
-                <NetworkPayload
-                  payload={harEntry.request.postData.text}
-                  //   isPayloadTooLarge={((harEntry.response?.errors as any) ?? [])?.includes(
-                  //     NetworkEventErrorCodes.REQUEST_TOO_LARGE
-                  //   )}
-                />
+                <NetworkPayload payload={harEntry.request.postData.text} />
               </Collapse.Panel>
             )}
           </Collapse>
@@ -94,11 +95,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
               <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
             )}
 
-            <NetworkPayload
-              label="Body"
-              payload={harEntry.response.content.text}
-              //   isPayloadTooLarge={(harEntry.response?.errors as any)?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)}
-            />
+            <NetworkPayload label="Body" payload={harEntry.response.content.text} />
           </>
         );
       },
