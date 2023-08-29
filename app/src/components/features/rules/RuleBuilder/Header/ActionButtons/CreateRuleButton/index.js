@@ -137,7 +137,7 @@ const CreateRuleButton = ({
         })
         .then(() => {
           if (!isRuleEditorModal) {
-            redirectToRuleEditor(navigate, currentlySelectedRuleData.id, "create");
+            redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
           }
         });
     } else {

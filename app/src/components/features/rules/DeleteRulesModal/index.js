@@ -8,9 +8,11 @@ import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
 import { actions } from "store";
 import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
+import { StorageService } from "init";
 
 const DeleteRulesModal = (props) => {
   const {
@@ -87,7 +89,19 @@ const DeleteRulesModal = (props) => {
     );
   };
 
+  const handleDeleteRuleTestReports = useCallback(async () => {
+    const testReports = await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS);
+    for (const test in testReports) {
+      if (ruleIdsToDelete.includes(testReports[test].ruleId)) {
+        delete testReports[test];
+      }
+    }
+    StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: testReports });
+  }, [appMode, ruleIdsToDelete]);
+
   const postDeletionSteps = () => {
+    //Delete test reports for ruleIdsToDelete
+    handleDeleteRuleTestReports();
     //Refresh List
     dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
     // Set loading to false
@@ -110,6 +124,7 @@ const DeleteRulesModal = (props) => {
     toggleDeleteRulesModal,
     ruleDeletedCallback,
     clearSearch,
+    handleDeleteRuleTestReports,
   ]);
 
   return (
