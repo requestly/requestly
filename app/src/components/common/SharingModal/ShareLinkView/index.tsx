@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
+import { CopyValue } from "components/misc/CopyValue";
 import { createSharedList } from "components/features/sharedLists/CreateSharedListModal/actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
@@ -25,10 +26,10 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [userEmails, setUserEmails] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
-  const [shareableLink, setShareableLink] = useState(null);
+  const [shareableLinkData, setShareableLinkData] = useState(null);
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
 
-  console.log({ shareableLink });
+  console.log({ shareableLinkData });
 
   const singleRuleData = useMemo(
     () => (rulesToShare && rulesToShare?.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
@@ -108,7 +109,10 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         [],
         user?.details?.profile?.uid
       ).then(({ sharedListId, sharedListName }) => {
-        setShareableLink(getSharedListURL(sharedListId, sharedListName));
+        setShareableLinkData({
+          link: getSharedListURL(sharedListId, sharedListName),
+          visibility: sharedLinkVisibility,
+        });
         setIsLinkGenerating(false);
       });
     } catch (e) {
@@ -148,16 +152,22 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
               </div>
               {option.value === sharedLinkVisibility && (
                 <>
-                  {renderSharedListNameField()}
-                  {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField()}</>}
-                  <RQButton
-                    type="primary"
-                    className="mt-8"
-                    onClick={handleSharedListCreation}
-                    loading={isLinkGenerating}
-                  >
-                    Create list
-                  </RQButton>
+                  {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
+                    <CopyValue value={shareableLinkData.link} />
+                  ) : (
+                    <>
+                      {renderSharedListNameField()}
+                      {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField()}</>}
+                      <RQButton
+                        type="primary"
+                        className="mt-8"
+                        onClick={handleSharedListCreation}
+                        loading={isLinkGenerating}
+                      >
+                        Create list
+                      </RQButton>
+                    </>
+                  )}
                 </>
               )}
             </Radio>
