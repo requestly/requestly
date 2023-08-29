@@ -29,6 +29,7 @@ import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { SharingModal } from "components/common/SharingModal";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -171,6 +172,8 @@ const DashboardContent = () => {
               {...activeModals.joinWorkspaceModal.props}
             />
           ) : null}
+
+          <SharingModal />
 
           {isImportRulesModalActive ? (
             <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
