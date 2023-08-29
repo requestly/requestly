@@ -1,17 +1,33 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { getAllRules } from "store/selectors";
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
+import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { SharedLinkVisibility } from "../types";
 import "../index.css";
+import { Rule } from "types";
 
-export const ShareLinkView: React.FC = () => {
+interface ShareLinkProps {
+  rulesToShare: string[];
+}
+
+// TODO: handle copy changes for session replay in V1
+
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
+  const rules = useSelector(getAllRules);
+
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [userEmails, setUserEmails] = useState([]);
-  // const [sharedListName, setSharedListName] = useState(null);
+  const [sharedListName, setSharedListName] = useState(null);
+
+  const singleRuleData = useMemo(
+    () => (rulesToShare.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
+    [rules, rulesToShare]
+  );
 
   const visibilityOptions = useMemo(
-    // TODO: handle labels and description for session replay in V1
     () => [
       {
         label: "Public shared list",
@@ -34,11 +50,16 @@ export const ShareLinkView: React.FC = () => {
           List name
         </label>
         <div className="shared-list-name-input-wrapper">
-          <RQInput id="shared_list_name" style={{ flex: 1 }} />
+          <RQInput
+            id="shared_list_name"
+            style={{ flex: 1 }}
+            value={sharedListName}
+            onChange={(e) => setSharedListName(e.target.value)}
+          />
         </div>
       </div>
     );
-  }, [sharedLinkVisibility]);
+  }, [sharedListName]);
 
   const renderEmailInputField = useCallback(() => {
     return (
@@ -67,13 +88,20 @@ export const ShareLinkView: React.FC = () => {
     );
   }, [userEmails]);
 
+  useEffect(() => {
+    if (rulesToShare) {
+      if (rulesToShare.length > 1) {
+        setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
+      } else setSharedListName(singleRuleData.name);
+    }
+  }, [rulesToShare, singleRuleData]);
+
   return (
     <div className="sharing-modal-body">
       <Space direction="vertical" size="large" className="w-full">
         {visibilityOptions.map((option, index) => (
-          <div className="w-full">
+          <div className="w-full" key={index}>
             <Radio
-              key={index}
               value={option.value}
               checked={sharedLinkVisibility === option.value}
               onChange={() => setSharedLinkVisibility(option.value)}

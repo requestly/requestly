@@ -7,7 +7,13 @@ import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import "./index.css";
 
-export const SharingModal: React.FC = () => {
+interface ModalProps {
+  isOpen: boolean;
+  toggleModal: () => void;
+  rulesToShare: string[];
+}
+
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesToShare = null }) => {
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       {
@@ -18,7 +24,7 @@ export const SharingModal: React.FC = () => {
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: <ShareLinkView />,
+        children: <ShareLinkView rulesToShare={rulesToShare} />,
       },
       {
         key: SharingOptions.DOWNLOAD,
@@ -26,16 +32,17 @@ export const SharingModal: React.FC = () => {
         children: "DOWNLOAD FROM HERE",
       },
     ],
-    []
+    [rulesToShare]
   );
 
+  console.log({ rulesToShare });
   const handleSharingOptionsChange = (key: SharingOptions) => {
     console.log({ key });
     //TODO: track share option tab clicked here
   };
 
   return (
-    <RQModal wrapClassName="sharing-modal-wrapper" title="Share rule" open={true} closeIcon={<></>} centered>
+    <RQModal wrapClassName="sharing-modal-wrapper" title="Share rule" open={isOpen} closeIcon={<></>} centered>
       <div className="rq-modal-content">
         <div className="sharing-modal-header">
           <HiOutlineShare /> Share rule

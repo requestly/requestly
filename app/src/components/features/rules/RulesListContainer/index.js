@@ -67,7 +67,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
+  // const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -85,8 +85,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
+  const toggleSharingModal = (selectedRules) => {
+    dispatch(actions.toggleActiveModal({ modalName: "sharingModal", newProps: { rulesToShare: selectedRules } }));
   };
 
   const toggleRenameGroupModal = () => {
@@ -157,8 +157,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const verifySharedListsLimit = () => {
     //Continue creating new shared list
-    setSelectedRules(getSelectedRules(rulesSelection));
-    setIsShareRulesModalActive(true);
+    const newSelectedRules = getSelectedRules(rulesSelection);
+    setSelectedRules(newSelectedRules);
+    toggleSharingModal(newSelectedRules);
     trackRQLastActivity("sharedList_created");
   };
 
@@ -304,13 +305,13 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
-      {isShareRulesModalActive ? (
+      {/* {isShareRulesModalActive ? (
         <CreateSharedListModal
           isOpen={isShareRulesModalActive}
           toggle={toggleShareRulesModal}
           rulesToShare={selectedRules}
         />
-      ) : null}
+      ) : null} */}
 
       {activeModals.renameGroupModal.isActive ? (
         <RenameGroupModal
