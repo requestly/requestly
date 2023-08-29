@@ -60,6 +60,14 @@
   margin-top: 4px;
 }
 
+.sharing-modal-wrapper .sharing-modal-email-input.react-multi-email {
+  display: flex;
+  height: auto;
+}
+.sharing-modal-wrapper .sharing-modal-email-input.react-multi-email > input {
+  flex: 1;
+}
+
 .sharing-modal-wrapper .ant-input {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);

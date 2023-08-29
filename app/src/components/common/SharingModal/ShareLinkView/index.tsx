@@ -8,6 +8,9 @@ import { createSharedList } from "components/features/sharedLists/CreateSharedLi
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
+import { toast } from "utils/Toast";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { CheckCircleFilled } from "@ant-design/icons";
 import { SharedLinkVisibility } from "../types";
 import { Rule } from "types";
 import "../index.css";
@@ -24,13 +27,14 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
-  const [userEmails, setUserEmails] = useState([]);
+  const [permittedEmailsList, setPermittedEmailsList] = useState([]);
+  const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
   const [shareableLinkData, setShareableLinkData] = useState(null);
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
+  const [isMailSent, setIsMailSent] = useState(false);
 
-  console.log({ shareableLinkData });
-
+  const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
     () => (rulesToShare && rulesToShare?.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
     [rules, rulesToShare]
@@ -72,17 +76,17 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
 
   const renderEmailInputField = useCallback(() => {
     return (
-      <div className="mt-16 sharing-modal-email-input-wrapper">
+      <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
         <ReactMultiEmail
           className="sharing-modal-email-input"
-          // placeholder="john@requestly.io"
+          placeholder="john@example.com"
           //@ts-ignore
           type="email"
-          value={userEmails}
-          onChange={setUserEmails}
+          emails={permittedEmailsList}
+          onChange={(email) => handleAddRecipient(email)}
           validateEmail={validateEmail}
           getLabel={(email, index, removeEmail) => (
             <div data-tag key={index} className="multi-email-tag">
@@ -95,9 +99,21 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         />
       </div>
     );
-  }, [userEmails]);
+  }, [permittedEmailsList]);
+
+  const handleAddRecipient = (recipients: string[]) => {
+    setPermittedEmailsList(recipients);
+    const newRecipients = recipients.map((recipient) => ({
+      label: recipient,
+      value: recipient,
+    }));
+    setSharedListRecipients(newRecipients);
+  };
 
   const handleSharedListCreation = useCallback(() => {
+    setIsMailSent(false);
+    setShareableLinkData(null);
+
     try {
       setIsLinkGenerating(true);
       createSharedList(
@@ -106,9 +122,21 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         sharedListName,
         groupwiseRulesToPopulate,
         sharedLinkVisibility,
-        [],
+        sharedListRecipients,
         user?.details?.profile?.uid
-      ).then(({ sharedListId, sharedListName }) => {
+      ).then(({ sharedListId, sharedListName, sharedListData }) => {
+        if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
+          sendSharedListShareEmail({
+            sharedListData: sharedListData,
+            recipientEmails: sharedListRecipients,
+          })
+            .then((res: any) => {
+              if (res.data.success) setIsMailSent(true);
+            })
+            .catch((err) => {
+              toast.error("Opps! Couldn't send the notification");
+            });
+        }
         setShareableLinkData({
           link: getSharedListURL(sharedListId, sharedListName),
           visibility: sharedLinkVisibility,
@@ -124,7 +152,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     sharedListName,
     groupwiseRulesToPopulate,
     sharedLinkVisibility,
+    sharedListRecipients,
     user?.details?.profile?.uid,
+    sendSharedListShareEmail,
   ]);
 
   useEffect(() => {
@@ -153,7 +183,20 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
               {option.value === sharedLinkVisibility && (
                 <>
                   {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
-                    <CopyValue value={shareableLinkData.link} />
+                    <>
+                      {isMailSent && (
+                        <div className="mt-8 text-gray">
+                          <CheckCircleFilled className="success" /> Invites sent!
+                        </div>
+                      )}
+                      <CopyValue value={shareableLinkData.link} />
+                      {option.value === SharedLinkVisibility.PRIVATE && (
+                        <div className="mt-8 text-gray caption">
+                          You can also share above link for quick access, they’ll need to sign in using the email
+                          address you specified.
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <>
                       {renderSharedListNameField()}

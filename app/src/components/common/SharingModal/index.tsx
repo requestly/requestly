@@ -42,7 +42,14 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
   };
 
   return (
-    <RQModal wrapClassName="sharing-modal-wrapper" title="Share rule" open={isOpen} closeIcon={<></>} centered>
+    <RQModal
+      wrapClassName="sharing-modal-wrapper"
+      title="Share rule"
+      open={isOpen}
+      destroyOnClose
+      onCancel={toggleModal}
+      centered
+    >
       <div className="rq-modal-content">
         <div className="sharing-modal-header">
           <HiOutlineShare /> Share rule

@@ -6,5 +6,5 @@ export enum SharingOptions {
 
 export enum SharedLinkVisibility {
   PUBLIC = "public",
-  PRIVATE = "private",
+  PRIVATE = "custom",
 }
