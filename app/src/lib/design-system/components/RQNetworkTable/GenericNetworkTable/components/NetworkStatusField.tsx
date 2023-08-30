@@ -1,9 +1,17 @@
 import React, { useMemo } from "react";
-import StatusLight, { StatusLightType } from "components/misc/StatusLight";
+import { Badge } from "antd";
 
 interface Props {
   status: number;
   statusText?: string;
+}
+
+export enum StatusLightType {
+  SUCCESS = "#268e6c",
+  WARNING = "#d3a403",
+  ERROR = "#ff4d4f",
+  INFO = "#157af3",
+  NEUTRAL = "#5c5c5c",
 }
 
 export const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
@@ -20,17 +28,12 @@ export const NetworkStatusField: React.FC<Props> = ({ status, statusText }) => {
       return StatusLightType.WARNING;
     }
 
-    if (status >= 400 && status <= 599) {
+    if (status >= 400) {
       return StatusLightType.ERROR;
     }
 
     return StatusLightType.INFO;
   }, [status]);
 
-  return (
-    <StatusLight type={statusLightType}>
-      {status || "Failed"}
-      {statusText ? ` ${statusText}` : null}
-    </StatusLight>
-  );
+  return <Badge color={statusLightType} text={`${status || "Failed"} ${statusText ? statusText : ""}`} />;
 };

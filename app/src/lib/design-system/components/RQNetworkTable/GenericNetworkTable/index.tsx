@@ -33,7 +33,6 @@ export const GenericNetworkTable = <NetworkLog,>({
   extraColumns = [],
   extraDetailsTabs = [],
   excludeColumns = [],
-  isFailed = (log: NetworkLog) => false,
   networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
 }: NetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
@@ -51,13 +50,19 @@ export const GenericNetworkTable = <NetworkLog,>({
     extraDetailsTabs,
   ]);
 
+  const isFailed = (log: NetworkLog) => {
+    const harEntry = networkEntrySelector(log);
+    const { status } = harEntry.response;
+    return !status || status >= 400;
+  };
+
   return (
     <ResourceTable
       resources={logs}
       isFailed={isFailed}
       columns={finalColumns}
       detailsTabs={finalDetailsTabs}
-      primaryColumnKeys={["url"]}
+      primaryColumnKeys={["timeOffset", "url"]}
       colorScheme={ColorScheme.DARK}
       onRowSelection={setSelectedLog}
     />

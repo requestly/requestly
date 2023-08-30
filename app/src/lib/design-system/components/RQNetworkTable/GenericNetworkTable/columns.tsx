@@ -3,7 +3,7 @@ import { Column, NetworkEntry } from "./types";
 export const getDefaultColumns = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
   const harColumns: Column<NetworkLog>[] = [
     {
-      key: "time",
+      key: "startedDateTime",
       header: "Time",
       width: 5,
       priority: 0,
@@ -36,6 +36,13 @@ export const getDefaultColumns = <NetworkLog,>(networkEntrySelector: (log: Netwo
       width: 6,
       priority: 4,
       render: (log) => networkEntrySelector(log).response.status,
+    },
+    {
+      key: "time",
+      header: "Time",
+      width: 6,
+      priority: 4,
+      render: (log) => `${networkEntrySelector(log).time} ms`,
     },
   ];
 

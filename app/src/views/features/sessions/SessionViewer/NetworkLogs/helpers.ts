@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { NetworkLog } from "../types";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable";
+import { RQNetworkEventErrorCodes } from "@requestly/web-sdk";
 
 const getRequestObject = (networkLog: NetworkLog) => {
   const { searchParams } = new URL(networkLog.url);
@@ -13,6 +14,13 @@ const getRequestObject = (networkLog: NetworkLog) => {
     queryString,
     url: networkLog.url,
     method: networkLog.method,
+    postData: {
+      mimeType: "",
+      text: networkLog?.errors?.includes(RQNetworkEventErrorCodes.REQUEST_TOO_LARGE)
+        ? "Payload too large to capture"
+        : networkLog.requestData,
+      comment: "",
+    },
   } as RQNetworkLog["entry"]["request"];
 };
 
@@ -24,7 +32,9 @@ const getResponseObject = (networkLog: NetworkLog) => {
     headers: [],
     content: {
       mimeType: networkLog.contentType,
-      text: networkLog.response,
+      text: networkLog?.errors?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)
+        ? "Payload too large to capture"
+        : networkLog.response,
       comment: "",
     },
     redirectURL: networkLog.responseURL,
@@ -37,8 +47,8 @@ export const convertSessionRecordingNetworkLogsToRQNetworkLogs = (networkLogs: N
     (networkLog: NetworkLog) =>
       ({
         id: uuidv4(),
-        errors: networkLog.errors,
         entry: {
+          time: networkLog.responseTime,
           startedDateTime: String(networkLog.timestamp),
           request: getRequestObject(networkLog),
           response: getResponseObject(networkLog),
