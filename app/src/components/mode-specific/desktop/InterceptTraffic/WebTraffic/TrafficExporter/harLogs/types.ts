@@ -80,11 +80,6 @@ interface HarMapEntry {
 }
 
 /* RQ LOG */
-export enum RQNetworkLogType {
-  DESKTOP = "desktop",
-  SESSION_RECORDING = "sessionRecording",
-}
-
 export interface RQNetworkLog {
   id: string;
   timestamp: number | string;
