@@ -19,7 +19,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
     return networkLogs.filter((log: RQNetworkLog) => {
       return getOffset(log, startTime) <= playerTimeOffset;
     });
-  }, [networkLogs, playerTimeOffset]);
+  }, [networkLogs, startTime, playerTimeOffset]);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
 

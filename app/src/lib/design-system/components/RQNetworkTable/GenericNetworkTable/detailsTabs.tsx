@@ -63,16 +63,18 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
       label: "Payload",
       render: (log: NetworkLog) => {
         const harEntry = networkEntrySelector(log);
+
         return (
           <Collapse defaultActiveKey={[0, 1]}>
-            <Collapse.Panel header="Query String" key={0}>
-              {harEntry.request.queryString &&
-                harEntry.request.queryString.map(({ name, value }) => (
-                  <NetworkLogProperty key={value} label={name}>
+            {harEntry.request.queryString.length > 0 && (
+              <Collapse.Panel header="Query String" key={0}>
+                {harEntry.request.queryString.map(({ name, value }) => (
+                  <NetworkLogProperty key={name} label={name}>
                     {value}
                   </NetworkLogProperty>
                 ))}
-            </Collapse.Panel>
+              </Collapse.Panel>
+            )}
             {harEntry.request.postData && harEntry.request.postData.text && (
               <Collapse.Panel header="Request Payload" key={1}>
                 <NetworkPayload payload={harEntry.request.postData.text} />
