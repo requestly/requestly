@@ -6,15 +6,16 @@ import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
 import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBold";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
+import { Download } from "./Download";
 import "./index.css";
 
 interface ModalProps {
   isOpen: boolean;
   toggleModal: () => void;
-  rulesToShare: string[];
+  selectedRules: string[];
 }
 
-export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesToShare = null }) => {
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, selectedRules = null }) => {
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       // {
@@ -33,7 +34,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
         children: <>{rulesToShare?.length ? "DOWNLOAD FROM HERE" : <EmptySelectionView />}</>,
       },
     ],
-    [rulesToShare]
+    [selectedRules]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
