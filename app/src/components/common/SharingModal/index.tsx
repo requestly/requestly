@@ -16,11 +16,11 @@ interface ModalProps {
 export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesToShare = null }) => {
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
-      {
-        key: SharingOptions.WORKSPACE,
-        label: "Share in workspace",
-        children: "SHARE WITHIN WORKSPACE HERE",
-      },
+      // {
+      //   key: SharingOptions.WORKSPACE,
+      //   label: "Share in workspace",
+      //   children: "SHARE WITHIN WORKSPACE HERE",
+      // },
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
@@ -55,12 +55,11 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
           <HiOutlineShare /> Share rule
         </div>
         <Tabs
-          defaultActiveKey={SharingOptions.WORKSPACE}
+          defaultActiveKey={SharingOptions.SHARE_LINK}
           items={sharingOptions}
           onChange={handleSharingOptionsChange}
         />
       </div>
-      {/* <div className="rq-modal-footer">FOOTER</div> */}
     </RQModal>
   );
 };
