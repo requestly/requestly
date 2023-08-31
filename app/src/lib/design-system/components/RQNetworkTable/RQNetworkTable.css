@@ -3,6 +3,16 @@
   overflow-y: auto;
 }
 
+.rq-network-table-container .rq-resource-table-container .rq-resource-table {
+  --headBackgroundColor: #303030;
+  --rowHoverColor: #51658d48;
+  --rowSelectedColor: #1e69ff;
+}
+
+.rq-network-table-container .rq-resource-table-container .rq-resource-details-header {
+  --backgroundColor: #303030;
+}
+
 .rq-network-table-container .rq-resource-table-container {
   background-color: var(--body-background);
 }
