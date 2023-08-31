@@ -180,10 +180,10 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
   ]);
 
   useEffect(() => {
-    if (rulesToShare) {
+    if (rulesToShare?.length) {
       if (rulesToShare.length > 1) {
         setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
-      } else setSharedListName(singleRuleData.name);
+      } else setSharedListName(singleRuleData?.name);
     }
   }, [rulesToShare, singleRuleData]);
 

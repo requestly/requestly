@@ -3,6 +3,8 @@ import { RQModal } from "lib/design-system/components";
 import { Tabs } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
 import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
+import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBold";
+
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import "./index.css";
@@ -54,11 +56,18 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
         <div className="sharing-modal-header">
           <HiOutlineShare /> Share rule
         </div>
-        <Tabs
-          defaultActiveKey={SharingOptions.SHARE_LINK}
-          items={sharingOptions}
-          onChange={handleSharingOptionsChange}
-        />
+        {rulesToShare?.length ? (
+          <Tabs
+            defaultActiveKey={SharingOptions.SHARE_LINK}
+            items={sharingOptions}
+            onChange={handleSharingOptionsChange}
+          />
+        ) : (
+          <div className="sharing-modal-empty-view sharing-modal-body">
+            <PiWarningCircleBold />
+            <div className="title text-white text-bold">Please select the rules that you want to share</div>
+          </div>
+        )}
       </div>
     </RQModal>
   );

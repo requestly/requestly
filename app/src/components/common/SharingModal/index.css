@@ -83,3 +83,14 @@
   box-shadow: var(--input-box-shadow);
   background-color: var(--component-dark-background);
 }
+.sharing-modal-empty-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+.sharing-modal-empty-view svg {
+  width: 80px;
+  height: 80px;
+}
