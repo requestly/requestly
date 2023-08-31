@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { NetworkLog } from "../types";
-import { RQNetworkEventErrorCodes } from "@requestly/web-sdk";
+import { RQNetworkEventErrorCodes, RQSessionAttributes } from "@requestly/web-sdk";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 
 const getRequestObject = (networkLog: NetworkLog) => {
@@ -55,4 +55,10 @@ export const convertSessionRecordingNetworkLogsToRQNetworkLogs = (networkLogs: N
         },
       } as RQNetworkLog)
   );
+};
+
+export const getOffset = (log: RQNetworkLog, sessionRecordingStartTime: RQSessionAttributes["startTime"]) => {
+  let offset = Math.floor((new Date(Number(log.entry.startedDateTime)).getTime() - sessionRecordingStartTime) / 1000);
+  offset = offset >= 0 ? offset : 0; // Sometimes offset comes out negative.
+  return offset;
 };

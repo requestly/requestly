@@ -24,6 +24,7 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { RQButton } from "lib/design-system/components";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./NetworkLogs/helpers";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
@@ -63,6 +64,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       timeOffset: Math.floor((networkEvent.timestamp - startTime) / 1000),
     }));
   }, [events, startTime]);
+
+  const rqNetworkLogs = useMemo(() => convertSessionRecordingNetworkLogsToRQNetworkLogs(networkLogs), [networkLogs]);
 
   const getCurrentTimeOffset = useCallback(() => {
     return Math.floor((currentTimeRef.current - startTime) / 1000);
@@ -189,7 +192,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             <Badge
               size="small"
               count={visibleNetworkLogsCount || undefined}
-              dot={visibleNetworkLogsCount === 0 && networkLogs.length > 0}
+              dot={visibleNetworkLogsCount === 0 && rqNetworkLogs.length > 0}
               style={{ margin: "0 5px" }}
             />
           </span>
@@ -197,7 +200,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
         children: (
           <NetworkLogsPanel
             startTime={attributes?.startTime ?? 0}
-            networkLogs={networkLogs}
+            networkLogs={rqNetworkLogs}
             playerTimeOffset={playerTimeOffset}
             updateCount={setVisibleNetworkLogsCount}
           />
@@ -220,7 +223,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     attributes?.environment,
     attributes?.startTime,
     consoleLogs,
-    networkLogs,
+    rqNetworkLogs,
     playerTimeOffset,
     visibleConsoleLogsCount,
     visibleNetworkLogsCount,

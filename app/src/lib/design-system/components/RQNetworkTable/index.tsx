@@ -2,6 +2,7 @@ import React from "react";
 import { GenericNetworkTable } from "./GenericNetworkTable";
 import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
+import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
 import "./RQNetworkTable.css";
 
@@ -24,11 +25,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs, sessionRec
             width: 4,
             priority: 0.5,
             render: (log) => {
-              let offset = Math.floor(
-                (new Date(Number(log.entry.startedDateTime)).getTime() - sessionRecordingStartTime) / 1000
-              );
-
-              offset = offset >= 0 ? offset : 0; // Sometimes offset comes out negative.
+              const offset = getOffset(log, sessionRecordingStartTime);
               return secToMinutesAndSeconds(offset);
             },
           },

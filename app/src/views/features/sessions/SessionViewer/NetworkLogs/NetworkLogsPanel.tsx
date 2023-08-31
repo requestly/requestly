@@ -1,29 +1,25 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Empty, Typography } from "antd";
-import { NetworkLog } from "../types";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 import { RQNetworkTable } from "lib/design-system/components/RQNetworkTable";
-import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./helpers";
+import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import { getOffset } from "./helpers";
 
 interface Props {
   startTime: number;
-  networkLogs: NetworkLog[];
+  networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
   updateCount: (count: number) => void;
 }
 
 const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, updateCount }) => {
-  const visibleNetworkLogs = useMemo<NetworkLog[]>(() => {
-    return networkLogs.filter((networkLog: NetworkLog) => {
-      return networkLog.timeOffset <= playerTimeOffset;
+  const visibleNetworkLogs = useMemo<RQNetworkLog[]>(() => {
+    return networkLogs.filter((log: RQNetworkLog) => {
+      return getOffset(log, startTime) <= playerTimeOffset;
     });
   }, [networkLogs, playerTimeOffset]);
-
-  const convertedLogs = useMemo(() => convertSessionRecordingNetworkLogsToRQNetworkLogs(visibleNetworkLogs), [
-    visibleNetworkLogs,
-  ]);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
 
@@ -34,7 +30,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
   return (
     <div className="session-panel-content network-logs-panel">
       {visibleNetworkLogs.length > 0 ? (
-        <RQNetworkTable logs={convertedLogs} sessionRecordingStartTime={startTime} />
+        <RQNetworkTable logs={visibleNetworkLogs} sessionRecordingStartTime={startTime} />
       ) : includeNetworkLogs === false ? (
         <div>
           <Typography.Text className="recording-options-message">
