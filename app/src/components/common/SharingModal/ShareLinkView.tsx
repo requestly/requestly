@@ -34,6 +34,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
   const [shareableLinkData, setShareableLinkData] = useState(null);
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
   const [isMailSent, setIsMailSent] = useState(false);
+  const [error, setError] = useState(null);
 
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
@@ -69,11 +70,13 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
             style={{ flex: 1 }}
             value={sharedListName}
             onChange={(e) => setSharedListName(e.target.value)}
+            status={error ? "error" : ""}
           />
         </div>
+        <div className="caption danger">{error}</div>
       </div>
     );
-  }, [sharedListName]);
+  }, [sharedListName, error]);
 
   const renderEmailInputField = useCallback(() => {
     return (
@@ -111,9 +114,25 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     setSharedListRecipients(newRecipients);
   };
 
+  const validateSharedListName = useCallback(() => {
+    //eslint-disable-next-line
+    const specialCharacters = /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
+    return specialCharacters.test(sharedListName);
+  }, [sharedListName]);
+
   const handleSharedListCreation = useCallback(() => {
+    const isSharedListNameNotValid = validateSharedListName();
+    if (!sharedListName) {
+      setError("Shared list name cannot be empty");
+      return;
+    }
+    if (isSharedListNameNotValid) {
+      setError("Shared list name cannot have special characters");
+      return;
+    }
     setIsMailSent(false);
     setShareableLinkData(null);
+    setError(null);
 
     try {
       setIsLinkGenerating(true);
@@ -157,6 +176,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     sharedListRecipients,
     user?.details?.profile?.uid,
     sendSharedListShareEmail,
+    validateSharedListName,
   ]);
 
   useEffect(() => {
@@ -207,6 +227,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
                         type="primary"
                         className="mt-8"
                         onClick={handleSharedListCreation}
+                        disabled={sharedLinkVisibility === SharedLinkVisibility.PRIVATE && !sharedListRecipients.length}
                         loading={isLinkGenerating}
                       >
                         Create list
