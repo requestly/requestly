@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { NetworkLog } from "../types";
-import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable";
 import { RQNetworkEventErrorCodes } from "@requestly/web-sdk";
+import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 
 const getRequestObject = (networkLog: NetworkLog) => {
   const { searchParams } = new URL(networkLog.url);
