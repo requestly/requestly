@@ -7,6 +7,7 @@ import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBo
 import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
+import { Download } from "./Download";
 import "./index.css";
 
 interface ModalProps {
