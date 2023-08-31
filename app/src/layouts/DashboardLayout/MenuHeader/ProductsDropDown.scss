@@ -1,0 +1,49 @@
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  background: var(--component-background);
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--border-radius-md);
+  max-width: 640px;
+}
+
+.products-grid .ant-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.product-tile .ant-card-body {
+  cursor: pointer;
+  max-width: 300px;
+  padding: 16px;
+  background: var(--component-background);
+}
+
+.product-content {
+  display: flex;
+  align-items: center;
+}
+
+.product-icon {
+  margin-right: 16px;
+  align-self: flex-start;
+  font-size: 24px;
+}
+
+.product-icon svg {
+  fill: var(--primary);
+}
+
+.product-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.product-description {
+  margin: 0;
+  font-size: 14px;
+}
