@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 import { ColorScheme, ResourceTable, DetailsTab } from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
@@ -50,11 +50,14 @@ export const GenericNetworkTable = <NetworkLog,>({
     extraDetailsTabs,
   ]);
 
-  const isFailed = (log: NetworkLog) => {
-    const harEntry = networkEntrySelector(log);
-    const { status } = harEntry.response;
-    return !status || status >= 400;
-  };
+  const isFailed = useCallback(
+    (log: NetworkLog) => {
+      const harEntry = networkEntrySelector(log);
+      const { status } = harEntry.response;
+      return !status || status >= 400;
+    },
+    [networkEntrySelector]
+  );
 
   return (
     <ResourceTable
