@@ -82,19 +82,19 @@ interface HarMapEntry {
 /* RQ LOG */
 export interface RQNetworkLog {
   id: string;
-  timestamp: number | string;
+  timestamp: number;
   url: string;
   request: LogRequest;
   response: LogResponse;
   requestShellCurl: string;
-  requestState?: string;
-  actions?: any; // array of applied actions
+  requestState: string;
+  actions: any; // array of applied actions
   consoleLogs: any; // array of logs generated in script based rules
   domain?: string;
   app?: string;
 }
 
-interface LogRequest extends Record<string, unknown> {
+interface LogRequest {
   method: string;
   path: string;
   host: string;
@@ -104,7 +104,7 @@ interface LogRequest extends Record<string, unknown> {
   queryParams: HarMapEntry[];
 }
 
-interface LogResponse extends Record<string, unknown> {
+interface LogResponse {
   statusCode: number;
   headers: HeaderMap;
   contentType: string;
