@@ -1,14 +1,9 @@
 import React from "react";
 import { GenericNetworkTable } from "./GenericNetworkTable";
-import { NetworkEntry } from "./GenericNetworkTable/types";
 import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
+import { RQNetworkLog } from "./types";
 import "./RQNetworkTable.css";
-
-export interface RQNetworkLog {
-  id: string;
-  entry: NetworkEntry;
-}
 
 interface RQNetworkTableProps {
   logs: RQNetworkLog[];
