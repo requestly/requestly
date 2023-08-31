@@ -148,6 +148,9 @@ CONSTANTS.EXTENSION_MESSAGES = {
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
   START_RECORDING_ON_URL: "startRecordingOnUrl",
   NOTIFY_EXTENSION_UPDATED: "notifyExtensionUpdated",
+  TEST_RULE_ON_URL: "testRuleOnUrl",
+  SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
 };
 
 CONSTANTS.HEADERS_TARGET = {
@@ -201,6 +204,7 @@ CONSTANTS.STORAGE_KEYS = {
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
   USE_EVENTS_ENGINE: "useEventsEngine",
   SEND_EXECUTION_EVENTS: "sendExecutionEvents",
+  TEST_REPORTS: "testReports",
 };
 
 CONSTANTS.REQUEST_STATE = {
