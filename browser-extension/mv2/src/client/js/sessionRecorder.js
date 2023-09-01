@@ -120,9 +120,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
     }
   });
 
-  window.addEventListener("beforeunload", (event) => {
-    event.preventDefault();
-
+  window.addEventListener("beforeunload", () => {
     RQ.SessionRecorder.sendMessageToClient("getSessionData", null, (session) => {
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
