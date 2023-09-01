@@ -37,6 +37,13 @@ export abstract class RQDraggableWidget extends HTMLElement {
       };
 
       const onMouseUp = () => {
+        // Fallback incase click event is not triggered. Timeout because we need to stopPropogation in case isDragging=true. Else it will propogate it and cause weird behaviour
+        // This happens when mousedown and mouseup doesn't happen on the same element
+        // Similar to this https://melkornemesis.medium.com/handling-javascript-mouseup-event-outside-element-b0a34090bb56
+        setTimeout(() => {
+          this.#isDragging = false;
+        }, 100);
+
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };
