@@ -8,6 +8,15 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.9.2",
+    logs: [
+      "fix: need to double click on session recording on-page widget (#1008)",
+      "[RQ-816] fix: sessions not being stitched (#1006)",
+      "[RQ-810] fix: port connection not working in firefox (#997)",
+      "[RQ-778] feat: test this rule revamp (#994)",
+    ],
+  },
+  {
     version: "23.8.24",
     logs: [
       "Revamped Requestly devtools panel in browser inspect with support of rule creation from network traffic",
