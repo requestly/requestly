@@ -1033,6 +1033,10 @@ BG.Methods.handleClientPortConnections = () => {
       clientLoadSubscribers.forEach((subscriber) => subscriber());
 
       BG.Methods.onClientPageLoad(senderTab);
+
+      // It is recommended to remove the onConnect listener after connection has been established.
+      // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
+      port.disconnect();
     }
 
     port.onDisconnect.addListener(() => {
