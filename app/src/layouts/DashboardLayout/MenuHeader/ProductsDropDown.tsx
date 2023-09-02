@@ -32,6 +32,8 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import LINKS from "config/constants/sub/links";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface ProductProps {
   title: string | React.ReactNode;
@@ -149,6 +151,10 @@ const Products: React.FC<ProductsProps> = (props) => {
       }, [props]),
     },
   ];
+
+  if (!isFeatureCompatible(FEATURES.API_ACCESS)) {
+    products.splice(5, 1);
+  }
 
   if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
     return (
