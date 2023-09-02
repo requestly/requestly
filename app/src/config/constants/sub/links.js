@@ -47,6 +47,8 @@ const LINKS = {
 
   REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
 
+  REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
+
   /** LANDING PAGES **/
 
   // Home

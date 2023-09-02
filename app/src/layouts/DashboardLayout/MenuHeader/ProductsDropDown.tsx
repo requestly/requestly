@@ -3,7 +3,12 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 import { Button, Card, Dropdown, MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
-import { redirectToMocks, redirectToRules, redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import {
+  redirectToMocks,
+  redirectToRules,
+  redirectToSessionRecordingHome,
+  redirectToUrl,
+} from "utils/RedirectionUtils";
 
 import {
   ApiOutlined as ApiClientImg,
@@ -18,10 +23,15 @@ import "./ProductsDropDown.scss";
 import React, { useCallback, useState } from "react";
 import PATHS from "config/constants/sub/paths";
 import { DesktopAppPromoModal } from "./DesktopAppPromoModal";
-import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
+import {
+  trackProductClickedInDropDown,
+  trackProductsDropDownBtnClicked,
+  trackTopbarClicked,
+} from "modules/analytics/events/common/onboarding/header";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import LINKS from "config/constants/sub/links";
 
 interface ProductProps {
   title: string | React.ReactNode;
@@ -77,8 +87,8 @@ const Products: React.FC<ProductsProps> = (props) => {
       title: "Web Debugger",
       icon: RulesImg,
       description: "Lightweight web debugging proxy to modify HTTPs request & response.",
-      // handleClick: () => {}
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("web_debugger");
         props.toggleDropDown();
         redirectToRules(navigate);
       }, [navigate, props]),
@@ -92,6 +102,7 @@ const Products: React.FC<ProductsProps> = (props) => {
       icon: SessionImg,
       description: "A Modern way to Capture, Report, Debug & fix bugs in web applications",
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("session_replay");
         props.toggleDropDown();
         redirectToSessionRecordingHome(navigate);
       }, [navigate, props]),
@@ -101,6 +112,7 @@ const Products: React.FC<ProductsProps> = (props) => {
       icon: ApiClientImg,
       description: "Customise request headers, query parameters, and request body payloads.",
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("api_client");
         props.toggleDropDown();
         navigate(PATHS.API_CLIENT.INDEX);
       }, [navigate, props]),
@@ -110,6 +122,7 @@ const Products: React.FC<ProductsProps> = (props) => {
       icon: MockServerImg,
       description: "Generate custom API responses without actually having a pre-built API or a backend server",
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("mock_server");
         props.toggleDropDown();
         redirectToMocks(navigate);
       }, [navigate, props]),
@@ -119,6 +132,7 @@ const Products: React.FC<ProductsProps> = (props) => {
       icon: DesktopImg,
       description: "Inspect and modify HTTP(s) traffic from any browser, desktop app & mobile apps",
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("desktop_app");
         handleDesktopAppPromoClicked();
         props.toggleDropDown();
       }, [props, handleDesktopAppPromoClicked]),
@@ -128,7 +142,9 @@ const Products: React.FC<ProductsProps> = (props) => {
       icon: ApiAccessImg,
       description: "Easily test changes related to a PR without needing a staging environment",
       handleClick: useCallback(() => {
+        trackProductClickedInDropDown("api_access");
         // todo: add typeform link
+        redirectToUrl(LINKS.REQUESTLY_API_DOCS, true);
         props.toggleDropDown();
       }, [props]),
     },
@@ -156,6 +172,10 @@ const ProductsDropDown: React.FC<{}> = () => {
   const toggleDropDown = useCallback(() => {
     setOpen(!open);
   }, [open]);
+  const handleDropDownBtnClick = useCallback(() => {
+    trackProductsDropDownBtnClicked();
+    toggleDropDown();
+  }, [toggleDropDown]);
   return (
     <>
       <Dropdown
@@ -165,7 +185,7 @@ const ProductsDropDown: React.FC<{}> = () => {
         overlay={<Products toggleDropDown={toggleDropDown} />}
         onVisibleChange={toggleDropDown}
       >
-        <Button type="text" onClick={toggleDropDown}>
+        <Button type="text" onClick={handleDropDownBtnClick}>
           Products
         </Button>
       </Dropdown>
