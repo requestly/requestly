@@ -47,3 +47,18 @@
   margin: 0;
   font-size: 14px;
 }
+
+.down-icon {
+  margin-top: 7px;
+  margin-left: 5px;
+}
+
+.ant-card-hoverable:hover {
+  transition: 0.15s all ease-in-out;
+  transform: scale(1.02);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+  .ant-card-body:hover {
+    background: var(--border-dark);
+  }
+}

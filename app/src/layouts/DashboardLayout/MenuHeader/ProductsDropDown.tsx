@@ -17,6 +17,7 @@ import {
   CloudOutlined as MockServerImg,
   VideoCameraOutlined as SessionImg,
   SwapOutlined as RulesImg,
+  DownOutlined,
 } from "@ant-design/icons";
 
 import "./ProductsDropDown.scss";
@@ -188,11 +189,11 @@ const ProductsDropDown: React.FC<{}> = () => {
         open={open}
         placement="bottomRight"
         trigger={["click"]}
-        overlay={<Products toggleDropDown={toggleDropDown} />}
+        overlay={<Products toggleDropDown={handleDropDownBtnClick} />}
         onVisibleChange={toggleDropDown}
       >
-        <Button type="text" onClick={handleDropDownBtnClick}>
-          Products
+        <Button type="text" onClick={toggleDropDown}>
+          Products <DownOutlined className="down-icon" />
         </Button>
       </Dropdown>
     </>
