@@ -40,7 +40,6 @@ FEATURES.REDIRECT_RULE_DEMO_VIDEO_IN_EDITOR = "redirect-rule-tutorial-video-in-e
 FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
-FEATURES.API_ACCESS = "API_ACCESS";
 
 // MARKETING
 FEATURES.INTERCEPTOR = {};

@@ -33,8 +33,7 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import LINKS from "config/constants/sub/links";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface ProductProps {
   title: string | React.ReactNode;
@@ -75,6 +74,7 @@ const Products: React.FC<ProductsProps> = (props) => {
   const appMode = useSelector(getAppMode);
 
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
+  const isRequestlyApiEnabled = useFeatureIsOn("requestly_api_in_header");
 
   const handleDesktopAppPromoClicked = useCallback(() => {
     setIsDesktopAppPromoModalOpen(true);
@@ -153,7 +153,7 @@ const Products: React.FC<ProductsProps> = (props) => {
     },
   ];
 
-  if (!isFeatureCompatible(FEATURES.API_ACCESS)) {
+  if (!isRequestlyApiEnabled) {
     products.splice(5, 1);
   }
 
