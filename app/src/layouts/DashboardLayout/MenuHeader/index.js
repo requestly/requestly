@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from "react";
+import React, { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
@@ -12,14 +12,13 @@ import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
-import { RQBadge } from "lib/design-system/components/RQBadge";
 import { RQButton } from "lib/design-system/components";
 import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
-import { DesktopAppPromoModal } from "./DesktopAppPromoModal";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
+import ProductsDropDown from "./ProductsDropDown";
 
 const { Header } = Layout;
 
@@ -30,19 +29,10 @@ const MenuHeader = () => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
-  const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
+
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const randomNumberBetween1And2 = useRef(Math.floor(Math.random() * 2) + 1);
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
-
-  const handleDesktopAppPromoClicked = useCallback(() => {
-    setIsDesktopAppPromoModalOpen(true);
-    trackTopbarClicked("desktop_app");
-  }, []);
-
-  const handleDesktopAppPromoModalClose = useCallback(() => {
-    setIsDesktopAppPromoModalOpen(false);
-  }, []);
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
@@ -67,16 +57,7 @@ const MenuHeader = () => {
               >
                 Tutorials
               </a>
-
-              {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
-                <>
-                  <Button type="text" className="desktop-app-promo-btn" onClick={handleDesktopAppPromoClicked}>
-                    Desktop App <RQBadge badgeText="NEW" />
-                  </Button>
-
-                  <DesktopAppPromoModal open={isDesktopAppPromoModalOpen} onCancel={handleDesktopAppPromoModalClose} />
-                </>
-              )}
+              <ProductsDropDown />
             </div>
           </Col>
         ) : null}
