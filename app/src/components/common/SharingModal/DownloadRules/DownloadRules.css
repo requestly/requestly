@@ -3,17 +3,10 @@
   flex-direction: column;
   justify-content: center;
   padding: 8px;
-<<<<<<< HEAD
   font-size: 13px;
-=======
-  font-size: 12px;
->>>>>>> d206c110 (refactor: download rules component)
   margin-bottom: 8px;
   color: var(--white);
   border-radius: var(--border-radius-sm);
   background-color: var(--component-dark-background);
-<<<<<<< HEAD
   border: 1px solid var(--border-dark);
-=======
->>>>>>> d206c110 (refactor: download rules component)
 }
