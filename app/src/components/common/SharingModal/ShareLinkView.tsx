@@ -179,7 +179,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   useEffect(() => {
     if (!selectedRules?.length) return;
 
-    if (selectedRules.length > 1) setSharedListName(`requesly_shared_list_${getFormattedDate("MM_DD_YYYY")}`);
+    if (selectedRules.length > 1) setSharedListName(`requesly_shared_list_${getFormattedDate("DD_MM_YYYY")}`);
     else setSharedListName(singleRuleData?.name);
   }, [selectedRules?.length, singleRuleData?.name]);
 
