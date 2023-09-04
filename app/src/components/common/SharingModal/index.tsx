@@ -44,7 +44,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
         ),
       },
     ],
-    [selectedRules]
+    [selectedRules, toggleModal]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
