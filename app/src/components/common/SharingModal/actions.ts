@@ -26,13 +26,13 @@ export const createSharedList = async (
     sharedListRecipients,
   };
 
-  const res = (await generateSharedList(sharedListData)) as any;
+  const sharedList = (await generateSharedList(sharedListData)) as any;
 
   return {
-    sharedListId: res.sharedListId,
-    sharedListName: res.sharedListName,
-    sharedListData: res.sharedListData,
-    nonRQEmails: res.nonRQEmails,
+    sharedListId: sharedList.sharedListId,
+    sharedListName: sharedList.sharedListName,
+    sharedListData: sharedList.sharedListData,
+    nonRQEmails: sharedList.nonRQEmails,
   };
 };
 
