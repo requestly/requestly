@@ -12,6 +12,7 @@ import underlineIcon from "../../../../../assets/img/icons/common/underline.svg"
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
+import { Switch } from "antd";
 
 const FreeAndEnterprisePlanTable = () => {
   // Component State
@@ -21,9 +22,26 @@ const FreeAndEnterprisePlanTable = () => {
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
-  const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
+  const [duration, setDuration] = useState("annual");
+
+  // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
+
   return (
     <>
+      <div className="text-center margin-bottom-one">
+        <Switch
+          size="small"
+          checked={duration === "annual"}
+          onChange={(checked) => {
+            if (checked) {
+              setDuration("annual");
+            } else {
+              setDuration("monthly");
+            }
+          }}
+        />
+        <span>{"  "}Annual pricing (save 20%)</span>
+      </div>
       <div className="pricing-table-wrapper">
         <div className="pricing-table-product-wrapper">
           <div className="pricing-table-product-view">
@@ -65,63 +83,39 @@ const FreeAndEnterprisePlanTable = () => {
             </div>
           </div>
           <div className="pricing-table-row">
-            <div className="pricing-table-col">
-              <div className="pricing-col-header">
-                <p className="text-gray plan-for">For individuals</p>
-                <div className="header text-left">
-                  <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]}</span> plan
-                </div>
-                <div className="price text-left price-container">$0</div>
-
-                <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                  Use now
-                </RQButton>
-              </div>
-              <div>
-                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.FREE].map((feature, index) => (
-                  <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                ))}
-              </div>
-              {product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && (
-                <div>
-                  <div className="basic-use-with-text text-left">Use Requestly with</div>
-                  <div>
-                    {useRQwith.map((title, index) => (
-                      <div className="rq-use-with" key={index}>
-                        <img src="/assets/icons/leftArrow.svg" alt="right arrow" />
-                        <div>{title}</div>
-                      </div>
-                    ))}
+            {Object.entries(Plans[product]).map(([planName, planDetails]) => (
+              <div className="pricing-table-col">
+                <div className="pricing-col-header">
+                  <p className="text-gray plan-for">{planDetails.heading}</p>
+                  <div className="header text-left">
+                    <span style={{ textTransform: "capitalize" }}>{planName}</span>
                   </div>
+                  <div className="text-gray text-left price-container">
+                    <span className="price">
+                      ${duration === "monthly" ? planDetails.price : planDetails.price * 10}
+                    </span>{" "}
+                    per member, per {duration === "monthly" ? "month" : "year"}
+                  </div>
+
+                  <RQButton onClick={() => (window.location.href = "/")} type="primary">
+                    Use now
+                  </RQButton>
                 </div>
-              )}
-            </div>
-            <div className="pricing-table-col">
-              <div className="pricing-col-header">
-                <p className="text-gray plan-for">For collaboration in QA & developer teams</p>
-                <div className="header text-left">
-                  <span>{APP_CONSTANTS.PRICING.PLAN_HEADERS[APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]}</span>
+                {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                  <div className="pro-basic-feature-title text-left">
+                    <span>
+                      Everything <img src={underlineIcon} alt="highlight" />
+                    </span>{" "}
+                    in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                  </div>
+                )}
+                <div>
+                  {planDetails.features.map((feature, index) => (
+                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                  ))}
                 </div>
-                <div className="text-gray text-left price-container">
-                  <span className="price">${APP_CONSTANTS.PRICING.PLAN_PRICES.PROFESSIONAL[product]}</span> per member,
-                  per month
-                </div>
-                <RQButton type="primary" onClick={() => setIsContactUsModalOpen(true)}>
-                  Start 30 days free trial
-                </RQButton>
               </div>
-              <div className="pro-basic-feature-title text-left">
-                <span>
-                  Everything <img src={underlineIcon} alt="highlight" />
-                </span>{" "}
-                in Free plan, and
-              </div>
-              <div>
-                {Plans[product][APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL].map((feature, index) => (
-                  <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
         <div className="note-container text-gray text-center">
