@@ -58,7 +58,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     []
   );
 
-  const renderSharedListNameField = useCallback(() => {
+  const renderSharedListNameField = () => {
     return (
       <div className="w-full mt-8">
         <label htmlFor="shared_list_name" className="text-gray caption">
@@ -76,10 +76,10 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         <div className="caption danger">{error}</div>
       </div>
     );
-  }, [sharedListName, error]);
+  };
 
-  const renderEmailInputField = useCallback(() => {
-    return (
+  const renderEmailInputField = useMemo(
+    () => (
       <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
@@ -102,8 +102,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
           )}
         />
       </div>
-    );
-  }, [permittedEmailsList]);
+    ),
+    [permittedEmailsList]
+  );
 
   const handleAddRecipient = (recipients: string[]) => {
     setPermittedEmailsList(recipients);
@@ -222,7 +223,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
                   ) : (
                     <>
                       {renderSharedListNameField()}
-                      {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField()}</>}
+                      {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField}</>}
                       <RQButton
                         type="primary"
                         className="mt-8"
