@@ -7,7 +7,6 @@ import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBo
 import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
-import { Download } from "./Download";
 import "./index.css";
 
 interface ModalProps {
@@ -27,7 +26,9 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: <ShareLinkView selectedRules={selectedRules} />,
+        children: (
+          <>{selectedRules?.length ? <ShareLinkView selectedRules={selectedRules} /> : <EmptySelectionView />}</>
+        ),
       },
       {
         key: SharingOptions.DOWNLOAD,
