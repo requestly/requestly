@@ -18,7 +18,6 @@ import {
   GroupOutlined,
   SearchOutlined,
   DownOutlined,
-  UploadOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
@@ -119,7 +118,6 @@ const RulesTable = ({
   isTableLoading = false,
   handleChangeGroupOnClick,
   handleShareRulesOnClick,
-  handleExportRulesOnClick,
   handleImportRulesOnClick,
   handleDeleteRulesOnClick,
   handleNewGroupOnClick,
@@ -1229,21 +1227,6 @@ const RulesTable = ({
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
-              <AuthConfirmationPopover
-                title="You need to sign up to export rules"
-                callback={handleExportRulesOnClick}
-                source={AUTH.SOURCE.EXPORT_RULES}
-              >
-                <Tooltip title={isScreenSmall ? "Export Rules" : null}>
-                  <Button
-                    shape={isScreenSmall ? "circle" : null}
-                    onClick={user?.details?.isLoggedIn && handleExportRulesOnClick}
-                    icon={<UploadOutlined />}
-                  >
-                    {isScreenSmall ? null : "Export"}
-                  </Button>
-                </Tooltip>
-              </AuthConfirmationPopover>
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
@@ -1307,15 +1290,6 @@ const RulesTable = ({
                     trackClickEvent: () => {
                       trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
                     },
-                  },
-                  {
-                    shape: "circle",
-                    isTooltipShown: true,
-                    hasPopconfirm: true,
-                    buttonText: "Export",
-                    authSource: AUTH.SOURCE.EXPORT_RULES,
-                    icon: <UploadOutlined />,
-                    onClickHandler: handleExportRulesOnClick,
                   },
                   {
                     shape: "circle",
