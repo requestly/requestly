@@ -30,7 +30,7 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 <p align="center">
   <a href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/16779465/3d5945a9-4f42-4509-90d6-769cf2600ef1" alt="Requestly Details" width="60%"/>
+    <img src="https://github.com/requestly/requestly/assets/16779465/92af73cc-e75c-48cc-8266-acb6c05a3350" alt="Requestly Details" width="60%"/>
   </a>
 </p>
 
