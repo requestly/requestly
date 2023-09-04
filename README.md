@@ -1,4 +1,4 @@
-<p align="center">
+![svgviewer-output (2)](https://github.com/requestly/requestly/assets/16779465/b2a40e48-eae8-445e-948d-4ceedf90cbe8)<p align="center">
 <p align="center">
   <a target="_blank" href="https://requestly.io/">
     <img src="https://github.com/requestly/requestly/assets/16779465/652552db-c867-44cb-9bb5-94a2026e04ca" alt="Requestly Logo" width="40%"/>
@@ -31,7 +31,7 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 <p align="center">
   <a href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/3108399/f0359812-35dc-495c-8ab3-10aced90de3e" alt="Requestly Details" width="60%"/>
+    <img src="https://github.com/requestly/requestly/assets/16779465/3d5945a9-4f42-4509-90d6-769cf2600ef1" alt="Requestly Details" width="60%"/>
   </a>
 </p>
 
