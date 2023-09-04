@@ -115,7 +115,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
 
   const validateSharedListName = useCallback(() => {
     //eslint-disable-next-line
-    const specialCharacters = /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
+    const specialCharacters = /[`!@#$%^&*()+\=\[\]{};':"\\|,.<>\/?~]/;
     return specialCharacters.test(sharedListName);
   }, [sharedListName]);
 
@@ -179,7 +179,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   useEffect(() => {
     if (!selectedRules?.length) return;
 
-    if (selectedRules.length > 1) setSharedListName(`requestly-shared-list-${getFormattedDate("DD-MM-YYYY")}`);
+    if (selectedRules.length > 1) setSharedListName(`requestly_shared_list_${getFormattedDate("DD_MM_YYYY")}`);
     else setSharedListName(singleRuleData?.name);
   }, [selectedRules?.length, singleRuleData?.name]);
 
