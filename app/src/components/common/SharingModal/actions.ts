@@ -26,19 +26,19 @@ export const createSharedList = async (
     sharedListRecipients,
   };
 
-  const res = (await generateSharedList(sharedListData)) as any;
+  const sharedList = (await generateSharedList(sharedListData)) as any;
 
   return {
-    sharedListId: res.sharedListId,
-    sharedListName: res.sharedListName,
-    sharedListData: res.sharedListData,
-    nonRQEmails: res.nonRQEmails,
+    sharedListId: sharedList.sharedListId,
+    sharedListName: sharedList.sharedListName,
+    sharedListData: sharedList.sharedListData,
+    nonRQEmails: sharedList.nonRQEmails,
   };
 };
 
 const generateSharedList = async (sharedListData: SharedListData) => {
   const functions = getFunctions();
   const createSharedList = httpsCallable(functions, "sharedLists-create");
-  const res = await createSharedList(sharedListData);
-  return res.data;
+  const newSharedList = await createSharedList(sharedListData);
+  return newSharedList.data;
 };
