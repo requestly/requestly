@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
-import { createSharedList } from "components/features/sharedLists/CreateSharedListModal/actions";
+import { createSharedList } from "./actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
@@ -23,7 +23,6 @@ interface ShareLinkProps {
 // TODO: handle copy changes for session replay in V1
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
-  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
@@ -141,9 +140,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
         sharedListName,
         groupwiseRulesToPopulate,
         sharedLinkVisibility,
-        sharedListRecipients,
-        user?.details?.profile?.uid
-      ).then(({ sharedListId, sharedListName, sharedListData }) => {
+        sharedListRecipients
+      ).then(({ sharedListId, sharedListName, sharedListData }: any) => {
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,
@@ -173,7 +171,6 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     groupwiseRulesToPopulate,
     sharedLinkVisibility,
     sharedListRecipients,
-    user?.details?.profile?.uid,
     sendSharedListShareEmail,
     validateSharedListName,
   ]);
