@@ -39,6 +39,6 @@ export const createSharedList = async (
 const generateSharedList = async (sharedListData: SharedListData) => {
   const functions = getFunctions();
   const createSharedList = httpsCallable(functions, "sharedLists-create");
-  const res = await createSharedList(sharedListData);
-  return res.data;
+  const newSharedList = await createSharedList(sharedListData);
+  return newSharedList.data;
 };
