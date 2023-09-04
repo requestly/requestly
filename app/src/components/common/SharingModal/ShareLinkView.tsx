@@ -177,12 +177,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   ]);
 
   useEffect(() => {
-    if (selectedRules?.length) {
-      if (selectedRules.length > 1) {
-        setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
-      } else setSharedListName(singleRuleData?.name);
-    }
-  }, [selectedRules, singleRuleData]);
+    if (!selectedRules?.length) return;
+
+    if (selectedRules.length > 1)
+      setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
+    else setSharedListName(singleRuleData?.name);
+  }, [selectedRules?.length, singleRuleData?.name]);
 
   return (
     <div className="sharing-modal-body">
