@@ -26,13 +26,22 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: <>{rulesToShare?.length ? <ShareLinkView rulesToShare={rulesToShare} /> : <EmptySelectionView />}</>,
+        children: (
+          <>{selectedRules?.length ? <ShareLinkView rulesToShare={selectedRules} /> : <EmptySelectionView />}</>
+        ),
       },
       {
         key: SharingOptions.DOWNLOAD,
         label: "Download",
-        children: <>{rulesToShare?.length ? <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} /> : <EmptySelectionView />}</>,
-        children: ,
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
       },
     ],
     [selectedRules]
