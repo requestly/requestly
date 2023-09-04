@@ -58,27 +58,25 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     []
   );
 
-  const renderSharedListNameField = () => {
-    return (
-      <div className="w-full mt-8">
-        <label htmlFor="shared_list_name" className="text-gray caption">
-          List name
-        </label>
-        <div className="shared-list-name-input-wrapper">
-          <RQInput
-            id="shared_list_name"
-            style={{ flex: 1 }}
-            value={sharedListName}
-            onChange={(e) => setSharedListName(e.target.value)}
-            status={error ? "error" : ""}
-          />
-        </div>
-        <div className="caption danger">{error}</div>
+  const sharedListNameField = (
+    <div className="w-full mt-8">
+      <label htmlFor="shared_list_name" className="text-gray caption">
+        List name
+      </label>
+      <div className="shared-list-name-input-wrapper">
+        <RQInput
+          id="shared_list_name"
+          style={{ flex: 1 }}
+          value={sharedListName}
+          onChange={(e) => setSharedListName(e.target.value)}
+          status={error ? "error" : ""}
+        />
       </div>
-    );
-  };
+      <div className="caption danger">{error}</div>
+    </div>
+  );
 
-  const renderEmailInputField = useMemo(
+  const emailInputField = useMemo(
     () => (
       <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
@@ -186,7 +184,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     if (rulesToShare.length > 1)
       setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
     else setSharedListName(singleRuleData?.name);
-  }, [rulesToShare, singleRuleData]);
+  }, [rulesToShare?.length, singleRuleData?.name]);
 
   return (
     <div className="sharing-modal-body">
@@ -222,8 +220,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
                     </>
                   ) : (
                     <>
-                      {renderSharedListNameField()}
-                      {option.value === SharedLinkVisibility.PRIVATE && <>{renderEmailInputField}</>}
+                      {sharedListNameField}
+                      {option.value === SharedLinkVisibility.PRIVATE && <>{emailInputField}</>}
                       <RQButton
                         type="primary"
                         className="mt-8"
