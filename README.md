@@ -116,10 +116,11 @@ Collaborate with other teammates and get Requestly sessions that contain video, 
 ## 📕 Documentation
 
 Please find our [documentation here](https://developers.requestly.io/). Our docs can help with
-- Getting Started
+- [Getting Started](https://developers.requestly.io/)
 - Product Documentation
 - FAQs
 - Troubleshooting
+- [Security & Privacy](https://developers.requestly.io/faq/security-and-privacy/)
 
 ## 👩‍💻 Development
 
