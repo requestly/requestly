@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { Button, Tooltip } from "antd";
-import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -13,14 +12,9 @@ import { getModeData } from "../../../actions";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive((prev) => !prev);
-  };
 
   const shareRuleClickHandler = () => {
     if (user.loggedIn) {
@@ -47,7 +41,15 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
 
     fetchSharedLists(user.details.profile.uid).then((result) => {
       //Create new shared list
-      toggleShareRulesModal();
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "sharingModal",
+          newValue: true,
+          newProps: {
+            selectedRules: [currentlySelectedRuleData.id],
+          },
+        })
+      );
       //Deactivate loading modal
       dispatch(
         actions.toggleActiveModal({
@@ -99,14 +101,6 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           />
         </Tooltip>
       )}
-
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={[currentlySelectedRuleData.id]}
-        />
-      ) : null}
     </>
   );
 };

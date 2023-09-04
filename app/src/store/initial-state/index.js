@@ -130,6 +130,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */

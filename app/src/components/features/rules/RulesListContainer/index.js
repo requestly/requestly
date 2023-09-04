@@ -5,12 +5,10 @@ import ProCard from "@ant-design/pro-card";
 import { actions } from "../../../../store";
 //Sub Components
 import CreateNewRuleGroupModal from "../CreateNewRuleGroupModal";
-import ExportRulesModal from "../ExportRulesModal";
 import DeleteRulesModal from "../DeleteRulesModal";
 import ImportRulesModal from "../ImportRulesModal";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import RenameGroupModal from "../RenameGroupModal";
-import CreateSharedListModal from "../../sharedLists/CreateSharedListModal";
 import {
   getRulesSelection,
   getUserAuthDetails,
@@ -64,10 +62,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //Modals
   const [isCreateNewRuleGroupModalActive, setIsCreateNewRuleGroupModalActive] = useState(false);
   const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
-  const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -75,9 +71,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleChangeGroupModal = () => {
     setIsChangeGroupModalActive(isChangeGroupModalActive ? false : true);
   };
-  const toggleExportRulesModal = () => {
-    setIsExportRulesModalActive(isExportRulesModalActive ? false : true);
-  };
+
   const toggleDeleteRulesModal = () => {
     // isDeleteRulesModalActive
     setIsDeleteRulesModalActive(isDeleteRulesModalActive ? false : true);
@@ -85,8 +79,15 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
+
+  const toggleSharingModal = (selectedRules) => {
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "sharingModal",
+        newValue: true,
+        newProps: { selectedRules: selectedRules },
+      })
+    );
   };
 
   const toggleRenameGroupModal = () => {
@@ -157,8 +158,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const verifySharedListsLimit = () => {
     //Continue creating new shared list
-    setSelectedRules(getSelectedRules(rulesSelection));
-    setIsShareRulesModalActive(true);
+    const newSelectedRules = getSelectedRules(rulesSelection);
+    setSelectedRules(newSelectedRules);
+    toggleSharingModal(newSelectedRules);
     trackRQLastActivity("sharedList_created");
   };
 
@@ -170,15 +172,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const verifyImportRulesLimitAndContinue = () => {
     setIsImportRulesModalActive(true);
-  };
-
-  const handleExportRulesOnClick = () => {
-    verifyExportRulesLimitAndContinue();
-  };
-
-  const verifyExportRulesLimitAndContinue = () => {
-    setSelectedRules(getSelectedRules(rulesSelection));
-    setIsExportRulesModalActive(true);
   };
 
   //TO SET MOBILE VIEW WIDTH BY CHECKING THROUGH WINDOW OBJECT
@@ -246,7 +239,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
             setIsChangeGroupModalActive(true);
           }}
           handleShareRulesOnClick={handleShareRulesOnClick}
-          handleExportRulesOnClick={handleExportRulesOnClick}
           handleDeleteRulesOnClick={() => {
             setSelectedRules(getSelectedRules(rulesSelection));
             setIsDeleteRulesModalActive(true);
@@ -284,14 +276,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           mode="SELECTED_RULES"
         />
       ) : null}
-
-      {isExportRulesModalActive ? (
-        <ExportRulesModal
-          isOpen={isExportRulesModalActive}
-          toggle={toggleExportRulesModal}
-          rulesToExport={selectedRules}
-        />
-      ) : null}
       {isDeleteRulesModalActive ? (
         <DeleteRulesModal
           isOpen={isDeleteRulesModalActive}
@@ -303,13 +287,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       ) : null}
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={selectedRules}
-        />
       ) : null}
 
       {activeModals.renameGroupModal.isActive ? (
