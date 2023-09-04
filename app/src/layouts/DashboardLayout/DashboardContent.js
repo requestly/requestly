@@ -172,8 +172,13 @@ const DashboardContent = () => {
               {...activeModals.joinWorkspaceModal.props}
             />
           ) : null}
-
-          <SharingModal />
+          {activeModals.sharingModal.isActive ? (
+            <SharingModal
+              isOpen={activeModals.sharingModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "sharingModal" }))}
+              {...activeModals.sharingModal.props}
+            />
+          ) : null}
 
           {isImportRulesModalActive ? (
             <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
