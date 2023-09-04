@@ -44,19 +44,18 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
 
       trackRQLastActivity("rules_exported");
       trackRulesExportedEvent(rulesCount);
+      dispatch(actions.clearSelectedRules());
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
       toggleModal();
-      setRulesToDownload(null);
     },
-    [fileName, rulesToDownload]
+    [fileName, dispatch, toggleModal, rulesToDownload]
   );
 
   useEffect(() => {
     if (!rulesToDownload) {
       prepareContentToExport(appMode, selectedRules, groupwiseRulesToPopulate).then((result) => {
         setRulesToDownload(result);
-        dispatch(actions.clearSelectedRules());
       });
     }
   }, [selectedRules, groupwiseRulesToPopulate, rulesToDownload, appMode, dispatch]);
