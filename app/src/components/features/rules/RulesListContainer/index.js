@@ -10,7 +10,6 @@ import DeleteRulesModal from "../DeleteRulesModal";
 import ImportRulesModal from "../ImportRulesModal";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import RenameGroupModal from "../RenameGroupModal";
-import CreateSharedListModal from "../../sharedLists/CreateSharedListModal";
 import {
   getRulesSelection,
   getUserAuthDetails,
@@ -67,7 +66,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
-  // const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -306,13 +304,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
-      {/* {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={selectedRules}
-        />
-      ) : null} */}
 
       {activeModals.renameGroupModal.isActive ? (
         <RenameGroupModal

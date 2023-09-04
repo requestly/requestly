@@ -56,7 +56,6 @@ import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
-import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -135,9 +134,6 @@ const RulesTable = ({
   // Component State
   const [isSharedListRuleViewerModalActive, setIsSharedListRuleViewModalActive] = useState(false);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
-
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
-
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -146,7 +142,6 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
-  const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
@@ -191,9 +186,6 @@ const RulesTable = ({
     setIsSharedListRuleViewModalActive(!isSharedListRuleViewerModalActive);
   };
 
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
-  };
   const toggleDeleteConfirmationModal = () => {
     setIsDeleteConfirmationModalActive(isDeleteConfirmationModalActive ? false : true);
   };
@@ -497,8 +489,15 @@ const RulesTable = ({
 
     fetchSharedLists(user.details.profile.uid).then((result) => {
       //Continue creating new shared list
-      setSharedListModalRuleIDs([rule.id]);
-      setIsShareRulesModalActive(true);
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "sharingModal",
+          newValue: true,
+          newProps: {
+            rulesToShare: [rule.id],
+          },
+        })
+      );
       trackRQLastActivity("sharedList_created");
 
       //Deactivate loading modal
@@ -1383,13 +1382,6 @@ const RulesTable = ({
           isOpen={isSharedListRuleViewerModalActive}
           toggle={toggleSharedListRuleViewerModal}
           rule={ruleToViewInModal}
-        />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={sharedListModalRuleIDs}
         />
       ) : null}
       {isDeleteConfirmationModalActive ? (
