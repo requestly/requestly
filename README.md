@@ -1,4 +1,3 @@
-![svgviewer-output (2)](https://github.com/requestly/requestly/assets/16779465/b2a40e48-eae8-445e-948d-4ceedf90cbe8)<p align="center">
 <p align="center">
   <a target="_blank" href="https://requestly.io/">
     <img src="https://github.com/requestly/requestly/assets/16779465/652552db-c867-44cb-9bb5-94a2026e04ca" alt="Requestly Logo" width="40%"/>
