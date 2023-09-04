@@ -18,7 +18,6 @@ import {
   GroupOutlined,
   SearchOutlined,
   DownOutlined,
-  UploadOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
@@ -56,7 +55,6 @@ import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
-import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -120,7 +118,6 @@ const RulesTable = ({
   isTableLoading = false,
   handleChangeGroupOnClick,
   handleShareRulesOnClick,
-  handleExportRulesOnClick,
   handleImportRulesOnClick,
   handleDeleteRulesOnClick,
   handleNewGroupOnClick,
@@ -135,9 +132,6 @@ const RulesTable = ({
   // Component State
   const [isSharedListRuleViewerModalActive, setIsSharedListRuleViewModalActive] = useState(false);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
-
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
-
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -146,7 +140,6 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
-  const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
@@ -191,9 +184,6 @@ const RulesTable = ({
     setIsSharedListRuleViewModalActive(!isSharedListRuleViewerModalActive);
   };
 
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
-  };
   const toggleDeleteConfirmationModal = () => {
     setIsDeleteConfirmationModalActive(isDeleteConfirmationModalActive ? false : true);
   };
@@ -497,8 +487,15 @@ const RulesTable = ({
 
     fetchSharedLists(user.details.profile.uid).then((result) => {
       //Continue creating new shared list
-      setSharedListModalRuleIDs([rule.id]);
-      setIsShareRulesModalActive(true);
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "sharingModal",
+          newValue: true,
+          newProps: {
+            selectedRules: [rule.id],
+          },
+        })
+      );
       trackRQLastActivity("sharedList_created");
 
       //Deactivate loading modal
@@ -1230,21 +1227,6 @@ const RulesTable = ({
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
-              <AuthConfirmationPopover
-                title="You need to sign up to export rules"
-                callback={handleExportRulesOnClick}
-                source={AUTH.SOURCE.EXPORT_RULES}
-              >
-                <Tooltip title={isScreenSmall ? "Export Rules" : null}>
-                  <Button
-                    shape={isScreenSmall ? "circle" : null}
-                    onClick={user?.details?.isLoggedIn && handleExportRulesOnClick}
-                    icon={<UploadOutlined />}
-                  >
-                    {isScreenSmall ? null : "Export"}
-                  </Button>
-                </Tooltip>
-              </AuthConfirmationPopover>
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
@@ -1312,11 +1294,10 @@ const RulesTable = ({
                   {
                     shape: "circle",
                     isTooltipShown: true,
-                    hasPopconfirm: true,
-                    buttonText: "Export",
-                    authSource: AUTH.SOURCE.EXPORT_RULES,
-                    icon: <UploadOutlined />,
-                    onClickHandler: handleExportRulesOnClick,
+                    tourId: "rule-table-create-group-btn",
+                    buttonText: "New Group",
+                    icon: <GroupOutlined />,
+                    onClickHandler: handleNewGroupOnClick,
                   },
                   {
                     shape: "circle",
@@ -1326,14 +1307,6 @@ const RulesTable = ({
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
                     onClickHandler: handleShareRulesOnClick,
-                  },
-                  {
-                    shape: "circle",
-                    isTooltipShown: true,
-                    tourId: "rule-table-create-group-btn",
-                    buttonText: "New Group",
-                    icon: <GroupOutlined />,
-                    onClickHandler: handleNewGroupOnClick,
                   },
                   {
                     shape: null,
@@ -1383,13 +1356,6 @@ const RulesTable = ({
           isOpen={isSharedListRuleViewerModalActive}
           toggle={toggleSharedListRuleViewerModal}
           rule={ruleToViewInModal}
-        />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={sharedListModalRuleIDs}
         />
       ) : null}
       {isDeleteConfirmationModalActive ? (

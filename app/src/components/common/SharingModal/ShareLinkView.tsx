@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
-import { createSharedList } from "components/features/sharedLists/CreateSharedListModal/actions";
+import { createSharedList } from "./actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
@@ -17,13 +17,12 @@ import Logger from "lib/logger";
 import "./index.css";
 
 interface ShareLinkProps {
-  rulesToShare: string[];
+  selectedRules: string[];
 }
 
 // TODO: handle copy changes for session replay in V1
 
-export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
-  const user = useSelector(getUserAuthDetails);
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
@@ -38,8 +37,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
 
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
-    () => (rulesToShare && rulesToShare?.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
-    [rules, rulesToShare]
+    () =>
+      selectedRules && selectedRules?.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null,
+    [rules, selectedRules]
   );
 
   const visibilityOptions = useMemo(
@@ -137,13 +137,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
       setIsLinkGenerating(true);
       createSharedList(
         appMode,
-        rulesToShare,
+        selectedRules,
         sharedListName,
         groupwiseRulesToPopulate,
         sharedLinkVisibility,
-        sharedListRecipients,
-        user?.details?.profile?.uid
-      ).then(({ sharedListId, sharedListName, sharedListData }) => {
+        sharedListRecipients
+      ).then(({ sharedListId, sharedListName, sharedListData }: any) => {
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,
@@ -168,23 +167,22 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     }
   }, [
     appMode,
-    rulesToShare,
+    selectedRules,
     sharedListName,
     groupwiseRulesToPopulate,
     sharedLinkVisibility,
     sharedListRecipients,
-    user?.details?.profile?.uid,
     sendSharedListShareEmail,
     validateSharedListName,
   ]);
 
   useEffect(() => {
-    if (!rulesToShare?.length) return;
+    if (!selectedRules?.length) return;
 
-    if (rulesToShare.length > 1)
+    if (selectedRules.length > 1)
       setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
     else setSharedListName(singleRuleData?.name);
-  }, [rulesToShare?.length, singleRuleData?.name]);
+  }, [selectedRules?.length, singleRuleData?.name]);
 
   return (
     <div className="sharing-modal-body">
