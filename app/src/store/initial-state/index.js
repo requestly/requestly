@@ -200,6 +200,7 @@ const INITIAL_STATE = {
         firstRule: false,
         fifthRule: false,
         firstDraftSession: false,
+        rulesListSharingOnboarding: false,
       },
 
       hasConnectedApp: false,
