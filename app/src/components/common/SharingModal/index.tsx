@@ -26,9 +26,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: (
-          <>{selectedRules?.length ? <ShareLinkView rulesToShare={selectedRules} /> : <EmptySelectionView />}</>
-        ),
+        children: <ShareLinkView selectedRules={selectedRules} />,
       },
       {
         key: SharingOptions.DOWNLOAD,

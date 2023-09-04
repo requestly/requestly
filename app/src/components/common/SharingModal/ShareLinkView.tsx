@@ -17,12 +17,12 @@ import Logger from "lib/logger";
 import "./index.css";
 
 interface ShareLinkProps {
-  rulesToShare: string[];
+  selectedRules: string[];
 }
 
 // TODO: handle copy changes for session replay in V1
 
-export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
@@ -37,8 +37,9 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
 
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
-    () => (rulesToShare && rulesToShare?.length === 1 ? rules.find((rule: Rule) => rule.id === rulesToShare[0]) : null),
-    [rules, rulesToShare]
+    () =>
+      selectedRules && selectedRules?.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null,
+    [rules, selectedRules]
   );
 
   const visibilityOptions = useMemo(
@@ -136,7 +137,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
       setIsLinkGenerating(true);
       createSharedList(
         appMode,
-        rulesToShare,
+        selectedRules,
         sharedListName,
         groupwiseRulesToPopulate,
         sharedLinkVisibility,
@@ -166,7 +167,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
     }
   }, [
     appMode,
-    rulesToShare,
+    selectedRules,
     sharedListName,
     groupwiseRulesToPopulate,
     sharedLinkVisibility,
@@ -176,12 +177,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ rulesToShare }) => {
   ]);
 
   useEffect(() => {
-    if (!rulesToShare?.length) return;
-
-    if (rulesToShare.length > 1)
-      setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
-    else setSharedListName(singleRuleData?.name);
-  }, [rulesToShare?.length, singleRuleData?.name]);
+    if (selectedRules?.length) {
+      if (selectedRules.length > 1) {
+        setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
+      } else setSharedListName(singleRuleData?.name);
+    }
+  }, [selectedRules, singleRuleData]);
 
   return (
     <div className="sharing-modal-body">

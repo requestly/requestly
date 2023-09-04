@@ -492,7 +492,7 @@ const RulesTable = ({
           modalName: "sharingModal",
           newValue: true,
           newProps: {
-            rulesToShare: [rule.id],
+            selectedRules: [rule.id],
           },
         })
       );

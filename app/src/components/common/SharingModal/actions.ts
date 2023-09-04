@@ -1,6 +1,6 @@
 import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { SharedLinkVisibility } from "./types";
+import { SharedLinkVisibility, SharedListData } from "./types";
 import { Group, Rule } from "types";
 
 export const createSharedList = async (
@@ -18,7 +18,7 @@ export const createSharedList = async (
     children: [] as Rule[],
   }));
 
-  const sharedListData = {
+  const sharedListData: SharedListData = {
     rules,
     updatedGroups,
     sharedListName,
@@ -36,7 +36,7 @@ export const createSharedList = async (
   };
 };
 
-const generateSharedList = async (sharedListData: any) => {
+const generateSharedList = async (sharedListData: SharedListData) => {
   const functions = getFunctions();
   const createSharedList = httpsCallable(functions, "sharedLists-create");
   const res = await createSharedList(sharedListData);

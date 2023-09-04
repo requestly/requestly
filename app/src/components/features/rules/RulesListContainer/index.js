@@ -81,7 +81,13 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const toggleSharingModal = (selectedRules) => {
-    dispatch(actions.toggleActiveModal({ modalName: "sharingModal", newProps: { selectedRules: selectedRules } }));
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "sharingModal",
+        newValue: true,
+        newProps: { selectedRules: selectedRules },
+      })
+    );
   };
 
   const toggleRenameGroupModal = () => {
