@@ -1320,19 +1320,19 @@ const RulesTable = ({
                   {
                     shape: "circle",
                     isTooltipShown: true,
+                    tourId: "rule-table-create-group-btn",
+                    buttonText: "New Group",
+                    icon: <GroupOutlined />,
+                    onClickHandler: handleNewGroupOnClick,
+                  },
+                  {
+                    shape: "circle",
+                    isTooltipShown: true,
                     hasPopconfirm: true,
                     buttonText: "Share",
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
                     onClickHandler: handleShareRulesOnClick,
-                  },
-                  {
-                    shape: "circle",
-                    isTooltipShown: true,
-                    tourId: "rule-table-create-group-btn",
-                    buttonText: "New Group",
-                    icon: <GroupOutlined />,
-                    onClickHandler: handleNewGroupOnClick,
                   },
                   {
                     shape: null,
