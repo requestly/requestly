@@ -37,6 +37,16 @@ export const dateStringFromTimestamp = (timestamp) => {
   return isNaN(day) ? null : fullDate;
 };
 
+/** Returns date in DD_MM_YYYY format */
+export const getTodaysDateInFormat = () => {
+  const date = new Date();
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}_${month}_${year}`;
+};
+
 export const getOldestDate = (arrayOfDates = []) => {
   // Get all dates in "YYYY-MM-DD" format
   const datesArray = arrayOfDates.map((date) => {

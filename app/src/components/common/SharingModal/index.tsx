@@ -4,9 +4,9 @@ import { Tabs } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
 import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
 import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBold";
+import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
-import { Download } from "./Download";
 import "./index.css";
 
 interface ModalProps {
@@ -31,7 +31,8 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
       {
         key: SharingOptions.DOWNLOAD,
         label: "Download",
-        children: <>{rulesToShare?.length ? "DOWNLOAD FROM HERE" : <EmptySelectionView />}</>,
+        children: <>{rulesToShare?.length ? <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} /> : <EmptySelectionView />}</>,
+        children: ,
       },
     ],
     [selectedRules]
