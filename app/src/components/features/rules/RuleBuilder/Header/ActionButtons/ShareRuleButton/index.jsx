@@ -47,6 +47,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
           newValue: true,
           newProps: {
             selectedRules: [currentlySelectedRuleData.id],
+            source: "rule_editor",
           },
         })
       );

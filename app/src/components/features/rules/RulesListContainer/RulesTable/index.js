@@ -493,6 +493,7 @@ const RulesTable = ({
           newValue: true,
           newProps: {
             selectedRules: [rule.id],
+            source: "rules_list",
           },
         })
       );

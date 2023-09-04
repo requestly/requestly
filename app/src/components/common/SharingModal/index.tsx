@@ -8,14 +8,16 @@ import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import "./index.css";
+import { trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
 
 interface ModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   selectedRules: string[];
+  source: string;
 }
 
-export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, selectedRules = null }) => {
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       // {
@@ -27,7 +29,13 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
         children: (
-          <>{selectedRules?.length ? <ShareLinkView selectedRules={selectedRules} /> : <EmptySelectionView />}</>
+          <>
+            {selectedRules?.length ? (
+              <ShareLinkView selectedRules={selectedRules} source={source} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
         ),
       },
       {
@@ -44,12 +52,11 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
         ),
       },
     ],
-    [selectedRules, toggleModal]
+    [selectedRules, toggleModal, source]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
-    console.log({ key });
-    //TODO: track share option tab clicked here
+    trackSharingTabSwitched(key);
   };
 
   return (

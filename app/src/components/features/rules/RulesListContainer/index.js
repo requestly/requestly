@@ -85,7 +85,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       actions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
-        newProps: { selectedRules: selectedRules },
+        newProps: { selectedRules: selectedRules, source: "rules_list" },
       })
     );
   };

@@ -14,15 +14,18 @@ import { CheckCircleFilled } from "@ant-design/icons";
 import { SharedLinkVisibility } from "./types";
 import { Rule } from "types";
 import Logger from "lib/logger";
+import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
+import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
 
 interface ShareLinkProps {
   selectedRules: string[];
+  source: string;
 }
 
 // TODO: handle copy changes for session replay in V1
 
-export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source }) => {
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
@@ -142,7 +145,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
         groupwiseRulesToPopulate,
         sharedLinkVisibility,
         sharedListRecipients
-      ).then(({ sharedListId, sharedListName, sharedListData }: any) => {
+      ).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,
@@ -160,6 +163,15 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
           link: getSharedListURL(sharedListId, sharedListName),
           visibility: sharedLinkVisibility,
         });
+        trackSharedListCreatedEvent(
+          sharedListId,
+          sharedListName,
+          selectedRules.length,
+          source,
+          sharedLinkVisibility,
+          nonRQEmails?.length ?? null,
+          sharedListRecipients.length ?? null
+        );
         setIsLinkGenerating(false);
       });
     } catch (e) {
@@ -167,6 +179,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
     }
   }, [
     appMode,
+    source,
     selectedRules,
     sharedListName,
     groupwiseRulesToPopulate,
@@ -207,7 +220,16 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
                           <CheckCircleFilled className="success" /> Invites sent!
                         </div>
                       )}
-                      <CopyValue value={shareableLinkData.link} />
+                      <CopyValue
+                        value={shareableLinkData.link}
+                        trackCopiedEvent={() =>
+                          trackSharedListUrlCopied(
+                            source,
+                            getSharedListIdFromImportURL(shareableLinkData.link),
+                            sharedLinkVisibility
+                          )
+                        }
+                      />
                       {option.value === SharedLinkVisibility.PRIVATE && (
                         <div className="mt-8 text-gray caption">
                           You can also share above link for quick access, they’ll need to sign in using the email
