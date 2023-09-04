@@ -8,7 +8,7 @@ import { prepareContentToExport } from "components/features/rules/ExportRulesMod
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
-import { getTodaysDateInFormat } from "utils/DateTimeUtils";
+import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import "./DownloadRules.css";
 
@@ -34,7 +34,9 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
   );
 
   const fileName =
-    rulesToDownload?.rulesCount === 1 ? singleRuleData?.name ?? "" : `requestly_export_${getTodaysDateInFormat()}.json`;
+    rulesToDownload?.rulesCount === 1
+      ? singleRuleData?.name ?? ""
+      : `requestly_export_${epochToDateAndTimeString(new Date()).split(" ")[0]}.json`;
 
   const handleDownloadRules = useCallback(
     (e: unknown) => {
