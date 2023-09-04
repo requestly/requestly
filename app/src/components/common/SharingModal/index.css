@@ -18,7 +18,7 @@
 }
 
 .sharing-modal-body {
-  padding: 1.5rem;
+  padding: 1.2rem;
 }
 
 .sharing-modal-wrapper .ant-tabs {
@@ -90,6 +90,7 @@
   align-items: center;
   gap: 30px;
 }
+
 .sharing-modal-empty-view svg {
   width: 80px;
   height: 80px;

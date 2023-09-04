@@ -4,6 +4,7 @@ import { Tabs } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
 import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
 import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBold";
+import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import "./index.css";
@@ -11,10 +12,10 @@ import "./index.css";
 interface ModalProps {
   isOpen: boolean;
   toggleModal: () => void;
-  rulesToShare: string[];
+  selectedRules: string[];
 }
 
-export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesToShare = null }) => {
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, selectedRules = null }) => {
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       // {
@@ -25,15 +26,25 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, rulesT
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
-        children: <>{rulesToShare?.length ? <ShareLinkView rulesToShare={rulesToShare} /> : <EmptySelectionView />}</>,
+        children: (
+          <>{selectedRules?.length ? <ShareLinkView rulesToShare={selectedRules} /> : <EmptySelectionView />}</>
+        ),
       },
       {
         key: SharingOptions.DOWNLOAD,
         label: "Download",
-        children: <>{rulesToShare?.length ? "DOWNLOAD FROM HERE" : <EmptySelectionView />}</>,
+        children: (
+          <>
+            {selectedRules?.length ? (
+              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
+        ),
       },
     ],
-    [rulesToShare]
+    [selectedRules]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
