@@ -61,21 +61,15 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
 
   return (
     <div className="sharing-modal-body">
-      {rulesToDownload?.rulesCount > 0 ? (
-        <>
-          <div className="download-rules-details">
-            <span className="line-clamp">{fileName}</span>
-            <span className="text-gray">
-              {rulesToDownload?.rulesCount} {rulesToDownload?.rulesCount === 1 ? " rule" : " rules"}
-            </span>
-          </div>
-          <Button type="primary" onClick={handleDownloadRules}>
-            Download rule
-          </Button>
-        </>
-      ) : (
-        <div>show empty state</div>
-      )}
+      <div className="download-rules-details">
+        <span className="line-clamp">{fileName}</span>
+        <span className="text-gray">
+          {rulesToDownload?.rulesCount} {rulesToDownload?.rulesCount === 1 ? " rule" : " rules"}
+        </span>
+      </div>
+      <Button type="primary" onClick={handleDownloadRules}>
+        Download rule
+      </Button>
     </div>
   );
 };
