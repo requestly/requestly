@@ -6,7 +6,7 @@ import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
 import { createSharedList } from "./actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
-import { epochToDateAndTimeString } from "utils/DateTimeUtils";
+import { getFormattedDate } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
 import { toast } from "utils/Toast";
 import { httpsCallable, getFunctions } from "firebase/functions";
@@ -179,8 +179,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
   useEffect(() => {
     if (!selectedRules?.length) return;
 
-    if (selectedRules.length > 1)
-      setSharedListName(`requesly_shared_list_${epochToDateAndTimeString(new Date()).split(" ")[0]}`);
+    if (selectedRules.length > 1) setSharedListName(`requesly_shared_list_${getFormattedDate("DD_MM_YYYY")}`);
     else setSharedListName(singleRuleData?.name);
   }, [selectedRules?.length, singleRuleData?.name]);
 
