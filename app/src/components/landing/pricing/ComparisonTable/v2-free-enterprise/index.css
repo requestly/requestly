@@ -126,7 +126,7 @@
 }
 
 .enterprise-banner {
-  border: 1px solid var(--border);
+  border: 1px solid var(--white);
   border-radius: var(--border-radius-md);
   display: flex;
   padding: 48px;
