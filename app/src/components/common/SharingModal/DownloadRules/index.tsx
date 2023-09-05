@@ -10,6 +10,7 @@ import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
+import { trackRulesDownloadClicked } from "modules/analytics/events/misc/sharing";
 import "./DownloadRules.css";
 
 interface DownloadRulesProps {
@@ -47,9 +48,10 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
       dispatch(actions.clearSelectedRules());
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
+      trackRulesDownloadClicked(selectedRules.length);
       toggleModal();
     },
-    [fileName, dispatch, toggleModal, rulesToDownload]
+    [fileName, dispatch, toggleModal, rulesToDownload, selectedRules.length]
   );
 
   useEffect(() => {

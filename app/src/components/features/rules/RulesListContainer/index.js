@@ -32,6 +32,7 @@ import {
   trackRuleCreationWorkflowStartedEvent,
 } from "modules/analytics/events/common/rules";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
 const { PATHS } = APP_CONSTANTS;
@@ -81,11 +82,12 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const toggleSharingModal = (selectedRules) => {
+    trackShareButtonClicked("rules_list", selectedRules.length);
     dispatch(
       actions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
-        newProps: { selectedRules: selectedRules },
+        newProps: { selectedRules: selectedRules, source: "rules_list" },
       })
     );
   };

@@ -67,6 +67,7 @@ import {
   trackRulePinToggled,
   trackRulesUngrouped,
 } from "modules/analytics/events/common/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -506,6 +507,7 @@ const RulesTable = ({
 
   const shareIconOnClickHandler = (event, rule) => {
     event.stopPropagation();
+    trackShareButtonClicked("rules_list");
     user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 

@@ -1,4 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getAvailableTeams } from "store/features/teams/selectors";
 import { RQModal } from "lib/design-system/components";
 import { Tabs } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
@@ -7,15 +9,18 @@ import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBo
 import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
+import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
 import "./index.css";
 
 interface ModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   selectedRules: string[];
+  source: string;
 }
 
-export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, selectedRules = null }) => {
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
+  const availableTeams = useSelector(getAvailableTeams);
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       // {
@@ -27,7 +32,13 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
         children: (
-          <>{selectedRules?.length ? <ShareLinkView selectedRules={selectedRules} /> : <EmptySelectionView />}</>
+          <>
+            {selectedRules?.length ? (
+              <ShareLinkView selectedRules={selectedRules} source={source} />
+            ) : (
+              <EmptySelectionView />
+            )}
+          </>
         ),
       },
       {
@@ -44,13 +55,16 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, select
         ),
       },
     ],
-    [selectedRules, toggleModal]
+    [selectedRules, toggleModal, source]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
-    console.log({ key });
-    //TODO: track share option tab clicked here
+    trackSharingTabSwitched(key);
   };
+
+  useEffect(() => {
+    trackShareModalViewed(selectedRules?.length, source, availableTeams?.length);
+  }, [availableTeams?.length, selectedRules?.length, source]);
 
   return (
     <RQModal
