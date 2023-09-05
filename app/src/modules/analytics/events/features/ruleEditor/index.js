@@ -14,3 +14,9 @@ export const trackTestRuleReportGenerated = (ruleType) => {
   const params = { ruleType };
   trackEvent(RULE_EDITOR.TEST_THIS_RULE.TEST_RULE_REPORT_GENERATED, params);
 };
+
+export const trackTroubleshootClicked = (source) => {
+  trackEvent(RULE_EDITOR.TROUBLESHOOT_CLICKED, {
+    source,
+  });
+};
