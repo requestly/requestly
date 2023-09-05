@@ -42,3 +42,23 @@ const generateSharedList = async (sharedListData: SharedListData) => {
   const newSharedList = await createSharedList(sharedListData);
   return newSharedList.data;
 };
+
+export const prepareContentToExport = (
+  appMode: string,
+  selectedRuleIds: string[],
+  groupwiseRules: Record<string, Group>
+) => {
+  return new Promise((resolve, reject) => {
+    getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds, groupwiseRules).then(({ rules, groups }) => {
+      const updatedGroups = groups.map((group: Group) => ({
+        ...group,
+        children: [] as Rule[],
+      }));
+      resolve({
+        fileContent: JSON.stringify(rules.concat(updatedGroups), null, 2),
+        rulesCount: rules.length,
+        groupsCount: updatedGroups.length,
+      });
+    });
+  });
+};

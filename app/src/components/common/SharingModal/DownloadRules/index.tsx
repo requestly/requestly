@@ -4,7 +4,7 @@ import { actions } from "store";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
 import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
-import { prepareContentToExport } from "components/features/rules/ExportRulesModal/actions";
+import { prepareContentToExport } from "../actions";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
@@ -54,7 +54,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
 
   useEffect(() => {
     if (!rulesToDownload) {
-      prepareContentToExport(appMode, selectedRules, groupwiseRulesToPopulate).then((result) => {
+      prepareContentToExport(appMode, selectedRules, groupwiseRulesToPopulate).then((result: any) => {
         setRulesToDownload(result);
       });
     }
