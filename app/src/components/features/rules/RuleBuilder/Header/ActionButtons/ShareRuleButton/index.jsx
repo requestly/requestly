@@ -17,7 +17,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const shareRuleClickHandler = () => {
-    trackShareButtonClicked(1, "rule_editor");
+    trackShareButtonClicked("rule_editor");
     if (user.loggedIn) {
       toggleSharingModal();
     } else {

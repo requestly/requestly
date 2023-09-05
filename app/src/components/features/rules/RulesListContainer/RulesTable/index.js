@@ -507,7 +507,7 @@ const RulesTable = ({
 
   const shareIconOnClickHandler = (event, rule) => {
     event.stopPropagation();
-    trackShareButtonClicked(1, "rules_list");
+    trackShareButtonClicked("rules_list");
     user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 

@@ -82,7 +82,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const toggleSharingModal = (selectedRules) => {
-    trackShareButtonClicked(selectedRules.length, "rules_list");
+    trackShareButtonClicked("rules_list", selectedRules.length);
     dispatch(
       actions.toggleActiveModal({
         modalName: "sharingModal",

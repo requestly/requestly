@@ -11,7 +11,7 @@ export const trackRulesDownloadClicked = (num_rules) => {
   trackEvent(SHARING.RULES_DOWNLOAD_CLICKED, params);
 };
 
-export const trackShareButtonClicked = (selection_count, source) => {
+export const trackShareButtonClicked = (source, selection_count = 1) => {
   const params = { selection_count, source };
   trackEvent(SHARING.SHARE_BUTTON_CLICKED, params);
 };
