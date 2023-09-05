@@ -1,4 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getAvailableTeams } from "store/features/teams/selectors";
 import { RQModal } from "lib/design-system/components";
 import { Tabs } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
@@ -7,8 +9,8 @@ import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBo
 import { DownloadRules } from "./DownloadRules";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
+import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
 import "./index.css";
-import { trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
 
 interface ModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ interface ModalProps {
 }
 
 export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
+  const availableTeams = useSelector(getAvailableTeams);
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
       // {
@@ -58,6 +61,10 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
   const handleSharingOptionsChange = (key: SharingOptions) => {
     trackSharingTabSwitched(key);
   };
+
+  useEffect(() => {
+    trackShareModalViewed(selectedRules?.length, source, availableTeams?.length);
+  }, [availableTeams?.length, selectedRules?.length, source]);
 
   return (
     <RQModal

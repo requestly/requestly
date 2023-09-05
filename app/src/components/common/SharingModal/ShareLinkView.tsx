@@ -4,6 +4,7 @@ import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/sele
 import { Radio, Space } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
+import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
 import { createSharedList } from "./actions";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFormattedDate } from "utils/DateTimeUtils";
@@ -16,7 +17,6 @@ import { Rule } from "types";
 import Logger from "lib/logger";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
-import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
 
 interface ShareLinkProps {
   selectedRules: string[];

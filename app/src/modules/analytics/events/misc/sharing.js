@@ -10,3 +10,13 @@ export const trackRulesDownloadClicked = (num_rules) => {
   const params = { num_rules };
   trackEvent(SHARING.RULES_DOWNLOAD_CLICKED, params);
 };
+
+export const trackShareButtonClicked = (selection_count, source) => {
+  const params = { selection_count, source };
+  trackEvent(SHARING.SHARE_BUTTON_CLICKED, params);
+};
+
+export const trackShareModalViewed = (selection_count, source, num_team_workspaces) => {
+  const params = { selection_count, source, num_team_workspaces };
+  trackEvent(SHARING.SHARE_MODAL_VIEWED, params);
+};

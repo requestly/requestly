@@ -6,6 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { Button, Tooltip } from "antd";
 import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
@@ -17,6 +18,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const shareRuleClickHandler = () => {
+    trackShareButtonClicked(1, "rule_editor");
     if (user.loggedIn) {
       verifySharedListsLimit();
     } else {
