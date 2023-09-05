@@ -5,6 +5,7 @@ import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selector
 import { RQButton } from "lib/design-system/components";
 import { Button, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
@@ -16,6 +17,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const shareRuleClickHandler = () => {
+    trackShareButtonClicked("rule_editor");
     if (user.loggedIn) {
       toggleSharingModal();
     } else {
