@@ -97,9 +97,15 @@ const FreeAndEnterprisePlanTable = () => {
                     per member, per {duration === "monthly" ? "month" : "year"}
                   </div>
 
-                  <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                    Use now
-                  </RQButton>
+                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
+                    <RQButton onClick={() => (window.location.href = "/")} type="primary">
+                      Use now
+                    </RQButton>
+                  ) : (
+                    <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+                      Contact Us
+                    </RQButton>
+                  )}
                 </div>
                 {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
                   <div className="pro-basic-feature-title text-left">
