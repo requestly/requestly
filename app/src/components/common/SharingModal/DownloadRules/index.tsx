@@ -51,7 +51,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
       trackRulesDownloadClicked(selectedRules.length);
       toggleModal();
     },
-    [fileName, dispatch, toggleModal, rulesToDownload, selectedRules]
+    [fileName, dispatch, toggleModal, rulesToDownload, selectedRules.length]
   );
 
   useEffect(() => {
