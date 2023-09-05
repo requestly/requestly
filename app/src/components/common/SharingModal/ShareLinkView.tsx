@@ -163,14 +163,19 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
           link: getSharedListURL(sharedListId, sharedListName),
           visibility: sharedLinkVisibility,
         });
+
+        const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
+        const recipientsCount =
+          sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? sharedListRecipients.length : null;
+
         trackSharedListCreatedEvent(
           sharedListId,
           sharedListName,
           selectedRules.length,
           source,
           sharedLinkVisibility,
-          nonRQEmails?.length ?? null,
-          sharedListRecipients.length ?? null
+          nonRQEmailsCount,
+          recipientsCount
         );
         setIsLinkGenerating(false);
       });

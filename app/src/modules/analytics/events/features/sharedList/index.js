@@ -1,6 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { SHARED_LIST } from "../constants";
+import { isNull } from "lodash";
 
 export const trackSharedListCreatedEvent = (
   id,
@@ -19,8 +20,8 @@ export const trackSharedListCreatedEvent = (
     access_type,
   };
 
-  if (num_users_notified) params.num_users_notified = num_users_notified;
-  if (non_rq_users) params.non_rq_users = non_rq_users;
+  if (!isNull(num_users_notified)) params.num_users_notified = num_users_notified;
+  if (!isNull(non_rq_users)) params.non_rq_users = non_rq_users;
 
   trackEvent(SHARED_LIST.CREATED, params);
 };
