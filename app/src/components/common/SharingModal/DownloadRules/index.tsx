@@ -10,8 +10,8 @@ import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
-import "./DownloadRules.css";
 import { trackRulesDownloadClicked } from "modules/analytics/events/misc/sharing";
+import "./DownloadRules.css";
 
 interface DownloadRulesProps {
   selectedRules: string[];
