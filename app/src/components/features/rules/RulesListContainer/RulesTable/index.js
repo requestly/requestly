@@ -54,7 +54,6 @@ import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -145,6 +144,7 @@ const RulesTable = ({
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
   const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
+  const [startSharingWalkthrough, setStartSharingWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
@@ -477,37 +477,16 @@ const RulesTable = ({
     }
   };
 
-  const verifyAndContinueSharingRules = (rule) => {
-    //Activate loading modal
+  const toggleSharingModal = (rule) => {
     dispatch(
       actions.toggleActiveModal({
-        modalName: "loadingModal",
+        modalName: "sharingModal",
         newValue: true,
+        newProps: {
+          selectedRules: [rule.id],
+        },
       })
     );
-
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Continue creating new shared list
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "sharingModal",
-          newValue: true,
-          newProps: {
-            selectedRules: [rule.id],
-            source: "rules_list",
-          },
-        })
-      );
-      trackRQLastActivity("sharedList_created");
-
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
   };
 
   const promptUserToSignup = (source) => {
@@ -529,7 +508,7 @@ const RulesTable = ({
   const shareIconOnClickHandler = (event, rule) => {
     event.stopPropagation();
     trackShareButtonClicked(1, "rules_list");
-    user.loggedIn ? verifyAndContinueSharingRules(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   const copyIconOnClickHandler = useCallback(async (event, rule) => {
@@ -1124,6 +1103,17 @@ const RulesTable = ({
     groupingAndRuleActivationExp,
   ]);
 
+  useEffect(() => {
+    //TODO: change date before merging
+    if (
+      !isMiscTourCompleted.rulesListSharingOnboarding &&
+      userAttributes?.num_rules > 1 &&
+      new Date(userAttributes?.install_date) < new Date("2023-09-05")
+    ) {
+      setStartSharingWalkthrough(true);
+    }
+  }, [userAttributes?.num_rules, userAttributes?.install_date, isMiscTourCompleted.rulesListSharingOnboarding]);
+
   return (
     <>
       <ProductWalkthrough
@@ -1138,6 +1128,19 @@ const RulesTable = ({
         startWalkthrough={startFirstRuleWalkthrough}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
+        }
+      />
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.SHARING.RULES_LIST_SHARING_ONBOARDING}
+        startWalkthrough={startSharingWalkthrough && !isMiscTourCompleted.rulesListSharingOnboarding}
+        completeTourOnUnmount={false}
+        onTourComplete={() =>
+          dispatch(
+            actions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              subTour: "rulesListSharingOnboarding",
+            })
+          )
         }
       />
       <ProTable
@@ -1309,7 +1312,16 @@ const RulesTable = ({
                     buttonText: "Share",
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
-                    onClickHandler: handleShareRulesOnClick,
+                    tourId: "rule-list-share-btn",
+                    onClickHandler: () => {
+                      handleShareRulesOnClick();
+                      dispatch(
+                        actions.updateProductTourCompleted({
+                          tour: TOUR_TYPES.MISCELLANEOUS,
+                          subTour: "rulesListSharingOnboarding",
+                        })
+                      );
+                    },
                   },
                   {
                     shape: null,
@@ -1325,7 +1337,16 @@ const RulesTable = ({
 
                 return buttonData.map(
                   (
-                    { icon, type = null, buttonText, isTooltipShown, onClickHandler, isDropdown = false, overlay },
+                    {
+                      icon,
+                      type = null,
+                      buttonText,
+                      isTooltipShown,
+                      onClickHandler,
+                      isDropdown = false,
+                      overlay,
+                      tourId = null,
+                    },
                     index
                   ) => (
                     <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
@@ -1336,6 +1357,7 @@ const RulesTable = ({
                             type={type}
                             onClick={onClickHandler}
                             overlay={overlay}
+                            data-tour-id={tourId}
                             className="rule-selection-dropdown-btn"
                           >
                             {buttonText}

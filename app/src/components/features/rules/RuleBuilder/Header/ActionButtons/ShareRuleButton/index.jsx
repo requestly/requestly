@@ -4,7 +4,6 @@ import { actions } from "store";
 import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { Button, Tooltip } from "antd";
-import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -20,7 +19,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   const shareRuleClickHandler = () => {
     trackShareButtonClicked(1, "rule_editor");
     if (user.loggedIn) {
-      verifySharedListsLimit();
+      toggleSharingModal();
     } else {
       dispatch(
         actions.toggleActiveModal({
@@ -33,35 +32,18 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
     }
   };
 
-  const verifySharedListsLimit = () => {
+  const toggleSharingModal = () => {
     dispatch(
       actions.toggleActiveModal({
-        modalName: "loadingModal",
+        modalName: "sharingModal",
         newValue: true,
+        newProps: {
+          selectedRules: [currentlySelectedRuleData.id],
+        },
       })
     );
-
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Create new shared list
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "sharingModal",
-          newValue: true,
-          newProps: {
-            selectedRules: [currentlySelectedRuleData.id],
-            source: "rule_editor",
-          },
-        })
-      );
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
   };
+
   return (
     <>
       {isRuleEditorModal ? (
