@@ -9,6 +9,7 @@ import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
 import { toast } from "utils/Toast";
+import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { CheckCircleFilled } from "@ant-design/icons";
 import { SharedLinkVisibility } from "./types";
@@ -143,6 +144,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules }) => {
         sharedLinkVisibility,
         sharedListRecipients
       ).then(({ sharedListId, sharedListName, sharedListData }: any) => {
+        trackRQLastActivity("sharedList_created");
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,

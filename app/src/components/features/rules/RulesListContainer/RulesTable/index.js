@@ -54,7 +54,6 @@ import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -477,36 +476,16 @@ const RulesTable = ({
     }
   };
 
-  const verifyAndContinueSharingRules = (rule) => {
-    //Activate loading modal
+  const toggleSharingModal = (rule) => {
     dispatch(
       actions.toggleActiveModal({
-        modalName: "loadingModal",
+        modalName: "sharingModal",
         newValue: true,
+        newProps: {
+          selectedRules: [rule.id],
+        },
       })
     );
-
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Continue creating new shared list
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "sharingModal",
-          newValue: true,
-          newProps: {
-            selectedRules: [rule.id],
-          },
-        })
-      );
-      trackRQLastActivity("sharedList_created");
-
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
   };
 
   const promptUserToSignup = (source) => {
@@ -527,7 +506,7 @@ const RulesTable = ({
 
   const shareIconOnClickHandler = (event, rule) => {
     event.stopPropagation();
-    user.loggedIn ? verifyAndContinueSharingRules(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   const copyIconOnClickHandler = useCallback(async (event, rule) => {
