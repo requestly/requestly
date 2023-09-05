@@ -15,6 +15,7 @@
 }
 .pricing-page-container .pricing-page-body {
   max-width: 1200px;
+  justify-content: center;
 }
 .pricing-title-container {
   display: flex;

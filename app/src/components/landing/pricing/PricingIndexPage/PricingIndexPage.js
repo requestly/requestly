@@ -53,24 +53,22 @@ const PricingIndexPage = () => {
       </Layout.Header>
       <div className="pricing-page-container">
         <Row className="pricing-page-body">
-          <div className="col">
-            <EnterpriseRequestBanner user={user} />
-            <PricingTable />
-            <div>
-              <ChromeStoreStats />
-              <div className="text-gray text-center">Trusted by developer & QA teams from 5000+ organizations</div>
-              <div className="company-marquee-wrapper">
-                <CompanyMarquee />
-              </div>
-
-              <div className="testimonials-container">
-                {customerStoryData.map((data) => (
-                  <CustomerStory {...data} key={data.companyName} />
-                ))}
-              </div>
+          <EnterpriseRequestBanner user={user} />
+          <PricingTable />
+          <div>
+            <ChromeStoreStats />
+            <div className="text-gray text-center">Trusted by developer & QA teams from 5000+ organizations</div>
+            <div className="company-marquee-wrapper">
+              <CompanyMarquee />
             </div>
-            <PricingFAQs />
+
+            <div className="testimonials-container">
+              {customerStoryData.map((data) => (
+                <CustomerStory {...data} key={data.companyName} />
+              ))}
+            </div>
           </div>
+          <PricingFAQs />
         </Row>
       </div>
     </>

@@ -13,6 +13,7 @@ import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 import { Switch } from "antd";
+import EnterpriseBanner from "./EnterpriseBanner";
 
 const FreeAndEnterprisePlanTable = () => {
   // Component State
@@ -28,21 +29,21 @@ const FreeAndEnterprisePlanTable = () => {
 
   return (
     <>
-      <div className="text-center margin-bottom-one">
-        <Switch
-          size="small"
-          checked={duration === "annual"}
-          onChange={(checked) => {
-            if (checked) {
-              setDuration("annual");
-            } else {
-              setDuration("monthly");
-            }
-          }}
-        />
-        <span>{"  "}Annual pricing (save 20%)</span>
-      </div>
       <div className="pricing-table-wrapper">
+        <div className="text-center margin-bottom-one">
+          <Switch
+            size="small"
+            checked={duration === "annual"}
+            onChange={(checked) => {
+              if (checked) {
+                setDuration("annual");
+              } else {
+                setDuration("monthly");
+              }
+            }}
+          />
+          <span>{"  "}Annual pricing (save 20%)</span>
+        </div>
         <div className="pricing-table-product-wrapper">
           <div className="pricing-table-product-view">
             <h1>Products</h1>
@@ -96,7 +97,6 @@ const FreeAndEnterprisePlanTable = () => {
                     </span>{" "}
                     per member, per {duration === "monthly" ? "month" : "year"}
                   </div>
-
                   {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">
                       Use now
@@ -124,6 +124,7 @@ const FreeAndEnterprisePlanTable = () => {
             ))}
           </div>
         </div>
+        <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
         <div className="note-container text-gray text-center">
           <span>
             <img alt="StripeClimateBadge" src={StripeClimateBadge} style={{ height: "1em" }} /> At Requestly, we
