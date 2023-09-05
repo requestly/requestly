@@ -37,7 +37,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+.sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab .ant-tabs-tab-btn {
   color: var(--white);
   font-weight: 500;
   font-size: 13px;
