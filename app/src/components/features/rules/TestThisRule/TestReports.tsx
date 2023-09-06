@@ -28,7 +28,6 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
       (message: { testReportId: string }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
-        trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType);
       }
     );
   }, [currentlySelectedRuleData.ruleType]);
@@ -47,6 +46,11 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
         .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS)
         .then((data) => {
           if (data) {
+            const newTestReport = data[newReportId];
+            if (newTestReport) {
+              trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, newTestReport.appliedStatus);
+            }
+
             const reports = Object.values(data)
               .filter((report: TestReport) => report.ruleId === currentlySelectedRuleData.id)
               .sort((report1: TestReport, report2: TestReport) => report2.timestamp - report1.timestamp);
@@ -58,7 +62,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
           setRefreshTestReports(false);
         });
     }
-  }, [appMode, currentlySelectedRuleData.id, refreshTestReports]);
+  }, [appMode, currentlySelectedRuleData.id, currentlySelectedRuleData.ruleType, newReportId, refreshTestReports]);
 
   return (
     <>
