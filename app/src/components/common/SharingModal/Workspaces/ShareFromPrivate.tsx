@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Avatar, Row } from "antd";
 import { LockOutlined } from "@ant-design/icons";
@@ -10,12 +10,19 @@ import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import "./index.scss";
 
-export const ShareFromPrivate: React.FC = () => {
+interface Props {
+  selectedRules: string[];
+}
+
+export const ShareFromPrivate: React.FC<Props> = ({ selectedRules }) => {
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
+  const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
 
   const [memberEmails, setMemberEmails] = useState([]);
@@ -45,6 +52,10 @@ export const ShareFromPrivate: React.FC = () => {
         }).then((res: any) => {
           setIsLoading(false);
           if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, "write", "share_modal");
+        });
+
+        duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
+          setIsLoading(false);
         });
       });
     } catch (e) {

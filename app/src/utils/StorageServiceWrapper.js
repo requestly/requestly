@@ -86,12 +86,14 @@ class StorageServiceWrapper {
     return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
   }
 
-  async saveMultipleRulesOrGroups(array) {
+  async saveMultipleRulesOrGroups(array, options = {}) {
     const formattedObject = {};
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
     });
-    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode);
+    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+      workspaceId: options.workspaceId,
+    });
     return this.saveRecord(formattedObject);
   }
 

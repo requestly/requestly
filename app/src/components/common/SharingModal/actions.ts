@@ -2,6 +2,7 @@ import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
 import { Group, Rule } from "types";
+import { StorageService } from "init";
 
 export const createSharedList = async (
   appMode: string,
@@ -61,4 +62,14 @@ export const prepareContentToExport = (
       });
     });
   });
+};
+
+export const duplicateRulesToTargetWorkspace = async (
+  appMode: string,
+  workspaceId: string,
+  ruleIdsToShare: string[],
+  groupwiseRules: Record<string, Group>
+) => {
+  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
+  return StorageService(appMode).saveMultipleRulesOrGroups([...rules, ...groups], { workspaceId });
 };
