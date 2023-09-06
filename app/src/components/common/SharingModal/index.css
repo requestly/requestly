@@ -19,10 +19,16 @@
 
 .sharing-modal-body {
   padding: 1.2rem;
+  font-size: 13px;
 }
 
 .sharing-modal-wrapper .ant-tabs {
   margin-top: 4px;
+}
+
+.sharing-modal-wrapper .sharing-primary-btn.ant-btn {
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top .ant-tabs-nav {
