@@ -27,7 +27,9 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
       {
         key: SharingOptions.WORKSPACE,
         label: "Share in workspaces",
-        children: <>{selectedRules?.length ? <ShareInWorkspaces /> : <EmptySelectionView />}</>,
+        children: (
+          <>{selectedRules?.length ? <ShareInWorkspaces selectedRules={selectedRules} /> : <EmptySelectionView />}</>
+        ),
       },
       {
         key: SharingOptions.SHARE_LINK,
