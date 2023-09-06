@@ -1,6 +1,6 @@
 import { Col, Row, Typography } from "antd";
 import React from "react";
-import enterpriseImage from "assets/images/illustrations/enterprise-banner.png";
+import enterpriseImage from "assets/images/illustrations/enterprise-banner.svg";
 import { RQButton } from "lib/design-system/components";
 import checkIcon from "assets/img/icons/common/check.svg";
 
