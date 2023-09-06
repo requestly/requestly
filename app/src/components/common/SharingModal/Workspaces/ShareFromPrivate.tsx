@@ -13,13 +13,15 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
+import { WorkspaceSharingTypes, PostSharingData } from "../types";
 import "./index.scss";
 
 interface Props {
   selectedRules: string[];
+  setPostShareData: ({ type, teamData }: PostSharingData) => void;
 }
 
-export const ShareFromPrivate: React.FC<Props> = ({ selectedRules }) => {
+export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareData }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
@@ -43,6 +45,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules }) => {
         teamName: isVerifiedUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team",
       }).then((res: any) => {
         const teamId = res.data.teamId;
+        const teamData = res.data;
         trackNewWorkspaceCreated();
 
         createTeamInvites({
@@ -56,6 +59,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules }) => {
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
+          setPostShareData({ type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED, teamData });
         });
       });
     } catch (e) {
