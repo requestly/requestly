@@ -1,4 +1,4 @@
-import { Group, Rule } from "types";
+import { Group, Rule, TeamInviteMetadata } from "types";
 
 export enum SharingOptions {
   WORKSPACE = "workspace",
@@ -17,4 +17,15 @@ export type SharedListData = {
   sharedListName: string;
   sharedListVisibility: SharedLinkVisibility;
   sharedListRecipients: unknown;
+};
+
+export enum WorkspaceSharingTypes {
+  NEW_WORKSPACE_CREATED = "new_workspace_created",
+  USERS_INVITED = "users_invites",
+  EXISTING_WORKSPACE = "existing_workspace",
+}
+
+export type PostSharingData = {
+  type: WorkspaceSharingTypes;
+  teamData: TeamInviteMetadata;
 };
