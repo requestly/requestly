@@ -10,13 +10,17 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 
 interface Props {
   defaultActiveWorkspaces?: number;
+  onTransferClick: (teamData: Team) => void;
+  isLoading: boolean;
 }
 
 interface WorkspaceItemProps {
   team: Team;
+  onTransferClick: (teamData: Team) => void;
+  isLoading: boolean;
 }
 
-export const WorkspaceShareMenu: React.FC<Props> = ({ defaultActiveWorkspaces = 0 }) => {
+export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableTeams = useSelector(getAvailableTeams);
 
   const sortedTeams = useMemo(
@@ -24,18 +28,14 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ defaultActiveWorkspaces = 
     [availableTeams]
   );
 
-  console.log({ availableTeams, sortedTeams });
-
-  const menuItems: MenuProps["items"] = useMemo(
-    () =>
-      sortedTeams.map((team, index) => {
-        return {
-          key: index,
-          label: <WorkspaceItem team={team} />,
-        };
-      }),
-    [sortedTeams]
-  );
+  const menuItems: MenuProps["items"] = useMemo(() => {
+    return sortedTeams.slice(defaultActiveWorkspaces ? defaultActiveWorkspaces : 0).map((team, index) => {
+      return {
+        key: index,
+        label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
+      };
+    });
+  }, [sortedTeams, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   return (
     <>
@@ -43,10 +43,15 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ defaultActiveWorkspaces = 
         <>
           <div className="mt-1">
             {sortedTeams.slice(0, defaultActiveWorkspaces).map((team: Team, index: number) => (
-              <WorkspaceItem team={team} key={index} />
+              <WorkspaceItem isLoading={isLoading} team={team} onTransferClick={onTransferClick} key={index} />
             ))}
           </div>
-          <Dropdown menu={{ items: menuItems }} placement="bottom" overlayClassName="workspace-share-menu-wrapper">
+          <Dropdown
+            menu={{ items: menuItems }}
+            placement="bottom"
+            overlayClassName="workspace-share-menu-wrapper"
+            trigger={["click"]}
+          >
             <div>{chooseOtherWorkspaceItem}</div>
           </Dropdown>
         </>
@@ -58,7 +63,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ defaultActiveWorkspaces = 
   );
 };
 
-const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team }) => {
+const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team, isLoading, onTransferClick }) => {
   return (
     <div className="workspace-share-menu-item-card">
       <Row align="middle" className="items-center">
@@ -76,7 +81,12 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team }) => {
           <div className="text-gray">{team.accessCount} members</div>
         </span>
       </Row>
-      <RQButton type="link" className="workspace-menu-item-transfer-btn">
+      <RQButton
+        disabled={isLoading}
+        type="link"
+        className="workspace-menu-item-transfer-btn"
+        onClick={() => onTransferClick(team)}
+      >
         Transfer here
       </RQButton>
     </div>

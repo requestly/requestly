@@ -33,6 +33,11 @@
   border-radius: var(--border-radius-sm);
   margin-top: 4px;
 
+  & .workspace-card-description {
+    font-size: 13px;
+    margin-left: 8px;
+  }
+
   .workspace-menu-item-transfer-btn.ant-btn {
     color: var(--text-gray);
     padding: 0;
