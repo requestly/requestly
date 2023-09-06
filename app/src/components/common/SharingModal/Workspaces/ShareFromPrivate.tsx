@@ -18,10 +18,10 @@ import "./index.scss";
 
 interface Props {
   selectedRules: string[];
-  setPostShareData: ({ type, teamData }: PostSharingData) => void;
+  setPostShareViewData: ({ type, teamData }: PostSharingData) => void;
 }
 
-export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareData }) => {
+export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
@@ -36,13 +36,13 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareD
     const createTeam = httpsCallable(functions, "teams-createTeam");
     const createTeamInvites = httpsCallable(functions, "invites-createTeamInvites");
 
-    const isVerifiedUser = await isVerifiedBusinessDomainUser(
+    const isBusinessUser = await isVerifiedBusinessDomainUser(
       user?.details?.profile?.email,
       user?.details?.profile?.uid
     );
     try {
       createTeam({
-        teamName: isVerifiedUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team",
+        teamName: isBusinessUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team",
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
@@ -59,12 +59,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareD
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
-          setPostShareData({ type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED, teamData });
+          setPostShareViewData({ type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED, teamData });
         });
       });
     } catch (e) {
       setIsLoading(false);
-      console.log(e);
     }
   };
 
@@ -83,15 +82,13 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareD
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {availableTeams.length ? <></> : <>{collaborateCTA}</>}
+      {availableTeams.length ? <>{/* TODO: add dropdown for case 2 here */}</> : <>{bannerToUseWorkspace}</>}
       <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
         <ReactMultiEmail
           className="sharing-modal-email-input"
-          //@ts-ignore
-          type="email"
           emails={memberEmails}
           onChange={setMemberEmails}
           validateEmail={validateEmail}
@@ -117,7 +114,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareD
   );
 };
 
-const collaborateCTA = (
+const bannerToUseWorkspace = (
   <div className="no-available-team-hero-section">
     <img src={puzzleImg} alt="puzzle" width={48} />
     <div className="subheader mt-8">Don't just share, collaborate!</div>

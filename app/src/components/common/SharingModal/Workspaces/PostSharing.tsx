@@ -11,12 +11,12 @@ import { PostSharingData } from "../types";
 import "./index.scss";
 
 interface PostSharingProps {
-  postShareData: PostSharingData;
-  setPostShareData: ({ type, teamData }: PostSharingData) => void;
+  postShareViewData: PostSharingData;
+  setPostShareViewData: ({ type, teamData }: PostSharingData) => void;
   toggleModal: () => void;
 }
 
-export const PostSharing: React.FC<PostSharingProps> = ({ postShareData, setPostShareData, toggleModal }) => {
+export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, setPostShareViewData, toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -24,9 +24,9 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareData, setPost
   const handleSwitchWorkspace = useCallback(() => {
     switchWorkspace(
       {
-        teamId: postShareData.teamData.teamId,
-        teamName: postShareData.teamData.teamName,
-        teamMembersCount: postShareData.teamData.accessCount,
+        teamId: postShareViewData.teamData.teamId,
+        teamName: postShareViewData.teamData.teamName,
+        teamMembersCount: postShareViewData.teamData.accessCount,
       },
       dispatch,
       {
@@ -37,9 +37,9 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareData, setPost
     ).then(() => {
       toggleModal();
     });
-  }, [appMode, dispatch, isWorkspaceMode, toggleModal, postShareData]);
+  }, [appMode, dispatch, isWorkspaceMode, toggleModal, postShareViewData]);
 
-  const postSharingData = useMemo(() => {
+  const postSharingViews = useMemo(() => {
     return {
       [WorkspaceSharingTypes.NEW_WORKSPACE_CREATED]: {
         icon: <img src={mailSuccessImg} alt="mail sent" width={60} />,
@@ -51,23 +51,27 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareData, setPost
         icon: <img src={mailSuccessImg} alt="mail sent" width={60} />,
         message: "Email invites sent!",
         ctaText: "Invite more users",
-        action: () => setPostShareData(null),
+        action: () => setPostShareViewData(null), // clear post share data and go back to workspace sharing screen,
       },
       [WorkspaceSharingTypes.EXISTING_WORKSPACE]: {
         icon: <></>, //TODO: add icon
-        message: `Selected rules have been copied to ${postShareData.teamData.teamName}`,
+        message: `Selected rules have been copied to ${postShareViewData.teamData.teamName}`,
         ctaText: "Switch to the new workspace",
         action: handleSwitchWorkspace,
       },
     };
-  }, [handleSwitchWorkspace, setPostShareData, postShareData.teamData.teamName]);
+  }, [handleSwitchWorkspace, setPostShareViewData, postShareViewData.teamData.teamName]);
 
   return (
     <div className="post-sharing-wrapper">
-      {postSharingData[postShareData.type].icon}
-      <div className="subheader">{postSharingData[postShareData.type].message}</div>
-      <RQButton type="primary" className="sharing-primary-btn" onClick={postSharingData[postShareData.type].action}>
-        {postSharingData[postShareData.type].ctaText}
+      {postSharingViews[postShareViewData.type].icon}
+      <div className="subheader">{postSharingViews[postShareViewData.type].message}</div>
+      <RQButton
+        type="primary"
+        className="sharing-primary-btn"
+        onClick={postSharingViews[postShareViewData.type].action}
+      >
+        {postSharingViews[postShareViewData.type].ctaText}
       </RQButton>
     </div>
   );
