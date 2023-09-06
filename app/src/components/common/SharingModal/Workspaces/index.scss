@@ -3,12 +3,18 @@
     font-size: 13px;
     margin-left: 8px;
   }
-  .no-available-team-hero-section {
+
+  .no-available-team-hero-section,
+  .post-sharing-wrapper {
     margin-top: 30px;
     display: flex;
     flex-direction: column;
-    // justify-content: center;
     gap: 8px;
     align-items: center;
+  }
+
+  .post-sharing-wrapper {
+    gap: 1.5rem;
+    margin: 1.8rem auto;
   }
 }
