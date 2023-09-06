@@ -15,6 +15,7 @@ import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams"
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostSharingData } from "../types";
 import "./index.scss";
+import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 
 interface Props {
   selectedRules: string[];
@@ -26,6 +27,8 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const appMode = useSelector(getAppMode);
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
+
+  console.log({ availableTeams });
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,12 +80,19 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           className="workspace-avatar"
           style={{ backgroundColor: "#1E69FF" }}
         />
-        <span className="private-workspace-card-description">
+        <span className="workspace-card-description">
           <div className="text-white">Private workspace</div>
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {availableTeams.length ? <>{/* TODO: add dropdown for case 2 here */}</> : <>{bannerToUseWorkspace}</>}
+      {availableTeams.length ? (
+        <>
+          <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
+          <WorkspaceShareMenu defaultActiveWorkspaces={2} />
+        </>
+      ) : (
+        <>{bannerToUseWorkspace}</>
+      )}
       <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
