@@ -15,10 +15,6 @@ export const Plans = {
           enabled: true,
         },
         {
-          title: "10 rules (3 active)",
-          enabled: true,
-        },
-        {
           title: "Unlimited header modification",
           enabled: true,
         },
@@ -36,10 +32,6 @@ export const Plans = {
         },
         {
           title: "Team Workspace(in beta)",
-          enabled: true,
-        },
-        {
-          title: "Session Replay",
           enabled: true,
         },
         {
