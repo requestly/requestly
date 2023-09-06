@@ -36,7 +36,7 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
         </RQButton>
       </Col>
       <Col offset={2}>
-        <img src={enterpriseImage} height={280} width={330} alt="enterprise" />
+        <img src={enterpriseImage} height={250} width={330} alt="enterprise-plan" />
       </Col>
     </Row>
   );

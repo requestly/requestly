@@ -38,7 +38,6 @@
 
 .pricing-table-product-view-para p {
   color: var(--text-gray);
-  text-align: justify;
 }
 .pricing-table-row {
   justify-content: flex-start;
@@ -146,7 +145,7 @@
   padding-left: 4px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .pricing-table-product-wrapper {
     flex-direction: column;
     justify-content: center;
@@ -173,9 +172,9 @@
   }
   .pricing-table-row {
     justify-content: center;
+    flex-wrap: wrap;
   }
-  .pricing-table-wrapper .pricing-table-col {
+  .pricing-table-col {
     width: 100%;
-    min-width: unset;
   }
 }

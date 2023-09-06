@@ -68,7 +68,9 @@ const PricingIndexPage = () => {
               ))}
             </div>
           </div>
-          <PricingFAQs />
+          <div>
+            <PricingFAQs />
+          </div>
         </Row>
       </div>
     </>

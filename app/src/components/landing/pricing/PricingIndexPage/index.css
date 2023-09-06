@@ -14,8 +14,8 @@
   padding: 30px 20px;
 }
 .pricing-page-container .pricing-page-body {
-  max-width: 1200px;
   justify-content: center;
+  padding: 0 20px;
 }
 .pricing-title-container {
   display: flex;
