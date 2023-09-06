@@ -1,4 +1,4 @@
-import { Group, Rule, TeamInviteMetadata } from "types";
+import { Group, Rule } from "types";
 
 export enum SharingOptions {
   WORKSPACE = "workspace",
@@ -27,5 +27,9 @@ export enum WorkspaceSharingTypes {
 
 export type PostSharingData = {
   type: WorkspaceSharingTypes;
-  teamData: TeamInviteMetadata;
+  teamData: {
+    teamId: string;
+    teamName: string;
+    accessCount: number;
+  };
 };

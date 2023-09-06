@@ -16,6 +16,7 @@ import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/tea
 import { WorkspaceSharingTypes, PostSharingData } from "../types";
 import "./index.scss";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
+import { Team } from "types";
 
 interface Props {
   selectedRules: string[];
@@ -62,12 +63,26 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
-          setPostShareViewData({ type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED, teamData });
+          setPostShareViewData({
+            type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
+            teamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+          });
         });
       });
     } catch (e) {
       setIsLoading(false);
     }
+  };
+
+  const handleTransfer = (teamData: Team) => {
+    setIsLoading(true);
+    duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+      setIsLoading(false);
+      setPostShareViewData({
+        type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+        teamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+      });
+    });
   };
 
   return (
@@ -88,7 +103,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       {availableTeams.length ? (
         <>
           <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
-          <WorkspaceShareMenu defaultActiveWorkspaces={2} />
+          <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleTransfer} />
         </>
       ) : (
         <>{bannerToUseWorkspace}</>
