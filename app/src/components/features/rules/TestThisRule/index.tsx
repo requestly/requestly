@@ -14,7 +14,7 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import LINKS from "config/constants/sub/links";
-import { trackTestRuleClicked } from "modules/analytics/events/features/ruleEditor";
+import { trackTestRuleClicked, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
 
 export const TestThisRuleRow: React.FC = () => {
@@ -159,6 +159,9 @@ export const TestThisRuleRow: React.FC = () => {
           href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
           target="_blank"
           rel="noreferrer"
+          onClick={() => {
+            trackTroubleshootClicked("test_this_rule");
+          }}
         >
           troubleshooting guide
         </a>
