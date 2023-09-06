@@ -210,6 +210,7 @@ export const RULE_EDITOR = {
     TEST_RULE_CLICKED: "test_rule_clicked",
     TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
   },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {
