@@ -11,18 +11,22 @@ interface ShareInWorkspaceProps {
 
 export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({ selectedRules, toggleModal }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const [postShareData, setPostShareData] = useState(null);
+  const [postShareViewData, setPostShareViewData] = useState(null);
 
   return (
     <div className="sharing-modal-body share-in-workspaces-wrapper">
-      {postShareData ? (
-        <PostSharing postShareData={postShareData} setPostShareData={setPostShareData} toggleModal={toggleModal} />
+      {postShareViewData ? (
+        <PostSharing
+          postShareViewData={postShareViewData}
+          setPostShareViewData={setPostShareViewData}
+          toggleModal={toggleModal}
+        />
       ) : (
         <>
           {isWorkspaceMode ? (
-            "SHARE FROM WORKSPACE SCREEN HERE"
+            "SHARE FROM WORKSPACE SCREEN HERE" //TODO: add sharing flows within workspaces
           ) : (
-            <ShareFromPrivate selectedRules={selectedRules} setPostShareData={setPostShareData} />
+            <ShareFromPrivate selectedRules={selectedRules} setPostShareViewData={setPostShareViewData} />
           )}
         </>
       )}
