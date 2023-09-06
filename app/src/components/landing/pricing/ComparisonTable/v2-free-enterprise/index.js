@@ -23,7 +23,7 @@ const FreeAndEnterprisePlanTable = () => {
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
-  const [duration, setDuration] = useState("annual");
+  const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUAL);
 
   // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
@@ -33,12 +33,12 @@ const FreeAndEnterprisePlanTable = () => {
         <div className="text-center margin-bottom-one">
           <Switch
             size="small"
-            checked={duration === "annual"}
+            checked={duration === APP_CONSTANTS.PRICING.DURATION.ANNUAL}
             onChange={(checked) => {
               if (checked) {
-                setDuration("annual");
+                setDuration(APP_CONSTANTS.PRICING.DURATION.ANNUAL);
               } else {
-                setDuration("monthly");
+                setDuration(APP_CONSTANTS.PRICING.DURATION.MONTHLY);
               }
             }}
           />
@@ -93,9 +93,10 @@ const FreeAndEnterprisePlanTable = () => {
                   </div>
                   <div className="text-gray text-left price-container">
                     <span className="price">
-                      ${duration === "monthly" ? planDetails.price : planDetails.price * 10}
+                      $
+                      {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? planDetails.price : planDetails.price * 10}
                     </span>{" "}
-                    per member, per {duration === "monthly" ? "month" : "year"}
+                    per member, per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
                   </div>
                   {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">
