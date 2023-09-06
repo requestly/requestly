@@ -38,12 +38,10 @@
 
 .pricing-table-product-view-para p {
   color: var(--text-gray);
-  text-align: justify;
 }
 .pricing-table-row {
   justify-content: flex-start;
   display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
   max-width: 1200px;
 }
@@ -53,8 +51,8 @@
 .pricing-table-wrapper {
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: center;
+  min-width: 90vw;
 }
 .pricing-table-wrapper .pricing-table-col {
   min-width: 340px;
@@ -122,12 +120,32 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 28px;
   margin-bottom: 12px;
   font-size: 13px;
 }
 
-@media (max-width: 768px) {
+.enterprise-banner {
+  border: 1px solid var(--white);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  padding: 48px;
+  margin: 20px 24px;
+}
+
+.enterprise-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.enterprise-features-grid span {
+  vertical-align: middle;
+  padding-left: 4px;
+}
+
+@media (max-width: 992px) {
   .pricing-table-product-wrapper {
     flex-direction: column;
     justify-content: center;
@@ -154,6 +172,7 @@
   }
   .pricing-table-row {
     justify-content: center;
+    flex-wrap: wrap;
   }
   .pricing-table-col {
     width: 100%;
