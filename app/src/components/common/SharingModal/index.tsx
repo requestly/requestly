@@ -7,6 +7,7 @@ import { ShareLinkView } from "./ShareLinkView";
 import { HiOutlineShare } from "@react-icons/all-files/hi/HiOutlineShare";
 import { PiWarningCircleBold } from "@react-icons/all-files/pi/PiWarningCircleBold";
 import { DownloadRules } from "./DownloadRules";
+import { ShareInWorkspaces } from "./Workspaces";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
@@ -23,11 +24,11 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
   const availableTeams = useSelector(getAvailableTeams);
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
-      // {
-      //   key: SharingOptions.WORKSPACE,
-      //   label: "Share in workspace",
-      //   children: "SHARE WITHIN WORKSPACE HERE",
-      // },
+      {
+        key: SharingOptions.WORKSPACE,
+        label: "Share in workspaces",
+        children: <>{selectedRules?.length ? <ShareInWorkspaces /> : <EmptySelectionView />}</>,
+      },
       {
         key: SharingOptions.SHARE_LINK,
         label: "Shared list",
@@ -80,7 +81,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
           <HiOutlineShare /> Share rule
         </div>
         <Tabs
-          defaultActiveKey={SharingOptions.SHARE_LINK}
+          defaultActiveKey={SharingOptions.WORKSPACE}
           items={sharingOptions}
           onChange={handleSharingOptionsChange}
         />
