@@ -95,6 +95,7 @@
   justify-content: center;
   align-items: center;
   gap: 15px;
+  margin: 2rem auto;
 }
 
 .sharing-modal-empty-view svg {
