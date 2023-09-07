@@ -109,7 +109,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       ) : (
         <>{bannerToUseWorkspace}</>
       )}
-      <div className="mt-8 sharing-modal-email-input-wrapper">
+      <div className="sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
@@ -129,10 +129,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         />
       </div>
       <RQButton
-        className="mt-8 text-bold sharing-primary-btn"
+        className="mt-1 text-bold sharing-primary-btn"
         type="primary"
         onClick={handleSharingInNewWorkspace}
         loading={isLoading}
+        disabled={!memberEmails.length}
       >
         Create workspace & share
       </RQButton>
