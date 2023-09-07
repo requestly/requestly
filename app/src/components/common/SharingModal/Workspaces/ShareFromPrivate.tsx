@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { Avatar, Row } from "antd";
+import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
+import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
@@ -14,9 +15,8 @@ import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
+import { Team, TeamRole } from "types";
 import "./index.scss";
-import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
-import { Team } from "types";
 
 interface Props {
   selectedRules: string[];
@@ -54,10 +54,10 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         createTeamInvites({
           teamId,
           emails: memberEmails,
-          role: "write",
+          role: TeamRole.write,
         }).then((res: any) => {
           setIsLoading(false);
-          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, "write", "share_modal");
+          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, TeamRole.write, "share_modal");
         });
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
@@ -104,6 +104,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         <>
           <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleTransfer} />
+          <Divider />
         </>
       ) : (
         <>{bannerToUseWorkspace}</>

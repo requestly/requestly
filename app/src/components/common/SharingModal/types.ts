@@ -27,7 +27,7 @@ export enum WorkspaceSharingTypes {
 
 export type PostShareViewData = {
   type: WorkspaceSharingTypes;
-  targetTeamData: {
+  targetTeamData?: {
     teamId: string;
     teamName: string;
     accessCount: number;
