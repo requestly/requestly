@@ -21,6 +21,17 @@
   .workspace-share-menu-item-card.choose-other-workspace {
     cursor: pointer;
   }
+  .workspace-sharing-flow-cta {
+    width: 100%;
+    justify-content: space-evenly;
+
+    & .sharing-flow-cta-workspace-avatar {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
 }
 
 .share-in-workspaces-wrapper .workspace-share-menu-item-card,
@@ -52,7 +63,7 @@
 
 .workspace-share-menu-wrapper .ant-dropdown-menu {
   max-height: 250px;
-  overflow-y: scroll;
+  overflow-y: auto;
   border: none;
   padding: 0;
 

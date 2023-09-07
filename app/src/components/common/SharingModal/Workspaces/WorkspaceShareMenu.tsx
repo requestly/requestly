@@ -56,7 +56,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           </Dropdown>
         </>
       ) : (
-        <></>
+        <></> //TODO: case 3 & 4
       )}
       <Divider />
     </>

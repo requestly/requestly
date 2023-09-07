@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
+import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
@@ -13,14 +13,14 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
-import { WorkspaceSharingTypes, PostSharingData } from "../types";
+import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import "./index.scss";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { Team } from "types";
 
 interface Props {
   selectedRules: string[];
-  setPostShareViewData: ({ type, teamData }: PostSharingData) => void;
+  setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
 }
 
 export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
@@ -28,6 +28,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const appMode = useSelector(getAppMode);
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   console.log({ availableTeams });
 
@@ -65,7 +66,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           setIsLoading(false);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
-            teamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+            targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
           });
         });
       });
@@ -80,7 +81,8 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       setIsLoading(false);
       setPostShareViewData({
         type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-        teamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+        targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+        sourceTeamData: currentlyActiveWorkspace,
       });
     });
   };
