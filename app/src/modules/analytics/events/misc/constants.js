@@ -107,5 +107,4 @@ export const SHARING = {
   SHARE_BUTTON_CLICKED: "share_button_clicked",
   SHARE_MODAL_VIEWED: "share_modal_viewed",
   SHARING_TAB_SWITCHED: "sharing_tab_switched",
-  RULES_DOWNLOAD_CLICKED: "rules_download_clicked",
 };
