@@ -37,6 +37,12 @@ export const dateStringFromTimestamp = (timestamp) => {
   return isNaN(day) ? null : fullDate;
 };
 
+/** Returns date based on the format passed  */
+export const getFormattedDate = (format = "DD-MM-YYYY", timestamp = new Date()) => {
+  const momentObj = moment(timestamp);
+  return momentObj.format(format);
+};
+
 export const getOldestDate = (arrayOfDates = []) => {
   // Get all dates in "YYYY-MM-DD" format
   const datesArray = arrayOfDates.map((date) => {
