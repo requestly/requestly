@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -34,7 +34,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSharingInNewWorkspace = async () => {
+  const handleSharingInNewWorkspace = useCallback(async () => {
     setIsLoading(true);
     const functions = getFunctions();
     const createTeam = httpsCallable(functions, "teams-createTeam");
@@ -72,19 +72,30 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, [
+    appMode,
+    groupwiseRules,
+    memberEmails,
+    selectedRules,
+    setPostShareViewData,
+    user?.details?.profile?.email,
+    user?.details?.profile?.uid,
+  ]);
 
-  const handleTransfer = (teamData: Team) => {
-    setIsLoading(true);
-    duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
-      setIsLoading(false);
-      setPostShareViewData({
-        type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-        targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
-        sourceTeamData: currentlyActiveWorkspace,
+  const handleTransferToAnotherWorkspace = useCallback(
+    (teamData: Team) => {
+      setIsLoading(true);
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+        setIsLoading(false);
+        setPostShareViewData({
+          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          sourceTeamData: currentlyActiveWorkspace,
+        });
       });
-    });
-  };
+    },
+    [appMode, groupwiseRules, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+  );
 
   return (
     <>
@@ -104,7 +115,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       {_availableTeams.current.length ? (
         <>
           <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
-          <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleTransfer} />
+          <WorkspaceShareMenu
+            isLoading={isLoading}
+            defaultActiveWorkspaces={2}
+            onTransferClick={handleTransferToAnotherWorkspace}
+          />
           <Divider />
         </>
       ) : (

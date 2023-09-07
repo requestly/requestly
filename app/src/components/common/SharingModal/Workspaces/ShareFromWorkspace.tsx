@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -24,7 +24,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInviteMembers = () => {
+  const handleInviteMembers = useCallback(() => {
     setIsLoading(true);
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
     createTeamInvites({
@@ -39,19 +39,22 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
         type: WorkspaceSharingTypes.USERS_INVITED,
       });
     });
-  };
+  }, [memberEmails, currentlyActiveWorkspace.id, setPostShareViewData]);
 
-  const handleTransferToOtherWorkspace = (teamData: Team) => {
-    setIsLoading(true);
-    duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
-      setIsLoading(false);
-      setPostShareViewData({
-        type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-        targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
-        sourceTeamData: currentlyActiveWorkspace,
+  const handleTransferToOtherWorkspace = useCallback(
+    (teamData: Team) => {
+      setIsLoading(true);
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+        setIsLoading(false);
+        setPostShareViewData({
+          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          sourceTeamData: currentlyActiveWorkspace,
+        });
       });
-    });
-  };
+    },
+    [appMode, selectedRules, groupwiseRules, currentlyActiveWorkspace, setPostShareViewData]
+  );
 
   return (
     <>
