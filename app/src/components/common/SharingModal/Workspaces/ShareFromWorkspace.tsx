@@ -24,8 +24,6 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log({ currentlyActiveWorkspace });
-
   const handleInviteMembers = () => {
     setIsLoading(true);
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
