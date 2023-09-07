@@ -30,8 +30,6 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
-  console.log({ availableTeams });
-
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
