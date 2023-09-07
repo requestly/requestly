@@ -6,6 +6,7 @@ import { Avatar, Row } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
+import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
@@ -14,9 +15,8 @@ import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import "./index.scss";
-import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { Team } from "types";
+import "./index.scss";
 
 interface Props {
   selectedRules: string[];
@@ -108,7 +108,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       ) : (
         <>{bannerToUseWorkspace}</>
       )}
-      <div className="mt-8 sharing-modal-email-input-wrapper">
+      <div className="sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
@@ -132,6 +132,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         type="primary"
         onClick={handleSharingInNewWorkspace}
         loading={isLoading}
+        disabled={!memberEmails.length}
       >
         Create workspace & share
       </RQButton>
