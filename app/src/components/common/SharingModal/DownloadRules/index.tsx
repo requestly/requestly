@@ -49,7 +49,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
       toggleModal();
     },
-    [fileName, dispatch, toggleModal, rulesToDownload, selectedRules.length]
+    [fileName, dispatch, toggleModal, rulesToDownload]
   );
 
   useEffect(() => {
