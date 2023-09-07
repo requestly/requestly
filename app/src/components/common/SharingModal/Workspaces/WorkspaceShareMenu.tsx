@@ -46,14 +46,16 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
               <WorkspaceItem isLoading={isLoading} team={team} onTransferClick={onTransferClick} key={index} />
             ))}
           </div>
-          <Dropdown
-            menu={{ items: menuItems }}
-            placement="bottom"
-            overlayClassName="workspace-share-menu-wrapper"
-            trigger={["click"]}
-          >
-            <div>{chooseOtherWorkspaceItem}</div>
-          </Dropdown>
+          {sortedTeams.length > defaultActiveWorkspaces && (
+            <Dropdown
+              menu={{ items: menuItems }}
+              placement="bottom"
+              overlayClassName="workspace-share-menu-wrapper"
+              trigger={["click"]}
+            >
+              <div>{chooseOtherWorkspaceItem}</div>
+            </Dropdown>
+          )}
         </>
       ) : (
         <></> //TODO: case 3 & 4
