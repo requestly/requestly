@@ -128,7 +128,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         />
       </div>
       <RQButton
-        className="mt-8 text-bold sharing-primary-btn"
+        className="mt-1 text-bold sharing-primary-btn"
         type="primary"
         onClick={handleSharingInNewWorkspace}
         loading={isLoading}
