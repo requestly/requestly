@@ -9,7 +9,7 @@ import CopyButton from "components/misc/CopyButton";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
-import { TeamRole } from "types";
+import { Team, TeamRole } from "types";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 
 interface Props {
@@ -43,17 +43,13 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
     });
   };
 
-  const handleTransferToOtherWorkspace = () => {
+  const handleTransferToOtherWorkspace = (teamData: Team) => {
     setIsLoading(true);
-    duplicateRulesToTargetWorkspace(appMode, currentlyActiveWorkspace.id, selectedRules, groupwiseRules).then(() => {
+    duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
       setIsLoading(false);
       setPostShareViewData({
         type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-        targetTeamData: {
-          teamId: currentlyActiveWorkspace.id,
-          teamName: currentlyActiveWorkspace.name,
-          accessCount: currentlyActiveWorkspace.membersCount,
-        },
+        targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
         sourceTeamData: currentlyActiveWorkspace,
       });
     });
