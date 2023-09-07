@@ -21,8 +21,8 @@ interface PostSharingProps {
 }
 
 interface WorkspaceInfoProps {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
 }
 
 export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, setPostShareViewData, toggleModal }) => {
