@@ -20,6 +20,11 @@
 
   .workspace-share-menu-item-card.choose-other-workspace {
     cursor: pointer;
+    transition: 0.25s ease-in-out;
+
+    &:hover {
+      background: var(--gray-dark);
+    }
   }
   .workspace-sharing-flow-cta {
     width: 100%;
@@ -66,6 +71,7 @@
   overflow-y: auto;
   border: none;
   padding: 0;
+  border-radius: 0;
 
   & .ant-dropdown-menu-item {
     padding: 0;
