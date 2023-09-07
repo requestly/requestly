@@ -222,9 +222,18 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
                 <>
                   {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
                     <>
-                      {isMailSent && (
+                      {shareableLinkData.visibility === SharedLinkVisibility.PRIVATE ? (
+                        <>
+                          {isMailSent && (
+                            <div className="mt-8 text-gray">
+                              <CheckCircleFilled className="success" /> Invites sent!
+                            </div>
+                          )}
+                        </>
+                      ) : (
                         <div className="mt-8 text-gray">
-                          <CheckCircleFilled className="success" /> Invites sent!
+                          <CheckCircleFilled className="success" /> Public shared list created! Anyone with the link can
+                          access the rule(s)!
                         </div>
                       )}
                       <CopyValue
