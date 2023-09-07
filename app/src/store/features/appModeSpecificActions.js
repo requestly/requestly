@@ -6,11 +6,6 @@ export const updateUserCountry = (prevState, action) => {
   prevState.country = action.payload;
 };
 
-// not used anywhere
-export const updateTrialModeEnabled = (prevState, action) => {
-  prevState.trialModeEnabled = action.payload;
-};
-
 export const updateMobileDebuggerAppDetails = (prevState, action) => {
   prevState.mobileDebugger.app = action.payload;
 };

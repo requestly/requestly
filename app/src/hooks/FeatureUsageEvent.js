@@ -6,10 +6,17 @@ import { getFeatureUsage } from "utils/rules/getFeatureUsage";
 import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rules";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
+import { useFeatureLimiter } from "./featureLimiter/useFeatureLimiter";
 
 const FeatureUsageEvent = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+
+  const { checkFeatureLimits } = useFeatureLimiter();
+
+  useEffect(() => {
+    checkFeatureLimits();
+  }, [checkFeatureLimits]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {

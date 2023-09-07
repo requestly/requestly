@@ -24,7 +24,7 @@ const userSubscriptionNodeListener = (dispatch) => {
           actions.updateUserPlanDetails({
             userPlanDetails: {
               ...planDetails,
-              planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
+              planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.FREE,
             },
             isUserPremium,
           })

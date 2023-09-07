@@ -132,11 +132,6 @@ const INITIAL_STATE = {
     },
   },
 
-  /* Marketplace */
-  marketplace: {
-    ruleStatus: {},
-  },
-
   desktopSpecificDetails: {
     isBackgroundProcessActive: false,
     isProxyServerRunning: false,
@@ -149,9 +144,6 @@ const INITIAL_STATE = {
 
   // country of current user
   country: "",
-
-  // if trial part
-  trialModeEnabled: false,
 
   mobileDebugger: {
     app: {
