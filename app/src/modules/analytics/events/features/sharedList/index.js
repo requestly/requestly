@@ -1,14 +1,27 @@
 import { trackEvent } from "modules/analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { SHARED_LIST } from "../constants";
+import { isNull } from "lodash";
 
-export const trackSharedListCreatedEvent = (num_rules, source, page, access_type) => {
+export const trackSharedListCreatedEvent = (
+  id,
+  name,
+  num_rules,
+  source,
+  access_type,
+  non_rq_users,
+  num_users_notified
+) => {
   const params = {
+    id,
+    name,
     num_rules,
     source,
-    page,
     access_type,
   };
+
+  if (!isNull(num_users_notified)) params.num_users_notified = num_users_notified;
+  if (!isNull(non_rq_users)) params.non_rq_users = non_rq_users;
 
   trackEvent(SHARED_LIST.CREATED, params);
 };
@@ -34,8 +47,8 @@ export const trackSharedListImportCompleted = (id) => {
   trackEvent(SHARED_LIST.IMPORT_COMPLETED, params); // add session id
 };
 
-export const trackSharedListUrlCopied = (source) => {
-  const params = { source };
+export const trackSharedListUrlCopied = (source, id, access_type) => {
+  const params = { source, id, access_type };
   trackEvent(SHARED_LIST.URL_COPIED, params);
 };
 
