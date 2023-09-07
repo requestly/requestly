@@ -15,6 +15,7 @@ const FeatureUsageEvent = () => {
   const { checkFeatureLimits } = useFeatureLimiter();
 
   useEffect(() => {
+    // TODO turn off before releasing
     checkFeatureLimits();
   }, [checkFeatureLimits]);
 
