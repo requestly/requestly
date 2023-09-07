@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { ShareFromPrivate } from "./ShareFromPrivate";
+import { ShareFromWorkspace } from "./ShareFromWorkspace";
 import { PostSharing } from "./PostSharing";
 
 interface ShareInWorkspaceProps {
@@ -24,7 +25,7 @@ export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({ selectedRul
       ) : (
         <>
           {isWorkspaceMode ? (
-            "SHARE FROM WORKSPACE SCREEN HERE" //TODO: add sharing flows within workspaces
+            <ShareFromWorkspace selectedRules={selectedRules} setPostShareViewData={setPostShareViewData} />
           ) : (
             <ShareFromPrivate selectedRules={selectedRules} setPostShareViewData={setPostShareViewData} />
           )}
