@@ -69,14 +69,16 @@
 .workspace-share-menu-wrapper .ant-dropdown-menu {
   max-height: 250px;
   overflow-y: auto;
-  border: none;
-  padding: 0;
-  border-radius: 0;
+  border: 1px solid var(--border-dark);
+  background: var(--body-background);
+  border-radius: var(--border-radius-sm);
 
   & .ant-dropdown-menu-item {
-    padding: 0;
-    margin: 0;
+    & .workspace-share-menu-item-card {
+      margin-top: 0;
+    }
 
+    padding: 0;
     &:hover {
       background: none;
     }
