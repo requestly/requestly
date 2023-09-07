@@ -29,6 +29,7 @@ import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { SharingModal } from "components/common/SharingModal";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -169,6 +170,13 @@ const DashboardContent = () => {
               isOpen={activeModals.joinWorkspaceModal.isActive}
               toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
               {...activeModals.joinWorkspaceModal.props}
+            />
+          ) : null}
+          {activeModals.sharingModal.isActive ? (
+            <SharingModal
+              isOpen={activeModals.sharingModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "sharingModal" }))}
+              {...activeModals.sharingModal.props}
             />
           ) : null}
 

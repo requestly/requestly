@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Divider, Dropdown, Menu } from "antd";
 import DuplicateButton from "../ActionButtons/DuplicateButton";
-import ExportButton from "../ActionButtons/ExportButton";
 import DeleteButton from "../ActionButtons/DeleteButton";
 import APP_CONSTANTS from "config/constants";
 import "./RuleOptions.css";
@@ -30,9 +29,7 @@ const RuleOptions = ({ mode, rule }) => {
         disabled={isDisabled}
         className="editor-rule-options-menu-item"
         onClick={handleRuleOptionsDropdownClose}
-      >
-        <ExportButton rule={rule} isDisabled={isDisabled} />
-      </Menu.Item>
+      ></Menu.Item>
       <Divider className="editor-rule-options-menu-divider" />
       <Menu.Item
         key="2"
