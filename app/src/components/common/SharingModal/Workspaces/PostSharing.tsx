@@ -20,6 +20,11 @@ interface PostSharingProps {
   toggleModal: () => void;
 }
 
+interface WorkspaceInfoProps {
+  id?: string;
+  name?: string;
+}
+
 export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, setPostShareViewData, toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -59,7 +64,7 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
       },
       [WorkspaceSharingTypes.EXISTING_WORKSPACE]: {
         header: <WorkspaceSharingInfoHeader postShareViewData={postShareViewData} />,
-        message: `Selected rules have been copied to ${postShareViewData.targetTeamData.teamName}`,
+        message: `Selected rules have been copied to ${postShareViewData.targetTeamData?.teamName}`,
         ctaText: "Switch to the new workspace",
         action: handleSwitchWorkspace,
       },
@@ -81,37 +86,32 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
   );
 };
 
+const WorkspaceAvatar: React.FC<WorkspaceInfoProps> = ({ id, name }) => {
+  const avatarBackgroundColor = id ? getUniqueColorForWorkspace(id, name) : "#1E69FF";
+  const avatarIcon = id ? name ? name[0].toUpperCase() : "W" : <LockOutlined />;
+
+  return (
+    <div className="sharing-flow-cta-workspace-avatar">
+      <Avatar
+        size={35}
+        shape="square"
+        icon={avatarIcon}
+        className="workspace-avatar"
+        style={{ backgroundColor: avatarBackgroundColor }}
+      />
+      <div className="mt-8">{name || "Private workspace"}</div>
+    </div>
+  );
+};
+
 const WorkspaceSharingInfoHeader: React.FC<{ postShareViewData: PostShareViewData }> = ({ postShareViewData }) => {
   const { targetTeamData, sourceTeamData } = postShareViewData;
+
   return (
     <div className="items-center workspace-sharing-flow-cta">
-      <div>
-        {!sourceTeamData.id ? (
-          <div className="sharing-flow-cta-workspace-avatar">
-            <Avatar
-              size={35}
-              shape="square"
-              icon={<LockOutlined />}
-              className="workspace-avatar"
-              style={{ backgroundColor: "#1E69FF" }}
-            />
-            <div className="mt-8">Private workspace</div>
-          </div>
-        ) : null}
-      </div>
+      <WorkspaceAvatar id={sourceTeamData.id} name={sourceTeamData.name} />
       <FaRegCopy className="header text-gray" />
-      <div className="sharing-flow-cta-workspace-avatar">
-        <Avatar
-          size={35}
-          shape="square"
-          icon={targetTeamData.teamName ? targetTeamData.teamName?.[0]?.toUpperCase() : "W"}
-          className="workspace-avatar"
-          style={{
-            backgroundColor: getUniqueColorForWorkspace(targetTeamData.teamId ?? "", targetTeamData.teamName),
-          }}
-        />
-        <div className="mt-8">{targetTeamData.teamName}</div>
-      </div>
+      <WorkspaceAvatar id={targetTeamData.teamId} name={targetTeamData.teamName} />
     </div>
   );
 };
