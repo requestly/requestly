@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -33,7 +33,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSharingInNewWorkspace = async () => {
+  const handleSharingInNewWorkspace = useCallback(async () => {
     setIsLoading(true);
     const functions = getFunctions();
     const createTeam = httpsCallable(functions, "teams-createTeam");
@@ -71,19 +71,30 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, [
+    appMode,
+    groupwiseRules,
+    memberEmails,
+    selectedRules,
+    setPostShareViewData,
+    user?.details?.profile?.email,
+    user?.details?.profile?.uid,
+  ]);
 
-  const handleTransfer = (teamData: Team) => {
-    setIsLoading(true);
-    duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
-      setIsLoading(false);
-      setPostShareViewData({
-        type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-        targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
-        sourceTeamData: currentlyActiveWorkspace,
+  const handleTransfer = useCallback(
+    (teamData: Team) => {
+      setIsLoading(true);
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+        setIsLoading(false);
+        setPostShareViewData({
+          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          sourceTeamData: currentlyActiveWorkspace,
+        });
       });
-    });
-  };
+    },
+    [appMode, groupwiseRules, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+  );
 
   return (
     <>
