@@ -10,8 +10,7 @@ import { getUniqueColorForWorkspace } from "utils/teams";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { LockOutlined } from "@ant-design/icons";
 import mailSuccessImg from "assets/images/illustrations/mail-success.svg";
-import { PostShareViewData } from "../types";
-import { WorkspaceSharingTypes } from "../types";
+import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import "./index.scss";
 
 interface PostSharingProps {

@@ -19,6 +19,9 @@ interface WorkspaceItemProps {
   onTransferClick: (teamData: Team) => void;
   isLoading: boolean;
 }
+/**
+ * @param {number} defaultActiveWorkspaces - The default number of active workspaces to display before dropdown menu.
+ */
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableTeams = useSelector(getAvailableTeams);
@@ -36,6 +39,26 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       };
     });
   }, [sortedTeams, onTransferClick, defaultActiveWorkspaces, isLoading]);
+
+  const chooseOtherWorkspaceItem = (
+    <div className="workspace-share-menu-item-card choose-other-workspace">
+      <Row align="middle" className="items-center">
+        <Avatar
+          size={35}
+          className="workspace-avatar"
+          shape="square"
+          icon="*"
+          style={{
+            backgroundColor: "#B835F6",
+          }}
+        />
+        <span className="workspace-card-description">
+          <div className="text-gray">Choose other workspace</div>
+        </span>
+      </Row>
+      <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
+    </div>
+  );
 
   return (
     <>
@@ -94,23 +117,3 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team, isLoading, onTransf
     </div>
   );
 };
-
-const chooseOtherWorkspaceItem = (
-  <div className="workspace-share-menu-item-card choose-other-workspace">
-    <Row align="middle" className="items-center">
-      <Avatar
-        size={35}
-        className="workspace-avatar"
-        shape="square"
-        icon="*"
-        style={{
-          backgroundColor: "#B835F6",
-        }}
-      />
-      <span className="workspace-card-description">
-        <div className="text-gray">Choose other workspace</div>
-      </span>
-    </Row>
-    <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
-  </div>
-);
