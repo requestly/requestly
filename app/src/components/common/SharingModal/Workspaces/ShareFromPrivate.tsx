@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { Avatar, Row } from "antd";
+import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
@@ -15,7 +15,7 @@ import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import { Team } from "types";
+import { Team, TeamRole } from "types";
 import "./index.scss";
 
 interface Props {
@@ -29,6 +29,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const _availableTeams = useRef(availableTeams);
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,10 +55,10 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         createTeamInvites({
           teamId,
           emails: memberEmails,
-          role: "write",
+          role: TeamRole.write,
         }).then((res: any) => {
           setIsLoading(false);
-          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, "write", "share_modal");
+          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, TeamRole.write, "share_modal");
         });
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
@@ -111,10 +112,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {availableTeams.length ? (
+      {_availableTeams.current.length ? (
         <>
           <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />
+          <Divider />
         </>
       ) : (
         <>{bannerToUseWorkspace}</>
