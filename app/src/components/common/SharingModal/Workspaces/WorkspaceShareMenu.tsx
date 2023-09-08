@@ -9,6 +9,9 @@ import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 interface Props {
+  /**
+   * The default number of active workspaces to display before dropdown menu.
+   */
   defaultActiveWorkspaces?: number;
   onTransferClick: (teamData: Team) => void;
   isLoading: boolean;
@@ -19,9 +22,6 @@ interface WorkspaceItemProps {
   onTransferClick: (teamData: Team) => void;
   isLoading: boolean;
 }
-/**
- * @param {number} defaultActiveWorkspaces - The default number of active workspaces to display before dropdown menu.
- */
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableTeams = useSelector(getAvailableTeams);
