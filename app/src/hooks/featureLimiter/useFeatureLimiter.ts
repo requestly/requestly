@@ -6,6 +6,8 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { useEffect, useState } from "react";
 
+const premiumPlansToCheckLimit = [APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC];
+
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const userAttributes = useSelector(getUserAttributes);
@@ -28,7 +30,7 @@ export const useFeatureLimiter = () => {
       return;
     }
 
-    if (isUserPremium && userPlan !== APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC) {
+    if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
       return;
     }
 
@@ -56,11 +58,17 @@ export const useFeatureLimiter = () => {
   };
 
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
-    return featureLimits[userPlan][featureLimitType];
+    return (
+      featureLimits[userPlan]?.[featureLimitType] ??
+      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
+    );
   };
 
   const getIsFeatureEnabled = (featureLimitType: FeatureLimitType) => {
-    return featureLimits[userPlan][featureLimitType];
+    return (
+      featureLimits[userPlan]?.[featureLimitType] ??
+      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType]
+    );
   };
 
   return {
