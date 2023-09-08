@@ -73,7 +73,6 @@ export const duplicateRulesToTargetWorkspace = async (
   groupwiseRules: Record<string, Group>
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
-  console.log({ rules, groups });
 
   const formattedRules: Rule[] = [];
   const formattedGroups: Group[] = [];
