@@ -31,7 +31,7 @@ const columns = [
     sorter: (a, b) => a.timestamp - b.timestamp,
   },
   {
-    title: "Request Url",
+    title: "Request URL",
     dataIndex: "url",
     width: "60%",
     ellipsis: true,
