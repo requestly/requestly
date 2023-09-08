@@ -11,6 +11,10 @@ import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/tea
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { Team, TeamRole } from "types";
 import { duplicateRulesToTargetWorkspace } from "../actions";
+import {
+  trackSharingModalRulesDuplicated,
+  trackSharingUrlInWorkspaceCopied,
+} from "modules/analytics/events/misc/sharing";
 
 interface Props {
   selectedRules: string[];
@@ -34,7 +38,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
     }).then((res: any) => {
       setIsLoading(false);
       if (res?.data?.success)
-        trackAddTeamMemberSuccess(currentlyActiveWorkspace.id, memberEmails, TeamRole.write, "share_modal");
+        trackAddTeamMemberSuccess(currentlyActiveWorkspace.id, memberEmails, TeamRole.write, "sharing_modal");
       setPostShareViewData({
         type: WorkspaceSharingTypes.USERS_INVITED,
       });
@@ -46,6 +50,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       setIsLoading(true);
       duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
         setIsLoading(false);
+        trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
@@ -94,6 +99,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
               copyText={`${window.location.origin}/rules/editor/edit/${selectedRules[0]}`}
               showIcon={false}
               disableTooltip
+              trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}
             />
           ) : null}
         </div>
