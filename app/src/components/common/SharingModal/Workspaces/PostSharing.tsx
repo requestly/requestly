@@ -65,7 +65,7 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
       [WorkspaceSharingTypes.EXISTING_WORKSPACE]: {
         header: <WorkspaceSharingInfoHeader postShareViewData={postShareViewData} />,
         message: `Selected rules have been copied to ${postShareViewData.targetTeamData?.teamName}`,
-        ctaText: "Switch to the new workspace",
+        ctaText: "Switch to the workspace",
         action: handleSwitchWorkspace,
       },
     };
