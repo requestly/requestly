@@ -20,3 +20,17 @@ export const trackShareModalViewed = (selection_count, source, num_team_workspac
   const params = { selection_count, source, num_team_workspaces };
   trackEvent(SHARING.SHARE_MODAL_VIEWED, params);
 };
+
+export const trackShareModalWorkspaceDropdownClicked = () => {
+  trackEvent(SHARING.SHARING_MODAL_WORKSPACE_DROPDOWN_CLICKED);
+};
+
+export const trackSharingUrlInWorkspaceCopied = (urlType) => {
+  const params = { urlType };
+  trackEvent(SHARING.SHARING_URL_IN_WORKSPACE_COPIED, params);
+};
+
+export const trackSharingModalRulesDuplicated = (currentWorkspace, count) => {
+  const params = { currentWorkspace, count };
+  trackEvent(SHARING.SHARING_MODAL_RULES_DUPLICATED, params);
+};
