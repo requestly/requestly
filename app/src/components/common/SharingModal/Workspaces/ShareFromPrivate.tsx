@@ -82,7 +82,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     user?.details?.profile?.uid,
   ]);
 
-  const handleTransferToAnotherWorkspace = useCallback(
+  const handleRulesTransfer = useCallback(
     (teamData: Team) => {
       setIsLoading(true);
       duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
@@ -115,11 +115,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       {_availableTeams.current.length ? (
         <>
           <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
-          <WorkspaceShareMenu
-            isLoading={isLoading}
-            defaultActiveWorkspaces={2}
-            onTransferClick={handleTransferToAnotherWorkspace}
-          />
+          <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />
           <Divider />
         </>
       ) : (

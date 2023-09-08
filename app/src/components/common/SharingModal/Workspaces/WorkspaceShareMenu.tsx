@@ -9,6 +9,9 @@ import type { MenuProps } from "antd";
 import { Team } from "types";
 
 interface Props {
+  /**
+   * The default number of active workspaces to display before dropdown menu.
+   */
   defaultActiveWorkspaces?: number;
   onTransferClick: (teamData: Team) => void;
   isLoading: boolean;
@@ -46,6 +49,26 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       })
       .filter(Boolean);
   }, [sortedTeams, activeTeamData.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
+
+  const chooseOtherWorkspaceItem = (
+    <div className="workspace-share-menu-item-card choose-other-workspace">
+      <Row align="middle" className="items-center">
+        <Avatar
+          size={35}
+          className="workspace-avatar"
+          shape="square"
+          icon="*"
+          style={{
+            backgroundColor: "#B835F6",
+          }}
+        />
+        <span className="workspace-card-description">
+          <div className="text-gray">Choose other workspace</div>
+        </span>
+      </Row>
+      <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
+    </div>
+  );
 
   return (
     <>
@@ -121,23 +144,3 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
     </div>
   );
 };
-
-const chooseOtherWorkspaceItem = (
-  <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
-    <Row align="middle" className="items-center">
-      <Avatar
-        size={35}
-        className="workspace-avatar"
-        shape="square"
-        icon="*"
-        style={{
-          backgroundColor: "#B835F6",
-        }}
-      />
-      <span className="workspace-card-description">
-        <div className="text-gray">Choose other workspace</div>
-      </span>
-    </Row>
-    <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
-  </div>
-);
