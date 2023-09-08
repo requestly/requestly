@@ -25,23 +25,27 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace).id;
 
-  const activeTeamData = useMemo(() => availableTeams.find((team: Team) => team.id === currentlyActiveWorkspaceId), [
-    currentlyActiveWorkspaceId,
-    availableTeams,
-  ]);
-  const sortedTeams = useMemo(
+  const activeTeamData: Team = useMemo(
+    () => availableTeams.find((team: Team) => team.id === currentlyActiveWorkspaceId),
+    [currentlyActiveWorkspaceId, availableTeams]
+  );
+  const sortedTeams: Team[] = useMemo(
     () => (availableTeams ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount) : []),
     [availableTeams]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
-    return sortedTeams.slice(defaultActiveWorkspaces ? defaultActiveWorkspaces : 0).map((team, index) => {
-      return {
-        key: index,
-        label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
-      };
-    });
-  }, [sortedTeams, onTransferClick, defaultActiveWorkspaces, isLoading]);
+    return sortedTeams
+      .slice(defaultActiveWorkspaces || 0)
+      .map((team: Team, index: number) => {
+        if (!defaultActiveWorkspaces && team.id === activeTeamData.id) return null;
+        return {
+          key: index,
+          label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
+        };
+      })
+      .filter(Boolean);
+  }, [sortedTeams, activeTeamData.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   return (
     <>
