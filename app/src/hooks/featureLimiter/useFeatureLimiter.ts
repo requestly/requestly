@@ -3,6 +3,7 @@ import { getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { FeatureLimitType, featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
@@ -11,10 +12,14 @@ export const useFeatureLimiter = () => {
 
   const isUserPremium = user?.details?.isPremium;
   const isUserLoggedIn = user?.loggedIn;
-  const userPlan = user?.details?.planDetails?.planName;
+  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
-    if (!isUserLoggedIn || isUserPremium) {
+    if (!isUserLoggedIn) {
+      return;
+    }
+
+    if (isUserPremium && userPlan !== APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC) {
       return;
     }
 
@@ -44,6 +49,7 @@ export const useFeatureLimiter = () => {
   };
 
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
+    console.log("!!!debug", "", user);
     return featureLimits[userPlan][featureLimitType];
   };
 
