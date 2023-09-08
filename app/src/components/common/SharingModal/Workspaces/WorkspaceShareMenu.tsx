@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
-import { Avatar, Divider, Row, Dropdown } from "antd";
+import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { Avatar, Row, Dropdown } from "antd";
 import { getUniqueColorForWorkspace } from "utils/teams";
-import { Team } from "types";
-import type { MenuProps } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import type { MenuProps } from "antd";
+import { Team } from "types";
 
 interface Props {
   /**
@@ -19,26 +19,36 @@ interface Props {
 
 interface WorkspaceItemProps {
   team: Team;
-  onTransferClick: (teamData: Team) => void;
-  isLoading: boolean;
+  onTransferClick?: (teamData: Team) => void;
+  showArrow?: boolean;
+  isLoading?: boolean;
 }
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableTeams = useSelector(getAvailableTeams);
+  const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace).id;
 
-  const sortedTeams = useMemo(
+  const activeTeamData: Team = useMemo(
+    () => availableTeams.find((team: Team) => team.id === currentlyActiveWorkspaceId),
+    [currentlyActiveWorkspaceId, availableTeams]
+  );
+  const sortedTeams: Team[] = useMemo(
     () => (availableTeams ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount) : []),
     [availableTeams]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
-    return sortedTeams.slice(defaultActiveWorkspaces ? defaultActiveWorkspaces : 0).map((team, index) => {
-      return {
-        key: index,
-        label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
-      };
-    });
-  }, [sortedTeams, onTransferClick, defaultActiveWorkspaces, isLoading]);
+    return sortedTeams
+      .slice(defaultActiveWorkspaces || 0)
+      .map((team: Team, index: number) => {
+        if (!defaultActiveWorkspaces && team.id === activeTeamData.id) return null;
+        return {
+          key: index,
+          label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
+        };
+      })
+      .filter(Boolean);
+  }, [sortedTeams, activeTeamData.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card choose-other-workspace">
@@ -81,16 +91,29 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           )}
         </>
       ) : (
-        <></> //TODO: case 3 & 4
+        <Dropdown
+          menu={{ items: menuItems }}
+          placement="bottom"
+          overlayClassName="workspace-share-menu-wrapper"
+          trigger={["click"]}
+        >
+          <div>
+            <WorkspaceItem team={activeTeamData} showArrow />
+          </div>
+        </Dropdown>
       )}
-      <Divider />
     </>
   );
 };
 
-const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team, isLoading, onTransferClick }) => {
+const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
+  team,
+  onTransferClick,
+  showArrow = false,
+  isLoading = false,
+}) => {
   return (
-    <div className="workspace-share-menu-item-card">
+    <div className={`workspace-share-menu-item-card ${showArrow && "workspace-share-menu-dropdown"}`}>
       <Row align="middle" className="items-center">
         <Avatar
           size={35}
@@ -106,14 +129,18 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ team, isLoading, onTransf
           <div className="text-gray">{team.accessCount} members</div>
         </span>
       </Row>
-      <RQButton
-        disabled={isLoading}
-        type="link"
-        className="workspace-menu-item-transfer-btn"
-        onClick={() => onTransferClick(team)}
-      >
-        Transfer here
-      </RQButton>
+      {showArrow ? (
+        <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
+      ) : (
+        <RQButton
+          disabled={isLoading}
+          type="link"
+          className="workspace-menu-item-transfer-btn"
+          onClick={() => onTransferClick(team)}
+        >
+          Transfer here
+        </RQButton>
+      )}
     </div>
   );
 };
