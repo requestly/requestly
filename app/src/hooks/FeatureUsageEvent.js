@@ -7,6 +7,7 @@ import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rule
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import { useFeatureLimiter } from "./featureLimiter/useFeatureLimiter";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const FeatureUsageEvent = () => {
   const appMode = useSelector(getAppMode);
@@ -14,10 +15,13 @@ const FeatureUsageEvent = () => {
 
   const { checkFeatureLimits } = useFeatureLimiter();
 
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+
   useEffect(() => {
-    // TODO turn off before releasing
-    checkFeatureLimits();
-  }, [checkFeatureLimits]);
+    if (isFeatureLimiterOn) {
+      checkFeatureLimits();
+    }
+  }, [checkFeatureLimits, isFeatureLimiterOn]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
