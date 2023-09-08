@@ -227,6 +227,10 @@ const RuleBuilder = (props) => {
       cleanup(dispatch);
   }, [dispatch, location]);
 
+  useEffect(() => {
+    console.log("RULE BUILDER");
+  }, []);
+
   if (
     currentlySelectedRuleConfig === false ||
     currentlySelectedRuleConfig === undefined ||
