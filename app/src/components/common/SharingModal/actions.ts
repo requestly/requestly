@@ -3,6 +3,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
 import { Group, Rule } from "types";
 import { StorageService } from "init";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { generateObjectId } from "utils/FormattingHelper";
 
 export const createSharedList = async (
   appMode: string,
@@ -71,5 +73,37 @@ export const duplicateRulesToTargetWorkspace = async (
   groupwiseRules: Record<string, Group>
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
-  return StorageService(appMode).saveMultipleRulesOrGroups([...rules, ...groups], { workspaceId });
+  console.log({ rules, groups });
+
+  const formattedRules: Rule[] = [];
+  const formattedGroups: Group[] = [];
+
+  // mapping of old group IDs to new group IDs
+  const groupIdMapping: Record<string, string> = {};
+
+  const formatRule = (rule: Rule, newGroupId: string) => ({
+    ...rule,
+    creationDate: generateObjectCreationDate(),
+    modificationDate: generateObjectCreationDate(),
+    name: `${rule.name}_shared`,
+    id: `${rule.ruleType}_${generateObjectId()}`,
+    groupId: newGroupId,
+  });
+
+  groups.forEach((group: Group) => {
+    const newGroupId = `Group_${generateObjectId()}`;
+    groupIdMapping[group.id] = newGroupId;
+    formattedGroups.push({
+      ...group,
+      id: newGroupId,
+      name: `${group.name}_shared`,
+    });
+  });
+
+  rules.forEach((rule: Rule) => {
+    const newGroupId = groupIdMapping[rule.groupId] || "";
+    formattedRules.push(formatRule(rule, newGroupId));
+  });
+
+  return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
 };
