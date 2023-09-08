@@ -74,9 +74,6 @@ export const duplicateRulesToTargetWorkspace = async (
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
 
-  const formattedRules: Rule[] = [];
-  const formattedGroups: Group[] = [];
-
   // mapping of old group IDs to new group IDs
   const groupIdMapping: Record<string, string> = {};
 
@@ -84,24 +81,25 @@ export const duplicateRulesToTargetWorkspace = async (
     ...rule,
     creationDate: generateObjectCreationDate(),
     modificationDate: generateObjectCreationDate(),
-    name: `${rule.name}_shared`,
+    name: `${rule.name} Copy`,
     id: `${rule.ruleType}_${generateObjectId()}`,
     groupId: newGroupId,
   });
 
-  groups.forEach((group: Group) => {
+  const formattedGroups = groups.reduce((acc: Group[], group: Group) => {
     const newGroupId = `Group_${generateObjectId()}`;
     groupIdMapping[group.id] = newGroupId;
-    formattedGroups.push({
+    acc.push({
       ...group,
       id: newGroupId,
-      name: `${group.name}_shared`,
+      name: `${group.name} Copy`,
     });
-  });
+    return acc;
+  }, []);
 
-  rules.forEach((rule: Rule) => {
+  const formattedRules = rules.map((rule: Rule) => {
     const newGroupId = groupIdMapping[rule.groupId] || "";
-    formattedRules.push(formatRule(rule, newGroupId));
+    return formatRule(rule, newGroupId);
   });
 
   return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
