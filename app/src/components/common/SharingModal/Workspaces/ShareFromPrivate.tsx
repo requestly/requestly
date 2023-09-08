@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
+import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
+import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
@@ -13,12 +14,13 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
-import { WorkspaceSharingTypes, PostSharingData } from "../types";
+import { WorkspaceSharingTypes, PostShareViewData } from "../types";
+import { Team } from "types";
 import "./index.scss";
 
 interface Props {
   selectedRules: string[];
-  setPostShareViewData: ({ type, teamData }: PostSharingData) => void;
+  setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
 }
 
 export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
@@ -26,11 +28,12 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
   const appMode = useSelector(getAppMode);
   const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSharingInNewWorkspace = async () => {
+  const handleSharingInNewWorkspace = useCallback(async () => {
     setIsLoading(true);
     const functions = getFunctions();
     const createTeam = httpsCallable(functions, "teams-createTeam");
@@ -59,13 +62,39 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
-          setPostShareViewData({ type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED, teamData });
+          setPostShareViewData({
+            type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
+            targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+          });
         });
       });
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, [
+    appMode,
+    groupwiseRules,
+    memberEmails,
+    selectedRules,
+    setPostShareViewData,
+    user?.details?.profile?.email,
+    user?.details?.profile?.uid,
+  ]);
+
+  const handleRulesTransfer = useCallback(
+    (teamData: Team) => {
+      setIsLoading(true);
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+        setIsLoading(false);
+        setPostShareViewData({
+          type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
+          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          sourceTeamData: currentlyActiveWorkspace,
+        });
+      });
+    },
+    [appMode, groupwiseRules, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+  );
 
   return (
     <>
@@ -77,13 +106,20 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           className="workspace-avatar"
           style={{ backgroundColor: "#1E69FF" }}
         />
-        <span className="private-workspace-card-description">
+        <span className="workspace-card-description">
           <div className="text-white">Private workspace</div>
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {availableTeams.length ? <>{/* TODO: add dropdown for case 2 here */}</> : <>{bannerToUseWorkspace}</>}
-      <div className="mt-8 sharing-modal-email-input-wrapper">
+      {availableTeams.length ? (
+        <>
+          <div className="mt-1">Transfer rules into a workspace to start collaborating</div>
+          <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />
+        </>
+      ) : (
+        <>{bannerToUseWorkspace}</>
+      )}
+      <div className="sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
@@ -103,10 +139,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         />
       </div>
       <RQButton
-        className="mt-8 text-bold sharing-primary-btn"
+        className="mt-1 text-bold sharing-primary-btn"
         type="primary"
         onClick={handleSharingInNewWorkspace}
         loading={isLoading}
+        disabled={!memberEmails.length}
       >
         Create workspace & share
       </RQButton>
