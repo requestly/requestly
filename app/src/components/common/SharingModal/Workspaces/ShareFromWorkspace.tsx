@@ -15,6 +15,7 @@ import {
   trackSharingModalRulesDuplicated,
   trackSharingUrlInWorkspaceCopied,
 } from "modules/analytics/events/misc/sharing";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   selectedRules: string[];
@@ -96,7 +97,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
             <CopyButton
               title="Copy link"
               type="default"
-              copyText={`${window.location.origin}/rules/editor/edit/${selectedRules[0]}`}
+              copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}`}
               showIcon={false}
               disableTooltip
               trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}
