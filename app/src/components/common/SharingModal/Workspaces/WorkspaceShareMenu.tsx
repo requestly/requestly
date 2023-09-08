@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
 import { Team } from "types";
+import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
 
 interface Props {
   /**
@@ -85,6 +86,9 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
               placement="bottom"
               overlayClassName="workspace-share-menu-wrapper"
               trigger={["click"]}
+              onOpenChange={(open) => {
+                if (open) trackShareModalWorkspaceDropdownClicked();
+              }}
             >
               <div>{chooseOtherWorkspaceItem}</div>
             </Dropdown>
@@ -96,6 +100,9 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
           trigger={["click"]}
+          onOpenChange={(open) => {
+            if (open) trackShareModalWorkspaceDropdownClicked();
+          }}
         >
           <div>
             <WorkspaceItem team={activeTeamData} showArrow />

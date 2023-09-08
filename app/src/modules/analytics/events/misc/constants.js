@@ -108,4 +108,7 @@ export const SHARING = {
   SHARE_MODAL_VIEWED: "share_modal_viewed",
   SHARING_TAB_SWITCHED: "sharing_tab_switched",
   RULES_DOWNLOAD_CLICKED: "rules_download_clicked",
+  SHARING_MODAL_WORKSPACE_DROPDOWN_CLICKED: "sharing_modal_workspace_dropdown_clicked",
+  SHARING_URL_IN_WORKSPACE_COPIED: "sharing_url_in_workspace_copied",
+  SHARING_MODAL_RULES_DUPLICATED: "sharing_modal_rules_duplicated",
 };
