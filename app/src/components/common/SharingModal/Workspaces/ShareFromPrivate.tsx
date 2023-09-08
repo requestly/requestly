@@ -17,6 +17,7 @@ import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/tea
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import { Team, TeamRole } from "types";
 import "./index.scss";
+import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 
 interface Props {
   selectedRules: string[];
@@ -50,7 +51,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
-        trackNewWorkspaceCreated();
+        trackNewWorkspaceCreated("sharing_modal");
 
         createTeamInvites({
           teamId,
@@ -58,11 +59,12 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           role: TeamRole.write,
         }).then((res: any) => {
           setIsLoading(false);
-          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, TeamRole.write, "share_modal");
+          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, TeamRole.write, "sharing_modal");
         });
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
+          trackSharingModalRulesDuplicated("personal", selectedRules.length);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
             targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
@@ -87,6 +89,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       setIsLoading(true);
       duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
         setIsLoading(false);
+        trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
