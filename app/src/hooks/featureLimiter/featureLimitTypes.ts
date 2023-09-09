@@ -1,13 +1,5 @@
 import APP_CONSTANTS from "config/constants";
-
-export enum FeatureLimitType {
-  num_rules = "num_rules",
-  num_active_rules = "num_active_rules",
-}
-
-type FeatureLimits = Record<FeatureLimitType, number | boolean>;
-
-type PlanFeatureLimits = Record<string, FeatureLimits>;
+import { FeatureLimitType, PlanFeatureLimits } from "./types";
 
 export const featureLimits: PlanFeatureLimits = {
   [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: {

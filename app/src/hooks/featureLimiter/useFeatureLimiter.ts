@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { FeatureLimitType, featureLimits } from "./featureLimitTypes";
+import { featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { useEffect, useState } from "react";
+import { FeatureLimitType } from "./types";
 
 const premiumPlansToCheckLimit = [APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC];
 
