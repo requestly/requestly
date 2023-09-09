@@ -7,7 +7,8 @@ import ContactUsModal from "components/landing/contactUsModal";
 import APP_CONSTANTS from "config/constants";
 import FeatureRepresentation from "../../FeatureRepresentation";
 import GitHubButton from "react-github-btn";
-import { Plans } from "./pricingPlan";
+import { PricingFeatures } from "./pricingFeatures";
+import { PricingPlans } from "./pricingPlans";
 import underlineIcon from "../../../../../assets/img/icons/common/underline.svg";
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
@@ -23,7 +24,7 @@ const FreeAndEnterprisePlanTable = () => {
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
-  const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUAL);
+  const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
 
   // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
@@ -33,10 +34,10 @@ const FreeAndEnterprisePlanTable = () => {
         <div className="text-center margin-bottom-one">
           <Switch
             size="small"
-            checked={duration === APP_CONSTANTS.PRICING.DURATION.ANNUAL}
+            checked={duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY}
             onChange={(checked) => {
               if (checked) {
-                setDuration(APP_CONSTANTS.PRICING.DURATION.ANNUAL);
+                setDuration(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
               } else {
                 setDuration(APP_CONSTANTS.PRICING.DURATION.MONTHLY);
               }
@@ -84,21 +85,18 @@ const FreeAndEnterprisePlanTable = () => {
             </div>
           </div>
           <div className="pricing-table-row">
-            {Object.entries(Plans[product]).map(([planName, planDetails]) => (
+            {Object.values(PricingFeatures[product]).map((planDetails) => (
               <div className="pricing-table-col">
                 <div className="pricing-col-header">
                   <p className="text-gray plan-for">{planDetails.heading}</p>
                   <div className="header text-left">
-                    <span style={{ textTransform: "capitalize" }}>{planName}</span>
+                    <span style={{ textTransform: "capitalize" }}>{planDetails.planName}</span>
                   </div>
                   <div className="text-gray text-left price-container">
-                    <span className="price">
-                      $
-                      {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? planDetails.price : planDetails.price * 10}
-                    </span>{" "}
-                    per member, per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
+                    <span className="price">${PricingPlans[planDetails.planName].plans[duration].usd.price}</span> per
+                    member, per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
                   </div>
-                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
+                  {planDetails.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">
                       Use now
                     </RQButton>
@@ -108,12 +106,12 @@ const FreeAndEnterprisePlanTable = () => {
                     </RQButton>
                   )}
                 </div>
-                {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                {planDetails.planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
                   <div className="pro-basic-feature-title text-left">
                     <span>
                       Everything <img src={underlineIcon} alt="highlight" />
                     </span>{" "}
-                    in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                    in {planDetails.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
                   </div>
                 )}
                 <div>
