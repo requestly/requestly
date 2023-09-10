@@ -39,6 +39,7 @@ export enum RuleEditorUrlFragment {
   QUERY_PARAM = "QueryParam",
   SCRIPT = "Script",
   USER_AGENT = "UserAgent",
+  REQUEST = "Request",
 }
 
 export interface ResourceFilters {
