@@ -1,10 +1,17 @@
 import React, { useCallback, useState } from "react";
 
-import { NetworkEvent } from "../../../../../../types";
+import { NetworkEvent, RuleEditorUrlFragment } from "../../../../../../types";
 import { Button, Collapse, Space, Tooltip } from "antd";
 import { CaretRightOutlined, EditOutlined } from "@ant-design/icons";
 import RequestBody from "./RequestBody";
-import { isContentBodyEditable, isRequestBodyParseable } from "../../../../../../utils";
+import {
+  createRule,
+  generateRuleName,
+  getBaseUrl,
+  isContentBodyEditable,
+  isRequestBodyParseable,
+} from "../../../../../../utils";
+import { SourceKey, SourceOperator } from "../../../../../../../types";
 
 interface Props {
   networkEvent: NetworkEvent;
@@ -12,6 +19,28 @@ interface Props {
 
 const RequestBodyPanel: React.FC<Props> = ({ networkEvent }) => {
   const [isParsed, setIsParsed] = useState(false);
+
+  const editRequestBody = useCallback(() => {
+    createRule(
+      RuleEditorUrlFragment.REQUEST,
+      (rule) => {
+        const baseUrl = getBaseUrl(networkEvent.request.url);
+        rule.pairs[0].source = {
+          key: SourceKey.URL,
+          operator: SourceOperator.CONTAINS,
+          value: baseUrl,
+        };
+        // @ts-ignore
+        rule.pairs[0].request = {
+          type: "static",
+          value: networkEvent.request?.postData?.text || "",
+        };
+        rule.name = generateRuleName("Modify Request Body");
+        rule.description = `Modify Request Body of ${baseUrl}`;
+      },
+      ""
+    );
+  }, [networkEvent]);
 
   const renderHeader = useCallback(() => {
     if (isRequestBodyParseable(networkEvent.request.postData?.mimeType)) {
@@ -21,8 +50,8 @@ const RequestBodyPanel: React.FC<Props> = ({ networkEvent }) => {
           <Button
             type="text"
             onClick={(e) => {
-              e.stopPropagation();
               setIsParsed(!isParsed);
+              e.stopPropagation();
             }}
           >
             {isParsed ? "view source" : "view parsed"}
@@ -36,13 +65,21 @@ const RequestBodyPanel: React.FC<Props> = ({ networkEvent }) => {
         <span className="collapse-header-text">Request Body</span>
       </Space>
     );
-  }, [networkEvent]);
+  }, [networkEvent, isParsed]);
 
   const renderEditRequestBodyButton = useCallback(() => {
     if (isContentBodyEditable(networkEvent._resourceType)) {
       return (
         <Space>
-          <Button icon={<EditOutlined />}>Edit Request Body</Button>
+          <Button
+            onClick={(e) => {
+              editRequestBody();
+              e.stopPropagation();
+            }}
+            icon={<EditOutlined />}
+          >
+            Edit Request Body
+          </Button>
         </Space>
       );
     }
