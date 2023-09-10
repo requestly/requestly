@@ -117,3 +117,11 @@ export const isRequestBodyParseable = (mimeType: string): boolean => {
 
   return false;
 };
+
+export const isContentBodyEditable = (networkResourceType: NetworkResourceType): boolean => {
+  if (matchResourceTypeFilter(networkResourceType, ResourceTypeFilterValue.AJAX)) {
+    return true;
+  }
+
+  return false;
+};

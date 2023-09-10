@@ -63,3 +63,12 @@ export interface ExecutionEvent {
   modification: string;
   _resourceType?: NetworkResourceType;
 }
+
+export enum RequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  OPTIONS = "OPTIONS",
+}
