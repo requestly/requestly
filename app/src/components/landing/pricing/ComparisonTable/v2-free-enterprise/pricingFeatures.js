@@ -3,7 +3,7 @@ import APP_CONSTANTS from "config/constants";
 export const PricingFeatures = {
   [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
     free: {
-      planName: "Free",
+      planTitle: "Free",
       heading: "Starter Plan",
       features: [
         {
@@ -41,7 +41,7 @@ export const PricingFeatures = {
       ],
     },
     basic: {
-      planName: "Basic",
+      planTitle: "Basic",
       heading: "For individuals",
       features: [
         {
@@ -79,7 +79,7 @@ export const PricingFeatures = {
       ],
     },
     professional: {
-      planName: "Professional",
+      planTitle: "Professional",
       heading: "For collaboration in QA & dev teams",
       features: [
         {
@@ -111,7 +111,7 @@ export const PricingFeatures = {
   },
   [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
     session_free: {
-      planName: "Free",
+      planTitle: "Free",
       features: [
         {
           title: "10 sessions",
@@ -144,7 +144,7 @@ export const PricingFeatures = {
       ],
     },
     session_professional: {
-      planName: "Professional",
+      planTitle: "Professional",
       features: [
         {
           title: "Unlimited sessions",

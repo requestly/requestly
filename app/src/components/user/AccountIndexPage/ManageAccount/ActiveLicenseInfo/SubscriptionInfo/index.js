@@ -25,8 +25,8 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
     if (type === "individual") {
       redirectToCheckout({
         mode: type,
-        planType: "gold",
-        days: 365,
+        planName: "gold",
+        duration: 365,
       });
     } else if (type === "team") {
       redirectToMyTeams(navigate);

@@ -12,27 +12,22 @@ import { loadStripe } from "@stripe/stripe-js";
 import VerifyAndContinueCheckout from "./VerifyAndContinueCheckout";
 // UTILS
 import * as RedirectionUtils from "../../../utils/RedirectionUtils";
-import * as PricingUtils from "../../../utils/PricingUtils";
 // Static Asset
 import RQIcon from "assets/img/brand/rq_logo.svg";
 import Text from "antd/lib/typography/Text";
 import APP_CONSTANTS from "config/constants";
 
-const { getDurationTitleFromDays } = PricingUtils;
-
 const Checkout = () => {
   const navigate = useNavigate();
-  // const mountedRef = useRef(true);
   const stripe = useStripe();
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get("m") ?? "individual"; // mode -> Defines what type of checkout we`re processing i.e. the individual or a team. Accepted values: "individual", "team"
   const teamId = urlParams.get("t");
   const planType = urlParams.get("p") ?? "professional";
-  const days = urlParams.get("d") ?? 365;
+  const duration = urlParams.get("d") ?? "annually";
   const quantity = urlParams.get("q");
   const currency = "usd";
 
-  const [duration, setDuration] = useState(false);
   const [isPlanVerificationPassed, setIsPlanVerificationPassed] = useState(false);
   const antIcon = <LoadingOutlined style={{ color: "gray" }} spin />;
 
@@ -43,10 +38,6 @@ const Checkout = () => {
     },
     [navigate]
   );
-
-  useEffect(() => {
-    setDuration(getDurationTitleFromDays(days));
-  }, [days]);
 
   useEffect(() => {
     if (!duration) {
@@ -61,33 +52,6 @@ const Checkout = () => {
 
     setIsPlanVerificationPassed(true);
   }, [duration, mode, planType, quantity, redirectTo404WithError, teamId]);
-
-  // const plan = "professional";
-  // pricingPlans.find((p) => p.id === planType);
-
-  // const stableUpdatePlanInfo = useCallback(
-  //   (userCountry) => {
-  //     const newCurrency = getDefaultCurrencyBasedOnLocation(userCountry);
-  //     if (!newCurrency) return stableRedirectTo404WithError();
-  //     setCurrency(newCurrency);
-
-  //     const newDuration = getDurationTitleFromDays(days);
-  //     if (!newDuration) return stableRedirectTo404WithError();
-  //     setDuration("annual");
-
-  //     // const newPlanInfo = plan[newDuration];
-  //     // if (!newPlanInfo) return stableRedirectTo404WithError();
-
-  //     const priceListOfDuration = 25;
-  //     if (!priceListOfDuration) return stableRedirectTo404WithError();
-
-  //     const priceForGivenCurrency = 25;
-  //     if (!priceForGivenCurrency) return stableRedirectTo404WithError();
-
-  //     setIsPlanVerificationPassed(true);
-  //   },
-  //   [days, stableRedirectTo404WithError]
-  // );
 
   // const stableFetchUserCountry = useCallback(() => {
   //   fetch("https://api.country.is/")
@@ -116,26 +80,6 @@ const Checkout = () => {
   //       stableUpdatePlanInfo(country);
   //     });
   // },[country, stableUpdatePlanInfo]);
-
-  // useEffect(() => {
-  //   if (
-  //     !planType ||
-  //     !plan ||
-  //     !days ||
-  //     !(mode === "individual" || mode === "team")
-  //     // (mode === "team" ? typeof teamId !== "string" : false)
-  //   ) {
-  //     if (!mountedRef.current) return;
-  //     stableRedirectTo404WithError();
-  //   } else {
-  //     stableFetchUserCountry();
-  //   }
-
-  //   // Cleanup
-  //   return () => {
-  //     mountedRef.current = false;
-  //   };
-  // }, [stableFetchUserCountry, days, mode, plan, planType, stableRedirectTo404WithError, teamId]);
 
   return (
     <Row>
@@ -179,7 +123,6 @@ const Checkout = () => {
 };
 
 const CheckoutIndex = () => {
-  // Component State
   const [stripePromise, setStripePromise] = useState(false);
 
   useEffect(() => {

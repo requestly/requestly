@@ -15,13 +15,9 @@ import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 import { Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
+import { redirectToCheckout } from "utils/RedirectionUtils";
 
 const FreeAndEnterprisePlanTable = () => {
-  // Component State
-  //   const [isBuyForTeamsModalActive, setIsBuyForTeamsModalActive] = useState(
-  //     false
-  //   );
-
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
@@ -85,24 +81,33 @@ const FreeAndEnterprisePlanTable = () => {
             </div>
           </div>
           <div className="pricing-table-row">
-            {Object.values(PricingFeatures[product]).map((planDetails) => (
+            {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
               <div className="pricing-table-col">
                 <div className="pricing-col-header">
                   <p className="text-gray plan-for">{planDetails.heading}</p>
                   <div className="header text-left">
-                    <span style={{ textTransform: "capitalize" }}>{planDetails.planName}</span>
+                    <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
                   </div>
                   <div className="text-gray text-left price-container">
-                    <span className="price">${PricingPlans[planDetails.planName].plans[duration].usd.price}</span> per
-                    member, per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
+                    <span className="price">${PricingPlans[planName].plans[duration].usd.price}</span> per member, per{" "}
+                    {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
                   </div>
-                  {planDetails.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
+                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">
                       Use now
                     </RQButton>
                   ) : (
-                    <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-                      Contact Us
+                    <RQButton
+                      onClick={() =>
+                        redirectToCheckout({
+                          mode: "individual",
+                          planName: planName,
+                          duration: duration,
+                        })
+                      }
+                      type="primary"
+                    >
+                      Upgrade now
                     </RQButton>
                   )}
                 </div>
