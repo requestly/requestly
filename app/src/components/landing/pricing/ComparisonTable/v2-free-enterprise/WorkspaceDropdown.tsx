@@ -73,9 +73,9 @@ const WorkspaceDropdown: React.FC<{
 
   return user.loggedIn ? (
     <div className="pricing-workspace-selector-container">
-      <div>
-        Select workspace to upgrade:
-        <Dropdown menu={workspaceMenuItems} trigger={["click"]}>
+      <div className="pricing-workspace-dropdown-container">
+        Select workspace to upgrade
+        <Dropdown menu={workspaceMenuItems} trigger={["click"]} overlayClassName="pricing-workspace-dropdown">
           <RQButton className="pricing-workspace-dropdown-btn">
             <div className="cursor-pointer items-center">
               <Avatar
@@ -93,14 +93,14 @@ const WorkspaceDropdown: React.FC<{
                       : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
                 }}
               />
-              {workspaceToUpgrade?.name}
+              <span>{workspaceToUpgrade?.name}</span>
               <DownOutlined className="pricing-workspace-dropdown-icon" />
             </div>
           </RQButton>
         </Dropdown>
       </div>
-      <div>
-        <Typography.Text type="secondary" className="font-12">
+      <div className="text-center">
+        <Typography.Text type="secondary">
           Your workspace has {workspaceToUpgrade?.accessCount} active members
         </Typography.Text>
       </div>

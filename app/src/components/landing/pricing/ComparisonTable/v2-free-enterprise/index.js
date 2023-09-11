@@ -20,7 +20,7 @@ import WorkspaceDropdown from "./WorkspaceDropdown";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "prive_workspace",
+  id: "private_workspace",
   accessCount: 1,
 };
 
@@ -98,8 +98,11 @@ const FreeAndEnterprisePlanTable = () => {
                     <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
                   </div>
                   <div className="text-gray text-left price-container">
-                    <span className="price">${PricingPlans[planName].plans[duration].usd.price}</span> per member, per{" "}
-                    {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"}
+                    <span className="price">
+                      ${PricingPlans[planName].plans[duration].usd.price * workspaceToUpgrade.accessCount}
+                    </span>{" "}
+                    per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"} for{" "}
+                    {workspaceToUpgrade.accessCount} members
                   </div>
                   {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">

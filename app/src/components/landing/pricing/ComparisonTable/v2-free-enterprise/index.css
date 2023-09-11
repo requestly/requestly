@@ -165,6 +165,16 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
+  width: 100%;
+}
+
+.pricing-workspace-dropdown .ant-dropdown-menu-root {
+  overflow: auto;
+  max-height: 15rem;
+}
+
+.pricing-workspace-dropdown-container {
+  margin-left: 38%;
 }
 
 @media (max-width: 992px) {
