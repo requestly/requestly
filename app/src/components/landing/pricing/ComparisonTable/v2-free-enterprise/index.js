@@ -16,6 +16,7 @@ import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/
 import { Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
+import WorkspaceDropdown from "./WorkspaceDropdown";
 
 const FreeAndEnterprisePlanTable = () => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
@@ -41,6 +42,7 @@ const FreeAndEnterprisePlanTable = () => {
           />
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
+        <WorkspaceDropdown />
         <div className="pricing-table-product-wrapper">
           <div className="pricing-table-product-view">
             <h1>Products</h1>

@@ -145,6 +145,22 @@
   padding-left: 4px;
 }
 
+.pricing-workspace-dropdown-icon.anticon {
+  margin-left: 2px;
+  font-size: 0.7rem;
+}
+
+.pricing-workspace-dropdown-btn.ant-btn.rq-btn {
+  background-color: var(--input-background);
+  border: none;
+  margin-left: 4px;
+  padding: 8px;
+}
+
+.pricing-workspace-dropdown-btn.ant-btn.rq-btn:hover {
+  border: none;
+}
+
 @media (max-width: 992px) {
   .pricing-table-product-wrapper {
     flex-direction: column;
