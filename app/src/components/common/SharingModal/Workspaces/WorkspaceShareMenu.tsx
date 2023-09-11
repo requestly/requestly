@@ -20,6 +20,7 @@ interface Props {
 
 interface WorkspaceItemProps {
   team: Team;
+  availableTeams?: Team[];
   onTransferClick?: (teamData: Team) => void;
   showArrow?: boolean;
   isLoading?: boolean;
@@ -27,10 +28,10 @@ interface WorkspaceItemProps {
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace).id;
+  const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace)?.id;
 
   const activeTeamData: Team = useMemo(
-    () => availableTeams.find((team: Team) => team.id === currentlyActiveWorkspaceId),
+    () => availableTeams?.find((team: Team) => team?.id === currentlyActiveWorkspaceId),
     [currentlyActiveWorkspaceId, availableTeams]
   );
   const sortedTeams: Team[] = useMemo(
@@ -42,14 +43,14 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
     return sortedTeams
       .slice(defaultActiveWorkspaces || 0)
       .map((team: Team, index: number) => {
-        if (!defaultActiveWorkspaces && team.id === activeTeamData.id) return null;
+        if (!defaultActiveWorkspaces && team?.id === activeTeamData?.id) return null;
         return {
           key: index,
           label: <WorkspaceItem isLoading={isLoading} onTransferClick={onTransferClick} team={team} />,
         };
       })
       .filter(Boolean);
-  }, [sortedTeams, activeTeamData.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
+  }, [sortedTeams, activeTeamData?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
     <div className="workspace-share-menu-item-card choose-other-workspace">
@@ -99,13 +100,13 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={["click"]}
+          trigger={availableTeams?.length > 1 ? ["click"] : [null]}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
         >
           <div>
-            <WorkspaceItem team={activeTeamData} showArrow />
+            <WorkspaceItem team={activeTeamData} showArrow availableTeams={availableTeams} />
           </div>
         </Dropdown>
       )}
@@ -116,11 +117,16 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
 const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   team,
   onTransferClick,
+  availableTeams,
   showArrow = false,
   isLoading = false,
 }) => {
   return (
-    <div className={`workspace-share-menu-item-card ${showArrow && "workspace-share-menu-dropdown"}`}>
+    <div
+      className={`workspace-share-menu-item-card ${
+        showArrow && availableTeams?.length > 1 && "workspace-share-menu-dropdown"
+      }`}
+    >
       <Row align="middle" className="items-center">
         <Avatar
           size={35}
@@ -137,7 +143,9 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         </span>
       </Row>
       {showArrow ? (
-        <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
+        availableTeams?.length > 1 ? (
+          <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
+        ) : null
       ) : (
         <RQButton
           disabled={isLoading}
