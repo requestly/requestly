@@ -4,6 +4,7 @@ import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
 import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
+import { redirectToPricingPlans } from "utils/RedirectionUtils";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   const [isContactUsModalActive, setIsContactUsModalActive] = useState(false);
@@ -27,7 +28,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
         <Button
           type="primary"
           onClick={() => {
-            setIsContactUsModalActive(true);
+            redirectToPricingPlans();
             trackUpgradeWorkspaceClicked();
           }}
         >
