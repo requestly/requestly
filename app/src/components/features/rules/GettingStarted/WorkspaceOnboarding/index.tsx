@@ -198,7 +198,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
                 type="text"
                 onClick={() => {
                   trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
-                  dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+                  dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
                 }}
               >
                 Skip for now
