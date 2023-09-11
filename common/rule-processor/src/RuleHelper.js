@@ -106,9 +106,12 @@ class RuleMatcher {
       value = sourceObject.value,
       blackListedDomains = CONSTANTS.BLACK_LIST_DOMAINS || [];
 
-    for (var index = 0; index < blackListedDomains.length; index++) {
-      if (url.indexOf(blackListedDomains[index]) !== -1) {
-        return { destination: null };
+    const forceEnableRuleOnAppURL = true; // todo: set in some way from desktop app
+    if (!(forceEnableRuleOnAppURL && url.includes("requestly.io"))) {
+      for (var index = 0; index < blackListedDomains.length; index++) {
+        if (url.indexOf(blackListedDomains[index]) !== -1) {
+          return { destination: null };
+        }
       }
     }
     return RuleMatcher.matchUrlCriteria(urlComponent, operator, value, destination);
