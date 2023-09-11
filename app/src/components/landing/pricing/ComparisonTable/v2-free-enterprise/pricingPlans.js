@@ -41,4 +41,32 @@ export const PricingPlans = {
       },
     },
   },
+  session_free: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 0,
+        },
+      },
+      annually: {
+        usd: {
+          price: 0,
+        },
+      },
+    },
+  },
+  session_professional: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 10,
+        },
+      },
+      annually: {
+        usd: {
+          price: 100,
+        },
+      },
+    },
+  },
 };

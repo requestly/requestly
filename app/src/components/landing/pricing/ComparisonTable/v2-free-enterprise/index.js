@@ -124,14 +124,15 @@ const FreeAndEnterprisePlanTable = () => {
                     </RQButton>
                   )}
                 </div>
-                {planDetails.planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
-                  <div className="pro-basic-feature-title text-left">
-                    <span>
-                      Everything <img src={underlineIcon} alt="highlight" />
-                    </span>{" "}
-                    in {planDetails.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
-                  </div>
-                )}
+                {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
+                  product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
+                    <div className="pro-basic-feature-title text-left">
+                      <span>
+                        Everything <img src={underlineIcon} alt="highlight" />
+                      </span>{" "}
+                      in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                    </div>
+                  )}
                 <div>
                   {planDetails.features.map((feature, index) => (
                     <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
