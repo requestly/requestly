@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../../../types";
 import { Button, Collapse, Space, Tooltip } from "antd";
@@ -19,6 +19,10 @@ interface Props {
 
 const RequestBodyPanel: React.FC<Props> = ({ networkEvent }) => {
   const [isParsed, setIsParsed] = useState(false);
+
+  useEffect(() => {
+    setIsParsed(false);
+  }, [networkEvent]);
 
   const editRequestBody = useCallback(() => {
     createRule(

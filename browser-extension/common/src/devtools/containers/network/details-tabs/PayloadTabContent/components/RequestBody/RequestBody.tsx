@@ -2,6 +2,7 @@ import React from "react";
 
 import { NetworkEvent } from "../../../../../../types";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
+import { isRequestBodyParseable } from "../../../../../../utils";
 
 interface Props {
   networkEvent: NetworkEvent;
@@ -24,7 +25,7 @@ const RequestBodySource: React.FC<Props> = ({ networkEvent }) => {
 };
 
 const RequestBody: React.FC<Props> = ({ networkEvent, parsed }) => {
-  if (parsed) {
+  if (parsed && isRequestBodyParseable(networkEvent.request.postData?.mimeType)) {
     return <RequestBodyParsed networkEvent={networkEvent} />;
   }
 
