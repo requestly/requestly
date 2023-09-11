@@ -36,6 +36,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       teamId: currentlyActiveWorkspace.id,
       emails: memberEmails,
       role: TeamRole.write,
+      allowMembersToInvite: true,
     }).then((res: any) => {
       setIsLoading(false);
       if (res?.data?.success)
