@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { RQButton } from "lib/design-system/components";
 import sessionImg from "../../../../../assets/icons/session.svg";
 import rulesImg from "../../../../../assets/icons/http-rules.svg";
@@ -17,6 +17,8 @@ import { Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -25,12 +27,66 @@ const PRIVATE_WORKSPACE = {
 };
 
 const FreeAndEnterprisePlanTable = () => {
+  const user = useSelector(getUserAuthDetails);
+
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
 
   // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
+
+  const renderButtonsForPlans = useCallback(
+    (planName) => {
+      const isUserPremium = user?.details?.isPremium;
+      const userPlanName = user?.details?.planDetails?.planName;
+
+      if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+        return (
+          <RQButton disabled={isUserPremium} onClick={() => (window.location.href = "/")} type="primary">
+            Use now
+          </RQButton>
+        );
+      } else if (planName === userPlanName) {
+        return (
+          <RQButton disabled type="primary">
+            Current Plan
+          </RQButton>
+        );
+      } else if (product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY) {
+        return (
+          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+            Contact us
+          </RQButton>
+        );
+      }
+
+      return (
+        <RQButton
+          onClick={() =>
+            redirectToCheckout({
+              mode: workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "individual" : "team",
+              planName: planName,
+              duration: duration,
+              quantity: workspaceToUpgrade.accessCount,
+            })
+          }
+          disabled={isUserPremium && userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
+          type="primary"
+        >
+          Upgrade now
+        </RQButton>
+      );
+    },
+    [
+      duration,
+      product,
+      user?.details?.isPremium,
+      user?.details?.planDetails?.planName,
+      workspaceToUpgrade.accessCount,
+      workspaceToUpgrade.id,
+    ]
+  );
 
   return (
     <>
@@ -104,29 +160,7 @@ const FreeAndEnterprisePlanTable = () => {
                     per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"} for{" "}
                     {workspaceToUpgrade.accessCount} members
                   </div>
-                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
-                    <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                      Use now
-                    </RQButton>
-                  ) : product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY ? (
-                    <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-                      Contact us
-                    </RQButton>
-                  ) : (
-                    <RQButton
-                      onClick={() =>
-                        redirectToCheckout({
-                          mode: workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "individual" : "team",
-                          planName: planName,
-                          duration: duration,
-                          quantity: workspaceToUpgrade.accessCount,
-                        })
-                      }
-                      type="primary"
-                    >
-                      Upgrade now
-                    </RQButton>
-                  )}
+                  {renderButtonsForPlans(planName)}
                 </div>
                 {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
                   product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
