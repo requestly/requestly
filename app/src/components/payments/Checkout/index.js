@@ -23,7 +23,7 @@ const Checkout = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get("m") ?? "individual"; // mode -> Defines what type of checkout we`re processing i.e. the individual or a team. Accepted values: "individual", "team"
   const teamId = urlParams.get("t");
-  const planType = urlParams.get("p") ?? "professional";
+  const planName = urlParams.get("p") ?? "professional";
   const duration = urlParams.get("d") ?? "annually";
   const quantity = urlParams.get("q");
   const currency = "usd";
@@ -43,7 +43,7 @@ const Checkout = () => {
     if (!duration) {
       return redirectTo404WithError("Plan duration not set");
     }
-    if (![APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC, APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL].includes(planType)) {
+    if (![APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC, APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL].includes(planName)) {
       return redirectTo404WithError("Invalid plan type");
     }
     if (mode === "team" && !teamId && !quantity) {
@@ -51,7 +51,7 @@ const Checkout = () => {
     }
 
     setIsPlanVerificationPassed(true);
-  }, [duration, mode, planType, quantity, redirectTo404WithError, teamId]);
+  }, [duration, mode, planName, quantity, redirectTo404WithError, teamId]);
 
   // const stableFetchUserCountry = useCallback(() => {
   //   fetch("https://api.country.is/")
@@ -113,7 +113,7 @@ const Checkout = () => {
             duration={duration}
             isPlanVerificationPassed={isPlanVerificationPassed}
             stripe={stripe}
-            planType={planType}
+            planName={planName}
             quantity={quantity}
           />
         </section>

@@ -19,7 +19,7 @@ const VerifyAndContinueCheckout = ({
   duration,
   isPlanVerificationPassed,
   stripe,
-  planType,
+  planName,
   quantity,
 }) => {
   // Global State
@@ -55,7 +55,7 @@ const VerifyAndContinueCheckout = ({
       currency: currency,
       teamId: teamId,
       quantity: quantity,
-      planType,
+      planName,
       duration,
       success_url:
         "http://" +
@@ -93,7 +93,7 @@ const VerifyAndContinueCheckout = ({
     isPlanVerificationPassed,
     isSubscriptionCheckPassed,
     mode,
-    planType,
+    planName,
     quantity,
     stripe,
     teamId,
@@ -171,7 +171,7 @@ const VerifyAndContinueCheckout = ({
       } else if (mode === "individual") {
         fetchUserSubscriptionInfo();
       }
-      if (mode && currency && duration && planType && isPlanVerificationPassed && isSubscriptionCheckPassed) {
+      if (mode && currency && duration && planName && isPlanVerificationPassed && isSubscriptionCheckPassed) {
         initiateCheckoutSession();
       }
     }
@@ -181,10 +181,10 @@ const VerifyAndContinueCheckout = ({
     currency,
     duration,
     isSubscriptionCheckPassed,
-    planType,
     initiateCheckoutSession,
     fetchUserSubscriptionInfo,
     fetchTeamSubscriptionInfo,
+    planName,
   ]);
 
   return <></>;
