@@ -54,6 +54,7 @@ export default [
     output: {
       file: `${OUTPUT_DIR}/devtools/index.js`,
       format: "iife",
+      inlineDynamicImports: true,
     },
     context: "window",
     plugins: [
