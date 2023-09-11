@@ -36,7 +36,6 @@ const getEditorLanguageFromMimeType = (mimeType: string) => {
     language = mimeTypeToLangugageMap[mimeType.toLowerCase().split(";")?.[0]];
   }
 
-  console.log({ language });
   return language || "";
 };
 
