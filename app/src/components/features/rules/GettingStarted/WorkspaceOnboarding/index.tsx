@@ -31,7 +31,7 @@ import { Invite, InviteUsage } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
-import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
+import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 

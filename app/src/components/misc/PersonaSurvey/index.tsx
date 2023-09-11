@@ -11,7 +11,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/onboarding";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore

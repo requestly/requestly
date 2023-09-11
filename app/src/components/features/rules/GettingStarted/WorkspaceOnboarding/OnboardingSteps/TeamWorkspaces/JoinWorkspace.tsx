@@ -12,7 +12,7 @@ import { acceptTeamInvite } from "backend/workspace";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
+import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
 import { OnboardingSteps } from "../../types";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 
