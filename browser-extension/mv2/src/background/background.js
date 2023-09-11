@@ -571,6 +571,30 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 BG.Methods.onHeadersReceived = function (details) {
   var modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
 
+  const initiatorPatterns = [
+    /^http:\/\/localhost:\d+/,
+    /^http:\/\/127\.0\.0\.1:\d+/,
+    /^https:\/\/app\.requestly\.io/,
+    /^https:\/\/beta\.requestly\.io/,
+  ];
+
+  const isSessionViewerInitiator = initiatorPatterns.some((initiator) => initiator.test(details.initiator));
+
+  if (isSessionViewerInitiator && (details.type === "font" || details.url?.includes("woff"))) {
+    const corsHeaders = [
+      { name: "Access-Control-Allow-Methods", value: "*" },
+      { name: "Access-Control-Allow-Headers", value: "*" },
+      { name: "Access-Control-Allow-Credentials", value: "true" },
+      { name: "Access-Control-Allow-Origin", value: details.initiator },
+    ];
+
+    if (modifiedHeaders) {
+      modifiedHeaders.push(...corsHeaders);
+    } else {
+      modifiedHeaders = [...corsHeaders];
+    }
+  }
+
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
   }
