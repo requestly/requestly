@@ -161,6 +161,12 @@
   border: none;
 }
 
+.pricing-workspace-selector-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 992px) {
   .pricing-table-product-wrapper {
     flex-direction: column;

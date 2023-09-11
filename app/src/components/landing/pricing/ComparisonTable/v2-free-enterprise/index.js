@@ -18,10 +18,17 @@ import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 
+const PRIVATE_WORKSPACE = {
+  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
+  id: "prive_workspace",
+  accessCount: 1,
+};
+
 const FreeAndEnterprisePlanTable = () => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
 
   // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
@@ -42,7 +49,7 @@ const FreeAndEnterprisePlanTable = () => {
           />
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
-        <WorkspaceDropdown />
+        <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
         <div className="pricing-table-product-wrapper">
           <div className="pricing-table-product-view">
             <h1>Products</h1>
@@ -102,9 +109,10 @@ const FreeAndEnterprisePlanTable = () => {
                     <RQButton
                       onClick={() =>
                         redirectToCheckout({
-                          mode: "individual",
+                          mode: workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "individual" : "team",
                           planName: planName,
                           duration: duration,
+                          quantity: workspaceToUpgrade.accessCount,
                         })
                       }
                       type="primary"
