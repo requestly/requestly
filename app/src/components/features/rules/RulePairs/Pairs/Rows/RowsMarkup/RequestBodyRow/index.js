@@ -44,6 +44,12 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }
   };
 
+  useEffect(() => {
+    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+      setEditorStaticValue(pair.request.value);
+    }
+  }, [pair.request]);
+
   const showPopup = (e) => {
     const requestType = e.target.value;
 

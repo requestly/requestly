@@ -109,3 +109,19 @@ export const matchResourceTypeFilter = (
       return true;
   }
 };
+
+export const isRequestBodyParseable = (mimeType: string): boolean => {
+  if (mimeType && mimeType.startsWith("application/json")) {
+    return true;
+  }
+
+  return false;
+};
+
+export const isContentBodyEditable = (networkResourceType: NetworkResourceType): boolean => {
+  if (matchResourceTypeFilter(networkResourceType, ResourceTypeFilterValue.AJAX)) {
+    return true;
+  }
+
+  return false;
+};

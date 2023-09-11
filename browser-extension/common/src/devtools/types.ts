@@ -39,6 +39,7 @@ export enum RuleEditorUrlFragment {
   QUERY_PARAM = "QueryParam",
   SCRIPT = "Script",
   USER_AGENT = "UserAgent",
+  REQUEST = "Request",
 }
 
 export interface ResourceFilters {
@@ -62,4 +63,13 @@ export interface ExecutionEvent {
   rule: Rule;
   modification: string;
   _resourceType?: NetworkResourceType;
+}
+
+export enum RequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  OPTIONS = "OPTIONS",
 }
