@@ -1,15 +1,16 @@
 import React, { useMemo } from "react";
-import NetworkLogProperty from "./NetworkLogProperty";
+
 import { ThemeProvider } from "@devtools-ds/themes";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
+import { NetworkLogProperty } from "./NetworkLogProperty";
 
 type Props = {
-  label: string;
+  label?: string;
   payload: any;
   isPayloadTooLarge?: boolean;
 };
 
-const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) => {
+export const NetworkPayload: React.FC<Props> = ({ label, payload }) => {
   const parsedPayload = useMemo(() => {
     if (typeof payload === "string") {
       try {
@@ -21,10 +22,6 @@ const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) 
     return payload;
   }, [payload]);
 
-  if (!parsedPayload && !isPayloadTooLarge) {
-    return null;
-  }
-
   if (typeof parsedPayload === "object") {
     return (
       <NetworkLogProperty label={label}>
@@ -35,11 +32,13 @@ const NetworkPayload: React.FC<Props> = ({ label, payload, isPayloadTooLarge }) 
     );
   }
 
-  return (
-    <NetworkLogProperty label={label} isCodeBlock>
-      {isPayloadTooLarge ? "Payload too large to capture" : parsedPayload}
-    </NetworkLogProperty>
-  );
-};
+  if (payload && typeof payload === "string") {
+    return (
+      <NetworkLogProperty label={label} isCodeBlock>
+        {payload}
+      </NetworkLogProperty>
+    );
+  }
 
-export default NetworkPayload;
+  return null;
+};

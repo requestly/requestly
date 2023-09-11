@@ -1104,11 +1104,10 @@ const RulesTable = ({
   ]);
 
   useEffect(() => {
-    //TODO: change date before merging
     if (
       !isMiscTourCompleted.rulesListSharingOnboarding &&
       userAttributes?.num_rules >= 1 &&
-      new Date(userAttributes?.install_date) < new Date("2023-09-05")
+      new Date(userAttributes?.install_date) < new Date("2023-09-07")
     ) {
       setStartSharingWalkthrough(true);
     }

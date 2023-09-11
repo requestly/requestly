@@ -293,71 +293,6 @@
     }
   }
 
-  .network-logs-panel {
-    .network-logs-table {
-      overflow: auto;
-      height: 100%;
-
-      .network-log-row {
-        cursor: pointer;
-
-        &.selected {
-          background-color: #0948b2;
-          color: #fff;
-        }
-
-        .network-log-url {
-          word-break: break-all;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-
-          &.failed {
-            color: #ff4d4f;
-          }
-        }
-
-        .request-method-tag {
-          font-size: 11px;
-          padding: 2px 8px;
-          margin-right: 10px;
-          margin-top: -2px;
-          min-width: 48px;
-          text-align: center;
-          flex-shrink: 0;
-        }
-      }
-    }
-
-    .gutter {
-      background-color: #0000000f;
-      margin: 0 8px;
-      cursor: col-resize;
-    }
-
-    .network-log-details {
-      .ant-tabs-tab {
-        padding: 6px 0;
-
-        + .ant-tabs-tab {
-          margin: 0 0 0 20px;
-        }
-      }
-
-      .network-log-details-tab-content {
-        overflow: auto;
-        height: 244px;
-      }
-
-      .network-payload-object {
-        span {
-          font-size: 11px;
-        }
-      }
-    }
-  }
-
   .session-properties-wrapper {
     display: flex;
     gap: 1rem;
@@ -548,10 +483,6 @@ body.dark {
       }
     }
 
-    .network-logs-panel .gutter {
-      background-color: #313a46;
-    }
-
     .ant-pro-card,
     .rr-player {
       background: var(--component-background) !important;
@@ -658,10 +589,6 @@ body.dark {
           display: block;
         }
       }
-
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 16rem;
-      }
     }
   }
 }
@@ -674,10 +601,6 @@ body.dark {
         .secondary-message {
           width: 26rem;
         }
-      }
-
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 22rem;
       }
     }
   }
@@ -692,10 +615,6 @@ body.dark {
           width: 34rem;
         }
       }
-
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 30rem;
-      }
     }
   }
 }
@@ -709,10 +628,6 @@ body.dark {
           width: 48rem;
         }
       }
-
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 42rem;
-      }
     }
   }
 }
@@ -725,20 +640,6 @@ body.dark {
         .secondary-message {
           width: 60rem;
         }
-      }
-
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 58rem;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 1800px) {
-  .session-viewer-page {
-    .session-details-panel-row {
-      &.network-logs-panel .network-logs-table .network-log-row .network-log-url {
-        max-width: 80rem;
       }
     }
   }
