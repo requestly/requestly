@@ -126,12 +126,7 @@ const CheckoutIndex = () => {
   const [stripePromise, setStripePromise] = useState(false);
 
   useEffect(() => {
-    if (!stripePromise)
-      setStripePromise(
-        loadStripe(
-          "pk_test_51KflXlDiNNz2hbmOUApXI81Y1qQu3F9dt0xmoC79bnNjJnYU1tRr7YpkjSMOqI5kVKesBVv4HEfa5m6NMjSmolC600bkl82JE6"
-        )
-      );
+    if (!stripePromise) setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY));
   }, [stripePromise]);
 
   return (
