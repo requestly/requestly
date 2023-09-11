@@ -108,6 +108,10 @@ const FreeAndEnterprisePlanTable = () => {
                     <RQButton onClick={() => (window.location.href = "/")} type="primary">
                       Use now
                     </RQButton>
+                  ) : product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY ? (
+                    <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+                      Contact us
+                    </RQButton>
                   ) : (
                     <RQButton
                       onClick={() =>

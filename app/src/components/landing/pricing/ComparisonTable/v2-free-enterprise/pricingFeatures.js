@@ -110,7 +110,7 @@ export const PricingFeatures = {
     },
   },
   [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
-    session_free: {
+    free: {
       planTitle: "Free",
       features: [
         {
