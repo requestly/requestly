@@ -113,3 +113,11 @@ export function startRecordingOnUrl(url) {
     url,
   });
 }
+
+export function testRuleOnUrl(url, ruleId) {
+  return sendMessage({
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.TEST_RULE_ON_URL,
+    url,
+    ruleId,
+  });
+}

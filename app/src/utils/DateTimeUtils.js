@@ -127,3 +127,19 @@ export const getTimeDifferenceFromTimestamps = (time1, time2) => {
   const time2DateObj = new Date(time2);
   return time1DateObj.getTime() - time2DateObj.getTime(); // in milliseconds
 };
+
+//get formatted timestamp in "24 August 2023 - 5:24PM" format
+export const getFormattedTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+
+  const day = date.getDate();
+  const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+  const year = date.getFullYear();
+
+  const hours = date.getHours() % 12 || 12;
+  const ampm = date.getHours() >= 12 ? "PM" : "AM";
+  const minutes = date.getMinutes();
+
+  const formattedDate = `${day} ${month} ${year} - ${hours}:${minutes < 10 ? "0" : ""}${minutes}${ampm}`;
+  return formattedDate;
+};

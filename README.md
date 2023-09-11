@@ -1,5 +1,4 @@
 <p align="center">
-<p align="center">
   <a target="_blank" href="https://requestly.io/">
     <img src="https://github.com/requestly/requestly/assets/16779465/652552db-c867-44cb-9bb5-94a2026e04ca" alt="Requestly Logo" width="40%"/>
   </a>
@@ -31,7 +30,7 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 <p align="center">
   <a href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/3108399/f0359812-35dc-495c-8ab3-10aced90de3e" alt="Requestly Details" width="60%"/>
+    <img src="https://github.com/requestly/requestly/assets/16779465/92af73cc-e75c-48cc-8266-acb6c05a3350" alt="Requestly Details" width="60%"/>
   </a>
 </p>
 
@@ -117,10 +116,11 @@ Collaborate with other teammates and get Requestly sessions that contain video, 
 ## 📕 Documentation
 
 Please find our [documentation here](https://developers.requestly.io/). Our docs can help with
-- Getting Started
+- [Getting Started](https://developers.requestly.io/)
 - Product Documentation
 - FAQs
 - Troubleshooting
+- [Security & Privacy](https://developers.requestly.io/faq/security-and-privacy/)
 
 ## 👩‍💻 Development
 

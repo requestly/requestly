@@ -1,0 +1,94 @@
+:host {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  top: 10px;
+  right: 10px;
+  width: 32vw;
+}
+
+#container {
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: system-ui;
+  background: #1c1d21;
+  border: 1px solid #5c5b5b;
+  cursor: move;
+}
+
+#rule-name {
+  font-size: 12px;
+  margin: 4px 0;
+  font-weight: bolder;
+  line-height: 1.4;
+}
+
+#heading-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid #5c5b5b;
+  padding: 12px 18px;
+  background: transparent;
+}
+
+#heading-container div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+#content-container {
+  display: flex;
+  flex-direction: row;
+  padding: 12px 18px;
+  background: #242529;
+  border-radius: 8px;
+  justify-content: space-between;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#secondary-text {
+  font-size: 11px;
+  color: #b0b0b5b3;
+  align-self: center;
+}
+
+#icon-container {
+  height: 20px;
+  width: 20px;
+  padding-right: 4px;
+  align-self: center;
+}
+
+#icon-container img {
+  height: 16px;
+  width: 16px;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+#view-result-btn {
+  all: unset;
+  background: #1e69ff;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+#view-result-btn:hover {
+  cursor: pointer;
+  border-color: #0f4cd9;
+  background: #0f4cd9;
+}
+
+#rule-status {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 4px;
+}

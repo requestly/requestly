@@ -206,6 +206,11 @@ export const RULE_EDITOR = {
   MODIFY_API_RESPONSE: {
     SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
   },
+  TEST_THIS_RULE: {
+    TEST_RULE_CLICKED: "test_rule_clicked",
+    TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
+  },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {

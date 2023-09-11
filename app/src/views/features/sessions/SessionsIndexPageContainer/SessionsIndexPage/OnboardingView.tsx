@@ -10,6 +10,7 @@ import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
+import { prefixUrlWithHttps } from "utils/URLUtils";
 import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
 import {
   trackInstallExtensionDialogShown,
@@ -130,7 +131,8 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   const handleStartRecordingBtnClicked = useCallback(() => {
     trackStartRecordingWithURLClicked();
     if (isExtensionInstalled()) {
-      const urlToRecord = sanitize(inputRef?.current.input.value);
+      const urlToRecord = prefixUrlWithHttps(inputRef?.current.input.value);
+      inputRef.current.input.value = urlToRecord;
       if (isValidUrl(urlToRecord)) {
         trackStartRecordingOnExternalTarget(urlToRecord);
         return startRecordingOnUrl(urlToRecord);
@@ -140,16 +142,6 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
       }
     } else {
       openInstallExtensionModal();
-    }
-
-    function sanitize(url: string) {
-      let sanitizedURL = url.trim();
-      if (sanitizedURL && !sanitizedURL.startsWith("http://") && !sanitizedURL.startsWith("https://")) {
-        sanitizedURL = "https://" + sanitizedURL;
-        inputRef.current.input.value = sanitizedURL;
-        return sanitizedURL;
-      }
-      return sanitizedURL;
     }
   }, [openInstallExtensionModal]);
 
