@@ -35,8 +35,6 @@ const VerifyAndContinueCheckout = ({
     if (isCheckoutSessionProcessing) return null;
     setIsCheckoutSessionProcessing(true);
 
-    const rqPlanId = "professional_12m"; // to fix
-
     let FFName;
     switch (mode) {
       case "individual":
@@ -54,7 +52,6 @@ const VerifyAndContinueCheckout = ({
     const createSubscriptionUsingStripeCheckout = httpsCallable(functions, FFName);
 
     createSubscriptionUsingStripeCheckout({
-      rqPlanId: rqPlanId,
       currency: currency,
       teamId: teamId,
       quantity: quantity,
