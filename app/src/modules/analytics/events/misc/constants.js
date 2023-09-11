@@ -93,6 +93,7 @@ export const ONBOARDING = {
   },
   WORKSPACE: {
     ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
+    WORKSPACE_ONBOARDING_PAGE_VIEWED: "workspace_onboarding_page_viewed",
   },
 };
 

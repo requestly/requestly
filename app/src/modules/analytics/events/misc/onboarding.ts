@@ -47,3 +47,8 @@ export const trackOnboardingWorkspaceSkip = (step: string) => {
   const params = { step };
   trackEvent(WORKSPACE.ONBOARDING_WORKSPACE_SKIP, params);
 };
+
+export const trackWorkspaceOnboardingPageViewed = (page: string) => {
+  const params = { page };
+  trackEvent(WORKSPACE.WORKSPACE_ONBOARDING_PAGE_VIEWED, params);
+};

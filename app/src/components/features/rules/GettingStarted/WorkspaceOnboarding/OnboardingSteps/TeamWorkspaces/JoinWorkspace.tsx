@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
@@ -12,9 +12,12 @@ import { acceptTeamInvite } from "backend/workspace";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
-import { OnboardingSteps } from "../../types";
+import {
+  trackOnboardingWorkspaceSkip,
+  trackWorkspaceOnboardingPageViewed,
+} from "modules/analytics/events/misc/onboarding";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
+import { OnboardingSteps } from "../../types";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -92,6 +95,9 @@ export const JoinWorkspace: React.FC<{
 }> = ({ availableTeams, isPendingInvite, createNewTeam }) => {
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    trackWorkspaceOnboardingPageViewed("join_workspace");
+  }, []);
   return (
     <>
       <div className="header text-center">
