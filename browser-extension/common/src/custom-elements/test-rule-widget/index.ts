@@ -40,11 +40,11 @@ class RQTestRuleWidget extends RQDraggableWidget {
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
 
-    const infoText = this.attributes.getNamedItem("info-text")?.value;
-    if (infoText) {
+    const infoTextContent = this.attributes.getNamedItem("info-text-content")?.value;
+    if (infoTextContent) {
       const infoContainer = this.shadowRoot.getElementById("info-container");
       const infoContainerText = this.shadowRoot.getElementById("info-text");
-      infoContainerText.innerText = infoText;
+      infoContainerText.innerHTML = infoTextContent;
       infoContainer.classList.remove("hidden");
     }
   }
