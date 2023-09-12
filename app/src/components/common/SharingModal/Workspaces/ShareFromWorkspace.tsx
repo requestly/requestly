@@ -4,6 +4,7 @@ import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
+import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { httpsCallable, getFunctions } from "firebase/functions";
@@ -94,14 +95,27 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
             Share
           </RQButton>
           {selectedRules.length === 1 ? (
-            <CopyButton
-              title="Copy link"
-              type="default"
-              copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?workspaceId=${currentlyActiveWorkspace.id}`}
-              showIcon={false}
-              disableTooltip
-              trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}
-            />
+            <Tooltip
+              title="Anyone in the workspace will be able to view the rule."
+              placement="bottom"
+              color="var(--border-dark)"
+              overlayInnerStyle={{
+                color: "var(--text-gray)",
+                fontSize: "13px",
+                width: "max-content",
+              }}
+            >
+              <>
+                <CopyButton
+                  title="Copy link"
+                  type="default"
+                  copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?workspaceId=${currentlyActiveWorkspace.id}`}
+                  showIcon={false}
+                  disableTooltip
+                  trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}
+                />
+              </>
+            </Tooltip>
           ) : null}
         </div>
       </div>
