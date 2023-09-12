@@ -64,6 +64,10 @@ export default [
             src: ["src/devtools/devtools.html", "src/devtools/devtools.js", "src/devtools/index.html"],
             dest: `${OUTPUT_DIR}/devtools`,
           },
+          {
+            src: ["src/devtools/assets/*"], // For monaco editor
+            dest: `${OUTPUT_DIR}/devtools`,
+          },
         ],
       }),
       nodeResolve(),
