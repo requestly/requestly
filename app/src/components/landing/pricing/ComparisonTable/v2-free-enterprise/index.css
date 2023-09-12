@@ -175,6 +175,7 @@
 
 .pricing-workspace-dropdown-container {
   margin-left: 38%;
+  margin-bottom: 4px;
 }
 
 @media (max-width: 992px) {
