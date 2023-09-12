@@ -13,11 +13,11 @@ import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { renameWorkspace } from "backend/workspace";
+import { trackWorkspaceInviteLinkCopied, trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import {
-  trackWorkspaceInviteLinkCopied,
   trackOnboardingWorkspaceSkip,
-  trackCreateNewTeamClicked,
-} from "modules/analytics/events/common/teams";
+  trackWorkspaceOnboardingPageViewed,
+} from "modules/analytics/events/misc/onboarding";
 import {
   trackAddTeamMemberFailure,
   trackAddTeamMemberSuccess,
@@ -145,6 +145,10 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
       upsertTeamCommonInvite({ teamId: defaultTeamData?.teamId, domainEnabled: true });
     }
   }, [defaultTeamData, upsertTeamCommonInvite]);
+
+  useEffect(() => {
+    trackWorkspaceOnboardingPageViewed("create_workspace");
+  }, []);
 
   return (
     <>

@@ -2,7 +2,13 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../store";
 // UTILS
-import { getAppMode, getDesktopSpecificDetails, getHasConnectedApp, getUserAuthDetails } from "../store/selectors";
+import {
+  getAppMode,
+  getDesktopSpecificDetails,
+  getHasConnectedApp,
+  getUserAuthDetails,
+  getUserPersonaSurveyDetails,
+} from "../store/selectors";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // ACTIONS
@@ -38,6 +44,7 @@ const AppModeInitializer = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
+  const userPersona = useSelector(getUserPersonaSurveyDetails);
 
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
@@ -148,10 +155,15 @@ const AppModeInitializer = () => {
   }, [appMode]);
 
   useEffect(() => {
-    if (isProxyServerRunning && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !hasConnectedAppBefore) {
+    if (
+      isProxyServerRunning &&
+      appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+      !hasConnectedAppBefore &&
+      userPersona.isSurveyCompleted
+    ) {
       dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
     }
-  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning]);
+  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona.isSurveyCompleted]);
 
   // Set app mode to "DESKTOP" if required. Default is "EXTENSION"
   useEffect(() => {
