@@ -571,29 +571,32 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 BG.Methods.onHeadersReceived = function (details) {
   let modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
 
-  const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
-  const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
-  const fontTypes = ["woff", "woff2", "otf", "ttf"];
-  const requestURL = new URL(details.url);
-  const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
+  try {
+    const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+    const fontTypes = ["woff", "woff2", "otf", "ttf"];
+    const requestURL = new URL(details.url);
+    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
 
-  if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
-    const corsHeaders = {
-      "Access-Control-Allow-Methods": "*",
-      "Access-Control-Allow-Headers": "*",
-      "Access-Control-Allow-Credentials": "true",
-      "Access-Control-Allow-Origin": requestInitiator.origin,
-    };
+    // This bypasses the CORS error in session replay player
+    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
+      const corsHeaders = {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": requestInitiator.origin,
+      };
 
-    const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
+      const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
 
-    modifiedHeaders = !modifiedHeaders
-      ? formattedCorsHeaders
-      : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
-  }
-
-  if (modifiedHeaders !== null) {
-    return { responseHeaders: modifiedHeaders };
+      modifiedHeaders = !modifiedHeaders
+        ? formattedCorsHeaders
+        : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
+    }
+  } finally {
+    if (modifiedHeaders !== null) {
+      return { responseHeaders: modifiedHeaders };
+    }
   }
 };
 
