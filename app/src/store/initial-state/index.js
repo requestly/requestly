@@ -130,6 +130,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -196,6 +200,7 @@ const INITIAL_STATE = {
         firstRule: false,
         fifthRule: false,
         firstDraftSession: false,
+        rulesListSharingOnboarding: false,
       },
 
       hasConnectedApp: false,

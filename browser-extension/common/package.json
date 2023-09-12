@@ -23,7 +23,7 @@
     "watch": "rm -rf dist && rollup -cw"
   },
   "devDependencies": {
-    "@requestly-ui/resource-table": "^0.1.0",
+    "@requestly-ui/resource-table": "^0.1.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -50,7 +50,9 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.2.1",
     "@devtools-ds/themes": "^1.2.1",
+    "@monaco-editor/react": "^4.5.2",
     "antd": "^5.0.4",
+    "monaco-editor": "^0.41.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-split": "^2.0.14",

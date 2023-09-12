@@ -102,3 +102,9 @@ export const MORE_INFO = {
   MORE_INFO_VIEWED: "more_info_viewed",
   MORE_INFO_CLICKED: "more_info_clicked",
 };
+
+export const SHARING = {
+  SHARE_BUTTON_CLICKED: "share_button_clicked",
+  SHARE_MODAL_VIEWED: "share_modal_viewed",
+  SHARING_TAB_SWITCHED: "sharing_tab_switched",
+};
