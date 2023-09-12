@@ -29,3 +29,8 @@ export const trackSharingModalRulesDuplicated = (currentWorkspace, count) => {
   const params = { currentWorkspace, count };
   trackEvent(SHARING.SHARING_MODAL_RULES_DUPLICATED, params);
 };
+
+export const trackSharingModalToastViewed = (message) => {
+  const params = { message };
+  trackEvent(SHARING.SHARING_MODAL_TOAST_VIEWED, params);
+};

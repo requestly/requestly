@@ -111,4 +111,5 @@ export const SHARING = {
   SHARING_MODAL_WORKSPACE_DROPDOWN_CLICKED: "sharing_modal_workspace_dropdown_clicked",
   SHARING_URL_IN_WORKSPACE_COPIED: "sharing_url_in_workspace_copied",
   SHARING_MODAL_RULES_DUPLICATED: "sharing_modal_rules_duplicated",
+  SHARING_MODAL_TOAST_VIEWED: "sharing_modal_toast_viewed",
 };

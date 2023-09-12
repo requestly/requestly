@@ -14,9 +14,11 @@ import { Team, TeamRole } from "types";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import {
   trackSharingModalRulesDuplicated,
+  trackSharingModalToastViewed,
   trackSharingUrlInWorkspaceCopied,
 } from "modules/analytics/events/misc/sharing";
 import PATHS from "config/constants/sub/paths";
+import { toast } from "utils/Toast";
 
 interface Props {
   selectedRules: string[];
@@ -38,12 +40,19 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       emails: memberEmails,
       role: TeamRole.write,
     }).then((res: any) => {
-      setIsLoading(false);
-      if (res?.data?.success)
+      const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
+
+      if (hasSuccessfulInvite) {
         trackAddTeamMemberSuccess(currentlyActiveWorkspace.id, memberEmails, TeamRole.write, "sharing_modal");
-      setPostShareViewData({
-        type: WorkspaceSharingTypes.USERS_INVITED,
-      });
+        setPostShareViewData({
+          type: WorkspaceSharingTypes.USERS_INVITED,
+        });
+      } else {
+        const errorMessage = "The user is either in the workspace or has a pending invite.";
+        toast.error(errorMessage);
+        trackSharingModalToastViewed(errorMessage);
+      }
+      setIsLoading(false);
     });
   }, [memberEmails, currentlyActiveWorkspace.id, setPostShareViewData]);
 
