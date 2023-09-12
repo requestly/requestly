@@ -40,6 +40,7 @@ export enum RuleEditorUrlFragment {
   SCRIPT = "Script",
   USER_AGENT = "UserAgent",
   REQUEST = "Request",
+  RESPONSE = "Response",
 }
 
 export interface ResourceFilters {
