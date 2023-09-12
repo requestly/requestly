@@ -569,30 +569,27 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 };
 
 BG.Methods.onHeadersReceived = function (details) {
-  var modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
+  let modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
 
-  const initiatorPatterns = [
-    /^http:\/\/localhost:\d+/,
-    /^http:\/\/127\.0\.0\.1:\d+/,
-    /^https:\/\/app\.requestly\.io/,
-    /^https:\/\/beta\.requestly\.io/,
-  ];
+  const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+  const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+  const fontTypes = ["woff", "woff2", "otf", "ttf"];
+  const requestURL = new URL(details.url);
+  const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
 
-  const isSessionViewerInitiator = initiatorPatterns.some((initiator) => initiator.test(details.initiator));
+  if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
+    const corsHeaders = {
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Allow-Origin": requestInitiator.origin,
+    };
 
-  if (isSessionViewerInitiator && (details.type === "font" || details.url?.includes("woff"))) {
-    const corsHeaders = [
-      { name: "Access-Control-Allow-Methods", value: "*" },
-      { name: "Access-Control-Allow-Headers", value: "*" },
-      { name: "Access-Control-Allow-Credentials", value: "true" },
-      { name: "Access-Control-Allow-Origin", value: details.initiator },
-    ];
+    const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
 
-    if (modifiedHeaders) {
-      modifiedHeaders.push(...corsHeaders);
-    } else {
-      modifiedHeaders = [...corsHeaders];
-    }
+    modifiedHeaders = !modifiedHeaders
+      ? formattedCorsHeaders
+      : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
   }
 
   if (modifiedHeaders !== null) {
