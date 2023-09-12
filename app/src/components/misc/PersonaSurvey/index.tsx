@@ -7,7 +7,6 @@ import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
 import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
 import { handleSurveyNavigation } from "./actions";
-import { isExtensionInstalled } from "actions/ExtensionActions";
 import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
@@ -127,14 +126,14 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   }, [appMode, currentPage, dispatch, navigate, isSurveyModal]);
 
   useEffect(() => {
-    if (currentPage === SurveyPage.GETTING_STARTED) {
+    if (isSurveyModal && currentPage === SurveyPage.GETTING_STARTED) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result) {
-          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || isExtensionInstalled()) trackPersonaSurveyViewed();
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) trackPersonaSurveyViewed();
         }
       });
     }
-  }, [appMode, currentPage]);
+  }, [appMode, currentPage, isSurveyModal]);
 
   useEffect(() => {
     if (userPersona?.page > 2) dispatch(actions.updateIsPersonaSurveyCompleted(true));
