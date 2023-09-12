@@ -6,6 +6,7 @@ import HeadersTabContent from "./HeadersTabContent/HeadersTabContent";
 import PayloadTabContent from "./PayloadTabContent/PayloadTabContent";
 // @ts-ignore
 import { ObjectInspector } from "@devtools-ds/object-inspector";
+import ResponseTabContent from "./ResponseTabContent/ResponseTabContent";
 
 const networkEventDetailsTabs: DetailsTab<NetworkEvent>[] = [
   {
@@ -22,6 +23,11 @@ const networkEventDetailsTabs: DetailsTab<NetworkEvent>[] = [
     key: "payload",
     label: "Payload",
     render: (networkEvent) => <PayloadTabContent networkEvent={networkEvent} />,
+  },
+  {
+    key: "response",
+    label: "Response",
+    render: (networkEvent) => <ResponseTabContent networkEvent={networkEvent} />,
   },
   {
     key: "har",
