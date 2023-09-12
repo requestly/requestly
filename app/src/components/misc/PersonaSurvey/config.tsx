@@ -1,4 +1,4 @@
-import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig, SurveyPage } from "./types";
+import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig, SurveyPage, Visibility } from "./types";
 import { setUserPersona } from "./actions";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 
@@ -46,6 +46,43 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
       },
     ],
   },
+  [QuestionnaireType.INDUSTRY]: {
+    questionResponseAction: (dispatch, value, doClear = false) =>
+      setUserPersona(dispatch, value, doClear, QuestionnaireType.INDUSTRY),
+    options: [
+      {
+        title: "Ad-Tech",
+      },
+      {
+        title: "E-commerce",
+      },
+      {
+        title: "Gaming",
+      },
+      {
+        title: "Ed-Tech",
+      },
+      {
+        title: "IT services",
+      },
+      {
+        title: "Financial services",
+      },
+      {
+        title: "Healthcare",
+      },
+      {
+        title: "SaaS",
+      },
+      {
+        title: "Travel",
+      },
+      {
+        type: "other",
+        title: null,
+      },
+    ],
+  },
 };
 
 export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
@@ -54,6 +91,7 @@ export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
     pageId: SurveyPage.GETTING_STARTED,
     title: "Welcome to Requestly!",
     subTitle: "Help us personalise your experience by answering the following questionnaire",
+    visibility: () => true,
     render: () => <GettingStartedWithSurvey />,
   },
 
@@ -62,6 +100,17 @@ export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
     pageId: SurveyPage.PERSONA,
     title: "Which role describes you the best?",
     subTitle: "Please select one you closely relate to",
+    visibility: () => true,
     render: QuestionnaireType.PERSONA,
+  },
+  [SurveyPage.INDUSTRY]: {
+    pageId: SurveyPage.INDUSTRY,
+    title: "In which industry do you apply your skills as a developer?",
+    subTitle: "Select one",
+    visibility: ({ userPersona }: Visibility) =>
+      userPersona.persona === PersonaType.FRONTEND ||
+      userPersona.persona === PersonaType.BACKEND ||
+      userPersona.persona === PersonaType.FULLSTACK,
+    render: QuestionnaireType.INDUSTRY,
   },
 };

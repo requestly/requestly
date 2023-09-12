@@ -13,6 +13,7 @@ const INITIAL_STATE = {
   userPersona: {
     page: "getting_started",
     persona: "",
+    industry: "",
     // useCases: [],
     // referralChannel: "",
     // numberOfEmployees: "",
@@ -129,6 +130,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -184,19 +189,23 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
+      isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,
         firstDraftSession: false,
+        rulesListSharingOnboarding: false,
       },
 
       hasConnectedApp: false,
       lastSeenInviteTs: 0,
+      isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,

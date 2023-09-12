@@ -19,6 +19,7 @@ const TeamsList = ({ teams = [] }) => {
   const renderSubscriptionStatus = (subscriptionStatus, teamId) => {
     switch (subscriptionStatus) {
       case "active":
+      case "trialing":
         return (
           <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
             <Badge status="success" /> Active
@@ -128,7 +129,13 @@ const TeamsList = ({ teams = [] }) => {
             type="primary"
             onClick={() => {
               trackCreateNewWorkspaceClicked("my_teams");
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: { source: "my_teams" },
+                })
+              );
             }}
             icon={<PlusOutlined />}
           >

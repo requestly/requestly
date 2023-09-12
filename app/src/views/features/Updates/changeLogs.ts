@@ -8,6 +8,41 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.9.2",
+    logs: [
+      "fix: need to double click on session recording on-page widget (#1008)",
+      "[RQ-816] fix: sessions not being stitched (#1006)",
+      "[RQ-810] fix: port connection not working in firefox (#997)",
+      "[RQ-778] feat: test this rule revamp (#994)",
+    ],
+  },
+  {
+    version: "23.8.24",
+    logs: [
+      "Revamped Requestly devtools panel in browser inspect with support of rule creation from network traffic",
+      "Bug fix: Script rule does not execute in HTML documents which don't have doctype defined",
+    ],
+  },
+  {
+    version: "23.8.12",
+    logs: [
+      "Ignore large request/response payloads in Session replay",
+      "Bug fix: Session recording does not start automatically on pages cached by the browser",
+      "Bug fix: Disabling automatic recording keeps recording existing tabs even on page reload/navigation",
+    ],
+  },
+  {
+    version: "23.8.8",
+    logs: [
+      "Stitch sessions across pages while navigation or reload.",
+      "Floating widget for session recording when it is manually started from extension popup.",
+      "Updated extension icon for session recording state.",
+      "Bug fix in Session recorder where few events were being dropped.",
+      "Stop session recording in all tabs on deactivating extension.",
+      "Prompt to reload application if the extension is manually updated.",
+    ],
+  },
+  {
     version: "23.7.12",
     logs: [
       {

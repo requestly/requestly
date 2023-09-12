@@ -251,7 +251,7 @@ const SessionsSettingsPage: React.FC = () => {
             icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
             onClick={() => redirectToSessionRecordingHome(navigate)}
           />
-          <span>Session Recording Settings</span>
+          <span>Session Replay Settings</span>
         </div>
 
         <div className="automatic-recording-container">

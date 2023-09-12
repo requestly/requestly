@@ -22,7 +22,13 @@ const InviteButton: React.FC = () => {
     if (isWorkspaceMode) {
       dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal", newValue: true }));
     } else if (availableTeams?.length === 0) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "sidebar_invite_button" },
+        })
+      );
     } else {
       dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
     }

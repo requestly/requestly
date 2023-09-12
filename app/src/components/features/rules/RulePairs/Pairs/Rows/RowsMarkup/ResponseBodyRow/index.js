@@ -17,7 +17,7 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system/components";
 import LINKS from "config/constants/sub/links";
@@ -137,6 +137,12 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
     return null;
   };
+
+  useEffect(() => {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      setEditorStaticValue(pair.response.value);
+    }
+  }, [pair.response]);
 
   const responseBodyChangeHandler = (value) => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {

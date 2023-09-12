@@ -32,7 +32,7 @@
 .persona-survey-banner .survey-banner-footer,
 .persona-survey-container .survey-footer {
   position: absolute;
-  bottom: 0;
+  bottom: -40px;
   left: 0;
   right: 0;
   padding: 9px 20px;
@@ -44,6 +44,7 @@
 }
 .persona-survey-banner .survey-banner-footer {
   text-align: center;
+  bottom: 0;
 }
 .persona-survey-container .survey-footer {
   margin-top: 40px;
@@ -52,6 +53,10 @@
   opacity: 0.4;
   pointer-events: none;
   cursor: not-allowed;
+}
+.persona-survey-container .survey-lottie-animation-container {
+  position: relative;
+  top: 50px;
 }
 .persona-survey-banner .survey-lottie-animation-container {
   width: 100%;

@@ -19,7 +19,10 @@ export const UNINSTALLATION = {
   EXTENSION_UNINSTALLED: "extension_uninstalled",
 };
 
-export const EXTENSION_CONTEXT_INVALIDATED = "extension_context_invalidated";
+export const EXTENSION_CONTEXT_INVALIDATION = {
+  MESSAGE_SEEN: "extension_context_invalidated",
+  APP_RELOADED_FROM_MESSAGE: "app_reloaded_from_extension_context_invalidated_message",
+};
 
 export const ORGANIZATION = {
   VIEW_MORE_USERS_CLICKED: "organization_view_more_users_clicked",
@@ -98,4 +101,10 @@ export const MORE_INFO = {
   MORE_INFO_SHOWN: "more_info_shown",
   MORE_INFO_VIEWED: "more_info_viewed",
   MORE_INFO_CLICKED: "more_info_clicked",
+};
+
+export const SHARING = {
+  SHARE_BUTTON_CLICKED: "share_button_clicked",
+  SHARE_MODAL_VIEWED: "share_modal_viewed",
+  SHARING_TAB_SWITCHED: "sharing_tab_switched",
 };

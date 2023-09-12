@@ -17,13 +17,22 @@ import {
   getSessionRecordingStartTimeOffset,
 } from "store/features/session-recording/selectors";
 import { useSelector } from "react-redux";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { cloneDeep } from "lodash";
 import { getConsoleLogs, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
+import { RQButton } from "lib/design-system/components";
+import { removeElement } from "utils/domUtils";
+import { isAppOpenedInIframe } from "utils/AppUtils";
+import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./NetworkLogs/helpers";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
-const SessionDetails: React.FC = () => {
+interface SessionDetailsProps {
+  isInsideIframe?: boolean;
+}
+
+const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false }) => {
   const attributes = useSelector(getSessionRecordingAttributes);
   const events = useSelector(getSessionRecordingEvents);
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
@@ -32,9 +41,11 @@ const SessionDetails: React.FC = () => {
   const [player, setPlayer] = useState<Replayer>();
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
+  const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
+  const [expandLogsPanel, setExpandLogsPanel] = useState(false);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -54,9 +65,28 @@ const SessionDetails: React.FC = () => {
     }));
   }, [events, startTime]);
 
+  const rqNetworkLogs = useMemo(() => convertSessionRecordingNetworkLogsToRQNetworkLogs(networkLogs), [networkLogs]);
+
   const getCurrentTimeOffset = useCallback(() => {
     return Math.floor((currentTimeRef.current - startTime) / 1000);
   }, [startTime]);
+
+  useEffect(() => {
+    if (!isAppOpenedInIframe()) return;
+
+    removeElement(".session-viewer-header .back-button");
+    removeElement(".session-properties-wrapper");
+
+    setTimeout(() => {
+      removeElement(".rr-controller__btns button:last-child");
+
+      const rrwebPlayerContainer = document.querySelector(
+        ".session-recording-player-container > .rr-player"
+      ) as HTMLElement;
+
+      if (rrwebPlayerContainer) rrwebPlayerContainer.style.border = "none";
+    }, 0);
+  }, []);
 
   useEffect(() => {
     if (events?.rrweb?.length) {
@@ -81,14 +111,22 @@ const SessionDetails: React.FC = () => {
     }
   }, [events]);
 
-  // destroy player on unmount
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    const pauseVideo = () => {
+      player?.pause();
+    };
+
+    // no rrweb listener on the player works when focus is shifted from the tab
+    // The player keeps playing even when the tab is not in focus.
+    // so we add a listener on the window to pause the player when the tab is blurred
+    window.addEventListener("blur", pauseVideo);
+
+    return () => {
       // @ts-ignore
-      player?.$destroy();
-    },
-    [player]
-  );
+      player?.$destroy(); // destroy player on unmount
+      window.removeEventListener("blur", pauseVideo);
+    };
+  }, [player]);
 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
@@ -102,8 +140,24 @@ const SessionDetails: React.FC = () => {
       return;
     }
 
-    player.goto(startTimeOffset * 1000, true);
-  }, [player, startTimeOffset]);
+    // player should start playing from the start time offset only on the
+    // first load and not when the user changes time offset.
+    player.goto(offsetTimeRef.current * 1000, true);
+  }, [player]);
+
+  useEffect(() => {
+    const togglePlay = (e: KeyboardEvent) => {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        player?.toggle();
+      }
+    };
+
+    document.addEventListener("keydown", togglePlay);
+    return () => {
+      document.removeEventListener("keydown", togglePlay);
+    };
+  }, [player]);
 
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
@@ -138,14 +192,15 @@ const SessionDetails: React.FC = () => {
             <Badge
               size="small"
               count={visibleNetworkLogsCount || undefined}
-              dot={visibleNetworkLogsCount === 0 && networkLogs.length > 0}
+              dot={visibleNetworkLogsCount === 0 && rqNetworkLogs.length > 0}
               style={{ margin: "0 5px" }}
             />
           </span>
         ),
         children: (
           <NetworkLogsPanel
-            networkLogs={networkLogs}
+            startTime={attributes?.startTime ?? 0}
+            networkLogs={rqNetworkLogs}
             playerTimeOffset={playerTimeOffset}
             updateCount={setVisibleNetworkLogsCount}
           />
@@ -166,8 +221,9 @@ const SessionDetails: React.FC = () => {
     return tabItems;
   }, [
     attributes?.environment,
+    attributes?.startTime,
     consoleLogs,
-    networkLogs,
+    rqNetworkLogs,
     playerTimeOffset,
     visibleConsoleLogsCount,
     visibleNetworkLogsCount,
@@ -198,12 +254,30 @@ const SessionDetails: React.FC = () => {
         <div className="session-recording-player-container" ref={playerContainer} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
       </div>
-      <ProCard className="primary-card session-panels-container">
+      <ProCard
+        className={`primary-card session-panels-container ${
+          isInsideIframe ? `inside-iframe ${expandLogsPanel ? "expand-panels-container" : ""}` : ""
+        }`}
+      >
         <Tabs
           defaultActiveKey="consoleLogs"
           items={getSessionPanelTabs}
+          tabBarExtraContent={{
+            right: isInsideIframe ? (
+              <RQButton
+                iconOnly
+                onClick={() => setExpandLogsPanel((prev) => !prev)}
+                icon={<DownArrow style={{ transform: expandLogsPanel ? "none" : "rotate(180deg)" }} />}
+              />
+            ) : null,
+          }}
           onTabClick={(key) => {
-            trackSessionRecordingPanelTabClicked(key, window.location.pathname.split("/")?.[2]);
+            setExpandLogsPanel(true);
+            trackSessionRecordingPanelTabClicked(
+              key,
+              window.location.pathname.split("/")?.[2],
+              isInsideIframe ? "embed" : "app"
+            );
           }}
         />
       </ProCard>

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { Typography, Row, Col, Alert } from "antd";
-import { FaSpinner } from "react-icons/fa";
-import { HiArrowLeft } from "react-icons/hi";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
+import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
 import { isEmailValid } from "utils/FormattingHelper";
 
 //IMAGES

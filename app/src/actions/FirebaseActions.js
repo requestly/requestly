@@ -1,7 +1,6 @@
 // import firebase from "../firebase";
 // Firebase App
 import firebaseApp from "firebase.js";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -126,9 +125,6 @@ export async function signUp(name, email, password, refCode, source) {
         photoURL: `https://www.gravatar.com/avatar/${md5(email)}`,
       })
         .then(() => {
-          const functions = getFunctions();
-          const addUserToCRM = httpsCallable(functions, "external-addUserToCRM");
-          addUserToCRM({});
           const authData = getAuthData(result.user);
           const database = getDatabase();
           return update(ref(database, getUserProfilePath(authData.uid)), authData)

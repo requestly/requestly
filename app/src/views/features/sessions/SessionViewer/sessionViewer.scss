@@ -5,6 +5,11 @@
   flex-direction: column;
   padding: 24px;
 
+  &.inside-iframe {
+    position: relative;
+    overflow: hidden;
+  }
+
   .session-recording-player-row {
     display: flex;
     width: 100%;
@@ -112,6 +117,7 @@
         color: var(--white);
         font-size: 1.25rem;
         font-weight: 500;
+
         svg {
           align-self: center;
           cursor: pointer;
@@ -120,8 +126,17 @@
           min-width: 16px;
           color: var(--text-gray);
         }
+
+        &.inside-iframe {
+          width: 100%;
+
+          svg {
+            color: inherit;
+          }
+        }
       }
     }
+
     .editor-title-container {
       .session-title-name {
         min-height: 33px;
@@ -168,6 +183,21 @@
   .session-panels-container {
     > div {
       padding-top: 0;
+    }
+
+    &.inside-iframe,
+    &.expand-panels-container {
+      max-width: 94vw;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      z-index: 10;
+      transform: translate(-50%, calc(100% - 50px));
+    }
+
+    &.expand-panels-container {
+      bottom: 20px;
+      transform: translate(-50%, 0);
     }
 
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
@@ -218,6 +248,8 @@
 
         .primary-message {
           // object-inspector button
+          word-break: break-word;
+
           li > div {
             line-height: 12px;
             width: auto !important; // overriding inline style
@@ -225,13 +257,14 @@
         }
 
         .right-info {
+          max-width: 180px;
           margin-left: 8px;
-          width: 200px;
           text-align: right;
-          flex: 0 0 auto;
+          flex-shrink: 0;
         }
 
         .secondary-message {
+          word-break: break-word;
           padding-left: 40px;
         }
       }
@@ -257,65 +290,6 @@
     }
     .warn span {
       color: #d3a403;
-    }
-  }
-
-  .network-logs-panel {
-    .network-logs-table {
-      overflow: auto;
-      height: 100%;
-
-      .network-log-row {
-        cursor: pointer;
-
-        &.selected {
-          background-color: #0948b2;
-          color: #fff;
-        }
-
-        .network-log-url {
-          &.failed {
-            color: #ff4d4f;
-          }
-        }
-
-        .request-method-tag {
-          font-size: 11px;
-          padding: 2px 8px;
-          margin-right: 10px;
-          margin-top: -2px;
-          min-width: 48px;
-          text-align: center;
-          flex-shrink: 0;
-        }
-      }
-    }
-
-    .gutter {
-      background-color: #0000000f;
-      margin: 0 8px;
-      cursor: col-resize;
-    }
-
-    .network-log-details {
-      .ant-tabs-tab {
-        padding: 6px 0;
-
-        + .ant-tabs-tab {
-          margin: 0 0 0 20px;
-        }
-      }
-
-      .network-log-details-tab-content {
-        overflow: auto;
-        height: 244px;
-      }
-
-      .network-payload-object {
-        span {
-          font-size: 11px;
-        }
-      }
     }
   }
 
@@ -509,14 +483,10 @@ body.dark {
       }
     }
 
-    .network-logs-panel .gutter {
-      background-color: #313a46;
-    }
-
     .ant-pro-card,
     .rr-player {
       background: var(--component-background) !important;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-dark);
       border-radius: var(--border-radius-sm);
       box-sizing: content-box;
     }
@@ -585,5 +555,92 @@ body.dark {
 @media screen and (max-width: 520px) {
   .session-viewer-page .session-properties-wrapper .session-page-url-property .ant-input-wrapper .ant-input {
     width: 100px;
+  }
+}
+
+@media screen and (min-width: 520px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 28rem;
+        }
+
+        .right-info {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 20rem;
+          word-break: break-all;
+        }
+
+        .right-info {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 850px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 26rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 34rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 48rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 60rem;
+        }
+      }
+    }
   }
 }

@@ -221,6 +221,10 @@ export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
 };
 
+export const getIsProductHuntLaunchedBannerClosed = (state) => {
+  return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
+};
+
 export const getIsRedirectRuleTourCompleted = (state) => {
   return getGlobalState(state).misc?.persist?.isRedirectRuleTourCompleted;
 };
@@ -273,4 +277,12 @@ export const getIsCommandBarOpen = (state) => {
 
 export const getLastSeenInviteTs = (state) => {
   return getGlobalState(state).misc.persist?.lastSeenInviteTs;
+};
+
+export const getIsJoinWorkspaceCardVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};
+
+export const getExtensionInsallSource = (state) => {
+  return getGlobalState(state).misc.persist?.extensionInstallSource;
 };

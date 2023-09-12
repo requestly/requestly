@@ -1,14 +1,18 @@
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { actions } from "store";
-import { AiOutlineFolderOpen, AiFillYoutube } from "react-icons/ai";
-import { BsHandbag, BsCameraVideo } from "react-icons/bs";
-import { MdOutlineGroupAdd, MdReportGmailerrorred } from "react-icons/md";
-import { TbArrowsDownUp } from "react-icons/tb";
-import { BiBook, BiShuffle } from "react-icons/bi";
+import { AiOutlineFolderOpen } from "@react-icons/all-files/ai/AiOutlineFolderOpen";
+import { AiFillYoutube } from "@react-icons/all-files/ai/AiFillYoutube";
+import { BsHandbag } from "@react-icons/all-files/bs/BsHandbag";
+import { BsCameraVideo } from "@react-icons/all-files/bs/BsCameraVideo";
+import { MdOutlineGroupAdd } from "@react-icons/all-files/md/MdOutlineGroupAdd";
+import { MdReportGmailerrorred } from "@react-icons/all-files/md/MdReportGmailerrorred";
+import { TbArrowsDownUp } from "@react-icons/all-files/tb/TbArrowsDownUp";
+import { BiBook } from "@react-icons/all-files/bi/BiBook";
+import { BiShuffle } from "@react-icons/all-files/bi/BiShuffle";
 import { Document, PaperUpload } from "react-iconly";
-import { HiOutlineUserGroup } from "react-icons/hi";
-import { IoPersonAddOutline } from "react-icons/io5";
+import { HiOutlineUserGroup } from "@react-icons/all-files/hi/HiOutlineUserGroup";
+import { IoPersonAddOutline } from "@react-icons/all-files/io5/IoPersonAddOutline";
 import {
   redirectToFileMocksList,
   redirectToMocksList,
@@ -56,7 +60,15 @@ export const config: PageConfig[] = [
             title: "Create new workspace",
             icon: <HiOutlineUserGroup />,
             action: ({ dispatch }) =>
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true })),
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: {
+                    source: "command_palette",
+                  },
+                })
+              ),
           },
         ],
       },

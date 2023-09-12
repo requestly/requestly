@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Modal } from "antd";
@@ -40,6 +40,8 @@ const DraftSessionViewer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
+  const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+  const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
 
   const generateDraftSessionTitle = useCallback((url: string) => {
     const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
@@ -48,6 +50,37 @@ const DraftSessionViewer: React.FC = () => {
     const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
     return `${hostname}@${formattedDate}`;
   }, []);
+
+  const hasUserCreatedSessions = useMemo(
+    () =>
+      userAttributes?.num_sessions > 0 ||
+      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_offline > 0,
+    [
+      userAttributes?.num_sessions,
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+    ]
+  );
+
+  useEffect(() => {
+    const unloadListener = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
+    };
+
+    // It is fired only if there was ANY interaction of the user with the site.
+    // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
+    // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+    window.addEventListener("beforeunload", unloadListener);
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, []);
+
+  unstable_usePrompt({
+    when: !isSaveSessionClicked && !isDiscardSessionClicked,
+    message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+  });
 
   useEffect(
     () => () => {
@@ -106,6 +139,7 @@ const DraftSessionViewer: React.FC = () => {
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
   const confirmDiscard = () => {
+    setIsDiscardSessionClicked(true);
     Modal.confirm({
       title: "Confirm Discard",
       icon: <ExclamationCircleOutlined />,
@@ -115,6 +149,9 @@ const DraftSessionViewer: React.FC = () => {
       onOk() {
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
+      },
+      onCancel() {
+        setIsDiscardSessionClicked(false);
       },
     });
   };
@@ -151,13 +188,18 @@ const DraftSessionViewer: React.FC = () => {
             Save <DownArrow />
           </RQButton>
 
-          {isSavePopupVisible && <SaveRecordingConfigPopup onClose={() => setIsSavePopupVisible(false)} />}
+          {isSavePopupVisible && (
+            <SaveRecordingConfigPopup
+              onClose={() => setIsSavePopupVisible(false)}
+              setIsSaveSessionClicked={setIsSaveSessionClicked}
+            />
+          )}
         </div>
       </div>
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}
-        startWalkthrough={!userAttributes?.num_sessions && !isMiscTourCompleted?.firstDraftSession}
+        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))

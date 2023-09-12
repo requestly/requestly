@@ -6,7 +6,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 // UTILS
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { LoadingOutlined } from "@ant-design/icons";
-import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import "./index.css";
 import {
   trackTeamPlanCardClicked,

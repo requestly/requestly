@@ -74,3 +74,9 @@ body,
     }
   }
 }
+
+.property-row {
+  word-break: break-all;
+  margin-bottom: 8px;
+  line-height: var(--rq-font-size-normal);
+}

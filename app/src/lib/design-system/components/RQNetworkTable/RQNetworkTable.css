@@ -1,0 +1,74 @@
+.rq-network-table-container {
+  height: inherit;
+  overflow-y: auto;
+}
+
+.rq-network-table-container .rq-resource-table-container .rq-resource-table {
+  --headBackgroundColor: #303030;
+  --rowHoverColor: #51658d48;
+  --rowSelectedColor: #1e69ff;
+}
+
+.rq-network-table-container .rq-resource-table-container .rq-resource-details-header {
+  --backgroundColor: #303030;
+}
+
+.rq-network-table-container .rq-resource-table-container {
+  background-color: var(--body-background);
+}
+
+.rq-network-table-container .rq-resource-table-container .empty-text.ant-typography {
+  font-size: 12px;
+}
+
+.rq-network-table-container
+  .rq-resource-table-splitpane
+  .rq-resource-details
+  .rq-resource-details-content
+  > :not(.ant-collapse) {
+  padding: 8px;
+}
+
+.rq-network-table-container .rq-resource-table-splitpane .rq-resource-details button[aria-label="Close"] span {
+  margin-top: -4px;
+  display: block;
+}
+
+.rq-network-table-container .ant-collapse {
+  border: none;
+}
+
+.rq-network-table-container .ant-collapse .ant-collapse-header {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.rq-network-table-container .ant-collapse > .ant-collapse-item:last-child {
+  border-bottom: none;
+}
+
+.rq-network-table-container .ant-collapse > .ant-collapse-item:last-child,
+.rq-network-table-container .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+  border-radius: 0;
+}
+
+.rq-network-table-container .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+  font-size: 11px;
+  margin-right: 8px;
+}
+
+.rq-network-table-container .ant-collapse .ant-collapse-header .ant-collapse-header-text {
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.rq-network-table-container .ant-collapse .ant-collapse-item .ant-collapse-content {
+  border-bottom: 0;
+}
+
+.rq-network-table-container .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
+  padding: 8px;
+  background-color: var(--body-background);
+}

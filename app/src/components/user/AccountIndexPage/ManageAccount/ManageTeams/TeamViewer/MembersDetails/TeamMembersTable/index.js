@@ -96,13 +96,22 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
           <Col>
             <Row className="text-bold">
               {!member?.isPending
-                ? member.displayName +
-                  (loggedInUserId === member.id ? " (You) " : "") +
-                  (billingExclude.includes(member.id) ? " (Free) " : "")
+                ? member?.displayName
+                  ? member?.displayName +
+                    (loggedInUserId === member.id ? " (You) " : "") +
+                    (billingExclude.includes(member.id) ? " (Free) " : "")
+                  : null
                 : null}
             </Row>
             <Row align={"middle"}>
-              <span className="member-email">{member.email}</span>
+              <span className="member-email">
+                {member.email +
+                  (member?.displayName
+                    ? ""
+                    : (loggedInUserId === member.id ? " (You) " : "") +
+                      (billingExclude.includes(member.id) ? " (Free) " : ""))}
+              </span>
+
               {member?.isPending ? (
                 <Badge
                   count={
@@ -237,7 +246,10 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
     getTeamSubscriptionInfo({ teamId: teamId })
       .then((res) => {
         const response = res.data;
-        setIsTeamPlanActive(response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE);
+        setIsTeamPlanActive(
+          response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
+            response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+        );
       })
       .catch((err) => new Error(err));
   };

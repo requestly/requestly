@@ -42,6 +42,6 @@
 
 - Add updates to `app/src/views/features/Updates/changeLogs.ts`
 - Commit the files – `git add . && git commit -am "Requestly va.b.c released"`
-- Push to production branch – `git push origin <branch>`
+- Push to remote branch – `git push origin <branch>`
 - Add tag – `git tag -a va.b.c -m "Requestly va.b.c released"`
 - Push the tags – `git push --tags origin`

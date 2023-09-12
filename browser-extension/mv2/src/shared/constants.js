@@ -42,7 +42,7 @@ RQ.CLIENT_MESSAGES = {
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   SYNC_APPLIED_RULES: "syncAppliedRules",
-  NOTIFY_CONTENT_SCRIPT_LOADED: "notifyContentScriptLoaded",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
+  START_RULE_TESTING: "startRuleTesting",
 };

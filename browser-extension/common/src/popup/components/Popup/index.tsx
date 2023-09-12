@@ -4,8 +4,8 @@ import { EXTENSION_MESSAGES } from "../../../constants";
 import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
-import "./popup.css";
 import { EVENT, sendEvent } from "../../events";
+import "./popup.css";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -30,11 +30,19 @@ const Popup: React.FC = () => {
   }, []);
 
   return (
-    <div className="popup">
-      <PopupHeader isExtensionEnabled={isExtensionEnabled} handleToggleExtensionStatus={handleToggleExtensionStatus} />
-      <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
-      <PopupFooter isExtensionEnabled={isExtensionEnabled} handleToggleExtensionStatus={handleToggleExtensionStatus} />
-    </div>
+    <>
+      <div className="popup">
+        <PopupHeader
+          isExtensionEnabled={isExtensionEnabled}
+          handleToggleExtensionStatus={handleToggleExtensionStatus}
+        />
+        <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
+        <PopupFooter
+          isExtensionEnabled={isExtensionEnabled}
+          handleToggleExtensionStatus={handleToggleExtensionStatus}
+        />
+      </div>
+    </>
   );
 };
 

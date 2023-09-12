@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Row, Space, Typography } from "antd";
 import { Alert } from "antd";
 import UAParser from "ua-parser-js";
+import { actions } from "store";
 import { supportedBrowserExtensions } from "./supportedBrowserExtensions";
 import LINKS from "config/constants/sub/links";
 import APP_CONSTANTS from "../../../config/constants";
@@ -23,6 +25,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   heading = HEADING,
   subHeading = SUBHEADING,
 }) => {
+  const dispatch = useDispatch();
   const [isReloadPagePromptVisible, setIsReloadPagePromptVisible] = useState(false);
   const [browser, setBrowser] = useState<
     { downloadURL: string; name: string; iconURL: string; alt: string } | undefined
@@ -48,6 +51,7 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
   }, [supportedBrowsers]);
 
   const handleDownloadExtensionClick = () => {
+    dispatch(actions.updateExtensionInstallSource(window.location.pathname));
     setIsReloadPagePromptVisible(true);
     trackExtensionInstallationButtonClicked(eventPage);
   };

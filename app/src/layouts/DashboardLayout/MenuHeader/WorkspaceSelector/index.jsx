@@ -38,6 +38,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
@@ -149,9 +150,13 @@ const WorkspaceSelector = () => {
   }, [lastSeenInviteTs, teamInvites, user?.loggedIn]);
 
   useEffect(() => {
+    if (hasNewInvites) trackWorkspaceInviteAnimationViewed();
+  }, [hasNewInvites]);
+
+  useEffect(() => {
     if (!user.loggedIn) return;
 
-    getPendingInvites({ email: true, domain: false })
+    getPendingInvites({ email: true, domain: true })
       .then((res) => {
         setTeamInvites(res?.pendingInvites ?? []);
       })
@@ -197,21 +202,33 @@ const WorkspaceSelector = () => {
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-      trackWorkspaceJoiningModalOpened(teamInvites?.length);
+      trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
         dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
-        trackWorkspaceJoiningModalOpened(teamInvites?.length);
+        trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
     if (user.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "workspaces_dropdown" },
+        })
+      );
     } else {
       promptUserSignupModal(() => {
-        dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "createWorkspaceModal",
+            newValue: true,
+            newProps: { source: "workspaces_dropdown" },
+          })
+        );
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };

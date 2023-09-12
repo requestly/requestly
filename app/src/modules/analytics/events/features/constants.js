@@ -21,6 +21,7 @@ export const SESSION_RECORDING = {
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
   session_recording_upload: "session_recording_upload",
+  session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -205,6 +206,11 @@ export const RULE_EDITOR = {
   MODIFY_API_RESPONSE: {
     SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
   },
+  TEST_THIS_RULE: {
+    TEST_RULE_CLICKED: "test_rule_clicked",
+    TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
+  },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {
