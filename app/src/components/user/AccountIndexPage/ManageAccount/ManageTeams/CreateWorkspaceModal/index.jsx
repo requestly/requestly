@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
@@ -41,70 +41,91 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     setCreateWorkspaceFormData(data);
   };
 
-  const handlePostTeamCreation = (teamId, newTeamName) => {
-    switchWorkspace(
-      {
-        teamId: teamId,
-        teamName: newTeamName,
-        teamMembersCount: 1,
-      },
-      dispatch,
-      {
-        isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode,
-      },
-      appMode
-    );
-    redirectToTeam(navigate, teamId, {
-      state: {
-        isNewTeam: !isNotifyAllSelected,
-      },
-    });
-  };
-
-  const handleFinishClick = async (details) => {
-    setIsLoading(true);
-    const newTeamName = details.workspaceName;
-    const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
-
-    try {
-      const response = await createTeam({
-        teamName: newTeamName,
+  const handlePostTeamCreation = useCallback(
+    (teamId, newTeamName, hasMembersInSameDomain) => {
+      switchWorkspace(
+        {
+          teamId: teamId,
+          teamName: newTeamName,
+          teamMembersCount: 1,
+        },
+        dispatch,
+        {
+          isSyncEnabled: user?.details?.isSyncEnabled,
+          isWorkspaceMode,
+        },
+        appMode
+      );
+      redirectToTeam(navigate, teamId, {
+        state: {
+          isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
+        },
       });
+    },
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+  );
 
-      trackNewWorkspaceCreated();
-      toast.info("Workspace Created");
+  const handleFinishClick = useCallback(
+    async (details) => {
+      setIsLoading(true);
+      const newTeamName = details.workspaceName;
+      const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 
-      const teamId = response.data.teamId;
-      if (isNotifyAllSelected) {
-        try {
-          const domain = getDomainFromEmail(user?.details?.profile?.email);
-          const inviteRes = await createOrgTeamInvite({ domain, teamId });
-          await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
+      try {
+        const response = await createTeam({
+          teamName: newTeamName,
+        });
 
-          if (inviteRes.data.success) {
-            toast.success(`All users from ${domain} have been invited to join this workspace.`);
-          } else {
-            toast.error(`Could not invite all users from ${domain}.`);
+        trackNewWorkspaceCreated();
+        toast.info("Workspace Created");
+
+        const teamId = response.data.teamId;
+        let hasMembersInSameDomain = true; //flag for keeping check if there are more than one user in same domain
+        if (isNotifyAllSelected) {
+          try {
+            const domain = getDomainFromEmail(user?.details?.profile?.email);
+            const inviteRes = await createOrgTeamInvite({ domain, teamId });
+            await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
+            console.log({ inviteRes });
+            if (inviteRes.data.success) {
+              toast.success(`All users from ${domain} have been invited to join this workspace.`);
+            } else {
+              switch (inviteRes.data.errCode) {
+                case "no-users-in-same-domain":
+                  hasMembersInSameDomain = false;
+                  break;
+                default:
+                  toast.error(`Could not invite all users from ${domain}.`);
+              }
+            }
+          } catch (error) {
+            toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
           }
-        } catch (error) {
-          toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
         }
+
+        handlePostTeamCreation(teamId, newTeamName, hasMembersInSameDomain);
+
+        callback?.();
+        toggleModal();
+        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
+        trackNewWorkspaceCreated(isNotifyAllSelected);
+      } catch (err) {
+        toast.error("Unable to Create Team");
+        trackNewTeamCreateFailure(newTeamName);
+      } finally {
+        setIsLoading(false);
       }
-
-      handlePostTeamCreation(teamId, newTeamName);
-
-      callback?.();
-      toggleModal();
-      trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
-      trackNewWorkspaceCreated(isNotifyAllSelected);
-    } catch (err) {
-      toast.error("Unable to Create Team");
-      trackNewTeamCreateFailure(newTeamName);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [
+      isNotifyAllSelected,
+      createOrgTeamInvite,
+      callback,
+      toggleModal,
+      upsertTeamCommonInvite,
+      user?.details?.profile?.email,
+      handlePostTeamCreation,
+    ]
+  );
 
   const handleFinishFailed = () => toast.error("Please enter valid details");
 
