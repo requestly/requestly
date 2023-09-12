@@ -232,7 +232,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   return (
     <>
       {/* Page content */}
-      {user?.loggedIn && user.details.isLimitReached ? <FeatureLimiterBanner /> : null}
+      {user?.loggedIn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
       {/* Table */}
       <ProCard title={null} className="rules-table-container rules-list-container">
         <RulesTable

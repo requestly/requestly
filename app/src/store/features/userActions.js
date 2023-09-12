@@ -30,7 +30,7 @@ export const updateUsername = (prevState, action) => {
 };
 
 export const updateUserLimitReached = (prevState, action) => {
-  prevState.user.details.isLimitReached = action.payload;
+  prevState.user.isLimitReached = action.payload;
 };
 
 //Persona Survey actions
