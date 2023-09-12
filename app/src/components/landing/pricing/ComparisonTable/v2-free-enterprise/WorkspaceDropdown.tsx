@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { DownOutlined, LockOutlined } from "@ant-design/icons";
 import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -18,15 +18,25 @@ const WorkspaceDropdown: React.FC<{
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
 }> = ({ workspaceToUpgrade, setWorkspaceToUpgrade }) => {
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams) || [];
-  const filteredAvailableTeams = availableTeams.filter((team: any) => !team?.archived);
+  const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+
+  const filteredAvailableTeams = useMemo(() => {
+    return availableTeams?.filter((team: any) => !team?.archived) ?? [];
+  }, [availableTeams]);
+
+  const populateWorkspaceDetails = useCallback(
+    (workspaceId: string) => {
+      return filteredAvailableTeams.find((team: any) => team.id === workspaceId);
+    },
+    [filteredAvailableTeams]
+  );
 
   useEffect(() => {
     if (currentlyActiveWorkspace?.id) {
-      setWorkspaceToUpgrade({ ...currentlyActiveWorkspace, accessCount: currentlyActiveWorkspace.membersCount });
+      setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
     }
-  }, [currentlyActiveWorkspace, setWorkspaceToUpgrade]);
+  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade]);
 
   const workspaceMenuItems = {
     items: [
@@ -67,7 +77,7 @@ const WorkspaceDropdown: React.FC<{
           accessCount: 1,
         });
       }
-      setWorkspaceToUpgrade(filteredAvailableTeams.find((team: any) => team.id === teamId));
+      setWorkspaceToUpgrade(populateWorkspaceDetails(teamId));
     },
   };
 

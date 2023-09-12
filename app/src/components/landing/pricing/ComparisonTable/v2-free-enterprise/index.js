@@ -73,6 +73,7 @@ const FreeAndEnterprisePlanTable = () => {
               planName: planName,
               duration: duration,
               quantity: workspaceToUpgrade.accessCount,
+              teamId: workspaceToUpgrade.id,
             })
           }
           disabled={isUserPremium && userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
@@ -89,6 +90,7 @@ const FreeAndEnterprisePlanTable = () => {
       user?.details?.planDetails?.planName,
       workspaceToUpgrade.accessCount,
       workspaceToUpgrade.id,
+      workspaceToUpgrade?.subscriptionStatus,
     ]
   );
 
