@@ -42,6 +42,7 @@ const getEditorLanguageFromMimeType = (mimeType: string) => {
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
   const [response, setResponse] = useState(null);
   const [isEditorMount, setIsEditorMount] = useState(false);
+  // @ts-ignore
   const [editorLangugage, setEditorLanguage] = useState("");
 
   useEffect(() => {
