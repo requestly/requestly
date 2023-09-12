@@ -40,6 +40,7 @@ const FreeAndEnterprisePlanTable = () => {
     (planName) => {
       const isUserPremium = user?.details?.isPremium;
       const userPlanName = user?.details?.planDetails?.planName;
+      const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
 
       if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
         return (
@@ -47,7 +48,10 @@ const FreeAndEnterprisePlanTable = () => {
             Use now
           </RQButton>
         );
-      } else if (planName === userPlanName) {
+      } else if (
+        (isSelectedWorkspacePremium || workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) &&
+        planName === userPlanName
+      ) {
         return (
           <RQButton disabled type="primary">
             Current Plan
