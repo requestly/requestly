@@ -42,18 +42,38 @@
 
 #content-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   padding: 12px 18px;
   background: #242529;
   border-radius: 8px;
   justify-content: space-between;
   font-size: 13px;
   line-height: 1.4;
+  gap: 8px;
 }
 
-#secondary-text {
-  font-size: 11px;
-  color: #b0b0b5b3;
+#rule-status-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+#info-icon {
+  color: #dc6803;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+
+#rule-status-comment {
   align-self: center;
 }
 
@@ -91,4 +111,13 @@
   flex-wrap: nowrap;
   justify-content: center;
   gap: 4px;
+}
+
+.secondary-text {
+  font-size: 11px;
+  color: #b0b0b5b3;
+}
+
+.hidden {
+  display: none !important;
 }

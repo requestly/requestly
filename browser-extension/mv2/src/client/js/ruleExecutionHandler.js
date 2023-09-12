@@ -79,6 +79,12 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   testRuleWidget.setAttribute("rule-name", ruleName);
   testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
+  if (ruleId.includes("Response")) {
+    testRuleWidget.setAttribute(
+      "info-text",
+      "Response Modifications will not show up in the browser network devtools due to technical contraints."
+    );
+  }
 
   document.documentElement.appendChild(testRuleWidget);
 
