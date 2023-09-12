@@ -53,7 +53,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
   }, [sortedTeams, activeTeamData?.id, onTransferClick, defaultActiveWorkspaces, isLoading]);
 
   const chooseOtherWorkspaceItem = (
-    <div className="workspace-share-menu-item-card choose-other-workspace">
+    <div className="workspace-share-menu-item-card workspace-share-menu-dropdown">
       <Row align="middle" className="items-center">
         <Avatar
           size={35}
