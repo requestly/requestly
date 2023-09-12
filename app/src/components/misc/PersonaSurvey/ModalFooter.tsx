@@ -12,7 +12,7 @@ import { QuestionnaireType, SurveyPage } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
-import { trackPersonaQ1Completed, trackPersonaQ2Completed } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaQ1Completed, trackPersonaQ2Completed } from "modules/analytics/events/misc/onboarding";
 import "./index.css";
 
 interface FooterProps {

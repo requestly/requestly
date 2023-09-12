@@ -1,8 +1,15 @@
+import { useEffect } from "react";
 import WelcomeAnimation from "components/misc/LottieAnimation/WelcomeAnimation";
 import "components/misc/PersonaSurvey/index.css";
 import { Typography } from "antd";
+import { trackWorkspaceOnboardingPageViewed } from "modules/analytics/events/misc/onboarding";
+import { OnboardingSteps } from "../../types";
 
 export const GettingStartedWithSurvey = () => {
+  useEffect(() => {
+    trackWorkspaceOnboardingPageViewed(OnboardingSteps.PERSONA_SURVEY);
+  }, []);
+
   return (
     <div className="persona-survey-banner">
       <Typography.Title className="onboarding-banner-title">Welcome to Requestly!</Typography.Title>

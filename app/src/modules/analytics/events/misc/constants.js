@@ -79,16 +79,22 @@ export const COMMAND_PALETTE = {
 
 export const SETTINGS_TOGGLED = "settings_toggled";
 
-export const PERSONA_SURVEY = {
-  PERSONA_SURVEY_VIEWED: "persona_survey_viewed",
-  PERSONA_Q1_COMPLETED: "persona_q1_completed",
-  PERSONA_Q2_COMPLETED: "persona_q2_completed",
-  PERSONA_Q3_COMPLETED: "persona_q3_completed",
-  PERSONA_QUESTIONNAIRE_STARTED: "persona_questionnaire_started",
-  PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
-  PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
-  PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
-  VIEW_ALL_PERSONA_RECOMMENDATION: "view_all_persona_recommendation",
+export const ONBOARDING = {
+  PERSONA_SURVEY: {
+    PERSONA_SURVEY_VIEWED: "persona_survey_viewed",
+    PERSONA_Q1_COMPLETED: "persona_q1_completed",
+    PERSONA_Q2_COMPLETED: "persona_q2_completed",
+    PERSONA_Q3_COMPLETED: "persona_q3_completed",
+    PERSONA_QUESTIONNAIRE_STARTED: "persona_questionnaire_started",
+    PERSONA_RECOMMENDATION_SELECTED: "persona_recommendation_selected",
+    PERSONA_RECOMMENDATION_SKIPPED: "persona_recommendation_skipped",
+    PERSONA_SURVEY_SIGN_IN_CLICKED: "persona_survey_sign_in_clicked",
+    VIEW_ALL_PERSONA_RECOMMENDATION: "view_all_persona_recommendation",
+  },
+  WORKSPACE: {
+    ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
+    WORKSPACE_ONBOARDING_PAGE_VIEWED: "workspace_onboarding_page_viewed",
+  },
 };
 
 export const PRODUCT_WALKTHROUGH = {

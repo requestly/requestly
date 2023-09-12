@@ -14,7 +14,7 @@ import { trackUploadRulesButtonClicked } from "modules/analytics/events/features
 import {
   trackPersonaRecommendationSkipped,
   trackPersonaSurveyViewAllOptionsClicked,
-} from "modules/analytics/events/misc/personaSurvey";
+} from "modules/analytics/events/misc/onboarding";
 import "./PersonaRecommendation.css";
 
 interface Props {

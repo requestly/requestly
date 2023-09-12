@@ -1,5 +1,7 @@
-import { PERSONA_SURVEY } from "./constants";
+import { ONBOARDING } from "./constants";
 import { trackEvent } from "modules/analytics";
+
+const { PERSONA_SURVEY, WORKSPACE } = ONBOARDING;
 
 export const trackPersonaSurveyViewed = () => {
   trackEvent(PERSONA_SURVEY.PERSONA_SURVEY_VIEWED);
@@ -39,4 +41,14 @@ export const trackPersonaSurveySignInClicked = () => {
 
 export const trackPersonaSurveyViewAllOptionsClicked = () => {
   trackEvent(PERSONA_SURVEY.VIEW_ALL_PERSONA_RECOMMENDATION);
+};
+
+export const trackOnboardingWorkspaceSkip = (step: string) => {
+  const params = { step };
+  trackEvent(WORKSPACE.ONBOARDING_WORKSPACE_SKIP, params);
+};
+
+export const trackWorkspaceOnboardingPageViewed = (page: string) => {
+  const params = { page };
+  trackEvent(WORKSPACE.WORKSPACE_ONBOARDING_PAGE_VIEWED, params);
 };

@@ -5,7 +5,7 @@ import { actions } from "store";
 import { Feature } from "../types";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
-import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/onboarding";
 import "./FeatureCard.css";
 
 export const FeatureCard: React.FC<Feature> = ({ id, icon: Icon, title, subTitle, link, tag = "" }) => {
