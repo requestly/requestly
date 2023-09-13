@@ -153,7 +153,7 @@ const FreeAndEnterprisePlanTable = () => {
           </div>
           <div className="pricing-table-row">
             {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
-              <div className="pricing-table-col">
+              <div className="pricing-table-col" key={planName}>
                 <div className="pricing-col-header">
                   <p className="text-gray plan-for">{planDetails.heading}</p>
                   <div className="header text-left">
