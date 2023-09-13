@@ -4,6 +4,7 @@ import "./styles.scss";
 import { RQButton } from "lib/design-system/components";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { trackFeatureLimitUpgradeBannerClicked } from "modules/analytics/events/common/feature-limiter";
 
 const FeatureLimiterBanner = () => {
   const navigate = useNavigate();
@@ -18,7 +19,13 @@ const FeatureLimiterBanner = () => {
           }
           icon={<TbInfoTriangle className="feature-limit-banner-icon" />}
           action={
-            <RQButton className="feature-limit-banner-btn" onClick={() => redirectToPricingPlans(navigate)}>
+            <RQButton
+              className="feature-limit-banner-btn"
+              onClick={() => {
+                trackFeatureLimitUpgradeBannerClicked();
+                redirectToPricingPlans(navigate);
+              }}
+            >
               Upgrade
             </RQButton>
           }
