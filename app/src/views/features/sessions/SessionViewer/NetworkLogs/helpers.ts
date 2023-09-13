@@ -2,12 +2,21 @@ import { v4 as uuidv4 } from "uuid";
 import { NetworkLog } from "../types";
 import { RQNetworkEventErrorCodes, RQSessionAttributes } from "@requestly/web-sdk";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import { captureException } from "@sentry/react";
 
 const getRequestObject = (networkLog: NetworkLog) => {
-  const { searchParams } = new URL(networkLog.url);
-  const queryString = [] as RQNetworkLog["entry"]["request"]["queryString"];
+  let queryString = [] as RQNetworkLog["entry"]["request"]["queryString"];
 
-  searchParams.forEach((value: string, key: string) => queryString.push({ name: key, value }));
+  try {
+    const { searchParams } = new URL(networkLog.url);
+    searchParams.forEach((value: string, key: string) => queryString.push({ name: key, value }));
+  } catch (error) {
+    captureException(new Error("Invalid URL in Session Replay"), {
+      extra: {
+        url: networkLog.url,
+      },
+    });
+  }
 
   return {
     headers: [],
