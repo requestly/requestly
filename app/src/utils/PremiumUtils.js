@@ -49,18 +49,18 @@ export const isPremiumUser = (userPlanDetails) => {
 
 export const getPlanName = (planDetails) => {
   if (!planDetails || !planDetails.planId || !planDetails.subscription) {
-    return APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
+    return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
   }
 
   if (isPlanExpired(planDetails)) {
-    return APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
+    return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
   }
 
   if (planDetails.planId) {
     return planDetails.planId.split("_")[0];
   }
 
-  return APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
+  return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 };
 
 export const isBasicPlan = (planId) => {
