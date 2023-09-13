@@ -2,6 +2,9 @@ import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
 import { Group, Rule } from "types";
+import { StorageService } from "init";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { generateObjectId } from "utils/FormattingHelper";
 
 export const createSharedList = async (
   appMode: string,
@@ -61,4 +64,43 @@ export const prepareContentToExport = (
       });
     });
   });
+};
+
+export const duplicateRulesToTargetWorkspace = async (
+  appMode: string,
+  workspaceId: string,
+  ruleIdsToShare: string[],
+  groupwiseRules: Record<string, Group>
+) => {
+  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
+
+  // mapping of old group IDs to new group IDs
+  const groupIdMapping: Record<string, string> = {};
+
+  const formatRule = (rule: Rule, newGroupId: string) => ({
+    ...rule,
+    creationDate: generateObjectCreationDate(),
+    modificationDate: generateObjectCreationDate(),
+    name: `${rule.name} Copy`,
+    id: `${rule.ruleType}_${generateObjectId()}`,
+    groupId: newGroupId,
+  });
+
+  const formattedGroups = groups.reduce((acc: Group[], group: Group) => {
+    const newGroupId = `Group_${generateObjectId()}`;
+    groupIdMapping[group.id] = newGroupId;
+    acc.push({
+      ...group,
+      id: newGroupId,
+      name: `${group.name} Copy`,
+    });
+    return acc;
+  }, []);
+
+  const formattedRules = rules.map((rule: Rule) => {
+    const newGroupId = groupIdMapping[rule.groupId] || "";
+    return formatRule(rule, newGroupId);
+  });
+
+  return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
 };
