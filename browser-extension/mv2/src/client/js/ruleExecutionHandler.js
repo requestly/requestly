@@ -43,6 +43,11 @@ RQ.RuleExecutionHandler.setup = () => {
         break;
 
       case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
+        if (message.record) {
+          chrome.runtime.sendMessage({
+            action: RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
+          });
+        }
         RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
         break;
     }
