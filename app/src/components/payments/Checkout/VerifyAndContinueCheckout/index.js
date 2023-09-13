@@ -4,11 +4,7 @@ import { toast } from "utils/Toast.js";
 // Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUserAuthDetails } from "../../../../store/selectors";
-import {
-  redirectToPaymentFailed,
-  redirectToUpdateSubscription,
-  redirectToUpdateSubscriptionContactUs,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToPaymentFailed, redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
 // Constants
 import APP_CONSTANTS from "../../../../config/constants";
 
@@ -129,11 +125,7 @@ const VerifyAndContinueCheckout = ({
         if (err) {
           setIsSubscriptionCheckPassed(false);
           toast.error("You might already have a subscription");
-          redirectToUpdateSubscription({
-            mode: "team",
-            planType: "enterprise",
-            teamId: teamId,
-          });
+          redirectToUpdateSubscriptionContactUs();
         }
       });
   }, [teamId]);
@@ -142,12 +134,9 @@ const VerifyAndContinueCheckout = ({
     if (user && user.details && user.details.profile.email) {
       // Check if user already has a subscription
       const functions = getFunctions();
-      const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(
-        functions,
-        "fetchIndividualUserSubscriptionDetails"
-      );
+      const fetchIndividualUserSubscriptionDetails = httpsCallable(functions, "fetchIndividualUserSubscriptionDetails");
 
-      fetchIndividualUserSubscriptionDetailsFF({})
+      fetchIndividualUserSubscriptionDetails({})
         .then((res) => {
           const userSubscriptionDetails = res.data.data;
 

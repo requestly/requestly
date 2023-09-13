@@ -4,11 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Card } from "reactstrap";
 import { Button, Col as AntCol, Row as AntRow, Descriptions, Badge, Space } from "antd";
 // UTILS
-import {
-  redirectToCheckout,
-  redirectToMyTeams,
-  redirectToPricingPlans,
-} from "../../../../../..//utils/RedirectionUtils";
+import { redirectToPricingPlans } from "../../../../../..//utils/RedirectionUtils";
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
@@ -22,17 +18,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
 
   const handleRenewOnClick = (e) => {
     e.preventDefault();
-    if (type === "individual") {
-      redirectToCheckout({
-        mode: type,
-        planName: "gold",
-        duration: 365,
-      });
-    } else if (type === "team") {
-      redirectToMyTeams(navigate);
-    } else {
-      redirectToPricingPlans(navigate);
-    }
+    redirectToPricingPlans(navigate);
   };
 
   if (!subscriptionDetails) {
