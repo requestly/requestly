@@ -1285,7 +1285,7 @@ BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
     window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA, {
       url: payload.url,
       ruleId: payload.ruleId,
-      record: true,
+      record: payload.record,
     });
   });
 };
@@ -1297,14 +1297,26 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
     const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
     if (!isParentTabFocussed) {
-      // update the current tab with URL if opener tab does not exist
-      chrome.tabs.update({
-        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
-      });
+      // create new tab with URL if opener tab does not exist
+      chrome.tabs.create(
+        {
+          url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
+        },
+        (tab) => {
+          window.tabService.ensureTabLoadingComplete(tab.id).then(() => {
+            BG.Methods.sendMessageToClient(tab.id, {
+              action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+              testReportId: test_id,
+              testPageTabId: senderTab.id,
+            });
+          });
+        }
+      );
     } else {
       BG.Methods.sendMessageToClient(senderTab.openerTabId, {
         action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
         testReportId: test_id,
+        testPageTabId: senderTab.id,
       });
     }
   });
