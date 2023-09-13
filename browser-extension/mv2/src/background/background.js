@@ -593,7 +593,9 @@ BG.Methods.onHeadersReceived = function (details) {
         ? formattedCorsHeaders
         : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
     }
-  } catch (e) {}
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
