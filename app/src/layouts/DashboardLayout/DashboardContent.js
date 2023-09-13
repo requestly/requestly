@@ -9,6 +9,7 @@ import {
   getActiveModals,
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
+  getAppMode,
   getIsWorkspaceOnboardingCompleted,
   getIsJoinWorkspaceCardVisible,
 } from "store/selectors";
@@ -19,7 +20,6 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
@@ -29,15 +29,17 @@ import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { SharingModal } from "components/common/SharingModal";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const DashboardContent = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   //Global state
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
@@ -131,12 +133,10 @@ const DashboardContent = () => {
               {...activeModals.connectedAppsModal.props}
             />
           ) : null}
-          {!userPersona.isSurveyCompleted && appOnboardingExp === "control" && !user?.loggedIn ? (
+          {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {appOnboardingExp === "workspace_onboarding" &&
-          !isWorkspaceOnboardingCompleted &&
-          !userPersona.isSurveyCompleted ? (
+          {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
               handleUploadRulesModalClick={toggleImportRulesModal}
@@ -169,6 +169,13 @@ const DashboardContent = () => {
               isOpen={activeModals.joinWorkspaceModal.isActive}
               toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal" }))}
               {...activeModals.joinWorkspaceModal.props}
+            />
+          ) : null}
+          {activeModals.sharingModal.isActive ? (
+            <SharingModal
+              isOpen={activeModals.sharingModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "sharingModal" }))}
+              {...activeModals.sharingModal.props}
             />
           ) : null}
 

@@ -138,6 +138,12 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
+  useEffect(() => {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      setEditorStaticValue(pair.response.value);
+    }
+  }, [pair.response]);
+
   const responseBodyChangeHandler = (value) => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       setEditorStaticValue(value);
