@@ -21,9 +21,7 @@ export const useFeatureLimiter = () => {
   const [isLimitReached, setIsLimitReached] = useState(false);
 
   useEffect(() => {
-    if (isLimitReached) {
-      dispatch(actions.updateUserLimitReached(true));
-    }
+    dispatch(actions.updateUserLimitReached(isLimitReached));
   }, [dispatch, isLimitReached]);
 
   const checkFeatureLimits = () => {
