@@ -4,27 +4,18 @@ import { featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { useEffect, useState } from "react";
 import { FeatureLimitType } from "./types";
 
 const premiumPlansToCheckLimit = [APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC];
 
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
-  const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
 
   const isUserPremium = user?.details?.isPremium;
   const isUserLoggedIn = user?.loggedIn;
   const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
-
-  const [isLimitReached, setIsLimitReached] = useState(false);
-
-  useEffect(() => {
-    if (isLimitReached) {
-      dispatch(actions.updateUserLimitReached(true));
-    }
-  }, [dispatch, isLimitReached]);
 
   const checkFeatureLimits = () => {
     if (!isUserLoggedIn) {
@@ -35,11 +26,11 @@ export const useFeatureLimiter = () => {
       return;
     }
 
-    const isLimitBreached = Object.values(FeatureLimitType).some((featureLimitType) =>
+    const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
       checkIfFeatureLimitBreached(featureLimitType)
     );
 
-    setIsLimitReached(isLimitBreached);
+    dispatch(actions.updateUserLimitReached(isLimitReached));
   };
 
   const checkIfFeatureLimitBreached = (featureLimitType: FeatureLimitType, currentValue?: number) => {
