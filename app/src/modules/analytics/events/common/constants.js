@@ -166,7 +166,6 @@ export const TEAMS = {
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
-  ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
   TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED: "team_workspace_organization_card_viewed",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
