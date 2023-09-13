@@ -22,13 +22,8 @@ RQ.SessionRecorder.setup = () => {
         return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
-        RQ.SessionRecorder.sendMessageToClient("stopRecording", null, () => {
-          // only the top document should send confirmation
-          if (isTopDocument) {
-            sendResponse();
-          }
-        });
-        return true;
+        RQ.SessionRecorder.sendMessageToClient("stopRecording", null);
+        break;
     }
 
     // messages for only the top document
