@@ -10,6 +10,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { trackTestRuleReportGenerated } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
+import { RQModal } from "lib/design-system/components";
+import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
@@ -18,9 +20,12 @@ interface TestReportsProps {
 export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) => {
   const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+
   const [testReports, setTestReports] = useState(null);
   const [newReportId, setNewReportId] = useState(null);
+  const [newTestPageTabId, setNewTestPageTabId] = useState<string>(null);
   const [refreshTestReports, setRefreshTestReports] = useState(true);
+  const [draftSessionModal, setDraftSessionModal] = useState<boolean>(false);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
@@ -28,6 +33,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
       (message: { testReportId: string; testPageTabId: string }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
+        setNewTestPageTabId(message.testPageTabId);
       }
     );
   }, [currentlySelectedRuleData.ruleType]);
@@ -55,7 +61,10 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
               .filter((report: TestReport) => report.ruleId === currentlySelectedRuleData.id)
               .sort((report1: TestReport, report2: TestReport) => report2.timestamp - report1.timestamp);
 
-            if (reports.length) setTestReports(reports);
+            if (reports.length) {
+              setTestReports(reports);
+              setDraftSessionModal(true);
+            }
           }
         })
         .finally(() => {
@@ -68,6 +77,18 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
     <>
       {testReports && (
         <>
+          <RQModal
+            maskClosable={false}
+            open={draftSessionModal}
+            onCancel={() => setDraftSessionModal(false)}
+            className="draft-session-modal"
+          >
+            <DraftSessionViewer
+              draftSessionTabId={newTestPageTabId}
+              isModalView={true}
+              closeModal={() => setDraftSessionModal(false)}
+            />
+          </RQModal>
           <div className="test-this-rule-row-header test-this-rule-results-header text-bold subtitle">
             Previous results
           </div>

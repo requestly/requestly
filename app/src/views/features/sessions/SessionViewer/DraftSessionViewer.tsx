@@ -28,8 +28,12 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
-const DraftSessionViewer: React.FC = () => {
-  const { tabId } = useParams();
+const DraftSessionViewer: React.FC<{ draftSessionTabId?: string; isModalView?: boolean; closeModal?: () => void }> = ({
+  draftSessionTabId,
+  isModalView,
+  closeModal,
+}) => {
+  const tabId = useParams().tabId ?? draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -118,6 +122,9 @@ const DraftSessionViewer: React.FC = () => {
           setLoadingError(payload);
         } else {
           const tabSession = payload as RQSession;
+          if (!tabSession) {
+            return;
+          }
 
           if (tabSession.events.rrweb?.length < 2) {
             setLoadingError("RRWeb events not captured");
@@ -148,7 +155,11 @@ const DraftSessionViewer: React.FC = () => {
       cancelText: "No",
       onOk() {
         trackDraftSessionDiscarded();
-        navigate(PATHS.SESSIONS.ABSOLUTE);
+        if (isModalView) {
+          closeModal();
+        } else {
+          navigate(PATHS.SESSIONS.ABSOLUTE);
+        }
       },
       onCancel() {
         setIsDiscardSessionClicked(false);

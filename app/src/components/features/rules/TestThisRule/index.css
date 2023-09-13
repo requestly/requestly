@@ -88,6 +88,15 @@
   animation: highlight-report 4s ease-in-out;
 }
 
+.rq-modal.draft-session-modal {
+  width: 80vw !important;
+}
+
+.rq-modal.draft-session-modal .ant-modal-body {
+  height: 80vh;
+  overflow: auto;
+}
+
 @keyframes highlight-report {
   0% {
     background: #5c5b5b80;
