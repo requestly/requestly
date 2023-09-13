@@ -72,7 +72,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         teamName: newTeamName,
       });
 
-      trackNewWorkspaceCreated();
       toast.info("Workspace Created");
 
       const teamId = response.data.teamId;
@@ -97,7 +96,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       callback?.();
       toggleModal();
       trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal");
-      trackNewWorkspaceCreated(isNotifyAllSelected);
+      trackNewWorkspaceCreated("create_workspace_modal", isNotifyAllSelected);
     } catch (err) {
       toast.error("Unable to Create Team");
       trackNewTeamCreateFailure(newTeamName);

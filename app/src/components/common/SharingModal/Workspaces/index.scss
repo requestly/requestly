@@ -1,0 +1,86 @@
+.share-in-workspaces-wrapper {
+  .workspace-card-description {
+    font-size: 13px;
+    margin-left: 8px;
+  }
+
+  .no-available-team-hero-section,
+  .post-sharing-wrapper {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .post-sharing-wrapper {
+    gap: 1.5rem;
+    margin: 1.8rem auto;
+  }
+
+  .workspace-share-menu-item-card.workspace-share-menu-dropdown {
+    cursor: pointer;
+    transition: 0.25s ease-in-out;
+
+    &:hover {
+      background: var(--gray-dark);
+    }
+  }
+  .workspace-sharing-flow-cta {
+    width: 100%;
+    justify-content: space-evenly;
+
+    & .sharing-flow-cta-workspace-avatar {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+.share-in-workspaces-wrapper .workspace-share-menu-item-card,
+.workspace-share-menu-wrapper .workspace-share-menu-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background: var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  margin-top: 4px;
+
+  & .workspace-card-description {
+    font-size: 13px;
+    margin-left: 8px;
+  }
+
+  .workspace-menu-item-transfer-btn.ant-btn {
+    color: var(--text-gray);
+    padding: 0;
+    margin-right: 8px;
+    transition: 0.25s ease-in-out;
+
+    &:hover {
+      color: var(--white);
+    }
+  }
+}
+
+.workspace-share-menu-wrapper .ant-dropdown-menu {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--border-dark);
+  background: var(--body-background);
+  border-radius: var(--border-radius-sm);
+
+  & .ant-dropdown-menu-item {
+    & .workspace-share-menu-item-card {
+      margin-top: 0;
+    }
+
+    padding: 0;
+    &:hover {
+      background: none;
+    }
+  }
+}
