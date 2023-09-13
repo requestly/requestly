@@ -178,3 +178,7 @@ export const TRAFFIC_TABLE = {
   SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
   SIDEBAR_FILTER_CLEAR_ALL_CLICKED: "sidebar_filter_clear_all_clicked",
 };
+
+export const FEATURE_LIMITER = {
+  UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
+};
