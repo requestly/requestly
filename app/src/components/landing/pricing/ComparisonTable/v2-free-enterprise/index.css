@@ -130,6 +130,7 @@
   display: flex;
   padding: 48px;
   margin: 20px 24px;
+  justify-content: center;
 }
 
 .enterprise-features-grid {
@@ -196,6 +197,7 @@
     flex-direction: row;
     width: 100%;
     margin-bottom: 1rem;
+    justify-content: center;
   }
   .pricing-table-product-view-para p {
     display: none;
@@ -207,7 +209,9 @@
     justify-content: center;
     flex-wrap: wrap;
   }
-  .pricing-table-col {
-    width: 100%;
+
+  .pricing-workspace-dropdown-container {
+    margin-left: 0;
+    text-align: center;
   }
 }
