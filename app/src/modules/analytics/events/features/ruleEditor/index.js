@@ -5,8 +5,8 @@ export const trackServeResponseWithoutRequestEnabled = () => {
   trackEvent(RULE_EDITOR.MODIFY_API_RESPONSE.SERVE_WITHOUT_REQUEST_ENABLED);
 };
 
-export const trackTestRuleClicked = (rule_type) => {
-  const params = { rule_type };
+export const trackTestRuleClicked = (rule_type, record_test_page) => {
+  const params = { rule_type, record_test_page };
   trackEvent(RULE_EDITOR.TEST_THIS_RULE.TEST_RULE_CLICKED, params);
 };
 

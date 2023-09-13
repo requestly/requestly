@@ -25,7 +25,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
-      (message: { testReportId: string }) => {
+      (message: { testReportId: string; testPageTabId: string }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
       }

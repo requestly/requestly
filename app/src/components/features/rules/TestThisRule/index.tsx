@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { getCurrentlySelectedRuleData, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
-import { Row, Typography } from "antd";
+import { Checkbox, Row, Typography } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { TestReports } from "./TestReports";
 import { isValidUrl } from "utils/FormattingHelper";
@@ -26,8 +26,10 @@ export const TestThisRuleRow: React.FC = () => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const testThisRuleBoxRef = useRef(null);
+
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
+  const [recordTestPage, setRecordTestPage] = useState<boolean>(true);
 
   const isRuleCurrentlyActive = useMemo(() => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
@@ -38,8 +40,6 @@ export const TestThisRuleRow: React.FC = () => {
   }, [isCurrentlySelectedRuleHasUnsavedChanges, isRuleCurrentlyActive]);
 
   const handleStartTestRule = () => {
-    trackTestRuleClicked(currentlySelectedRuleData.ruleType);
-
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
@@ -50,9 +50,13 @@ export const TestThisRuleRow: React.FC = () => {
       setError("Enter a valid page URL");
       return;
     }
-    if (error) setError(null);
+    if (error) {
+      setError(null);
+    }
+
+    trackTestRuleClicked(currentlySelectedRuleData.ruleType, recordTestPage);
     setPageUrl(urlToTest);
-    testRuleOnUrl(urlToTest, currentlySelectedRuleData.id);
+    testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: recordTestPage });
   };
 
   const FeedbackMessage = () => {
@@ -147,7 +151,11 @@ export const TestThisRuleRow: React.FC = () => {
                 <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
               </RQButton>
             </Row>
-            {/* ADD CHECKBOX FOR SESSION REPLAY HERE IN V1 */}
+            <Row className="mt-8">
+              <Checkbox checked={recordTestPage} onChange={(e) => setRecordTestPage(e.target.checked)}>
+                Capture screen, console and network details for this test
+              </Checkbox>
+            </Row>
           </div>
           <TestReports scrollToTestRule={handleScrollToTestThisRule} />
         </div>
