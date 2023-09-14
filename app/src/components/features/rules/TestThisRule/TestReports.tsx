@@ -14,6 +14,7 @@ import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import { getTestReportsByRuleId } from "./helpers";
 import { Link } from "react-router-dom";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
+import { Tooltip } from "antd";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
@@ -116,7 +117,11 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                 }`}
                 key={index}
               >
-                <div className="text-white text-bold test-this-rule-report-url">{report.url}</div>
+                <div className="text-white text-bold test-this-rule-report-url">
+                  <Tooltip title={report.url} destroyTooltipOnHide>
+                    {report.url}
+                  </Tooltip>
+                </div>
                 <div className="text-gray">{getFormattedTimestamp(report.timestamp)}</div>
                 <div className="text-gray test-this-rule-report-status">
                   {report.appliedStatus ? (
