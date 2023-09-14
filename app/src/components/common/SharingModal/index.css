@@ -122,6 +122,6 @@
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
 }
 .sharing-modal-footer svg {
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 20px;
+  min-height: 20px;
 }
