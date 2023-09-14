@@ -74,6 +74,7 @@
   border-radius: var(--border-radius-sm);
 
   & .ant-dropdown-menu-item {
+    line-height: 18px;
     & .workspace-share-menu-item-card {
       margin-top: 0;
     }
