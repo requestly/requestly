@@ -40,21 +40,11 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
     () =>
       [
         {
-          key: "copy_url",
-          label: "Copy URL",
-          onSelect: (key, log) => {
-            copyToClipBoard(log.entry.request.url, "URL copied to clipboard");
-            trackSessionRecordingNetworkLogContextMenuOptionClicked(key);
-          },
-        },
-        {
-          type: "divider",
-        },
-        {
-          key: "replay_request",
+          key: "replayRequest",
           label: "Replay Request",
+
           onSelect: (key, log) => {
-            const { url, method, headers, postData } = log.entry.request ?? {};
+            const { url, method, headers, postData } = log.entry.request;
 
             setSelectedRequestData({
               url,
