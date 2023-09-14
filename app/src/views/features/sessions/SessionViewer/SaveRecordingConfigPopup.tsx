@@ -37,6 +37,7 @@ interface Props {
     draftSessionTabId: string;
     testReportId: string;
     closeModal: () => void;
+    appliedRuleStatus: boolean;
   };
 }
 

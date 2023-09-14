@@ -26,13 +26,14 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const [newReportId, setNewReportId] = useState(null);
   const [newTestPageTabId, setNewTestPageTabId] = useState<string>(null);
+  const [appliedRuleStatus, setAppliedRuleStatus] = useState<boolean>(false);
   const [refreshTestReports, setRefreshTestReports] = useState(true);
-  const [draftSessionModal, setDraftSessionModal] = useState<boolean>(false);
+  const [showDraftSessionModal, setShowDraftSessionModal] = useState<boolean>(false);
   const [highlightNewReport, setHighlightNewReport] = useState<boolean>(false);
 
   const closeDraftSessionModal = () => {
     setRefreshTestReports(true);
-    setDraftSessionModal(false);
+    setShowDraftSessionModal(false);
     hightlightReport();
   };
 
@@ -46,11 +47,12 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
-      (message: { testReportId: string; testPageTabId: string; record: boolean }) => {
+      (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
         setNewTestPageTabId(message.testPageTabId);
-        setDraftSessionModal(message.record);
+        setShowDraftSessionModal(message.record);
+        setAppliedRuleStatus(message.appliedStatus);
       }
     );
   }, [currentlySelectedRuleData.ruleType]);
@@ -89,7 +91,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
           {newTestPageTabId && (
             <RQModal
               maskClosable={false}
-              open={draftSessionModal}
+              open={showDraftSessionModal}
               onCancel={closeDraftSessionModal}
               className="draft-session-modal"
             >
@@ -98,6 +100,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                   closeModal: closeDraftSessionModal,
                   draftSessionTabId: newTestPageTabId,
                   testReportId: newReportId,
+                  appliedRuleStatus: appliedRuleStatus,
                 }}
               />
             </RQModal>

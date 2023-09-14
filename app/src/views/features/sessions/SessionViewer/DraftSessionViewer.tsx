@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
-import { Modal } from "antd";
+import { Input, Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
@@ -33,6 +33,7 @@ interface Props {
     draftSessionTabId: string;
     testReportId: string;
     closeModal: () => void;
+    appliedRuleStatus: boolean;
   };
 }
 
@@ -183,7 +184,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
     <PageError error="Session Recording Loading Error" />
   ) : (
     <div className="session-viewer-page">
-      <div className="session-viewer-header">
+      <div className="session-viewer-header margin-bottom-one">
         <SessionViewerTitle />
         <div className="session-viewer-actions">
           <RQButton type="default" onClick={confirmDiscard}>
@@ -212,6 +213,12 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
           )}
         </div>
       </div>
+      <Input
+        readOnly
+        addonBefore="Rule execution status"
+        value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
+        style={{ width: "fit-content" }}
+      />
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}

@@ -1309,6 +1309,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
               testReportId: test_id,
               testPageTabId: senderTab.id,
               record: testRuleData.record,
+              appliedStatus: payload.appliedStatus,
             });
           });
         }
@@ -1319,6 +1320,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
         testReportId: test_id,
         testPageTabId: senderTab.id,
         record: testRuleData.record,
+        appliedStatus: payload.appliedStatus,
       });
     }
   });
