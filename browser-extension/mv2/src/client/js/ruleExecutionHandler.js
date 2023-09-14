@@ -71,7 +71,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
     return;
   }
 
-  const ruleName = (await RQ.RulesStore.getRule(ruleId)).name;
+  const { name: ruleName, ruleType } = await RQ.RulesStore.getRule(ruleId);
 
   const testRuleWidget = document.createElement("rq-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
@@ -79,6 +79,12 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   testRuleWidget.setAttribute("rule-name", ruleName);
   testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
+  if (ruleType === "Response") {
+    testRuleWidget.setAttribute(
+      "info-text-content",
+      `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>`
+    );
+  }
 
   document.documentElement.appendChild(testRuleWidget);
 

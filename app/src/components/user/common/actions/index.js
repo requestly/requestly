@@ -31,7 +31,7 @@ export const refreshUserInGlobalState = async (dispatch) => {
           isLoggedIn: true,
           planDetails: {
             ...planDetails,
-            planName: isPremiumUser(planDetails) ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE,
+            planName: isPremiumUser(planDetails) ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.FREE,
           },
           isPremium: isPremiumUser(planDetails),
         };

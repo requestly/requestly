@@ -24,8 +24,8 @@ export const trackCreateNewWorkspaceClicked = (source) => {
   trackEvent(TEAMS.CREATE_NEW_WORKSPACE_CLICKED, params);
 };
 
-export const trackNewWorkspaceCreated = (notify_all_teammates) => {
-  const params = { notify_all_teammates };
+export const trackNewWorkspaceCreated = (source, notify_all_teammates = false) => {
+  const params = { notify_all_teammates, source };
   trackEvent(TEAMS.NEW_WORKSPACE_CREATED, params);
 };
 
@@ -85,11 +85,6 @@ export const trackCreateNewTeamClicked = (source) => {
 export const trackWorkspaceInviteLinkCopied = (source) => {
   const params = { source };
   trackEvent(TEAMS.WORKSPACE_INVITE_LINK_COPIED, params);
-};
-
-export const trackOnboardingWorkspaceSkip = (step) => {
-  const params = { step };
-  trackEvent(TEAMS.ONBOARDING_WORKSPACE_SKIP, params);
 };
 
 export const trackWorkspaceOrganizationCardViewed = (domain, cta) => {

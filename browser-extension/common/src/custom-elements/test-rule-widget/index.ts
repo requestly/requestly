@@ -1,6 +1,7 @@
 import styles from "./index.css";
 import { registerCustomElement, setInnerHTML } from "../utils";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
+import InfoIcon from "../../../resources/icons/info.svg";
 
 enum RQTestRuleWidgetEvent {
   VIEW_RESULTS = "view-results",
@@ -38,6 +39,14 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
+
+    const infoTextContent = this.attributes.getNamedItem("info-text-content")?.value;
+    if (infoTextContent) {
+      const infoContainer = this.shadowRoot.getElementById("info-container");
+      const infoContainerText = this.shadowRoot.getElementById("info-text");
+      infoContainerText.innerHTML = infoTextContent;
+      infoContainer.classList.remove("hidden");
+    }
   }
 
   addListeners() {
@@ -63,11 +72,11 @@ class RQTestRuleWidget extends RQDraggableWidget {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
     if (appliedStatus) {
       ruleStatusContainer.innerHTML = `
-				✅ Rule applied
+				✅&nbsp;&nbsp;Rule applied
 			`;
     } else {
       ruleStatusContainer.innerHTML = `
-				❌ Rule not applied yet
+				❌&nbsp;&nbsp;Rule not applied yet
 			`;
     }
   }
@@ -84,8 +93,14 @@ class RQTestRuleWidget extends RQDraggableWidget {
         <button id="view-result-btn">View Results</button>
       </div>
       <div id="content-container">
-        <div id="rule-status"></div>
-        <div id="secondary-text">You can view detailed logs in console.</div>
+        <div id="rule-status-container">
+          <div id="rule-status"></div>
+          <div id="rule-status-comment" class="secondary-text">You can view detailed logs in console</div>
+        </div>
+        <div id="info-container" class="hidden">
+          <div id="info-icon">${InfoIcon}</div>
+          <div id="info-text" class="secondary-text"></div>
+        </div>
       </div>
     </div>
     `;
