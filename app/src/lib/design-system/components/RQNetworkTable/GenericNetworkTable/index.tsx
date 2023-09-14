@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { ColorScheme, ResourceTable, DetailsTab } from "@requestly-ui/resource-table";
+import { ColorScheme, ResourceTable, DetailsTab, ContextMenuOption } from "./resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
@@ -23,6 +23,8 @@ interface NetworkTableProps<NetworkLog> {
    * @returns HAR entry from the given log.
    */
   networkEntrySelector: (log: NetworkLog) => NetworkEntry;
+
+  contextMenuOptions?: ContextMenuOption<NetworkLog>[];
 }
 
 /**
@@ -33,6 +35,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   extraColumns = [],
   extraDetailsTabs = [],
   excludeColumns = [],
+  contextMenuOptions = [],
   networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
 }: NetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
@@ -68,6 +71,7 @@ export const GenericNetworkTable = <NetworkLog,>({
       primaryColumnKeys={["timeOffset", "url"]}
       colorScheme={ColorScheme.DARK}
       onRowSelection={setSelectedLog}
+      contextMenuOptions={contextMenuOptions}
     />
   );
 };

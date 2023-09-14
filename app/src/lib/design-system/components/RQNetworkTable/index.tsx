@@ -4,20 +4,27 @@ import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
+import { ContextMenuOption } from "./GenericNetworkTable/resource-table/dist";
 import "./RQNetworkTable.css";
 
-interface RQNetworkTableProps {
+export interface RQNetworkTableProps {
   logs: RQNetworkLog[];
+  contextMenuOptions?: ContextMenuOption<RQNetworkLog>[];
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
 }
 
-export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({ logs, sessionRecordingStartTime = 0 }) => {
+export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
+  logs,
+  contextMenuOptions = [],
+  sessionRecordingStartTime = 0,
+}) => {
   return (
     <div className="rq-network-table-container">
       <GenericNetworkTable
         logs={logs}
         networkEntrySelector={(log: RQNetworkLog) => log.entry}
         excludeColumns={["startedDateTime", "contentType"]}
+        contextMenuOptions={contextMenuOptions}
         extraColumns={[
           {
             key: "timeOffset",
