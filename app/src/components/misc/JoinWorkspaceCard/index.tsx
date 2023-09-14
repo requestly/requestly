@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { Row, Avatar, Typography } from "antd";
@@ -46,9 +46,14 @@ export const JoinWorkspaceCard = () => {
     []
   );
 
-  const handleNudgeCTAClick = () => {
+  const handleNudgeCTAClick = useCallback(() => {
+    if (hasEmailInvite) {
+      trackWorkspaceOrganizationCardClicked("Show invites");
+    } else if (hasActiveWorkspace) {
+      trackWorkspaceOrganizationCardClicked("Join your teammates");
+    }
+
     if (hasActiveWorkspace || hasEmailInvite) {
-      trackWorkspaceOrganizationCardClicked("join_teammates");
       trackWorkspaceJoiningModalOpened(teamInvites.length, "join_workspace_card");
       dispatch(
         actions.toggleActiveModal({
@@ -60,7 +65,7 @@ export const JoinWorkspaceCard = () => {
         })
       );
     } else {
-      trackWorkspaceOrganizationCardClicked("create_team");
+      trackWorkspaceOrganizationCardClicked("Start collaborating");
       dispatch(
         actions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -74,7 +79,7 @@ export const JoinWorkspaceCard = () => {
         })
       );
     }
-  };
+  }, [hasEmailInvite, hasActiveWorkspace, dispatch, teamInvites.length]);
 
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {
@@ -90,35 +95,42 @@ export const JoinWorkspaceCard = () => {
   }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.uid]);
 
   useEffect(() => {
-    if (organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE) {
-      getPendingInvites({ email: true, domain: true })
-        .then((res: any) => {
-          if (res?.pendingInvites) {
-            setTeamInvites(res.pendingInvites);
-            setHasEmailInvite(res.pendingInvites.some((invite: Invite) => !invite.domains?.length));
-            const hasActiveMembers = res.pendingInvites.some(
-              (invite: Invite) => (invite.metadata.teamAccessCount as number) > 1
-            );
-            if (hasActiveMembers) {
-              setHasActiveWorkspace(true);
-            }
-          }
-        })
-        .catch((e) => {
-          setHasActiveWorkspace(false);
-        });
+    if (!organizationMembers || organizationMembers.total < MIN_MEMBERS_IN_WORKSPACE) {
+      return;
     }
-  }, [organizationMembers]);
 
-  useEffect(() => {
-    if (organizationMembers?.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn) {
-      trackWorkspaceOrganizationCardViewed(getDomainFromEmail(user?.details?.profile?.email), cardCTA);
-    }
-  }, [cardCTA, organizationMembers?.total, user.loggedIn, user?.details?.profile?.email]);
+    getPendingInvites({ email: true, domain: true })
+      .then((res: any) => {
+        const domain = getDomainFromEmail(user?.details?.profile?.email);
+        if (res?.pendingInvites && res.pendingInvites.length > 0) {
+          const hasEmailInvites = res.pendingInvites.some((invite: Invite) => !invite.domains?.length);
+          const hasActiveMembers = res.pendingInvites.some(
+            (invite: Invite) => (invite.metadata.teamAccessCount as number) > 1
+          );
+
+          setTeamInvites(res.pendingInvites);
+          setHasEmailInvite(hasEmailInvites);
+          setHasActiveWorkspace(hasActiveMembers);
+
+          const actionType = hasEmailInvites
+            ? "Show invites"
+            : hasActiveMembers
+            ? "Join your teammates"
+            : "Start collaborating";
+
+          trackWorkspaceOrganizationCardViewed(domain, actionType);
+        } else {
+          trackWorkspaceOrganizationCardViewed(domain, "Start collaborating");
+        }
+      })
+      .catch((error) => {
+        setHasActiveWorkspace(false);
+      });
+  }, [organizationMembers, user]);
 
   return (
     <>
-      {!hideCard && organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE && user.loggedIn ? (
+      {!hideCard && organizationMembers && organizationMembers?.total >= MIN_MEMBERS_IN_WORKSPACE ? (
         <div className="workspace-card-container">
           <Row justify="end">
             <RQButton
@@ -137,6 +149,7 @@ export const JoinWorkspaceCard = () => {
               <Avatar.Group maxCount={3}>
                 {getUniqueTeamsFromInvites(teamInvites).map((team, index) => (
                   <Avatar
+                    key={index}
                     icon={<>{team?.teamName?.charAt(0)?.toUpperCase()}</>}
                     style={{
                       backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
