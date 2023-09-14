@@ -13,6 +13,7 @@ import { RQModal } from "lib/design-system/components";
 import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import { getTestReportsByRuleId } from "./helpers";
 import { Link } from "react-router-dom";
+import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
@@ -45,11 +46,11 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
-      (message: { testReportId: string; testPageTabId: string }) => {
+      (message: { testReportId: string; testPageTabId: string; record: boolean }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
         setNewTestPageTabId(message.testPageTabId);
-        setDraftSessionModal(true);
+        setDraftSessionModal(message.record);
       }
     );
   }, [currentlySelectedRuleData.ruleType]);
@@ -112,7 +113,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                 }`}
                 key={index}
               >
-                <div className="text-white text-bold">{report.url}</div>
+                <div className="text-white text-bold test-this-rule-report-url">{report.url}</div>
                 <div className="text-gray">{getFormattedTimestamp(report.timestamp)}</div>
                 <div className="text-gray test-this-rule-report-status">
                   {report.appliedStatus ? (
@@ -125,9 +126,11 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                     </>
                   )}
                 </div>
-                <div>
+                <div className="test-this-rule-report-session-link">
                   {report.sessionLink ? (
-                    <Link to={report.sessionLink}>View session recording</Link>
+                    <>
+                      <SessionIcon /> <Link to={report.sessionLink}>View session recording</Link>
+                    </>
                   ) : (
                     "Session not saved"
                   )}
