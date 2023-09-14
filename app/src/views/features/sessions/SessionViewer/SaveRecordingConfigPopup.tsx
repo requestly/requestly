@@ -15,7 +15,7 @@ import {
 } from "./sessionEventsUtils";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAuthDetails, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails, getUserAttributes, getAppMode } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -27,16 +27,23 @@ import {
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/helpers";
+import { getSessionRecordingSharedLink } from "utils/PathUtils";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
   setIsSaveSessionClicked?: (value: boolean) => void;
+  testRuleDraftSession?: {
+    draftSessionTabId: string;
+    testReportId: string;
+    closeModal: () => void;
+  };
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked, testRuleDraftSession }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
@@ -46,10 +53,12 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
+  const appMode = useSelector(getAppMode);
+
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes("draft");
+  const isDraftSession = pathname.includes("draft") || !!testRuleDraftSession;
   const isSessionLogOptionsAlreadySaved = tabId === "imported" || !isDraftSession;
 
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
@@ -127,10 +136,21 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
             SessionSaveMode.ONLINE
           );
           trackSessionsCreatedCount();
-          navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
-            replace: true,
-            state: { fromApp: true, viewAfterSave: true },
-          });
+          if (testRuleDraftSession) {
+            getTestReportById(appMode, testRuleDraftSession.testReportId).then((testReport) => {
+              if (testReport) {
+                testReport.sessionLink = getSessionRecordingSharedLink(response?.firestoreId);
+                saveTestReport(appMode, testRuleDraftSession.testReportId, testReport).then(
+                  testRuleDraftSession.closeModal
+                );
+              }
+            });
+          } else {
+            navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
+              replace: true,
+              state: { fromApp: true, viewAfterSave: true },
+            });
+          }
         } else {
           toast.error(response?.message);
           trackDraftSessionSaveFailed(response?.message);
@@ -141,16 +161,18 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
     [
       user?.loggedIn,
       user?.details?.profile?.uid,
-      workspace?.id,
       isSaving,
-      includedDebugInfo,
-      sessionEvents,
       sessionRecordingMetadata,
+      includedDebugInfo,
       setIsSaveSessionClicked,
+      workspace?.id,
+      sessionEvents,
       dispatch,
-      navigate,
       onClose,
       trackSessionsCreatedCount,
+      testRuleDraftSession,
+      appMode,
+      navigate,
     ]
   );
 

@@ -1308,6 +1308,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
               action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
               testReportId: test_id,
               testPageTabId: senderTab.id,
+              record: testRuleData.record,
             });
           });
         }
@@ -1317,6 +1318,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
         action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
         testReportId: test_id,
         testPageTabId: senderTab.id,
+        record: testRuleData.record,
       });
     }
   });

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
-import { StorageService } from "init";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { TestReport } from "./types";
@@ -12,6 +11,8 @@ import { trackTestRuleReportGenerated } from "modules/analytics/events/features/
 import "./index.css";
 import { RQModal } from "lib/design-system/components";
 import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
+import { getTestReportsByRuleId } from "./helpers";
+import { Link } from "react-router-dom";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
@@ -21,11 +22,25 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const [testReports, setTestReports] = useState(null);
+  const [testReports, setTestReports] = useState<TestReport[]>(null);
   const [newReportId, setNewReportId] = useState(null);
   const [newTestPageTabId, setNewTestPageTabId] = useState<string>(null);
   const [refreshTestReports, setRefreshTestReports] = useState(true);
   const [draftSessionModal, setDraftSessionModal] = useState<boolean>(false);
+  const [highlightNewReport, setHighlightNewReport] = useState<boolean>(false);
+
+  const closeDraftSessionModal = () => {
+    setRefreshTestReports(true);
+    setDraftSessionModal(false);
+    hightlightReport();
+  };
+
+  const hightlightReport = () => {
+    setHighlightNewReport(true);
+    setTimeout(() => {
+      setHighlightNewReport(false);
+    }, 4500);
+  };
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
@@ -34,6 +49,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
         setNewTestPageTabId(message.testPageTabId);
+        setDraftSessionModal(true);
       }
     );
   }, [currentlySelectedRuleData.ruleType]);
@@ -48,22 +64,14 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
 
   useEffect(() => {
     if (refreshTestReports) {
-      StorageService(appMode)
-        .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS)
-        .then((data) => {
-          if (data) {
-            const newTestReport = data[newReportId];
+      getTestReportsByRuleId(appMode, currentlySelectedRuleData.id)
+        .then((testReports: TestReport[]) => {
+          if (testReports.length) {
+            setTestReports(testReports);
+
+            const newTestReport = testReports.find((report: TestReport) => report.id === newReportId);
             if (newTestReport) {
               trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, newTestReport.appliedStatus);
-            }
-
-            const reports = Object.values(data)
-              .filter((report: TestReport) => report.ruleId === currentlySelectedRuleData.id)
-              .sort((report1: TestReport, report2: TestReport) => report2.timestamp - report1.timestamp);
-
-            if (reports.length) {
-              setTestReports(reports);
-              setDraftSessionModal(true);
             }
           }
         })
@@ -77,25 +85,31 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
     <>
       {testReports && (
         <>
-          <RQModal
-            maskClosable={false}
-            open={draftSessionModal}
-            onCancel={() => setDraftSessionModal(false)}
-            className="draft-session-modal"
-          >
-            <DraftSessionViewer
-              draftSessionTabId={newTestPageTabId}
-              isModalView={true}
-              closeModal={() => setDraftSessionModal(false)}
-            />
-          </RQModal>
+          {newTestPageTabId && (
+            <RQModal
+              maskClosable={false}
+              open={draftSessionModal}
+              onCancel={closeDraftSessionModal}
+              className="draft-session-modal"
+            >
+              <DraftSessionViewer
+                testRuleDraftSession={{
+                  closeModal: closeDraftSessionModal,
+                  draftSessionTabId: newTestPageTabId,
+                  testReportId: newReportId,
+                }}
+              />
+            </RQModal>
+          )}
           <div className="test-this-rule-row-header test-this-rule-results-header text-bold subtitle">
             Previous results
           </div>
           <div className="test-this-rule-report-row-wrapper">
             {testReports.map((report: TestReport, index: number) => (
               <div
-                className={`test-this-rule-report-row ${report.id === newReportId && "highlight-new-report"}`}
+                className={`test-this-rule-report-row ${
+                  report.id === newReportId && highlightNewReport ? "highlight-new-report" : ""
+                }`}
                 key={index}
               >
                 <div className="text-white text-bold">{report.url}</div>
@@ -109,6 +123,13 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                     <>
                       <CloseOutlined style={{ color: "var(--danger" }} /> Failed
                     </>
+                  )}
+                </div>
+                <div>
+                  {report.sessionLink ? (
+                    <Link to={report.sessionLink}>View session recording</Link>
+                  ) : (
+                    "Session not saved"
                   )}
                 </div>
               </div>

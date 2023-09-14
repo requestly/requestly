@@ -28,12 +28,16 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 
-const DraftSessionViewer: React.FC<{ draftSessionTabId?: string; isModalView?: boolean; closeModal?: () => void }> = ({
-  draftSessionTabId,
-  isModalView,
-  closeModal,
-}) => {
-  const tabId = useParams().tabId ?? draftSessionTabId;
+interface Props {
+  testRuleDraftSession?: {
+    draftSessionTabId: string;
+    testReportId: string;
+    closeModal: () => void;
+  };
+}
+
+const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
+  const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -155,8 +159,8 @@ const DraftSessionViewer: React.FC<{ draftSessionTabId?: string; isModalView?: b
       cancelText: "No",
       onOk() {
         trackDraftSessionDiscarded();
-        if (isModalView) {
-          closeModal();
+        if (testRuleDraftSession) {
+          testRuleDraftSession.closeModal();
         } else {
           navigate(PATHS.SESSIONS.ABSOLUTE);
         }
@@ -203,6 +207,7 @@ const DraftSessionViewer: React.FC<{ draftSessionTabId?: string; isModalView?: b
             <SaveRecordingConfigPopup
               onClose={() => setIsSavePopupVisible(false)}
               setIsSaveSessionClicked={setIsSaveSessionClicked}
+              testRuleDraftSession={testRuleDraftSession}
             />
           )}
         </div>
