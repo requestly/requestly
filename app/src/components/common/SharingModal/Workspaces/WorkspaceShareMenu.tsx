@@ -139,7 +139,9 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         />
         <span className="workspace-card-description">
           <div className="text-white">{team.name}</div>
-          <div className="text-gray">{team.accessCount} members</div>
+          <div className="text-gray">
+            {team.accessCount} {team.accessCount > 1 ? "members" : "member"}
+          </div>
         </span>
       </Row>
       {showArrow ? (
