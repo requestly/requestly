@@ -161,9 +161,13 @@ const FreeAndEnterprisePlanTable = () => {
                   </div>
                   <div className="text-gray text-left price-container">
                     <span className="price">
-                      ${PricingPlans[planName].plans[duration].usd.price * workspaceToUpgrade.accessCount}
+                      $
+                      {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY
+                        ? PricingPlans[planName].plans[duration].usd.price * workspaceToUpgrade.accessCount
+                        : Math.floor(PricingPlans[planName].plans[duration].usd.price / 12) *
+                          workspaceToUpgrade.accessCount}
                     </span>{" "}
-                    per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "year"} for{" "}
+                    per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "month, billed annually"} for{" "}
                     {workspaceToUpgrade.accessCount} members
                   </div>
                   {renderButtonsForPlans(planName)}
