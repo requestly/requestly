@@ -48,9 +48,9 @@ export const JoinWorkspaceCard = () => {
 
   const handleNudgeCTAClick = useCallback(() => {
     if (hasEmailInvite) {
-      trackWorkspaceOrganizationCardClicked("show_invites");
+      trackWorkspaceOrganizationCardClicked("Show invites");
     } else if (hasActiveWorkspace) {
-      trackWorkspaceOrganizationCardClicked("join_teammates");
+      trackWorkspaceOrganizationCardClicked("Join your teammates");
     }
 
     if (hasActiveWorkspace || hasEmailInvite) {
@@ -65,7 +65,7 @@ export const JoinWorkspaceCard = () => {
         })
       );
     } else {
-      trackWorkspaceOrganizationCardClicked("create_team");
+      trackWorkspaceOrganizationCardClicked("Start collaborating");
       dispatch(
         actions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -113,14 +113,14 @@ export const JoinWorkspaceCard = () => {
           setHasActiveWorkspace(hasActiveMembers);
 
           const actionType = hasEmailInvites
-            ? "show_invites"
+            ? "Show invites"
             : hasActiveMembers
-            ? "join_teammates"
-            : "start_collaborating";
+            ? "Join your teammates"
+            : "Start collaborating";
 
           trackWorkspaceOrganizationCardViewed(domain, actionType);
         } else {
-          trackWorkspaceOrganizationCardViewed(domain, "start_collaborating");
+          trackWorkspaceOrganizationCardViewed(domain, "Start collaborating");
         }
       })
       .catch((error) => {
@@ -130,7 +130,7 @@ export const JoinWorkspaceCard = () => {
 
   return (
     <>
-      {!hideCard && organizationMembers && organizationMembers.total >= MIN_MEMBERS_IN_WORKSPACE ? (
+      {!hideCard && organizationMembers && organizationMembers?.total >= MIN_MEMBERS_IN_WORKSPACE ? (
         <div className="workspace-card-container">
           <Row justify="end">
             <RQButton
