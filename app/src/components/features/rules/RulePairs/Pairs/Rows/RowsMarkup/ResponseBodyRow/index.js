@@ -13,7 +13,6 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
-import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
