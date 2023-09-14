@@ -182,7 +182,7 @@ const DashboardContent = () => {
           {isImportRulesModalActive ? (
             <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
           ) : null}
-          {isJoinWorkspaceCardVisible ? <JoinWorkspaceCard /> : null}
+          {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}
     </>
