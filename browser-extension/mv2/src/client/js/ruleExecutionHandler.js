@@ -76,7 +76,8 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
     return;
   }
 
-  const { name: ruleName, ruleType } = await RQ.RulesStore.getRule(ruleId);
+  const ruleDetails = await RQ.RulesStore.getRule(ruleId);
+  const { name: ruleName } = ruleDetails;
 
   const testRuleWidget = document.createElement("rq-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
@@ -84,12 +85,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   testRuleWidget.setAttribute("rule-name", ruleName);
   testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
-  if (ruleType === "Response") {
-    testRuleWidget.setAttribute(
-      "info-text-content",
-      `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>`
-    );
-  }
+  RQ.RuleExecutionHandler.setWidgetInfoText(testRuleWidget, ruleDetails);
 
   document.documentElement.appendChild(testRuleWidget);
 
@@ -100,6 +96,31 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
       appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
     });
   });
+};
+
+RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
+  const { ruleType } = ruleDetails;
+
+  switch (ruleType) {
+    case "Response":
+      testRuleWidget.setAttribute(
+        "info-text-content",
+        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>`
+      );
+      break;
+    case "Headers":
+      const responseHeaderExists = ruleDetails.pairs.some((pair) => {
+        return pair?.modifications?.Response?.length > 0;
+      });
+      responseHeaderExists &&
+        testRuleWidget.setAttribute(
+          "info-text-content",
+          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>`
+        );
+      break;
+    default:
+      return;
+  }
 };
 
 RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {

@@ -45,7 +45,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
               </Collapse.Panel>
             )}
 
-            {harEntry.request.headers.length > 0 && (
+            {harEntry.request.headers?.length > 0 && (
               <Collapse.Panel header="Request Headers" key={2}>
                 {harEntry.request.headers.map(({ name, value }) => (
                   <NetworkLogProperty key={name} label={name}>
