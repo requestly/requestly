@@ -81,6 +81,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
         })
         .finally(() => {
           setRefreshTestReports(false);
+          hightlightReport();
         });
     }
   }, [appMode, currentlySelectedRuleData.id, currentlySelectedRuleData.ruleType, newReportId, refreshTestReports]);

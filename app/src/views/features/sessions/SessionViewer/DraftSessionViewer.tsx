@@ -87,7 +87,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
   }, []);
 
   unstable_usePrompt({
-    when: !isSaveSessionClicked && !isDiscardSessionClicked,
+    when: !isSaveSessionClicked && !isDiscardSessionClicked && !testRuleDraftSession,
     message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
   });
 
