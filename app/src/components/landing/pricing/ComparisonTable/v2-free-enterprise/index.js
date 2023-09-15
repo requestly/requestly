@@ -160,7 +160,13 @@ const FreeAndEnterprisePlanTable = () => {
                     <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
                   </div>
                   <div className="text-gray text-left price-container">
-                    <span className="price">${PricingPlans[planName].plans[duration]?.usd?.price}</span> per user/month
+                    <span className="price">
+                      $
+                      {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY
+                        ? PricingPlans[planName].plans[duration]?.usd?.price / 12
+                        : PricingPlans[planName].plans[duration]?.usd?.price}
+                    </span>{" "}
+                    per user/month
                     {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
                   </div>
                   {renderButtonsForPlans(planName)}
