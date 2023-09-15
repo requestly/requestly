@@ -4,7 +4,6 @@ import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
-import { ContextMenuOption } from "./GenericNetworkTable/resource-table/dist";
 import "./RQNetworkTable.css";
 
 export interface RQNetworkTableProps {
