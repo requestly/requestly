@@ -1,15 +1,14 @@
 import React from "react";
-import { GenericNetworkTable } from "./GenericNetworkTable";
+import { GenericNetworkTable, GenericNetworkTableProps } from "./GenericNetworkTable";
 import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
-import { ContextMenuOption } from "./GenericNetworkTable/resource-table/dist";
 import "./RQNetworkTable.css";
 
 export interface RQNetworkTableProps {
   logs: RQNetworkLog[];
-  contextMenuOptions?: ContextMenuOption<RQNetworkLog>[];
+  contextMenuOptions?: GenericNetworkTableProps<RQNetworkLog>["contextMenuOptions"];
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
 }
 

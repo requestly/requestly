@@ -1,10 +1,10 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { ColorScheme, ResourceTable, DetailsTab, ContextMenuOption } from "./resource-table";
+import { ColorScheme, ContextMenuOption, DetailsTab, ResourceTable } from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
 
-interface NetworkTableProps<NetworkLog> {
+export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
   extraColumns?: Column<NetworkLog>[];
   extraDetailsTabs?: DetailsTab<NetworkLog>[];
@@ -37,7 +37,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   excludeColumns = [],
   contextMenuOptions = [],
   networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
-}: NetworkTableProps<NetworkLog>): ReactElement => {
+}: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
 
   const finalColumns = useMemo(
