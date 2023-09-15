@@ -22,8 +22,12 @@ const WorkspaceDropdown: React.FC<{
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const filteredAvailableTeams = useMemo(() => {
-    return availableTeams?.filter((team: any) => !team?.archived) ?? [];
-  }, [availableTeams]);
+    return (
+      availableTeams?.filter(
+        (team: any) => !team?.archived && team.members[user?.details?.profile?.uid]?.role === "admin"
+      ) ?? []
+    );
+  }, [availableTeams, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {
