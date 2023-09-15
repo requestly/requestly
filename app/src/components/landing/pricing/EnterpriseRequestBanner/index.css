@@ -4,6 +4,9 @@
   border-radius: var(--border-radius-sm);
   max-width: 700px;
 }
+.pricing-alert-row .ant-alert.ant-alert-info {
+  width: fit-content;
+}
 .pricing-alert-row .ant-alert svg {
   color: var(--text-gray);
   align-self: flex-start;

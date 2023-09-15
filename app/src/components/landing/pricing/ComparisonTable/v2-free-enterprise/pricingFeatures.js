@@ -1,10 +1,10 @@
 import APP_CONSTANTS from "config/constants";
 
-export const Plans = {
+export const PricingFeatures = {
   [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: {
+    free: {
+      planTitle: "Free",
       heading: "Starter Plan",
-      price: 0,
       features: [
         {
           title: "10 rules",
@@ -40,9 +40,9 @@ export const Plans = {
         },
       ],
     },
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: {
+    basic: {
+      planTitle: "Basic",
       heading: "For individuals",
-      price: 12,
       features: [
         {
           title: "Upto 25 rules",
@@ -78,9 +78,9 @@ export const Plans = {
         },
       ],
     },
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]: {
+    professional: {
+      planTitle: "Professional",
       heading: "For collaboration in QA & dev teams",
-      price: 25,
       features: [
         {
           title: "Unlimited rules",
@@ -110,8 +110,8 @@ export const Plans = {
     },
   },
   [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: {
-      price: 0,
+    free: {
+      planTitle: "Free",
       features: [
         {
           title: "10 sessions",
@@ -143,8 +143,8 @@ export const Plans = {
         },
       ],
     },
-    [APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL]: {
-      price: 10,
+    session_professional: {
+      planTitle: "Professional",
       features: [
         {
           title: "Unlimited sessions",

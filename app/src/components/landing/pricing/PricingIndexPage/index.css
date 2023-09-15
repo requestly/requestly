@@ -16,6 +16,7 @@
 .pricing-page-container .pricing-page-body {
   justify-content: center;
   padding: 0 20px;
+  flex-direction: column;
 }
 .pricing-title-container {
   display: flex;

@@ -63,7 +63,7 @@ PRICING.PREMIUM_PLANS = [
 
 PRICING.DURATION = {
   MONTHLY: "monthly",
-  ANNUAL: "annual",
+  ANNUALLY: "annually",
 };
 
 export default PRICING;
