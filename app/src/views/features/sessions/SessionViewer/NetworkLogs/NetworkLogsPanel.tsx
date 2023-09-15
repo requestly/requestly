@@ -5,8 +5,8 @@ import { getIncludeNetworkLogs } from "store/features/session-recording/selector
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
-import { getOffset } from "./helpers";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
+import { getOffset } from "./helpers";
 
 interface Props {
   startTime: number;
@@ -39,12 +39,12 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
           label: "Replay Request",
 
           onSelect: (key, log) => {
-            const { url, method, headers, postData } = log.entry.request;
+            const { url, method, headers, postData } = log.entry?.request ?? {};
 
             setSelectedRequestData({
               url,
               method,
-              body: JSON.stringify(postData),
+              body: postData.text,
               headers: headers.reduce((result, header) => ({ ...result, [header.name]: header.value }), {}),
             });
 
