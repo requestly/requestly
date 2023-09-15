@@ -213,12 +213,14 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
           )}
         </div>
       </div>
-      <Input
-        readOnly
-        addonBefore="Rule execution status"
-        value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
-        style={{ width: "fit-content" }}
-      />
+      {testRuleDraftSession && (
+        <Input
+          readOnly
+          addonBefore="Rule execution status"
+          value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
+          style={{ width: "fit-content" }}
+        />
+      )}
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}
