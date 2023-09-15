@@ -13,7 +13,7 @@ import underlineIcon from "../../../../../assets/img/icons/common/underline.svg"
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
-import { Switch } from "antd";
+import { Switch, Tag } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
@@ -40,27 +40,67 @@ const FreeAndEnterprisePlanTable = () => {
     (planName) => {
       const isUserPremium = user?.details?.isPremium;
       const userPlanName = user?.details?.planDetails?.planName;
+      const userPlanType = user?.details?.planDetails?.planType;
       const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
 
       if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
         return (
-          <RQButton disabled={isUserPremium} onClick={() => (window.location.href = "/")} type="primary">
-            Use now
+          <>
+            <RQButton onClick={() => (window.location.href = "/")} type="primary">
+              Use now
+            </RQButton>
+            {!isUserPremium && <Tag className="current-plan">Current Plan</Tag>}
+          </>
+        );
+      }
+
+      if (isUserPremium) {
+        if (userPlanType === "team") {
+          if (workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id || !isSelectedWorkspacePremium) {
+            return (
+              <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+                Contact us
+              </RQButton>
+            );
+          }
+        } else {
+          if (workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
+            return (
+              <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+                Contact us
+              </RQButton>
+            );
+          }
+        }
+      }
+
+      if (product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY) {
+        if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+          return (
+            <>
+              <RQButton onClick={() => (window.location.href = "/")} type="primary">
+                Use now
+              </RQButton>
+              <Tag className="current-plan">Current Plan</Tag>
+            </>
+          );
+        }
+
+        return (
+          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+            Contact us
           </RQButton>
         );
-      } else if (
+      }
+
+      if (
+        isUserPremium &&
         (isSelectedWorkspacePremium || workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) &&
         planName === userPlanName
       ) {
         return (
           <RQButton disabled type="primary">
             Current Plan
-          </RQButton>
-        );
-      } else if (product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY) {
-        return (
-          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-            Contact us
           </RQButton>
         );
       }
@@ -88,6 +128,7 @@ const FreeAndEnterprisePlanTable = () => {
       product,
       user?.details?.isPremium,
       user?.details?.planDetails?.planName,
+      user?.details?.planDetails?.planType,
       workspaceToUpgrade.accessCount,
       workspaceToUpgrade.id,
       workspaceToUpgrade?.subscriptionStatus,

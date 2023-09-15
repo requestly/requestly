@@ -60,6 +60,7 @@
   border: 1px solid var(--border-dark);
   background: var(--component-background);
   border-radius: var(--border-radius-sm);
+  height: 100%;
 }
 
 .pricing-table-col .pricing-col-header .plan-for {
@@ -110,11 +111,12 @@
   transform: rotate(180deg);
 }
 .current-plan {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: text-gray;
-  padding: 4px 16px;
-  border-radius: var(--border-radius-sm);
+  margin: 0 4px;
+  padding: 0 4px;
+  color: var(--text-gray);
+  font-size: 10px;
+  vertical-align: bottom;
+  border: none;
 }
 .pricing-table-wrapper .note-container {
   max-width: 615px;
