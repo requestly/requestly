@@ -69,6 +69,7 @@
 }
 .pricing-table-col .price-container {
   margin: 8px 0;
+  font-size: 12px;
 }
 .pricing-table-col .price {
   color: var(--white);
