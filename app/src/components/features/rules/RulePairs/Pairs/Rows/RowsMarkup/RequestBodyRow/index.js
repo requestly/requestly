@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Button } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -44,18 +44,24 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }
   };
 
-  useEffect(() => {
-    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      setEditorStaticValue(pair.request.value);
-    }
-  }, [pair.request]);
-
   const showPopup = (e) => {
     const requestType = e.target.value;
 
     setRequestTypePopupSelection(requestType);
     setRequestTypePopupVisible(true);
   };
+
+  const getEditorDefaultValue = useCallback(() => {
+    codeFormattedFlag.current = true;
+    setTimeout(() => {
+      codeFormattedFlag.current = false;
+    }, 2000);
+
+    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+      return pair.request.value ? pair.request.value : "";
+    }
+    return null;
+  }, [pair.request.type, pair.request.value]);
 
   const requestBodyChangeHandler = (value) => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
@@ -146,6 +152,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                     ? editorStaticValue
                     : pair.request.value
                 }
+                defaultValue={getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 readOnly={isInputDisabled}
                 validation={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? "off" : "editable"}

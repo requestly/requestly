@@ -24,7 +24,10 @@ const Error404 = () => {
 
               {!isAppOpenedInIframe() && (
                 <>
-                  <p className="hp-mb-32 hp-p1-body">You can go back home.</p>
+                  <p className="hp-mb-32 hp-p1-body">
+                    You might be looking for something which is available in a particular workspace, try switching
+                    workspaces.
+                  </p>
 
                   <Link to="/">
                     <Button type="primary" icon={<LeftOutlined />}>

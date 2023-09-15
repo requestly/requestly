@@ -19,10 +19,16 @@
 
 .sharing-modal-body {
   padding: 1.2rem;
+  font-size: 13px;
 }
 
 .sharing-modal-wrapper .ant-tabs {
   margin-top: 4px;
+}
+
+.sharing-modal-wrapper .sharing-primary-btn.ant-btn {
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top .ant-tabs-nav {
@@ -101,4 +107,21 @@
 .sharing-modal-empty-view svg {
   width: 60px;
   height: 60px;
+}
+
+.sharing-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  color: var(--text-gray);
+  background: var(--component-background);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  opacity: 0.8;
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+}
+.sharing-modal-footer svg {
+  min-width: 20px;
+  min-height: 20px;
 }
