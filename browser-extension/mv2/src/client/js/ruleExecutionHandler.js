@@ -46,6 +46,7 @@ RQ.RuleExecutionHandler.setup = () => {
         if (message.record) {
           chrome.runtime.sendMessage({
             action: RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
+            showWidget: false,
           });
         }
         RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);

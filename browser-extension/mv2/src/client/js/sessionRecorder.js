@@ -5,6 +5,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isRecording = false;
   RQ.SessionRecorder.isExplicitRecording = false;
   RQ.SessionRecorder.widgetPosition = null;
+  RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.sendResponseCallbacks = {};
 
   const isTopDocument = !RQ.SessionRecorder.isIframe();
@@ -46,7 +47,7 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget } = options;
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
@@ -63,6 +64,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   RQ.SessionRecorder.isExplicitRecording = explicit;
   RQ.SessionRecorder.widgetPosition = widgetPosition;
+  RQ.SessionRecorder.showWidget = showWidget;
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -102,7 +104,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
 
-      if (RQ.SessionRecorder.isExplicitRecording) {
+      if (RQ.SessionRecorder.showWidget) {
         RQ.SessionRecorder.showWidget();
       }
     } else if (event.data.action === "sessionRecordingStopped") {
