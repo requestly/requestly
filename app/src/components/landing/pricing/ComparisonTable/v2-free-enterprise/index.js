@@ -166,7 +166,7 @@ const FreeAndEnterprisePlanTable = () => {
                         ? PricingPlans[planName].plans[duration]?.usd?.price / 12
                         : PricingPlans[planName].plans[duration]?.usd?.price}
                     </span>{" "}
-                    per user/month
+                    {workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "per month" : "per user/month"}
                     {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
                   </div>
                   {renderButtonsForPlans(planName)}
