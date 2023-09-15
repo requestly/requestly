@@ -103,7 +103,7 @@ export default function EnterpriseRequestBanner({ user }) {
                         <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here
                         </span>{" "}
-                        to request a Professional Plan subscription for you.
+                        to request a Requestly Professional subscription for you.
                       </>
                     }
                   ></Alert>

@@ -160,15 +160,8 @@ const FreeAndEnterprisePlanTable = () => {
                     <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
                   </div>
                   <div className="text-gray text-left price-container">
-                    <span className="price">
-                      $
-                      {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY
-                        ? PricingPlans[planName].plans[duration].usd.price * workspaceToUpgrade.accessCount
-                        : Math.floor(PricingPlans[planName].plans[duration].usd.price / 12) *
-                          workspaceToUpgrade.accessCount}
-                    </span>{" "}
-                    per {duration === APP_CONSTANTS.PRICING.DURATION.MONTHLY ? "month" : "month, billed annually"} for{" "}
-                    {workspaceToUpgrade.accessCount} members
+                    <span className="price">${PricingPlans[planName].plans[duration]?.usd?.price}</span> per user/month
+                    {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
                   </div>
                   {renderButtonsForPlans(planName)}
                 </div>
