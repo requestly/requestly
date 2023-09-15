@@ -69,6 +69,7 @@
 }
 .pricing-table-col .price-container {
   margin: 8px 0;
+  font-size: 12px;
 }
 .pricing-table-col .price {
   color: var(--white);
@@ -130,6 +131,7 @@
   display: flex;
   padding: 48px;
   margin: 20px 24px;
+  justify-content: center;
 }
 
 .enterprise-features-grid {
@@ -163,6 +165,7 @@
     flex-direction: row;
     width: 100%;
     margin-bottom: 1rem;
+    justify-content: center;
   }
   .pricing-table-product-view-para p {
     display: none;
@@ -173,8 +176,5 @@
   .pricing-table-row {
     justify-content: center;
     flex-wrap: wrap;
-  }
-  .pricing-table-col {
-    width: 100%;
   }
 }
