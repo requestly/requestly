@@ -34,6 +34,7 @@ import {
   trackSignupSuccessEvent,
 } from "modules/analytics/events/common/auth/signup";
 import {
+  trackEmailLoginLinkGenerated,
   trackLoginAttemptedEvent,
   trackLoginFailedEvent,
   trackLoginSuccessEvent,
@@ -188,7 +189,7 @@ export async function signUp(name, email, password, refCode, source) {
     });
 }
 
-export async function sendEmailLinkForSignin(email) {
+export async function sendEmailLinkForSignin(email, source) {
   const auth = getAuth(firebaseApp);
   return sendSignInLinkToEmail(auth, email, {
     url: window.location.href,
@@ -197,6 +198,7 @@ export async function sendEmailLinkForSignin(email) {
     .then((res) => {
       window.localStorage.setItem("RQEmailForSignIn", email);
       toast.info("Please check your email for instructions to login.");
+      trackEmailLoginLinkGenerated(email, source);
     })
     .catch((err) => {
       toast.error("Failed to send login link. Please try again, or contact support if the problem persists");

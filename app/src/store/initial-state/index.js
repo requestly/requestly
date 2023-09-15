@@ -134,6 +134,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    emailLoginLinkPopup: {
+      isActive: false,
+      props: {},
+    },
   },
 
   /* Marketplace */
@@ -209,6 +213,7 @@ const INITIAL_STATE = {
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
     },
   },

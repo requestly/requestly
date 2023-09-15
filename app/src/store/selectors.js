@@ -286,3 +286,7 @@ export const getIsJoinWorkspaceCardVisible = (state) => {
 export const getExtensionInsallSource = (state) => {
   return getGlobalState(state).misc.persist?.extensionInstallSource;
 };
+
+export const getTimeToResendEmailLogin = (state) => {
+  return getGlobalState(state).misc.nonPersist?.timeToResendEmailLogin;
+};

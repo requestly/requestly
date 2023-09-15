@@ -105,16 +105,6 @@
   position: relative;
 }
 
-@keyframes afterElement {
-  0% {
-    width: 100%;
-    pointer-events: none;
-  }
-  100% {
-    width: 0%;
-  }
-}
-
 .generate-login-link-btn-animation::after {
   background-color: var(--background);
   opacity: 0.3;
@@ -123,6 +113,5 @@
   position: absolute;
   inset: 0;
   content: "";
-  animation: afterElement 15s linear;
   z-index: 9;
 }

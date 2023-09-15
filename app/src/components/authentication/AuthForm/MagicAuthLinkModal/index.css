@@ -1,0 +1,44 @@
+.mail-icon {
+  background-color: var(--white);
+  padding: 8px;
+  width: fit-content;
+  width: 50px;
+  border-radius: var(--border-radius-md);
+}
+
+.mail-icon > span {
+  font-size: 2rem;
+}
+.mail-icon > span > svg {
+  fill: var(--black);
+}
+.mail-sent-title {
+  color: var(--white);
+}
+
+.mail-link-modal-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  color: var(--white);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-dark);
+}
+
+.mail-link-modal-content {
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 3.5rem;
+}
+
+.resend-email-cta {
+  cursor: pointer;
+}
+
+.mail-link-modal-message {
+  gap: 1px !important;
+}

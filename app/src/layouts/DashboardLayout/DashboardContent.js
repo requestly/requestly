@@ -30,6 +30,7 @@ import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/M
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
+import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -177,6 +178,16 @@ const DashboardContent = () => {
               isOpen={activeModals.sharingModal.isActive}
               toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "sharingModal" }))}
               {...activeModals.sharingModal.props}
+            />
+          ) : null}
+          {activeModals.emailLoginLinkPopup.isActive ? (
+            <MailLoginLinkPopup
+              isOpen={activeModals.emailLoginLinkPopup.isActive}
+              toggleModal={() => {
+                dispatch(actions.toggleActiveModal({ modalName: "emailLoginLinkPopup" }));
+                dispatch(actions.updateTimeToResendEmailLogin(0));
+              }}
+              {...activeModals.emailLoginLinkPopup.props}
             />
           ) : null}
 

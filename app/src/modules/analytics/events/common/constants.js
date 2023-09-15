@@ -45,6 +45,7 @@ export const AUTH = {
   },
   AUTH_MODAL: {
     SHOWN: "auth_modal_shown",
+    EMAIL_LOGIN_LINK_GENERATED: "email_login_link_generated",
   },
   AUTH_ONE_TAP_PROMPT: {
     VISIBLE: "auth_one_tap_prompt_visible",
