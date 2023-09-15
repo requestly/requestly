@@ -110,9 +110,11 @@ const WorkspaceDropdown: React.FC<{
         </Dropdown>
       </div>
       <div className="text-center">
-        <Typography.Text type="secondary">
-          Your workspace has {workspaceToUpgrade?.accessCount} active members
-        </Typography.Text>
+        {workspaceToUpgrade.id !== "private_workspace" && (
+          <Typography.Text type="secondary">
+            Your workspace has {workspaceToUpgrade?.accessCount} active members
+          </Typography.Text>
+        )}
       </div>
     </div>
   ) : null;

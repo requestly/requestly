@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col } from "antd";
+import { Row } from "antd";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "utils/Toast.js";
@@ -82,43 +82,37 @@ const Checkout = () => {
   // },[country, stableUpdatePlanInfo]);
 
   return (
-    <Row>
-      <Col span={24}>
-        <Row className="mb-3 mt-8">
-          <Col span={24} align="center">
-            <img alt="Please wait" src={RQIcon} style={{ width: "8vw" }} className="animation-pulse" />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24} align="center">
-            <Text type="secondary">
-              <Spin indicator={antIcon} /> &nbsp;&nbsp;
-              <TextLoop interval={2500}>
-                <span>Getting price plan...</span>
-                <span>Checking payment provider...</span>
-                <span>Setting your user...</span>
-                <span>Loading pay gateway...</span>
-                <span>This shouldn't take more than a minute...</span>
-                <span>Almost done...</span>
-              </TextLoop>
-            </Text>
-          </Col>
-        </Row>
+    <>
+      <Row className="mb-2" justify={"center"}>
+        <img alt="Please wait" src={RQIcon} style={{ width: "8vw" }} className="animation-pulse" />
+      </Row>
+      <Row justify={"center"}>
+        <Text type="secondary">
+          <Spin indicator={antIcon} /> &nbsp;&nbsp;
+          <TextLoop interval={2500}>
+            <span>Getting price plan...</span>
+            <span>Checking payment provider...</span>
+            <span>Setting your user...</span>
+            <span>Loading pay gateway...</span>
+            <span>This shouldn't take more than a minute...</span>
+            <span>Almost done...</span>
+          </TextLoop>
+        </Text>
+      </Row>
 
-        <section className="section section-sm " style={{ display: "none" }}>
-          <VerifyAndContinueCheckout
-            mode={mode}
-            teamId={teamId}
-            currency={currency}
-            duration={duration}
-            isPlanVerificationPassed={isPlanVerificationPassed}
-            stripe={stripe}
-            planName={planName}
-            quantity={quantity}
-          />
-        </section>
-      </Col>
-    </Row>
+      <section className="section section-sm " style={{ display: "none" }}>
+        <VerifyAndContinueCheckout
+          mode={mode}
+          teamId={teamId}
+          currency={currency}
+          duration={duration}
+          isPlanVerificationPassed={isPlanVerificationPassed}
+          stripe={stripe}
+          planName={planName}
+          quantity={quantity}
+        />
+      </section>
+    </>
   );
 };
 
@@ -130,15 +124,13 @@ const CheckoutIndex = () => {
   }, [stripePromise]);
 
   return (
-    <Row>
-      <Col span={24}>
-        {stripePromise !== false ? (
-          <Elements stripe={stripePromise}>
-            <Checkout />
-          </Elements>
-        ) : null}
-      </Col>
-    </Row>
+    <div>
+      {stripePromise !== false ? (
+        <Elements stripe={stripePromise}>
+          <Checkout />
+        </Elements>
+      ) : null}
+    </div>
   );
 };
 
