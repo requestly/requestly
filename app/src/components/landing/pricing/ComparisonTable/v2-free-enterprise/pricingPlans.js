@@ -64,7 +64,7 @@ export const PricingPlans = {
       },
       annually: {
         usd: {
-          price: 10,
+          price: 120,
         },
       },
     },
