@@ -42,7 +42,6 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         {
           key: "replayRequest",
           label: "Replay Request",
-
           onSelect: (key, log) => {
             const { url, method, headers, postData } = log.entry?.request ?? {};
 
