@@ -26,8 +26,6 @@ export const AppNotificationBanner = () => {
   const banners = useFeatureValue("app_banner", []);
   const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
 
-  console.log("rerender");
-
   useEffect(() => {
     if (newBanners?.length > 0) {
       return setIsVisible(true);
