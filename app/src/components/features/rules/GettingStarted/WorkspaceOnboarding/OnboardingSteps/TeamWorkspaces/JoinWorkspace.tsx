@@ -18,6 +18,7 @@ import {
 } from "modules/analytics/events/misc/onboarding";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import { OnboardingSteps } from "../../types";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -126,7 +127,15 @@ export const JoinWorkspace: React.FC<{
         >
           Skip for now
         </RQButton>
-        <RQButton type="default" className="text-bold" onClick={createNewTeam} icon={<PlusOutlined />}>
+        <RQButton
+          type="default"
+          className="text-bold"
+          onClick={() => {
+            trackCreateNewTeamClicked("onboarding");
+            createNewTeam();
+          }}
+          icon={<PlusOutlined />}
+        >
           Create new workspace
         </RQButton>
       </div>

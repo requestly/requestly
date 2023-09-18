@@ -20,11 +20,6 @@ export const trackInviteMoreTeammatesButtonClicked = () => {
   trackEvent(TEAMS.INVITE_MORE_TEAMMATES_BUTTON_CLICKED);
 };
 
-export const trackCreateNewWorkspaceClicked = (source) => {
-  const params = { source };
-  trackEvent(TEAMS.CREATE_NEW_WORKSPACE_CLICKED, params);
-};
-
 export const trackNewWorkspaceCreated = (source, notify_all_teammates = false) => {
   const params = { notify_all_teammates, source };
   trackEvent(TEAMS.NEW_WORKSPACE_CREATED, params);

@@ -15,6 +15,7 @@ import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -121,6 +122,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   }, [user.loggedIn, dispatch]);
 
   const handleCreateNewWorkspace = () => {
+    trackCreateNewTeamClicked("join_workspace_modal");
     toggleModal();
     if (user.loggedIn) {
       dispatch(

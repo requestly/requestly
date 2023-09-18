@@ -12,6 +12,7 @@ import { Team } from "types";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 interface SwitchWorkspaceModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   const user = useSelector(getUserAuthDetails);
 
   const handleCreateNewWorkspaceClick = () => {
+    trackCreateNewTeamClicked("switch_workspace_modal");
     toggleModal();
     dispatch(
       actions.toggleActiveModal({
