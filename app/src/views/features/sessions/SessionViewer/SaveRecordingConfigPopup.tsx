@@ -27,17 +27,17 @@ import {
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { clearDraftSessionCache } from "./SessionViewerActions";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
   setIsSaveSessionClicked?: (value: boolean) => void;
-  clearSavedDraft?: () => void;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked, clearSavedDraft }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
@@ -120,8 +120,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         recordingOptionsToSave
       ).then((response) => {
         if (response?.success) {
+          clearDraftSessionCache(tabId);
           onClose();
-          clearSavedDraft?.();
           toast.success("Recording saved successfully");
           trackDraftSessionSaved(
             sessionRecordingMetadata?.sessionAttributes?.duration,
@@ -141,6 +141,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       });
     },
     [
+      tabId,
       user?.loggedIn,
       user?.details?.profile?.uid,
       workspace?.id,
@@ -149,7 +150,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       sessionEvents,
       sessionRecordingMetadata,
       setIsSaveSessionClicked,
-      clearSavedDraft,
       dispatch,
       navigate,
       onClose,
