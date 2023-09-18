@@ -115,7 +115,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
 
             {activeTab === SharingOptions.SHARE_LINK && (
               <span className="sharing-modal-footer-text">
-                Sharing with URLs only share current state of rules, it does not update in realtime.{" "}
+                Sharing using shared list only share current state of rules, it does not update in realtime.{" "}
                 <Typography.Link onClick={() => setActiveTab(SharingOptions.WORKSPACE)}>
                   Share in a workspace
                 </Typography.Link>{" "}
