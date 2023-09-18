@@ -106,11 +106,12 @@
 }
 
 .rq-modal.draft-session-modal {
-  width: 80vw !important;
+  width: 90vw !important;
+  top: 25px;
 }
 
 .rq-modal.draft-session-modal .ant-modal-body {
-  height: 80vh;
+  height: 93vh;
   overflow: auto;
 }
 
