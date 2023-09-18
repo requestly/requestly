@@ -44,7 +44,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
     updateCount(visibleNetworkLogs.length);
   }, [visibleNetworkLogs, updateCount]);
 
-  const handleContextMenuRuleOptionClick = useCallback(
+  const handleContextMenuRuleOptionSelect = useCallback(
     (key: React.Key, log: RQNetworkLog) => {
       const ruleData = {
         id: log.id,
@@ -113,56 +113,56 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         {
           key: RuleType.REDIRECT,
           label: "Redirect URL (Map local/Remote)",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.RESPONSE,
           label: "Modify Response Body",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.REQUEST,
           label: "Modify Request Body",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.HEADERS,
           label: "Modify Headers",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.REPLACE,
           label: "Replace part of URL",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
 
         {
           key: RuleType.CANCEL,
           label: "Cancel Request",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.SCRIPT,
           label: "Insert Custom Script",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.DELAY,
           label: "Delay Request",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.QUERYPARAM,
           label: "Modify Query Params",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.USERAGENT,
           label: "Modify User Agent",
-          onSelect: handleContextMenuRuleOptionClick,
+          onSelect: handleContextMenuRuleOptionSelect,
         },
       ] as RQNetworkTableProps["contextMenuOptions"],
-    [handleContextMenuRuleOptionClick]
+    [handleContextMenuRuleOptionSelect]
   );
 
   const handleCloseApiClientModal = useCallback(() => {
