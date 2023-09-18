@@ -66,7 +66,7 @@ const SessionsIndexPage = () => {
     const records = [];
     fetchDraftRecordings().then((drafts) => {
       if (drafts.length) {
-        drafts.reverse();
+        drafts.sort((a, b) => b.startTime - a.startTime);
         records.push(...drafts);
       }
     });
@@ -117,6 +117,7 @@ const SessionsIndexPage = () => {
       } else {
         setReachedEnd(true);
       }
+      console.log({ records });
       setSessionRecordings(records);
       setIsTableLoading(false);
     });

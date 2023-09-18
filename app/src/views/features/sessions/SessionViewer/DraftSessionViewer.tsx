@@ -61,8 +61,6 @@ const DraftSessionViewer: React.FC = () => {
     ]
   );
 
-  console.log("DEBUG", !(!isSaveSessionClicked || !isDiscardSessionClicked));
-
   const populateSessionData = useCallback(
     (attributes: RQSessionAttributes, events: RQSessionEvents, tabId?: string) => {
       dispatch(

@@ -13,27 +13,30 @@ export const cacheDraftSession = async (attributes: RQSessionAttributes, events:
     metadata: { name: generateDraftSessionTitle(attributes.url), ...attributes },
     events: compressEvents(events),
   };
+  const cacheSessionId = `${tabId}-${Date.now()}`;
 
   const draftSessions = await StorageService().getRecord(APP_CONSTANTS.DRAFT_SESSIONS);
   if (!draftSessions) {
     StorageService()
-      .saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [tabId]: sessionToCache } })
+      .saveRecord({ [APP_CONSTANTS.DRAFT_SESSIONS]: { [cacheSessionId]: sessionToCache } })
       .then(() => {
         trackDraftSessionAutoSaved();
       })
       .catch((e) => console.log(e));
   } else {
-    if (tabId in draftSessions) {
-      delete draftSessions[tabId];
+    if (cacheSessionId in draftSessions) {
+      delete draftSessions[cacheSessionId];
     }
 
     if (Object.keys(draftSessions).length === MAX_CACHED_DRAFT_SESSIONS) {
-      const oldestDraftKey = Object.keys(draftSessions)[0];
+      const oldestDraftKey = Object.keys(draftSessions).sort(
+        (a, b) => draftSessions[a].startTime - draftSessions[b].startTime
+      )[0];
       delete draftSessions[oldestDraftKey];
     }
     StorageService()
       .saveRecord({
-        [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [tabId]: sessionToCache },
+        [APP_CONSTANTS.DRAFT_SESSIONS]: { ...draftSessions, [cacheSessionId]: sessionToCache },
       })
       .then(() => {
         trackDraftSessionAutoSaved();
