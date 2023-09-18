@@ -123,7 +123,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                 }`}
                 key={index}
               >
-                <div className="text-white text-bold test-this-rule-report-url">
+                <div className="text-white text-bold fit-text-content">
                   <Tooltip title={report.url} destroyTooltipOnHide>
                     {report.url}
                   </Tooltip>

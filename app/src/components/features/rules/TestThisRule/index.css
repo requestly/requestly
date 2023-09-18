@@ -80,12 +80,6 @@
   text-align: center;
 }
 
-.test-this-rule-report-url {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .test-this-rule-report-session-link {
   text-align: right;
 }

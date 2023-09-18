@@ -228,7 +228,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
             style={{ width: "fit-content" }}
           />
           <a
-            className="external-link"
+            className="text-underline underline-text-on-hover"
             href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
             target="_blank"
             rel="noreferrer"
@@ -236,7 +236,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
               trackTroubleshootClicked("test_this_rule__draft_session_modal");
             }}
           >
-            Troubleshooting guide
+            Troubleshooting Guide
           </a>
         </Space>
       )}
