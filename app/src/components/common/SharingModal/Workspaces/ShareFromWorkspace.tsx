@@ -118,7 +118,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
                 <CopyButton
                   title="Copy link"
                   type="default"
-                  copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?workspaceId=${currentlyActiveWorkspace.id}`}
+                  copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?wId=${currentlyActiveWorkspace.id}`}
                   showIcon={false}
                   disableTooltip
                   trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}
