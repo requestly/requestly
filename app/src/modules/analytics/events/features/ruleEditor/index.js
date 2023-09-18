@@ -20,3 +20,16 @@ export const trackTroubleshootClicked = (source) => {
     source,
   });
 };
+
+export const trackTestRuleResultClicked = (rule_type, session_link) => {
+  const params = { rule_type, session_link };
+  trackEvent(RULE_EDITOR.TEST_THIS_RULE.TEST_RULE_RESULT_CLICKED, params);
+};
+
+export const trackTestRuleSessionDraftViewed = () => {
+  trackEvent(RULE_EDITOR.TEST_THIS_RULE.TEST_RULE_SESSION_DRAFT_VIEWED);
+};
+
+export const trackTestRuleSessionDraftSaved = (mode) => {
+  trackEvent(RULE_EDITOR.TEST_THIS_RULE.TEST_RULE_SESSION_DRAFT_SAVED, { mode });
+};

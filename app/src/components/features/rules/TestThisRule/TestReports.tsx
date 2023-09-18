@@ -7,7 +7,7 @@ import { TestReport } from "./types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
-import { trackTestRuleReportGenerated } from "modules/analytics/events/features/ruleEditor";
+import { trackTestRuleReportGenerated, trackTestRuleResultClicked } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
 import { RQModal } from "lib/design-system/components";
 import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
@@ -138,7 +138,10 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
                 <div className="test-this-rule-report-session-link">
                   {report.sessionLink ? (
                     <>
-                      <SessionIcon /> <Link to={report.sessionLink}>View session recording</Link>
+                      <SessionIcon />{" "}
+                      <Link onClick={trackTestRuleResultClicked} to={report.sessionLink}>
+                        View session recording
+                      </Link>
                     </>
                   ) : (
                     "Session not saved"

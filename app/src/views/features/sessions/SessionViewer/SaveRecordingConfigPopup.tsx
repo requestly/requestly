@@ -29,6 +29,7 @@ import {
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/helpers";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
+import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -136,6 +137,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
             recordingOptionsToSave,
             SessionSaveMode.ONLINE
           );
+          testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
           trackSessionsCreatedCount();
           if (testRuleDraftSession) {
             getTestReportById(appMode, testRuleDraftSession.testReportId).then((testReport) => {
@@ -214,16 +216,19 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
             recordingOptionsToSave,
             SessionSaveMode.LOCAL
           );
+          testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
           trackSessionsCreatedCount(true);
         });
     },
     [
-      dispatch,
       user?.loggedIn,
-      sessionEvents,
-      sessionRecordingMetadata,
       includedDebugInfo,
+      sessionEvents,
+      sessionRecordingMetadata.name,
+      sessionRecordingMetadata.sessionAttributes,
+      dispatch,
       onClose,
+      testRuleDraftSession,
       trackSessionsCreatedCount,
     ]
   );

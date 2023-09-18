@@ -28,7 +28,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 import LINKS from "config/constants/sub/links";
-import { trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
+import { trackTestRuleSessionDraftSaved, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 
 interface Props {
   testRuleDraftSession?: {
@@ -109,6 +109,10 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
   useEffect(() => {
     trackDraftSessionViewed();
 
+    if (testRuleDraftSession) {
+      trackTestRuleSessionDraftSaved();
+    }
+
     setIsLoading(true);
 
     if (tabId === "imported") {
@@ -150,7 +154,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
