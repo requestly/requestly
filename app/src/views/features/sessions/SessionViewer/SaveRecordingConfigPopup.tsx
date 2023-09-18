@@ -30,16 +30,12 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/helpers";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
+import { DraftSessionViewerProps } from "./DraftSessionViewer";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
   setIsSaveSessionClicked?: (value: boolean) => void;
-  testRuleDraftSession?: {
-    draftSessionTabId: string;
-    testReportId: string;
-    closeModal: () => void;
-    appliedRuleStatus: boolean;
-  };
+  testRuleDraftSession?: DraftSessionViewerProps["testRuleDraftSession"];
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;

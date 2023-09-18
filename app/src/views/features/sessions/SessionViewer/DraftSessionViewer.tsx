@@ -30,7 +30,7 @@ import "./sessionViewer.scss";
 import LINKS from "config/constants/sub/links";
 import { trackTestRuleSessionDraftSaved, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 
-interface Props {
+export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
     testReportId: string;
@@ -39,7 +39,7 @@ interface Props {
   };
 }
 
-const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
+const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSession }) => {
   const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
