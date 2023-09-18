@@ -1,5 +1,11 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { ColorScheme, ContextMenuOption, DetailsTab, ResourceTable } from "@requestly-ui/resource-table";
+import {
+  ColorScheme,
+  ContextMenuOption,
+  DetailsTab,
+  ResourceTable,
+  ResourceTableProps,
+} from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
@@ -24,6 +30,8 @@ export interface GenericNetworkTableProps<NetworkLog> {
    */
   networkEntrySelector: (log: NetworkLog) => NetworkEntry;
 
+  onContextMenuOpenChange?: ResourceTableProps<NetworkLog>["onContextMenuOpenChange"];
+
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
 }
 
@@ -36,7 +44,8 @@ export const GenericNetworkTable = <NetworkLog,>({
   extraDetailsTabs = [],
   excludeColumns = [],
   contextMenuOptions = [],
-  networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
+  networkEntrySelector = (log) => log as NetworkEntry,
+  onContextMenuOpenChange = (isOpen) => {},
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
 
@@ -72,6 +81,7 @@ export const GenericNetworkTable = <NetworkLog,>({
       colorScheme={ColorScheme.DARK}
       onRowSelection={setSelectedLog}
       contextMenuOptions={contextMenuOptions}
+      onContextMenuOpenChange={onContextMenuOpenChange}
     />
   );
 };
