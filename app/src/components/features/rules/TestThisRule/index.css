@@ -81,7 +81,7 @@
 }
 
 .test-this-rule-report-url {
-  width: 25ch;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
