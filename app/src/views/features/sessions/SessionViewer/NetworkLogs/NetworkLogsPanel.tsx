@@ -1,17 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Empty, Typography } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
+import { actions } from "store";
+import { getActiveModals } from "store/selectors";
+import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
+import { APIClient, APIClientRequest } from "components/common/APIClient";
+import RuleEditorModal from "components/common/RuleEditorModal";
+import { getOffset } from "./helpers";
+import { snakeCase } from "lodash";
+import { RuleType } from "types";
 import {
   trackSampleSessionClicked,
   trackSessionRecordingNetworkLogContextMenuOpen,
   trackSessionRecordingNetworkLogContextMenuOptionClicked,
 } from "modules/analytics/events/features/sessionRecording";
-import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
-import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
-import { APIClient, APIClientRequest } from "components/common/APIClient";
-import { getOffset } from "./helpers";
-import { copyToClipBoard } from "utils/Misc";
+// import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 
 interface Props {
   startTime: number;
@@ -21,6 +26,8 @@ interface Props {
 }
 
 const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, updateCount }) => {
+  const dispatch = useDispatch();
+  const { ruleEditorModal } = useSelector(getActiveModals);
   const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState<APIClientRequest>(null);
 
@@ -35,6 +42,43 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
   useEffect(() => {
     updateCount(visibleNetworkLogs.length);
   }, [visibleNetworkLogs, updateCount]);
+
+  const handleContextMenuRuleOptionClick = useCallback(
+    (key: React.Key, log: RQNetworkLog) => {
+      const ruleData = {
+        id: log.id,
+        url: log.entry.request.url,
+        request: {
+          body: log.entry.request.postData.text,
+        },
+        response: {
+          body: log.entry.response.content.text,
+        },
+      };
+
+      dispatch(
+        actions.toggleActiveModal({
+          newValue: true,
+          modalName: "ruleEditorModal",
+          newProps: { ruleData, ruleType: key },
+        })
+      );
+
+      // TBD
+      // trackRuleCreationWorkflowStartedEvent(key, "modal");
+      trackSessionRecordingNetworkLogContextMenuOptionClicked(snakeCase(key as string));
+    },
+    [dispatch]
+  );
+
+  const handleCloseRuleEditorModal = useCallback(() => {
+    dispatch(
+      actions.toggleActiveModal({
+        newValue: false,
+        modalName: "ruleEditorModal",
+      })
+    );
+  }, [dispatch]);
 
   const options = useMemo(
     () =>
@@ -67,8 +111,62 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             setIsApiClientModalOpen(true);
           },
         },
+        {
+          type: "divider",
+        },
+        {
+          key: RuleType.REDIRECT,
+          label: "Redirect URL(Map local/Remote)",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.RESPONSE,
+          label: "Modify Response Body",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.REQUEST,
+          label: "Modify Request Body",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.HEADERS,
+          label: "Modify Headers",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.REPLACE,
+          label: "Replace part of URL",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+
+        {
+          key: RuleType.CANCEL,
+          label: "Cancel Request",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.SCRIPT,
+          label: "Insert Custom Script",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.DELAY,
+          label: "Delay Request",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.QUERYPARAM,
+          label: "Modify Query Params",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
+        {
+          key: RuleType.USERAGENT,
+          label: "Modify User Agent",
+          onSelect: handleContextMenuRuleOptionClick,
+        },
       ] as RQNetworkTableProps["contextMenuOptions"],
-    []
+    [handleContextMenuRuleOptionClick]
   );
 
   const handleCloseApiClientModal = useCallback(() => {
@@ -89,13 +187,23 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             }}
           />
 
-          <APIClient
-            openInModal
-            modalTitle="Replay request"
-            request={selectedRequestData}
-            isModalOpen={isApiClientModalOpen}
-            onModalClose={handleCloseApiClientModal}
-          />
+          {isApiClientModalOpen && (
+            <APIClient
+              openInModal
+              modalTitle="Replay request"
+              request={selectedRequestData}
+              isModalOpen={isApiClientModalOpen}
+              onModalClose={handleCloseApiClientModal}
+            />
+          )}
+
+          {ruleEditorModal.isActive && (
+            <RuleEditorModal
+              isOpen={ruleEditorModal.isActive}
+              handleModalClose={handleCloseRuleEditorModal}
+              analyticEventEditorViewedSource="session_recording_network_panel"
+            />
+          )}
         </>
       ) : includeNetworkLogs === false ? (
         <div>
