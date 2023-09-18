@@ -105,7 +105,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       });
 
       if (RQ.SessionRecorder.showWidget) {
-        RQ.SessionRecorder.showWidget();
+        RQ.SessionRecorder.showRecordingWidget();
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
@@ -196,7 +196,7 @@ RQ.SessionRecorder.showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-RQ.SessionRecorder.showWidget = () => {
+RQ.SessionRecorder.showRecordingWidget = () => {
   let widget = RQ.SessionRecorder.getWidget();
 
   if (!widget) {
