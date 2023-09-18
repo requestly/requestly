@@ -9,6 +9,7 @@ import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./DashboardLayout.css";
+import { AppNotificationBanner } from "./AppNotificationBanner";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -32,6 +33,7 @@ const DashboardLayout = () => {
 
   return (
     <>
+      <AppNotificationBanner />
       <div className="app-layout app-dashboard-layout">
         <div className="app-header">
           {" "}
