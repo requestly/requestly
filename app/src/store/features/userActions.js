@@ -137,3 +137,7 @@ export const updateExtensionInstallSource = (prevState, action) => {
 export const updateTimeToResendEmailLogin = (prevState, action) => {
   prevState.misc.nonPersist.timeToResendEmailLogin = action.payload;
 };
+
+export const updateAppNotificationBannerDismissTs = (prevState, action) => {
+  prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
+};

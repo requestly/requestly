@@ -264,3 +264,7 @@ export const getExtensionInsallSource = (state) => {
 export const getTimeToResendEmailLogin = (state) => {
   return getGlobalState(state).misc.nonPersist?.timeToResendEmailLogin;
 };
+
+export const getAppNotificationBannerDismissTs = (state) => {
+  return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
+};
