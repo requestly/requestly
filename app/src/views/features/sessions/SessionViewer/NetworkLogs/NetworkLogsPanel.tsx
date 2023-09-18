@@ -9,14 +9,15 @@ import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/component
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
 import { getOffset } from "./helpers";
-import { snakeCase } from "lodash";
 import { RuleType } from "types";
+import { copyToClipBoard } from "utils/Misc";
+import { snakeCase } from "lodash";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import {
   trackSampleSessionClicked,
   trackSessionRecordingNetworkLogContextMenuOpen,
   trackSessionRecordingNetworkLogContextMenuOptionClicked,
 } from "modules/analytics/events/features/sessionRecording";
-// import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 
 interface Props {
   startTime: number;
@@ -48,12 +49,8 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
       const ruleData = {
         id: log.id,
         url: log.entry.request.url,
-        request: {
-          body: log.entry.request.postData.text,
-        },
-        response: {
-          body: log.entry.response.content.text,
-        },
+        request: { body: log.entry.request.postData.text },
+        response: { body: log.entry.response.content.text },
       };
 
       dispatch(
@@ -64,9 +61,8 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         })
       );
 
-      // TBD
-      // trackRuleCreationWorkflowStartedEvent(key, "modal");
-      trackSessionRecordingNetworkLogContextMenuOptionClicked(snakeCase(key as string));
+      trackRuleCreationWorkflowStartedEvent(key, "modal");
+      trackSessionRecordingNetworkLogContextMenuOptionClicked(`${snakeCase(key as string)}_rule`);
     },
     [dispatch]
   );
@@ -116,7 +112,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         },
         {
           key: RuleType.REDIRECT,
-          label: "Redirect URL(Map local/Remote)",
+          label: "Redirect URL (Map local/Remote)",
           onSelect: handleContextMenuRuleOptionClick,
         },
         {
