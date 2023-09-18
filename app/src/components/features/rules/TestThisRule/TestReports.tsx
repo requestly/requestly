@@ -105,6 +105,9 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
               open={showDraftSessionModal}
               onCancel={closeDraftSessionModal}
               className="draft-session-modal"
+              width={"93vw"}
+              keyboard={false}
+              closable={false}
             >
               <DraftSessionViewer testRuleDraftSession={testRuleDraftSessionDetails} />
             </RQModal>
