@@ -465,7 +465,33 @@ export const signInWithEmailLink = async (email, callback) => {
 
     callback && callback.call(null, true);
     return { authData, isNewUser };
-  } catch (e) {
+  } catch (error) {
+    if (error?.code === "auth/email-already-in-use") {
+      /* user already exists with another auth provider */
+      const userEmail = error?.email;
+      try {
+        const auth = getAuth(firebaseApp);
+        const authData = getAuthData(auth.currentUser) || {};
+        authData.email = userEmail;
+
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
+          uid: authData.uid,
+          email,
+        });
+
+        return {
+          authData,
+          isNewUser: false,
+        };
+      } catch (e) {
+        /* wait for sign in to be triggered again, once userAuth is ready */
+        return {
+          authData: { email: userEmail },
+          isNewUser: false,
+        };
+      }
+    }
     trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
     return null;
   }

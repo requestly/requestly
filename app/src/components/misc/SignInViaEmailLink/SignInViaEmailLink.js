@@ -12,8 +12,6 @@ import { isEmailValid } from "../../../utils/FormattingHelper";
 
 import { signInWithEmailLink } from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
-
-import { toast } from "utils/Toast.js";
 import { redirectToRules } from "utils/RedirectionUtils";
 
 import "./index.css";
@@ -59,17 +57,19 @@ const SignInViaEmailLink = () => {
           renderAlreadyLoggedInWarning();
         }
         signInWithEmailLink(loginEmail)
-          .then(({ authData, isNewUser }) => {
-            if (authData) {
-              // todo: find a way to send isNewUser to workspace onboarding
-              window.localStorage.removeItem("RQEmailForSignIn");
-              if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
-              redirectToRules(navigate);
-              setIsProcessing(false);
-            } else throw new Error("Failed");
+          .then((response) => {
+            if (response) {
+              const { authData, isNewUser } = response;
+              if (authData) {
+                window.localStorage.removeItem("RQEmailForSignIn");
+                if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
+                redirectToRules(navigate);
+                setIsProcessing(false);
+              } else throw new Error("Failed");
+            }
           })
           .catch(() => {
-            toast.error("Session seems incorrect. Please contact support");
+            // toast.error("Something went wrong, Please contact ");
             setIsProcessing(false);
             setUserEmail(null);
           });
