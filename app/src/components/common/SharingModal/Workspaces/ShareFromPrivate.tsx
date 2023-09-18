@@ -12,8 +12,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
-import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
-import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
+import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import { Team, TeamRole } from "types";
 import "./index.scss";
@@ -51,7 +50,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
-        trackNewWorkspaceCreated("sharing_modal");
+        trackNewTeamCreateSuccess(teamId, teamData.name, "sharing_modal");
 
         createTeamInvites({
           teamId,
