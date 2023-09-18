@@ -133,3 +133,7 @@ export const updateIsProductHuntLaunchedBannerClosed = (prevState, action) => {
 export const updateExtensionInstallSource = (prevState, action) => {
   prevState.misc.persist.extensionInstallSource = action.payload;
 };
+
+export const updateAppNotificationBannerDismissTs = (prevState, action) => {
+  prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
+};

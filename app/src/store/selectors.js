@@ -260,3 +260,7 @@ export const getIsJoinWorkspaceCardVisible = (state) => {
 export const getExtensionInsallSource = (state) => {
   return getGlobalState(state).misc.persist?.extensionInstallSource;
 };
+
+export const getAppNotificationBannerDismissTs = (state) => {
+  return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
+};
