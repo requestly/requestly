@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
@@ -32,11 +32,11 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   const [showDraftSessionModal, setShowDraftSessionModal] = useState<boolean>(false);
   const [highlightNewReport, setHighlightNewReport] = useState<boolean>(false);
 
-  const closeDraftSessionModal = () => {
+  const closeDraftSessionModal = useCallback(() => {
     setRefreshTestReports(true);
     setShowDraftSessionModal(false);
     hightlightReport();
-  };
+  }, []);
 
   const hightlightReport = () => {
     setHighlightNewReport(true);
@@ -44,6 +44,15 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
       setHighlightNewReport(false);
     }, 4500);
   };
+
+  const testRuleDraftSessionDetails = useMemo(() => {
+    return {
+      closeModal: closeDraftSessionModal,
+      draftSessionTabId: newTestPageTabId,
+      testReportId: newReportId,
+      appliedRuleStatus: appliedRuleStatus,
+    };
+  }, [appliedRuleStatus, closeDraftSessionModal, newReportId, newTestPageTabId]);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
@@ -90,21 +99,14 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
     <>
       {testReports && (
         <>
-          {newTestPageTabId && (
+          {newTestPageTabId && showDraftSessionModal && (
             <RQModal
               maskClosable={false}
               open={showDraftSessionModal}
               onCancel={closeDraftSessionModal}
               className="draft-session-modal"
             >
-              <DraftSessionViewer
-                testRuleDraftSession={{
-                  closeModal: closeDraftSessionModal,
-                  draftSessionTabId: newTestPageTabId,
-                  testReportId: newReportId,
-                  appliedRuleStatus: appliedRuleStatus,
-                }}
-              />
+              <DraftSessionViewer testRuleDraftSession={testRuleDraftSessionDetails} />
             </RQModal>
           )}
           <div className="test-this-rule-row-header test-this-rule-results-header text-bold subtitle">

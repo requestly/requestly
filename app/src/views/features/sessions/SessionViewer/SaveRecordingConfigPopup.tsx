@@ -206,13 +206,12 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         });
     },
     [
-      includedDebugInfo,
       sessionEvents,
-      sessionRecordingMetadata.name,
-      sessionRecordingMetadata.sessionAttributes,
+      sessionRecordingMetadata,
+      includedDebugInfo,
       onClose,
-      testRuleDraftSession,
       trackSessionsCreatedCount,
+      testRuleDraftSession,
     ]
   );
 
