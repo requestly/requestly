@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
-import { Input, Modal } from "antd";
+import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
@@ -27,6 +27,8 @@ import {
   trackSessionRecordingFailed,
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
+import LINKS from "config/constants/sub/links";
+import { trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 
 interface Props {
   testRuleDraftSession?: {
@@ -214,12 +216,25 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
         </div>
       </div>
       {testRuleDraftSession && (
-        <Input
-          readOnly
-          addonBefore="Rule execution status"
-          value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
-          style={{ width: "fit-content" }}
-        />
+        <Space align="center">
+          <Input
+            readOnly
+            addonBefore="Rule execution status"
+            value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
+            style={{ width: "fit-content" }}
+          />
+          <a
+            className="external-link"
+            href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              trackTroubleshootClicked("test_this_rule__draft_session_modal");
+            }}
+          >
+            Troubleshooting guide
+          </a>
+        </Space>
       )}
       <SessionDetails key={tabId} />
       <ProductWalkthrough
