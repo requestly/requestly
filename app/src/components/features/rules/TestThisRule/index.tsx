@@ -16,6 +16,8 @@ import APP_CONSTANTS from "config/constants";
 import LINKS from "config/constants/sub/links";
 import { trackTestRuleClicked, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 import "./index.css";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 export const TestThisRuleRow: React.FC = () => {
   const location = useLocation();
@@ -29,7 +31,7 @@ export const TestThisRuleRow: React.FC = () => {
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
-  const [recordTestPage, setRecordTestPage] = useState<boolean>(true);
+  const [recordTestPage, setRecordTestPage] = useState<boolean>(!!isFeatureCompatible(FEATURES.TEST_THIS_RULE_SESSION));
 
   const isRuleCurrentlyActive = useMemo(() => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
@@ -151,11 +153,17 @@ export const TestThisRuleRow: React.FC = () => {
                 <BsFillLightningChargeFill className="start-test-rule-btn-icon" /> Test Rule
               </RQButton>
             </Row>
-            <Row className="mt-8">
-              <Checkbox checked={recordTestPage} onChange={(e) => setRecordTestPage(e.target.checked)}>
-                Capture screen, console and network details for this test
-              </Checkbox>
-            </Row>
+            {isFeatureCompatible(FEATURES.TEST_THIS_RULE_SESSION) && (
+              <Row className="mt-8">
+                <Checkbox
+                  checked={recordTestPage}
+                  onChange={(e) => setRecordTestPage(e.target.checked)}
+                  disabled={isTestRuleDisabled}
+                >
+                  Capture screen, console and network details for this test
+                </Checkbox>
+              </Row>
+            )}
           </div>
           <TestReports scrollToTestRule={handleScrollToTestThisRule} />
         </div>
