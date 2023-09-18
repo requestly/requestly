@@ -35,10 +35,10 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
   const closeDraftSessionModal = useCallback(() => {
     setRefreshTestReports(true);
     setShowDraftSessionModal(false);
-    hightlightReport();
+    highlightReport();
   }, []);
 
-  const hightlightReport = () => {
+  const highlightReport = () => {
     setHighlightNewReport(true);
     setTimeout(() => {
       setHighlightNewReport(false);
@@ -90,7 +90,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
         })
         .finally(() => {
           setRefreshTestReports(false);
-          hightlightReport();
+          highlightReport();
         });
     }
   }, [appMode, currentlySelectedRuleData.id, currentlySelectedRuleData.ruleType, newReportId, refreshTestReports]);
