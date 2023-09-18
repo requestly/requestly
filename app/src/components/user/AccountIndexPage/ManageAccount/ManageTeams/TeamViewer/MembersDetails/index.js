@@ -6,7 +6,6 @@ import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
-import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
 import { actions } from "store";
@@ -40,10 +39,10 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         newProps: {
           teamId: teamId,
           callback: doRefreshTeamMembersTable,
+          source: "team_members_table",
         },
       })
     );
-    trackAddMemberClicked();
   }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
   useEffect(() => {
@@ -55,6 +54,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           newProps: {
             teamId: teamId,
             callback: doRefreshTeamMembersTable,
+            source: "team_members_table",
           },
         })
       );

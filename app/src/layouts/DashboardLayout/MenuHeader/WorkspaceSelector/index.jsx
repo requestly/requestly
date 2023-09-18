@@ -239,6 +239,7 @@ const WorkspaceSelector = () => {
         actions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
+          newProps: { source: "workspaces_dropdown" },
         })
       );
       trackInviteTeammatesClicked("sidebar_dropdown");

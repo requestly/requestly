@@ -55,6 +55,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
+        newProps: { source: "switch_workspace_modal" },
       })
     );
   };
