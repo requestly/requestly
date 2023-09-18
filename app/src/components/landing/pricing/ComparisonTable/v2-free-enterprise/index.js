@@ -19,6 +19,7 @@ import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -40,8 +41,11 @@ const FreeAndEnterprisePlanTable = () => {
     (planName) => {
       const isUserPremium = user?.details?.isPremium;
       const userPlanName = user?.details?.planDetails?.planName;
-      const userPlanType = user?.details?.planDetails?.planType;
+      const userPlanType = user?.details?.planDetails?.type;
+      const userExpiredPlanName =
+        user?.details?.planDetails?.status !== "active" ? getPlanNameFromId(user?.details?.planDetails?.planId) : null;
       const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
+      const isPrivateWorksapceSelected = workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id;
 
       if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
         return (
@@ -56,7 +60,7 @@ const FreeAndEnterprisePlanTable = () => {
 
       if (isUserPremium) {
         if (userPlanType === "team") {
-          if (workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id || !isSelectedWorkspacePremium) {
+          if (isPrivateWorksapceSelected || !isSelectedWorkspacePremium) {
             return (
               <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
                 Contact us
@@ -64,11 +68,38 @@ const FreeAndEnterprisePlanTable = () => {
             );
           }
         } else {
-          if (workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
+          if (!isPrivateWorksapceSelected) {
             return (
               <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
                 Contact us
               </RQButton>
+            );
+          }
+        }
+      } else {
+        if (userExpiredPlanName === planName) {
+          if (
+            (userPlanType === "individual" && isPrivateWorksapceSelected) ||
+            (userPlanType === "team" && !isPrivateWorksapceSelected)
+          ) {
+            return (
+              <>
+                <RQButton
+                  onClick={() =>
+                    redirectToCheckout({
+                      mode: isPrivateWorksapceSelected ? "individual" : "team",
+                      planName: planName,
+                      duration: duration,
+                      quantity: workspaceToUpgrade.accessCount,
+                      teamId: isPrivateWorksapceSelected ? null : workspaceToUpgrade?.id,
+                    })
+                  }
+                  type="primary"
+                >
+                  Renew
+                </RQButton>
+                {<Tag className="current-plan">Expired</Tag>}
+              </>
             );
           }
         }
@@ -93,11 +124,7 @@ const FreeAndEnterprisePlanTable = () => {
         );
       }
 
-      if (
-        isUserPremium &&
-        (isSelectedWorkspacePremium || workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) &&
-        planName === userPlanName
-      ) {
+      if (isUserPremium && (isSelectedWorkspacePremium || isPrivateWorksapceSelected) && planName === userPlanName) {
         return (
           <RQButton disabled type="primary">
             Current Plan
@@ -109,11 +136,11 @@ const FreeAndEnterprisePlanTable = () => {
         <RQButton
           onClick={() =>
             redirectToCheckout({
-              mode: workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "individual" : "team",
+              mode: isPrivateWorksapceSelected ? "individual" : "team",
               planName: planName,
               duration: duration,
               quantity: workspaceToUpgrade.accessCount,
-              teamId: workspaceToUpgrade.id,
+              teamId: isPrivateWorksapceSelected ? null : workspaceToUpgrade.id,
             })
           }
           disabled={isUserPremium && userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
@@ -127,11 +154,11 @@ const FreeAndEnterprisePlanTable = () => {
       duration,
       product,
       user?.details?.isPremium,
+      user?.details?.planDetails?.planId,
       user?.details?.planDetails?.planName,
-      user?.details?.planDetails?.planType,
-      workspaceToUpgrade.accessCount,
-      workspaceToUpgrade.id,
-      workspaceToUpgrade?.subscriptionStatus,
+      user?.details?.planDetails?.status,
+      user?.details?.planDetails?.type,
+      workspaceToUpgrade,
     ]
   );
 

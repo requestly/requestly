@@ -46,15 +46,19 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
                 <Descriptions.Item label="Type" className="primary-card github-like-border">
                   {beautifySubscriptionType(type)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Valid From" className="primary-card github-like-border">
-                  {new Date(validFrom).toDateString()}
-                </Descriptions.Item>
-                <Descriptions.Item label="Plan" className="primary-card github-like-border">
+                {isUserPremium && (
+                  <Descriptions.Item label="Valid From" className="primary-card github-like-border">
+                    {new Date(validFrom).toDateString()}
+                  </Descriptions.Item>
+                )}
+                <Descriptions.Item label="Current Plan" className="primary-card github-like-border">
                   {getPrettyPlanName(planName)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
-                  {new Date(validTill).toDateString()}
-                </Descriptions.Item>
+                {isUserPremium && (
+                  <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
+                    {new Date(validTill).toDateString()}
+                  </Descriptions.Item>
+                )}
               </Descriptions>
             </AntCol>
           </AntRow>
