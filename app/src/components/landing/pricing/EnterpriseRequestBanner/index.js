@@ -97,13 +97,13 @@ export default function EnterpriseRequestBanner({ user }) {
                     icon={<AiOutlineQuestionCircle />}
                     message={
                       <>
-                        Your organization is already on Requestly Premium Plan managed by{" "}
+                        Your organization is already on Requestly Professional Plan managed by{" "}
                         {enterpriseContactDetails.data.enterpriseData.admin.name}
                         . <br />
                         <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here
                         </span>{" "}
-                        to request Premium subscription for you.
+                        to request a Requestly Professional subscription for you.
                       </>
                     }
                   ></Alert>
