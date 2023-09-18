@@ -152,7 +152,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
     }
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
 
-  const confirmDiscard = () => {
+  const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
     Modal.confirm({
       title: "Confirm Discard",
@@ -172,7 +172,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
         setIsDiscardSessionClicked(false);
       },
     });
-  };
+  }, [navigate, testRuleDraftSession]);
 
   useEffect(() => {
     if (loadingError) {
@@ -239,7 +239,7 @@ const DraftSessionViewer: React.FC<Props> = ({ testRuleDraftSession }) => {
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}
-        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession}
+        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession && !testRuleDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))
