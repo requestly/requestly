@@ -105,7 +105,7 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
               open={showDraftSessionModal}
               onCancel={closeDraftSessionModal}
               className="draft-session-modal"
-              width={"93vw"}
+              width={"90vw"}
               keyboard={false}
               closable={false}
             >
