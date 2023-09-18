@@ -31,7 +31,7 @@ export const TestThisRuleRow: React.FC = () => {
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
-  const [recordTestPage, setRecordTestPage] = useState<boolean>(!!isFeatureCompatible(FEATURES.TEST_THIS_RULE_SESSION));
+  const [recordTestPage, setRecordTestPage] = useState<boolean>(true);
 
   const isRuleCurrentlyActive = useMemo(() => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
