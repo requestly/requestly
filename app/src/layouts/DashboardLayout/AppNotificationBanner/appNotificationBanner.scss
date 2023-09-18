@@ -3,17 +3,26 @@
 }
 
 .app-banner {
-  padding: 2px;
+  padding: 8px 16px;
   width: 100%;
   height: 48px;
   font-size: 13px;
   color: var(--white) !important;
-  background-color: #ff6005;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   column-gap: 5px;
+
+  .close-button-container {
+    width: 5%;
+  }
+
+  .app-banner-text {
+    p {
+      margin-bottom: 0px;
+    }
+  }
 
   .right-arrow-icon {
     transition: 0.3s transform;
