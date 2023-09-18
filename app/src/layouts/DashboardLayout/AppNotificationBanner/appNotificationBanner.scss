@@ -14,6 +14,16 @@
   justify-content: center;
   column-gap: 5px;
 
+  .close-button-container {
+    width: 5%;
+  }
+
+  .app-banner-text {
+    p {
+      margin-bottom: 0px;
+    }
+  }
+
   .right-arrow-icon {
     transition: 0.3s transform;
   }
