@@ -2,11 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Empty, Typography } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
-import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackSampleSessionClicked,
+  trackSessionRecordingNetworkLogContextMenuOpen,
+  trackSessionRecordingNetworkLogContextMenuOptionClicked,
+} from "modules/analytics/events/features/sessionRecording";
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { getOffset } from "./helpers";
+import { snakeCase } from "lodash";
 
 interface Props {
   startTime: number;
@@ -47,6 +52,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
               headers: headers.reduce((result, header) => ({ ...result, [header.name]: header.value }), {}),
             });
 
+            trackSessionRecordingNetworkLogContextMenuOptionClicked(snakeCase(key as string));
             setIsApiClientModalOpen(true);
           },
         },
@@ -67,6 +73,9 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             logs={visibleNetworkLogs}
             contextMenuOptions={options}
             sessionRecordingStartTime={startTime}
+            onContextMenuOpenChange={(isOpen) => {
+              if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
+            }}
           />
 
           <APIClient
