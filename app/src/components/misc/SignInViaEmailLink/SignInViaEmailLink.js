@@ -59,9 +59,11 @@ const SignInViaEmailLink = () => {
           renderAlreadyLoggedInWarning();
         }
         signInWithEmailLink(loginEmail)
-          .then((resp) => {
-            if (resp) {
+          .then(({ authData, isNewUser }) => {
+            if (authData) {
+              // todo: find a way to send isNewUser to workspace onboarding
               window.localStorage.removeItem("RQEmailForSignIn");
+              if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
               redirectToRules(navigate);
               setIsProcessing(false);
             } else throw new Error("Failed");

@@ -14,7 +14,6 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
     updateTimeToResendEmailLogin(dispatch, 15);
   };
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
-  console.log(authMode, AUTH.ACTION_LABELS.LOG_IN);
   return (
     <div className="mail-link-modal-content">
       <div className="mail-icon">

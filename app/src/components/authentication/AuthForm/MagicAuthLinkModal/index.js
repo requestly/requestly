@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Modal } from "antd";
 //SUB COMPONENTS
 
 //STYLES
@@ -11,13 +10,14 @@ import MagicLinkModalContent from "./MagicLinkModalContent";
 import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import "./index.css";
+import { RQModal } from "lib/design-system/components";
 const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource }) => {
   //GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   return email && isEmailValid(email) ? (
     <>
       <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggleModal()} alt="close-icon" />
-      <Modal
+      <RQModal
         size="small"
         open={!user.loggedIn && isOpen}
         onCancel={isOpen ? () => toggleModal() : null}
@@ -35,7 +35,7 @@ const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource 
           authMode={authMode}
           className="mail-link-modal-content"
         />
-      </Modal>
+      </RQModal>
     </>
   ) : (
     toast.error("Please enter a valid email address")

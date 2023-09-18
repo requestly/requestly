@@ -6,7 +6,6 @@ import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
-import { isEmailValid } from "utils/FormattingHelper";
 
 //IMAGES
 import GoogleIcon from "../../../assets/img/icons/common/google.svg";
@@ -65,7 +64,6 @@ const AuthForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState();
-  const [showEmailSecondStep, setShowEmailSecondStep] = useState(false);
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
@@ -400,25 +398,12 @@ const AuthForm = ({
     }
   };
 
-  const renderEmailAuthSecondStep = () => {
-    return (
-      <>
-        <BackButton action={() => setShowEmailSecondStep(false)} />
-        {renderEmailField()}
-        {MODE === AUTH_ACTION_LABELS.SIGN_UP && <div className="mt-20 w-full">{renderNameField()}</div>}
-        {renderPasswordField()}
-        <FormSubmitButton />
-      </>
-    );
-  };
-
   const onSignInClick = () => {
     SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
     SET_POPOVER(true);
     setEmail("");
     setName("");
     setPassword("");
-    setShowEmailSecondStep(false);
   };
 
   const onCreateAccountClick = () => {
@@ -426,7 +411,6 @@ const AuthForm = ({
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
-    setShowEmailSecondStep(false);
   };
 
   return (
@@ -448,39 +432,11 @@ const AuthForm = ({
                 </RQButton>
               </Row>
               <Row className="auth-wrapper mt-1">
-                {isOnboardingForm ? (
-                  <>
-                    {showEmailSecondStep ? (
-                      <>{renderEmailAuthSecondStep()}</>
-                    ) : (
-                      <>
-                        <SocialAuthButtons />
-                        <div className="auth-modal-divider w-full" style={{ marginBottom: 0 }}>
-                          or sign up through email
-                        </div>
-                        {renderEmailField()}
-                        <RQButton
-                          type="primary"
-                          className="w-full text-bold mt-20"
-                          onClick={() => {
-                            if (isEmailValid(email)) setShowEmailSecondStep(true);
-                            else toast.error("Please enter a valid email address");
-                          }}
-                        >
-                          Continue with email
-                        </RQButton>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {renderNameField()}
-                    {renderEmailField()}
-                    <FormSubmitButton />
-                    <div className="auth-modal-divider w-full">or</div>
-                    <SocialAuthButtons />
-                  </>
-                )}
+                {renderNameField()}
+                {renderEmailField()}
+                <FormSubmitButton />
+                <div className="auth-modal-divider w-full">or</div>
+                <SocialAuthButtons />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
                   <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
@@ -508,33 +464,12 @@ const AuthForm = ({
             </RQButton>
           </Row>
           <Row className="auth-wrapper mt-1">
-            {showEmailSecondStep ? (
-              <>{renderEmailAuthSecondStep()}</>
-            ) : (
-              <>
-                <SocialAuthButtons />
-                <div className="auth-modal-divider w-full mb-0" style={{ marginBottom: "-20px" }}>
-                  or sign in with email
-                </div>
-                {renderEmailField()}
-                {!isOnboardingForm ? (
-                  <>
-                    <FormSubmitButton />
-                  </>
-                ) : (
-                  <RQButton
-                    type="primary"
-                    className="w-full text-bold mt-20"
-                    onClick={() => {
-                      if (isEmailValid(email)) setShowEmailSecondStep(true);
-                      else toast.error("Please enter a valid email address");
-                    }}
-                  >
-                    Continue with email
-                  </RQButton>
-                )}
-              </>
-            )}
+            <SocialAuthButtons />
+            <div className="auth-modal-divider w-full mb-0" style={{ marginBottom: "-20px" }}>
+              or sign in with email
+            </div>
+            {renderEmailField()}
+            <FormSubmitButton />
           </Row>
         </Col>
       ) : (

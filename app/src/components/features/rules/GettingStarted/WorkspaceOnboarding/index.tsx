@@ -50,6 +50,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
+  const [isNewUserFromEmailLinkSignIn, setIsNewUserFromEmailLinkSignIn] = useState(false);
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
 
@@ -119,6 +120,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   ]);
 
   useEffect(() => {
+    setIsNewUserFromEmailLinkSignIn(!!window.localStorage.getItem("isNewUser"));
+  }, []);
+
+  useEffect(() => {
     if (step === OnboardingSteps.CREATE_JOIN_WORKSPACE) {
       if (workspaceOnboardingTeamDetails.createdTeam) {
         setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
@@ -146,9 +151,11 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
       if (currentTeams?.length) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      else if (isNewUserFromEmailLinkSignIn)
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
       else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
+  }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
 
   useEffect(() => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
@@ -168,7 +175,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   }, [toggle]);
 
   useEffect(() => {
-    if (userPersona?.page > 2) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    if (userPersona?.page > 2) {
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      window.localStorage.removeItem("isNewUser");
+    }
   }, [dispatch, userPersona?.page]);
 
   const renderOnboardingBanner = useCallback(() => {

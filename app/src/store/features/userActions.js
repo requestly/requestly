@@ -135,29 +135,5 @@ export const updateExtensionInstallSource = (prevState, action) => {
 };
 
 export const updateTimeToResendEmailLogin = (prevState, action) => {
-  // if(!action.payload) {
-  //   prevState.misc.nonPersist.timeToResendEmailLogin = action.payload;
-  //   // start timer
-
-  //   if(prevState.misc.nonPersist.timeToResendEmailLoginInterval) {
-  //     clearInterval(prevState.misc.nonPersist.timeToResendEmailLoginInterval);
-  //   }
-  // } else {
-  //   if(prevState.misc.nonPersist.timeToResendEmailLoginInterval) {
-  //     clearInterval(prevState.misc.nonPersist.timeToResendEmailLoginInterval);
-
-  //     let timeLeft = action.payload;
-  //     const interval = setInterval(() => {
-  //       if(timeLeft === 0) {
-  //         clearInterval(interval);
-  //       } else {
-  //         prevState.misc.nonPersist.timeToResendEmailLogin = timeLeft;
-  //       }
-  //     }, 1000);
-
-  //     prevState.misc.nonPersist.timeToResendEmailLoginInterval = interval;
-  //   }
-  // }
-
   prevState.misc.nonPersist.timeToResendEmailLogin = action.payload;
 };

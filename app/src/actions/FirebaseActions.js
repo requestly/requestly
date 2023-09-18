@@ -319,7 +319,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
     const uid = result?.user?.uid || null;
     const email = result?.user?.email || null;
 
-    const additionalUserInfo = getAdditionalUserInfo(result);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
     const is_new_user = additionalUserInfo?.isNewUser || false;
 
     if (is_new_user) {
@@ -447,6 +447,8 @@ export const signInWithEmailLink = async (email, callback) => {
   try {
     const auth = getAuth(firebaseApp);
     const result = await signInWithEmailLinkFirebaseLib(auth, email, window.location.href);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
+    const isNewUser = additionalUserInfo?.isNewUser || false;
 
     // Update details in db
     const authData = getAuthData(result.user);
@@ -462,7 +464,7 @@ export const signInWithEmailLink = async (email, callback) => {
     });
 
     callback && callback.call(null, true);
-    return authData;
+    return { authData, isNewUser };
   } catch (e) {
     trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
     return null;
