@@ -55,7 +55,9 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
                 isWorkspaceMode,
                 isSyncEnabled: true,
               },
-              appMode
+              appMode,
+              null,
+              "onboarding"
             );
             redirectToRules(navigate);
           }

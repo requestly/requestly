@@ -41,7 +41,9 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
         isWorkspaceMode,
         isSyncEnabled: true,
       },
-      appMode
+      appMode,
+      null,
+      "sharing_modal"
     ).then(() => {
       toggleModal();
     });

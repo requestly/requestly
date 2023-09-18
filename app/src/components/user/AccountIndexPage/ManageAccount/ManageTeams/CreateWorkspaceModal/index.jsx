@@ -54,7 +54,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           isSyncEnabled: user?.details?.isSyncEnabled,
           isWorkspaceMode,
         },
-        appMode
+        appMode,
+        null,
+        "create_workspace_modal"
       );
       redirectToTeam(navigate, teamId, {
         state: {

@@ -1,8 +1,9 @@
 import { trackEvent } from "modules/analytics";
 import { TEAMS } from "../constants";
 
-export const trackWorkspaceSwitched = () => {
-  trackEvent(TEAMS.WORKSPACE_SWITCHED);
+export const trackWorkspaceSwitched = (source) => {
+  const params = { source };
+  trackEvent(TEAMS.WORKSPACE_SWITCHED, params);
 };
 
 export const trackInviteTeammatesClicked = (event_src) => {

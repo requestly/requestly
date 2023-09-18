@@ -19,7 +19,14 @@ export const showSwitchWorkspaceSuccessToast = (teamName) => {
   else toast.info(`Switched back to ${APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE}`);
 };
 
-export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSyncingState, appMode, setLoader) => {
+export const switchWorkspace = async (
+  newWorkspaceDetails,
+  dispatch,
+  currentSyncingState,
+  appMode,
+  setLoader,
+  source
+) => {
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
@@ -40,8 +47,7 @@ export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSync
       }
     }
   }
-
-  trackWorkspaceSwitched();
+  trackWorkspaceSwitched(source);
   dispatch(actions.updateIsRulesListLoading(true));
 
   setLoader?.();

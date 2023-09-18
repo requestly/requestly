@@ -328,7 +328,8 @@ const WorkspaceSelector = () => {
           if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
           setIsModalOpen(false);
         }, 2 * 1000);
-      }
+      },
+      "workspaces_dropdown"
     );
   };
 

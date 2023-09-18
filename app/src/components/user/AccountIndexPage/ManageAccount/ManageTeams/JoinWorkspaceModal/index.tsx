@@ -36,7 +36,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
-    trackWorkspaceJoinClicked(team?.teamId, "workspace_joining_modal");
+    trackWorkspaceJoinClicked(team?.teamId, "join_workspace_modal");
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
@@ -55,7 +55,9 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
                 isWorkspaceMode,
                 isSyncEnabled: true,
               },
-              appMode
+              appMode,
+              null,
+              "join_workspace_modal"
             );
           }
         }

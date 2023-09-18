@@ -49,7 +49,9 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
         isSyncEnabled: user?.details?.isSyncEnabled,
         isWorkspaceMode: true,
       },
-      appMode
+      appMode,
+      null,
+      "switch_workspace_modal"
     );
     dispatch(
       actions.toggleActiveModal({
