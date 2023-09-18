@@ -156,21 +156,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
 
   const handleDownloadFileClick = useCallback(
     (e: React.MouseEvent) => {
-      if (!user?.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: {
-              authMode: AUTH_ACTION_LABELS.SIGN_UP,
-              src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
-            },
-          })
-        );
-        return;
-      }
-
       setIsSaving(true);
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
       const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
@@ -194,15 +179,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
           trackSessionsCreatedCount(true);
         });
     },
-    [
-      dispatch,
-      user?.loggedIn,
-      sessionEvents,
-      sessionRecordingMetadata,
-      includedDebugInfo,
-      onClose,
-      trackSessionsCreatedCount,
-    ]
+    [sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose, trackSessionsCreatedCount]
   );
 
   return (
