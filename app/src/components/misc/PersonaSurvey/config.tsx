@@ -72,7 +72,7 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
         title: "Healthcare",
       },
       {
-        title: "Sass",
+        title: "SaaS",
       },
       {
         title: "Travel",

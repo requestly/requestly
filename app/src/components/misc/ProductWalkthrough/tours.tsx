@@ -380,4 +380,17 @@ export const productTours: Record<string, CustomSteps[]> = {
       customNextButtonText: "Got it!",
     },
   ],
+  [MISC_TOURS.SHARING.RULES_LIST_SHARING_ONBOARDING]: [
+    {
+      ...tourTooltipPresets,
+      title: "Share rules with your teammates",
+      target: getTourTarget("rule-list-share-btn"),
+      content: "Collaborate seamlessly with your team by sharing a shared list or export rules as a JSON file.",
+      placement: "bottom",
+      spotlightPadding: 0,
+      offset: 20,
+      pointerPlacement: PointerPlacement.TOP_50,
+      customNextButtonText: "Got it!",
+    },
+  ],
 };

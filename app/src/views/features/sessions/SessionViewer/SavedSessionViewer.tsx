@@ -123,7 +123,7 @@ const SavedSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if ((location.state as NavigationState)?.viewAfterSave && hasUserCreatedSessions) {
+    if ((location.state as NavigationState)?.viewAfterSave && !hasUserCreatedSessions) {
       setShowOnboardingPrompt(true);
     }
   }, [location.state, hasUserCreatedSessions]);

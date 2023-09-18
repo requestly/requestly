@@ -29,6 +29,10 @@ export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };
 
+export const updateUserLimitReached = (prevState, action) => {
+  prevState.user.isLimitReached = action.payload;
+};
+
 //Persona Survey actions
 export const setUserPersonaData = (prevState, action) => {
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
@@ -120,4 +124,12 @@ export const updateLastSeenInviteTs = (prevState, action) => {
 
 export const updateJoinWorkspaceCardVisible = (prevState, action) => {
   prevState.misc.persist.isJoinWorkspaceCardVisible = action.payload;
+};
+
+export const updateIsProductHuntLaunchedBannerClosed = (prevState, action) => {
+  prevState.misc.persist.isProductHuntLaunchedBannerClosed = action.payload;
+};
+
+export const updateExtensionInstallSource = (prevState, action) => {
+  prevState.misc.persist.extensionInstallSource = action.payload;
 };

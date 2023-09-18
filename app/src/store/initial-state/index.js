@@ -130,11 +130,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-  },
-
-  /* Marketplace */
-  marketplace: {
-    ruleStatus: {},
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -149,9 +148,6 @@ const INITIAL_STATE = {
 
   // country of current user
   country: "",
-
-  // if trial part
-  trialModeEnabled: false,
 
   mobileDebugger: {
     app: {
@@ -185,15 +181,18 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
+      isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,
         firstDraftSession: false,
+        rulesListSharingOnboarding: false,
       },
 
       hasConnectedApp: false,

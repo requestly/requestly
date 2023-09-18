@@ -1,73 +1,36 @@
-import { Empty, Typography } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import { NetworkLog } from "../types";
-import NetworkLogRow from "./NetworkLogRow";
-import Split from "react-split";
-import NetworkLogDetails from "./NetworkLogDetails";
-import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { Empty, Typography } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
+import { RQNetworkTable } from "lib/design-system/components/RQNetworkTable";
+import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import { getOffset } from "./helpers";
 
 interface Props {
-  networkLogs: NetworkLog[];
+  startTime: number;
+  networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
   updateCount: (count: number) => void;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, updateCount }) => {
-  const visibleNetworkLogs = useMemo<NetworkLog[]>(() => {
-    return networkLogs.filter((networkLog: NetworkLog) => {
-      return networkLog.timeOffset <= playerTimeOffset;
+const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, updateCount }) => {
+  const visibleNetworkLogs = useMemo<RQNetworkLog[]>(() => {
+    return networkLogs.filter((log: RQNetworkLog) => {
+      return getOffset(log, startTime) <= playerTimeOffset;
     });
-  }, [networkLogs, playerTimeOffset]);
-
-  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(visibleNetworkLogs);
+  }, [networkLogs, startTime, playerTimeOffset]);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
-  const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
   useEffect(() => {
     updateCount(visibleNetworkLogs.length);
   }, [visibleNetworkLogs, updateCount]);
 
-  const networkLogsTable = useMemo(
-    () => (
-      <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
-        {visibleNetworkLogs.map((log, i) => (
-          <NetworkLogRow
-            key={i}
-            {...log}
-            onClick={() => setSelectedLogIndex(i)}
-            isSelected={i === selectedLogIndex}
-            showResponseTime={selectedLogIndex === -1}
-          />
-        ))}
-      </div>
-    ),
-    [visibleNetworkLogs, selectedLogIndex, containerRef, onScroll]
-  );
-
   return (
     <div className="session-panel-content network-logs-panel">
-      {visibleNetworkLogs.length ? (
-        selectedLogIndex === -1 ? (
-          networkLogsTable
-        ) : (
-          <Split
-            direction="horizontal"
-            cursor="col-resize"
-            sizes={[60, 40]}
-            minSize={[400, 200]}
-            gutterSize={4}
-            gutterAlign="center"
-            style={{ display: "flex", height: "100%" }}
-            snapOffset={30}
-          >
-            {networkLogsTable}
-            <NetworkLogDetails {...visibleNetworkLogs[selectedLogIndex]} onClose={() => setSelectedLogIndex(-1)} />
-          </Split>
-        )
+      {visibleNetworkLogs.length > 0 ? (
+        <RQNetworkTable logs={visibleNetworkLogs} sessionRecordingStartTime={startTime} />
       ) : includeNetworkLogs === false ? (
         <div>
           <Typography.Text className="recording-options-message">

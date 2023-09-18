@@ -177,6 +177,9 @@ const DraftSessionViewer: React.FC = () => {
         trackDraftSessionDiscarded();
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
+      onCancel() {
+        setIsDiscardSessionClicked(false);
+      },
     });
   };
 

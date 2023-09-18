@@ -12,4 +12,7 @@ export const MISC_TOURS = {
     FIFTH_RULE: "fifth_rule_created",
     FIRST_DRAFT_SESSION: "first_draft_session",
   },
+  SHARING: {
+    RULES_LIST_SHARING_ONBOARDING: "rules_list_onboarding",
+  },
 };

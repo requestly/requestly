@@ -141,6 +141,9 @@ export const ONBOARDING = {
   HELPDESK_CLICKED: "helpdesk_clicked",
   FOOTER_CLICKED: "footer_clicked",
   DESKTOP_APP_PROMO_CLICKED: "desktop_app_download_promo_clicked",
+  PRODUCT_HUNT_BANNER_CLICKED: "product_hunt_banner_clicked",
+  PRODUCTS_DROPDOWN_CLICKED: "products_dropdown_clicked",
+  PRODUCT_CLICKED: "product_clicked",
 };
 
 export const TEAMS = {
@@ -163,7 +166,6 @@ export const TEAMS = {
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
-  ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
   TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED: "team_workspace_organization_card_viewed",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
@@ -175,4 +177,8 @@ export const TRAFFIC_TABLE = {
   SIDEBAR_FILTER_EXPANDED: "sidebar_filter_expanded",
   SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
   SIDEBAR_FILTER_CLEAR_ALL_CLICKED: "sidebar_filter_clear_all_clicked",
+};
+
+export const FEATURE_LIMITER = {
+  UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
 };

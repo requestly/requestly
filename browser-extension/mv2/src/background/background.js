@@ -23,6 +23,7 @@ BG.TAB_SERVICE_DATA = {
   CLIENT_LOAD_SUBSCRIBERS: "clientLoadSubscribers",
   SESSION_RECORDING: "sessionRecording",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
+  TEST_RULE_DATA: "testRuleData",
 };
 
 /**
@@ -548,7 +549,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
     return;
   }
 
-  RQ.extensionIconManager.markRuleExecuted(requestDetails.tabId);
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
   BG.Methods.saveExecutionLog(rule, requestDetails, modification);
   BG.Methods.sendLogToConsoleLogger(rule, requestDetails, modification);
@@ -569,7 +569,33 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 };
 
 BG.Methods.onHeadersReceived = function (details) {
-  var modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
+  let modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
+
+  try {
+    const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+    const fontTypes = ["woff", "woff2", "otf", "ttf"];
+    const requestURL = new URL(details.url);
+    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
+
+    // This bypasses the CORS error in session replay player
+    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
+      const corsHeaders = {
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": requestInitiator.origin,
+      };
+
+      const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
+
+      modifiedHeaders = !modifiedHeaders
+        ? formattedCorsHeaders
+        : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
+    }
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
@@ -977,10 +1003,6 @@ BG.Methods.addListenerForExtensionMessages = function () {
         BG.Methods.getExecutedRules(message.tabId, sendResponse);
         return true;
 
-      case RQ.CLIENT_MESSAGES.NOTIFY_CONTENT_SCRIPT_LOADED:
-        BG.Methods.onContentScriptLoadedNotification(sender.tab, message.payload);
-        break;
-
       case RQ.CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE:
         BG.Methods.onPageLoadedFromCacheNotification(sender.tab, message.payload);
         break;
@@ -1004,20 +1026,43 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
+
+      case RQ.EXTENSION_MESSAGES.TEST_RULE_ON_URL:
+        BG.Methods.launchUrlAndStartRuleTesting(message, sender.tab.id);
+        break;
+
+      case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
+        BG.Methods.saveTestRuleResult(message, sender.tab);
+        break;
     }
   });
 };
 
 BG.Methods.handleClientPortConnections = () => {
   chrome.runtime.onConnect.addListener((port) => {
-    const tabId = port.sender.tab.id;
+    const senderTab = port.sender.tab;
 
-    if (port.sender.documentLifecycle === "active") {
+    // for devtools and blocked pages, senderTab is not available
+    if (!senderTab) {
+      return;
+    }
+
+    const tabId = senderTab.id;
+
+    // documentLifeCycle is only used by chrome and not firefox
+    if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
+      window.tabService.resetPageData(senderTab.id);
       window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
       const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
       window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
       clientLoadSubscribers.forEach((subscriber) => subscriber());
+
+      BG.Methods.onClientPageLoad(senderTab);
+
+      // It is recommended to remove the onConnect listener after connection has been established.
+      // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
+      port.disconnect();
     }
 
     port.onDisconnect.addListener(() => {
@@ -1039,7 +1084,7 @@ BG.Methods.handleClientPortConnections = () => {
 };
 
 BG.Methods.isConnectedToClient = (tabId) => {
-  return window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+  return !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
 };
 
 BG.Methods.sendMessageToClient = (tabId, ...restArgs) => {
@@ -1122,13 +1167,9 @@ BG.Methods.onAppLoadedNotification = () => {
   EventActions.sendExtensionEvents();
 };
 
-BG.Methods.onContentScriptLoadedNotification = (tab, payload = {}) => {
-  window.tabService.resetPageData(tab.id);
-
-  Promise.all([
-    BG.Methods.handleRuleExecutionsOnClientPageLoad(tab),
-    BG.Methods.handleSessionRecordingOnClientPageLoad(tab, payload),
-  ]);
+BG.Methods.onClientPageLoad = (tab) => {
+  BG.Methods.handleRuleExecutionsOnClientPageLoad(tab);
+  BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
 BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
@@ -1152,8 +1193,6 @@ BG.Methods.handleRuleExecutionsOnClientPageLoad = async (tab) => {
 };
 
 BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
-  window.tabService.resetPageData(tab.id);
-
   if (payload.hasExecutedRules) {
     RQ.extensionIconManager.markRuleExecuted(tab.id);
   }
@@ -1162,17 +1201,17 @@ BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
     RQ.extensionIconManager.markRecording(tab.id);
   }
 
-  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab, payload);
+  await BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
-BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab, payload) => {
+BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
   if (!sessionRecordingData) {
-    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(payload.url);
+    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
     if (sessionRecordingConfig) {
-      sessionRecordingData = { config: sessionRecordingConfig, url: payload.url };
+      sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1203,6 +1242,65 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab, payload) => {
   }
 };
 
+BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
+  const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
+
+  const ruleTestReports = Object.values(testReports)
+    .filter((testReport) => testReport.ruleId === ruleId)
+    .sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0));
+
+  if (ruleTestReports.length > 2) {
+    delete testReports[ruleTestReports[2].id];
+  }
+
+  const newTestReportId = RQ.commonUtils.generateUUID();
+  testReports[newTestReportId] = {
+    timestamp: Date.now(),
+    ruleId,
+    appliedStatus,
+    url,
+    id: newTestReportId,
+  };
+
+  await RQ.StorageService.saveRecord({
+    [RQ.STORAGE_KEYS.TEST_REPORTS]: testReports,
+  });
+
+  return newTestReportId;
+};
+
+BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
+  BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA, {
+      url: payload.url,
+    });
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      ruleId: payload.ruleId,
+    });
+  });
+};
+
+BG.Methods.saveTestRuleResult = (payload, senderTab) => {
+  const testRuleData = window.tabService.getData(senderTab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA);
+  const testRuleUrl = testRuleData.url ?? senderTab.url;
+
+  BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
+    const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
+    if (!isParentTabFocussed) {
+      // update the current tab with URL if opener tab does not exist
+      chrome.tabs.update({
+        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
+      });
+    } else {
+      BG.Methods.sendMessageToClient(senderTab.openerTabId, {
+        action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+        testReportId: test_id,
+      });
+    }
+  });
+};
+
 BG.Methods.startRecordingExplicitly = (tabId) => {
   const sessionRecordingData = { explicit: true };
 
@@ -1215,8 +1313,14 @@ BG.Methods.startRecordingExplicitly = (tabId) => {
 };
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
-  chrome.tabs.create({ url }, (tab) => {
+  BG.Methods.launchUrl(url).then((tab) => {
     window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true, explicit: true });
+  });
+};
+
+BG.Methods.launchUrl = (url, openerTabId) => {
+  return new Promise((resolve) => {
+    window.tabService.createNewTab(url, openerTabId, resolve);
   });
 };
 
@@ -1529,10 +1633,18 @@ BG.Methods.sendAppliedRuleDetailsToClient = async (rule, requestDetails) => {
 
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   } else {
-    BG.Methods.sendMessageToClient(tabId, {
-      action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
-      rule,
-    });
+    BG.Methods.sendMessageToClient(
+      tabId,
+      {
+        action: RQ.CLIENT_MESSAGES.NOTIFY_RULE_APPLIED,
+        rule,
+      },
+      () => {
+        if (!chrome.runtime.lastError) {
+          RQ.extensionIconManager.markRuleExecuted(tabId);
+        }
+      }
+    );
   }
 };
 

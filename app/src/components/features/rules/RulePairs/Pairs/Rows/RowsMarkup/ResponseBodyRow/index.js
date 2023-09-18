@@ -13,8 +13,6 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
-import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
@@ -25,7 +23,6 @@ import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
-  const { MODE } = getModeData(window.location);
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
     []
@@ -200,13 +197,10 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-        return "{}";
-      }
-      return pair.response.value ?? "{}";
+      return pair.response.value ? pair.response.value : "{}";
     }
     return null;
-  }, [MODE, pair.response.type, pair.response.value]);
+  }, [pair.response.type, pair.response.value]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
