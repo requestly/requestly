@@ -6,6 +6,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const InviteButton: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
 
   const handleInviteClick = useCallback(() => {
+    trackInviteTeammatesClicked("sidebar_invite_button");
     if (!user?.loggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
       return;

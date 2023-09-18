@@ -12,7 +12,11 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
+import {
+  trackAddTeamMemberSuccess,
+  trackNewTeamCreateFailure,
+  trackNewTeamCreateSuccess,
+} from "modules/analytics/events/features/teams";
 import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import APP_CONSTANTS from "config/constants";
 import "./CreateWorkspaceModal.css";
@@ -88,9 +92,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             const domain = getDomainFromEmail(user?.details?.profile?.email);
             const inviteRes = await createOrgTeamInvite({ domain, teamId });
             await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
-            console.log({ inviteRes });
             if (inviteRes.data.success) {
               toast.success(`All users from ${domain} have been invited to join this workspace.`);
+              trackAddTeamMemberSuccess(teamId, user?.details?.profile?.email, true, "notify_all_teammates");
             } else {
               switch (inviteRes.data.errCode) {
                 case "no-users-in-same-domain":

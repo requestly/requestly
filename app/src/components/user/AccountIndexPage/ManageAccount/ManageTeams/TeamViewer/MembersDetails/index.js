@@ -10,6 +10,7 @@ import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
 import { actions } from "store";
 import { useDispatch } from "react-redux";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   }, [refreshTeamMembersTable]);
 
   const handleAddMemberClick = useCallback(() => {
+    trackInviteTeammatesClicked("manage_workspace");
     dispatch(
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",

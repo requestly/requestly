@@ -242,7 +242,7 @@ const WorkspaceSelector = () => {
           newProps: { source: "workspaces_dropdown" },
         })
       );
-      trackInviteTeammatesClicked("sidebar_dropdown");
+      trackInviteTeammatesClicked("workspaces_dropdown");
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
