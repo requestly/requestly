@@ -53,6 +53,7 @@ const GreenVerifiedCheck: React.FC<{}> = () => {
 interface SessionOnboardProps {
   redirectToSettingsPage?: () => void;
   openDownloadedSessionModalBtn?: React.ReactNode;
+  isModalView?: boolean;
 }
 
 export enum OnboardingTypes {
@@ -106,9 +107,10 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   );
 };
 
-const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
+export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   redirectToSettingsPage,
   openDownloadedSessionModalBtn,
+  isModalView = false,
 }) => {
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
@@ -129,7 +131,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   }, [dispatch]);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
-    trackStartRecordingWithURLClicked();
+    trackStartRecordingWithURLClicked(isModalView ? "modal" : "onboarding");
     if (isExtensionInstalled()) {
       const urlToRecord = prefixUrlWithHttps(inputRef?.current.input.value);
       inputRef.current.input.value = urlToRecord;
@@ -143,7 +145,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     } else {
       openInstallExtensionModal();
     }
-  }, [openInstallExtensionModal]);
+  }, [openInstallExtensionModal, isModalView]);
 
   const handleSettingsNavigation = useCallback(() => {
     trackOnboardingToSettingsNavigate();
@@ -152,21 +154,24 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
 
   return (
     <div className="onboarding-content-container">
-      <Row justify="end" align="middle" className="settings-row">
-        <Space size={20}>
-          {openDownloadedSessionModalBtn}
-          <span onClick={handleSettingsNavigation} className="settings-btn">
-            <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-          </span>
-        </Space>
-      </Row>
+      {!isModalView && (
+        <Row justify="end" align="middle" className="settings-row">
+          <Space size={20}>
+            {openDownloadedSessionModalBtn}
+            <span onClick={handleSettingsNavigation} className="settings-btn">
+              <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+            </span>
+          </Space>
+        </Row>
+      )}
+
       <Row justify="space-between" className="onboarding-banner">
-        <Col span={12} className="banner-text-container">
+        <Col span={isModalView ? 24 : 12} className="banner-text-container">
           <Row className="banner-header">
             <Title className="banner-title">Debug issues faster with Session Replay</Title>
           </Row>
           <Row className="banner-description">
-            <Text type="secondary" className="banner-text">
+            <Text type="secondary" className="banner-text w-full">
               <div>
                 Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
                 <Text strong>network</Text> &
@@ -177,49 +182,54 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
               </div>
               <div> debugging </div>
             </Text>
-
-            <Text type="secondary" className="banner-message banner-text">
-              <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
-              saving
-            </Text>
+            {!isModalView && (
+              <Text type="secondary" className="banner-message banner-text">
+                <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
+                saving
+              </Text>
+            )}
           </Row>
-          <Row className="record-label">
-            <Text type="secondary" className="banner-text">
-              Record your first session
-            </Text>
-          </Row>
-          <Row>
-            <Col span={15} className="input-container">
-              <Input
-                ref={inputRef}
-                placeholder="Enter Page URL eg. https://ebay.com"
-                onPressEnter={handleStartRecordingBtnClicked}
-              />
-            </Col>
-            <Col span={3} className="start-btn-container">
-              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                {" "}
-                Start Recording
-              </Button>
-            </Col>
-          </Row>
+          <Col span={24}>
+            <Row className="record-label">
+              <Text type="secondary" className="banner-text">
+                Record your {!isModalView && "first"} session
+              </Text>
+            </Row>
+            <Row>
+              <Col span={15} className="input-container">
+                <Input
+                  ref={inputRef}
+                  placeholder="Enter Page URL eg. https://ebay.com"
+                  onPressEnter={handleStartRecordingBtnClicked}
+                />
+              </Col>
+              <Col span={3} className="start-btn-container">
+                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                  {" "}
+                  Start Recording
+                </Button>
+              </Col>
+            </Row>
+          </Col>
         </Col>
-        <Col span={12} className="banner-demo-video">
-          <Row justify="end">
-            <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
-          </Row>
-          <Row onClick={trackOnboardingSampleSessionViewed}>
-            <a
-              href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
-              target="__blank"
-              className="sample-link-container"
-            >
-              <Row justify="end" align="middle" className="sample-link">
-                <Text underline>View sample replay</Text>
-              </Row>
-            </a>
-          </Row>
-        </Col>
+        {!isModalView && (
+          <Col span={12} className="banner-demo-video">
+            <Row justify="end">
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+            </Row>
+            <Row onClick={trackOnboardingSampleSessionViewed}>
+              <a
+                href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+                target="__blank"
+                className="sample-link-container"
+              >
+                <Row justify="end" align="middle" className="sample-link">
+                  <Text underline>View sample replay</Text>
+                </Row>
+              </a>
+            </Row>
+          </Col>
+        )}
       </Row>
     </div>
   );
