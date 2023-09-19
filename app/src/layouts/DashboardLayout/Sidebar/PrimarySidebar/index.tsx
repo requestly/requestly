@@ -65,7 +65,9 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <SessionIcon />
+            <span className="icon-with-badge">
+              <SessionIcon /> <RQBadge badgeText="NEW" />
+            </span>
           </Tooltip>
         ),
         display: true,
@@ -83,11 +85,7 @@ export const PrimarySidebar: React.FC = () => {
         id: 5,
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
-        icon: (
-          <span className="icon-with-badge">
-            <ApiOutlined /> <RQBadge badgeText="BETA" />
-          </span>
-        ),
+        icon: <ApiOutlined />,
         feature: FEATURES.API_CLIENT,
         display: true,
         activeColor: "var(--api-client)",
