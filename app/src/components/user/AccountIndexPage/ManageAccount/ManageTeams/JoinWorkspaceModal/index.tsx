@@ -15,6 +15,7 @@ import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
-    trackWorkspaceJoinClicked(team?.teamId, "workspace_joining_modal");
+    trackWorkspaceJoinClicked(team?.teamId, "join_workspace_modal");
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
@@ -55,7 +56,9 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
                 isWorkspaceMode,
                 isSyncEnabled: true,
               },
-              appMode
+              appMode,
+              null,
+              "join_workspace_modal"
             );
           }
         }
@@ -119,6 +122,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   }, [user.loggedIn, dispatch]);
 
   const handleCreateNewWorkspace = () => {
+    trackCreateNewTeamClicked("join_workspace_modal");
     toggleModal();
     if (user.loggedIn) {
       dispatch(

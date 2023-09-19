@@ -20,8 +20,8 @@ import {
 import { Avatar, Badge, Divider, Dropdown, Menu, Modal, Spin, Tag, Tooltip } from "antd";
 import {
   trackInviteTeammatesClicked,
-  trackCreateNewWorkspaceClicked,
   trackWorkspaceDropdownClicked,
+  trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
 import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import {
@@ -239,9 +239,10 @@ const WorkspaceSelector = () => {
         actions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
+          newProps: { source: "workspaces_dropdown" },
         })
       );
-      trackInviteTeammatesClicked("sidebar_dropdown");
+      trackInviteTeammatesClicked("workspaces_dropdown");
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
@@ -327,7 +328,8 @@ const WorkspaceSelector = () => {
           if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
           setIsModalOpen(false);
         }, 2 * 1000);
-      }
+      },
+      "workspaces_dropdown"
     );
   };
 
@@ -339,7 +341,7 @@ const WorkspaceSelector = () => {
         onClick={() => {
           handleCreateNewWorkspaceRedirect();
           trackWorkspaceDropdownClicked("create_new_workspace");
-          trackCreateNewWorkspaceClicked("workspaces_dropdown");
+          trackCreateNewTeamClicked("workspaces_dropdown");
         }}
         icon={<PlusOutlined className="icon-wrapper" />}
       >
@@ -394,7 +396,7 @@ const WorkspaceSelector = () => {
       onClick: () => {
         handleCreateNewWorkspaceRedirect();
         trackWorkspaceDropdownClicked("create_new_workspace");
-        trackCreateNewWorkspaceClicked("workspaces_dropdown");
+        trackCreateNewTeamClicked("workspaces_dropdown");
       },
     },
   ];

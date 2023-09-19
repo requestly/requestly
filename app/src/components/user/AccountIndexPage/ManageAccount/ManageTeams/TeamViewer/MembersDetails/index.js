@@ -6,11 +6,11 @@ import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
-import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
 import { actions } from "store";
 import { useDispatch } from "react-redux";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
@@ -33,6 +33,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   }, [refreshTeamMembersTable]);
 
   const handleAddMemberClick = useCallback(() => {
+    trackInviteTeammatesClicked("manage_workspace");
     dispatch(
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",
@@ -40,10 +41,10 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         newProps: {
           teamId: teamId,
           callback: doRefreshTeamMembersTable,
+          source: "team_members_table",
         },
       })
     );
-    trackAddMemberClicked();
   }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
   useEffect(() => {
@@ -55,6 +56,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           newProps: {
             teamId: teamId,
             callback: doRefreshTeamMembersTable,
+            source: "team_members_table",
           },
         })
       );

@@ -8,11 +8,7 @@ import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/busin
 import { LoadingOutlined } from "@ant-design/icons";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import "./index.css";
-import {
-  trackTeamPlanCardClicked,
-  trackTeamPlanCardShown,
-  trackTeamPlanInterestCaptured,
-} from "modules/analytics/events/common/teams";
+import { trackTeamPlanCardClicked, trackTeamPlanCardShown } from "modules/analytics/events/common/teams";
 
 export default function EnterpriseRequestBanner({ user }) {
   const [enterpriseContactDetails, setEnterpriseContactDetails] = useState({});
@@ -35,7 +31,6 @@ export default function EnterpriseRequestBanner({ user }) {
     })
       .then(() => {
         //GA4
-        trackTeamPlanInterestCaptured(domain);
         trackEnterpriseRequestEvent(domain);
         setEnterpriseRequestedState(2);
       })
