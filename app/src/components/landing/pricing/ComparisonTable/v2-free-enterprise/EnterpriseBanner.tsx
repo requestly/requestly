@@ -16,7 +16,7 @@ const enterpriseFeatures = [
 const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openContactUsModal }) => {
   return (
     <Row className="enterprise-banner">
-      <Col span={13}>
+      <Col lg={13} sm={10}>
         <Typography.Title level={2}>Enterprise Plan</Typography.Title>
         <Typography.Text>
           Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive
@@ -35,7 +35,7 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
           Contact Us
         </RQButton>
       </Col>
-      <Col offset={2}>
+      <Col lg={{ offset: 2 }} sm={{ offset: 0 }}>
         <img src={enterpriseImage} height={250} width={330} alt="enterprise-plan" />
       </Col>
     </Row>

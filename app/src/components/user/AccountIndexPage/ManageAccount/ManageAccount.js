@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Row, Card, CardHeader, Col, CardBody, Input, InputGroup, InputGroupText } from "reactstrap";
 import { Button as AntButton } from "antd";
 import { toast } from "utils/Toast.js";
@@ -10,10 +9,7 @@ import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 import DataStoreUtils from "../../../../utils/DataStoreUtils";
-import {
-  redirectToRefreshSubscription,
-  redirectToUpdateSubscriptionContactUs,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
 import { refreshUserInGlobalState } from "../../common/actions";
@@ -111,8 +107,6 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
 };
 
 const ManageAccount = () => {
-  const navigate = useNavigate();
-
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -296,7 +290,7 @@ const ManageAccount = () => {
                           type="secondary"
                           size="small"
                           onClick={() => {
-                            redirectToRefreshSubscription(navigate);
+                            redirectToUpdateSubscriptionContactUs();
                           }}
                         >
                           Refresh Subscription
