@@ -1,8 +1,8 @@
 import { trackEvent } from "modules/analytics";
 import { TEAMS } from "../constants";
 
-export const trackNewTeamCreateSuccess = (id, name, source) => {
-  const params = { id, name, source };
+export const trackNewTeamCreateSuccess = (id, name, source, notify_all_teammates = false) => {
+  const params = { id, name, source, notify_all_teammates };
   trackEvent(TEAMS.NEW_TEAM_CREATE_SUCCESS, params);
 };
 
