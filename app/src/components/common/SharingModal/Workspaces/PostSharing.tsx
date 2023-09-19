@@ -11,6 +11,7 @@ import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { LockOutlined } from "@ant-design/icons";
 import mailSuccessImg from "assets/images/illustrations/mail-success.svg";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 
 interface PostSharingProps {
@@ -41,7 +42,9 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
         isWorkspaceMode,
         isSyncEnabled: true,
       },
-      appMode
+      appMode,
+      null,
+      "sharing_modal"
     ).then(() => {
       toggleModal();
     });
@@ -59,7 +62,10 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
         header: <img src={mailSuccessImg} alt="mail sent" width={60} />,
         message: "Email invites sent!",
         ctaText: "Invite more users",
-        action: () => setPostShareViewData(null), // clear post share data and go back to workspace sharing screen,
+        action: () => {
+          setPostShareViewData(null);
+          trackInviteTeammatesClicked("sharing_modal");
+        }, // clear post share data and go back to workspace sharing screen,
       },
       [WorkspaceSharingTypes.EXISTING_WORKSPACE]: {
         header: <WorkspaceSharingInfoHeader postShareViewData={postShareViewData} />,
