@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
 import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
-import { Modal } from "antd";
+import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
@@ -27,9 +27,20 @@ import {
   trackSessionRecordingFailed,
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
+import LINKS from "config/constants/sub/links";
+import { trackTestRuleSessionDraftSaved, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
 
-const DraftSessionViewer: React.FC = () => {
-  const { tabId } = useParams();
+export interface DraftSessionViewerProps {
+  testRuleDraftSession?: {
+    draftSessionTabId: string;
+    testReportId: string;
+    closeModal: () => void;
+    appliedRuleStatus: boolean;
+  };
+}
+
+const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSession }) => {
+  const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -54,7 +65,7 @@ const DraftSessionViewer: React.FC = () => {
   const hasUserCreatedSessions = useMemo(
     () =>
       userAttributes?.num_sessions > 0 ||
-      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_online - 1 > 0 ||
       userAttributes?.num_sessions_saved_offline > 0,
     [
       userAttributes?.num_sessions,
@@ -78,7 +89,7 @@ const DraftSessionViewer: React.FC = () => {
   }, []);
 
   unstable_usePrompt({
-    when: !isSaveSessionClicked && !isDiscardSessionClicked,
+    when: !isSaveSessionClicked && !isDiscardSessionClicked && !testRuleDraftSession,
     message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
   });
 
@@ -97,6 +108,10 @@ const DraftSessionViewer: React.FC = () => {
 
   useEffect(() => {
     trackDraftSessionViewed();
+
+    if (testRuleDraftSession) {
+      trackTestRuleSessionDraftSaved();
+    }
 
     setIsLoading(true);
 
@@ -118,6 +133,9 @@ const DraftSessionViewer: React.FC = () => {
           setLoadingError(payload);
         } else {
           const tabSession = payload as RQSession;
+          if (!tabSession) {
+            return;
+          }
 
           if (tabSession.events.rrweb?.length < 2) {
             setLoadingError("RRWeb events not captured");
@@ -136,9 +154,9 @@ const DraftSessionViewer: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession]);
 
-  const confirmDiscard = () => {
+  const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
     Modal.confirm({
       title: "Confirm Discard",
@@ -148,13 +166,17 @@ const DraftSessionViewer: React.FC = () => {
       cancelText: "No",
       onOk() {
         trackDraftSessionDiscarded();
-        navigate(PATHS.SESSIONS.ABSOLUTE);
+        if (testRuleDraftSession) {
+          testRuleDraftSession.closeModal();
+        } else {
+          navigate(PATHS.SESSIONS.ABSOLUTE);
+        }
       },
       onCancel() {
         setIsDiscardSessionClicked(false);
       },
     });
-  };
+  }, [navigate, testRuleDraftSession]);
 
   useEffect(() => {
     if (loadingError) {
@@ -168,7 +190,7 @@ const DraftSessionViewer: React.FC = () => {
     <PageError error="Session Recording Loading Error" />
   ) : (
     <div className="session-viewer-page">
-      <div className="session-viewer-header">
+      <div className="session-viewer-header margin-bottom-one">
         <SessionViewerTitle />
         <div className="session-viewer-actions">
           <RQButton type="default" onClick={confirmDiscard}>
@@ -192,14 +214,36 @@ const DraftSessionViewer: React.FC = () => {
             <SaveRecordingConfigPopup
               onClose={() => setIsSavePopupVisible(false)}
               setIsSaveSessionClicked={setIsSaveSessionClicked}
+              testRuleDraftSession={testRuleDraftSession}
             />
           )}
         </div>
       </div>
+      {testRuleDraftSession && (
+        <Space align="center">
+          <Input
+            readOnly
+            addonBefore="Rule execution status"
+            value={testRuleDraftSession.appliedRuleStatus ? "✅ Rule executed" : "❌ Failed"}
+            style={{ width: "fit-content" }}
+          />
+          <a
+            className="text-underline underline-text-on-hover"
+            href={LINKS.REQUESTLY_EXTENSION_RULES_NOT_WORKING}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              trackTroubleshootClicked("test_this_rule__draft_session_modal");
+            }}
+          >
+            Troubleshooting Guide
+          </a>
+        </Space>
+      )}
       <SessionDetails key={tabId} />
       <ProductWalkthrough
         completeTourOnUnmount={false}
-        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession}
+        startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession && !testRuleDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))

@@ -8,11 +8,10 @@ import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
 import { actions } from "store";
 import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
-import { StorageService } from "init";
+import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 
 const DeleteRulesModal = (props) => {
   const {
@@ -90,13 +89,7 @@ const DeleteRulesModal = (props) => {
   };
 
   const handleDeleteRuleTestReports = useCallback(async () => {
-    const testReports = await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS);
-    for (const test in testReports) {
-      if (ruleIdsToDelete.includes(testReports[test].ruleId)) {
-        delete testReports[test];
-      }
-    }
-    StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: testReports });
+    deleteTestReportByRuleId(appMode, ruleIdsToDelete);
   }, [appMode, ruleIdsToDelete]);
 
   const postDeletionSteps = () => {

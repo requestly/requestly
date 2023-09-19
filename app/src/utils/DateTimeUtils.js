@@ -133,7 +133,7 @@ export const getFormattedTimestamp = (timestamp) => {
   const date = new Date(timestamp);
 
   const day = date.getDate();
-  const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(date);
   const year = date.getFullYear();
 
   const hours = date.getHours() % 12 || 12;
