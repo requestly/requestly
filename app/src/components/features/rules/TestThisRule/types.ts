@@ -4,4 +4,5 @@ export type TestReport = {
   ruleId: string;
   timestamp: number;
   appliedStatus: boolean;
+  sessionLink?: string;
 };

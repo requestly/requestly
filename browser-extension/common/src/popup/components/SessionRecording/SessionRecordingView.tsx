@@ -16,6 +16,7 @@ const SessionRecordingView: React.FC = () => {
     chrome.runtime.sendMessage({
       action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
       tabId: currentTabId,
+      showWidget: true,
     });
     setIsManualMode(true);
     setIsRecordingSession(true);
