@@ -33,6 +33,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
+            members: teamData.members,
           };
         });
 

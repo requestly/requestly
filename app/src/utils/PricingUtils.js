@@ -12,7 +12,7 @@ export const getDurationTitleFromDays = (days) => {
     case 180:
       return "half-yearly";
     case 365:
-      return "annual";
+      return "annually";
     default:
       return false;
   }
