@@ -34,7 +34,10 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
-import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackNewSessionClicked,
+  trackSessionRecordingUpload,
+} from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
 
 const _ = require("lodash");
@@ -238,7 +241,13 @@ const SessionsIndexPage = () => {
   );
 
   const newSessionButton = (
-    <RQButton type="primary" onClick={() => setIsNewSessionModalOpen(true)}>
+    <RQButton
+      type="primary"
+      onClick={() => {
+        setIsNewSessionModalOpen(true);
+        trackNewSessionClicked();
+      }}
+    >
       New Session
     </RQButton>
   );

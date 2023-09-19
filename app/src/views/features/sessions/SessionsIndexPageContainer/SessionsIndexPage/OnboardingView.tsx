@@ -131,7 +131,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   }, [dispatch]);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
-    trackStartRecordingWithURLClicked();
+    trackStartRecordingWithURLClicked(isModalView ? "modal" : "onboarding");
     if (isExtensionInstalled()) {
       const urlToRecord = prefixUrlWithHttps(inputRef?.current.input.value);
       inputRef.current.input.value = urlToRecord;
