@@ -139,7 +139,7 @@ const SessionsIndexPage = () => {
   const configureBtn = useMemo(
     () => (
       <>
-        <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
+        <Button type="default" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
           Settings
         </Button>
       </>
