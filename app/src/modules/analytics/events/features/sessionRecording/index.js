@@ -93,7 +93,9 @@ export const trackSampleSessionClicked = (log_type) => {
 /* ONBOARDING */
 export const trackOnboardingPageViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.onboarding_page_viewed);
 export const trackOnboardingSampleSessionViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.sample_session_viewed);
-export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
+export const trackStartRecordingWithURLClicked = (source) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked, { source });
+};
 export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
 export const trackStartRecordingOnExternalTarget = (url) => {
   trackEvent(SESSION_RECORDING.ONBAORDING.navigate_to_target_website, { url });
@@ -105,4 +107,8 @@ export const trackTriedRecordingForInvalidURL = (url) => {
 // UPLOAD SESSION
 export const trackSessionRecordingUpload = (status) => {
   trackEvent(SESSION_RECORDING.session_recording_upload, { status });
+};
+
+export const trackNewSessionClicked = () => {
+  trackEvent(SESSION_RECORDING.NEW_SESSION_CLICKED);
 };
