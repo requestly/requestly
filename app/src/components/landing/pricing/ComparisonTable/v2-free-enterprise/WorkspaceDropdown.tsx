@@ -24,7 +24,7 @@ const WorkspaceDropdown: React.FC<{
   const filteredAvailableTeams = useMemo(() => {
     return (
       availableTeams?.filter(
-        (team: any) => !team?.archived && team.members[user?.details?.profile?.uid]?.role === "admin"
+        (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
   }, [availableTeams, user?.details?.profile?.uid]);
