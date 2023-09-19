@@ -3,18 +3,8 @@ import APP_CONSTANTS from "../config/constants";
 
 export const getPlanNameFromId = (planId) => {
   if (!planId) return null;
-  const planName = planId.split("_")[0];
 
-  switch (planName) {
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.GOLD:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
-    default:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
-  }
+  return planId.split("_")[0];
 };
 
 export const isPremiumPlan = (planId) => {
@@ -67,7 +57,7 @@ export const getPlanName = (planDetails) => {
   }
 
   if (planDetails.planId) {
-    return getPlanNameFromId(planDetails.planId);
+    return planDetails.planId.split("_")[0];
   }
 
   return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
