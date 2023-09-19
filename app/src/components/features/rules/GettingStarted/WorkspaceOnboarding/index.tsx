@@ -166,7 +166,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
         }
       });
     }
-  }, [appMode, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode, dispatch, window.location.href]);
 
   useEffect(() => {
     return () => {

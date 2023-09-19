@@ -27,6 +27,7 @@ const SignInViaEmailLink = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
   const navigate = useNavigate();
 
   const logOutUser = useCallback(() => {
@@ -48,6 +49,13 @@ const SignInViaEmailLink = () => {
     }
     return <SpinnerColumn />;
   }, [user.email, userEmail, logOutUser, navigate]);
+
+  useEffect(() => {
+    if (user.loggedIn && isEmailLoginLinkDone) {
+      redirectToRules(navigate);
+    }
+  }, [user.loggedIn, isEmailLoginLinkDone, navigate]);
+
   const handleLogin = useCallback(
     (email) => {
       const loginEmail = email || userEmail;
@@ -63,8 +71,8 @@ const SignInViaEmailLink = () => {
               if (authData) {
                 window.localStorage.removeItem("RQEmailForSignIn");
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
-                redirectToRules(navigate);
                 setIsProcessing(false);
+                setIsEmailLoginLinkDone(true);
               } else throw new Error("Failed");
             }
           })
@@ -77,7 +85,7 @@ const SignInViaEmailLink = () => {
         window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
       }
     },
-    [userEmail, user.loggedIn, renderAlreadyLoggedInWarning, navigate]
+    [userEmail, user.loggedIn, renderAlreadyLoggedInWarning]
   );
 
   const renderEmailInputForm = () => {

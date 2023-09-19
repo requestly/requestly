@@ -123,7 +123,8 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         }
       });
     }
-  }, [appMode, currentPage, dispatch, navigate, isSurveyModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode, currentPage, dispatch, navigate, isSurveyModal, window.location.href]);
 
   useEffect(() => {
     if (isSurveyModal && currentPage === SurveyPage.GETTING_STARTED) {
@@ -133,7 +134,8 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         }
       });
     }
-  }, [appMode, currentPage, isSurveyModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode, currentPage, isSurveyModal, window.location.href]);
 
   useEffect(() => {
     if (userPersona?.page > 2) dispatch(actions.updateIsPersonaSurveyCompleted(true));
