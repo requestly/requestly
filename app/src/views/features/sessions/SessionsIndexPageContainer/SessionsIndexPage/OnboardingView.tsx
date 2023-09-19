@@ -145,7 +145,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     } else {
       openInstallExtensionModal();
     }
-  }, [openInstallExtensionModal]);
+  }, [openInstallExtensionModal, isModalView]);
 
   const handleSettingsNavigation = useCallback(() => {
     trackOnboardingToSettingsNavigate();
