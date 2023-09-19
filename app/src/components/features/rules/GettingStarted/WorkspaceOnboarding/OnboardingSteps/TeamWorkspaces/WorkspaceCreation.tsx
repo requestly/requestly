@@ -111,7 +111,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
             isWorkspaceMode,
             isSyncEnabled: true,
           },
-          appMode
+          appMode,
+          null,
+          "onboarding"
         );
       })
       .catch((err) => {
