@@ -21,7 +21,7 @@ import { filterUniqueObjects } from "utils/FormattingHelper";
 import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
-import OnboardingView from "./OnboardingView";
+import OnboardingView, { SessionOnboardingView } from "./OnboardingView";
 import { actions } from "../../../../../store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -35,6 +35,7 @@ import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
 import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
+import "./index.scss";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -56,6 +57,7 @@ const SessionsIndexPage = () => {
   const [qs, setQs] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isNewSessionModalOpen, setIsNewSessionModalOpen] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
 
   const fetchRecordings = (lastDoc = null) => {
@@ -235,6 +237,12 @@ const SessionsIndexPage = () => {
     [toggleImportSessionModal]
   );
 
+  const newSessionButton = (
+    <RQButton type="primary" onClick={() => setIsNewSessionModalOpen(true)}>
+      New Session
+    </RQButton>
+  );
+
   if (isTableLoading) {
     return <PageLoader message="Loading sessions..." />;
   }
@@ -254,6 +262,15 @@ const SessionsIndexPage = () => {
         </div>
       </RQModal>
 
+      <RQModal
+        open={isNewSessionModalOpen}
+        onCancel={() => setIsNewSessionModalOpen(false)}
+        wrapClassName="create-new-session-modal"
+        centered
+      >
+        <SessionOnboardingView isModalView />
+      </RQModal>
+
       {user?.loggedIn && filteredRecordings?.length ? (
         <>
           <ProtectedRoute
@@ -267,6 +284,7 @@ const SessionsIndexPage = () => {
                   setIsShareModalVisible={setIsShareModalVisible}
                   fetchRecordings={fetchRecordings}
                   configureBtn={configureBtn}
+                  newSessionButton={newSessionButton}
                   openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
                   callbackOnDeleteSuccess={() => {
                     setSessionRecordings([]);
