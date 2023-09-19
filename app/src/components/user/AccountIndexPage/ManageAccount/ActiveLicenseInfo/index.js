@@ -24,12 +24,15 @@ const ActiveLicenseInfo = ({
   const doesSubscriptionExist = !!type && !!status && !!planName;
 
   useEffect(() => {
-    getAttrFromFirebase("session_replay_lifetime_pro").then((val) => {
-      console.log("session_replay_lifetime_pro", val);
-      if (val) {
-        setIsSessionReplayLifetimeActive(true);
-      }
-    });
+    getAttrFromFirebase("session_replay_lifetime_pro")
+      .then((val) => {
+        if (val) {
+          setIsSessionReplayLifetimeActive(true);
+        }
+      })
+      .catch(() => {
+        // do nothing
+      });
   });
 
   const renderSubscriptionInfo = () => {
