@@ -22,7 +22,7 @@ import APP_CONSTANTS from "config/constants";
 import "react-multi-email/style.css";
 import "./AddMemberModal.css";
 
-const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
+const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
@@ -154,8 +154,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
   }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
 
   useEffect(() => {
-    if (isOpen) trackAddMembersInWorkspaceModalViewed();
-  }, [isOpen]);
+    if (isOpen) trackAddMembersInWorkspaceModalViewed(source);
+  }, [isOpen, source]);
 
   useEffect(() => {
     if (isOpen) {
