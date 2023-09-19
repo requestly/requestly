@@ -980,7 +980,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(message.tabId);
+        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1169,6 +1169,7 @@ BG.Methods.onAppLoadedNotification = () => {
 
 BG.Methods.onClientPageLoad = (tab) => {
   BG.Methods.handleRuleExecutionsOnClientPageLoad(tab);
+  BG.Methods.handleTestRuleOnClientPageLoad(tab);
   BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
@@ -1242,6 +1243,18 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   }
 };
 
+BG.Methods.handleTestRuleOnClientPageLoad = (tab) => {
+  const testRuleData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA);
+
+  if (testRuleData) {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      ruleId: testRuleData.ruleId,
+      record: testRuleData.record,
+    });
+  }
+};
+
 BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
   const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
 
@@ -1273,10 +1286,8 @@ BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
   BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
     window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA, {
       url: payload.url,
-    });
-    BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
       ruleId: payload.ruleId,
+      record: payload.record,
     });
   });
 };
@@ -1288,21 +1299,42 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
     const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
     if (!isParentTabFocussed) {
-      // update the current tab with URL if opener tab does not exist
-      chrome.tabs.update({
-        url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
-      });
+      // create new tab with URL if opener tab does not exist
+      chrome.tabs.create(
+        {
+          url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
+        },
+        (tab) => {
+          window.tabService.ensureTabLoadingComplete(tab.id).then(() => {
+            BG.Methods.sendMessageToClient(tab.id, {
+              action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+              testReportId: test_id,
+              testPageTabId: senderTab.id,
+              record: testRuleData.record,
+              appliedStatus: payload.appliedStatus,
+            });
+          });
+        }
+      );
     } else {
       BG.Methods.sendMessageToClient(senderTab.openerTabId, {
         action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
         testReportId: test_id,
+        testPageTabId: senderTab.id,
+        record: testRuleData.record,
+        appliedStatus: payload.appliedStatus,
       });
     }
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId) => {
-  const sessionRecordingData = { explicit: true };
+BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
+  const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  if (sessionRecordingDataExist) {
+    return;
+  }
+
+  const sessionRecordingData = { explicit: true, showWidget };
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
