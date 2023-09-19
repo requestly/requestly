@@ -15,12 +15,13 @@ import "./styles/custom/custom.scss";
 
 import PageError from "components/misc/PageError";
 import { routes } from "routes";
+import { fullScreenRoutes } from "routes/fullScreenRoutes";
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");
 const root = createRoot(container);
 
-const router = createBrowserRouter([{ element: <App />, children: routes }]);
+const router = createBrowserRouter([{ element: <App />, children: [...routes, ...fullScreenRoutes] }]);
 
 root.render(
   <Provider store={reduxStore}>
