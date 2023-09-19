@@ -52,7 +52,6 @@
     "@devtools-ds/themes": "^1.2.1",
     "@monaco-editor/react": "^4.5.2",
     "antd": "^5.0.4",
-    "monaco-editor": "^0.41.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-split": "^2.0.14",
