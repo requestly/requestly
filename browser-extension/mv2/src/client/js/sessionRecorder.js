@@ -5,6 +5,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isRecording = false;
   RQ.SessionRecorder.isExplicitRecording = false;
   RQ.SessionRecorder.widgetPosition = null;
+  RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.sendResponseCallbacks = {};
 
   const isTopDocument = !RQ.SessionRecorder.isIframe();
@@ -22,13 +23,8 @@ RQ.SessionRecorder.setup = () => {
         return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
-        RQ.SessionRecorder.sendMessageToClient("stopRecording", null, () => {
-          // only the top document should send confirmation
-          if (isTopDocument) {
-            sendResponse();
-          }
-        });
-        return true;
+        RQ.SessionRecorder.sendMessageToClient("stopRecording", null);
+        break;
     }
 
     // messages for only the top document
@@ -51,7 +47,7 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget } = options;
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
@@ -68,6 +64,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   RQ.SessionRecorder.isExplicitRecording = explicit;
   RQ.SessionRecorder.widgetPosition = widgetPosition;
+  RQ.SessionRecorder.showWidget = showWidget;
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -107,8 +104,8 @@ RQ.SessionRecorder.addMessageListeners = () => {
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
 
-      if (RQ.SessionRecorder.isExplicitRecording) {
-        RQ.SessionRecorder.showWidget();
+      if (RQ.SessionRecorder.showWidget) {
+        RQ.SessionRecorder.showRecordingWidget();
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
@@ -199,7 +196,7 @@ RQ.SessionRecorder.showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-RQ.SessionRecorder.showWidget = () => {
+RQ.SessionRecorder.showRecordingWidget = () => {
   let widget = RQ.SessionRecorder.getWidget();
 
   if (!widget) {
