@@ -1,10 +1,16 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { ColorScheme, ResourceTable, DetailsTab } from "@requestly-ui/resource-table";
+import {
+  ColorScheme,
+  ContextMenuOption,
+  DetailsTab,
+  ResourceTable,
+  ResourceTableProps,
+} from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
 
-interface NetworkTableProps<NetworkLog> {
+export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
   extraColumns?: Column<NetworkLog>[];
   extraDetailsTabs?: DetailsTab<NetworkLog>[];
@@ -23,6 +29,10 @@ interface NetworkTableProps<NetworkLog> {
    * @returns HAR entry from the given log.
    */
   networkEntrySelector: (log: NetworkLog) => NetworkEntry;
+
+  onContextMenuOpenChange?: ResourceTableProps<NetworkLog>["onContextMenuOpenChange"];
+
+  contextMenuOptions?: ContextMenuOption<NetworkLog>[];
 }
 
 /**
@@ -33,8 +43,10 @@ export const GenericNetworkTable = <NetworkLog,>({
   extraColumns = [],
   extraDetailsTabs = [],
   excludeColumns = [],
-  networkEntrySelector = (log: NetworkLog) => log as NetworkEntry,
-}: NetworkTableProps<NetworkLog>): ReactElement => {
+  contextMenuOptions = [],
+  networkEntrySelector = (log) => log as NetworkEntry,
+  onContextMenuOpenChange = (isOpen) => {},
+}: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
 
   const finalColumns = useMemo(
@@ -68,6 +80,8 @@ export const GenericNetworkTable = <NetworkLog,>({
       primaryColumnKeys={["timeOffset", "url"]}
       colorScheme={ColorScheme.DARK}
       onRowSelection={setSelectedLog}
+      contextMenuOptions={contextMenuOptions}
+      onContextMenuOpenChange={onContextMenuOpenChange}
     />
   );
 };
