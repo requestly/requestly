@@ -5,7 +5,11 @@ import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types"
 import { captureException } from "@sentry/react";
 
 const getStringifiedData = (data: unknown) => {
-  return typeof data === "string" ? data : JSON.stringify(data) ?? "";
+  try {
+    return typeof data === "string" ? data : JSON.stringify(data) ?? "";
+  } catch (error) {
+    return "";
+  }
 };
 
 const getRequestObject = (networkLog: NetworkLog) => {
