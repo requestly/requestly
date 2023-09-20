@@ -38,7 +38,7 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
 
   const handleEmailSend = () => {
     sendEmailLinkForSignin(email, "resend-from-modal", "The email has been resent.");
-    updateTimeToResendEmailLogin(dispatch, 15);
+    updateTimeToResendEmailLogin(dispatch, 30);
   };
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   return loading ? (
@@ -74,10 +74,10 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
       <br />
       <Typography.Text>
         Didn't recieve the email?{" "}
-        <Typography.Text strong underline>
-          {timeToResendEmailLogin > 0 ? (
-            `Send again in ${timeToResendEmailLogin} seconds`
-          ) : (
+        {timeToResendEmailLogin > 0 ? (
+          <Typography.Text strong>{`Send again in ${timeToResendEmailLogin} seconds`}</Typography.Text>
+        ) : (
+          <Typography.Text strong underline>
             <span
               className="resend-email-cta"
               onClick={() => {
@@ -86,8 +86,8 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
             >
               Click to Resend
             </span>
-          )}
-        </Typography.Text>
+          </Typography.Text>
+        )}
       </Typography.Text>
     </div>
   );

@@ -15,7 +15,7 @@ export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource,
   const dispatch = useDispatch();
 
   const startResetTimerAndAnimation = useCallback(() => {
-    updateTimeToResendEmailLogin(dispatch, 15);
+    updateTimeToResendEmailLogin(dispatch, 30);
   }, [dispatch]);
 
   const handleBtnClick = useCallback(() => {
