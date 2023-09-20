@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Typography } from "antd";
+import { Row, Typography } from "antd";
 import SpinnerColumn from "../SpinnerColumn";
 import { RQButton, RQInput } from "lib/design-system/components";
 // ACTIONS
@@ -16,6 +16,10 @@ import { redirectToRules } from "utils/RedirectionUtils";
 
 import "./index.css";
 import { toast } from "utils/Toast";
+import {
+  trackSignInWithLinkCustomFormSeen,
+  trackSignInWithLinkCustomFormSubmitted,
+} from "modules/analytics/events/common/auth/emailLinkSignin";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -101,31 +105,28 @@ const SignInViaEmailLink = () => {
   const renderEmailInputForm = () => {
     return (
       <div className="email-entry-form-container">
-        <Row>
-          <Typography.Title level={3}>
-            Hey, It appears that you are accessing Requestly from a new web browser. Kindly re-enter your email address
-            to proceed.
+        <Row justify="center">
+          <Typography.Title level={2}>
+            Hey, It appears that you are accessing Requestly from a new web browser
           </Typography.Title>
         </Row>
-        <Row className="w-100 mb-16">
-          <Col span={6}>
-            <label htmlFor="SignInViaEmailLinkInputField" className="text-bold auth-modal-input-label">
-              <Typography.Title level={3}>Confirm email address</Typography.Title>
-            </label>
-          </Col>
-          <Col span={18}>
-            <RQInput
-              id="SignInViaEmailLinkInputField"
-              className="email-entry-form-input"
-              placeholder="name@example.com"
-              type="email"
-              required
-              value={emailInput}
-              onChange={(e) => {
-                setEmailInput(e.target.value);
-              }}
-            />
-          </Col>
+        <Row justify="center" className="mb-2">
+          <Typography.Text strong style={{ fontSize: "1rem" }}>
+            Kindly re-enter your email address to proceed.
+          </Typography.Text>
+        </Row>
+        <Row className="w-100 mb-16" justify="center">
+          <RQInput
+            id="SignInViaEmailLinkInputField"
+            className="email-entry-form-input"
+            placeholder="name@example.com"
+            type="email"
+            required
+            value={emailInput}
+            onChange={(e) => {
+              setEmailInput(e.target.value);
+            }}
+          />
         </Row>
         <Row className="w-100" justify="center">
           <RQButton
@@ -134,7 +135,7 @@ const SignInViaEmailLink = () => {
             size="large"
             onClick={(e) => {
               e.preventDefault();
-              console.log("triggered by button click");
+              trackSignInWithLinkCustomFormSubmitted();
               handleLogin(emailInput);
             }}
             loading={isProcessing}
@@ -155,11 +156,14 @@ const SignInViaEmailLink = () => {
 
       setUserEmailfromLocalStorage(email);
       if (!user.isLoggedIn && email) {
-        console.log("triggered by useEffect");
         handleLogin(email);
       }
     }
   }, [handleLogin, user.isLoggedIn]);
+
+  useEffect(() => {
+    if (isCustomLoginFlow) trackSignInWithLinkCustomFormSeen();
+  }, [isCustomLoginFlow]);
 
   return isCustomLoginFlow ? (
     renderEmailInputForm()

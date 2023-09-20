@@ -38,6 +38,11 @@ export const AUTH = {
     FAILED: "email_verification_failed",
   },
 
+  EMAIL_LINK_SIGNIN_FORM: {
+    SEEN: "email_link_signin_form_seen",
+    SUBMITTED: "email_link_signin_form_submitted",
+  },
+
   VERIFY_OOBCODE: {
     ATTEMPTED: "verify_oobcode_attempted",
     FAILED: "verify_oobcode_failed",
