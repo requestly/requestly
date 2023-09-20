@@ -17,7 +17,6 @@ const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource 
   const user = useSelector(getUserAuthDetails);
   return email && isEmailValid(email) ? (
     <>
-      {/* <img src={BiArrowBac} width={15} className="modal-close-icon" onClick={() => toggleModal()} alt="close-icon" /> */}
       <RQModal
         size="small"
         open={!user.loggedIn && isOpen}

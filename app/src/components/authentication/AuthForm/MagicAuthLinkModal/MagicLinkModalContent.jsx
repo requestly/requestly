@@ -8,10 +8,19 @@ import { useDispatch } from "react-redux";
 import { MailOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
+import { fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
+import firebaseApp from "firebase.js";
 
-function doesUserExist(email) {
-  // todo: check if email already exists
-  return true;
+// HACKY WAY FOR CHECKING IF USER EXISTS
+async function doesUserExist(email) {
+  try {
+    const auth = getAuth(firebaseApp);
+    const methods = await fetchSignInMethodsForEmail(auth, email);
+    return methods.length > 0;
+  } catch (error) {
+    // If there is an error, we assume that the user does not exist
+    return false;
+  }
 }
 
 export default function MagicLinkModalContent({ email, authMode, eventSource }) {
@@ -21,8 +30,10 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
   const [isLogin, setIsLogin] = useState(authMode === AUTH.ACTION_LABELS.LOG_IN);
 
   useEffect(() => {
-    setIsLogin(doesUserExist(email));
-    setLoading(false);
+    doesUserExist(email).then((isExistingUser) => {
+      setIsLogin(isExistingUser);
+      setLoading(false);
+    });
   }, [email]);
 
   const handleEmailSend = () => {

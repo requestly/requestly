@@ -46,8 +46,7 @@
 .modal-back-btn {
   margin-top: 1rem;
   margin-left: 1rem;
-  color: red;
-  padding: 0.5rem 1rem;
+  color: var(--white);
   cursor: pointer;
-  z-index: 99;
+  size: 1.3rem;
 }
