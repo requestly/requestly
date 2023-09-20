@@ -15,12 +15,15 @@ import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions
 import { redirectToRules } from "utils/RedirectionUtils";
 
 import "./index.css";
+import { toast } from "utils/Toast";
 
 const SignInViaEmailLink = () => {
   //Component State
-  const [userEmail, setUserEmail] = useState("");
+  const [userEmailfromLocalStorage, setUserEmailfromLocalStorage] = useState("");
+  const [emailInput, setEmailInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCustomLoginFlow, setIsCustomLoginFlow] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
 
   //Global State
   const dispatch = useDispatch();
@@ -40,26 +43,33 @@ const SignInViaEmailLink = () => {
     const shouldLogout = window.confirm(
       `You are already logged in${
         user.email ? ` as ${user.email}` : ""
-      }. Do you want to continue login as ${userEmail}?`
+      }. Do you want to continue login as ${userEmailfromLocalStorage}?`
     );
     if (shouldLogout === true) {
       logOutUser();
     } else {
-      redirectToRules(navigate);
+      setIsEmailLoginLinkDone(true);
     }
     return <SpinnerColumn />;
-  }, [user.email, userEmail, logOutUser, navigate]);
+  }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
   useEffect(() => {
     if (user.loggedIn && isEmailLoginLinkDone) {
+      const name = user?.displayName?.split(" ")[0];
+      let message = isLogin ? "Welcome back to Requestly!" : "Welcome to Requestly!";
+      if (name) {
+        message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
+      }
+      toast.success(message);
       redirectToRules(navigate);
     }
-  }, [user.loggedIn, isEmailLoginLinkDone, navigate]);
+  }, [user.loggedIn, isEmailLoginLinkDone, navigate, isLogin, user.displayName, user.email]);
 
   const handleLogin = useCallback(
-    (email) => {
-      const loginEmail = email || userEmail;
+    (emailToUseForLogin) => {
+      const loginEmail = emailToUseForLogin;
       if (loginEmail) {
+        console.log("hit here somehow");
         setIsProcessing(true);
         if (user.loggedIn) {
           renderAlreadyLoggedInWarning();
@@ -70,6 +80,7 @@ const SignInViaEmailLink = () => {
               const { authData, isNewUser } = response;
               if (authData) {
                 window.localStorage.removeItem("RQEmailForSignIn");
+                setIsLogin(!isNewUser);
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
                 setIsProcessing(false);
                 setIsEmailLoginLinkDone(true);
@@ -77,20 +88,25 @@ const SignInViaEmailLink = () => {
             }
           })
           .catch(() => {
-            // toast.error("Something went wrong, Please contact ");
             setIsProcessing(false);
-            setUserEmail(null);
+            setUserEmailfromLocalStorage(null);
           });
       } else {
         window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
       }
     },
-    [userEmail, user.loggedIn, renderAlreadyLoggedInWarning]
+    [user.loggedIn, renderAlreadyLoggedInWarning]
   );
 
   const renderEmailInputForm = () => {
     return (
       <div className="email-entry-form-container">
+        <Row>
+          <Typography.Title level={3}>
+            Hey, It appears that you are accessing Requestly from a new web browser. Kindly re-enter your email address
+            to proceed.
+          </Typography.Title>
+        </Row>
         <Row className="w-100 mb-16">
           <Col span={6}>
             <label htmlFor="SignInViaEmailLinkInputField" className="text-bold auth-modal-input-label">
@@ -104,9 +120,9 @@ const SignInViaEmailLink = () => {
               placeholder="name@example.com"
               type="email"
               required
-              value={userEmail ? userEmail : ""}
+              value={emailInput}
               onChange={(e) => {
-                setUserEmail(e.target.value);
+                setEmailInput(e.target.value);
               }}
             />
           </Col>
@@ -118,9 +134,10 @@ const SignInViaEmailLink = () => {
             size="large"
             onClick={(e) => {
               e.preventDefault();
-              handleLogin();
+              console.log("triggered by button click");
+              handleLogin(emailInput);
             }}
-            loading={userEmail && isProcessing}
+            loading={isProcessing}
           >
             Login
           </RQButton>
@@ -131,12 +148,14 @@ const SignInViaEmailLink = () => {
 
   useEffect(() => {
     const emailFromStorage = window.localStorage.getItem("RQEmailForSignIn");
+
     if (!emailFromStorage) setIsCustomLoginFlow(true);
     else {
       const email = isEmailValid(emailFromStorage) ? emailFromStorage : null;
 
-      setUserEmail(emailFromStorage);
+      setUserEmailfromLocalStorage(email);
       if (!user.isLoggedIn && email) {
+        console.log("triggered by useEffect");
         handleLogin(email);
       }
     }

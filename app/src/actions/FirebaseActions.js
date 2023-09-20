@@ -189,7 +189,11 @@ export async function signUp(name, email, password, refCode, source) {
     });
 }
 
-export async function sendEmailLinkForSignin(email, source) {
+export async function sendEmailLinkForSignin(
+  email,
+  source,
+  toastMessage = "Please check your email for instructions to login."
+) {
   const auth = getAuth(firebaseApp);
   return sendSignInLinkToEmail(auth, email, {
     url: window.location.href,
@@ -197,7 +201,7 @@ export async function sendEmailLinkForSignin(email, source) {
   })
     .then((res) => {
       window.localStorage.setItem("RQEmailForSignIn", email);
-      toast.info("Please check your email for instructions to login.");
+      toast.info(toastMessage);
       trackEmailLoginLinkGenerated(email, source);
     })
     .catch((err) => {

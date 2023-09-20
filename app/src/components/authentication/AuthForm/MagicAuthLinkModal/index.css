@@ -42,3 +42,12 @@
 .mail-link-modal-message {
   gap: 1px !important;
 }
+
+.modal-back-btn {
+  margin-top: 1rem;
+  margin-left: 1rem;
+  color: red;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 99;
+}

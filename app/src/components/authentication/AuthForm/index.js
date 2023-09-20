@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -33,13 +33,15 @@ import {
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode } from "../../../store/selectors";
+import { getAppMode, getTimeToResendEmailLogin } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
 import { AuthFormHero } from "./AuthFormHero";
 import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -51,6 +53,7 @@ const AuthForm = ({
   callbacks,
   isOnboardingForm,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
@@ -59,9 +62,11 @@ const AuthForm = ({
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
   const path = window.location.pathname;
+  const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   const [actionPending, setActionPending] = useState(false);
-  const [name, setName] = useState("");
+  const [lastEmailInputHandled, setLastEmailInputHandled] = useState("");
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState();
   // const [emailOptin, setEmailOptin] = useState(false);
@@ -83,6 +88,14 @@ const AuthForm = ({
       setTrackEvent(false);
     }
   }, [eventSource, referralCode, trackEvent]);
+
+  useEffect(() => {
+    if (timeToResendEmailLogin !== 0) {
+      if (lastEmailInputHandled !== email) {
+        dispatch(actions.updateTimeToResendEmailLogin(0));
+      }
+    }
+  }, [dispatch, email, lastEmailInputHandled, timeToResendEmailLogin]);
 
   const handleGoogleSignInButtonClick = () => {
     setActionPending(true);
@@ -216,10 +229,28 @@ const AuthForm = ({
     switch (MODE) {
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
-        return <GenerateLoginLinkBtn email={email} authMode={AUTH_ACTION_LABELS.LOG_IN} eventSource={eventSource} />;
+        return (
+          <GenerateLoginLinkBtn
+            email={email}
+            authMode={AUTH_ACTION_LABELS.LOG_IN}
+            eventSource={eventSource}
+            callback={() => {
+              setLastEmailInputHandled(email);
+            }}
+          />
+        );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
-        return <GenerateLoginLinkBtn email={email} authMode={AUTH_ACTION_LABELS.SIGN_UP} eventSource={eventSource} />;
+        return (
+          <GenerateLoginLinkBtn
+            email={email}
+            authMode={AUTH_ACTION_LABELS.SIGN_UP}
+            eventSource={eventSource}
+            callback={() => {
+              setLastEmailInputHandled(email);
+            }}
+          />
+        );
       case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
         return (
           <RQButton
@@ -269,7 +300,6 @@ const AuthForm = ({
                 SET_MODE(AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD);
                 SET_POPOVER(false);
                 setEmail("");
-                setName("");
                 setPassword("");
               }}
             >
@@ -345,31 +375,6 @@ const AuthForm = ({
     }
   };
 
-  const renderNameField = () => {
-    switch (MODE) {
-      case AUTH_ACTION_LABELS.SIGN_UP:
-        return (
-          <Row className="w-full">
-            <label htmlFor="username" className="text-bold auth-modal-input-label">
-              Your name
-            </label>
-            <RQInput
-              id="username"
-              className="auth-modal-input"
-              required={true}
-              placeholder="John Doe"
-              type="text"
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-            />
-          </Row>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   const renderEmailField = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.DO_RESET_PASSWORD:
@@ -398,20 +403,21 @@ const AuthForm = ({
     }
   };
 
-  const onSignInClick = () => {
+  const onSignInClick = useCallback(() => {
     SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
     SET_POPOVER(true);
     setEmail("");
-    setName("");
     setPassword("");
-  };
+    dispatch(actions.updateTimeToResendEmailLogin(0));
+  }, [SET_MODE, SET_POPOVER, dispatch]);
 
-  const onCreateAccountClick = () => {
+  const onCreateAccountClick = useCallback(() => {
     SET_MODE(AUTH_ACTION_LABELS.SIGN_UP);
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
-  };
+    dispatch(actions.updateTimeToResendEmailLogin(0));
+  }, [SET_MODE, SET_POPOVER, dispatch]);
 
   return (
     <Row className="bg-secondary shadow border-0 auth-modal">
@@ -432,11 +438,10 @@ const AuthForm = ({
                 </RQButton>
               </Row>
               <Row className="auth-wrapper mt-1">
-                {renderNameField()}
+                <SocialAuthButtons />
+                <div className="auth-modal-divider w-full">or sign up through email</div>
                 {renderEmailField()}
                 <FormSubmitButton />
-                <div className="auth-modal-divider w-full">or</div>
-                <SocialAuthButtons />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
                   <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
@@ -465,9 +470,7 @@ const AuthForm = ({
           </Row>
           <Row className="auth-wrapper mt-1">
             <SocialAuthButtons />
-            <div className="auth-modal-divider w-full mb-0" style={{ marginBottom: "-20px" }}>
-              or sign in with email
-            </div>
+            <div className="auth-modal-divider w-full mb-0">or sign in with email</div>
             {renderEmailField()}
             <FormSubmitButton />
           </Row>

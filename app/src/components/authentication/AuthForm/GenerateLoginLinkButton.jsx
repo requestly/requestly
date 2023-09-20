@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 import { actions } from "store";
 import { updateTimeToResendEmailLogin } from "./MagicAuthLinkModal/actions";
 
-export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource }) {
+export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource, callback }) {
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   const dispatch = useDispatch();
 
@@ -36,9 +36,10 @@ export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource 
             },
           })
         );
+        callback && callback();
       });
     }
-  }, [dispatch, email, authMode, eventSource, startResetTimerAndAnimation]);
+  }, [dispatch, email, authMode, eventSource, startResetTimerAndAnimation, callback]);
 
   return timeToResendEmailLogin > 0 ? (
     <RQButton
@@ -51,7 +52,7 @@ export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource 
   ) : (
     <RQButton className="form-elements-margin w-full" onClick={handleBtnClick}>
       {" "}
-      Get Started
+      Continue with Email
     </RQButton>
   );
 }

@@ -1,10 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 //SUB COMPONENTS
 
 //STYLES
 // import "./AuthModal.css";
-import closeIcon from "assets/images/modal/close.svg";
+// import closeIcon from "assets/images/modal/close.svg";
 import { getUserAuthDetails } from "store/selectors";
 import MagicLinkModalContent from "./MagicLinkModalContent";
 import { isEmailValid } from "utils/FormattingHelper";
@@ -16,7 +17,7 @@ const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource 
   const user = useSelector(getUserAuthDetails);
   return email && isEmailValid(email) ? (
     <>
-      <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggleModal()} alt="close-icon" />
+      {/* <img src={BiArrowBac} width={15} className="modal-close-icon" onClick={() => toggleModal()} alt="close-icon" /> */}
       <RQModal
         size="small"
         open={!user.loggedIn && isOpen}
@@ -29,6 +30,7 @@ const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource 
         wrapClassName="mail-link-modal-wrapper"
         closable={false}
       >
+        <BiArrowBack className="modal-back-btn" onClick={() => toggleModal()} alt="close-icon" />
         <MagicLinkModalContent
           eventSource={eventSource}
           email={email}
