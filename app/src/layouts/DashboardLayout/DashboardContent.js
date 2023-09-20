@@ -31,6 +31,7 @@ import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import PATHS from "config/constants/sub/paths";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -133,10 +134,15 @@ const DashboardContent = () => {
               {...activeModals.connectedAppsModal.props}
             />
           ) : null}
-          {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          {!userPersona.isSurveyCompleted &&
+          !user?.loggedIn &&
+          appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+          location.pathname !== PATHS.APPSUMO.RELATIVE ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          {!isWorkspaceOnboardingCompleted &&
+          appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+          location.pathname !== PATHS.APPSUMO.RELATIVE ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
               handleUploadRulesModalClick={toggleImportRulesModal}
