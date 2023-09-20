@@ -4,6 +4,10 @@ import { RQNetworkEventErrorCodes, RQSessionAttributes } from "@requestly/web-sd
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import { captureException } from "@sentry/react";
 
+const getStringifiedData = (data: unknown) => {
+  return typeof data === "string" ? data : JSON.stringify(data) ?? "";
+};
+
 const getRequestObject = (networkLog: NetworkLog) => {
   let queryString = [] as RQNetworkLog["entry"]["request"]["queryString"];
 
@@ -27,7 +31,7 @@ const getRequestObject = (networkLog: NetworkLog) => {
       mimeType: "",
       text: networkLog?.errors?.includes(RQNetworkEventErrorCodes.REQUEST_TOO_LARGE)
         ? "Payload too large to capture"
-        : networkLog.requestData,
+        : getStringifiedData(networkLog.requestData),
       comment: "",
     },
   } as RQNetworkLog["entry"]["request"];
@@ -43,7 +47,7 @@ const getResponseObject = (networkLog: NetworkLog) => {
       mimeType: networkLog.contentType,
       text: networkLog?.errors?.includes(RQNetworkEventErrorCodes.RESPONSE_TOO_LARGE)
         ? "Payload too large to capture"
-        : networkLog.response,
+        : getStringifiedData(networkLog.response),
       comment: "",
     },
     redirectURL: networkLog.responseURL,
