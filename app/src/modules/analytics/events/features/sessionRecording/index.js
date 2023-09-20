@@ -112,3 +112,12 @@ export const trackSessionRecordingUpload = (status) => {
 export const trackNewSessionClicked = () => {
   trackEvent(SESSION_RECORDING.NEW_SESSION_CLICKED);
 };
+
+// CONTEXT MENU
+export const trackSessionRecordingNetworkLogContextMenuOpen = () => {
+  trackEvent(SESSION_RECORDING.network_log_context_menu_open);
+};
+
+export const trackSessionRecordingNetworkLogContextMenuOptionClicked = (option) => {
+  trackEvent(SESSION_RECORDING.network_log_context_menu_option_clicked, { option });
+};
