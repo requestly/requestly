@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ReactMultiEmail } from "react-multi-email";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
-import WorkspaceDropdown from "../pricing/ComparisonTable/v2-free-enterprise/WorkspaceDropdown";
+import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
 import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
 import { arrayUnion, doc, getFirestore, updateDoc, increment } from "firebase/firestore";
 import firebaseApp from "../../../firebase";

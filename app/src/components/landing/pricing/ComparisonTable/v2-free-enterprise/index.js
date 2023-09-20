@@ -16,7 +16,7 @@ import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/
 import { Switch, Tag } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
-import WorkspaceDropdown from "./WorkspaceDropdown";
+import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
@@ -179,7 +179,11 @@ const FreeAndEnterprisePlanTable = () => {
           />
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
-        <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+        <WorkspaceDropdown
+          workspaceToUpgrade={workspaceToUpgrade}
+          setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+          className="pricing-workspace-selector"
+        />
         <div className="pricing-table-product-wrapper">
           <div className="pricing-table-product-view">
             <h1>Products</h1>
