@@ -8,6 +8,19 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.9.20",
+    logs: [
+      "chore: removed ph-asset (#1018)",
+      "[RQ-824] feat: Requestly devtools request support (#1030)",
+      "[RQ-824] feat: Requestly Devtools response body support (#1032)",
+      "[RQ-811] fix: session replay icon display issue (#1028)",
+      "[RQ-857] added communication for response modification in test rule widget (#1035)",
+      "added emoji in requestly devtools tab name (#1047)",
+      "[RQ-871] added communication for response header modification in test rule widget (#1045)",
+      "[RQ-802] feat: integration of session replay with test this rule (#1051)",
+    ],
+  },
+  {
     version: "23.9.2",
     logs: [
       "fix: need to double click on session recording on-page widget (#1008)",
