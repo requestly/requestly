@@ -57,10 +57,10 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector, excludeColumns, extraColumns]
   );
 
-  const finalDetailsTabs = useMemo(() => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs], [
-    networkEntrySelector,
-    extraDetailsTabs,
-  ]);
+  const finalDetailsTabs = useMemo(
+    () => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs],
+    [networkEntrySelector, extraDetailsTabs]
+  );
 
   const isFailed = useCallback(
     (log: NetworkLog) => {
