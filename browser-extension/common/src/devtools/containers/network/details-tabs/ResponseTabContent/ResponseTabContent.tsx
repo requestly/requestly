@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
-import * as monaco from "monaco-editor";
 import Editor, { loader } from "@monaco-editor/react";
 import { createRule, generateRuleName, getBaseUrl, isContentBodyEditable } from "../../../../utils";
 import { Button, Collapse, Tooltip } from "antd";
@@ -11,8 +10,6 @@ import "./responseTabContent.scss";
 interface Props {
   networkEvent: NetworkEvent;
 }
-
-loader.config({ monaco });
 
 enum EditorLanguage {
   JSON = "json",
@@ -42,7 +39,6 @@ const getEditorLanguageFromMimeType = (mimeType: string) => {
 const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
   const [response, setResponse] = useState(null);
   const [isEditorMount, setIsEditorMount] = useState(false);
-  // @ts-ignore
   const [editorLangugage, setEditorLanguage] = useState("");
 
   useEffect(() => {
@@ -118,7 +114,7 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
       {isEditorMount && (
         <Editor
           theme={"vs-dark"}
-          // language={editorLangugage} // Disabling this as it was causing errors due to workers
+          language={editorLangugage}
           value={response}
           height={"95%"}
           options={{

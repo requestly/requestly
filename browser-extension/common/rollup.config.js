@@ -54,7 +54,6 @@ export default [
     output: {
       file: `${OUTPUT_DIR}/devtools/index.js`,
       format: "iife",
-      inlineDynamicImports: true,
     },
     context: "window",
     plugins: [
@@ -62,10 +61,6 @@ export default [
         targets: [
           {
             src: ["src/devtools/devtools.html", "src/devtools/devtools.js", "src/devtools/index.html"],
-            dest: `${OUTPUT_DIR}/devtools`,
-          },
-          {
-            src: ["src/devtools/assets/*"], // For monaco editor
             dest: `${OUTPUT_DIR}/devtools`,
           },
         ],
