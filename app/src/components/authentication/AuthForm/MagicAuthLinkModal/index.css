@@ -50,3 +50,8 @@
   cursor: pointer;
   size: 1.3rem;
 }
+
+.modal-loader {
+  min-height: 3rem;
+  width: 100%;
+}

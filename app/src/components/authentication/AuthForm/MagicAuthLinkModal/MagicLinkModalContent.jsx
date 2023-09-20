@@ -1,4 +1,4 @@
-import { Space, Typography } from "antd";
+import { Row, Space, Typography } from "antd";
 import AUTH from "config/constants/sub/auth";
 import { useSelector } from "react-redux";
 import { getTimeToResendEmailLogin } from "store/selectors";
@@ -42,7 +42,9 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
   };
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   return loading ? (
-    <FaSpinner />
+    <Row className="modal-loader" justify="center">
+      <FaSpinner />
+    </Row>
   ) : (
     <div className="mail-link-modal-content">
       <div className="mail-icon">
