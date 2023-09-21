@@ -28,16 +28,16 @@ export const renderHeroIcon = (currentVisibility, size = 16) => {
   switch (currentVisibility) {
     default:
     case Visibility.PUBLIC:
-      return <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />;
+      return <IoEarthOutline size={size} className="radio-hero-icon" />;
 
     case Visibility.CUSTOM:
-      return <FiUsers size={size} className="remix-icon radio-hero-icon" />;
+      return <FiUsers size={size} className="radio-hero-icon" />;
 
     case Visibility.ONLY_ME:
-      return <FiLock size={size} className="remix-icon radio-hero-icon" />;
+      return <FiLock size={size} className="radio-hero-icon" />;
 
     case Visibility.ORGANIZATION:
-      return <BsBuilding size={size} className="remix-icon radio-hero-icon" />;
+      return <BsBuilding size={size} className="radio-hero-icon" />;
   }
 };
 

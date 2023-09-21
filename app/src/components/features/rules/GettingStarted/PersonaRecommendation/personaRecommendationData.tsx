@@ -2,7 +2,9 @@ import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
-import { Document, PaperUpload, Video } from "react-iconly";
+import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
+import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
+import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { FeatureSection } from "./types";
 import { ApiOutlined } from "@ant-design/icons";
 import { FeatureReleaseTag } from "./types";
@@ -62,11 +64,7 @@ export const personaRecommendationData: FeatureSection[] = [
       {
         id: "record_session",
         title: "Record a session",
-        icon: () => (
-          <span className="remix-icon">
-            <Video set="curved" />
-          </span>
-        ),
+        icon: () => <FiVideo />,
         subTitle: "Record your browsing sessions along with network and console logs",
         link: PATHS.SESSIONS.ABSOLUTE,
         tag: FeatureReleaseTag.NEW,
@@ -81,11 +79,7 @@ export const personaRecommendationData: FeatureSection[] = [
       {
         id: "host_js_css",
         title: "Host JS/CSS",
-        icon: () => (
-          <span className="remix-icon">
-            <PaperUpload set="curved" />
-          </span>
-        ),
+        icon: () => <MdOutlineUploadFile />,
         subTitle: "Host your JS/CSS/HTML files and use them anywhere for debugging",
         link: PATHS.FILE_SERVER_V2.ABSOLUTE,
       },
@@ -97,11 +91,7 @@ export const personaRecommendationData: FeatureSection[] = [
       {
         id: "new_api_end_point",
         title: "New API endpoint",
-        icon: () => (
-          <span className="remix-icon">
-            <Document set="curved" />
-          </span>
-        ),
+        icon: () => <IoDocumentTextOutline />,
         subTitle: "Create mocks for your APIs",
         link: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       },

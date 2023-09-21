@@ -10,7 +10,8 @@ import { MdReportGmailerrorred } from "@react-icons/all-files/md/MdReportGmailer
 import { TbArrowsDownUp } from "@react-icons/all-files/tb/TbArrowsDownUp";
 import { BiBook } from "@react-icons/all-files/bi/BiBook";
 import { BiShuffle } from "@react-icons/all-files/bi/BiShuffle";
-import { Document, PaperUpload } from "react-iconly";
+import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
+import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { HiOutlineUserGroup } from "@react-icons/all-files/hi/HiOutlineUserGroup";
 import { IoPersonAddOutline } from "@react-icons/all-files/io5/IoPersonAddOutline";
 import {
@@ -115,7 +116,7 @@ export const config: PageConfig[] = [
           {
             id: "create mock api",
             title: "Create Mock API endpoint",
-            icon: <Document />,
+            icon: <IoDocumentTextOutline />,
             action: ({ navigate }: ActionProps) => {
               redirectToMocksList(navigate);
             },
@@ -123,7 +124,7 @@ export const config: PageConfig[] = [
           {
             id: "host files",
             title: "Host JS/CSS/HTML files",
-            icon: <PaperUpload />,
+            icon: <MdOutlineUploadFile />,
             action: ({ navigate }: ActionProps) => {
               redirectToFileMocksList(navigate);
             },
