@@ -1,0 +1,30 @@
+.rq-modal-content.appsumo-modal {
+  overflow: auto;
+  max-height: 550px;
+
+  .appsumo-code-input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 4px;
+
+    .appsumo-code-error {
+      text-align: right;
+      padding: 2px 0;
+    }
+
+    .ant-input-suffix {
+      color: var(--success);
+    }
+  }
+
+  .remove-icon {
+    margin: auto 6px;
+    cursor: pointer;
+  }
+
+  .appsumo-add-btn {
+    font-size: 13px;
+    padding: 0;
+  }
+}

@@ -1,8 +1,9 @@
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
-import React, { useCallback, useEffect, useState } from "react";
-import { ReactMultiEmail } from "react-multi-email";
+import React, { useCallback, useMemo, useState } from "react";
+import { AiFillDelete } from "@react-icons/all-files/ai/AiFillDelete";
+import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
@@ -12,9 +13,10 @@ import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
 import { getUserAttributes } from "store/selectors";
 import { useSelector } from "react-redux";
+import "./index.scss";
 
 const codesList: Record<string, { redeemed: boolean }> = {
-  rqn87: { redeemed: false },
+  rqn87: { redeemed: true },
   rqp87: { redeemed: false },
   rq467: { redeemed: false },
   rqn78: { redeemed: false },
@@ -26,6 +28,18 @@ const PRIVATE_WORKSPACE = {
   accessCount: 1,
 };
 
+interface AppSumoCode {
+  error: string;
+  code: string;
+  verified: boolean;
+}
+
+const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
+  error: "",
+  code: "",
+  verified: false,
+};
+
 const db = getFirestore(firebaseApp);
 
 const AppSumoModal: React.FC = () => {
@@ -34,55 +48,67 @@ const AppSumoModal: React.FC = () => {
   //TODO: remove before merging
   const userAttributes = useSelector(getUserAttributes);
 
-  const [appSumoCodes, setAppSumoCodes] = useState<string[]>([]);
+  const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
-  const [isCodeCheckPassed, setIsCodeCheckPassed] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
 
-  const verifyCodes = useCallback(async () => {
-    setIsCodeCheckPassed(false);
-    setErrorMessage("");
+  const addAppSumoCodeInput = () => {
+    setAppsumoCodes((prev) => [...prev, { ...DEFAULT_APPSUMO_INPUT }]);
+  };
+
+  const removeAppSumoCodeInput = (index: number) => {
+    if (appsumoCodes.length === 1) return;
+    setAppsumoCodes((prev) => {
+      const codes = [...prev];
+      codes.splice(index, 1);
+      return codes;
+    });
+  };
+
+  const updateAppSumoCode = (index: number, key: keyof AppSumoCode, value: AppSumoCode[typeof key]) => {
+    setAppsumoCodes((prev) => {
+      const codes: AppSumoCode[] = [...prev];
+      (codes[index] as any)[key] = value;
+      return codes;
+    });
+  };
+
+  const verifyCode = (enteredCode: string, index: number) => {
+    if (!enteredCode) return;
+
+    if (!codesList[enteredCode]) {
+      updateAppSumoCode(index, "error", "Invalid code. Please contact support");
+      return;
+    }
+
+    if (codesList[enteredCode].redeemed) {
+      updateAppSumoCode(index, "error", "Code already redeemed. Please contact support");
+      return;
+    }
+    updateAppSumoCode(index, "error", "");
+    updateAppSumoCode(index, "verified", true);
+  };
+
+  const isAllCodeCheckPassed = useMemo(() => appsumoCodes.every((code) => code.verified), [appsumoCodes]);
+
+  const onSubmit = useCallback(async () => {
+    if (!isAllCodeCheckPassed || !userEmail) {
+      toast.warn("Please fill all the fields correctly", 10);
+    }
 
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
       const sessionReplayLifetime =
         (await getAttrFromFirebase("session_replay_lifetime_pro")) ?? userAttributes["session_replay_lifetime_pro"];
       if (sessionReplayLifetime?.code) {
-        setErrorMessage("You have already redeemed a code. Please contact support");
+        toast.warn("You have already redeemed a code. Please contact support", 10);
         return;
       }
-
-      if (appSumoCodes.length > 1) {
-        setErrorMessage("You can only redeem one code for private workspace");
-        return;
-      }
-    }
-
-    if (appSumoCodes.length > 0) {
-      const code = appSumoCodes[appSumoCodes.length - 1];
-
-      if (!codesList[code]) {
-        setErrorMessage("Invalid code. Please contact support");
-        return;
-      }
-
-      if (codesList[code].redeemed) {
-        setErrorMessage("Code already redeemed. Please contact support");
-        return;
-      }
-    }
-    setIsCodeCheckPassed(true);
-  }, [appSumoCodes, userAttributes, workspaceToUpgrade.id]);
-
-  const onSubmit = useCallback(async () => {
-    if (!isCodeCheckPassed) {
-      toast.warn("Please fill all the fields");
     }
 
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
       submitAttrUtil("session_replay_lifetime_pro", {
-        code: appSumoCodes[0],
+        code: appsumoCodes[0].code,
         date: new Date(),
         type: "appsumo",
       });
@@ -90,16 +116,12 @@ const AppSumoModal: React.FC = () => {
       const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
 
       await updateDoc(teamsRef, {
-        "appsumo.code": arrayUnion(...appSumoCodes),
+        "appsumo.code": arrayUnion(...appsumoCodes.map((code) => code.code)),
         "appsumo.date": Date.now(),
-        "appsumo.numCodesClaimed": increment(appSumoCodes.length),
+        "appsumo.numCodesClaimed": increment(appsumoCodes.length),
       });
     }
-  }, [appSumoCodes, isCodeCheckPassed, workspaceToUpgrade.id]);
-
-  useEffect(() => {
-    verifyCodes();
-  }, [verifyCodes, workspaceToUpgrade.id]);
+  }, [appsumoCodes, isAllCodeCheckPassed, userAttributes, userEmail, workspaceToUpgrade.id]);
 
   return (
     <RQModal
@@ -111,7 +133,7 @@ const AppSumoModal: React.FC = () => {
       maskStyle={{ background: "#0d0d10ef" }}
       keyboard={false}
     >
-      <div className="rq-modal-content">
+      <div className="rq-modal-content appsumo-modal">
         <div>
           <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
         </div>
@@ -127,40 +149,39 @@ const AppSumoModal: React.FC = () => {
           />
         </div>
         <div className="title mt-16">AppSumo Code(s)</div>
-        <div className="display-flex mt-8">
-          <div className="emails-input-wrapper">
-            <ReactMultiEmail
-              placeholder="Enter code here"
-              emails={appSumoCodes}
-              onChange={(codes) => {
-                setAppSumoCodes(codes);
-                verifyCodes();
-              }}
-              validateEmail={(_) => true}
-              getLabel={(code, index, removeCode) => (
-                <div data-tag key={index} className="multi-email-tag">
-                  {code}
-                  <span title="Remove" data-tag-handle onClick={() => removeCode(index)}>
-                    <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                  </span>
-                </div>
-              )}
-            />
+        {appsumoCodes.map((appsumoCode, index) => (
+          <div className="display-flex">
+            <div className="appsumo-code-input-container">
+              <RQInput
+                value={appsumoCode.code}
+                key={index}
+                onChange={(e) => {
+                  verifyCode(e.target.value, index);
+                  updateAppSumoCode(index, "code", e.target.value);
+                }}
+                suffix={appsumoCode.verified ? <MdOutlineVerified /> : null}
+                placeholder="Enter code here"
+              />
+              <div className="appsumo-code-error field-error-prompt">{appsumoCode.error || null}</div>
+            </div>
+            <div className="remove-icon" style={{ margin: "auto 6px", cursor: "pointer" }}>
+              <AiFillDelete onClick={() => removeAppSumoCodeInput(index)} />
+            </div>
           </div>
-        </div>
-        <div className="field-error-prompt" style={{ textAlign: "right", padding: "2px 0" }}>
-          {errorMessage ? errorMessage : null}
-        </div>
+        ))}
+        <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
+          + Add more codes
+        </RQButton>
       </div>
       <Row className="rq-modal-footer" justify={"end"}>
         <RQButton
           type="primary"
-          disabled={!isCodeCheckPassed || !userEmail}
+          disabled={!isAllCodeCheckPassed || !userEmail}
           onClick={() => {
             onSubmit().then(() => {
               toast.success(
                 `Lifetime access to Session Replay Pro unlocked for ${
-                  appSumoCodes.length > 1 ? `${appSumoCodes.length} members` : "you"
+                  appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
                 }`,
                 10
               );
