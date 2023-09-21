@@ -90,7 +90,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
           <div>{team.teamName}</div>
         </Col>
         <div className="text-gray">{team.teamAccessCount} members</div>
-        <Button loading={isJoining} type={isPrimary ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
+        <Button loading={isJoining} type="primary" onClick={() => handleJoinClick(team)}>
           {isJoining ? "Joining" : "Join"}
         </Button>
       </div>
