@@ -71,7 +71,8 @@ const AppSumoModal: React.FC = () => {
   };
 
   const verifyCode = debounce(async (enteredCode: string, index: number) => {
-    if (!enteredCode || enteredCode.length < 8) {
+    if (enteredCode.length < 8) {
+      updateAppSumoCode(index, "verified", false);
       return;
     }
 
@@ -91,7 +92,7 @@ const AppSumoModal: React.FC = () => {
     }
     updateAppSumoCode(index, "error", "");
     updateAppSumoCode(index, "verified", true);
-  }, 600);
+  }, 800);
 
   const redeemSubmittedCodes = useCallback(async () => {
     const batch = writeBatch(db);
