@@ -85,7 +85,7 @@ const get = require("lodash/get");
 const { Link } = Typography;
 
 //Constants
-const { RULES_LIST_TABLE_CONSTANTS, PATHS} = APP_CONSTANTS;
+const { RULES_LIST_TABLE_CONSTANTS, PATHS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
 const GROUP_RULES = RULES_LIST_TABLE_CONSTANTS.GROUP_RULES;
 const UNGROUPED_GROUP_ID = RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
@@ -420,11 +420,17 @@ const RulesTable = ({
   };
 
   const handleRuleNameOnClick = (e, rule) => {
-    e.stopPropagation();
-    if (isEditingEnabled) {
-      redirectToRuleEditor(navigate, rule.id, "my_rules");
-    } else if (openRuleViewerInModal) {
-      openRuleViewerInModal(rule);
+    const hrefLink = e.currentTarget.getAttribute("href");
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) {
+      window.open(hrefLink, "_blank");
+    } else {
+      e.stopPropagation();
+      if (isEditingEnabled) {
+        redirectToRuleEditor(navigate, rule.id, "my_rules");
+      } else if (openRuleViewerInModal) {
+        openRuleViewerInModal(rule);
+      }
     }
   };
 
@@ -594,7 +600,7 @@ const RulesTable = ({
               <Link
                 href={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
                 onClick={(e) => {
-                  e.preventDefault();
+                  // e.preventDefault();
                   handleRuleNameOnClick(e, record);
                 }}
               >
