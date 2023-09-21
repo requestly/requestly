@@ -95,11 +95,15 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
           </Col>
           <Col>
             <Row className="text-bold">
-              {member.displayName === "Requestly Extension"
-                ? "Requestly Enterprise Support"
-                : member.displayName +
-                  (member?.displayName ? "" : loggedInUserId === member.id ? " (You) " : "") +
-                  (billingExclude.includes(member.id) ? " (Free) " : "")}
+              {!member?.isPending
+                ? member?.displayName
+                  ? member?.displayName === "Requestly Extension"
+                    ? "Requestly Enterprise Support"
+                    : member?.displayName +
+                      (loggedInUserId === member.id ? " (You) " : "") +
+                      (billingExclude.includes(member.id) ? " (Free) " : "")
+                  : null
+                : null}
             </Row>
             <Row align={"middle"}>
               <span className="member-email">
