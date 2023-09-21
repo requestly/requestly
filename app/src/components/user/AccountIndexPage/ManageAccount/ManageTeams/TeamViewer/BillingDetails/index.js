@@ -8,11 +8,16 @@ import BillingFooter from "./BillingFooter";
 import { toast } from "utils/Toast.js";
 import APP_CONSTANTS from "config/constants";
 import "./BillingDetails.css";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import firebaseApp from "../../../../../../../firebase";
+
+const db = getFirestore(firebaseApp);
 
 // Common Component for Team & Individual Payments
 const BillingDetails = ({ teamId, isTeamAdmin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState({});
+  const [appSumoSubscriptionInfo, setAppSumoSubscriptionInfo] = useState({});
 
   useEffect(() => {
     setIsLoading(true);
@@ -30,6 +35,17 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
         toast.error("You might not have permission to manage the team members.");
       })
       .finally(() => setIsLoading(false));
+  }, [teamId]);
+
+  useEffect(() => {
+    const teamsRef = doc(db, "teams", teamId);
+
+    getDoc(teamsRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setAppSumoSubscriptionInfo(data.appsumo);
+      }
+    });
   }, [teamId]);
 
   // const handleRedirectToUpdatePaymentMethod = () => {
@@ -59,6 +75,15 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
       )}
 
       <SubscriptionActionButtons isSubscriptionActive={isSubscriptionActive} />
+      {appSumoSubscriptionInfo && (
+        <>
+          <Divider className="manage-workspace-divider" />
+          <div className="title billing-title">Session Replay Lifetime Pro</div>
+          <p className="text-dark-gray billing-subscription-info">
+            {`This workspace has an active Session Replay Lifetime Pro subscription for ${appSumoSubscriptionInfo.codes.length} members.`}
+          </p>
+        </>
+      )}
 
       <Divider className="manage-workspace-divider" />
       <div className="title billing-invoice-container">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProCard from "@ant-design/pro-card";
 // UTILS
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAttributes, getUserAuthDetails } from "../../../../../store/selectors";
 // SUB COMPONENTS
 import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
@@ -18,22 +18,32 @@ const ActiveLicenseInfo = ({
   //Global State
   const user = useSelector(getUserAuthDetails);
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
+  const [sessionReplatLifeTimeDetails, setSessionReplatLifeTimeDetails] = useState({});
 
   const { type, status, planName, subscription } = user.details?.planDetails ?? {};
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
   const doesSubscriptionExist = !!type && !!status && !!planName;
+
+  //TODO: remove before merging
+  const userAttributes = useSelector(getUserAttributes);
 
   useEffect(() => {
     getAttrFromFirebase("session_replay_lifetime_pro")
       .then((val) => {
         if (val) {
           setIsSessionReplayLifetimeActive(true);
+          setSessionReplatLifeTimeDetails(val);
         }
       })
       .catch(() => {
         // do nothing
       });
-  });
+
+    if (userAttributes["session_replay_lifetime_pro"]) {
+      setIsSessionReplayLifetimeActive(true);
+      setSessionReplatLifeTimeDetails(userAttributes["session_replay_lifetime_pro"]);
+    }
+  }, [userAttributes]);
 
   const renderSubscriptionInfo = () => {
     return (
@@ -69,10 +79,10 @@ const ActiveLicenseInfo = ({
           <SubscriptionInfo
             hideShadow={hideShadow}
             subscriptionDetails={{
-              validFrom: new Date("2023-08-16T00:00:00Z").getTime(),
+              validFrom: new Date(sessionReplatLifeTimeDetails.date).getTime(),
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
-              type: "producthunt",
+              type: sessionReplatLifeTimeDetails.type ?? "producthunt",
               planName: "Session Replay Pro",
             }}
           />

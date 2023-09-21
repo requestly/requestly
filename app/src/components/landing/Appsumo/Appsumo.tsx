@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
 import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
-import { arrayUnion, doc, getFirestore, updateDoc, increment } from "firebase/firestore";
+import { arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
 import { getUserAttributes } from "store/selectors";
@@ -115,11 +115,9 @@ const AppSumoModal: React.FC = () => {
       });
     } else {
       const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-
       await updateDoc(teamsRef, {
-        "appsumo.code": arrayUnion(...appsumoCodes.map((code) => code.code)),
+        "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
         "appsumo.date": Date.now(),
-        "appsumo.numCodesClaimed": increment(appsumoCodes.length),
       });
     }
   }, [appsumoCodes, isAllCodeCheckPassed, userAttributes, userEmail, workspaceToUpgrade.id]);
