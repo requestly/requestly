@@ -99,7 +99,7 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
     <Dropdown overlay={menu}>
       <AntButton>
         <span style={{ textTransform: "capitalize", cursor: "pointer" }}>
-          {isEmpty(currentValue) ? "Choose" : currentValue} <RiArrowDropDownLine className="remix-icon" />
+          {isEmpty(currentValue) ? "Choose" : currentValue} <RiArrowDropDownLine />
         </span>
       </AntButton>
     </Dropdown>
