@@ -319,7 +319,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       </Skeleton>
     </div>
   ) : (
-    <ExtensionDeactivationMessage />
+    <div className="w-full">
+      <ExtensionDeactivationMessage />
+    </div>
   );
 };
 
