@@ -8,20 +8,13 @@ import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
 import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
-import { arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, getFirestore, updateDoc, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
 import { getUserAttributes } from "store/selectors";
 import { useSelector } from "react-redux";
 import "./index.scss";
 import { debounce } from "lodash";
-
-const codesList: Record<string, { redeemed: boolean }> = {
-  rqn87: { redeemed: true },
-  rqp87: { redeemed: false },
-  rq467: { redeemed: false },
-  rqn78: { redeemed: false },
-};
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -67,6 +60,8 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
+  const isAllCodeCheckPassed = useMemo(() => appsumoCodes.every((code) => code.verified), [appsumoCodes]);
+
   const updateAppSumoCode = (index: number, key: keyof AppSumoCode, value: AppSumoCode[typeof key]) => {
     setAppsumoCodes((prev) => {
       const codes: AppSumoCode[] = [...prev];
@@ -75,23 +70,37 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
-  const verifyCode = debounce((enteredCode: string, index: number) => {
-    if (!enteredCode) return;
-
-    if (!codesList[enteredCode]) {
-      updateAppSumoCode(index, "error", "Invalid code. Please contact support");
+  const verifyCode = debounce(async (enteredCode: string, index: number) => {
+    if (!enteredCode || enteredCode.length < 5) {
       return;
     }
 
-    if (codesList[enteredCode].redeemed) {
+    const docRef = doc(db, "appSumoCodes", enteredCode);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      updateAppSumoCode(index, "error", "Invalid code. Please contact support");
+      updateAppSumoCode(index, "verified", false);
+      return;
+    }
+
+    if (docSnap.data()?.redeemed) {
       updateAppSumoCode(index, "error", "Code already redeemed. Please contact support");
+      updateAppSumoCode(index, "verified", false);
       return;
     }
     updateAppSumoCode(index, "error", "");
     updateAppSumoCode(index, "verified", true);
   }, 1000);
 
-  const isAllCodeCheckPassed = useMemo(() => appsumoCodes.every((code) => code.verified), [appsumoCodes]);
+  const redeemSubmittedCodes = useCallback(async () => {
+    const batch = writeBatch(db);
+    appsumoCodes.forEach((code) => {
+      const docRef = doc(db, "appSumoCodes", code.code);
+      batch.update(docRef, { redeemed: true });
+    });
+    await batch.commit();
+  }, [appsumoCodes]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || !userEmail) {
@@ -103,7 +112,7 @@ const AppSumoModal: React.FC = () => {
         (await getAttrFromFirebase("session_replay_lifetime_pro")) ?? userAttributes["session_replay_lifetime_pro"];
       if (sessionReplayLifetime?.code) {
         toast.warn("You have already redeemed a code. Please contact support", 10);
-        return;
+        throw new Error("You have already redeemed a code. Please contact support");
       }
     }
 
@@ -115,12 +124,13 @@ const AppSumoModal: React.FC = () => {
       });
     } else {
       const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-      await updateDoc(teamsRef, {
+      updateDoc(teamsRef, {
         "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
         "appsumo.date": Date.now(),
       });
     }
-  }, [appsumoCodes, isAllCodeCheckPassed, userAttributes, userEmail, workspaceToUpgrade.id]);
+    await redeemSubmittedCodes();
+  }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userAttributes, userEmail, workspaceToUpgrade.id]);
 
   return (
     <RQModal
@@ -181,15 +191,19 @@ const AppSumoModal: React.FC = () => {
           type="primary"
           disabled={!isAllCodeCheckPassed || !userEmail}
           onClick={() => {
-            onSubmit().then(() => {
-              toast.success(
-                `Lifetime access to Session Replay Pro unlocked for ${
-                  appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
-                }`,
-                10
-              );
-              redirectToRoot(navigate);
-            });
+            onSubmit()
+              .then(() => {
+                toast.success(
+                  `Lifetime access to Session Replay Pro unlocked for ${
+                    appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
+                  }`,
+                  10
+                );
+                redirectToRoot(navigate);
+              })
+              .catch(() => {
+                // do nothing
+              });
           }}
         >
           Unlock Deal

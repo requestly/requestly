@@ -17,7 +17,7 @@ const db = getFirestore(firebaseApp);
 const BillingDetails = ({ teamId, isTeamAdmin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState({});
-  const [appSumoSubscriptionInfo, setAppSumoSubscriptionInfo] = useState({});
+  const [appSumoSubscriptionInfo, setAppSumoSubscriptionInfo] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -43,7 +43,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
     getDoc(teamsRef).then((docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setAppSumoSubscriptionInfo(data.appsumo);
+        setAppSumoSubscriptionInfo(data?.appsumo);
       }
     });
   }, [teamId]);
@@ -80,7 +80,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
           <Divider className="manage-workspace-divider" />
           <div className="title billing-title">Session Replay Lifetime Pro</div>
           <p className="text-dark-gray billing-subscription-info">
-            {`This workspace has an active Session Replay Lifetime Pro subscription for ${appSumoSubscriptionInfo.codes.length} members.`}
+            {`This workspace has an active Session Replay Lifetime Pro subscription for ${appSumoSubscriptionInfo?.codes?.length} members.`}
           </p>
         </>
       )}
