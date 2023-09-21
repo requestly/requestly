@@ -72,6 +72,7 @@ const OnboardingScreen: React.FC = () => {
           type="text"
           className="view-all-link"
           onClick={() => {
+            sendEvent(EVENT.EXTENSION_VIEW_ALL_MODIFICATIONS_CLICKED);
             window.open(`${config.WEB_URL}/rules/create?source=popup`, "_blank");
           }}
         >
