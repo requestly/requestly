@@ -1,7 +1,6 @@
 // import firebase from "../firebase";
 // Firebase App
 import firebaseApp from "firebase.js";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -54,7 +53,6 @@ import {
   trackVerifyOobCodeSuccess,
 } from "modules/analytics/events/common/auth/verifyOobcode";
 import { sanitizeDataForFirebase } from "utils/Misc";
-import { createNewUsername } from "backend/auth/username";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
@@ -125,20 +123,11 @@ export async function signUp(name, email, password, refCode, source) {
         photoURL: `https://www.gravatar.com/avatar/${md5(email)}`,
       })
         .then(() => {
-          const functions = getFunctions();
-          const addUserToCRM = httpsCallable(functions, "addUserToCRM");
-          addUserToCRM({});
           const authData = getAuthData(result.user);
           const database = getDatabase();
           return update(ref(database, getUserProfilePath(authData.uid)), authData)
             .then(() => {
               Logger.log("Profile Created Successfully");
-
-              createNewUsername(authData.uid)
-                .then((username) => {
-                  // Do Nothing
-                })
-                .catch((e) => Logger.error(e));
 
               trackSignupSuccessEvent({
                 auth_provider: AUTH_PROVIDERS.EMAIL,
@@ -377,12 +366,6 @@ export async function googleSignIn(callback, MODE, source) {
         });
         setSignupDate(uid);
         setEmailVerified(uid, true);
-
-        createNewUsername(uid)
-          .then((username) => {
-            // Do Nothing
-          })
-          .catch((e) => Logger.error(e));
       } else {
         trackLoginAttemptedEvent({
           auth_provider: AUTH_PROVIDERS.GMAIL,

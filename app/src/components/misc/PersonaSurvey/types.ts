@@ -1,48 +1,45 @@
 import { ReactNode } from "react";
 
 export interface UserPersona {
-  page: number;
+  page: number | SurveyPage;
   isSurveyCompleted: boolean;
   persona: string;
   referralChannel?: string;
-  useCases: multipleChoiceOption[];
+  useCases?: string[];
   numberOfEmployees?: string;
+  industry?: string | OtherOption;
 }
 
+export type OtherOption = {
+  type: "other";
+  value: string;
+};
+
 export interface Option {
-  type?: string;
-  title: string;
+  type?: "other" | "select";
+  title: string | null;
   icon?: string | ReactNode;
 }
 
+export interface Visibility {
+  userPersona: UserPersona;
+}
 export interface PageConfig {
-  pageId: number;
+  page?: number;
+  pageId: SurveyPage;
   title: string;
   subTitle: string;
   /**
-   * If skip true then don't show the question in survey
+   *  If skip true then don't show the page in survey
    */
   skip?: boolean;
   render?: QuestionnaireType | (() => ReactNode);
+  visibility: ({ userPersona }: Visibility) => boolean;
 }
 
 export interface SurveyOptionsConfig {
-  key: string;
-  questionType: "single" | "multiple";
-  isActive?: (props: ActiveProps) => boolean;
-  action?: (dispatch: any, value: string, clear: boolean, optionType?: string) => void;
-  conditional?: any;
+  questionResponseAction?: (dispatch: any, value: string | OtherOption, doClear: boolean) => void;
   options?: Option[];
-}
-
-export interface multipleChoiceOption {
-  optionType: "select" | "other";
-  value: "string";
-}
-export interface ActiveProps {
-  key: string | multipleChoiceOption[];
-  title: string;
-  optionType?: "select" | "other";
 }
 
 export enum PersonaType {
@@ -57,4 +54,12 @@ export enum PersonaType {
 
 export enum QuestionnaireType {
   PERSONA = "persona",
+  INDUSTRY = "industry",
+}
+
+export enum SurveyPage {
+  GETTING_STARTED = "getting_started",
+  PERSONA = "persona",
+  INDUSTRY = "industry",
+  RECOMMENDATIONS = "recommendations",
 }

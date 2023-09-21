@@ -20,9 +20,15 @@ export const SESSION_RECORDING = {
   session_recording_name_updated: "session_recording_name_updated",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
+  session_recording_upload: "session_recording_upload",
+  session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
+  NEW_SESSION_CLICKED: "new_session clicked",
+  network_log_context_menu_open: "network_log_context_menu_open",
+  network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
 
   ONBAORDING: {
-    youtube_link_clicked: "session_onboarding_youtube_link_clicked",
+    onboarding_page_viewed: "session_onboarding_page_viewed",
+    sample_session_viewed: "sample_session_viewed",
     start_recording_clicked: "start_recording_btn_clicked",
     invalid_recording_url: "invalid_recording_url_entered",
     navigate_to_target_website: "navigated_to_recording_target",
@@ -196,15 +202,28 @@ export const TEST_URL_CONDITION = {
   TEST_URL_CONDITION_SOURCE_MODIFIED: "test_URL_condition_source_modified",
   TEST_URL_CONDITION_SOURCE_MODIFICATION_SAVED: "test_URL_condition_source_modification_saved",
   TEST_URL_CONDITION_MODAL_CLOSED: "test_URL_condition_modal_closed",
+  TEST_URL_CONDITION_ANIMATION_VIEWED: "test_URL_condition_animation_viewed",
 };
 
 export const RULE_EDITOR = {
   MODIFY_API_RESPONSE: {
     SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
   },
+  TEST_THIS_RULE: {
+    TEST_RULE_CLICKED: "test_rule_clicked",
+    TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
+    TEST_RULE_RESULT_CLICKED: "test_rule_result_clicked",
+    TEST_RULE_SESSION_DRAFT_VIEWED: "test_rule_session_draft_viewed",
+    TEST_RULE_SESSION_DRAFT_SAVED: "test_rule_session_draft_saved",
+  },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",
+};
+
+export const ECOSYSTEM = {
+  ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
 };

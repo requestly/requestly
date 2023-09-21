@@ -2,15 +2,17 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "hooks/useDebounce";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { SourceConditionInput } from "../SourceUrl";
+import { LearnMoreLink } from "../LearnMoreLink";
 import { Typography, Divider, Row, Input } from "antd";
 import { CheckCircleOutlined, InfoCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { isRegexFormat } from "utils/rules/misc";
+import { isValidRegex } from "utils/rules/misc";
 import { isValidUrl } from "utils/FormattingHelper";
 import { isEqual } from "lodash";
-import { SourceOperator } from "types";
-import { Source } from "../SourceUrl/types";
+import { RulePairSource, SourceOperator } from "types";
+import { SessionRecordingPageSource } from "types/sessionRecording";
 //@ts-ignore
 import { RULE_PROCESSOR } from "@requestly/requestly-core";
+import LINKS from "config/constants/sub/links";
 import {
   trackURLConditionMatchingTried,
   trackURLConditionModalViewed,
@@ -19,10 +21,12 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 import "./index.scss";
 
+type Source = RulePairSource | SessionRecordingPageSource;
+
 interface ModalProps {
   isOpen: boolean;
   source: Source;
-  analyticsContext: string;
+  analyticsContext: Record<string, string>;
   onClose: (operator: SourceOperator) => void;
   onSave: (newSource: Source) => void;
 }
@@ -57,7 +61,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
   }, [matchedGroups, updatedSource.operator]);
 
   const renderResult = useCallback(() => {
-    if (updatedSource.operator === SourceOperator.MATCHES && !isRegexFormat(updatedSource.value)) {
+    if (updatedSource.operator === SourceOperator.MATCHES && !isValidRegex(updatedSource.value)) {
       return (
         <>
           <CloseCircleOutlined className="danger" />
@@ -161,7 +165,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
         <div className="test-url-modal-section">
           <div className="text-bold white"> Enter URL to be checked</div>
           <Input
-            className="mt-8"
+            className="test-url-field"
             placeholder="https://www.example.com"
             value={testURL}
             onChange={(e) => {
@@ -177,8 +181,14 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
           </div>
         </div>
       </div>
-      <div className="rq-modal-footer">
-        <Row className="w-full" justify="end">
+      <div className="rq-modal-footer test-url-modal-footer">
+        <Row className="w-full" justify="space-between">
+          <Row align="middle">
+            <LearnMoreLink
+              linkText="Learn more about source condition matching"
+              href={LINKS.REQUESTLY_DOCS_TEST_URL_CONDITION}
+            />
+          </Row>
           {isEqual(source, updatedSource) ? (
             <RQButton type="default" onClick={() => onClose(updatedSource.operator)}>
               Close

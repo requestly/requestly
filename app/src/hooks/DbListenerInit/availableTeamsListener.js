@@ -33,6 +33,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
             subscriptionStatus: teamData.subscriptionStatus,
             accessCount: teamData.accessCount,
             adminCount: teamData.adminCount,
+            members: teamData.members,
           };
         });
 
@@ -62,7 +63,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
 
           // Update details of all team members
           const functions = getFunctions();
-          const getTeamUsers = httpsCallable(functions, "getTeamUsers");
+          const getTeamUsers = httpsCallable(functions, "teams-getTeamUsers");
 
           getTeamUsers({
             teamId: currentlyActiveWorkspace?.id,

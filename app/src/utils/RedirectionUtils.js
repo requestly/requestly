@@ -236,16 +236,6 @@ export const redirectToUnlockPremium = (navigate) => {
   navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
 };
 
-/* USER - License - Index Page */
-export const redirectToLicenseIndexPage = (navigate) => {
-  navigate(PATHS.LICENSE.ABSOLUTE);
-};
-
-/* USER - License - Manage */
-export const redirectToManageLicense = (navigate) => {
-  navigate(PATHS.LICENSE.MANAGE.ABSOLUTE);
-};
-
 /* ACCOUNT */
 
 /* ACCOUNT - View Account Details */
@@ -333,7 +323,7 @@ export const redirectToPersonalSubscription = (navigate, hardRedirect, autoRefre
 };
 
 /* ACCOUNT - CHECKOUT */
-export const redirectToCheckout = ({ mode, teamId, planType: planName, days, quantity }) => {
+export const redirectToCheckout = ({ mode, teamId, planName, duration, quantity }) => {
   const url = new URL(window.location.href);
   url.pathname = PATHS.CHECKOUT.ABSOLUTE;
   url.searchParams.set("m", mode);
@@ -341,7 +331,7 @@ export const redirectToCheckout = ({ mode, teamId, planType: planName, days, qua
     url.searchParams.set("t", teamId);
   }
   url.searchParams.set("p", planName);
-  url.searchParams.set("d", days);
+  url.searchParams.set("d", duration);
   if (quantity) {
     url.searchParams.set("q", quantity);
   }

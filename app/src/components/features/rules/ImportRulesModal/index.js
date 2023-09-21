@@ -2,15 +2,13 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
-import { AiOutlineWarning } from "react-icons/ai";
-import { BsFileEarmarkCheck } from "react-icons/bs";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
 import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
-import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
-import FEATURES from "../../../../config/constants/sub/features";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
@@ -140,9 +138,7 @@ const ImportRulesModal = (props) => {
 
   const doImportRules = (natureOfImport) => {
     setIsImporting(true);
-    const migratedDataToImport = isFeatureCompatible(FEATURES.HEADERS_V2_MIGRATION)
-      ? migrateHeaderRulesToV2(dataToImport)
-      : dataToImport;
+    const migratedDataToImport = migrateHeaderRulesToV2(dataToImport);
 
     addRulesAndGroupsToStorage(appMode, migratedDataToImport)
       .then(async () => {

@@ -1,17 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardBody } from "reactstrap";
-import { Row, Col, Alert } from "antd";
+import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
+import { TestThisRuleRow } from "../../TestThisRule";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
@@ -34,40 +34,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
     onChangeHandler(currentlySelectedRuleData, dispatch, event);
   };
 
-  const renderWarning = () => {
-    switch (currentlySelectedRuleConfig.TYPE) {
-      case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
-        return isFeatureCompatible(FEATURES.MODIFY_REQUEST_BODY) ? null : (
-          <>
-            <Row className="margin-top-one margin-bottom-one">
-              <Col span={24}>
-                <Alert
-                  type="info"
-                  showIcon
-                  message={
-                    appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? (
-                      <>
-                        This Rule type is currently available only in the desktop app. Download now{" "}
-                        <a href="https://requestly.io/desktop/">https://requestly.io/desktop/</a>.
-                      </>
-                    ) : (
-                      <>
-                        Please update your app to use this rule. Download latest version at{" "}
-                        <a href="https://requestly.io/desktop/">https://requestly.io/desktop/</a>.
-                      </>
-                    )
-                  }
-                ></Alert>
-              </Col>
-            </Row>
-          </>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
       {!isSharedListView && (
@@ -83,7 +49,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
           descriptionChangeCallback={handleDescriptionChange}
         />
       )}
-      <Row className="rule-builder-body">
+      <Row className="rule-builder-body" id="rule-builder-body">
         <Col
           span={22}
           offset={1}
@@ -99,7 +65,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
-            {renderWarning()}
 
             <RulePairs mode={mode} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
 
@@ -111,6 +76,9 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                   ) : null}
                 </Col>
               </Row>
+            ) : null}
+            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) ? (
+              <TestThisRuleRow ruleId={currentlySelectedRuleData.id} />
             ) : null}
           </CardBody>
         </Col>

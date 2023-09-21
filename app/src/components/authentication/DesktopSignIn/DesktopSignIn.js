@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FaCheck, FaExclamationCircle, FaSpinner } from "react-icons/fa";
+import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
+import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { Container, Row, Col, Card, CardBody } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
@@ -16,7 +18,6 @@ import {
   signInWithRedirect,
 } from "firebase/auth";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import { createNewUsername } from "backend/auth/username";
 //UTILS
 import { getEmailType } from "utils/FormattingHelper";
 //EVENTS
@@ -45,7 +46,7 @@ const DesktopSignIn = () => {
       const code = params.get("ot-auth-code");
       const source = params.get("source").replace(/ /g, "_");
       const functions = getFunctions();
-      const createAuthToken = httpsCallable(functions, "createAuthToken");
+      const createAuthToken = httpsCallable(functions, "auth-createAuthToken");
 
       let uid = firebaseUser?.uid || null;
       let email = firebaseUser?.email || null;
@@ -132,13 +133,6 @@ const DesktopSignIn = () => {
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
           let isNewUser = getAdditionalUserInfo(result).isNewUser || false;
-          if (isNewUser) {
-            createNewUsername(result?.user?.uid)
-              .then((username) => {
-                // Do Nothing
-              })
-              .catch((e) => Logger.error(e));
-          }
           // User just signed in. we can get the result.credential or result.user
           await handleDoneSignIn(result.user, isNewUser);
         } else if (auth.currentUser) {

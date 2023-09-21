@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Row, Card, CardHeader, Col, CardBody, Input, InputGroup, InputGroupText } from "reactstrap";
 import { Button as AntButton } from "antd";
 import { toast } from "utils/Toast.js";
@@ -10,10 +9,7 @@ import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 import DataStoreUtils from "../../../../utils/DataStoreUtils";
-import {
-  redirectToRefreshSubscription,
-  redirectToUpdateSubscriptionContactUs,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
 import { refreshUserInGlobalState } from "../../common/actions";
@@ -23,8 +19,9 @@ import ProCard from "@ant-design/pro-card";
 import { Dropdown, Menu } from "antd";
 
 import isEmpty from "is-empty";
-import { RiArrowDropDownLine } from "react-icons/ri";
+import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { useDispatch, useSelector } from "react-redux";
+import "./index.css";
 
 const getDesignationDisplayValue = (originalValue) => {
   switch (originalValue) {
@@ -102,7 +99,7 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
     <Dropdown overlay={menu}>
       <AntButton>
         <span style={{ textTransform: "capitalize", cursor: "pointer" }}>
-          {isEmpty(currentValue) ? "Choose" : currentValue} <RiArrowDropDownLine className="remix-icon" />
+          {isEmpty(currentValue) ? "Choose" : currentValue} <RiArrowDropDownLine />
         </span>
       </AntButton>
     </Dropdown>
@@ -110,8 +107,6 @@ const getUserProfileDropdown = (currentValue, onChangeHandler) => {
 };
 
 const ManageAccount = () => {
-  const navigate = useNavigate();
-
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -295,7 +290,7 @@ const ManageAccount = () => {
                           type="secondary"
                           size="small"
                           onClick={() => {
-                            redirectToRefreshSubscription(navigate);
+                            redirectToUpdateSubscriptionContactUs();
                           }}
                         >
                           Refresh Subscription

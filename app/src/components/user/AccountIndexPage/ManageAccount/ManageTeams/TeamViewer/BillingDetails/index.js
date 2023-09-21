@@ -18,7 +18,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
     setIsLoading(true);
 
     const functions = getFunctions();
-    const getTeamSubscriptionInfo = httpsCallable(functions, "getTeamSubscriptionInfo");
+    const getTeamSubscriptionInfo = httpsCallable(functions, "teams-getTeamSubscriptionInfo");
 
     getTeamSubscriptionInfo({
       teamId: teamId,
@@ -41,7 +41,8 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
   //   });
   // };
 
-  const isSubscriptionActive = subscriptionInfo.subscriptionStatus === "active";
+  const isSubscriptionActive =
+    subscriptionInfo.subscriptionStatus === "active" || subscriptionInfo.subscriptionStatus === "trialing";
 
   return isLoading ? (
     <SpinnerColumn skeletonCount={2} message="Fetching subscription details" />

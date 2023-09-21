@@ -1,73 +1,206 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Empty, Typography } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import { NetworkLog } from "../types";
-import NetworkLogRow from "./NetworkLogRow";
-import Split from "react-split";
-import NetworkLogDetails from "./NetworkLogDetails";
-import useAutoScrollableContainer from "hooks/useAutoScrollableContainer";
-import { useSelector } from "react-redux";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
-import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
+import { actions } from "store";
+import { getActiveModals } from "store/selectors";
+import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
+import { APIClient, APIClientRequest } from "components/common/APIClient";
+import RuleEditorModal from "components/common/RuleEditorModal";
+import { getOffset } from "./helpers";
+import { RuleType } from "types";
+import { copyToClipBoard } from "utils/Misc";
+import { snakeCase } from "lodash";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
+import {
+  trackSampleSessionClicked,
+  trackSessionRecordingNetworkLogContextMenuOpen,
+  trackSessionRecordingNetworkLogContextMenuOptionClicked,
+} from "modules/analytics/events/features/sessionRecording";
 
 interface Props {
-  networkLogs: NetworkLog[];
+  startTime: number;
+  networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
   updateCount: (count: number) => void;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({ networkLogs, playerTimeOffset, updateCount }) => {
-  const visibleNetworkLogs = useMemo<NetworkLog[]>(() => {
-    return networkLogs.filter((networkLog: NetworkLog) => {
-      return networkLog.timeOffset <= playerTimeOffset;
-    });
-  }, [networkLogs, playerTimeOffset]);
+const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, updateCount }) => {
+  const dispatch = useDispatch();
+  const { ruleEditorModal } = useSelector(getActiveModals);
+  const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
+  const [selectedRequestData, setSelectedRequestData] = useState<APIClientRequest>(null);
 
-  const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(visibleNetworkLogs);
+  const visibleNetworkLogs = useMemo<RQNetworkLog[]>(() => {
+    return networkLogs.filter((log: RQNetworkLog) => {
+      return getOffset(log, startTime) <= playerTimeOffset;
+    });
+  }, [networkLogs, startTime, playerTimeOffset]);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
-  const [selectedLogIndex, setSelectedLogIndex] = useState(-1);
 
   useEffect(() => {
     updateCount(visibleNetworkLogs.length);
   }, [visibleNetworkLogs, updateCount]);
 
-  const networkLogsTable = useMemo(
-    () => (
-      <div className="network-logs-table" ref={containerRef} onScroll={onScroll}>
-        {visibleNetworkLogs.map((log, i) => (
-          <NetworkLogRow
-            key={i}
-            {...log}
-            onClick={() => setSelectedLogIndex(i)}
-            isSelected={i === selectedLogIndex}
-            showResponseTime={selectedLogIndex === -1}
-          />
-        ))}
-      </div>
-    ),
-    [visibleNetworkLogs, selectedLogIndex, containerRef, onScroll]
+  const handleContextMenuRuleOptionSelect = useCallback(
+    (key: React.Key, log: RQNetworkLog) => {
+      const ruleData = {
+        id: log.id,
+        url: log.entry.request.url,
+        request: { body: log.entry.request.postData.text },
+        response: { body: log.entry.response.content.text },
+      };
+
+      dispatch(
+        actions.toggleActiveModal({
+          newValue: true,
+          modalName: "ruleEditorModal",
+          newProps: { ruleData, ruleType: key },
+        })
+      );
+
+      trackRuleCreationWorkflowStartedEvent(key, "modal");
+      trackSessionRecordingNetworkLogContextMenuOptionClicked(`${snakeCase(key as string)}_rule`);
+    },
+    [dispatch]
   );
+
+  const handleCloseRuleEditorModal = useCallback(() => {
+    dispatch(
+      actions.toggleActiveModal({
+        newValue: false,
+        modalName: "ruleEditorModal",
+      })
+    );
+  }, [dispatch]);
+
+  const options = useMemo(
+    () =>
+      [
+        {
+          key: "copy_url",
+          label: "Copy URL",
+          onSelect: (key, log) => {
+            copyToClipBoard(log.entry.request.url, "URL copied to clipboard");
+            trackSessionRecordingNetworkLogContextMenuOptionClicked(key);
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: "replay_request",
+          label: "Replay Request",
+          onSelect: (key, log) => {
+            const { url, method, headers, postData } = log.entry.request ?? {};
+
+            setSelectedRequestData({
+              url,
+              method,
+              body: postData.text,
+              headers: headers.reduce((result, header) => ({ ...result, [header.name]: header.value }), {}),
+            });
+
+            trackSessionRecordingNetworkLogContextMenuOptionClicked(key);
+            setIsApiClientModalOpen(true);
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: RuleType.REDIRECT,
+          label: "Redirect URL (Map local/Remote)",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.RESPONSE,
+          label: "Modify Response Body",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.REQUEST,
+          label: "Modify Request Body",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.HEADERS,
+          label: "Modify Headers",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.REPLACE,
+          label: "Replace part of URL",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+
+        {
+          key: RuleType.CANCEL,
+          label: "Cancel Request",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.SCRIPT,
+          label: "Insert Custom Script",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.DELAY,
+          label: "Delay Request",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.QUERYPARAM,
+          label: "Modify Query Params",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+        {
+          key: RuleType.USERAGENT,
+          label: "Modify User Agent",
+          onSelect: handleContextMenuRuleOptionSelect,
+        },
+      ] as RQNetworkTableProps["contextMenuOptions"],
+    [handleContextMenuRuleOptionSelect]
+  );
+
+  const handleCloseApiClientModal = useCallback(() => {
+    setIsApiClientModalOpen(false);
+    setSelectedRequestData(null);
+  }, []);
 
   return (
     <div className="session-panel-content network-logs-panel">
-      {visibleNetworkLogs.length ? (
-        selectedLogIndex === -1 ? (
-          networkLogsTable
-        ) : (
-          <Split
-            direction="horizontal"
-            cursor="col-resize"
-            sizes={[60, 40]}
-            minSize={[400, 200]}
-            gutterSize={4}
-            gutterAlign="center"
-            style={{ display: "flex", height: "100%" }}
-            snapOffset={30}
-          >
-            {networkLogsTable}
-            <NetworkLogDetails {...visibleNetworkLogs[selectedLogIndex]} onClose={() => setSelectedLogIndex(-1)} />
-          </Split>
-        )
+      {visibleNetworkLogs.length > 0 ? (
+        <>
+          <RQNetworkTable
+            logs={visibleNetworkLogs}
+            contextMenuOptions={options}
+            sessionRecordingStartTime={startTime}
+            onContextMenuOpenChange={(isOpen) => {
+              if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
+            }}
+          />
+
+          {isApiClientModalOpen && (
+            <APIClient
+              openInModal
+              modalTitle="Replay request"
+              request={selectedRequestData}
+              isModalOpen={isApiClientModalOpen}
+              onModalClose={handleCloseApiClientModal}
+            />
+          )}
+
+          {ruleEditorModal.isActive && (
+            <RuleEditorModal
+              isOpen={ruleEditorModal.isActive}
+              handleModalClose={handleCloseRuleEditorModal}
+              analyticEventEditorViewedSource="session_recording_network_panel"
+            />
+          )}
+        </>
       ) : includeNetworkLogs === false ? (
         <div>
           <Typography.Text className="recording-options-message">

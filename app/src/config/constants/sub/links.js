@@ -27,6 +27,10 @@ const LINKS = {
 
   // Docs - Extension Troubleshooting
   REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.io/troubleshooting",
+
+  REQUESTLY_EXTENSION_RULES_NOT_WORKING:
+    "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
+
   // Docs - Mock GraphQL API response
   REQUESTLY_DOCS_MOCK_GRAPHQL: "https://docs.requestly.io/using-rules/mock-graphql-api-response",
   // Docs - Android Debugger Overview
@@ -41,6 +45,13 @@ const LINKS = {
   // Docs - Import rules from charles proxy (desktop only)
   REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES:
     "https://docs.requestly.io/desktop-app/mac/features/import-settings-from-charles",
+
+  // Docs - Test URL condition
+  REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/test-url-condition",
+
+  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
+
+  REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
 
   /** LANDING PAGES **/
 

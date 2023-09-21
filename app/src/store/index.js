@@ -8,7 +8,6 @@ import * as searchActions from "./features/searchActions";
 import * as modalActions from "./features/modalActions";
 import * as sharedListActions from "./features/sharedListActions";
 import * as rulesActions from "./features/rulesActions";
-import * as marketplaceActions from "./features/marketplaceActions";
 import * as appModeSpecificActions from "./features/appModeSpecificActions";
 import { sessionRecordingReducer } from "./features/session-recording/slice";
 import { teamsReducer } from "./features/teams/slice";
@@ -27,7 +26,6 @@ const globalSlice = createSlice({
     ...modalActions,
     ...sharedListActions,
     ...rulesActions,
-    ...marketplaceActions,
     ...appModeSpecificActions,
   },
 });
@@ -38,6 +36,7 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "user",
   "appMode",
   "appTheme",
+  "isExtensionEnabled",
   // "rules",
   // "desktopSpecificDetails.appsList",
   "hasConnectedApp",

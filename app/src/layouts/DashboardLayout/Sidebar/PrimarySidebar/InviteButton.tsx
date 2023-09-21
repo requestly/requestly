@@ -6,6 +6,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -14,15 +15,28 @@ const InviteButton: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
 
   const handleInviteClick = useCallback(() => {
+    trackInviteTeammatesClicked("sidebar_invite_button");
     if (!user?.loggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
       return;
     }
 
     if (isWorkspaceMode) {
-      dispatch(actions.toggleActiveModal({ modalName: "inviteMembersModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "inviteMembersModal",
+          newValue: true,
+          newProps: { source: "sidebar_invite_button" },
+        })
+      );
     } else if (availableTeams?.length === 0) {
-      dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "createWorkspaceModal",
+          newValue: true,
+          newProps: { source: "sidebar_invite_button" },
+        })
+      );
     } else {
       dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
     }

@@ -11,6 +11,7 @@ import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
+import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 
 const DeleteRulesModal = (props) => {
   const {
@@ -87,7 +88,13 @@ const DeleteRulesModal = (props) => {
     );
   };
 
+  const handleDeleteRuleTestReports = useCallback(async () => {
+    deleteTestReportByRuleId(appMode, ruleIdsToDelete);
+  }, [appMode, ruleIdsToDelete]);
+
   const postDeletionSteps = () => {
+    //Delete test reports for ruleIdsToDelete
+    handleDeleteRuleTestReports();
     //Refresh List
     dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
     // Set loading to false
@@ -110,6 +117,7 @@ const DeleteRulesModal = (props) => {
     toggleDeleteRulesModal,
     ruleDeletedCallback,
     clearSearch,
+    handleDeleteRuleTestReports,
   ]);
 
   return (

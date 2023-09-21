@@ -31,7 +31,7 @@ const NotFoundError = () => {
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
-              <h1 className="display-3">The session recording you were looking for does not exist.</h1>
+              <h1 className="display-3">The session replay you were looking for does not exist.</h1>
               <center>
                 <Button
                   type="primary"

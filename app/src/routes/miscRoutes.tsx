@@ -1,10 +1,8 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import AppMode from "components/misc/AppMode";
-import Feedback from "components/misc/Feedback";
 import Updates from "views/features/Updates";
 import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
-import ManageLicenseIndexPage from "components/user/ManageLicenseIndexPage";
 import Goodbye from "components/misc/Goodbye";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
@@ -12,6 +10,7 @@ import Page403 from "views/misc/ServerResponses/403";
 import Page404 from "views/misc/ServerResponses/404";
 import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
+import { Home } from "components/landing/Home";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -28,36 +27,12 @@ export const miscRoutes: RouteObject[] = [
     element: <AppMode />,
   },
   {
-    path: PATHS.FEEDBACK.RELATIVE,
-    element: <Feedback />,
-  },
-  {
     path: PATHS.UPDATES.RELATIVE,
     element: <Updates />,
   },
   {
     path: PATHS.PRICING.RELATIVE,
     element: <PricingIndexPage />,
-  },
-  {
-    path: PATHS.LEGACY.PRICING.ABSOLUTE,
-    element: <Navigate to={PATHS.PRICING.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.MANAGE.RELATIVE,
-    element: <ProtectedRoute component={ManageLicenseIndexPage} />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.MANAGE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.MANAGE.RELATIVE} />,
-  },
-  {
-    path: PATHS.LICENSE.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_TEAMS.RELATIVE} />,
-  },
-  {
-    path: PATHS.LEGACY.LICENSE.ABSOLUTE,
-    element: <Navigate to={PATHS.LICENSE.RELATIVE} />,
   },
   {
     path: PATHS.GOODBYE.RELATIVE,
@@ -78,6 +53,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
     element: <ProtectedRoute component={AcceptTeamInvite} />,
+  },
+  {
+    path: PATHS.HOME.RELATIVE,
+    element: <Home />,
   },
   {
     path: PATHS.ANY,

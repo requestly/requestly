@@ -18,7 +18,6 @@ import {
   GroupOutlined,
   SearchOutlined,
   DownOutlined,
-  UploadOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
@@ -55,8 +54,6 @@ import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { fetchSharedLists } from "components/features/sharedLists/SharedListsIndexPage/actions";
-import CreateSharedListModal from "components/features/sharedLists/CreateSharedListModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -70,6 +67,7 @@ import {
   trackRulePinToggled,
   trackRulesUngrouped,
 } from "modules/analytics/events/common/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -78,6 +76,7 @@ import LINKS from "config/constants/sub/links";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
+import AuthPopoverButton from "./AuthPopoverButtons";
 
 //Lodash
 const set = require("lodash/set");
@@ -98,7 +97,7 @@ const isGroupSwitchDisabled = (record, groupwiseRulesToPopulate) => {
 
   if (!record.groupId) return false;
   if (!groupwiseRulesToPopulate[record.groupId]) return false;
-  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE)
+  if (groupwiseRulesToPopulate[record.groupId][GROUP_DETAILS]?.["status"] !== GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE)
     return true;
   return false;
 };
@@ -119,7 +118,6 @@ const RulesTable = ({
   isTableLoading = false,
   handleChangeGroupOnClick,
   handleShareRulesOnClick,
-  handleExportRulesOnClick,
   handleImportRulesOnClick,
   handleDeleteRulesOnClick,
   handleNewGroupOnClick,
@@ -134,9 +132,6 @@ const RulesTable = ({
   // Component State
   const [isSharedListRuleViewerModalActive, setIsSharedListRuleViewModalActive] = useState(false);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
-
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
-
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -145,11 +140,11 @@ const RulesTable = ({
   const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
-  const [sharedListModalRuleIDs, setSharedListModalRuleIDs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
   const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
+  const [startSharingWalkthrough, setStartSharingWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
@@ -190,9 +185,6 @@ const RulesTable = ({
     setIsSharedListRuleViewModalActive(!isSharedListRuleViewerModalActive);
   };
 
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
-  };
   const toggleDeleteConfirmationModal = () => {
     setIsDeleteConfirmationModalActive(isDeleteConfirmationModalActive ? false : true);
   };
@@ -485,29 +477,16 @@ const RulesTable = ({
     }
   };
 
-  const verifyAndContinueSharingRules = (rule) => {
-    //Activate loading modal
+  const toggleSharingModal = (rule) => {
     dispatch(
       actions.toggleActiveModal({
-        modalName: "loadingModal",
+        modalName: "sharingModal",
         newValue: true,
+        newProps: {
+          selectedRules: [rule.id],
+        },
       })
     );
-
-    fetchSharedLists(user.details.profile.uid).then((result) => {
-      //Continue creating new shared list
-      setSharedListModalRuleIDs([rule.id]);
-      setIsShareRulesModalActive(true);
-      trackRQLastActivity("sharedList_created");
-
-      //Deactivate loading modal
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "loadingModal",
-          newValue: false,
-        })
-      );
-    });
   };
 
   const promptUserToSignup = (source) => {
@@ -528,7 +507,8 @@ const RulesTable = ({
 
   const shareIconOnClickHandler = (event, rule) => {
     event.stopPropagation();
-    user.loggedIn ? verifyAndContinueSharingRules(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    trackShareButtonClicked("rules_list");
+    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   const copyIconOnClickHandler = useCallback(async (event, rule) => {
@@ -706,7 +686,7 @@ const RulesTable = ({
           return (
             <Switch
               size="small"
-              // We Rule's group is OFF, this switch must be disabled
+              // When Rule's group is OFF, this switch must be disabled
               disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
               checked={checkIfRuleIsActive(record)}
               onClick={(_, event) => toggleRuleStatus(event, record)}
@@ -750,7 +730,7 @@ const RulesTable = ({
             return (
               <ReactHoverObserver>
                 {({ isHovering }) => (
-                  <div className={hideActionButtons ? "group-action-buttons hidden-element" : "group-action-buttons"}>
+                  <div className={hideActionButtons ? "group-action-buttons not-visible" : "group-action-buttons"}>
                     <Space>
                       {isFavouritingAllowed && showGroupPinIcon && (
                         <Text
@@ -827,7 +807,7 @@ const RulesTable = ({
 
         if (areActionsEnabled) {
           return (
-            <div className={hideActionButtons ? "rule-action-buttons hidden-element" : "rule-action-buttons"}>
+            <div className={hideActionButtons ? "rule-action-buttons not-visible" : "rule-action-buttons"}>
               <ReactHoverObserver>
                 {({ isHovering }) => (
                   <Space>
@@ -1125,6 +1105,16 @@ const RulesTable = ({
     groupingAndRuleActivationExp,
   ]);
 
+  useEffect(() => {
+    if (
+      !isMiscTourCompleted.rulesListSharingOnboarding &&
+      userAttributes?.num_rules >= 1 &&
+      new Date(userAttributes?.install_date) < new Date("2023-09-07")
+    ) {
+      setStartSharingWalkthrough(true);
+    }
+  }, [userAttributes?.num_rules, userAttributes?.install_date, isMiscTourCompleted.rulesListSharingOnboarding]);
+
   return (
     <>
       <ProductWalkthrough
@@ -1139,6 +1129,19 @@ const RulesTable = ({
         startWalkthrough={startFirstRuleWalkthrough}
         onTourComplete={() =>
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
+        }
+      />
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.SHARING.RULES_LIST_SHARING_ONBOARDING}
+        startWalkthrough={startSharingWalkthrough && !isMiscTourCompleted.rulesListSharingOnboarding}
+        completeTourOnUnmount={false}
+        onTourComplete={() =>
+          dispatch(
+            actions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              subTour: "rulesListSharingOnboarding",
+            })
+          )
         }
       />
       <ProTable
@@ -1231,21 +1234,6 @@ const RulesTable = ({
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
-              <AuthConfirmationPopover
-                title="You need to sign up to export rules"
-                callback={handleExportRulesOnClick}
-                source={AUTH.SOURCE.EXPORT_RULES}
-              >
-                <Tooltip title={isScreenSmall ? "Export Rules" : null}>
-                  <Button
-                    shape={isScreenSmall ? "circle" : null}
-                    onClick={user?.details?.isLoggedIn && handleExportRulesOnClick}
-                    icon={<UploadOutlined />}
-                  >
-                    {isScreenSmall ? null : "Export"}
-                  </Button>
-                </Tooltip>
-              </AuthConfirmationPopover>
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
@@ -1313,11 +1301,10 @@ const RulesTable = ({
                   {
                     shape: "circle",
                     isTooltipShown: true,
-                    hasPopconfirm: true,
-                    buttonText: "Export",
-                    authSource: AUTH.SOURCE.EXPORT_RULES,
-                    icon: <UploadOutlined />,
-                    onClickHandler: handleExportRulesOnClick,
+                    tourId: "rule-table-create-group-btn",
+                    buttonText: "New Group",
+                    icon: <GroupOutlined />,
+                    onClickHandler: handleNewGroupOnClick,
                   },
                   {
                     shape: "circle",
@@ -1326,15 +1313,16 @@ const RulesTable = ({
                     buttonText: "Share",
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
-                    onClickHandler: handleShareRulesOnClick,
-                  },
-                  {
-                    shape: "circle",
-                    isTooltipShown: true,
-                    tourId: "rule-table-create-group-btn",
-                    buttonText: "New Group",
-                    icon: <GroupOutlined />,
-                    onClickHandler: handleNewGroupOnClick,
+                    tourId: "rule-list-share-btn",
+                    onClickHandler: () => {
+                      handleShareRulesOnClick();
+                      dispatch(
+                        actions.updateProductTourCompleted({
+                          tour: TOUR_TYPES.MISCELLANEOUS,
+                          subTour: "rulesListSharingOnboarding",
+                        })
+                      );
+                    },
                   },
                   {
                     shape: null,
@@ -1349,20 +1337,19 @@ const RulesTable = ({
                 ];
 
                 return buttonData.map(
-                  ({
-                    icon,
-                    shape,
-                    type = null,
-                    buttonText,
-                    authSource,
-                    isTooltipShown,
-                    onClickHandler,
-                    isDropdown = false,
-                    hasPopconfirm = false,
-                    tourId = null,
-                    trackClickEvent = () => {},
-                    overlay,
-                  }) => (
+                  (
+                    {
+                      icon,
+                      type = null,
+                      buttonText,
+                      isTooltipShown,
+                      onClickHandler,
+                      isDropdown = false,
+                      overlay,
+                      tourId = null,
+                    },
+                    index
+                  ) => (
                     <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
@@ -1371,30 +1358,17 @@ const RulesTable = ({
                             type={type}
                             onClick={onClickHandler}
                             overlay={overlay}
+                            data-tour-id={tourId}
                             className="rule-selection-dropdown-btn"
                           >
                             {buttonText}
                           </Dropdown.Button>
                         ) : (
-                          <AuthConfirmationPopover
-                            title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-                            disabled={!hasPopconfirm}
-                            callback={onClickHandler}
-                            source={authSource}
-                          >
-                            <Button
-                              type={type || "default"}
-                              shape={isScreenSmall ? shape : null}
-                              onClick={() => {
-                                trackClickEvent();
-                                hasPopconfirm ? user?.details?.isLoggedIn && onClickHandler() : onClickHandler();
-                              }}
-                              icon={icon}
-                              data-tour-id={tourId}
-                            >
-                              {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
-                            </Button>
-                          </AuthConfirmationPopover>
+                          <AuthPopoverButton
+                            isScreenSmall={isScreenSmall}
+                            isLoggedIn={user?.details?.isLoggedIn}
+                            {...buttonData[index]}
+                          />
                         )}
                       </>
                     </Tooltip>
@@ -1408,13 +1382,6 @@ const RulesTable = ({
           isOpen={isSharedListRuleViewerModalActive}
           toggle={toggleSharedListRuleViewerModal}
           rule={ruleToViewInModal}
-        />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={sharedListModalRuleIDs}
         />
       ) : null}
       {isDeleteConfirmationModalActive ? (

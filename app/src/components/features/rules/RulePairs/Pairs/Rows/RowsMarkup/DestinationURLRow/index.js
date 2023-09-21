@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Radio, Popconfirm } from "antd";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { RedirectDestinationType } from "types/rules";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
@@ -24,13 +25,12 @@ import {
 } from "modules/analytics/events/features/rules/redirectDestinationOptions";
 import { trackDesktopActionInterestCaptured } from "modules/analytics/events/misc/interestCaptured";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
-import "./index.css";
 import LINKS from "config/constants/sub/links";
+import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
+import "./index.css";
 
-const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInputDisabled }) => {
-  const { generatePlaceholderText, modifyPairAtGivenPath } = helperFunctions;
-
-  //Component State
+const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+  const dispatch = useDispatch();
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(null);
@@ -47,12 +47,24 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
   const handleMockPickerSelectionCallback = (url) => {
     trackSelectMock(url);
     setIsMockPickerVisible(false);
-    modifyPairAtGivenPath(undefined, pairIndex, "destination", url);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: { destination: url },
+      })
+    );
   };
 
   const handleFileSelectCallback = (filePath) => {
     trackSelectMapLocalFile(filePath);
-    modifyPairAtGivenPath(undefined, pairIndex, "destination", `file://${filePath}`);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          destination: `file://${filePath}`,
+        },
+      })
+    );
   };
 
   const preValidateURL = () => {
@@ -66,14 +78,13 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
         !currentDestinationURL.startsWith("https://") &&
         !currentDestinationURL.startsWith("file://")
       ) {
-        modifyPairAtGivenPath(
-          {
-            target: {
-              value: "http://" + currentDestinationURL,
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            updates: {
+              destination: "http://" + currentDestinationURL,
             },
-          },
-          pairIndex,
-          "destination"
+          })
         );
       }
     }
@@ -111,12 +122,16 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
   };
 
   const handleDestinationTypeChange = () => {
-    modifyPairAtGivenPath(undefined, pairIndex, "destinationType", destinationPopupSelection, [
-      {
-        path: "destination",
-        value: "",
-      },
-    ]);
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          destination: "",
+          destinationType: destinationPopupSelection,
+        },
+      })
+    );
+
     setDestinationType(destinationPopupSelection);
   };
 
@@ -128,7 +143,16 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, helperFunctions, isInput
         className="display-inline-block"
         placeholder={generatePlaceholderText(pair.source.operator, "destination")}
         type="text"
-        onChange={(event) => modifyPairAtGivenPath(event, pairIndex, "destination")}
+        onChange={(event) =>
+          dispatch(
+            actions.updateRulePairAtGivenPath({
+              pairIndex,
+              updates: {
+                destination: event?.target?.value,
+              },
+            })
+          )
+        }
         onBlur={preValidateURL}
         value={pair.destination}
         disabled={isInputDisabled}

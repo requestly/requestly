@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { toast } from "utils/Toast.js";
 import { Modal, Button } from "antd";
 // Firebase
@@ -11,7 +11,7 @@ const ChangeUserRoleModal = ({ isOpen, toggleModal, userId, teamId, isCurrentlyA
   const changeTeamUserRole = () => {
     setShowLoader(true);
     const functions = getFunctions();
-    const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
+    const updateTeamUserRole = httpsCallable(functions, "teams-updateTeamUserRole");
 
     updateTeamUserRole({
       teamId: teamId,

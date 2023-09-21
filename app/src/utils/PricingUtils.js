@@ -12,7 +12,7 @@ export const getDurationTitleFromDays = (days) => {
     case 180:
       return "half-yearly";
     case 365:
-      return "annual";
+      return "annually";
     default:
       return false;
   }
@@ -128,6 +128,8 @@ export const beautifySubscriptionType = (subscriptionType) => {
       return "Personal Subscription";
     case "trial":
       return "Free Trial";
+    case "producthunt":
+      return "Producthunt Unlock";
     default:
       return "Premium Plan";
   }

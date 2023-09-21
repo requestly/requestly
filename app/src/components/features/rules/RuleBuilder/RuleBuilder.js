@@ -24,7 +24,6 @@ import {
   getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsRuleEditorTourCompleted,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
@@ -38,6 +37,7 @@ import {
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import { useHasChanged } from "hooks";
 import Help from "./Help";
 import "./RuleBuilder.css";
 
@@ -55,7 +55,6 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
@@ -80,19 +79,6 @@ const RuleBuilder = (props) => {
   }, [enableDocs, showDocs]);
 
   useExternalRuleCreation(MODE);
-
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
 
   useEffect(() => {
     if (isDocsVisible) {
@@ -240,21 +226,6 @@ const RuleBuilder = (props) => {
     )
       cleanup(dispatch);
   }, [dispatch, location]);
-
-  useEffect(() => {
-    const unloadListener = (e) => {
-      e.preventDefault();
-      e.returnValue = "Are you sure?";
-    };
-
-    if (isCurrentlySelectedRuleHasUnsavedChanges) {
-      window.addEventListener("beforeunload", unloadListener);
-    } else {
-      window.removeEventListener("beforeunload", unloadListener);
-    }
-
-    return () => window.removeEventListener("beforeunload", unloadListener);
-  }, [isCurrentlySelectedRuleHasUnsavedChanges]);
 
   if (
     currentlySelectedRuleConfig === false ||

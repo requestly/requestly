@@ -125,11 +125,14 @@ APP_CONSTANTS.TEAM_WORKSPACES = TEAM_WORKSPACES;
 APP_CONSTANTS.SUBSCRIPTION_STATUS = {
   ACTIVE: "active",
   CANCELLED: "cancelled",
+  TRIALING: "trialing",
 };
 
 APP_CONSTANTS.PATH_FROM_PAIR = {
+  SOURCE: "source",
   RULE_KEYS: "source.key",
   RULE_OPERATORS: "source.operator",
+  RULE_VALUE: "source.value",
   SCRIPT_LIBRARIES: "libraries",
   SOURCE_PAGE_URL_OPERATOR: "source.filters.pageUrl.operator",
   SOURCE_PAGE_URL_VALUE: "source.filters.pageUrl.value",

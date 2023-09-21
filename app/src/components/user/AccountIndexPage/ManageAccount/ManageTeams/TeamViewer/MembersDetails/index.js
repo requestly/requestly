@@ -6,11 +6,11 @@ import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
-import { trackAddMemberClicked } from "modules/analytics/events/common/teams";
 import PublicInviteLink from "./PublicInviteLink";
 import "./MembersDetails.css";
 import { actions } from "store";
 import { useDispatch } from "react-redux";
+import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
@@ -33,15 +33,18 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   }, [refreshTeamMembersTable]);
 
   const handleAddMemberClick = useCallback(() => {
+    trackInviteTeammatesClicked("manage_workspace");
     dispatch(
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
-        teamId: teamId,
-        callback: doRefreshTeamMembersTable,
+        newProps: {
+          teamId: teamId,
+          callback: doRefreshTeamMembersTable,
+          source: "team_members_table",
+        },
       })
     );
-    trackAddMemberClicked();
   }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
   useEffect(() => {
@@ -50,31 +53,36 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
         actions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
-          teamId: teamId,
-          callback: doRefreshTeamMembersTable,
+          newProps: {
+            teamId: teamId,
+            callback: doRefreshTeamMembersTable,
+            source: "team_members_table",
+          },
         })
       );
     }
   }, [dispatch, doRefreshTeamMembersTable, isNewTeam, teamId]);
 
   useEffect(() => {
-    const functions = getFunctions();
-    const getTeamBillingUsers = httpsCallable(functions, "getTeamBillingUsers");
+    if (refreshTeamMembersTable) {
+      const functions = getFunctions();
+      const getTeamBillingUsers = httpsCallable(functions, "teams-getTeamBillingUsers");
 
-    getTeamBillingUsers({
-      teamId,
-    })
-      .then((res) => {
-        const seatsData = res.data;
-        if (seatsData.success) {
-          setSeats({
-            billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
-            actualBillQuantity: seatsData.actualBillQuantity, // total number of users
-          });
-          setShowSeatStatus(true);
-        }
+      getTeamBillingUsers({
+        teamId,
       })
-      .catch(() => setShowSeatStatus(false));
+        .then((res) => {
+          const seatsData = res.data;
+          if (seatsData.success) {
+            setSeats({
+              billQuantity: seatsData.billQuantity, // quantity passed to stripe to bill
+              actualBillQuantity: seatsData.actualBillQuantity, // total number of users
+            });
+            setShowSeatStatus(true);
+          }
+        })
+        .catch(() => setShowSeatStatus(false));
+    }
   }, [teamId, refreshTeamMembersTable]);
 
   return (

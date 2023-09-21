@@ -38,13 +38,13 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
   const [isTeamPlanActive, setIsTeamPlanActive] = useState(true);
   const [billingExclude, setBillingExclude] = useState([]);
 
-  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "getTeamUsers"), []);
+  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamUsers"), []);
 
-  const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "getPendingUsers"), []);
+  const getPendingUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getPendingUsers"), []);
 
-  const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "getTeamSubscriptionInfo"), []);
+  const getTeamSubscriptionInfo = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamSubscriptionInfo"), []);
 
-  const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "getTeamBillingExclude"), []);
+  const getTeamBillingExclude = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamBillingExclude"), []);
 
   const changeTeamUserRole = ({ teamId, userId, updatedRole, isAdmin, setIsLoading }) => {
     if ((isAdmin && updatedRole === "admin") || (!isAdmin && updatedRole === "user")) {
@@ -53,7 +53,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
 
     setIsLoading(true);
     const functions = getFunctions();
-    const updateTeamUserRole = httpsCallable(functions, "updateTeamUserRole");
+    const updateTeamUserRole = httpsCallable(functions, "teams-updateTeamUserRole");
 
     updateTeamUserRole({
       teamId: teamId,
@@ -96,13 +96,22 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
           <Col>
             <Row className="text-bold">
               {!member?.isPending
-                ? member.displayName +
-                  (loggedInUserId === member.id ? " (You) " : "") +
-                  (billingExclude.includes(member.id) ? " (Free) " : "")
+                ? member?.displayName
+                  ? member?.displayName +
+                    (loggedInUserId === member.id ? " (You) " : "") +
+                    (billingExclude.includes(member.id) ? " (Free) " : "")
+                  : null
                 : null}
             </Row>
             <Row align={"middle"}>
-              <span className="member-email">{member.email}</span>
+              <span className="member-email">
+                {member.email +
+                  (member?.displayName
+                    ? ""
+                    : (loggedInUserId === member.id ? " (You) " : "") +
+                      (billingExclude.includes(member.id) ? " (Free) " : ""))}
+              </span>
+
               {member?.isPending ? (
                 <Badge
                   count={
@@ -237,7 +246,10 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
     getTeamSubscriptionInfo({ teamId: teamId })
       .then((res) => {
         const response = res.data;
-        setIsTeamPlanActive(response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE);
+        setIsTeamPlanActive(
+          response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE ||
+            response.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+        );
       })
       .catch((err) => new Error(err));
   };

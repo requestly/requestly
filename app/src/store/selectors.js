@@ -4,6 +4,10 @@ export const getGlobalState = (rootState) => {
   return rootState[ReducerKeys.GLOBAL];
 };
 
+export const getIsExtensionEnabled = (state) => {
+  return getGlobalState(state)["isExtensionEnabled"];
+};
+
 export const getRulesNode = (state) => {
   return getGlobalState(state)["rules"];
 };
@@ -16,19 +20,6 @@ export const getAllRulesData = (state) => {
 export const getAllRules = (state) => {
   const allRulesData = getAllRulesData(state);
   return allRulesData["rules"];
-};
-
-export const getMarketplaceRules = (state) => {
-  const allRules = getAllRules(state);
-  return allRules.filter((data) => "MKTRuleID" in data);
-};
-
-export const getUniqueMarketplaceRuleID = (state) => {
-  const onlyMarketplaceRules = getMarketplaceRules(state);
-  const uniqueMarketplaceRuleIDs = onlyMarketplaceRules.filter(
-    (rule, index, self) => self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
-  );
-  return uniqueMarketplaceRuleIDs;
 };
 
 export const getAllGroups = (state) => {
@@ -115,11 +106,6 @@ export const getSharedListsSearchKeyword = (state) => {
   return allSearch["sharedLists"];
 };
 
-export const getMarketplaceSearchKeyword = (state) => {
-  const allSearch = getSearch(state);
-  return allSearch["marketplace"];
-};
-
 export const getPendingHardRefreshItems = (state) => {
   return getGlobalState(state)["pendingHardRefresh"];
 };
@@ -166,10 +152,6 @@ export const getHasConnectedApp = (state) => {
   return getGlobalState(state).misc?.persist?.hasConnectedApp;
 };
 
-export const getMarketplaceRuleStatus = (state) => {
-  return getGlobalState(state)["marketplace"]["ruleStatus"];
-};
-
 export const getAppMode = (state) => {
   return getGlobalState(state)["appMode"];
 };
@@ -184,10 +166,6 @@ export const getDesktopSpecificDetails = (state) => {
 
 export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
-};
-
-export const getIfTrialModeEnabled = (state) => {
-  return getGlobalState(state)["trialModeEnabled"];
 };
 
 export const getMobileDebuggerAppDetails = (state) => {
@@ -215,6 +193,10 @@ export const getUserPersonaSurveyDetails = (state) => {
 
 export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
+};
+
+export const getIsProductHuntLaunchedBannerClosed = (state) => {
+  return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
 
 export const getIsRedirectRuleTourCompleted = (state) => {
@@ -261,4 +243,24 @@ export const getIsSecondarySidebarCollapsed = (state) => {
 
 export const getWorkspaceOnboardingTeamDetails = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.workspace;
+};
+
+export const getIsCommandBarOpen = (state) => {
+  return getGlobalState(state).misc.nonPersist?.isCommandBarOpen;
+};
+
+export const getLastSeenInviteTs = (state) => {
+  return getGlobalState(state).misc.persist?.lastSeenInviteTs;
+};
+
+export const getIsJoinWorkspaceCardVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};
+
+export const getExtensionInsallSource = (state) => {
+  return getGlobalState(state).misc.persist?.extensionInstallSource;
+};
+
+export const getAppNotificationBannerDismissTs = (state) => {
+  return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
 };

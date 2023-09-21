@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Row, Col, Avatar, Tabs, Alert } from "antd";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
@@ -10,35 +9,19 @@ import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
-import "./TeamViewer.css";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
+import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
+import "./TeamViewer.css";
 
 const TeamViewer = () => {
-  // Component State
-  const [isTeamAdmin, setIsTeamAdmin] = useState(false);
-
-  // Global State
   const { teamId } = useParams();
+  const { isTeamAdmin } = useIsTeamAdmin(teamId);
   const availableTeams = useSelector(getAvailableTeams);
   const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
   const teamMembersCount = teamDetails?.accessCount;
-
-  useEffect(() => {
-    const functions = getFunctions();
-    const getIsTeamAdmin = httpsCallable(functions, "isTeamAdmin");
-
-    getIsTeamAdmin({
-      teamId,
-    }).then((res) => {
-      const response = res.data;
-      if (response.success) {
-        setIsTeamAdmin(response.isAdmin);
-      }
-    });
-  }, [teamId]);
 
   const manageWorkspaceItems = useMemo(
     () => [

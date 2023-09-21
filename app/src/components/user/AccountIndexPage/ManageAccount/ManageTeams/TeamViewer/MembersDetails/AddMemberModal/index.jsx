@@ -1,43 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
-import { Row, Col } from "antd";
+import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
 import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
+import CopyButton from "components/misc/CopyButton";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
-import "react-multi-email/style.css";
-import "./AddMemberModal.css";
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
-import Logger from "lib/logger";
+import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isVerifiedBusinessDomainUser } from "utils/Misc";
+import APP_CONSTANTS from "config/constants";
+import "react-multi-email/style.css";
+import "./AddMemberModal.css";
 
-const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }) => {
-  const functions = getFunctions();
+const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
-  const [isTeamAdmin, setIsTeamAdmin] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-
+  const [isDomainJoiningEnabled, setIsDomainJoiningEnabled] = useState(false);
+  const [publicInviteId, setPublicInviteId] = useState(null);
+  const [isInvitePublic, setIsInvitePublic] = useState(false);
+  const [isInviteGenerating, setIsInviteGenerating] = useState(false);
+  const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
+  const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
   // Global state
+  const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
-  const teamId = currentTeamId ?? activeWorkspaceId;
+  const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
+  const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
+  const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
+    user?.details?.profile?.email,
+  ]);
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
+  const getTeamPublicInvite = useMemo(() => httpsCallable(getFunctions(), "invites-getTeamPublicInvite"), []);
 
   const toggleInviteEmailModal = () => {
     setInviteErrorModalActive(!isInviteErrorModalActive);
     toggleModal();
   };
+
+  const fetchPublicInvites = useCallback(() => {
+    setPublicInviteLoading(true);
+    getTeamPublicInvite({ teamId: teamId })
+      .then((res) => {
+        if (res?.data?.success) {
+          setPublicInviteId(res?.data?.inviteId);
+          setIsInvitePublic(res?.data?.public);
+          setIsDomainJoiningEnabled(res?.data?.domains?.length > 0);
+        }
+        setPublicInviteLoading(false);
+      })
+      .catch((err) => {
+        setPublicInviteLoading(false);
+      });
+  }, [teamId, getTeamPublicInvite]);
 
   const handleAddMember = () => {
     if (!userEmail || userEmail.length === 0) {
@@ -83,30 +114,58 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
       });
   };
 
-  useEffect(() => {
-    if (isOpen) trackAddMembersInWorkspaceModalViewed();
-  }, [isOpen]);
+  const handleAllowDomainUsers = useCallback(
+    (event) => {
+      const isEnabled = event.target.checked;
+      setIsDomainJoiningEnabled(isEnabled);
+
+      upsertTeamCommonInvite({ teamId, domainEnabled: isEnabled })
+        .then((res) => {
+          if (!res?.data?.success) {
+            setIsDomainJoiningEnabled(false);
+            toast.error("Couldn't update this setting. Please contact support.");
+          }
+        })
+        .catch(() => {
+          setIsDomainJoiningEnabled(false);
+          toast.error("Couldn't update this setting. Please contact support.");
+        });
+    },
+    [teamId, upsertTeamCommonInvite]
+  );
+
+  const handleCreateInviteLink = useCallback(() => {
+    setIsInviteGenerating(true);
+    upsertTeamCommonInvite({ teamId: teamId, publicEnabled: true }).then((res) => {
+      if (res?.data?.success) {
+        setPublicInviteId(res?.data?.inviteId);
+        setIsInvitePublic(true);
+      } else {
+        toast.error("Only admins can invite people");
+      }
+      setIsInviteGenerating(false);
+    });
+  }, [teamId, upsertTeamCommonInvite]);
 
   useEffect(() => {
-    setShowLoader(true);
-    const getIsTeamAdmin = httpsCallable(functions, "isTeamAdmin");
-    getIsTeamAdmin({
-      teamId,
-    })
-      .then((res) => {
-        if (res.data.success) {
-          setIsTeamAdmin(res.data.isAdmin);
-        }
-      })
-      .catch((err) => {
-        Logger.log("err while checking team admin", err);
-      })
-      .finally(() => setShowLoader(false));
-  }, [functions, teamId]);
+    isVerifiedBusinessDomainUser(user?.details?.profile?.email, user?.details?.profile?.uid).then((isVerified) =>
+      setIsVerifiedBusinessUser(isVerified)
+    );
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid]);
+
+  useEffect(() => {
+    if (isOpen) trackAddMembersInWorkspaceModalViewed(source);
+  }, [isOpen, source]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchPublicInvites();
+    }
+  }, [isOpen, fetchPublicInvites]);
 
   return (
     <>
-      <RQModal centered open={isOpen} onCancel={toggleModal}>
+      <RQModal width={620} centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
           {isTeamAdmin ? (
             <>
@@ -118,36 +177,73 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
               </div>
               <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-              <ReactMultiEmail
-                className="members-email-input"
-                placeholder="Email Address"
-                type="email"
-                value={userEmail}
-                onChange={setUserEmail}
-                validateEmail={validateEmail}
-                getLabel={(email, index, removeEmail) => (
-                  <div data-tag key={index} className="multi-email-tag">
-                    {email}
-                    <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                      <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                    </span>
-                  </div>
-                )}
-              />
-              <Row className="access-dropdown-container">
-                <Col span={24} align="right">
-                  <MemberRoleDropdown
-                    placement="bottomRight"
-                    isAdmin={makeUserAdmin}
-                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+              <div className="title mt-16">Email address</div>
+              <div className="email-invites-wrapper">
+                <div className="emails-input-wrapper">
+                  <ReactMultiEmail
+                    className="members-email-input"
+                    placeholder="Email Address"
+                    type="email"
+                    value={userEmail}
+                    onChange={setUserEmail}
+                    validateEmail={validateEmail}
+                    getLabel={(email, index, removeEmail) => (
+                      <div data-tag key={index} className="multi-email-tag">
+                        {email}
+                        <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
+                          <img alt="remove" src="/assets/img/workspaces/cross.svg" />
+                        </span>
+                      </div>
+                    )}
                   />
-                </Col>
-              </Row>
-              <div className="text-gray add-members-modal-info-text">
-                <div>Workspaces enable you to organize and collaborate on rules within your team.</div>
+                  <div className="access-dropdown-container">
+                    <MemberRoleDropdown
+                      placement="bottomRight"
+                      isAdmin={makeUserAdmin}
+                      handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                    />
+                  </div>
+                </div>
+                {isTeamAdmin && (
+                  <RQButton
+                    size="small"
+                    style={{ height: "37px", marginLeft: "4px" }}
+                    type={userEmail.length ? "primary" : "default"}
+                    htmlType="submit"
+                    onClick={handleAddMember}
+                    loading={isProcessing}
+                  >
+                    Invite People
+                  </RQButton>
+                )}
               </div>
+              <div className="title mt-16">Invite link</div>
+              {isInvitePublic ? (
+                <div className="display-flex items-center mt-8">
+                  <RQInput
+                    disabled
+                    value={`${window.location.origin}/invite/${publicInviteId}`}
+                    suffix={
+                      <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
+                    }
+                  />
+                </div>
+              ) : (
+                <div className="display-flex items-center">
+                  <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+                  <RQButton
+                    loading={isInviteGenerating}
+                    size="small"
+                    className="create-invite-link-btn"
+                    type="primary"
+                    onClick={handleCreateInviteLink}
+                  >
+                    Create link
+                  </RQButton>
+                </div>
+              )}
             </>
-          ) : showLoader ? (
+          ) : isLoading || isPublicInviteLoading ? (
             <PageLoader />
           ) : (
             <div className="title empty-message">
@@ -156,14 +252,25 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId }
             </div>
           )}
         </div>
-
-        {isTeamAdmin && (
-          <Row align="middle" justify="end" className="rq-modal-footer">
-            <RQButton type="primary" htmlType="submit" onClick={handleAddMember} loading={isProcessing}>
-              Invite People
-            </RQButton>
-          </Row>
-        )}
+        <Row align="middle" className="rq-modal-footer">
+          {isVerifiedBusinessUser && isTeamAdmin ? (
+            <>
+              {!isLoading && !isPublicInviteLoading && (
+                <>
+                  <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+                  <span className="ml-2 text-gray">
+                    Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+                  </span>
+                </>
+              )}
+            </>
+          ) : (
+            <LearnMoreLink
+              linkText="Learn more about team workspaces"
+              href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+            />
+          )}
+        </Row>
       </RQModal>
 
       <InviteErrorModal

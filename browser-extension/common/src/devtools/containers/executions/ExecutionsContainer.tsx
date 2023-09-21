@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ExecutionEvent, NetworkSettings, ExecutionFilters } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
-import "./executionsContainer.scss";
-import { ResourceTable } from "../../components/ResourceTable";
+import { ResourceTable } from "@requestly-ui/resource-table";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 import executionTableColumns, { EXECUTION_TABLE_COLUMN_IDS } from "./columns";
 import executionDetailsTabs from "./details-tabs";
 import { getResourceType } from "./utils";
-import { matchResourceTypeFilter } from "../../utils";
+import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
+import "./executionsContainer.scss";
 
 const ExecutionsContainer: React.FC = () => {
   const [executionEvents, setExecutionEvents] = useState<ExecutionEvent[]>([]);
@@ -81,6 +81,7 @@ const ExecutionsContainer: React.FC = () => {
         <>
           <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
           <ResourceTable
+            colorScheme={getCurrentColorScheme()}
             resources={executionEvents}
             columns={executionTableColumns}
             primaryColumnKeys={[EXECUTION_TABLE_COLUMN_IDS.URL]}

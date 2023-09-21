@@ -11,13 +11,16 @@ const INITIAL_STATE = {
   },
 
   userPersona: {
-    page: 0,
+    page: "getting_started",
     persona: "",
-    useCases: [],
-    referralChannel: "",
-    numberOfEmployees: "",
+    industry: "",
+    // useCases: [],
+    // referralChannel: "",
+    // numberOfEmployees: "",
     isSurveyCompleted: false,
   },
+
+  isExtensionEnabled: true,
 
   /* App Mode */
   appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
@@ -123,11 +126,14 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-  },
-
-  /* Marketplace */
-  marketplace: {
-    ruleStatus: {},
+    joinWorkspaceModal: {
+      isActive: false,
+      props: {},
+    },
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -142,9 +148,6 @@ const INITIAL_STATE = {
 
   // country of current user
   country: "",
-
-  // if trial part
-  trialModeEnabled: false,
 
   mobileDebugger: {
     app: {
@@ -178,20 +181,28 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
+      appNotificationBannerDismissTs: 0,
+      isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
         firstRule: false,
         fifthRule: false,
+        firstDraftSession: false,
+        rulesListSharingOnboarding: false,
       },
 
       hasConnectedApp: false,
+      lastSeenInviteTs: 0,
+      isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      isCommandBarOpen: false,
     },
   },
 };

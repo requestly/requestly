@@ -13,6 +13,7 @@ import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
 import { actions } from "store";
 import { isArray } from "lodash";
+import { useHasChanged } from "hooks/useHasChanged";
 
 window.isFirstSyncComplete = false;
 
@@ -25,19 +26,6 @@ const DBListeners = () => {
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
-
-  const useHasChanged = (val) => {
-    const prevVal = usePrevious(val);
-    return prevVal !== val;
-  };
-
-  const usePrevious = (value) => {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
 
   const hasAuthStateChanged = useHasChanged(user?.loggedIn);
 

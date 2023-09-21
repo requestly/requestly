@@ -6,11 +6,6 @@ export const updateUserCountry = (prevState, action) => {
   prevState.country = action.payload;
 };
 
-// not used anywhere
-export const updateTrialModeEnabled = (prevState, action) => {
-  prevState.trialModeEnabled = action.payload;
-};
-
 export const updateMobileDebuggerAppDetails = (prevState, action) => {
   prevState.mobileDebugger.app = action.payload;
 };
@@ -31,4 +26,8 @@ export const updateDesktopSpecificAppProperty = (prevState, action) => {
 
 export const updateHasConnectedApp = (prevState, action) => {
   prevState.misc.persist.hasConnectedApp = action.payload;
+};
+
+export const updateIsExtensionEnabled = (prevState, action) => {
+  prevState.isExtensionEnabled = action.payload;
 };

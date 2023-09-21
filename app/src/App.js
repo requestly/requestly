@@ -21,6 +21,8 @@ import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
+import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
+import { useIsExtensionEnabled } from "hooks";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -33,6 +35,7 @@ const App = () => {
   }, []);
 
   useGeoLocation();
+  useIsExtensionEnabled();
 
   submitAppDetailAttributes();
 
@@ -57,18 +60,19 @@ const App = () => {
 
   return (
     <>
+      <ExtensionContextInvalidationNotice />
       <AuthHandler />
       <PreLoadRemover />
       <AppModeInitializer />
       <DBListeners />
       <RuleExecutionsSyncer />
-      <FeatureUsageEvent />
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
 
       <ConfigProvider locale={enUS}>
         <GrowthBookProvider growthbook={growthbook}>
           <LocalUserAttributesHelperComponent />
+          <FeatureUsageEvent />
           <div id="requestly-dashboard-layout">
             <CommandBar />
             {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (

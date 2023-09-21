@@ -6,6 +6,8 @@ import { getAttrFromFirebase, submitAttrUtil } from "./AnalyticsUtils";
 import { dateObjToDateString, getOldestDate } from "./DateTimeUtils";
 import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installation";
 import { getValueAsPromise } from "actions/FirebaseActions";
+import { isEmailVerified } from "./AuthUtils";
+import { isCompanyEmail } from "./FormattingHelper";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -100,6 +102,12 @@ export const isDesktopMode = () => {
   else return false;
 };
 
+export const isMacOs = () => {
+  // platform is deprecated but still supported for all browsers
+  // will switch to navigator.userAgentData.platform when it's supported by all browsers
+  return window.navigator.platform.includes("Mac");
+};
+
 export const parseGravatarImage = (urlString) => {
   const url = new URL(urlString);
   url.searchParams.set(
@@ -164,4 +172,14 @@ export const getSignupDate = async (uid) => {
 
 export const getConnectedAppsCount = (appsListArray) => {
   return appsListArray?.filter((app) => app.isActive).length;
+};
+
+export const isVerifiedBusinessDomainUser = async (email, uid) => {
+  if (!email || !uid) return false;
+
+  return isEmailVerified(uid).then((result) => {
+    if (result && isCompanyEmail(email)) {
+      return true;
+    } else return false;
+  });
 };

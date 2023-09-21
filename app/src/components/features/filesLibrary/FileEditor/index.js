@@ -377,7 +377,7 @@ const FileEditor = (props) => {
     if (contentType.startsWith("image")) {
       return (
         <Row>
-          <Col className="text-align-center" span={24} align="center">
+          <Col className="text-center" span={24} align="center">
             {<ImageViewer src={props.fileDetails.webContentLink} />}
           </Col>
         </Row>
@@ -420,7 +420,13 @@ const FileEditor = (props) => {
       />
 
       <Row className="mock-editor-container">
-        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
+        <Col
+          span={22}
+          offset={1}
+          md={{ offset: 2, span: 20 }}
+          lg={{ offset: 4, span: 16 }}
+          className="mock-editor-container-col"
+        >
           <Row className="mock-editor-body">
             <Row className="mock-editor-meta-data-row" gutter={16}>
               {mockType === RESOURCE_TYPE_LIST.MOCK ? (
