@@ -1346,7 +1346,11 @@ BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
   BG.Methods.launchUrl(url).then((tab) => {
-    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true, explicit: true });
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
+      notify: true,
+      explicit: true,
+      showWidget: true,
+    });
   });
 };
 
