@@ -9,7 +9,6 @@ import { PersistGate } from "redux-persist/integration/react";
 import App from "./App";
 
 import "./init";
-import "./assets/icons/remixicon/remixicon.css";
 import "./assets/less/index.less";
 import "./styles/custom/custom.scss";
 
