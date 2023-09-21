@@ -97,7 +97,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
             <Row className="text-bold">
               {!member?.isPending
                 ? member?.displayName
-                  ? member?.displayName === "Requestly Extension"
+                  ? member.email === "requestly.extension@gmail.com"
                     ? "Requestly Enterprise Support"
                     : member?.displayName +
                       (loggedInUserId === member.id ? " (You) " : "") +
