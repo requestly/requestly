@@ -14,6 +14,7 @@ import { toast } from "utils/Toast";
 import { getUserAttributes } from "store/selectors";
 import { useSelector } from "react-redux";
 import "./index.scss";
+import { debounce } from "lodash";
 
 const codesList: Record<string, { redeemed: boolean }> = {
   rqn87: { redeemed: true },
@@ -74,7 +75,7 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
-  const verifyCode = (enteredCode: string, index: number) => {
+  const verifyCode = debounce((enteredCode: string, index: number) => {
     if (!enteredCode) return;
 
     if (!codesList[enteredCode]) {
@@ -88,7 +89,7 @@ const AppSumoModal: React.FC = () => {
     }
     updateAppSumoCode(index, "error", "");
     updateAppSumoCode(index, "verified", true);
-  };
+  }, 1000);
 
   const isAllCodeCheckPassed = useMemo(() => appsumoCodes.every((code) => code.verified), [appsumoCodes]);
 
@@ -150,28 +151,32 @@ const AppSumoModal: React.FC = () => {
         </div>
         <div className="title mt-16">AppSumo Code(s)</div>
         {appsumoCodes.map((appsumoCode, index) => (
-          <div className="display-flex">
+          <div className="display-flex" key={index}>
             <div className="appsumo-code-input-container">
               <RQInput
                 value={appsumoCode.code}
                 key={index}
                 onChange={(e) => {
-                  verifyCode(e.target.value, index);
                   updateAppSumoCode(index, "code", e.target.value);
+                  verifyCode(e.target.value, index);
                 }}
                 suffix={appsumoCode.verified ? <MdOutlineVerified /> : null}
                 placeholder="Enter code here"
               />
               <div className="appsumo-code-error field-error-prompt">{appsumoCode.error || null}</div>
             </div>
-            <div className="remove-icon" style={{ margin: "auto 6px", cursor: "pointer" }}>
-              <AiFillDelete onClick={() => removeAppSumoCodeInput(index)} />
-            </div>
+            {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
+              <div className="remove-icon" style={{ margin: "auto 6px", cursor: "pointer" }}>
+                <AiFillDelete onClick={() => removeAppSumoCodeInput(index)} />
+              </div>
+            )}
           </div>
         ))}
-        <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
-          + Add more codes
-        </RQButton>
+        {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
+          <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
+            + Add more codes
+          </RQButton>
+        )}
       </div>
       <Row className="rq-modal-footer" justify={"end"}>
         <RQButton
