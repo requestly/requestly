@@ -17,6 +17,10 @@ export const trackRequestPayloadKeyFilterModifiedEvent = (rule_type, resource_ty
   trackRuleFilterModified("payload_key", rule_type, resource_type);
 };
 
+export const trackRequestPayloadOperatorFilterModifiedEvent = (rule_type, resource_type) => {
+  trackRuleFilterModified("payload_operator", rule_type, resource_type);
+};
+
 export const trackRequestPayloadValueFilterModifiedEvent = (rule_type, resource_type) => {
   trackRuleFilterModified("payload_value", rule_type, resource_type);
 };

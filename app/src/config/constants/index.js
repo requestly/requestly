@@ -140,6 +140,7 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
   SOURCE_REQUEST_METHOD: "source.filters.requestMethod",
   SOURCE_REQUEST_PAYLOAD: "source.filters.requestPayload",
   SOURCE_REQUEST_PAYLOAD_KEY: "source.filters.requestPayload.key",
+  SOURCE_REQUEST_PAYLOAD_OPERATOR: "source.filters.requestPayload.operator",
   SOURCE_REQUEST_PAYLOAD_VALUE: "source.filters.requestPayload.value",
 };
 

@@ -32,7 +32,8 @@ const LINKS = {
     "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
 
   // Docs - Mock GraphQL API response
-  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://docs.requestly.io/using-rules/mock-graphql-api-response",
+  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
+
   // Docs - Android Debugger Overview
   REQUESTLY_DOCS_ANDROID_DEBUGGER: "https://docs.requestly.io/android-debugger/overview",
 
