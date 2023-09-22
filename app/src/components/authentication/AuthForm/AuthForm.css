@@ -60,9 +60,14 @@
   margin-bottom: 1.25rem;
 }
 .auth-modal-divider {
-  margin: 1rem 0;
+  margin-top: 1rem;
   color: #b0b0b5;
   text-align: center;
+}
+.auth-modal-message {
+  color: #b0b0b5;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 .mb-0 {
   margin-bottom: 0;

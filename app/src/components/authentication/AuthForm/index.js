@@ -439,7 +439,9 @@ const AuthForm = ({
               </Row>
               <Row className="auth-wrapper mt-1">
                 <SocialAuthButtons />
-                <div className="auth-modal-divider w-full">or sign up through email</div>
+                <div className="auth-modal-divider w-full">or</div>
+                <div className="auth-modal-message w-full">Sign Up with email</div>
+
                 {renderEmailField()}
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
@@ -470,7 +472,8 @@ const AuthForm = ({
           </Row>
           <Row className="auth-wrapper mt-1">
             <SocialAuthButtons />
-            <div className="auth-modal-divider w-full mb-0">or sign in with email</div>
+            <div className="auth-modal-divider w-full">or</div>
+            <div className="auth-modal-message w-full">Sign In with email</div>
             {renderEmailField()}
             <FormSubmitButton />
           </Row>
