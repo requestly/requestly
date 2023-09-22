@@ -2,7 +2,7 @@ import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import React, { useCallback, useMemo, useState } from "react";
-import { AiFillDelete } from "@react-icons/all-files/ai/AiFillDelete";
+import { ImCross } from "@react-icons/all-files/im/ImCross";
 import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
@@ -65,7 +65,9 @@ const AppSumoModal: React.FC = () => {
   const updateAppSumoCode = (index: number, key: keyof AppSumoCode, value: AppSumoCode[typeof key]) => {
     setAppsumoCodes((prev) => {
       const codes: AppSumoCode[] = [...prev];
-      (codes[index] as any)[key] = value;
+      if (codes[index]) {
+        (codes[index] as any)[key] = value;
+      }
       return codes;
     });
   };
@@ -175,8 +177,14 @@ const AppSumoModal: React.FC = () => {
               <div className="appsumo-code-error field-error-prompt">{appsumoCode.error || null}</div>
             </div>
             {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
-              <div className="remove-icon" style={{ margin: "auto 6px", cursor: "pointer" }}>
-                <AiFillDelete onClick={() => removeAppSumoCodeInput(index)} />
+              <div className={`remove-icon ${appsumoCodes.length === 1 ? "cursor-disabled" : "cursor-pointer"}`}>
+                <ImCross
+                  id="delete-pair"
+                  className="text-gray"
+                  onClick={() => {
+                    removeAppSumoCodeInput(index);
+                  }}
+                />
               </div>
             )}
           </div>
