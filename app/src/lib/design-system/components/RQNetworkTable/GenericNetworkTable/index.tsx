@@ -9,6 +9,7 @@ import {
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
+import FiltersToolbar, { Filters } from "./components/FiltersToolbar/FiltersToolbar";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -48,6 +49,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   onContextMenuOpenChange = (isOpen) => {},
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
+  const [filters, setFilters] = useState<Filters>({});
 
   const finalColumns = useMemo(
     () =>
@@ -57,10 +59,10 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector, excludeColumns, extraColumns]
   );
 
-  const finalDetailsTabs = useMemo(
-    () => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs],
-    [networkEntrySelector, extraDetailsTabs]
-  );
+  const finalDetailsTabs = useMemo(() => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs], [
+    networkEntrySelector,
+    extraDetailsTabs,
+  ]);
 
   const isFailed = useCallback(
     (log: NetworkLog) => {
@@ -71,17 +73,32 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
+  const filterLog = (networkLog: NetworkLog) => {
+    const entry = networkEntrySelector(networkLog);
+
+    if (filters.search) {
+      if (!entry?.request?.url?.includes(filters.search)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   return (
-    <ResourceTable
-      resources={logs}
-      isFailed={isFailed}
-      columns={finalColumns}
-      detailsTabs={finalDetailsTabs}
-      primaryColumnKeys={["timeOffset", "url"]}
-      colorScheme={ColorScheme.DARK}
-      onRowSelection={setSelectedLog}
-      contextMenuOptions={contextMenuOptions}
-      onContextMenuOpenChange={onContextMenuOpenChange}
-    />
+    <div className="network-container">
+      <FiltersToolbar filters={filters} setFilters={setFilters} />
+      <ResourceTable
+        resources={logs}
+        isFailed={isFailed}
+        columns={finalColumns}
+        detailsTabs={finalDetailsTabs}
+        primaryColumnKeys={["timeOffset", "url"]}
+        colorScheme={ColorScheme.DARK}
+        onRowSelection={setSelectedLog}
+        contextMenuOptions={contextMenuOptions}
+        filter={filterLog}
+      />
+    </div>
   );
 };
