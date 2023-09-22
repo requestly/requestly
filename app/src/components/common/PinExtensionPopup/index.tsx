@@ -8,6 +8,11 @@ import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { FaToggleOff } from "@react-icons/all-files/fa6/FaToggleOff";
 import { ReactComponent as BlueUnderline } from "./assets/blue-underline.svg";
+import pinExtensionGif from "./assets/pin-ext-guide.gif";
+import activateDeactivateGif from "./assets/activate-deactivate.gif";
+import executedRulesGif from "./assets/executed-rules.gif";
+import recordAndReplayGif from "./assets/record-browser-activity.gif";
+import pauseRequestlyGif from "./assets/pause-rq.gif";
 import "./PinExtensionPopup.css";
 
 interface Props {
@@ -36,7 +41,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Activate/Deactivate rules",
-          src: "https://dummyimage.com/600x400/000/fff",
+          src: activateDeactivateGif,
         },
       },
       {
@@ -47,7 +52,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Executed rules",
-          src: "https://dummyimage.com/600x400/000/fff",
+          src: executedRulesGif,
         },
       },
       {
@@ -58,7 +63,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Record and replay session",
-          src: "https://dummyimage.com/600x400/000/fff",
+          src: recordAndReplayGif,
         },
       },
       {
@@ -69,7 +74,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Pause requestly extension",
-          src: "https://dummyimage.com/600x400/000/fff",
+          src: pauseRequestlyGif,
         },
       },
     ],
@@ -98,13 +103,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           Requestly to your browser 📌
         </div>
 
-        <img
-          width={338}
-          height={196}
-          alt="Pin extension"
-          className="pin-extension-gif"
-          src="https://dummyimage.com/600x400/000/fff"
-        />
+        <img width={338} height={196} alt="Pin extension" className="pin-extension-gif" src={pinExtensionGif} />
 
         <div>
           <div className="subtitle">Access Requestly features quickly from the extension</div>
@@ -112,6 +111,12 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
             ghost
             accordion
             expandIconPosition="end"
+            onChange={(key) => {
+              if (!key) return;
+
+              console.log({ x: collapsePanelItems[Number(key)] });
+              // get and send analytic event
+            }}
             expandIcon={({ isActive }) => (
               <PiCaretDownBold className={`header-down-caret ${isActive ? "rotate" : ""}`} />
             )}

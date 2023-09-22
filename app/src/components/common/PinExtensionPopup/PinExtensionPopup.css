@@ -38,6 +38,8 @@
 .pin-extension-popup img {
   max-inline-size: 100%;
   block-size: auto;
+  object-fit: cover;
+  object-position: center;
 }
 
 .pin-extension-popup .pin-extension-gif {
@@ -85,6 +87,7 @@
 }
 
 .pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text {
+  font-size: 14px;
   padding: 10px 12px;
 }
 
