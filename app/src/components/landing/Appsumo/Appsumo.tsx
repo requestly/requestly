@@ -6,7 +6,7 @@ import { ImCross } from "@react-icons/all-files/im/ImCross";
 import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
-import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
+import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
 import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
 import { arrayUnion, doc, getDoc, getFirestore, updateDoc, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
@@ -15,6 +15,7 @@ import { getUserAttributes } from "store/selectors";
 import { useSelector } from "react-redux";
 import "./index.scss";
 import { debounce } from "lodash";
+import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -202,6 +203,7 @@ const AppSumoModal: React.FC = () => {
           onClick={() => {
             onSubmit()
               .then(() => {
+                trackAppsumoCodeRedeemed(appsumoCodes.length);
                 toast.success(
                   `Lifetime access to Session Replay Pro unlocked for ${
                     appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
