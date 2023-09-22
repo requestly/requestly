@@ -1,0 +1,116 @@
+.pin-extension-popup-container .rq-modal {
+  min-width: 370px !important;
+}
+
+.pin-extension-popup-container .rq-modal.ant-modal .ant-modal-close {
+  display: none;
+}
+
+.pin-extension-popup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.pin-extension-popup .title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 27px;
+}
+
+.pin-extension-popup .title span {
+  position: relative;
+}
+
+.pin-extension-popup .title span svg {
+  position: absolute;
+  top: 24px;
+  left: -6px;
+  width: 114px;
+  height: 6px;
+}
+
+.pin-extension-popup img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.pin-extension-popup .pin-extension-gif {
+  width: 338px;
+  height: 195.58px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-dark);
+}
+
+.pin-extension-popup .subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+  margin-bottom: 8px;
+}
+
+.pin-extension-popup .action-btns {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pin-extension-popup .action-btns .ant-btn {
+  padding: 0;
+  height: 16px;
+  color: var(--white);
+  font-family: Roboto;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.pin-extension-popup .action-btns .ant-btn:hover {
+  opacity: 0.7;
+}
+
+.pin-extension-popup .action-btns .ant-btn svg {
+  margin-right: 8px;
+  color: var(--text-gray);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item {
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--gray-dark);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header {
+  height: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
+  padding-top: 8px;
+  padding-bottom: 0;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .feature-gif {
+  height: 169px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* icons in accordion */
+/* font size for icons in action btns */
+/* padding and click issue in accordion header */
+/* convert all the images in gif and update in code*/
+/* analytics */
