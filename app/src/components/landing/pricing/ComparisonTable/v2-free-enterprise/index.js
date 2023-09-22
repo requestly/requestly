@@ -16,7 +16,7 @@ import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/
 import { Switch, Tag } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
-import WorkspaceDropdown from "components/common/WorkspaceDropdown/WorkspaceDropdown";
+import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
