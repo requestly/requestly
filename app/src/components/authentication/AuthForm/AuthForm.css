@@ -57,12 +57,17 @@
   min-height: 38px;
 }
 .form-elements-margin {
-  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 .auth-modal-divider {
-  margin: 1rem 0;
+  margin-top: 1rem;
   color: #b0b0b5;
   text-align: center;
+}
+.auth-modal-message {
+  color: #b0b0b5;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 .mb-0 {
   margin-bottom: 0;
@@ -98,4 +103,19 @@
   gap: 6px;
   border: 0;
   background: transparent;
+}
+
+/* ANIMATION */
+.generate-login-link-btn-animation {
+  position: relative;
+}
+
+.generate-login-link-btn-animation::after {
+  background-color: var(--background);
+  opacity: 0.3;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  content: "";
 }
