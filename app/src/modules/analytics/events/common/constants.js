@@ -150,6 +150,9 @@ export const ONBOARDING = {
   PRODUCT_HUNT_BANNER_CLICKED: "product_hunt_banner_clicked",
   PRODUCTS_DROPDOWN_CLICKED: "products_dropdown_clicked",
   PRODUCT_CLICKED: "product_clicked",
+  PIN_EXTENSION_POPUP_VIEWED: "pin_extension_popup_viewed",
+  PIN_EXTENSION_POPUP_EXPANDED: "pin_extension_popup_expanded",
+  PIN_EXTENSION_POPUP_CLOSED: "pin_extension_popup_closed",
 };
 
 export const TEAMS = {

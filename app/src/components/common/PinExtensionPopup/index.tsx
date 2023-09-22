@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { Button, Collapse } from "antd";
+import React, { useEffect, useMemo } from "react";
+import { Button, Collapse, CollapseProps } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { BsPin } from "@react-icons/all-files/bs/BsPin";
@@ -13,7 +13,14 @@ import activateDeactivateGif from "./assets/activate-deactivate.gif";
 import executedRulesGif from "./assets/executed-rules.gif";
 import recordAndReplayGif from "./assets/record-browser-activity.gif";
 import pauseRequestlyGif from "./assets/pause-rq.gif";
+import {
+  trackPinExtensionPopupClosed,
+  trackPinExtensionPopupExpanded,
+  trackPinExtensionPopupViewed,
+} from "modules/analytics/events/common/onboarding/pinExtensionPopup";
 import "./PinExtensionPopup.css";
+
+type PanelType = "activate_deactivate" | "what_rules_executed" | "record_and_replay" | "pause_extension";
 
 interface Props {
   isOpen: boolean;
@@ -21,19 +28,28 @@ interface Props {
 }
 
 export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
+  useEffect(() => {
+    trackPinExtensionPopupViewed();
+  }, []);
+
   const handleCloseClick = () => {
     onCancel();
-    // send analytics
+    trackPinExtensionPopupClosed("close");
   };
 
   const handleAlreadyPinnedClick = () => {
     onCancel();
-    // send analytics
+    trackPinExtensionPopupClosed("already_pinned");
   };
 
-  const collapsePanelItems = useMemo(
+  const collapsePanelItems: {
+    header: React.ReactNode;
+    analyticEventAction: PanelType;
+    image: { alt: string; src: any };
+  }[] = useMemo(
     () => [
       {
+        analyticEventAction: "activate_deactivate",
         header: (
           <div>
             <BiSliderAlt /> Activate/Deactivate rules
@@ -45,6 +61,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         },
       },
       {
+        analyticEventAction: "what_rules_executed",
         header: (
           <div>
             <BiSliderAlt style={{ transform: "rotate(90deg)" }} /> Know which rules executed on a web page
@@ -56,6 +73,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         },
       },
       {
+        analyticEventAction: "record_and_replay",
         header: (
           <div>
             <FiVideo /> Record and replay browser activity
@@ -67,6 +85,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         },
       },
       {
+        analyticEventAction: "pause_extension",
         header: (
           <div>
             <FaToggleOff /> Pause Requestly when not in use
@@ -80,6 +99,13 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
     ],
     []
   );
+
+  const handleExapandedPanelChange = (key: Parameters<CollapseProps["onChange"]>[0]) => {
+    if (key) {
+      const action = collapsePanelItems[Number(key)].analyticEventAction;
+      trackPinExtensionPopupExpanded(action);
+    }
+  };
 
   return (
     <RQModal
@@ -111,12 +137,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
             ghost
             accordion
             expandIconPosition="end"
-            onChange={(key) => {
-              if (!key) return;
-
-              console.log({ x: collapsePanelItems[Number(key)] });
-              // get and send analytic event
-            }}
+            onChange={handleExapandedPanelChange}
             expandIcon={({ isActive }) => (
               <PiCaretDownBold className={`header-down-caret ${isActive ? "rotate" : ""}`} />
             )}
