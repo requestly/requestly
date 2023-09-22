@@ -17,6 +17,7 @@ import {
   confirmPasswordReset,
   signOut as signOutFirebaseFunction,
   sendEmailVerification,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -33,6 +34,7 @@ import {
   trackSignupSuccessEvent,
 } from "modules/analytics/events/common/auth/signup";
 import {
+  trackEmailLoginLinkGenerated,
   trackLoginAttemptedEvent,
   trackLoginFailedEvent,
   trackLoginSuccessEvent,
@@ -62,6 +64,7 @@ import {
   trackLogoutFailed,
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
+import { toast } from "utils/Toast";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -186,6 +189,27 @@ export async function signUp(name, email, password, refCode, source) {
     });
 }
 
+export async function sendEmailLinkForSignin(
+  email,
+  source,
+  toastMessage = "Please check your email for instructions to login."
+) {
+  const auth = getAuth(firebaseApp);
+  return sendSignInLinkToEmail(auth, email, {
+    url: window.location.href,
+    handleCodeInApp: true,
+  })
+    .then((res) => {
+      window.localStorage.setItem("RQEmailForSignIn", email);
+      toast.info(toastMessage);
+      trackEmailLoginLinkGenerated(email, source);
+    })
+    .catch((err) => {
+      toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
+      console.log(err);
+    });
+}
+
 export async function emailSignIn(email, password, isSignUp, source) {
   trackLoginAttemptedEvent({
     auth_provider: AUTH_PROVIDERS.EMAIL,
@@ -299,7 +323,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
     const uid = result?.user?.uid || null;
     const email = result?.user?.email || null;
 
-    const additionalUserInfo = getAdditionalUserInfo(result);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
     const is_new_user = additionalUserInfo?.isNewUser || false;
 
     if (is_new_user) {
@@ -427,6 +451,8 @@ export const signInWithEmailLink = async (email, callback) => {
   try {
     const auth = getAuth(firebaseApp);
     const result = await signInWithEmailLinkFirebaseLib(auth, email, window.location.href);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
+    const isNewUser = additionalUserInfo?.isNewUser || false;
 
     // Update details in db
     const authData = getAuthData(result.user);
@@ -442,8 +468,34 @@ export const signInWithEmailLink = async (email, callback) => {
     });
 
     callback && callback.call(null, true);
-    return authData;
-  } catch (e) {
+    return { authData, isNewUser };
+  } catch (error) {
+    if (error?.code === "auth/email-already-in-use") {
+      /* user already exists with another auth provider */
+      const userEmail = error?.email;
+      try {
+        const auth = getAuth(firebaseApp);
+        const authData = getAuthData(auth.currentUser) || {};
+        authData.email = userEmail;
+
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
+          uid: authData.uid,
+          email,
+        });
+
+        return {
+          authData,
+          isNewUser: false,
+        };
+      } catch (e) {
+        /* wait for sign in to be triggered again, once userAuth is ready */
+        return {
+          authData: { email: userEmail },
+          isNewUser: false,
+        };
+      }
+    }
     trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
     return null;
   }
