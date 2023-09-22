@@ -72,6 +72,7 @@ const OnboardingScreen: React.FC = () => {
           type="text"
           className="view-all-link"
           onClick={() => {
+            sendEvent(EVENT.EXTENSION_VIEW_ALL_MODIFICATIONS_CLICKED);
             window.open(`${config.WEB_URL}/rules/create?source=popup`, "_blank");
           }}
         >
@@ -81,7 +82,7 @@ const OnboardingScreen: React.FC = () => {
           className="watch-demo-link"
           type="text"
           onClick={() => {
-            sendEvent(EVENT.WATCH_DEMO_VIDEO_CLICKED);
+            sendEvent(EVENT.EXTENSION_WATCH_DEMO_VIDEO_CLICKED);
             window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
           }}
         >
