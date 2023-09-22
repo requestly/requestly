@@ -4,10 +4,18 @@ import "./styles.scss";
 import { RQButton } from "lib/design-system/components";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { trackFeatureLimitUpgradeBannerClicked } from "modules/analytics/events/common/feature-limiter";
+import {
+  trackFeatureLimitUpgradeBannerClicked,
+  trackFeatureLimitUpgradeBannerViewed,
+} from "modules/analytics/events/common/feature-limiter";
+import { useEffect } from "react";
 
 const FeatureLimiterBanner = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackFeatureLimitUpgradeBannerViewed();
+  }, []);
 
   return (
     <Row className="feature-limit-banner-container">
