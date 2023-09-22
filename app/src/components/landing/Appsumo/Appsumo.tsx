@@ -126,6 +126,7 @@ const AppSumoModal: React.FC = () => {
         date: new Date(),
         type: "appsumo",
       });
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
     } else {
       const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
       updateDoc(teamsRef, {
