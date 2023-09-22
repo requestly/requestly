@@ -184,4 +184,5 @@ export const TRAFFIC_TABLE = {
 
 export const FEATURE_LIMITER = {
   UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
+  UPGRADE_BANNER_VIEWED: "feature_limiter_upgrade_banner_viewed",
 };
