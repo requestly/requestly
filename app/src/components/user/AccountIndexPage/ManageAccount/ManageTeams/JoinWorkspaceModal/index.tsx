@@ -24,12 +24,11 @@ interface JoinWorkspaceModalProps {
 }
 
 interface InviteRowProps {
-  isPrimary: boolean;
   team: TeamInviteMetadata;
   callback: () => void;
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
+const InviteRow: React.FC<InviteRowProps> = ({ team, callback }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -90,7 +89,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
           <div>{team.teamName}</div>
         </Col>
         <div className="text-gray">{team.teamAccessCount} members</div>
-        <Button loading={isJoining} type={isPrimary ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
+        <Button loading={isJoining} type="primary" onClick={() => handleJoinClick(team)}>
           {isJoining ? "Joining" : "Join"}
         </Button>
       </div>
@@ -166,7 +165,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata, index) => {
-              return <InviteRow team={team} isPrimary={index === 0} callback={callback} />;
+              return <InviteRow team={team} callback={callback} />;
             })}
           </ul>
         ) : (

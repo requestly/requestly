@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.9.2",
+  "version": "23.9.20",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,

@@ -10,8 +10,9 @@ export enum EVENT {
   START_RECORDING_CLICKED = "start_recording_clicked",
   STOP_RECORDING_CLICKED = "stop_recording_clicked",
   VIEW_RECORDING_CLICKED = "view_recording_clicked",
-  WATCH_DEMO_VIDEO_CLICKED = "watch_demo_video_clicked",
-  PRODUCT_HUNT_BANNER_CLICKED = "product_hunt_banner_clicked",
+  EXTENSION_WATCH_DEMO_VIDEO_CLICKED = "extension_watch_demo_video_clicked",
+  EXTENSION_RULE_CLICKED = "extension_rule_clicked",
+  EXTENSION_VIEW_ALL_MODIFICATIONS_CLICKED = "extension_view_all_modifications_clicked",
 }
 
 export const sendEvent = (eventName: EVENT, eventParams: Record<string, any> = {}) => {

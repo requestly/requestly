@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -6,7 +6,6 @@ import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
-import { isEmailValid } from "utils/FormattingHelper";
 
 //IMAGES
 import GoogleIcon from "../../../assets/img/icons/common/google.svg";
@@ -17,7 +16,7 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 //UTILS
 // import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
-import { getAuthErrorMessage, AuthTypes } from "../utils";
+// import { getAuthErrorMessage, AuthTypes } from "../utils";
 
 //CONSTANTS
 import APP_CONSTANTS from "../../../config/constants";
@@ -25,8 +24,8 @@ import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  handleEmailSignIn,
-  handleEmailSignUp,
+  // handleEmailSignIn,
+  // handleEmailSignUp,
   handleForgotPasswordButtonOnClick,
   handleGoogleSignIn,
   handleResetPasswordOnClick,
@@ -34,12 +33,15 @@ import {
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";
-import { getAppMode } from "../../../store/selectors";
+import { getAppMode, getTimeToResendEmailLogin } from "../../../store/selectors";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 //STYLES
 import { AuthFormHero } from "./AuthFormHero";
 import "./AuthForm.css";
+import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -51,6 +53,7 @@ const AuthForm = ({
   callbacks,
   isOnboardingForm,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   //LOAD PROPS
@@ -60,15 +63,15 @@ const AuthForm = ({
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
   const path = window.location.pathname;
+  const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   const [actionPending, setActionPending] = useState(false);
-  const [name, setName] = useState("");
+  const [lastEmailInputHandled, setLastEmailInputHandled] = useState("");
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState();
-  const [showEmailSecondStep, setShowEmailSecondStep] = useState(false);
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
-
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
   useEffect(() => {
@@ -87,6 +90,14 @@ const AuthForm = ({
     }
   }, [eventSource, referralCode, trackEvent]);
 
+  useEffect(() => {
+    if (timeToResendEmailLogin !== 0) {
+      if (lastEmailInputHandled !== email) {
+        dispatch(actions.updateTimeToResendEmailLogin(0));
+      }
+    }
+  }, [dispatch, email, lastEmailInputHandled, timeToResendEmailLogin]);
+
   const handleGoogleSignInButtonClick = () => {
     setActionPending(true);
     handleGoogleSignIn(appMode, MODE, eventSource)
@@ -103,62 +114,62 @@ const AuthForm = ({
       });
   };
 
-  const handleEmailSignUpButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignUp(name, email, password, referralCode, eventSource)
-      .then(({ status, errorCode }) => {
-        if (status) {
-          handleEmailSignIn(email, password, true, eventSource)
-            .then(({ result }) => {
-              if (result.user.uid) {
-                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-                setEmail("");
-                setPassword("");
-                // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-                onSignInSuccess && onSignInSuccess(result.user.uid, true);
-              }
-            })
-            .catch(({ errorCode }) => {
-              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-              setActionPending(false);
-              setEmail("");
-              setPassword("");
-            });
-        } else {
-          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-          setActionPending(false);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-        setActionPending(false);
-      });
-  };
+  // const handleEmailSignUpButtonClick = (event) => {
+  //   event.preventDefault();
+  //   setActionPending(true);
+  //   handleEmailSignUp(name, email, password, referralCode, eventSource)
+  //     .then(({ status, errorCode }) => {
+  //       if (status) {
+  //         handleEmailSignIn(email, password, true, eventSource)
+  //           .then(({ result }) => {
+  //             if (result.user.uid) {
+  //               !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+  //               setEmail("");
+  //               setPassword("");
+  //               // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+  //               onSignInSuccess && onSignInSuccess(result.user.uid, true);
+  //             }
+  //           })
+  //           .catch(({ errorCode }) => {
+  //             toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //             setActionPending(false);
+  //             setEmail("");
+  //             setPassword("");
+  //           });
+  //       } else {
+  //         toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //         setActionPending(false);
+  //       }
+  //     })
+  //     .catch(({ errorCode }) => {
+  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+  //       setActionPending(false);
+  //     });
+  // };
 
-  const handleEmailSignInButtonClick = (event) => {
-    event.preventDefault();
-    setActionPending(true);
-    handleEmailSignIn(email, password, false, eventSource)
-      .then(({ result }) => {
-        if (result.user.uid) {
-          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-          setEmail("");
-          setPassword("");
-          // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-          onSignInSuccess && onSignInSuccess(result.user.uid, false);
-        } else {
-          toast.error("Sorry we couldn't log you in. Can you please retry?");
-          setActionPending(true);
-        }
-      })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
-        setActionPending(false);
-        setEmail("");
-        setPassword("");
-      });
-  };
+  // const handleEmailSignInButtonClick = (event) => {
+  //   event.preventDefault();
+  //   setActionPending(true);
+  //   handleEmailSignIn(email, password, false, eventSource)
+  //     .then(({ result }) => {
+  //       if (result.user.uid) {
+  //         !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+  //         setEmail("");
+  //         setPassword("");
+  //         // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+  //         onSignInSuccess && onSignInSuccess(result.user.uid, false);
+  //       } else {
+  //         toast.error("Sorry we couldn't log you in. Can you please retry?");
+  //         setActionPending(true);
+  //       }
+  //     })
+  //     .catch(({ errorCode }) => {
+  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+  //       setActionPending(false);
+  //       setEmail("");
+  //       setPassword("");
+  //     });
+  // };
 
   const SocialAuthButtons = () => {
     switch (MODE) {
@@ -220,16 +231,26 @@ const AuthForm = ({
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
         return (
-          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignInButtonClick}>
-            Sign In with Email
-          </RQButton>
+          <GenerateLoginLinkBtn
+            email={email}
+            authMode={AUTH_ACTION_LABELS.LOG_IN}
+            eventSource={eventSource}
+            callback={() => {
+              setLastEmailInputHandled(email);
+            }}
+          />
         );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
         return (
-          <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignUpButtonClick}>
-            Create Account
-          </RQButton>
+          <GenerateLoginLinkBtn
+            email={email}
+            authMode={AUTH_ACTION_LABELS.SIGN_UP}
+            eventSource={eventSource}
+            callback={() => {
+              setLastEmailInputHandled(email);
+            }}
+          />
         );
       case AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD:
         return (
@@ -280,7 +301,6 @@ const AuthForm = ({
                 SET_MODE(AUTH_ACTION_LABELS.REQUEST_RESET_PASSWORD);
                 SET_POPOVER(false);
                 setEmail("");
-                setName("");
                 setPassword("");
               }}
             >
@@ -356,31 +376,6 @@ const AuthForm = ({
     }
   };
 
-  const renderNameField = () => {
-    switch (MODE) {
-      case AUTH_ACTION_LABELS.SIGN_UP:
-        return (
-          <Row className="w-full">
-            <label htmlFor="username" className="text-bold auth-modal-input-label">
-              Your name
-            </label>
-            <RQInput
-              id="username"
-              className="auth-modal-input"
-              required={true}
-              placeholder="John Doe"
-              type="text"
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-            />
-          </Row>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   const renderEmailField = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.DO_RESET_PASSWORD:
@@ -409,34 +404,21 @@ const AuthForm = ({
     }
   };
 
-  const renderEmailAuthSecondStep = () => {
-    return (
-      <>
-        <BackButton action={() => setShowEmailSecondStep(false)} />
-        {renderEmailField()}
-        {MODE === AUTH_ACTION_LABELS.SIGN_UP && <div className="mt-20 w-full">{renderNameField()}</div>}
-        {renderPasswordField()}
-        <FormSubmitButton />
-      </>
-    );
-  };
-
-  const onSignInClick = () => {
+  const onSignInClick = useCallback(() => {
     SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
     SET_POPOVER(true);
     setEmail("");
-    setName("");
     setPassword("");
-    setShowEmailSecondStep(false);
-  };
+    dispatch(actions.updateTimeToResendEmailLogin(0));
+  }, [SET_MODE, SET_POPOVER, dispatch]);
 
-  const onCreateAccountClick = () => {
+  const onCreateAccountClick = useCallback(() => {
     SET_MODE(AUTH_ACTION_LABELS.SIGN_UP);
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
-    setShowEmailSecondStep(false);
-  };
+    dispatch(actions.updateTimeToResendEmailLogin(0));
+  }, [SET_MODE, SET_POPOVER, dispatch]);
 
   return (
     <Row className="bg-secondary shadow border-0 auth-modal">
@@ -459,40 +441,12 @@ const AuthForm = ({
                 </RQButton>
               </Row>
               <Row className="auth-wrapper mt-1">
-                {isOnboardingForm ? (
-                  <>
-                    {showEmailSecondStep ? (
-                      <>{renderEmailAuthSecondStep()}</>
-                    ) : (
-                      <>
-                        <SocialAuthButtons />
-                        <div className="auth-modal-divider w-full" style={{ marginBottom: 0 }}>
-                          or sign up through email
-                        </div>
-                        {renderEmailField()}
-                        <RQButton
-                          type="primary"
-                          className="w-full text-bold mt-20"
-                          onClick={() => {
-                            if (isEmailValid(email)) setShowEmailSecondStep(true);
-                            else toast.error("Please enter a valid email address");
-                          }}
-                        >
-                          Continue with email
-                        </RQButton>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {renderNameField()}
-                    {renderEmailField()}
-                    {renderPasswordField()}
-                    <FormSubmitButton />
-                    <div className="auth-modal-divider w-full">or</div>
-                    <SocialAuthButtons />
-                  </>
-                )}
+                <SocialAuthButtons />
+                <div className="auth-modal-divider w-full">or</div>
+                <div className="auth-modal-message w-full">Sign Up with email</div>
+
+                {renderEmailField()}
+                <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
                   <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
@@ -520,34 +474,11 @@ const AuthForm = ({
             </RQButton>
           </Row>
           <Row className="auth-wrapper mt-1">
-            {showEmailSecondStep ? (
-              <>{renderEmailAuthSecondStep()}</>
-            ) : (
-              <>
-                <SocialAuthButtons />
-                <div className="auth-modal-divider w-full mb-0" style={{ marginBottom: "-20px" }}>
-                  or sign in with email
-                </div>
-                {renderEmailField()}
-                {!isOnboardingForm ? (
-                  <>
-                    {renderPasswordField()}
-                    <FormSubmitButton />
-                  </>
-                ) : (
-                  <RQButton
-                    type="primary"
-                    className="w-full text-bold mt-20"
-                    onClick={() => {
-                      if (isEmailValid(email)) setShowEmailSecondStep(true);
-                      else toast.error("Please enter a valid email address");
-                    }}
-                  >
-                    Continue with email
-                  </RQButton>
-                )}
-              </>
-            )}
+            <SocialAuthButtons />
+            <div className="auth-modal-divider w-full">or</div>
+            <div className="auth-modal-message w-full">Sign In with email</div>
+            {renderEmailField()}
+            <FormSubmitButton />
           </Row>
         </Col>
       ) : (

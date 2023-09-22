@@ -22,6 +22,9 @@ export const SESSION_RECORDING = {
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
   session_recording_upload: "session_recording_upload",
   session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
+  NEW_SESSION_CLICKED: "new_session clicked",
+  network_log_context_menu_open: "network_log_context_menu_open",
+  network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",

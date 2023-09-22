@@ -134,6 +134,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    emailLoginLinkPopup: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -202,6 +206,7 @@ const INITIAL_STATE = {
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
     },
   },
