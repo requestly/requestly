@@ -27,7 +27,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
         const records = querySnapshot.docs.map((team) => {
           const teamData = team.data();
 
-          if (!teamData.archived) {
+          if (!teamData.archived && teamData.appsumo) {
             submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
           }
 

@@ -73,29 +73,33 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
-  const verifyCode = debounce(async (enteredCode: string, index: number) => {
-    if (enteredCode.length < 8) {
-      updateAppSumoCode(index, "verified", false);
-      return;
-    }
+  const verifyCode = useMemo(
+    () =>
+      debounce(async (enteredCode: string, index: number) => {
+        if (enteredCode.length < 8) {
+          updateAppSumoCode(index, "verified", false);
+          return;
+        }
 
-    const docRef = doc(db, "appSumoCodes", enteredCode);
-    const docSnap = await getDoc(docRef);
+        const docRef = doc(db, "appSumoCodes", enteredCode);
+        const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      updateAppSumoCode(index, "error", "Invalid code. Please contact support");
-      updateAppSumoCode(index, "verified", false);
-      return;
-    }
+        if (!docSnap.exists()) {
+          updateAppSumoCode(index, "error", "Invalid code. Please contact support");
+          updateAppSumoCode(index, "verified", false);
+          return;
+        }
 
-    if (docSnap.data()?.redeemed) {
-      updateAppSumoCode(index, "error", "Code already redeemed. Please contact support");
-      updateAppSumoCode(index, "verified", false);
-      return;
-    }
-    updateAppSumoCode(index, "error", "");
-    updateAppSumoCode(index, "verified", true);
-  }, 800);
+        if (docSnap.data()?.redeemed) {
+          updateAppSumoCode(index, "error", "Code already redeemed. Please contact support");
+          updateAppSumoCode(index, "verified", false);
+          return;
+        }
+        updateAppSumoCode(index, "error", "");
+        updateAppSumoCode(index, "verified", true);
+      }, 800),
+    []
+  );
 
   const redeemSubmittedCodes = useCallback(async () => {
     const batch = writeBatch(db);
