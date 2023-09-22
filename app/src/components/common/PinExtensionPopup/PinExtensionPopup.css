@@ -54,6 +54,61 @@
   margin-bottom: 8px;
 }
 
+.pin-extension-popup .ant-collapse .ant-collapse-item {
+  padding: 12px 0;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--gray-dark);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header {
+  height: 16px;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
+  right: 12px;
+  color: var(--text-gray);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .header-down-caret {
+  transition: transform 0.3s;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .header-down-caret.rotate {
+  transform: rotate(180deg) translateY(6px);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text {
+  padding: 10px 12px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text > div {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text > div > svg {
+  width: 14px;
+  height: 15px;
+  color: var(--text-gray);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
+  padding: 8px 12px 0 12px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .feature-gif {
+  height: 169px;
+  border-radius: var(--border-radius-sm);
+}
+
 .pin-extension-popup .action-btns {
   position: absolute;
   left: 0;
@@ -72,6 +127,8 @@
   font-family: Roboto;
   font-size: 14px;
   line-height: 16px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .pin-extension-popup .action-btns .ant-btn:hover {
@@ -79,38 +136,16 @@
 }
 
 .pin-extension-popup .action-btns .ant-btn svg {
-  margin-right: 8px;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
   color: var(--text-gray);
 }
 
-.pin-extension-popup .ant-collapse .ant-collapse-item {
-  padding: 12px;
-  border-radius: var(--border-radius-sm);
-  background-color: var(--gray-dark);
-}
-
-.pin-extension-popup .ant-collapse .ant-collapse-item:not(:last-child) {
-  margin-bottom: 8px;
-}
-
-.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header {
-  height: 16px;
-  display: flex;
-  align-items: center;
-}
-
-.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
-  padding-top: 8px;
-  padding-bottom: 0;
-}
-
-.pin-extension-popup .ant-collapse .ant-collapse-item .feature-gif {
-  height: 169px;
-  border-radius: var(--border-radius-sm);
-}
-
-/* icons in accordion */
-/* font size for icons in action btns */
-/* padding and click issue in accordion header */
+/* icon fix in accordion header [done] */
+/* font size for icons in action btns [done] */
+/* padding and click issue in accordion header [done] */
 /* convert all the images in gif and update in code*/
 /* analytics */
+/* refactor for reusablity */
+/* consume in home page too */
