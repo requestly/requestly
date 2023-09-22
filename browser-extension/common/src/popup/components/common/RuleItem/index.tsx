@@ -64,9 +64,15 @@ const RuleItem: React.FC<RuleItemProps> = ({
             </Tooltip>
 
             <RecordName name={rule.name}>
-              <a target="_blank" className="record-name link" href={`${config.WEB_URL}/rules/editor/edit/${rule.id}`}>
+              <span
+                className="record-name link"
+                onClick={() => {
+                  sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
+                  window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
+                }}
+              >
                 {rule.name}
-              </a>
+              </span>
             </RecordName>
           </Row>
         </Col>
