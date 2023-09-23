@@ -231,7 +231,7 @@ const FreeAndEnterprisePlanTable = () => {
             </Row>
           </Col>
           <Col className="pricing-table-row" xs={24} lg={18}>
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 8]} style={{ flex: 1 }}>
               {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
                 <Col xs={24} md={8} className="pricing-table-col" key={planName}>
                   <div className="pricing-col-header">
