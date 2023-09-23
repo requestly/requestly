@@ -32,6 +32,7 @@ import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { isPricingPage } from "utils/PathUtils";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -73,6 +74,8 @@ const DashboardContent = () => {
 
   const prevProps = usePrevious({ location });
 
+  const disableOverflow = useMemo(() => isPricingPage(), []);
+
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
       document.documentElement.scrollTop = 0;
@@ -88,7 +91,7 @@ const DashboardContent = () => {
 
   return (
     <>
-      <div id="dashboardMainContent">
+      <div id="dashboardMainContent" style={{ overflow: !disableOverflow && "auto !important" }}>
         {/* Outlet renders all the children of the root route */}
         <Outlet />
       </div>

@@ -13,7 +13,7 @@ import underlineIcon from "../../../../../assets/img/icons/common/underline.svg"
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
-import { Col, Row, Switch, Tag } from "antd";
+import { Col, Row, Switch, Tag, Space } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
@@ -187,53 +187,55 @@ const FreeAndEnterprisePlanTable = () => {
               <Col xs={8} sm={8} lg={24}>
                 <h1>Products</h1>
               </Col>
-              <Col
-                xs={8}
-                sm={8}
-                lg={24}
-                className={`pricing-table-product-view-item ${
-                  product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && "active"
-                }`}
-                onClick={() => {
-                  setProduct(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
-                }}
-              >
-                <div className="pricing-table-product-view-icon">
-                  <img src={rulesImg} alt="rules" />
-                </div>
-                <div className="pricing-table-product-view-para">
-                  <h3>HTTP Rules</h3>
-                  <p>
-                    Intercept & Modify HTTP Requests & Responses. Redirect URLs, Modify Headers, API Request/Response
-                    Body, etc
-                  </p>
-                </div>
-              </Col>
-              <Col
-                xs={8}
-                sm={8}
-                lg={24}
-                className={`pricing-table-product-view-item ${
-                  product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && "active"
-                }`}
-                onClick={() => {
-                  setProduct(APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY);
-                }}
-              >
-                <div className="pricing-table-product-view-icon">
-                  <img src={sessionImg} alt="session replay" />
-                </div>
-                <div className="pricing-table-product-view-para">
-                  <h3>Session Replay</h3>
-                  <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
-                </div>
-              </Col>
+              <Row>
+                <Col
+                  xs={10}
+                  sm={12}
+                  lg={24}
+                  className={`pricing-table-product-view-item ${
+                    product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && "active"
+                  }`}
+                  onClick={() => {
+                    setProduct(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
+                  }}
+                >
+                  <div className="pricing-table-product-view-icon">
+                    <img src={rulesImg} alt="rules" />
+                  </div>
+                  <div className="pricing-table-product-view-para">
+                    <h3>HTTP Rules</h3>
+                    <p>
+                      Intercept & Modify HTTP Requests & Responses. Redirect URLs, Modify Headers, API Request/Response
+                      Body, etc
+                    </p>
+                  </div>
+                </Col>
+                <Col
+                  xs={10}
+                  sm={12}
+                  lg={24}
+                  className={`pricing-table-product-view-item ${
+                    product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && "active"
+                  }`}
+                  onClick={() => {
+                    setProduct(APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY);
+                  }}
+                >
+                  <div className="pricing-table-product-view-icon">
+                    <img src={sessionImg} alt="session replay" />
+                  </div>
+                  <div className="pricing-table-product-view-para">
+                    <h3>Session Replay</h3>
+                    <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
+                  </div>
+                </Col>
+              </Row>
             </Row>
           </Col>
           <Col className="pricing-table-row" xs={24} lg={18}>
-            <Row gutter={[8, 8]} style={{ flex: 1 }}>
+            <Space sm={18} lg={24} wrap={true}>
               {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
-                <Col xs={24} md={8} className="pricing-table-col" key={planName}>
+                <Col className="pricing-table-col" key={planName}>
                   <div className="pricing-col-header">
                     <p className="text-gray plan-for">{planDetails.heading}</p>
                     <div className="header text-left">
@@ -267,7 +269,7 @@ const FreeAndEnterprisePlanTable = () => {
                   </div>
                 </Col>
               ))}
-            </Row>
+            </Space>
           </Col>
           {/* </div> */}
         </Row>
