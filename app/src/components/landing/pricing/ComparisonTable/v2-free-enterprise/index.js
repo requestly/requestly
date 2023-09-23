@@ -13,7 +13,7 @@ import underlineIcon from "../../../../../assets/img/icons/common/underline.svg"
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
-import { Switch, Tag } from "antd";
+import { Col, Row, Switch, Tag } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "./WorkspaceDropdown";
@@ -180,83 +180,97 @@ const FreeAndEnterprisePlanTable = () => {
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
         <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
-        <div className="pricing-table-product-wrapper">
-          <div className="pricing-table-product-view">
-            <h1>Products</h1>
-            <div
-              className={`pricing-table-product-view-item ${
-                product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && "active"
-              }`}
-              onClick={() => {
-                setProduct(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
-              }}
-            >
-              <div className="pricing-table-product-view-icon">
-                <img src={rulesImg} alt="rules" />
-              </div>
-              <div className="pricing-table-product-view-para">
-                <h3>HTTP Rules</h3>
-                <p>
-                  Intercept & Modify HTTP Requests & Responses. Redirect URLs, Modify Headers, API Request/Response
-                  Body, etc
-                </p>
-              </div>
-            </div>
-            <div
-              className={`pricing-table-product-view-item ${
-                product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && "active"
-              }`}
-              onClick={() => {
-                setProduct(APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY);
-              }}
-            >
-              <div className="pricing-table-product-view-icon">
-                <img src={sessionImg} alt="session replay" />
-              </div>
-              <div className="pricing-table-product-view-para">
-                <h3>Session Replay</h3>
-                <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
-              </div>
-            </div>
-          </div>
-          <div className="pricing-table-row">
-            {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
-              <div className="pricing-table-col" key={planName}>
-                <div className="pricing-col-header">
-                  <p className="text-gray plan-for">{planDetails.heading}</p>
-                  <div className="header text-left">
-                    <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
-                  </div>
-                  <div className="text-gray text-left price-container">
-                    <span className="price">
-                      $
-                      {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY
-                        ? PricingPlans[planName].plans[duration]?.usd?.price / 12
-                        : PricingPlans[planName].plans[duration]?.usd?.price}
-                    </span>{" "}
-                    {workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "per month" : "per user/month"}
-                    {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
-                  </div>
-                  {renderButtonsForPlans(planName)}
+        <Row className="pricing-table-product-wrapper" align={"middle"} justify={"center"}>
+          {/* <div className="pricing-table-product-wrapper"> */}
+          <Col className="pricing-table-product-view" xs={24} lg={6}>
+            <Row>
+              <Col xs={8} sm={8} lg={24}>
+                <h1>Products</h1>
+              </Col>
+              <Col
+                xs={8}
+                sm={8}
+                lg={24}
+                className={`pricing-table-product-view-item ${
+                  product === APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES && "active"
+                }`}
+                onClick={() => {
+                  setProduct(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
+                }}
+              >
+                <div className="pricing-table-product-view-icon">
+                  <img src={rulesImg} alt="rules" />
                 </div>
-                {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
-                  product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
-                    <div className="pro-basic-feature-title text-left">
-                      <span>
-                        Everything <img src={underlineIcon} alt="highlight" />
-                      </span>{" "}
-                      in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                <div className="pricing-table-product-view-para">
+                  <h3>HTTP Rules</h3>
+                  <p>
+                    Intercept & Modify HTTP Requests & Responses. Redirect URLs, Modify Headers, API Request/Response
+                    Body, etc
+                  </p>
+                </div>
+              </Col>
+              <Col
+                xs={8}
+                sm={8}
+                lg={24}
+                className={`pricing-table-product-view-item ${
+                  product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && "active"
+                }`}
+                onClick={() => {
+                  setProduct(APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY);
+                }}
+              >
+                <div className="pricing-table-product-view-icon">
+                  <img src={sessionImg} alt="session replay" />
+                </div>
+                <div className="pricing-table-product-view-para">
+                  <h3>Session Replay</h3>
+                  <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
+                </div>
+              </Col>
+            </Row>
+          </Col>
+          <Col className="pricing-table-row" xs={24} lg={18}>
+            <Row gutter={[8, 8]} style={{ flex: 1 }}>
+              {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
+                <Col xs={24} md={8} className="pricing-table-col" key={planName}>
+                  <div className="pricing-col-header">
+                    <p className="text-gray plan-for">{planDetails.heading}</p>
+                    <div className="header text-left">
+                      <span style={{ textTransform: "capitalize" }}>{planDetails.planTitle}</span>
                     </div>
-                  )}
-                <div>
-                  {planDetails.features.map((feature, index) => (
-                    <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                    <div className="text-gray text-left price-container">
+                      <span className="price">
+                        $
+                        {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY
+                          ? PricingPlans[planName].plans[duration]?.usd?.price / 12
+                          : PricingPlans[planName].plans[duration]?.usd?.price}
+                      </span>{" "}
+                      {workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "per month" : "per user/month"}
+                      {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
+                    </div>
+                    {renderButtonsForPlans(planName)}
+                  </div>
+                  {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
+                    product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
+                      <div className="pro-basic-feature-title text-left">
+                        <span>
+                          Everything <img src={underlineIcon} alt="highlight" />
+                        </span>{" "}
+                        in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                      </div>
+                    )}
+                  <div>
+                    {planDetails.features.map((feature, index) => (
+                      <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                    ))}
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Col>
+          {/* </div> */}
+        </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
         <div className="note-container text-gray text-center">
           <span>
