@@ -37,7 +37,6 @@ import { isPricingPage } from "utils/PathUtils";
 const DashboardContent = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-
   //Global state
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -74,7 +73,7 @@ const DashboardContent = () => {
 
   const prevProps = usePrevious({ location });
 
-  const disableOverflow = useMemo(() => isPricingPage(), []);
+  const disableOverflow = isPricingPage();
 
   useEffect(() => {
     if (prevProps && prevProps.location !== location) {
