@@ -50,10 +50,31 @@
 }
 
 .share-link-radio-btn-label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   font-size: 13px;
+}
+
+.share-link-radio-btn-label + .success-message {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 3px;
+}
+
+.share-link-radio-btn-label + .success-message .success {
+  font-size: 14px;
+}
+
+.share-link-radio-btn-label span {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.share-link-radio-btn-label-tooltip.ant-tooltip {
+  padding: 4px;
+}
+
+.share-link-radio-btn-label-tooltip .ant-tooltip-inner {
+  width: max-content;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-radio-wrapper > span:nth-child(2) {
