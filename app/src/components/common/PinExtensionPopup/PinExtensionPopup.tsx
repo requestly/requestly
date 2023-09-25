@@ -123,7 +123,15 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           Requestly to your browser 📌
         </div>
 
-        <img width={338} height={196} alt="Pin extension" className="pin-extension-gif" src={pinExtensionGif} />
+        <img
+          width={338}
+          height={196}
+          //@ts-ignore
+          fetchpriority="high"
+          alt="Pin extension"
+          className="pin-extension-gif"
+          src={pinExtensionGif}
+        />
 
         <div>
           <div className="subtitle">Access Requestly features quickly from the extension</div>
@@ -138,7 +146,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           >
             {collapsePanelItems.map(({ header, image }, index) => (
               <Collapse.Panel header={header} key={index}>
-                <img width={315} height={169} loading="lazy" className="feature-gif" alt={image.alt} src={image.src} />
+                <img width={315} height={169} className="feature-gif" alt={image.alt} src={image.src} />
               </Collapse.Panel>
             ))}
           </Collapse>

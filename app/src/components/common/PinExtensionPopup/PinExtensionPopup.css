@@ -46,6 +46,7 @@
   object-fit: cover;
   object-position: center;
   user-select: none;
+  background-color: var(--component-background);
 }
 
 .pin-extension-popup .pin-extension-gif {
