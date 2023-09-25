@@ -15,8 +15,6 @@ export const useFeatureLimiter = () => {
   const isUserPremium = user?.details?.isPremium;
   const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
-  console.log({ isUserPremium });
-
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
       if (user.isLimitReached) {
