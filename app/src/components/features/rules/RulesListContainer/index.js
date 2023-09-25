@@ -26,7 +26,7 @@ import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RulesTable from "./RulesTable";
-import "./RulesListContainer.css";
+import { PinExtensionPopup, usePinExtensionPopup } from "components/common/PinExtensionPopup";
 import {
   trackNewRuleButtonClicked,
   trackRuleCreationWorkflowStartedEvent,
@@ -36,6 +36,7 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "./RulesListContainer.css";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -68,6 +69,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
+  console.log({ home: isPinExtensionPopupActive });
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -272,6 +275,10 @@ const RulesListContainer = ({ isTableLoading = false }) => {
       {isCreateNewRuleGroupModalActive ? (
         <CreateNewRuleGroupModal isOpen={isCreateNewRuleGroupModalActive} toggle={toggleCreateNewRuleGroupModal} />
       ) : null}
+
+      {isPinExtensionPopupActive && (
+        <PinExtensionPopup isOpen={isPinExtensionPopupActive} onCancel={closePinExtensionPopup} />
+      )}
 
       {isChangeGroupModalActive ? (
         <ChangeRuleGroupModal

@@ -144,7 +144,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
           >
             {collapsePanelItems.map(({ header, image }, index) => (
               <Collapse.Panel header={header} key={index}>
-                <img width={338} height={196} className="feature-gif" alt={image.alt} src={image.src} />
+                <img width={315} height={169} loading="lazy" className="feature-gif" alt={image.alt} src={image.src} />
               </Collapse.Panel>
             ))}
           </Collapse>
