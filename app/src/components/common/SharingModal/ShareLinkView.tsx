@@ -54,11 +54,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
           <span>
             Public shared list{" "}
             <Tooltip
+              showArrow={false}
               placement="bottom"
               overlayClassName="share-link-radio-btn-label-tooltip"
               title="Anyone with the link can access the rule."
             >
-              <AiOutlineInfoCircle />
+              <AiOutlineInfoCircle className="text-gray" />
             </Tooltip>
           </span>
         ),
@@ -69,11 +70,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
           <span>
             Private shared list{" "}
             <Tooltip
+              showArrow={false}
               placement="bottom"
               overlayClassName="share-link-radio-btn-label-tooltip"
               title="Only accessible by accounts you specify."
             >
-              <AiOutlineInfoCircle />
+              <AiOutlineInfoCircle className="text-gray" />
             </Tooltip>
           </span>
         ),

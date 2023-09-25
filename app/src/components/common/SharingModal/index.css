@@ -69,16 +69,8 @@
   column-gap: 6px;
 }
 
-.share-link-radio-btn-label span svg {
-  color: var(--text-gray);
-}
-
 .share-link-radio-btn-label-tooltip.ant-tooltip {
   padding: 4px;
-}
-
-.share-link-radio-btn-label-tooltip .ant-tooltip-arrow {
-  display: none;
 }
 
 .share-link-radio-btn-label-tooltip .ant-tooltip-inner {
