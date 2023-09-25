@@ -52,7 +52,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         analyticEventAction: "activate_deactivate",
         header: (
           <div>
-            <BiSliderAlt /> Activate/Deactivate rules
+            <BiSliderAlt /> <span className="header-text">Activate/Deactivate rules</span>
           </div>
         ),
         image: {
@@ -64,7 +64,8 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         analyticEventAction: "what_rules_executed",
         header: (
           <div>
-            <BiSliderAlt style={{ transform: "rotate(90deg)" }} /> Know which rules executed on a web page
+            <BiSliderAlt style={{ transform: "rotate(90deg)" }} />{" "}
+            <span className="header-text">Know which rules executed on a web page</span>
           </div>
         ),
         image: {
@@ -76,7 +77,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         analyticEventAction: "record_and_replay",
         header: (
           <div>
-            <FiVideo /> Record and replay browser activity
+            <FiVideo /> <span className="header-text">Record and replay browser activity</span>
           </div>
         ),
         image: {
@@ -88,7 +89,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         analyticEventAction: "pause_extension",
         header: (
           <div>
-            <FaToggleOff /> Pause Requestly when not in use
+            <FaToggleOff /> <span className="header-text">Pause Requestly when not in use</span>
           </div>
         ),
         image: {

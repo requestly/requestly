@@ -80,6 +80,10 @@
   padding-left: 0;
 }
 
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text span.header-text {
+  color: var(--white);
+}
+
 .pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
   right: 12px;
   color: var(--text-gray);
