@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
-import { Radio, Space } from "antd";
+import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
 import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
@@ -12,7 +12,8 @@ import { getSharedListURL } from "utils/PathUtils";
 import { toast } from "utils/Toast";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { httpsCallable, getFunctions } from "firebase/functions";
-import { CheckCircleFilled } from "@ant-design/icons";
+import { AiFillCheckCircle } from "@react-icons/all-files/ai/AiFillCheckCircle";
+import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { SharedLinkVisibility } from "./types";
 import { Rule } from "types";
 import Logger from "lib/logger";
@@ -49,14 +50,34 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
   const visibilityOptions = useMemo(
     () => [
       {
-        label: "Public shared list",
+        label: (
+          <span>
+            Public shared list{" "}
+            <Tooltip
+              placement="bottom"
+              overlayClassName="share-link-radio-btn-label-tooltip"
+              title="Anyone with the link can access the rule."
+            >
+              <AiOutlineInfoCircle />
+            </Tooltip>
+          </span>
+        ),
         value: SharedLinkVisibility.PUBLIC,
-        description: "Anyone with the link can access the rule(s).",
       },
       {
-        label: "Private shared list",
+        label: (
+          <span>
+            Private shared list{" "}
+            <Tooltip
+              placement="bottom"
+              overlayClassName="share-link-radio-btn-label-tooltip"
+              title="Only accessible by accounts you specify."
+            >
+              <AiOutlineInfoCircle />
+            </Tooltip>
+          </span>
+        ),
         value: SharedLinkVisibility.PRIVATE,
-        description: "Only accessible by accounts you specify.",
       },
     ],
     []
@@ -205,7 +226,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
 
   return (
     <div className="sharing-modal-body">
-      <Space direction="vertical" size="large" className="w-full">
+      <Space direction="vertical" size={12} className="w-full">
         {visibilityOptions.map((option, index) => (
           <div className="w-full" key={index}>
             <Radio
@@ -214,10 +235,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
               onChange={() => setSharedLinkVisibility(option.value)}
               className="w-full"
             >
-              <div className="share-link-radio-btn-label">
-                <div className="text-white text-bold">{option.label}</div>
-                <div className="text-gray">{option.description}</div>
-              </div>
+              <div className="text-white text-bold share-link-radio-btn-label">{option.label}</div>
+
               {option.value === sharedLinkVisibility && (
                 <>
                   {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
@@ -225,15 +244,14 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
                       {shareableLinkData.visibility === SharedLinkVisibility.PRIVATE ? (
                         <>
                           {isMailSent && (
-                            <div className="mt-8 text-gray">
-                              <CheckCircleFilled className="success" /> Invites sent!
+                            <div className="mt-8 text-gray success-message">
+                              <AiFillCheckCircle className="success" /> Invites sent!
                             </div>
                           )}
                         </>
                       ) : (
-                        <div className="mt-8 text-gray">
-                          <CheckCircleFilled className="success" /> Public shared list created! Anyone with the link can
-                          access the rule(s)!
+                        <div className="mt-8 text-gray success-message">
+                          <AiFillCheckCircle className="success" /> Shared list created
                         </div>
                       )}
                       <CopyValue
