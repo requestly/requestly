@@ -12,24 +12,22 @@ export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-
   const isUserPremium = user?.details?.isPremium;
-  const isUserLoggedIn = user?.loggedIn;
   const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
-  const checkFeatureLimits = () => {
-    if (!isUserLoggedIn) {
-      return;
-    }
+  console.log({ isUserPremium });
 
+  const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
+      if (user.isLimitReached) {
+        dispatch(actions.updateUserLimitReached(false));
+      }
       return;
     }
 
     const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
       checkIfFeatureLimitBreached(featureLimitType)
     );
-
     dispatch(actions.updateUserLimitReached(isLimitReached));
   };
 
