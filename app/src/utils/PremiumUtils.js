@@ -40,7 +40,7 @@ export const isPlanExpired = (planDetails) => {
     endDate = new Date(planDetails.subscription.current_period_end * 1000).toLocaleDateString("en-CA");
   }
 
-  return endDate < new Date().toLocaleDateString("en-CA");
+  return endDate < new Date().toISOString().split("T")[0];
 };
 
 export const isPremiumUser = (userPlanDetails) => {
