@@ -35,7 +35,7 @@ const DBListeners = () => {
     if (user?.loggedIn) {
       unsubscribeUserNodeRef.current = userNodeListener(dispatch, user?.details?.profile.uid, appMode);
 
-      userSubscriptionNodeListener(dispatch);
+      userSubscriptionNodeListener(dispatch, user?.loggedIn);
     }
   }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
 

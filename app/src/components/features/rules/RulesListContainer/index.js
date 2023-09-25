@@ -35,6 +35,7 @@ import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -49,6 +50,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
   //Component State
   const [selectedRules, setSelectedRules] = useState(getSelectedRules(rulesSelection));
@@ -227,7 +229,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   return (
     <>
       {/* Page content */}
-      {user?.loggedIn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
+      {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
       {/* Table */}
       <ProCard title={null} className="rules-table-container rules-list-container">
         <RulesTable

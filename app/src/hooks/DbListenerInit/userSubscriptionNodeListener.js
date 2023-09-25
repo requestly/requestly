@@ -9,7 +9,7 @@ import { getPlanName, isPremiumUser } from "../../utils/PremiumUtils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
-const userSubscriptionNodeListener = (dispatch) => {
+const userSubscriptionNodeListener = (dispatch, isUserLoggedIn) => {
   const auth = getAuth(firebaseApp);
   const user = auth.currentUser;
 
@@ -48,7 +48,8 @@ const userSubscriptionNodeListener = (dispatch) => {
         })
       );
     }
-  } else {
+  }
+  if (!isUserLoggedIn) {
     dispatch(
       actions.updateUserPlanDetails({
         userPlanDetails: null,
