@@ -109,16 +109,10 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
 
   return (
     <RQModal
+      width={373}
       open={isOpen}
       closable={false}
       maskClosable={false}
-      width={373}
-      style={{
-        margin: "0",
-        top: "16px",
-        left: "100%",
-        transform: "translateX(calc(-100% - 16px))",
-      }}
       wrapClassName="pin-extension-popup-container"
     >
       <div className="pin-extension-popup">

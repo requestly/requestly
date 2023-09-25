@@ -70,7 +70,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
-  console.log({ home: isPinExtensionPopupActive });
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);

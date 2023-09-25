@@ -1,5 +1,10 @@
-.pin-extension-popup-container .rq-modal {
+.pin-extension-popup-container .rq-modal.ant-modal {
+  width: 373px;
   min-width: 370px !important;
+  margin: 0px;
+  top: 16px;
+  left: calc(100% - 373px - 16px); /* whole screen - container width - spacing */
+  transform-origin: top right !important;
 }
 
 .pin-extension-popup-container .rq-modal.ant-modal .ant-modal-close {
@@ -40,6 +45,7 @@
   block-size: auto;
   object-fit: cover;
   object-position: center;
+  user-select: none;
 }
 
 .pin-extension-popup .pin-extension-gif {
