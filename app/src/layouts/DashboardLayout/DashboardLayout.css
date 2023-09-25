@@ -33,6 +33,7 @@
 
 .app-main-content {
   grid-area: main;
+  overflow: auto !important;
 }
 
 .app-footer {
