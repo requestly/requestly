@@ -88,17 +88,19 @@ export const GenericNetworkTable = <NetworkLog,>({
   return (
     <div className="network-container">
       <FiltersToolbar filters={filters} setFilters={setFilters} />
-      <ResourceTable
-        resources={logs}
-        isFailed={isFailed}
-        columns={finalColumns}
-        detailsTabs={finalDetailsTabs}
-        primaryColumnKeys={["timeOffset", "url"]}
-        colorScheme={ColorScheme.DARK}
-        onRowSelection={setSelectedLog}
-        contextMenuOptions={contextMenuOptions}
-        filter={filterLog}
-      />
+      <div className="rq-resource-table-wrapper">
+        <ResourceTable
+          resources={logs}
+          isFailed={isFailed}
+          columns={finalColumns}
+          detailsTabs={finalDetailsTabs}
+          primaryColumnKeys={["timeOffset", "url"]}
+          colorScheme={ColorScheme.DARK}
+          onRowSelection={setSelectedLog}
+          contextMenuOptions={contextMenuOptions}
+          filter={filterLog}
+        />
+      </div>
     </div>
   );
 };
