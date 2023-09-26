@@ -49,7 +49,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   onContextMenuOpenChange = (isOpen) => {},
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<Filters>({ search: "" });
 
   const finalColumns = useMemo(
     () =>
@@ -73,17 +73,15 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
-  const filterLog = (networkLog: NetworkLog) => {
-    const entry = networkEntrySelector(networkLog);
-
-    if (filters.search) {
-      if (!entry?.request?.url?.includes(filters.search)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
+  const filterLog = useCallback(
+    (networkLog: NetworkLog) => {
+      let includeLog = false;
+      const entry = networkEntrySelector(networkLog);
+      includeLog = !!entry?.request?.url?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
+      return includeLog;
+    },
+    [networkEntrySelector, filters.search]
+  );
 
   return (
     <div className="network-container">
