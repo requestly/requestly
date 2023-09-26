@@ -81,8 +81,8 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
           <div className="title billing-title">Session Replay Lifetime Pro</div>
           <p className="text-dark-gray billing-subscription-info">
             {`This workspace has an active Session Replay Lifetime Pro subscription for ${
-              appSumoSubscriptionInfo?.codes?.length > 1 ? "members" : "member"
-            }.`}
+              appSumoSubscriptionInfo?.codes?.length
+            } ${appSumoSubscriptionInfo?.codes?.length > 1 ? "members" : "member"}.`}
           </p>
         </>
       )}
