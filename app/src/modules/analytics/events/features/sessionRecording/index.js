@@ -39,6 +39,10 @@ export const trackDraftSessionSaved = (sessionLength, options, type) => {
 export const trackDraftSessionSaveFailed = (reason) =>
   trackEvent(SESSION_RECORDING.draft_session_recording_save_failed, { reason });
 
+export const trackDraftSessionAutoSaved = () => {
+  trackEvent(SESSION_RECORDING.draft_session_auto_saved);
+};
+
 export const trackSavedSessionViewed = (source) =>
   trackEvent(SESSION_RECORDING.saved_session_recording_viewed, { source });
 

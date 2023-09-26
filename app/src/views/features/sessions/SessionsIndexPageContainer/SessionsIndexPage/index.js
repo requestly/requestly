@@ -26,6 +26,7 @@ import { actions } from "../../../../../store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
+import { fetchDraftRecordings } from "./actions";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
 import { RQButton, RQModal } from "lib/design-system/components";
@@ -63,11 +64,18 @@ const SessionsIndexPage = () => {
   const [isNewSessionModalOpen, setIsNewSessionModalOpen] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
 
-  const fetchRecordings = (lastDoc = null) => {
+  const fetchRecordings = async (lastDoc = null) => {
     if (unsubscribeListener) unsubscribeListener();
 
     setIsTableLoading(true);
     const records = [];
+    fetchDraftRecordings().then((drafts) => {
+      if (drafts.length) {
+        drafts.sort((a, b) => b.startTime - a.startTime);
+        records.push(...drafts);
+      }
+    });
+
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
     const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
@@ -97,6 +105,7 @@ const SessionsIndexPage = () => {
           const recordData = doc.data();
           records.push({
             id: doc.id,
+            isDraft: false,
             name: recordData.name,
             duration: recordData.sessionAttributes.duration,
             startTime: recordData.sessionAttributes.startTime,
@@ -107,14 +116,14 @@ const SessionsIndexPage = () => {
           });
         });
 
-        setSessionRecordings(records);
         if (records.length > 0) {
           setQs(documentSnapshots); // Handles pagination
         }
       } else {
-        setSessionRecordings([]);
         setReachedEnd(true);
       }
+      console.log({ records });
+      setSessionRecordings(records);
       setIsTableLoading(false);
     });
   };

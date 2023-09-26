@@ -27,6 +27,7 @@ import {
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { clearDraftSessionCache } from "./SessionViewerActions";
 import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/helpers";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
@@ -126,6 +127,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         recordingOptionsToSave
       ).then((response) => {
         if (response?.success) {
+          clearDraftSessionCache(tabId);
           onClose();
           toast.success("Recording saved successfully");
           trackDraftSessionSaved(
@@ -158,6 +160,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       });
     },
     [
+      tabId,
       user?.loggedIn,
       user?.details?.profile?.uid,
       isSaving,

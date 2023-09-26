@@ -9,6 +9,7 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecordingModal";
+import { InfoTag } from "components/misc/InfoTag";
 import { deleteRecording } from "../../../api";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -61,9 +62,27 @@ const RecordingsList = ({
         width: "30%",
         render: (name, record) => {
           return (
-            <Link to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
-              {name}
-            </Link>
+            <div className="display-flex">
+              <Link
+                to={
+                  record.isDraft
+                    ? `${PATHS.SESSIONS.DRAFT.ABSOLUTE}/${record.id}?savedDraft`
+                    : `${PATHS.SESSIONS.SAVED.ABSOLUTE}/${record.id}`
+                }
+                state={{ fromApp: true }}
+              >
+                {name}
+              </Link>
+              {record.isDraft && (
+                <span style={{ marginLeft: "8px" }}>
+                  <InfoTag
+                    title="DRAFT"
+                    description="Only last 3 drafts are saved in browser cache. Please save these recording so that you don't lose on the data."
+                    tooltipWidth="300px"
+                  />
+                </span>
+              )}
+            </div>
           );
         },
       },
@@ -126,45 +145,49 @@ const RecordingsList = ({
         render: (id, record) => {
           return (
             <>
-              <div className="rule-action-buttons">
-                <ReactHoverObserver>
-                  {({ isHovering }) => (
-                    <Space>
-                      <Text
-                        type={isHovering ? "primary" : "secondary"}
-                        style={{
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          setSharingRecordId(id);
-                          setSelectedRowVisibility(record.visibility);
-                          setIsShareModalVisible(true);
-                        }}
-                      >
-                        <Tooltip title="Share with your Teammates">
-                          <Tag>
-                            <ShareAltOutlined />
-                          </Tag>
-                        </Tooltip>
-                      </Text>
+              {!record?.isDraft && (
+                <div className="rule-action-buttons">
+                  <ReactHoverObserver>
+                    {({ isHovering }) => (
+                      <Space>
+                        <Text
+                          type={isHovering ? "primary" : "secondary"}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            setSharingRecordId(id);
+                            setSelectedRowVisibility(record.visibility);
+                            setIsShareModalVisible(true);
+                          }}
+                        >
+                          <Tooltip title="Share with your Teammates">
+                            <Tag>
+                              <ShareAltOutlined />
+                            </Tag>
+                          </Tooltip>
+                        </Text>
 
-                      <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
-                        <Tooltip title="Delete" placement="bottom">
-                          <Tag onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}>
-                            <DeleteOutlined
-                              style={{
-                                padding: "5px 0px",
-                                fontSize: "12px",
-                                cursor: "pointer",
-                              }}
-                            />
-                          </Tag>
-                        </Tooltip>
-                      </Text>
-                    </Space>
-                  )}
-                </ReactHoverObserver>
-              </div>
+                        <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
+                          <Tooltip title="Delete" placement="bottom">
+                            <Tag
+                              onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}
+                            >
+                              <DeleteOutlined
+                                style={{
+                                  padding: "5px 0px",
+                                  fontSize: "12px",
+                                  cursor: "pointer",
+                                }}
+                              />
+                            </Tag>
+                          </Tooltip>
+                        </Text>
+                      </Space>
+                    )}
+                  </ReactHoverObserver>
+                </div>
+              )}
             </>
           );
         },

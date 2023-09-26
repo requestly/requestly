@@ -1,17 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
-import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { unstable_usePrompt, useNavigate, useParams, useLocation } from "react-router-dom";
+import { getIsMiscTourCompleted, getUserAttributes } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
+import { StorageService } from "init";
 import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
-import { RQSession } from "@requestly/web-sdk";
+import { RQSession, RQSessionAttributes, RQSessionEvents } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
+import { decompressEvents, filterOutLargeNetworkResponses, generateDraftSessionTitle } from "./sessionEventsUtils";
+import { cacheDraftSession, clearDraftSessionCache } from "./SessionViewerActions";
 import PageLoader from "components/misc/PageLoader";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
@@ -19,6 +21,7 @@ import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
+import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import {
@@ -41,9 +44,12 @@ export interface DraftSessionViewerProps {
 
 const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSession }) => {
   const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
+
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
@@ -54,13 +60,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
 
-  const generateDraftSessionTitle = useCallback((url: string) => {
-    const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
-    const date = new Date();
-    const month = date.toLocaleString("default", { month: "short" });
-    const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
-    return `${hostname}@${formattedDate}`;
-  }, []);
+  const exitMessage = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -74,12 +74,65 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
     ]
   );
 
+  const populateSessionData = useCallback(
+    (attributes: RQSessionAttributes, events: RQSessionEvents, tabId?: string) => {
+      dispatch(
+        sessionRecordingActions.setSessionRecordingMetadata({
+          sessionAttributes: attributes,
+          name: tabId === "mock" ? "Mock session replay" : generateDraftSessionTitle(attributes?.url),
+        })
+      );
+      filterOutLargeNetworkResponses(events);
+      dispatch(sessionRecordingActions.setEvents(events));
+    },
+    [dispatch]
+  );
+
+  const getSavedDraftReplay = useCallback(() => {
+    StorageService()
+      .getRecord(APP_CONSTANTS.DRAFT_SESSIONS)
+      .then((sessions) => {
+        const session = sessions[tabId];
+        const sessionEvents = decompressEvents(session.events);
+        populateSessionData(session.metadata, sessionEvents);
+      })
+      .catch((error) => {
+        setLoadingError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [tabId, populateSessionData]);
+
+  const getNewDraftReplay = useCallback(() => {
+    getTabSession(parseInt(tabId))
+      .then((payload) => {
+        if (typeof payload === "string") {
+          setLoadingError(payload);
+        } else {
+          const tabSession = payload as RQSession;
+
+          if (tabSession.events.rrweb?.length < 2) {
+            setLoadingError("RRWeb events not captured");
+          } else {
+            populateSessionData(tabSession.attributes, tabSession.events);
+            cacheDraftSession(tabSession.attributes, tabSession.events, tabId);
+          }
+        }
+      })
+      .catch((error) => {
+        setLoadingError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [tabId, populateSessionData]);
+
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
+      e.returnValue = exitMessage;
     };
-
     // It is fired only if there was ANY interaction of the user with the site.
     // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
     // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
@@ -118,43 +171,14 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
     if (tabId === "imported") {
       setIsLoading(false);
     } else if (tabId === "mock") {
-      // TODO: remove mock flow
-      dispatch(
-        sessionRecordingActions.setSessionRecordingMetadata({
-          sessionAttributes: mockSession.attributes,
-          name: "Mock Session Recording",
-        })
-      );
-      dispatch(sessionRecordingActions.setEvents(mockSession.events));
+      populateSessionData(mockSession.attributes, mockSession.events, tabId);
       setIsLoading(false);
+    } else if (queryParams.has("savedDraft")) {
+      getSavedDraftReplay();
     } else {
-      getTabSession(parseInt(tabId)).then((payload: unknown) => {
-        if (typeof payload === "string") {
-          setLoadingError(payload);
-        } else {
-          const tabSession = payload as RQSession;
-          if (!tabSession) {
-            return;
-          }
-
-          if (tabSession.events.rrweb?.length < 2) {
-            setLoadingError("RRWeb events not captured");
-          } else {
-            dispatch(
-              sessionRecordingActions.setSessionRecordingMetadata({
-                sessionAttributes: tabSession.attributes,
-                name: generateDraftSessionTitle(tabSession.attributes?.url),
-              })
-            );
-
-            filterOutLargeNetworkResponses(tabSession.events);
-            dispatch(sessionRecordingActions.setEvents(tabSession.events));
-          }
-        }
-        setIsLoading(false);
-      });
+      getNewDraftReplay();
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession]);
+  }, [dispatch, tabId, queryParams, getSavedDraftReplay, getNewDraftReplay, populateSessionData, testRuleDraftSession]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
@@ -164,7 +188,8 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
       content: "Are you sure you want to discard this draft recording?",
       okText: "Yes",
       cancelText: "No",
-      onOk() {
+      onOk: async () => {
+        await clearDraftSessionCache(tabId);
         trackDraftSessionDiscarded();
         if (testRuleDraftSession) {
           testRuleDraftSession.closeModal();
@@ -176,7 +201,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
         setIsDiscardSessionClicked(false);
       },
     });
-  }, [navigate, testRuleDraftSession]);
+  }, [navigate, tabId, testRuleDraftSession]);
 
   useEffect(() => {
     if (loadingError) {
