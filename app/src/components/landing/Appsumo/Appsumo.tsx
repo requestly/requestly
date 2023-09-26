@@ -15,9 +15,9 @@ import { toast } from "utils/Toast";
 import { getUserAttributes } from "store/selectors";
 import { useSelector } from "react-redux";
 import "./index.scss";
-import { debounce } from "lodash";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { isEmailValid } from "utils/FormattingHelper";
+import { useDebounce } from "hooks/useDebounce";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -76,14 +76,17 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
+  const debouncedVerifyCode = useDebounce((enteredCode: string, index: number) => verifyCode(enteredCode, index));
+
   const verifyCode = useCallback(
-    debounce(async (enteredCode: string, index: number) => {
+    async (enteredCode: string, index: number) => {
       if (enteredCode.length < 8) {
         updateAppSumoCode(index, "verified", false);
         return;
       }
+
       const isCodeAlreadyAdded = appsumoCodes.some((appsumoCode: AppSumoCode) => appsumoCode.code === enteredCode);
-      if (isCodeAlreadyAdded) {
+      if (isCodeAlreadyAdded && workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
         updateAppSumoCode(index, "error", "Code already used");
         updateAppSumoCode(index, "verified", false);
         return;
@@ -105,8 +108,8 @@ const AppSumoModal: React.FC = () => {
       }
       updateAppSumoCode(index, "error", "");
       updateAppSumoCode(index, "verified", true);
-    }, 800),
-    []
+    },
+    [appsumoCodes, workspaceToUpgrade?.id]
   );
 
   const redeemSubmittedCodes = useCallback(async () => {
@@ -204,7 +207,7 @@ const AppSumoModal: React.FC = () => {
                 key={index}
                 onChange={(e) => {
                   updateAppSumoCode(index, "code", e.target.value);
-                  verifyCode(e.target.value, index);
+                  debouncedVerifyCode(e.target.value, index);
                 }}
                 suffix={
                   appsumoCode.verified ? (
