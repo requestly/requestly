@@ -79,7 +79,10 @@ const ActiveLicenseInfo = ({
           <SubscriptionInfo
             hideShadow={hideShadow}
             subscriptionDetails={{
-              validFrom: new Date(sessionReplayLifeTimeDetails.date).getTime(),
+              validFrom:
+                typeof sessionReplayLifeTimeDetails === "string"
+                  ? new Date(sessionReplayLifeTimeDetails).getTime()
+                  : new Date(sessionReplayLifeTimeDetails.date).getTime(),
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
               type: sessionReplayLifeTimeDetails.type ?? "producthunt",
