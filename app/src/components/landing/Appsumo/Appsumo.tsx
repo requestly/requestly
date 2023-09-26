@@ -4,6 +4,7 @@ import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ImCross } from "@react-icons/all-files/im/ImCross";
 import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
+import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
@@ -75,31 +76,36 @@ const AppSumoModal: React.FC = () => {
     });
   };
 
-  const verifyCode = useMemo(
-    () =>
-      debounce(async (enteredCode: string, index: number) => {
-        if (enteredCode.length < 8) {
-          updateAppSumoCode(index, "verified", false);
-          return;
-        }
+  const verifyCode = useCallback(
+    debounce(async (enteredCode: string, index: number) => {
+      if (enteredCode.length < 8) {
+        updateAppSumoCode(index, "verified", false);
+        return;
+      }
+      const isCodeAlreadyAdded = appsumoCodes.some((appsumoCode: AppSumoCode) => appsumoCode.code === enteredCode);
+      if (isCodeAlreadyAdded) {
+        updateAppSumoCode(index, "error", "Code already used");
+        updateAppSumoCode(index, "verified", false);
+        return;
+      }
 
-        const docRef = doc(db, "appSumoCodes", enteredCode);
-        const docSnap = await getDoc(docRef);
+      const docRef = doc(db, "appSumoCodes", enteredCode);
+      const docSnap = await getDoc(docRef);
 
-        if (!docSnap.exists()) {
-          updateAppSumoCode(index, "error", "Invalid code. Please contact support");
-          updateAppSumoCode(index, "verified", false);
-          return;
-        }
+      if (!docSnap.exists()) {
+        updateAppSumoCode(index, "error", "Invalid code");
+        updateAppSumoCode(index, "verified", false);
+        return;
+      }
 
-        if (docSnap.data()?.redeemed) {
-          updateAppSumoCode(index, "error", "Code already redeemed. Please contact support");
-          updateAppSumoCode(index, "verified", false);
-          return;
-        }
-        updateAppSumoCode(index, "error", "");
-        updateAppSumoCode(index, "verified", true);
-      }, 800),
+      if (docSnap.data()?.redeemed) {
+        updateAppSumoCode(index, "error", "Code already redeemed");
+        updateAppSumoCode(index, "verified", false);
+        return;
+      }
+      updateAppSumoCode(index, "error", "");
+      updateAppSumoCode(index, "verified", true);
+    }, 800),
     []
   );
 
@@ -200,10 +206,18 @@ const AppSumoModal: React.FC = () => {
                   updateAppSumoCode(index, "code", e.target.value);
                   verifyCode(e.target.value, index);
                 }}
-                suffix={appsumoCode.verified ? <MdOutlineVerified /> : null}
+                suffix={
+                  appsumoCode.verified ? (
+                    <MdOutlineVerified />
+                  ) : appsumoCode.error ? (
+                    <>
+                      <span className="danger caption">{appsumoCode.error}</span>
+                      <FiXCircle className="danger" />
+                    </>
+                  ) : null
+                }
                 placeholder="Enter code here"
               />
-              <div className="appsumo-code-error field-error-prompt">{appsumoCode.error || null}</div>
             </div>
             {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
               <div className={`remove-icon ${appsumoCodes.length === 1 ? "cursor-disabled" : "cursor-pointer"}`}>
