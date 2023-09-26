@@ -1,7 +1,7 @@
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ImCross } from "@react-icons/all-files/im/ImCross";
 import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { useNavigate } from "react-router-dom";
@@ -154,6 +154,10 @@ const AppSumoModal: React.FC = () => {
     }
     setEmailValidation(null);
   };
+
+  useEffect(() => {
+    if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) setAppsumoCodes([{ ...DEFAULT_APPSUMO_INPUT }]);
+  }, [workspaceToUpgrade]);
 
   return (
     <RQModal
