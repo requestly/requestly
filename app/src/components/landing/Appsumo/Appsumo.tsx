@@ -85,8 +85,8 @@ const AppSumoModal: React.FC = () => {
         return;
       }
 
-      const isCodeAlreadyAdded = appsumoCodes.some((appsumoCode: AppSumoCode) => appsumoCode.code === enteredCode);
-      if (isCodeAlreadyAdded && workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
+      const codeOccurence = appsumoCodes.filter((appsumoCode: AppSumoCode) => appsumoCode.code === enteredCode).length;
+      if (codeOccurence > 1 && workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
         updateAppSumoCode(index, "error", "Code already used");
         updateAppSumoCode(index, "verified", false);
         return;
@@ -152,17 +152,19 @@ const AppSumoModal: React.FC = () => {
     await redeemSubmittedCodes();
   }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userAttributes, userEmail, workspaceToUpgrade.id]);
 
-  const handleEmailValidation = () => {
-    if (!userEmail) {
+  const handleEmailValidation = (email: string) => {
+    if (!email) {
       setEmailValidation("Please add your Appsumo email address");
       return;
     }
-    if (!isEmailValid(userEmail)) {
+    if (!isEmailValid(email)) {
       setEmailValidation("Please enter a valid email address");
       return;
     }
     setEmailValidation(null);
   };
+
+  const debouncedEmailValidation = useDebounce((email: string) => handleEmailValidation(email));
 
   useEffect(() => {
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) setAppsumoCodes([{ ...DEFAULT_APPSUMO_INPUT }]);
@@ -191,8 +193,10 @@ const AppSumoModal: React.FC = () => {
             <RQInput
               className="w-full"
               value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              onBlur={handleEmailValidation}
+              onChange={(e) => {
+                setUserEmail(e.target.value);
+                debouncedEmailValidation(e.target.value);
+              }}
               placeholder="Enter email address here"
             />
             <div className="danger caption">{emailValidation}</div>
@@ -244,7 +248,7 @@ const AppSumoModal: React.FC = () => {
       <Row className="rq-modal-footer" justify={"end"}>
         <RQButton
           type="primary"
-          disabled={!isAllCodeCheckPassed || !userEmail}
+          disabled={!isAllCodeCheckPassed || emailValidation}
           onClick={() => {
             onSubmit()
               .then(() => {
