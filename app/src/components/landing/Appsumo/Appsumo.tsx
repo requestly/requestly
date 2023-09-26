@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import "./index.scss";
 import { debounce } from "lodash";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
+import { isEmailValid } from "utils/FormattingHelper";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -45,6 +46,7 @@ const AppSumoModal: React.FC = () => {
 
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [emailValidation, setEmailValidation] = useState(null);
 
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
 
@@ -141,6 +143,18 @@ const AppSumoModal: React.FC = () => {
     await redeemSubmittedCodes();
   }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userAttributes, userEmail, workspaceToUpgrade.id]);
 
+  const handleEmailValidation = () => {
+    if (!userEmail) {
+      setEmailValidation("Please add your Appsumo email address");
+      return;
+    }
+    if (!isEmailValid(userEmail)) {
+      setEmailValidation("Please enter a valid email address");
+      return;
+    }
+    setEmailValidation(null);
+  };
+
   return (
     <RQModal
       width={620}
@@ -160,11 +174,16 @@ const AppSumoModal: React.FC = () => {
         <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
         <div className="title mt-16">AppSumo email address</div>
         <div className="items-center mt-8">
-          <RQInput
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
-            placeholder="Enter email address here"
-          />
+          <div className="w-full">
+            <RQInput
+              className="w-full"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              onBlur={handleEmailValidation}
+              placeholder="Enter email address here"
+            />
+            <div className="danger caption">{emailValidation}</div>
+          </div>
         </div>
         <div className="title mt-16">AppSumo Code(s)</div>
         {appsumoCodes.map((appsumoCode, index) => (
