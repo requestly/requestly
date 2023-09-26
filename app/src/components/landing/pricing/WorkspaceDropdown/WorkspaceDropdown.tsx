@@ -115,7 +115,7 @@ const WorkspaceDropdown: React.FC<{
           </RQButton>
         </Dropdown>
       </div>
-      {workspaceToUpgrade.id !== "private_workspace" && (
+      {workspaceToUpgrade?.id !== "private_workspace" && (
         <div className="workspace-members-display-text">
           <Typography.Text type="secondary">
             Your workspace has {workspaceToUpgrade?.accessCount} active members
