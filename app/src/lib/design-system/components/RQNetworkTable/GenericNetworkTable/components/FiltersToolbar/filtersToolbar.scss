@@ -1,0 +1,12 @@
+.filters-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0px;
+
+  .search-filter {
+    width: 250px;
+    padding: 4px 6px;
+  }
+}

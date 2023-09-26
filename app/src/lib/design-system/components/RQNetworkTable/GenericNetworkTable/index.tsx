@@ -9,6 +9,8 @@ import {
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
+import FiltersToolbar from "./components/FiltersToolbar/FiltersToolbar";
+import { NetworkFilters } from "./components/FiltersToolbar/types";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -48,6 +50,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   onContextMenuOpenChange = (isOpen) => {},
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
+  const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
 
   const finalColumns = useMemo(
     () =>
@@ -57,10 +60,10 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector, excludeColumns, extraColumns]
   );
 
-  const finalDetailsTabs = useMemo(
-    () => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs],
-    [networkEntrySelector, extraDetailsTabs]
-  );
+  const finalDetailsTabs = useMemo(() => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs], [
+    networkEntrySelector,
+    extraDetailsTabs,
+  ]);
 
   const isFailed = useCallback(
     (log: NetworkLog) => {
@@ -71,17 +74,32 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
+  const filterLog = useCallback(
+    (networkLog: NetworkLog) => {
+      let includeLog = false;
+      const entry = networkEntrySelector(networkLog);
+      includeLog = !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
+      return includeLog;
+    },
+    [networkEntrySelector, filters.search]
+  );
+
   return (
-    <ResourceTable
-      resources={logs}
-      isFailed={isFailed}
-      columns={finalColumns}
-      detailsTabs={finalDetailsTabs}
-      primaryColumnKeys={["timeOffset", "url"]}
-      colorScheme={ColorScheme.DARK}
-      onRowSelection={setSelectedLog}
-      contextMenuOptions={contextMenuOptions}
-      onContextMenuOpenChange={onContextMenuOpenChange}
-    />
+    <div className="network-container">
+      <FiltersToolbar filters={filters} setFilters={setFilters} />
+      <div className="rq-resource-table-wrapper">
+        <ResourceTable
+          resources={logs}
+          isFailed={isFailed}
+          columns={finalColumns}
+          detailsTabs={finalDetailsTabs}
+          primaryColumnKeys={["timeOffset", "url"]}
+          colorScheme={ColorScheme.DARK}
+          onRowSelection={setSelectedLog}
+          contextMenuOptions={contextMenuOptions}
+          filter={filterLog}
+        />
+      </div>
+    </div>
   );
 };

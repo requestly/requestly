@@ -72,3 +72,14 @@
   padding: 8px;
   background-color: var(--body-background);
 }
+
+.rq-network-table-container .network-container {
+  overflow: hidden;
+  height: 300px;
+}
+
+.rq-network-table-container .rq-resource-table-wrapper {
+  overflow-y: auto;
+  height: calc(100% - 56px); /* deducting filter input height */
+  margin-top: 8px;
+}
