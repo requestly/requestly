@@ -9,7 +9,8 @@ import {
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
-import FiltersToolbar, { Filters } from "./components/FiltersToolbar/FiltersToolbar";
+import FiltersToolbar from "./components/FiltersToolbar/FiltersToolbar";
+import { NetworkFilters } from "./components/FiltersToolbar/types";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -49,7 +50,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   onContextMenuOpenChange = (isOpen) => {},
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
-  const [filters, setFilters] = useState<Filters>({ search: "" });
+  const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
 
   const finalColumns = useMemo(
     () =>
@@ -77,7 +78,7 @@ export const GenericNetworkTable = <NetworkLog,>({
     (networkLog: NetworkLog) => {
       let includeLog = false;
       const entry = networkEntrySelector(networkLog);
-      includeLog = !!entry?.request?.url?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
+      includeLog = !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
       return includeLog;
     },
     [networkEntrySelector, filters.search]

@@ -3,14 +3,11 @@ import { Input } from "antd";
 import { useDebounce } from "hooks/useDebounce";
 
 import "./filtersToolbar.scss";
-
-export interface Filters {
-  search?: string;
-}
+import { NetworkFilters } from "./types";
 
 interface Props {
-  filters: Filters;
-  setFilters: (filters: Filters) => void;
+  filters: NetworkFilters;
+  setFilters: (filters: NetworkFilters) => void;
 }
 
 const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
