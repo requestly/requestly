@@ -90,7 +90,7 @@ const FreeAndEnterprisePlanTable = () => {
                       mode: isPrivateWorksapceSelected ? "individual" : "team",
                       planName: planName,
                       duration: duration,
-                      quantity: workspaceToUpgrade.accessCount,
+                      quantity: workspaceToUpgrade?.accessCount,
                       teamId: isPrivateWorksapceSelected ? null : workspaceToUpgrade?.id,
                     })
                   }
@@ -139,8 +139,8 @@ const FreeAndEnterprisePlanTable = () => {
               mode: isPrivateWorksapceSelected ? "individual" : "team",
               planName: planName,
               duration: duration,
-              quantity: workspaceToUpgrade.accessCount,
-              teamId: isPrivateWorksapceSelected ? null : workspaceToUpgrade.id,
+              quantity: workspaceToUpgrade?.accessCount,
+              teamId: isPrivateWorksapceSelected ? null : workspaceToUpgrade?.id,
             })
           }
           disabled={isUserPremium && userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
@@ -248,7 +248,7 @@ const FreeAndEnterprisePlanTable = () => {
                           ? PricingPlans[planName].plans[duration]?.usd?.price / 12
                           : PricingPlans[planName].plans[duration]?.usd?.price}
                       </span>{" "}
-                      {workspaceToUpgrade.id === PRIVATE_WORKSPACE.id ? "per month" : "per user/month"}
+                      {workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id ? "per month" : "per user/month"}
                       {duration === APP_CONSTANTS.PRICING.DURATION.ANNUALLY && ", billed annually"}
                     </div>
                     {renderButtonsForPlans(planName)}
