@@ -83,3 +83,9 @@
   height: calc(100% - 56px); /* deducting filter input height */
   margin-top: 8px;
 }
+.rq-network-table-container .empty-table-view {
+  background: var(--component-dark-background);
+  height: 100%;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+}

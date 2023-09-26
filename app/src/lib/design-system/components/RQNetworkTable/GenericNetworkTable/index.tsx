@@ -3,14 +3,15 @@ import {
   ColorScheme,
   ContextMenuOption,
   DetailsTab,
-  ResourceTable,
   ResourceTableProps,
+  ResourceTable,
 } from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
 import FiltersToolbar from "./components/FiltersToolbar/FiltersToolbar";
 import { NetworkFilters } from "./components/FiltersToolbar/types";
+import { Row } from "antd";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -98,8 +99,16 @@ export const GenericNetworkTable = <NetworkLog,>({
           onRowSelection={setSelectedLog}
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
+          //@ts-ignore
+          emptyView={emptyTableView}
         />
       </div>
     </div>
   );
 };
+
+const emptyTableView = (
+  <Row className="empty-table-view subtitle" align="middle" justify="center">
+    No request matches the filter you applied
+  </Row>
+);
