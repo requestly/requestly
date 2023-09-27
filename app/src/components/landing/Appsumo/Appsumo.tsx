@@ -119,6 +119,7 @@ const AppSumoModal: React.FC = () => {
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || !userEmail) {
       toast.warn("Please fill all the fields correctly", 10);
+      throw new Error("Please fill all the fields correctly");
     }
 
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
