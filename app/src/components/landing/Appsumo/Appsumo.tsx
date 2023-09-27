@@ -117,7 +117,7 @@ const AppSumoModal: React.FC = () => {
   }, [appsumoCodes]);
 
   const onSubmit = useCallback(async () => {
-    if (!isAllCodeCheckPassed || !userEmail) {
+    if (!isAllCodeCheckPassed || !emailValidation) {
       toast.warn("Please fill all the fields correctly", 10);
       throw new Error("Please fill all the fields correctly");
     }
