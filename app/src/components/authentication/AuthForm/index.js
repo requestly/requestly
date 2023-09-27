@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
@@ -55,6 +55,7 @@ const AuthForm = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
@@ -428,7 +429,9 @@ const AuthForm = ({
 
             <Col span={11} className="signup-modal-section-wrapper signup-form-wrapper">
               <Typography.Text type="primary" className="text-bold w-full header">
-                Create your Requestly account
+                {location.pathname === PATHS.APPSUMO.RELATIVE
+                  ? "Signup to redeem your AppSumo code"
+                  : "Create your Requestly account"}
               </Typography.Text>
 
               <Row align={"middle"} className="mt-1">

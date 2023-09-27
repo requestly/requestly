@@ -1,0 +1,33 @@
+.workspace-selector-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+
+  .workspace-selector-dropdown-container {
+    margin-bottom: 4px;
+
+    .workspace-selector-dropdown {
+      &.ant-dropdown-menu-root {
+        overflow: auto;
+        max-height: 15rem;
+      }
+    }
+
+    .workspace-selector-dropdown-btn.ant-btn.rq-btn {
+      background-color: var(--input-background);
+      border: none;
+      margin-left: 4px;
+      padding: 8px;
+
+      &:hover {
+        border: none;
+      }
+
+      .workspace-selector-dropdown-icon.anticon {
+        margin-left: 2px;
+        font-size: 0.7rem;
+      }
+    }
+  }
+}
