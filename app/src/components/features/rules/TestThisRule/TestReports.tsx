@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
+import { Tooltip } from "antd";
+import { RQModal } from "lib/design-system/components";
+import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { TestReport } from "./types";
@@ -8,13 +12,10 @@ import { TestReport } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { trackTestRuleReportGenerated, trackTestRuleResultClicked } from "modules/analytics/events/features/ruleEditor";
-import "./index.css";
-import { RQModal } from "lib/design-system/components";
-import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import { getTestReportsByRuleId } from "./helpers";
-import { Link } from "react-router-dom";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
-import { Tooltip } from "antd";
+import { DRAFT_SESSION_VIEWED_SOURCE } from "views/features/sessions/SessionViewer/constants";
+import "./index.css";
 
 interface TestReportsProps {
   scrollToTestRule: () => void;
@@ -109,7 +110,10 @@ export const TestReports: React.FC<TestReportsProps> = ({ scrollToTestRule }) =>
               keyboard={false}
               closable={false}
             >
-              <DraftSessionViewer testRuleDraftSession={testRuleDraftSessionDetails} />
+              <DraftSessionViewer
+                testRuleDraftSession={testRuleDraftSessionDetails}
+                source={DRAFT_SESSION_VIEWED_SOURCE.TEST_THIS_RULE}
+              />
             </RQModal>
           )}
           <div className="test-this-rule-row-header test-this-rule-results-header text-bold subtitle">
