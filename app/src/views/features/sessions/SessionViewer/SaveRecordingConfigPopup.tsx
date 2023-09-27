@@ -180,6 +180,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       testRuleDraftSession,
       appMode,
       navigate,
+      source,
     ]
   );
 
@@ -217,6 +218,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       onClose,
       trackSessionsCreatedCount,
       testRuleDraftSession,
+      source,
     ]
   );
 
