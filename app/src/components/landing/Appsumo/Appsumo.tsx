@@ -42,7 +42,7 @@ const AppSumoModal: React.FC = () => {
 
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
-  const [emailValidation, setEmailValidation] = useState(null);
+  const [emailValidationError, setEmailValidationError] = useState(null);
 
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
 
@@ -117,7 +117,7 @@ const AppSumoModal: React.FC = () => {
   }, [appsumoCodes]);
 
   const onSubmit = useCallback(async () => {
-    if (!isAllCodeCheckPassed || !emailValidation) {
+    if (!isAllCodeCheckPassed || emailValidationError) {
       toast.warn("Please fill all the fields correctly", 10);
       throw new Error("Please fill all the fields correctly");
     }
@@ -145,18 +145,18 @@ const AppSumoModal: React.FC = () => {
       });
     }
     await redeemSubmittedCodes();
-  }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userEmail, workspaceToUpgrade.id]);
+  }, [appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
 
   const handleEmailValidation = (email: string) => {
     if (!email) {
-      setEmailValidation("Please add your Appsumo email address");
+      setEmailValidationError("Please add your Appsumo email address");
       return;
     }
     if (!isEmailValid(email)) {
-      setEmailValidation("Please enter a valid email address");
+      setEmailValidationError("Please enter a valid email address");
       return;
     }
-    setEmailValidation(null);
+    setEmailValidationError(null);
   };
 
   const debouncedEmailValidation = useDebounce((email: string) => handleEmailValidation(email));
@@ -194,7 +194,7 @@ const AppSumoModal: React.FC = () => {
               }}
               placeholder="Enter email address here"
             />
-            <div className="danger caption">{emailValidation}</div>
+            <div className="danger caption">{emailValidationError}</div>
           </div>
         </div>
         <div className="title mt-16">AppSumo Code(s)</div>
@@ -243,7 +243,7 @@ const AppSumoModal: React.FC = () => {
       <Row className="rq-modal-footer" justify={"end"}>
         <RQButton
           type="primary"
-          disabled={!isAllCodeCheckPassed || emailValidation}
+          disabled={!isAllCodeCheckPassed || emailValidationError}
           onClick={() => {
             onSubmit()
               .then(() => {
