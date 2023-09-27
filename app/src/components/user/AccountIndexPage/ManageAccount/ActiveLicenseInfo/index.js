@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProCard from "@ant-design/pro-card";
 // UTILS
-import { getUserAttributes, getUserAuthDetails } from "../../../../../store/selectors";
+import { getUserAuthDetails } from "../../../../../store/selectors";
 // SUB COMPONENTS
 import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
@@ -24,9 +24,6 @@ const ActiveLicenseInfo = ({
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
   const doesSubscriptionExist = !!type && !!status && !!planName;
 
-  //TODO: remove before merging
-  const userAttributes = useSelector(getUserAttributes);
-
   useEffect(() => {
     getAttrFromFirebase("session_replay_lifetime_pro")
       .then((val) => {
@@ -38,12 +35,7 @@ const ActiveLicenseInfo = ({
       .catch(() => {
         // do nothing
       });
-
-    if (userAttributes["session_replay_lifetime_pro"]) {
-      setIsSessionReplayLifetimeActive(true);
-      setSessionReplayLifeTimeDetails(userAttributes["session_replay_lifetime_pro"]);
-    }
-  }, [userAttributes]);
+  }, []);
 
   const renderSubscriptionInfo = () => {
     return (

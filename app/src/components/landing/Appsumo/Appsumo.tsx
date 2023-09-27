@@ -12,8 +12,6 @@ import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
 import { arrayUnion, doc, getDoc, getFirestore, updateDoc, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
-import { getUserAttributes } from "store/selectors";
-import { useSelector } from "react-redux";
 import "./index.scss";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { isEmailValid } from "utils/FormattingHelper";
@@ -41,9 +39,6 @@ const db = getFirestore(firebaseApp);
 
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
-
-  //TODO: remove before merging
-  const userAttributes = useSelector(getUserAttributes);
 
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
@@ -127,8 +122,7 @@ const AppSumoModal: React.FC = () => {
     }
 
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
-      const sessionReplayLifetime =
-        (await getAttrFromFirebase("session_replay_lifetime_pro")) ?? userAttributes["session_replay_lifetime_pro"];
+      const sessionReplayLifetime = await getAttrFromFirebase("session_replay_lifetime_pro");
       if (sessionReplayLifetime?.code) {
         toast.warn("You have already redeemed a code. Please contact support", 10);
         throw new Error("You have already redeemed a code. Please contact support");
@@ -150,7 +144,7 @@ const AppSumoModal: React.FC = () => {
       });
     }
     await redeemSubmittedCodes();
-  }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userAttributes, userEmail, workspaceToUpgrade.id]);
+  }, [appsumoCodes, isAllCodeCheckPassed, redeemSubmittedCodes, userEmail, workspaceToUpgrade.id]);
 
   const handleEmailValidation = (email: string) => {
     if (!email) {
