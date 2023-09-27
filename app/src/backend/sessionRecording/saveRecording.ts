@@ -12,7 +12,8 @@ export const saveRecording = async (
   workspaceId: string | null,
   payload: SessionRecordingMetadata,
   events: any,
-  options: RecordingOptions
+  options: RecordingOptions,
+  source: string
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
@@ -36,6 +37,7 @@ export const saveRecording = async (
     lastUpdatedBy: uid,
     updatedTs: Date.now(),
     createdTs: Date.now(),
+    source,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)
