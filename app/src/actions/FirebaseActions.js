@@ -73,7 +73,7 @@ const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000
  * SignIn with Google in popup window and create profile node
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
  */
-export async function signUp(name, email, password, refCode, source) {
+export async function signUp(email, password, refCode, source) {
   const email_type = getEmailType(email);
   const domain = email.split("@")[1];
   trackSignUpAttemptedEvent({
@@ -84,15 +84,15 @@ export async function signUp(name, email, password, refCode, source) {
     domain,
     source,
   });
-  if (!name || isEmpty(name)) {
-    trackSignUpFailedEvent({
-      auth_provider: AUTH_PROVIDERS.EMAIL,
-      email,
-      error: "no-name",
-      source,
-    });
-    return Promise.reject({ status: false, errorCode: "no-name" });
-  }
+  // if (!name || isEmpty(name)) {
+  //   trackSignUpFailedEvent({
+  //     auth_provider: AUTH_PROVIDERS.EMAIL,
+  //     email,
+  //     error: "no-name",
+  //     source,
+  //   });
+  //   return Promise.reject({ status: false, errorCode: "no-name" });
+  // }
   if (!email || isEmpty(email)) {
     trackSignUpFailedEvent({
       auth_provider: AUTH_PROVIDERS.EMAIL,
@@ -122,7 +122,6 @@ export async function signUp(name, email, password, refCode, source) {
         setEmailVerified(result.user.uid, false);
       });
       return updateProfile(result.user, {
-        displayName: name,
         photoURL: `https://www.gravatar.com/avatar/${md5(email)}`,
       })
         .then(() => {
