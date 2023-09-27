@@ -99,7 +99,6 @@ export const GenericNetworkTable = <NetworkLog,>({
           onRowSelection={setSelectedLog}
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
-          //@ts-ignore
           emptyView={emptyTableView}
         />
       </div>
