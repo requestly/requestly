@@ -26,11 +26,12 @@ export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.dra
 
 export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength, options, type) => {
+export const trackDraftSessionSaved = (sessionLength, options, type, source) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
     type,
     sessionLength,
     options,
+    source,
   });
 
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
