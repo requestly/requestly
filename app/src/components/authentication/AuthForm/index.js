@@ -104,7 +104,8 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          const greatingName = result.user.displayName?.split(" ")?.[0];
+          !isOnboardingForm && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
@@ -124,15 +125,17 @@ const AuthForm = ({
           handleEmailSignIn(email, password, true, eventSource)
             .then(({ result }) => {
               if (result.user.uid) {
-                !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+                const greatingName = result.user.displayName?.split(" ")?.[0];
+                !isOnboardingForm &&
+                  toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
                 setEmail("");
                 setPassword("");
                 // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
                 onSignInSuccess && onSignInSuccess(result.user.uid, true);
               }
             })
-            .catch(({ errorCode }) => {
-              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+            .catch((err) => {
+              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
               setActionPending(false);
               setEmail("");
               setPassword("");
@@ -142,8 +145,8 @@ const AuthForm = ({
           setActionPending(false);
         }
       })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+      .catch((err) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
         setActionPending(false);
       });
   };
@@ -154,7 +157,8 @@ const AuthForm = ({
     handleEmailSignIn(email, password, false, eventSource)
       .then(({ result }) => {
         if (result.user.uid) {
-          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
+          const greatingName = result.user.displayName?.split(" ")?.[0];
+          !isOnboardingForm && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           setEmail("");
           setPassword("");
           // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
@@ -164,8 +168,9 @@ const AuthForm = ({
           setActionPending(true);
         }
       })
-      .catch(({ errorCode }) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
+      .catch((err) => {
+        console.log(err);
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorcode));
         setActionPending(false);
         setEmail("");
         setPassword("");
@@ -271,7 +276,7 @@ const AuthForm = ({
         return (
           <RQButton
             type="primary"
-            className="form-elements-margin w-full"
+            className="form-elements-margin w-full mt-16"
             onClick={(event) =>
               handleForgotPasswordButtonOnClick(event, email, setActionPending, onRequestPasswordResetSuccess)
             }
@@ -518,7 +523,7 @@ const AuthForm = ({
               </>
             )}
             <div className="w-full mt-20">{renderEmailField()}</div>
-            {renderPasswordField()}
+            {renderPasswordField()} {/* NOT SHOWN WHEN REQUESTING RESET */}
             <FormSubmitButton />
           </Row>
         </Col>

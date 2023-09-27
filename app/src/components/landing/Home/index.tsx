@@ -97,7 +97,7 @@ export const Home: React.FC = () => {
     <div className="home-v2-container">
       <div className="home-v2-welcome-message">
         <Typography.Title className="welcome-title">
-          Hello, {user?.loggedIn ? user.details.profile.displayName : "User"}
+          Hello, {user.details?.profile?.displayName ?? "User"}
         </Typography.Title>
         <Typography.Text className="welcome-subtitle">Where do you want to start today?</Typography.Text>
       </div>
