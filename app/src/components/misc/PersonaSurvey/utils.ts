@@ -18,7 +18,8 @@ export const shouldShowOnboarding = async (appMode: string) => {
     window.location.href.includes("/invite") ||
     window.location.href.includes(PATHS.AUTH.EMAIL_ACTION.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE) ||
-    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE)
+    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE) ||
+    window.location.href.includes(PATHS.APPSUMO.RELATIVE)
   )
     return false;
 

@@ -7,6 +7,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUniqueColorForWorkspace } from "utils/teams";
+import "./index.scss";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -16,7 +17,8 @@ const getWorkspaceIcon = (workspaceName: string) => {
 const WorkspaceDropdown: React.FC<{
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
-}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade }) => {
+  className?: string;
+}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className }) => {
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -86,11 +88,11 @@ const WorkspaceDropdown: React.FC<{
   };
 
   return user.loggedIn ? (
-    <div className="pricing-workspace-selector-container">
-      <div className="pricing-workspace-dropdown-container">
+    <div className={`workspace-selector-container ${className ?? ""}`}>
+      <div className="workspace-selector-dropdown-container">
         Select workspace to upgrade
-        <Dropdown menu={workspaceMenuItems} trigger={["click"]} overlayClassName="pricing-workspace-dropdown">
-          <RQButton className="pricing-workspace-dropdown-btn">
+        <Dropdown menu={workspaceMenuItems} trigger={["click"]} overlayClassName="workspace-selector-dropdown">
+          <RQButton className="workspace-selector-dropdown-btn">
             <div className="cursor-pointer items-center">
               <Avatar
                 size={18}
@@ -108,18 +110,19 @@ const WorkspaceDropdown: React.FC<{
                 }}
               />
               <span>{workspaceToUpgrade?.name}</span>
-              <DownOutlined className="pricing-workspace-dropdown-icon" />
+              <DownOutlined className="workspace-selector-dropdown-icon" />
             </div>
           </RQButton>
         </Dropdown>
       </div>
-      <div className="text-center">
-        {workspaceToUpgrade?.id !== "private_workspace" && (
+      {workspaceToUpgrade?.id !== "private_workspace" && (
+        <div className="workspace-members-display-text">
           <Typography.Text type="secondary">
-            Your workspace has {workspaceToUpgrade?.accessCount} active members
+            Your workspace has {workspaceToUpgrade?.accessCount} active{" "}
+            {workspaceToUpgrade?.accessCount > 1 ? "members" : "member"}.
           </Typography.Text>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   ) : null;
 };
