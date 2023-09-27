@@ -169,7 +169,6 @@ const AuthForm = ({
         }
       })
       .catch((err) => {
-        console.log(err);
         toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorcode));
         setActionPending(false);
         setEmail("");
