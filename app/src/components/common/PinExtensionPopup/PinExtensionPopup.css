@@ -1,14 +1,9 @@
-.pin-extension-popup-container .rq-modal.ant-modal {
-  width: 373px;
-  min-width: 370px !important;
+.pin-extension-popup-container.rq-modal.ant-modal {
   margin: 0px;
   top: 16px;
   left: calc(100% - 373px - 16px); /* whole screen - container width - spacing */
   transform-origin: top right !important;
-}
-
-.pin-extension-popup-container .rq-modal.ant-modal .ant-modal-close {
-  display: none;
+  min-width: 370px !important;
 }
 
 .pin-extension-popup {

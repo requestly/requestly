@@ -1,7 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { ONBOARDING } from "../constants";
 
-type PinExtensionExpandedAction =
+export type PinExtensionCollapseExpandedAction =
   | "activate_deactivate"
   | "what_rules_executed"
   | "record_and_replay"
@@ -13,7 +13,7 @@ export const trackPinExtensionPopupViewed = () => {
   trackEvent(ONBOARDING.PIN_EXTENSION_POPUP_VIEWED);
 };
 
-export const trackPinExtensionPopupExpanded = (action: PinExtensionExpandedAction) => {
+export const trackPinExtensionPopupExpanded = (action: PinExtensionCollapseExpandedAction) => {
   const params = { action };
   trackEvent(ONBOARDING.PIN_EXTENSION_POPUP_EXPANDED, params);
 };

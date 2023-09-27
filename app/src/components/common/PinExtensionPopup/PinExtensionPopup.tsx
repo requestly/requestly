@@ -17,10 +17,9 @@ import {
   trackPinExtensionPopupClosed,
   trackPinExtensionPopupExpanded,
   trackPinExtensionPopupViewed,
+  PinExtensionCollapseExpandedAction,
 } from "modules/analytics/events/common/onboarding/pinExtensionPopup";
 import "./PinExtensionPopup.css";
-
-type PanelType = "activate_deactivate" | "what_rules_executed" | "record_and_replay" | "pause_extension";
 
 interface Props {
   isOpen: boolean;
@@ -44,7 +43,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
 
   const collapsePanelItems: {
     header: React.ReactNode;
-    analyticEventAction: PanelType;
+    analyticEventAction: PinExtensionCollapseExpandedAction;
     image: { alt: string; src: any };
   }[] = useMemo(
     () => [
@@ -113,8 +112,9 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
       width={373}
       open={isOpen}
       closable={false}
+      closeIcon={null}
       maskClosable={false}
-      wrapClassName="pin-extension-popup-container"
+      className="pin-extension-popup-container"
     >
       <div className="pin-extension-popup">
         <div className="title">
