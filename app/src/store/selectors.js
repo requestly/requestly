@@ -195,6 +195,13 @@ export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
 };
 
+// Had to make a separate selector, since consuming
+// "userAttributes" directly in <RulesListContainer/> component goes into infinite re-renders
+// TODO: fix above
+export const getUserRulesCount = (state) => {
+  return getUserAttributes(state)?.num_rules ?? 0;
+};
+
 export const getIsProductHuntLaunchedBannerClosed = (state) => {
   return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
