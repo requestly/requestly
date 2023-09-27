@@ -130,6 +130,8 @@ export const beautifySubscriptionType = (subscriptionType) => {
       return "Free Trial";
     case "producthunt":
       return "Producthunt Unlock";
+    case "appsumo":
+      return "AppSumo";
     default:
       return "Premium Plan";
   }
