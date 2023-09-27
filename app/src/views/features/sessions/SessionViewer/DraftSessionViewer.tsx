@@ -21,6 +21,7 @@ import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { DRAFT_SESSION_VIEWED_SOURCE } from "./constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
@@ -37,9 +38,13 @@ export interface DraftSessionViewerProps {
     closeModal: () => void;
     appliedRuleStatus: boolean;
   };
+  source?: string;
 }
 
-const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSession }) => {
+const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
+  testRuleDraftSession,
+  source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
+}) => {
   const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -215,6 +220,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
               onClose={() => setIsSavePopupVisible(false)}
               setIsSaveSessionClicked={setIsSaveSessionClicked}
               testRuleDraftSession={testRuleDraftSession}
+              source={source}
             />
           )}
         </div>

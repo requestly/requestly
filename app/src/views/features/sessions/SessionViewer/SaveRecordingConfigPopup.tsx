@@ -36,12 +36,18 @@ interface Props {
   onClose: (e?: React.MouseEvent) => void;
   setIsSaveSessionClicked?: (value: boolean) => void;
   testRuleDraftSession?: DraftSessionViewerProps["testRuleDraftSession"];
+  source?: string;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked, testRuleDraftSession }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({
+  onClose,
+  setIsSaveSessionClicked,
+  testRuleDraftSession,
+  source,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
@@ -123,7 +129,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         workspace?.id,
         sessionRecordingMetadata,
         compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
-        recordingOptionsToSave
+        recordingOptionsToSave,
+        source
       ).then((response) => {
         if (response?.success) {
           onClose();
@@ -131,7 +138,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
           trackDraftSessionSaved(
             sessionRecordingMetadata?.sessionAttributes?.duration,
             recordingOptionsToSave,
-            SessionSaveMode.ONLINE
+            SessionSaveMode.ONLINE,
+            source
           );
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
           trackSessionsCreatedCount();
@@ -195,7 +203,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
           trackDraftSessionSaved(
             sessionRecordingMetadata.sessionAttributes?.duration,
             recordingOptionsToSave,
-            SessionSaveMode.LOCAL
+            SessionSaveMode.LOCAL,
+            source
           );
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
           trackSessionsCreatedCount(true);
