@@ -18,6 +18,7 @@ const ActiveLicenseInfo = ({
   //Global State
   const user = useSelector(getUserAuthDetails);
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
+  const [sessionReplayLifeTimeDetails, setSessionReplayLifeTimeDetails] = useState({});
 
   const { type, status, planName, subscription } = user.details?.planDetails ?? {};
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
@@ -28,12 +29,13 @@ const ActiveLicenseInfo = ({
       .then((val) => {
         if (val) {
           setIsSessionReplayLifetimeActive(true);
+          setSessionReplayLifeTimeDetails(val);
         }
       })
       .catch(() => {
         // do nothing
       });
-  });
+  }, []);
 
   const renderSubscriptionInfo = () => {
     return (
@@ -69,10 +71,13 @@ const ActiveLicenseInfo = ({
           <SubscriptionInfo
             hideShadow={hideShadow}
             subscriptionDetails={{
-              validFrom: new Date("2023-08-16T00:00:00Z").getTime(),
+              validFrom:
+                typeof sessionReplayLifeTimeDetails === "string"
+                  ? new Date(sessionReplayLifeTimeDetails).getTime()
+                  : new Date(sessionReplayLifeTimeDetails.date).getTime(),
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
-              type: "producthunt",
+              type: sessionReplayLifeTimeDetails.type ?? "producthunt",
               planName: "Session Replay Pro",
             }}
           />

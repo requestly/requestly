@@ -147,35 +147,10 @@
   padding-left: 4px;
 }
 
-.pricing-workspace-dropdown-icon.anticon {
-  margin-left: 2px;
-  font-size: 0.7rem;
+.pricing-workspace-selector.workspace-selector-container .workspace-selector-dropdown-container {
+  margin: auto;
 }
 
-.pricing-workspace-dropdown-btn.ant-btn.rq-btn {
-  background-color: var(--input-background);
-  border: none;
-  margin-left: 4px;
-  padding: 8px;
-}
-
-.pricing-workspace-dropdown-btn.ant-btn.rq-btn:hover {
-  border: none;
-}
-
-.pricing-workspace-selector-container {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-  width: 100%;
-}
-
-.pricing-workspace-dropdown .ant-dropdown-menu-root {
-  overflow: auto;
-  max-height: 15rem;
-}
-
-.pricing-workspace-dropdown-container {
-  margin-left: 38%;
-  margin-bottom: 4px;
+.pricing-workspace-selector.workspace-selector-container .workspace-members-display-text {
+  text-align: center;
 }
