@@ -52,6 +52,3 @@ export const trackRawResponseViewed = () => {
 export const trackResponseHeadersViewed = () => {
   trackEvent(API_CLIENT.RESPONSE_HEADERS_VIEWED);
 };
-
-export const trackInstallExtensionDialogShown = (params) =>
-  trackEvent(API_CLIENT.INSTALL_EXTENSION_DIALOG_SHOWN, params);
