@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardBody } from "reactstrap";
 import { Row, Col } from "antd";
@@ -24,15 +24,30 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
-  const handleRuleNameChange = (name) => {
-    const event = getEventObject("name", name);
-    onChangeHandler(currentlySelectedRuleData, dispatch, event);
-  };
+  const handleRuleNameChange = useCallback(
+    (name) => {
+      const event = getEventObject("name", name);
+      onChangeHandler(currentlySelectedRuleData, dispatch, event);
+    },
+    [dispatch, currentlySelectedRuleData]
+  );
 
-  const handleDescriptionChange = (description) => {
-    const event = getEventObject("description", description);
-    onChangeHandler(currentlySelectedRuleData, dispatch, event);
-  };
+  const handleDescriptionChange = useCallback(
+    (description) => {
+      const event = getEventObject("description", description);
+      onChangeHandler(currentlySelectedRuleData, dispatch, event);
+    },
+    [dispatch, currentlySelectedRuleData]
+  );
+
+  const generateRuleName = useCallback((ruleType) => {
+    return `${ruleType.toLowerCase()}-${Date.now()}`;
+  }, []);
+
+  const defaultRuleName = useMemo(() => generateRuleName(currentlySelectedRuleData.ruleType), [
+    generateRuleName,
+    currentlySelectedRuleData.ruleType,
+  ]);
 
   return (
     <>
@@ -41,6 +56,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
           mode={mode}
           errors={ruleErrors}
           showDocs={showDocs}
+          defaultName={defaultRuleName}
           name={currentlySelectedRuleData.name}
           namePlaceholder="Enter rule name"
           nameChangeCallback={handleRuleNameChange}

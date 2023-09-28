@@ -179,7 +179,9 @@ const FreeAndEnterprisePlanTable = () => {
           />
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
-        <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+        <div className="text-center">
+          <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+        </div>
         <Row className="pricing-table-product-wrapper" align={"middle"} justify={"center"}>
           {/* <div className="pricing-table-product-wrapper"> */}
           <Col className="pricing-table-product-view" xs={24} lg={6}>
