@@ -9,10 +9,12 @@ import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./InviteButton";
 import PATHS from "config/constants/sub/paths";
+import FEATURES from "config/constants/sub/features";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./PrimarySidebar.css";
@@ -84,6 +86,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "API client",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
+        feature: FEATURES.API_CLIENT,
         display: true,
         activeColor: "var(--api-client)",
       },
@@ -95,7 +98,8 @@ export const PrimarySidebar: React.FC = () => {
         display: isAndroidDebuggerEnabled,
       },
     ];
-    return items;
+
+    return items.filter((item) => !item.feature || isFeatureCompatible(item.feature));
   }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
 
   return (
