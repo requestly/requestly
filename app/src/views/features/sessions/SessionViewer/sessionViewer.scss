@@ -269,6 +269,12 @@
           padding-left: 40px;
         }
       }
+      .empty-table-view {
+        background: var(--component-dark-background);
+        height: 100%;
+        border: 1px solid var(--border-dark);
+        border-radius: var(--border-radius-sm);
+      }
     }
   }
 

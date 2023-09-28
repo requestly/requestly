@@ -3,8 +3,8 @@ import {
   ColorScheme,
   ContextMenuOption,
   DetailsTab,
-  ResourceTable,
   ResourceTableProps,
+  ResourceTable,
 } from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
@@ -35,6 +35,8 @@ export interface GenericNetworkTableProps<NetworkLog> {
   onContextMenuOpenChange?: ResourceTableProps<NetworkLog>["onContextMenuOpenChange"];
 
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
+
+  emptyView?: ResourceTableProps<NetworkLog>["emptyView"];
 }
 
 /**
@@ -48,6 +50,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   contextMenuOptions = [],
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
+  emptyView,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
@@ -98,6 +101,7 @@ export const GenericNetworkTable = <NetworkLog,>({
           onRowSelection={setSelectedLog}
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
+          emptyView={emptyView}
         />
       </div>
     </div>
