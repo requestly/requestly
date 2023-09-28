@@ -146,11 +146,3 @@
   vertical-align: middle;
   padding-left: 4px;
 }
-
-.pricing-workspace-selector.workspace-selector-container .workspace-selector-dropdown-container {
-  margin: auto;
-}
-
-.pricing-workspace-selector.workspace-selector-container .workspace-members-display-text {
-  text-align: center;
-}
