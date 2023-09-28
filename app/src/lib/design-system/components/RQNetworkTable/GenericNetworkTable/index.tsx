@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useMemo, useState } from "react";
+import { ReactElement, ReactNode, useCallback, useMemo, useState } from "react";
 import {
   ColorScheme,
   ContextMenuOption,
@@ -11,7 +11,6 @@ import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
 import FiltersToolbar from "./components/FiltersToolbar/FiltersToolbar";
 import { NetworkFilters } from "./components/FiltersToolbar/types";
-import { Row } from "antd";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -36,6 +35,8 @@ export interface GenericNetworkTableProps<NetworkLog> {
   onContextMenuOpenChange?: ResourceTableProps<NetworkLog>["onContextMenuOpenChange"];
 
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
+
+  emptyView?: ReactNode;
 }
 
 /**
@@ -49,6 +50,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   contextMenuOptions = [],
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
+  emptyView,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
@@ -99,15 +101,9 @@ export const GenericNetworkTable = <NetworkLog,>({
           onRowSelection={setSelectedLog}
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
-          emptyView={emptyTableView}
+          emptyView={emptyView}
         />
       </div>
     </div>
   );
 };
-
-const emptyTableView = (
-  <Row className="empty-table-view subtitle" align="middle" justify="center">
-    No request matches the filter you applied
-  </Row>
-);
