@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Empty, Typography } from "antd";
+import { Empty, Typography, Row } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
 import { actions } from "store";
 import { getActiveModals } from "store/selectors";
@@ -170,6 +170,12 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
     setSelectedRequestData(null);
   }, []);
 
+  const emptyTableView = (
+    <Row className="empty-table-view subtitle" align="middle" justify="center">
+      No request matches the search query!
+    </Row>
+  );
+
   return (
     <div className="session-panel-content network-logs-panel">
       {visibleNetworkLogs.length > 0 ? (
@@ -181,6 +187,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             onContextMenuOpenChange={(isOpen) => {
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
             }}
+            emptyView={emptyTableView}
           />
 
           {isApiClientModalOpen && (
