@@ -1,6 +1,5 @@
 import { Button, Empty, Input, Select, Skeleton, Space, Spin } from "antd";
 import React, { SyntheticEvent, memo, useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import Split from "react-split";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../types";
 import RequestTabs from "./request/RequestTabs";
@@ -15,17 +14,14 @@ import {
   removeEmptyKeys,
   supportsRequestBody,
 } from "../apiUtils";
-import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
   trackAPIRequestSent,
   trackRequestFailed,
   trackResponseLoaded,
-  trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { actions } from "store";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import Favicon from "components/misc/Favicon";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL } from "../constants";
@@ -45,7 +41,6 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 }));
 
 const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
@@ -177,19 +172,6 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       return;
     }
 
-    if (!isExtensionInstalled()) {
-      /* SHOW INSTALL EXTENSION MODAL */
-      const modalProps = {
-        heading: "Install browser Extension to use the API Client",
-        subHeading:
-          "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
-        eventPage: "api_client",
-      };
-      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
-      trackInstallExtensionDialogShown({ src: "api_client" });
-      return;
-    }
-
     const sanitizedEntry: RQAPI.Entry = {
       ...entry,
       request: {
@@ -252,7 +234,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     });
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
-  }, [entry, appMode, location.pathname, dispatch, notifyApiRequestFinished]);
+  }, [appMode, entry, notifyApiRequestFinished, location.pathname]);
 
   const cancelRequest = useCallback(() => {
     abortControllerRef.current?.abort();
