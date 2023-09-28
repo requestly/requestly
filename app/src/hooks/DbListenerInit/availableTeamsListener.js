@@ -24,24 +24,28 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = querySnapshot.docs.map((team) => {
-          const teamData = team.data();
+        const records = querySnapshot.docs
+          .map((team) => {
+            const teamData = team.data();
 
-          if (!teamData.archived && teamData.appsumo) {
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
-          }
+            if (teamData.deleted) return null;
 
-          return {
-            id: team.id,
-            name: teamData.name,
-            owner: teamData.owner,
-            archived: teamData.archived,
-            subscriptionStatus: teamData.subscriptionStatus,
-            accessCount: teamData.accessCount,
-            adminCount: teamData.adminCount,
-            members: teamData.members,
-          };
-        });
+            if (!teamData.archived && teamData.appsumo) {
+              submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
+            }
+
+            return {
+              id: team.id,
+              name: teamData.name,
+              owner: teamData.owner,
+              archived: teamData.archived,
+              subscriptionStatus: teamData.subscriptionStatus,
+              accessCount: teamData.accessCount,
+              adminCount: teamData.adminCount,
+              members: teamData.members,
+            };
+          })
+          .filter(Boolean);
 
         dispatch(teamsActions.setAvailableTeams(records));
 
