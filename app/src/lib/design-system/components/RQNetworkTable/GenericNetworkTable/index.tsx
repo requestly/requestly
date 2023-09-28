@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useCallback, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 import {
   ColorScheme,
   ContextMenuOption,
@@ -36,7 +36,7 @@ export interface GenericNetworkTableProps<NetworkLog> {
 
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
 
-  emptyView?: ReactNode;
+  emptyView?: ResourceTableProps<NetworkLog>["emptyView"];
 }
 
 /**

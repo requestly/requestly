@@ -170,6 +170,12 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
     setSelectedRequestData(null);
   }, []);
 
+  const emptyTableView = (
+    <Row className="empty-table-view subtitle" align="middle" justify="center">
+      No request matches the search query!
+    </Row>
+  );
+
   return (
     <div className="session-panel-content network-logs-panel">
       {visibleNetworkLogs.length > 0 ? (
@@ -228,9 +234,3 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
 };
 
 export default React.memo(NetworkLogsPanel);
-
-const emptyTableView = (
-  <Row className="empty-table-view subtitle" align="middle" justify="center">
-    No request matches the search query!
-  </Row>
-);

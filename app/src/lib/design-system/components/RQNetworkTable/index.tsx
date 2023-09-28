@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { useMemo } from "react";
 import { GenericNetworkTable, GenericNetworkTableProps } from "./GenericNetworkTable";
 import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
@@ -11,7 +11,7 @@ export interface RQNetworkTableProps {
   contextMenuOptions?: GenericNetworkTableProps<RQNetworkLog>["contextMenuOptions"];
   onContextMenuOpenChange?: GenericNetworkTableProps<RQNetworkLog>["onContextMenuOpenChange"];
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
-  emptyView?: ReactNode;
+  emptyView?: GenericNetworkTableProps<RQNetworkLog>["emptyView"];
 }
 
 export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
