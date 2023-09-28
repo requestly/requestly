@@ -180,9 +180,9 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
     if (!isExtensionInstalled()) {
       /* SHOW INSTALL EXTENSION MODAL */
       const modalProps = {
-        heading: "Install Browser extension to use the API client",
+        heading: "Install browser Extension to use the API Client",
         subHeading:
-          "Quickly test your backend with by easily creating a request. Easy to customize the headers, body and query parameters and also analyze the response. Your requests are saved for you to reference later.",
+          "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
         eventPage: "api_client",
       };
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
