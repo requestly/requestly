@@ -19,6 +19,7 @@ interface TitleProps {
   errors?: ValidationErrors;
   mode?: "create" | "edit";
   tagText?: string;
+  defaultName?: string;
 }
 
 const { TextArea } = Input;
@@ -31,6 +32,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   namePlaceholder,
   descriptionPlaceholder,
   descriptionChangeCallback,
+  defaultName,
   mode = "edit",
   tagText,
   errors,
@@ -54,6 +56,13 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
     }
   }, [isDescriptionEditable]);
 
+  useEffect(() => {
+    if (!defaultName || mode === "edit") return;
+
+    nameChangeCallback(defaultName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, defaultName]);
+
   return (
     <Col
       span={22}
@@ -76,7 +85,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                   ref={nameInputRef}
                   data-tour-id="rule-editor-title"
                   className={`${errors?.name && !name ? "error" : null}`}
-                  autoFocus={true || mode === "create"}
+                  autoFocus={mode === "create" && !defaultName}
                   onFocus={() => setIsNameEditable(true)}
                   onBlur={() => setIsNameEditable(false)}
                   bordered={false}
