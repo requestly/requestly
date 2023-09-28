@@ -9,7 +9,7 @@ import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
+// import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./InviteButton";
@@ -99,7 +99,8 @@ export const PrimarySidebar: React.FC = () => {
       },
     ];
 
-    return items.filter((item) => !item.feature || isFeatureCompatible(item.feature));
+    // return items.filter((item) => !item.feature || isFeatureCompatible(item.feature));
+    return items;
   }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
 
   return (
