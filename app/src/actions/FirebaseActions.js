@@ -38,6 +38,7 @@ import {
   trackLoginAttemptedEvent,
   trackLoginFailedEvent,
   trackLoginSuccessEvent,
+  trackGenerateMagicLinkFailed,
 } from "modules/analytics/events/common/auth/login";
 import {
   trackResetPasswordAttemptedEvent,
@@ -205,6 +206,7 @@ export async function sendEmailLinkForSignin(
     })
     .catch((err) => {
       toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
+      trackGenerateMagicLinkFailed(email, source);
       console.log(err);
     });
 }
