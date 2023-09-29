@@ -42,7 +42,7 @@ resetSyncDebounceTimerStart();
 export const resetSyncDebounce = () => {
   try {
     doSyncDebounced?.cancel();
-    // console.log("[Debug] Sync Debounce Canceled");
+    console.log("[Debug] Sync Debounce Canceled");
   } catch (err) {
     Logger.log("Sync Debounce cancel failed");
   }
