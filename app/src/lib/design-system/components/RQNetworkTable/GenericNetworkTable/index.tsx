@@ -77,14 +77,25 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
+  const statusCodeFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.statusCode.length) return true;
+      console.log(filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]));
+      return filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]);
+    },
+    [filters.statusCode]
+  );
+
   const filterLog = useCallback(
     (networkLog: NetworkLog) => {
       let includeLog = false;
       const entry = networkEntrySelector(networkLog);
-      includeLog = !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
+      console.log({ entry });
+      includeLog =
+        !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) && statusCodeFilter(entry); // TODO: add checks for other filters here
       return includeLog;
     },
-    [networkEntrySelector, filters.search]
+    [networkEntrySelector, filters.search, statusCodeFilter]
   );
 
   return (

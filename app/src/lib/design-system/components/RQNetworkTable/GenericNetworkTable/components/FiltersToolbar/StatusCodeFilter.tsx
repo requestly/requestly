@@ -2,7 +2,7 @@ import React from "react";
 import { Col, Row, Typography } from "antd";
 import { RQButton } from "lib/design-system/components/RQButton";
 
-const statusCodes = ["1XX", "2XX", "3XX", "4XX", "5XX"];
+const statusCodesGroups = ["1XX", "2XX", "3XX", "4XX", "5XX"];
 
 interface StatusCodeFilterProps {
   statusCodeFilters: string[];
@@ -16,9 +16,9 @@ export const StatusCodeFilter: React.FC<StatusCodeFilterProps> = ({
   console.log({ statusCodeFilters });
   return (
     <Col className="status-code-filters-wrapper">
-      <Typography.Text>Methods</Typography.Text>
+      <Typography.Text>Status code</Typography.Text>
       <Row className="status-code-filter-btns">
-        {statusCodes.map((code, index) => (
+        {statusCodesGroups.map((code, index) => (
           <RQButton
             type="default"
             size="small"
