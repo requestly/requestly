@@ -80,10 +80,17 @@ export const GenericNetworkTable = <NetworkLog,>({
   const statusCodeFilter = useCallback(
     (logEntry: NetworkEntry) => {
       if (!filters.statusCode.length) return true;
-      console.log(filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]));
       return filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]);
     },
     [filters.statusCode]
+  );
+
+  const methodsFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.method.length) return true;
+      return filters.method.some((method) => method === logEntry?.request.method);
+    },
+    [filters.method]
   );
 
   const filterLog = useCallback(
@@ -92,10 +99,12 @@ export const GenericNetworkTable = <NetworkLog,>({
       const entry = networkEntrySelector(networkLog);
       console.log({ entry });
       includeLog =
-        !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) && statusCodeFilter(entry); // TODO: add checks for other filters here
+        !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) &&
+        statusCodeFilter(entry) &&
+        methodsFilter(entry); // TODO: add checks for other filters here
       return includeLog;
     },
-    [networkEntrySelector, filters.search, statusCodeFilter]
+    [networkEntrySelector, filters.search, statusCodeFilter, methodsFilter]
   );
 
   return (

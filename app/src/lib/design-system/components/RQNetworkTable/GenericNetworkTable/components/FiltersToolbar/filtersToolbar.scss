@@ -37,7 +37,8 @@
   }
 
   .active-filter-btn.rq-btn.ant-btn,
-  .active-filter-btn.rq-btn.ant-btn:focus {
+  .active-filter-btn.rq-btn.ant-btn:focus,
+  .active-filter-btn.rq-btn.ant-btn:hover {
     color: #fff;
     background: var(--primary);
     border-color: var(--primary);

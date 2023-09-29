@@ -14,6 +14,7 @@ interface Props {
 const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
   const [searchValue, setSearchValue] = useState(filters?.search ?? "");
   const [statusCodeFilters, setStatusCodeFilters] = useState(filters?.statusCode ?? []);
+  const [methodFilters, setMethodFilters] = useState(filters?.method ?? []);
 
   console.log({ filters });
 
@@ -37,6 +38,21 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
     [statusCodeFilters, filters, setFilters]
   );
 
+  const onMethodsFilterChange = useCallback(
+    (method: string) => {
+      const currentMethods = methodFilters;
+      if (currentMethods.indexOf(method) !== -1) {
+        currentMethods.splice(currentMethods.indexOf(method), 1);
+        setMethodFilters(currentMethods);
+        setFilters({ ...filters, method: currentMethods });
+      } else {
+        setMethodFilters((prev) => [...prev, method]);
+        setFilters({ ...filters, method: [...currentMethods, method] });
+      }
+    },
+    [setFilters, filters, methodFilters]
+  );
+
   const debouncedSearchFilter = useDebounce((value: string) => onSearchFilterChange(value));
 
   return (
@@ -54,7 +70,7 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
       <Divider type="vertical" orientation="center" className="filters-divider" />
       <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onStatusCodeFilterChange} />
       <Divider type="vertical" orientation="center" className="filters-divider" />
-      <MethodFilter />
+      <MethodFilter methodFilters={methodFilters} handleMethodsFilterChange={onMethodsFilterChange} />
     </div>
   );
 };
