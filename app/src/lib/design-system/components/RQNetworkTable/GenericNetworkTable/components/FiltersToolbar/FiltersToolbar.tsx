@@ -3,6 +3,7 @@ import { Divider, Input } from "antd";
 import { useDebounce } from "hooks/useDebounce";
 import { NetworkFilters } from "./types";
 import { StatusCodeFilter } from "./StatusCodeFilter";
+import { MethodFilter } from "./MethodFilter";
 import "./filtersToolbar.scss";
 
 interface Props {
@@ -52,6 +53,8 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
       />
       <Divider type="vertical" orientation="center" className="filters-divider" />
       <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onStatusCodeFilterChange} />
+      <Divider type="vertical" orientation="center" className="filters-divider" />
+      <MethodFilter />
     </div>
   );
 };
