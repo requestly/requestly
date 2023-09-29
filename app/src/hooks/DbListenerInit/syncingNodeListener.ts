@@ -38,6 +38,16 @@ declare global {
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
+
+export const resetSyncDebounce = () => {
+  try {
+    doSyncDebounced?.cancel();
+    // console.log("[Debug] Sync Debounce Canceled");
+  } catch (err) {
+    Logger.log("Sync Debounce cancel failed");
+  }
+};
+
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
 /**
@@ -259,6 +269,7 @@ export const invokeSyncingIfRequired = async ({
     console.log("DEBUG", "doSyncDebounced");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
+    resetSyncDebounce();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
 };
