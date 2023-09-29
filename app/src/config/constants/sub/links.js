@@ -117,6 +117,8 @@ const LINKS = {
     WINDOWS: "https://bit.ly/rq-windows",
     LINUX: "https://bit.ly/rq-linux",
   },
+
+  PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 };
 
 export default LINKS;
