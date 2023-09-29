@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Input } from "antd";
+import React, { useCallback, useState } from "react";
+import { Divider, Input } from "antd";
 import { useDebounce } from "hooks/useDebounce";
-
-import "./filtersToolbar.scss";
 import { NetworkFilters } from "./types";
+import { StatusCodeFilter } from "./StatusCodeFilter";
+import "./filtersToolbar.scss";
 
 interface Props {
   filters: NetworkFilters;
@@ -12,9 +12,30 @@ interface Props {
 
 const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
   const [searchValue, setSearchValue] = useState(filters?.search ?? "");
+  const [statusCodeFilters, setStatusCodeFilters] = useState(filters?.statusCode ?? []);
+
+  console.log({ filters });
+
   const onSearchFilterChange = (searchValue: string) => {
     setFilters({ ...filters, search: searchValue });
   };
+
+  const onStatusCodeFilterChange = useCallback(
+    (statusCode: string) => {
+      const currentFilters = statusCodeFilters;
+
+      if (currentFilters.indexOf(statusCode) !== -1) {
+        currentFilters.splice(currentFilters.indexOf(statusCode), 1);
+        setStatusCodeFilters(currentFilters);
+        setFilters({ ...filters, statusCode: currentFilters });
+      } else {
+        setStatusCodeFilters((prev) => [...prev, statusCode]);
+        setFilters({ ...filters, statusCode: [...currentFilters, statusCode] });
+      }
+    },
+    [statusCodeFilters, filters, setFilters]
+  );
+
   const debouncedSearchFilter = useDebounce((value: string) => onSearchFilterChange(value));
 
   return (
@@ -29,6 +50,8 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
         }}
         allowClear
       />
+      <Divider type="vertical" orientation="center" className="filters-divider" />
+      <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onStatusCodeFilterChange} />
     </div>
   );
 };

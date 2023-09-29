@@ -53,7 +53,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   emptyView,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
-  const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
+  const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
 
   const finalColumns = useMemo(
     () =>

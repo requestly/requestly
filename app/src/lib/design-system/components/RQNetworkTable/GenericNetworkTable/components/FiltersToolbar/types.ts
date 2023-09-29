@@ -1,3 +1,5 @@
 export interface NetworkFilters {
-  search?: string;
+  search: string;
+  method: string[];
+  statusCode: string[];
 }

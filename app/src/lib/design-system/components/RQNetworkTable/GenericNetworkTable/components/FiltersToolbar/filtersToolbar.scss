@@ -1,12 +1,40 @@
 .filters-toolbar {
   display: flex;
+  // justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 2px 0px;
 
+  .filters-divider {
+    height: 1.8rem;
+    align-self: flex-end;
+    border-left: 1px solid var(--border);
+  }
+
   .search-filter {
-    width: 250px;
-    padding: 4px 6px;
+    width: 200px;
+    padding: 2px 4px;
+    font-size: 13px;
+    align-self: flex-end;
+  }
+  .status-code-filters-wrapper {
+    .ant-typography {
+      font-weight: 500;
+    }
+    .status-code-filter-btns {
+      gap: 3px;
+    }
+  }
+  .filter-btn.rq-btn {
+    font-size: 12px;
+    color: var(--text-gray);
+    padding: 0 4px;
+    height: 22px;
+  }
+  .active-filter-btn.rq-btn {
+    color: #fff;
+    border: 1px solid var(--border);
+    background: var(--gray-dark);
   }
 }
