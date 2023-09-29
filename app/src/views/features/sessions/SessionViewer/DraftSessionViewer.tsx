@@ -112,7 +112,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   }, [navigate, isImportedSession, sessionRecordingMetadata]);
 
   useEffect(() => {
-    trackDraftSessionViewed();
+    trackDraftSessionViewed(source);
 
     if (testRuleDraftSession) {
       trackTestRuleSessionDraftSaved();
@@ -159,7 +159,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession, source]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
