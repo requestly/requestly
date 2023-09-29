@@ -77,9 +77,12 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { localRecords });
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { recordsOnFirebase });
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { mergedRecords });
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -143,6 +146,7 @@ export const doSync = async (
   syncTarget: "teamSync" | "sync",
   team_id: string
 ): Promise<void> => {
+  console.log("DEBUG", "doSync");
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
@@ -196,7 +200,10 @@ export const doSync = async (
 };
 
 /** Debounced version of the doSync function */
-export const doSyncDebounced = _.debounce(doSync, 5000);
+export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+  console.log("[DEBUG] doSyncDebounced in action");
+  doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+}, 5000);
 
 /**
  * Initiates the syncing process if conditions are met
@@ -249,6 +256,7 @@ export const invokeSyncingIfRequired = async ({
     return;
   }
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+    console.log("DEBUG", "doSyncDebounced");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
