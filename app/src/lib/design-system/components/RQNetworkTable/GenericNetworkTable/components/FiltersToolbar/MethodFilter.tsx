@@ -1,12 +1,13 @@
 import React from "react";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components/RQButton";
+import { FilterKeys } from "./types";
 
 const methods = ["GET", "POST", "PUT"];
 
 interface MethodFilterProps {
   methodFilters: string[];
-  handleMethodsFilterChange: (method: string) => void;
+  handleMethodsFilterChange: (method: string, key: FilterKeys) => void;
 }
 
 export const MethodFilter: React.FC<MethodFilterProps> = ({ methodFilters, handleMethodsFilterChange }) => {
@@ -18,7 +19,7 @@ export const MethodFilter: React.FC<MethodFilterProps> = ({ methodFilters, handl
             type="default"
             size="small"
             key={index}
-            onClick={() => handleMethodsFilterChange(method)}
+            onClick={() => handleMethodsFilterChange(method, FilterKeys.METHOD)}
             className={`filter-btn ${methodFilters.indexOf(method) !== -1 ? "active-filter-btn" : null} `}
           >
             {method}

@@ -1,12 +1,13 @@
 import React from "react";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components/RQButton";
+import { FilterKeys } from "./types";
 
 const statusCodesGroups = ["1XX", "2XX", "3XX", "4XX", "5XX"];
 
 interface StatusCodeFilterProps {
   statusCodeFilters: string[];
-  handleStatusCodeFilterChange: (code: string) => void;
+  handleStatusCodeFilterChange: (code: string, key: FilterKeys) => void;
 }
 
 export const StatusCodeFilter: React.FC<StatusCodeFilterProps> = ({
@@ -21,7 +22,7 @@ export const StatusCodeFilter: React.FC<StatusCodeFilterProps> = ({
             type="default"
             size="small"
             key={index}
-            onClick={() => handleStatusCodeFilterChange(group)}
+            onClick={() => handleStatusCodeFilterChange(group, FilterKeys.STATUS_CODE)}
             className={`filter-btn ${statusCodeFilters.indexOf(group) !== -1 ? "active-filter-btn" : null} `}
           >
             {group}

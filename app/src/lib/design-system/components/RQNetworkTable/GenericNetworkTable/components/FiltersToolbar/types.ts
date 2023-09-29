@@ -3,3 +3,9 @@ export interface NetworkFilters {
   method: string[];
   statusCode: string[];
 }
+
+export enum FilterKeys {
+  SEARCH = "search",
+  METHOD = "method",
+  STATUS_CODE = "statusCode",
+}

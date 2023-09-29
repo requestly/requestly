@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Divider, Input } from "antd";
 import { useDebounce } from "hooks/useDebounce";
-import { NetworkFilters } from "./types";
+import { FilterKeys, NetworkFilters } from "./types";
 import { StatusCodeFilter } from "./StatusCodeFilter";
 import { MethodFilter } from "./MethodFilter";
 import "./filtersToolbar.scss";
@@ -16,41 +16,29 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
   const [statusCodeFilters, setStatusCodeFilters] = useState(filters?.statusCode ?? []);
   const [methodFilters, setMethodFilters] = useState(filters?.method ?? []);
 
-  console.log({ filters });
-
   const onSearchFilterChange = (searchValue: string) => {
     setFilters({ ...filters, search: searchValue });
   };
 
-  const onStatusCodeFilterChange = useCallback(
-    (statusCode: string) => {
-      const currentFilters = statusCodeFilters;
+  const onGroupFilterChange = useCallback(
+    (filterValue: string, filterType: string) => {
+      const currentFilter = filterType === FilterKeys.STATUS_CODE ? statusCodeFilters : methodFilters;
 
-      if (currentFilters.indexOf(statusCode) !== -1) {
-        currentFilters.splice(currentFilters.indexOf(statusCode), 1);
-        setStatusCodeFilters(currentFilters);
-        setFilters({ ...filters, statusCode: currentFilters });
+      if (currentFilter.indexOf(filterValue) !== -1) {
+        currentFilter.splice(currentFilter.indexOf(filterValue), 1);
       } else {
-        setStatusCodeFilters((prev) => [...prev, statusCode]);
-        setFilters({ ...filters, statusCode: [...currentFilters, statusCode] });
+        currentFilter.push(filterValue);
+      }
+
+      if (filterType === FilterKeys.STATUS_CODE) {
+        setStatusCodeFilters([...currentFilter]);
+        setFilters({ ...filters, statusCode: [...currentFilter] });
+      } else if (filterType === FilterKeys.METHOD) {
+        setMethodFilters([...currentFilter]);
+        setFilters({ ...filters, method: [...currentFilter] });
       }
     },
-    [statusCodeFilters, filters, setFilters]
-  );
-
-  const onMethodsFilterChange = useCallback(
-    (method: string) => {
-      const currentMethods = methodFilters;
-      if (currentMethods.indexOf(method) !== -1) {
-        currentMethods.splice(currentMethods.indexOf(method), 1);
-        setMethodFilters(currentMethods);
-        setFilters({ ...filters, method: currentMethods });
-      } else {
-        setMethodFilters((prev) => [...prev, method]);
-        setFilters({ ...filters, method: [...currentMethods, method] });
-      }
-    },
-    [setFilters, filters, methodFilters]
+    [statusCodeFilters, methodFilters, filters, setStatusCodeFilters, setMethodFilters, setFilters]
   );
 
   const debouncedSearchFilter = useDebounce((value: string) => onSearchFilterChange(value));
@@ -68,9 +56,9 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
         allowClear
       />
       <Divider type="vertical" orientation="center" className="filters-divider" />
-      <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onStatusCodeFilterChange} />
+      <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onGroupFilterChange} />
       <Divider type="vertical" orientation="center" className="filters-divider" />
-      <MethodFilter methodFilters={methodFilters} handleMethodsFilterChange={onMethodsFilterChange} />
+      <MethodFilter methodFilters={methodFilters} handleMethodsFilterChange={onGroupFilterChange} />
     </div>
   );
 };
