@@ -33,6 +33,7 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { isDesktopMode } from "utils/AppUtils";
 
 interface Props {
   apiEntry?: RQAPI.Entry;
@@ -177,7 +178,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
       return;
     }
 
-    if (!isExtensionInstalled()) {
+    if (!isExtensionInstalled() && !isDesktopMode()) {
       /* SHOW INSTALL EXTENSION MODAL */
       const modalProps = {
         heading: "Install browser Extension to use the API Client",
