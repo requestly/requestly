@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 //Components
-import MigrationCheckModal from "../../../misc/MigrationCheckModal";
-import StorageMigrationCheckModal from "components/misc/StorageMigrationCheckModal";
 import RulesListContainer from "../RulesListContainer";
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //Externals
@@ -117,8 +115,6 @@ const RulesIndexPage = () => {
 
   return (
     <React.Fragment>
-      <MigrationCheckModal />
-      <StorageMigrationCheckModal />
       {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
         rules?.length > 0 || groups?.length > 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
