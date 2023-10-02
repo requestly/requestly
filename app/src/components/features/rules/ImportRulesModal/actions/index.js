@@ -6,6 +6,7 @@ import APP_CONSTANTS from "../../../../../config/constants";
 import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-rules-pairs";
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
+import { runRuleMigrations } from "utils/rules/ruleMigrations";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -14,7 +15,7 @@ export const addRulesAndGroupsToStorage = (appMode, array) => {
   return StorageService(appMode).saveMultipleRulesOrGroups(array);
 };
 
-const setInnerIds = (incomingArray) => {
+const setNewIdOfRulePairs = (incomingArray) => {
   return incomingArray.forEach((object) => {
     if (object.objectType === GLOBAL_CONSTANTS.OBJECT_TYPES.RULE) {
       return setIdsOfSingleRulePairs(object);
@@ -24,12 +25,6 @@ const setInnerIds = (incomingArray) => {
   });
 };
 
-/**
- * Separates the Rules and Groups from incoming array
- *
- * @param {Array} incomingArray
- * @return {Object}
- */
 const filterRulesAndGroups = (incomingArray) => {
   const rules = [];
   const groups = [];
@@ -97,25 +92,22 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
 
 export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
-  //Filter valid rules
-  const rules = data.rules.filter((object) => isObjectValid(object));
-  //Filter valid groups
+  const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
-  //Set new Creation Date
+
   // setNewCreationDate(rules);
   // setNewCreationDate(groups);
+
   if (!overwrite) {
-    //Set new IDs of rules
     setNewIdofRules(rules);
-    //Set IDs of Rule Pairs
-    setInnerIds(rules);
+    setNewIdOfRulePairs(rules);
   }
 
   //For Rules which do not have a valid Group associated, move them to Ungrouped
   setUnknownGroupIdsToUngroupped(rules, data.groupsId);
   //Merge valid rules & groups
   const importedRulesAndGroups = rules.concat(groups);
-  // Change currentOwner
+
   const currentOwner = user?.details?.profile?.uid || null;
 
   const combinedRulesAndGroups = [];
@@ -125,7 +117,7 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
       combinedRulesAndGroups.push(updatedData);
     });
   }
-  //Return promise
+
   return new Promise(function (resolve) {
     resolve({
       data: combinedRulesAndGroups,
