@@ -17,7 +17,9 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
   const getRuleTitle = (name, mode) => {
-    return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${mode === "create" ? "new rule" : "rule"}`;
+    return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${
+      mode === "create" ? "new rule" : "rule"
+    }`;
   };
 
   // If user directly lands on rule editor, it ensures that
