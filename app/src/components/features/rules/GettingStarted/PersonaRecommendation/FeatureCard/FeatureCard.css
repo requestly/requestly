@@ -20,6 +20,10 @@
   margin-bottom: 6px;
 }
 
+.feature-title-container .rq-badge {
+  margin-left: -7px;
+}
+
 .feature-title-container .right-chevron svg {
   flex-shrink: 0;
   width: 15px;
@@ -47,15 +51,9 @@
   column-gap: 12px;
 }
 
-.feature-icon,
-.feature-icon .remix-icon {
+.feature-icon {
   display: flex;
   align-items: center;
-}
-
-.feature-title-wrapper .feature-icon .remix-icon svg {
-  width: 20px;
-  height: 20px;
 }
 
 .feature-title-wrapper .feature-icon svg {

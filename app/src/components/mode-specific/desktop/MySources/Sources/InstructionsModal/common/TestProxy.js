@@ -3,12 +3,18 @@ import proxySuccessImage from "assets/img/screenshots/proxy_success.png";
 import proxyFailureImage from "assets/img/screenshots/proxy_failure.png";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
 
-const TestProxyInstructions = () => {
+const TestProxyInstructions = ({ device }) => {
   return (
     <>
       <List itemLayout="horizontal">
         <List.Item>
-          <List.Item.Meta title="a. Open Incognito on safari in your iOS device" />
+          <List.Item.Meta
+            title={
+              device === "android"
+                ? "a. Open Incognito on browser in your Android device"
+                : "a. Open Incognito on safari in your IOS device"
+            }
+          />
         </List.Item>
         <List.Item>
           <List.Item.Meta

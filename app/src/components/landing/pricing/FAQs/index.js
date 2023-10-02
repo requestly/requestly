@@ -11,23 +11,23 @@ const PricingFAQs = () => {
       ques: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
       answer: (
         <React.Fragment>
-          No, developers working individually without a team are not required to pay for Requestly. The basic plan
+          No, developers working individually without a team are not required to pay for Requestly. The Free plan
           provides liberal limits and includes many features you know and love, including capturing requests and
           modifying requests, mocking APIs, session replays, and much more.
         </React.Fragment>
       ),
     },
     {
-      ques: <React.Fragment>How can I remove limits from the basic plan?</React.Fragment>,
+      ques: <React.Fragment>How can I remove limits from the Free plan?</React.Fragment>,
       answer: (
         <React.Fragment>
-          Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the basic plan
+          Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the Free plan
           without any limitations, but sharing and other collaboration features will be unavailable.
         </React.Fragment>
       ),
     },
     {
-      ques: <React.Fragment>When should I switch to the Team plan?</React.Fragment>,
+      ques: <React.Fragment>When should I switch to the Pro plan?</React.Fragment>,
       answer: (
         <React.Fragment>
           Users should look forward to creating teams when there is a need for collaboration, as team workspaces provide
@@ -37,7 +37,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <React.Fragment>Does unlimited really mean unlimited in the case of Team Plan?</React.Fragment>,
+      ques: <React.Fragment>Does unlimited really mean unlimited in the case of Pro plan?</React.Fragment>,
       answer: (
         <React.Fragment>
           Yes. Rarely some things might get restricted due to storage or performance reasons. Please contact us in case

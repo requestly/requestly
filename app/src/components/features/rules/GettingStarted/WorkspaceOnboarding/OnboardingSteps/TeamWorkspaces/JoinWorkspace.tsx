@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAppMode } from "store/selectors";
@@ -8,13 +8,17 @@ import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { PlusOutlined } from "@ant-design/icons";
 import { TeamInviteMetadata } from "types";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { acceptTeamInvite } from "backend/workspace";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
-import { OnboardingSteps } from "../../types";
+import {
+  trackOnboardingWorkspaceSkip,
+  trackWorkspaceOnboardingPageViewed,
+} from "modules/analytics/events/misc/onboarding";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
+import { OnboardingSteps } from "../../types";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const dispatch = useDispatch();
@@ -27,10 +31,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
 
   const handleJoinWorkspace = () => {
     setIsJoining(true);
-    const functions = getFunctions();
-    const acceptInvite = httpsCallable(functions, "invites-acceptInvite");
-
-    acceptInvite({ inviteId: team.inviteId })
+    acceptTeamInvite(team.inviteId)
       .then((res: any) => {
         if (res?.data?.success) {
           toast.success("Successfully accepted invite");
@@ -55,7 +56,9 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
                 isWorkspaceMode,
                 isSyncEnabled: true,
               },
-              appMode
+              appMode,
+              null,
+              "onboarding"
             );
             redirectToRules(navigate);
           }
@@ -95,6 +98,9 @@ export const JoinWorkspace: React.FC<{
 }> = ({ availableTeams, isPendingInvite, createNewTeam }) => {
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    trackWorkspaceOnboardingPageViewed("join_workspace");
+  }, []);
   return (
     <>
       <div className="header text-center">
@@ -105,7 +111,7 @@ export const JoinWorkspace: React.FC<{
           Join your teams workspace and get access to shared rules, mock APIs & session replays.
         </div>
       </div>
-      <div className="mt-20">
+      <div className="mt-20 onboarding-invites-list">
         {availableTeams.map((team) => (
           <Workspace team={team} />
         ))}
@@ -121,7 +127,15 @@ export const JoinWorkspace: React.FC<{
         >
           Skip for now
         </RQButton>
-        <RQButton type="default" className="text-bold" onClick={createNewTeam} icon={<PlusOutlined />}>
+        <RQButton
+          type="default"
+          className="text-bold"
+          onClick={() => {
+            trackCreateNewTeamClicked("onboarding");
+            createNewTeam();
+          }}
+          icon={<PlusOutlined />}
+        >
           Create new workspace
         </RQButton>
       </div>

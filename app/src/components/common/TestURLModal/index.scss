@@ -32,6 +32,9 @@
       padding-left: 8px;
       border: none;
     }
+    .test-url-field {
+      margin-top: 8px;
+    }
   }
   .test-url-modal-section.match-result {
     .anticon {
@@ -52,5 +55,8 @@
     margin-top: 10px;
     display: flex;
     gap: 12px;
+  }
+  .rq-modal-footer.test-url-modal-footer {
+    padding: 9px 30px;
   }
 }

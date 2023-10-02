@@ -1,16 +1,18 @@
 import React from "react";
-import { Avatar, Button, Col, Row } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { RQModal } from "lib/design-system/components";
-import LearnMoreAboutWorkspace from "../TeamViewer/common/LearnMoreAboutWorkspace";
-import { getUniqueColorForWorkspace } from "utils/teams";
-import { Team } from "types";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
-import { actions } from "store";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAvailableTeams } from "store/features/teams/selectors";
+import { Avatar, Button, Col, Row } from "antd";
+import { RQModal } from "lib/design-system/components";
+import { LearnMoreLink } from "components/common/LearnMoreLink";
+import { PlusOutlined } from "@ant-design/icons";
+import { getUniqueColorForWorkspace } from "utils/teams";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { Team } from "types";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 interface SwitchWorkspaceModalProps {
   isOpen: boolean;
@@ -24,12 +26,18 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
 
+  const sortedTeams: Team[] = availableTeams
+    ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount)
+    : [];
+
   const handleCreateNewWorkspaceClick = () => {
+    trackCreateNewTeamClicked("switch_workspace_modal");
     toggleModal();
     dispatch(
       actions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
+        newProps: { source: "switch_workspace_modal" },
       })
     );
   };
@@ -47,12 +55,15 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
         isSyncEnabled: user?.details?.isSyncEnabled,
         isWorkspaceMode: true,
       },
-      appMode
+      appMode,
+      null,
+      "switch_workspace_modal"
     );
     dispatch(
       actions.toggleActiveModal({
         modalName: "inviteMembersModal",
         newValue: true,
+        newProps: { source: "switch_workspace_modal" },
       })
     );
   };
@@ -64,7 +75,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
 
         {availableTeams?.length > 0 ? (
           <ul className="teams-list">
-            {availableTeams.map((team: Team) => (
+            {sortedTeams.map((team: Team) => (
               <li key={team.inviteId}>
                 <div className="w-full teams-list-row">
                   <Col>
@@ -99,7 +110,10 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
       {/* footer */}
       <Row align="middle" justify="space-between" className="rq-modal-footer">
         <Col>
-          <LearnMoreAboutWorkspace linkText="Learn more about team workspaces" />
+          <LearnMoreLink
+            linkText="Learn more about team workspaces"
+            href={APP_CONSTANTS.LINKS.DEMO_VIDEOS.TEAM_WORKSPACES}
+          />
         </Col>
         <Col>
           <Button className="display-row-center" onClick={handleCreateNewWorkspaceClick}>

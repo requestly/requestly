@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Tooltip, Dropdown } from "antd";
 import { ButtonType } from "antd/lib/button";
 import "./splitButtons.scss";
-import { DownOutlined } from "@ant-design/icons";
+import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import classNames from "classnames";
 
 interface CommonButtonProps {
@@ -40,7 +40,7 @@ const SplitButton: React.FC<SplitButtonProps & CommonButtonProps & { className: 
       {props.isDropdown ? (
         <Dropdown overlay={props.menu}>
           <Button {...buttonProps}>
-            {props.label} <DownOutlined />
+            {props.label} <DownArrow className="down-arrow-icon" />
           </Button>
         </Dropdown>
       ) : (

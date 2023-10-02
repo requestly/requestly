@@ -6,6 +6,13 @@
   color: var(--white);
 }
 
+.subheader {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.565rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
 .title {
   font-size: 1rem; /* 16px */
   line-height: 1.625rem;
@@ -200,6 +207,9 @@
 .success {
   color: var(--success);
 }
+.danger {
+  color: var(--danger);
+}
 
 .relative {
   position: relative;
@@ -228,4 +238,13 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 90%;
+}
+.external-link {
+  color: var(--white);
+  text-decoration: underline;
+  transition: 0.2s ease-in-out;
+}
+.external-link:hover {
+  color: var(--white);
+  text-decoration: underline;
 }

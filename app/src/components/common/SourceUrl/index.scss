@@ -22,6 +22,10 @@
     }
   }
 
+  .source-condition-input-select.ant-col {
+    padding: 0 !important; //overwrite inline styles added by ant design on <Col>
+  }
+
   .source-url-input {
     flex: 1;
     background: transparent;

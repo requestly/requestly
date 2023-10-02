@@ -1,7 +1,8 @@
 import { Tag } from "antd";
-import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
-import { MdOutlineKeyboardReturn } from "react-icons/md";
-import { FiDelete } from "react-icons/fi";
+import { AiOutlineArrowUp } from "@react-icons/all-files/ai/AiOutlineArrowUp";
+import { AiOutlineArrowDown } from "@react-icons/all-files/ai/AiOutlineArrowDown";
+import { MdOutlineKeyboardReturn } from "@react-icons/all-files/md/MdOutlineKeyboardReturn";
+import { FiDelete } from "@react-icons/all-files/fi/FiDelete";
 import "./index.css";
 
 export const Footer = () => {

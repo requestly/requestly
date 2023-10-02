@@ -20,6 +20,11 @@ export const SESSION_RECORDING = {
   session_recording_name_updated: "session_recording_name_updated",
   session_recording_panel_tab_clicked: "session_recording_panel_tab_clicked",
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
+  session_recording_upload: "session_recording_upload",
+  session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
+  NEW_SESSION_CLICKED: "new_session clicked",
+  network_log_context_menu_open: "network_log_context_menu_open",
+  network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -127,6 +132,7 @@ export const API_CLIENT = {
   RESPONSE_LOADED: "api_client_response_loaded",
   RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
   RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
+  INSTALL_EXTENSION_DIALOG_SHOWN: "api_client_install_extension_dialog_shown",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
@@ -204,9 +210,21 @@ export const RULE_EDITOR = {
   MODIFY_API_RESPONSE: {
     SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
   },
+  TEST_THIS_RULE: {
+    TEST_RULE_CLICKED: "test_rule_clicked",
+    TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
+    TEST_RULE_RESULT_CLICKED: "test_rule_result_clicked",
+    TEST_RULE_SESSION_DRAFT_VIEWED: "test_rule_session_draft_viewed",
+    TEST_RULE_SESSION_DRAFT_SAVED: "test_rule_session_draft_saved",
+  },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",
+};
+
+export const ECOSYSTEM = {
+  ECOSYSTEM_FEATURE_CLICKED: "ecosystem_feature_clicked",
 };

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Row } from "antd";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import { actions } from "store";
@@ -14,7 +14,7 @@ import { trackUploadRulesButtonClicked } from "modules/analytics/events/features
 import {
   trackPersonaRecommendationSkipped,
   trackPersonaSurveyViewAllOptionsClicked,
-} from "modules/analytics/events/misc/personaSurvey";
+} from "modules/analytics/events/misc/onboarding";
 import "./PersonaRecommendation.css";
 
 interface Props {
@@ -24,7 +24,6 @@ interface Props {
 
 const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRulesClick }) => {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const dispatch = useDispatch();
   const [isViewAllOptions, setIsViewAllOptions] = useState<boolean>(false);
 
@@ -34,17 +33,9 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped();
-
-    navigate(
-      //@ts-ignore
-      state?.redirectTo?.includes(PATHS.GETTING_STARTED)
-        ? PATHS.RULES.MY_RULES.ABSOLUTE
-        : //@ts-ignore
-          state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-      { replace: true }
-    );
     dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
+    navigate(PATHS.ROOT, { replace: true });
   };
 
   const handleViewAllOptionsClick = (e: React.MouseEvent<HTMLElement>) => {

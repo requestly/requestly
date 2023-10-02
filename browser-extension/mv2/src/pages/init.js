@@ -14,7 +14,9 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
         sendResponse(response);
       });
       return true;
+
+    case RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED:
+      RQ.ContentScriptMessageHandler.sendMessage(message);
+      break;
   }
 });
-
-RQ.SessionRecorder.setup();

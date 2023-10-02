@@ -7,4 +7,5 @@ export interface PrimarySidebarItem extends Record<string, unknown> {
   icon: React.ReactNode;
   display?: boolean;
   feature?: string;
+  activeColor?: string;
 }

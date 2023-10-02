@@ -29,8 +29,9 @@ function ipcRequest(channel: string, requestData: any, timeout = 10_000): any {
   });
 }
 
-export async function saveNetworkSession(name: string, har: Har): Promise<string> {
-  return ipcRequest("save-network-session", { name, har })
+export async function saveNetworkSession(name: string, har: Har, filePath?: string): Promise<string> {
+  const payload = { name, har, originalFilePath: filePath };
+  return ipcRequest("save-network-session", payload)
     .then((id: string) => {
       return id;
     })

@@ -1,7 +1,10 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog } from "./types";
+import { ConsoleLog, DebugInfo, PageNavigationLog, RecordingOptions, SessionRecordingMetadata } from "./types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
+import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "./constants";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import fileDownload from "js-file-download";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
 
@@ -34,6 +37,19 @@ const isConsoleLogEvent = (rrwebEvent: RRWebEventData): boolean => {
   return false;
 };
 
+export const getPageNavigationLogs = (rrwebEvents: RRWebEventData[], startTime: number): PageNavigationLog[] => {
+  return rrwebEvents
+    .filter((event) => event.type === EventType.Meta && event.data.href)
+    .map((metaEvent) => {
+      return {
+        // @ts-ignore
+        ...metaEvent.data,
+        timestamp: metaEvent.timestamp,
+        timeOffset: Math.ceil((metaEvent.timestamp - startTime) / 1000),
+      };
+    });
+};
+
 export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number): ConsoleLog[] => {
   return rrwebEvents
     .map((event) => {
@@ -58,4 +74,54 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
 
 export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventData[] => {
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
+};
+
+export const getRecordingOptionsToSave = (includedDebugInfo: CheckboxValueType[]): RecordingOptions => {
+  const recordingOptions: RecordingOptions = {
+    includeConsoleLogs: true,
+    includeNetworkLogs: true,
+  };
+
+  let option: keyof RecordingOptions;
+  for (option in recordingOptions) {
+    recordingOptions[option] = includedDebugInfo.includes(option);
+  }
+
+  return recordingOptions;
+};
+
+export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: RecordingOptions): RQSessionEvents => {
+  const filteredSessionEvents: RQSessionEvents = {
+    [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
+    [RQSessionEventType.NETWORK]: sessionEvents[RQSessionEventType.NETWORK],
+  };
+
+  if (options.includeNetworkLogs === false) {
+    delete filteredSessionEvents[RQSessionEventType.NETWORK];
+  }
+
+  if (options.includeConsoleLogs === false) {
+    const filteredRRWebEvent = filterOutConsoleLogs(sessionEvents[RQSessionEventType.RRWEB] as RRWebEventData[]);
+    filteredSessionEvents[RQSessionEventType.RRWEB] = filteredRRWebEvent;
+  }
+
+  return filteredSessionEvents;
+};
+
+export const prepareSessionToExport = (events: string, metadata: SessionRecordingMetadata): Promise<string> => {
+  const sessionToExport = {
+    version: 1,
+    type: SESSION_EXPORT_TYPE,
+    data: { events, metadata },
+  };
+
+  return new Promise((resolve) => resolve(JSON.stringify(sessionToExport)));
+};
+
+export const downloadSession = (fileContent: string, fileName: string): void => {
+  fileDownload(fileContent, `${fileName}.${EXPORTED_SESSION_FILE_EXTENSION}`);
+};
+
+export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
+  return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
 };

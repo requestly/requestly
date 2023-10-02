@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
 import { actions } from "store";
-import FilePickerModal from "../../../../../../filesLibrary/FilePickerModal";
 //Icons
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 //Constants
@@ -28,26 +27,6 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     }),
     []
   );
-
-  /* TODO: Remove Once Moved to Mockv2 */
-  const [isFilePickerModalActive, setIsFilePickerModalActive] = useState(false);
-  const toggleFilePickerModal = () => {
-    setIsFilePickerModalActive(!isFilePickerModalActive);
-  };
-
-  const handleFilePickerAction = (url) => {
-    setIsFilePickerModalActive(false);
-
-    dispatch(
-      actions.updateRulePairAtGivenPath({
-        pairIndex,
-        updates: {
-          [`scripts[${scriptIndex}].value`]: url,
-        },
-      })
-    );
-  };
-  /** Remove till here */
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
@@ -105,14 +84,6 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
         </Row>
         {/* MODALS */}
         {/* TODO: Remove this once MockV2 Released */}
-        {isFilePickerModalActive ? (
-          <FilePickerModal
-            isOpen={isFilePickerModalActive}
-            toggle={toggleFilePickerModal}
-            callback={handleFilePickerAction}
-          />
-        ) : null}
-        {/* TODO: Remove Till here */}
         {isMockPickerVisible ? (
           <MockPickerModal
             isVisible={isMockPickerVisible}

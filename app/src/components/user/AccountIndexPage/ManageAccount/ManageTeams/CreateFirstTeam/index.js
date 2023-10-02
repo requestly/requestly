@@ -23,7 +23,13 @@ const CreateFirstTeam = () => {
               <Button
                 type="primary"
                 onClick={() => {
-                  dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "createWorkspaceModal",
+                      newValue: true,
+                      newProps: { source: "my_teams" },
+                    })
+                  );
                   trackCreateNewTeamClicked("my_teams");
                 }}
               >

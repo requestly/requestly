@@ -18,6 +18,10 @@ const VersionedChangelogs: React.FC = () => {
               </Typography.Title>
               <ul>
                 {changeLog.logs.map((log, index) => {
+                  if (typeof log === "string") {
+                    log = { title: log };
+                  }
+
                   return (
                     <li key={`${changeLog.version}_${index}`}>
                       {log.title} {log.link ? <a href={log.link}>Read More</a> : null}

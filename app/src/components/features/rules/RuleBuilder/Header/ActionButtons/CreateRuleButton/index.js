@@ -71,70 +71,75 @@ const CreateRuleButton = ({
     //Validation
     const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
     if (ruleValidation.result) {
-      saveRule(appMode, {
-        ...fixedRuleData,
-        createdBy,
-        currentOwner,
-        lastModifiedBy,
-      }).then(async () => {
-        if (isRuleEditorModal) {
-          ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
-        } else {
-          toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
-        }
+      saveRule(
+        appMode,
+        {
+          ...fixedRuleData,
+          createdBy,
+          currentOwner,
+          lastModifiedBy,
+        },
+        // updating `isCurrentlySelectedRuleHasUnsavedChanges` in the callback of saveRule
+        // because the navigation blocker prompt is dependent on this value so we need to
+        // update it before navigating away from the page
+        () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
+      )
+        .then(async () => {
+          if (isRuleEditorModal) {
+            ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
+          } else {
+            toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
+          }
 
-        setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false);
+          /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
 
-        /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
+          let rule_type = null;
 
-        let rule_type = null;
+          if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
+            rule_type = currentlySelectedRuleData.ruleType;
+          }
+          if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
+            ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
 
-        if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
-          rule_type = currentlySelectedRuleData.ruleType;
-        }
-        if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
-          ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
-
-          trackRuleCreatedEvent({
-            rule_type,
-            description: currentlySelectedRuleData.description,
-            destinationTypes:
+            trackRuleCreatedEvent({
+              rule_type,
+              description: currentlySelectedRuleData.description,
+              destinationTypes:
+                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                  : null,
+              source: analyticEventRuleCreatedSource,
+              body_types:
+                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+                  ? getAllResponseBodyTypes(currentlySelectedRuleData)
+                  : null,
+            });
+          } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
+            trackRuleEditedEvent(
+              rule_type,
+              currentlySelectedRuleData.description,
               currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                 ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                 : null,
-            source: analyticEventRuleCreatedSource,
-            body_types:
-              currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-                ? getAllResponseBodyTypes(currentlySelectedRuleData)
-                : null,
-          });
-        } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
-          trackRuleEditedEvent(
-            rule_type,
-            currentlySelectedRuleData.description,
-            currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-              ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-              : null,
-            analyticEventRuleCreatedSource
-          );
-        }
-        ruleModifiedAnalytics(user);
-        trackRQLastActivity("rule_saved");
-
-        if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-          const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
-
-          if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
-            trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
+              analyticEventRuleCreatedSource
+            );
           }
-        }
+          ruleModifiedAnalytics(user);
+          trackRQLastActivity("rule_saved");
 
-        const ruleId = currentlySelectedRuleData.id;
+          if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+            const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
 
-        if (!isRuleEditorModal) {
-          redirectToRuleEditor(navigate, ruleId, "create");
-        }
-      });
+            if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
+              trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
+            }
+          }
+        })
+        .then(() => {
+          if (!isRuleEditorModal) {
+            redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
+          }
+        });
     } else {
       toast.warn(ruleValidation.message, {
         hideProgressBar: true,

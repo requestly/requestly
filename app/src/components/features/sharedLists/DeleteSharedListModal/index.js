@@ -5,8 +5,8 @@ import { toast } from "utils/Toast.js";
 import { Modal } from "antd";
 import isEmpty from "is-empty";
 //ICONS
-import { FaTrash } from "react-icons/fa";
-import { AiOutlineWarning } from "react-icons/ai";
+import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 //ACTIONS
 import { deleteSharedList, refreshPendingStatus } from "./actions";
 import { LoadingOutlined } from "@ant-design/icons";

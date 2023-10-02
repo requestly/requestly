@@ -1,0 +1,9 @@
+.feature-tag {
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 19px;
+  border-style: solid;
+  border-width: 1px;
+}

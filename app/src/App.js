@@ -66,13 +66,13 @@ const App = () => {
       <AppModeInitializer />
       <DBListeners />
       <RuleExecutionsSyncer />
-      <FeatureUsageEvent />
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
 
       <ConfigProvider locale={enUS}>
         <GrowthBookProvider growthbook={growthbook}>
           <LocalUserAttributesHelperComponent />
+          <FeatureUsageEvent />
           <div id="requestly-dashboard-layout">
             <CommandBar />
             {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (

@@ -1,6 +1,6 @@
 .rule-editor-modal.ant-modal .ant-modal-content .ant-modal-body {
   padding: 15px 0;
-  background-color: var(--body-background);
+  background-color: var(--component-background);
 }
 
 .rule-editor-modal.ant-modal .rq-modal-content {

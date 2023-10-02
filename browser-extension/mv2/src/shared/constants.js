@@ -24,13 +24,6 @@ RQ.CONSTANTS.MESSAGE_HANDLER_ACTIONS = {
 };
 
 // Variables exposed directly on RQ object
-
-RQ.RESOURCES = {
-  EXTENSION_ICON: "/resources/images/48x48.png",
-  EXTENSION_ICON_GREYSCALE: "/resources/images/48x48_greyscale.png",
-  EXTENSION_ICON_GREEN: "/resources/images/48x48_green.png",
-};
-
 RQ.CLIENT_MESSAGES = {
   ADD_EVENT: "addEvent",
   GET_SCRIPT_RULES: "getScriptRules",
@@ -38,17 +31,18 @@ RQ.CLIENT_MESSAGES = {
   OVERRIDE_RESPONSE: "overrideResponse",
   NOTIFY_RULES_APPLIED: "notifyRulesApplied",
   PRINT_CONSOLE_LOGS: "printConsoleLogs",
-  GET_SESSION_RECORDING_CONFIG: "getSessionRecordingConfig",
   NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
   NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
+  CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
   NOTIFY_RULE_APPLIED: "notifyRuleApplied",
   GET_APPLIED_RULE_IDS: "getAppliedRuleIds",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   SYNC_APPLIED_RULES: "syncAppliedRules",
-  NOTIFY_CONTENT_SCRIPT_LOADED: "notifyContentScriptLoaded",
+  NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
+  START_RULE_TESTING: "startRuleTesting",
 };

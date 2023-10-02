@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Space } from "antd";
-import { FaExclamationCircle } from "react-icons/fa";
+import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
 import { Row, Col, Container, Card, CardBody } from "reactstrap";
 // FIREBASE
 import { getFunctions, httpsCallable } from "firebase/functions";

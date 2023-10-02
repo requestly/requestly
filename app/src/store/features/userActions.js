@@ -29,6 +29,10 @@ export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };
 
+export const updateUserLimitReached = (prevState, action) => {
+  prevState.user.isLimitReached = action.payload;
+};
+
 //Persona Survey actions
 export const setUserPersonaData = (prevState, action) => {
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
@@ -108,4 +112,32 @@ export const updateWorkspaceOnboardingStep = (prevState, action) => {
 
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
+};
+
+export const updateIsCommandBarOpen = (prevState, action) => {
+  prevState.misc.nonPersist.isCommandBarOpen = action.payload;
+};
+
+export const updateLastSeenInviteTs = (prevState, action) => {
+  prevState.misc.persist.lastSeenInviteTs = action.payload;
+};
+
+export const updateJoinWorkspaceCardVisible = (prevState, action) => {
+  prevState.misc.persist.isJoinWorkspaceCardVisible = action.payload;
+};
+
+export const updateIsProductHuntLaunchedBannerClosed = (prevState, action) => {
+  prevState.misc.persist.isProductHuntLaunchedBannerClosed = action.payload;
+};
+
+export const updateExtensionInstallSource = (prevState, action) => {
+  prevState.misc.persist.extensionInstallSource = action.payload;
+};
+
+export const updateTimeToResendEmailLogin = (prevState, action) => {
+  prevState.misc.nonPersist.timeToResendEmailLogin = action.payload;
+};
+
+export const updateAppNotificationBannerDismissTs = (prevState, action) => {
+  prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
 };

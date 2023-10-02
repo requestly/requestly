@@ -55,3 +55,7 @@
 .workspace-list-card .workspace-list-card-name {
   align-self: center;
 }
+.onboarding-invites-list {
+  max-height: 350px;
+  overflow-y: scroll;
+}

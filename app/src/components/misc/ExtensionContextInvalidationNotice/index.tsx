@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Typography } from "antd";
-import { trackExtensionContextInvalidated } from "modules/analytics/events/misc/extensionContextInvalidation";
+import {
+  trackAppReloadedFromMessage,
+  trackExtensionContextInvalidated,
+} from "modules/analytics/events/misc/extensionContextInvalidation";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -19,12 +22,17 @@ const ExtensionContextInvalidationNotice: React.FC = () => {
     );
   }, []);
 
+  const onReloadClicked = useCallback(() => {
+    trackAppReloadedFromMessage();
+    window.location.reload();
+  }, []);
+
   return visible ? (
     <div id="extension-context-invalidation-notice">
       <Typography.Text>
         The browser extension was updated in the background. Please save your work and&nbsp;
       </Typography.Text>
-      <Typography.Link onClick={() => window.location.reload()}>Reload</Typography.Link>
+      <Typography.Link onClick={onReloadClicked}>Reload</Typography.Link>
       <Typography.Text>&nbsp;the page to avoid errors.</Typography.Text>
     </div>
   ) : null;

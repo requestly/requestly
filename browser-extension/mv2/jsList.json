@@ -13,8 +13,9 @@
     "dist/generated/shared.js",
     "src/client/js/utils.js",
     "src/modules/StorageService.js",
+    "src/pages/init.js",
     "src/client/js/sessionRecorder.js",
-    "src/pages/init.js"
+    "src/client/js/client.js"
   ],
   "client": [
     "../config/dist/config.js",
@@ -23,7 +24,6 @@
     "src/shared/constants.js",
     "src/client/js/utils.js",
     "src/client/js/ruleMatcher.js",
-    "src/client/js/registerCustomElements.js",
     "src/client/js/scriptRuleHandler.js",
     "src/client/js/userAgentRuleHandler.js",
     "src/client/js/requestResponseRuleHandler.js",
@@ -40,7 +40,7 @@
     "src/devtools/libs/jquery-3.5.1.js",
     "src/devtools/libs/handlebars.runtime-v4.7.7.js",
     "src/devtools/panel/js/handlebarHelpers.js",
-    "dist/generated/devtools/panel/templates.hbs.js",
+    "dist/devtools/panel/templates.hbs.js",
     "src/devtools/panel/js/main.js"
   ],
   "background": [
@@ -48,14 +48,14 @@
     "../../common/logger.js",
     "../common/dist/utils.js",
     "src/external/CircularQueue.js",
-    "src/external/chromeTabService.js",
+    "src/external/tabService.js",
     "src/modules/StorageService.js",
     "src/modules/PreDefinedFunction.js",
     "src/modules/PreDefinedFunctions.js",
     "src/modules/RuleMatcher.js",
     "src/modules/EventActions.js",
-    "src/background/SampleRules.js",
     "src/background/flags.js",
+    "src/background/ExtensionIconManager.js",
     "src/background/background.js"
   ]
 }

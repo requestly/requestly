@@ -1,0 +1,36 @@
+.workspace-card-container {
+  position: fixed;
+  left: 0;
+  bottom: 24px;
+  background: green;
+  padding: 20px 14px;
+  padding-top: 10px;
+  background: var(--background-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  width: 300px;
+}
+
+.workspace-card-close-icon {
+  position: relative;
+  left: 10px;
+}
+.workspace-card-text {
+  max-width: 280px;
+}
+.workspace-card-avatar-row-container {
+  margin-bottom: 8px;
+  display: flex;
+}
+.workspace-card-avatar-row-container .other-users-avatar {
+  background: var(--border);
+  display: flex;
+  font-weight: 500;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  position: relative;
+  left: -8px;
+}

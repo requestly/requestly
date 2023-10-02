@@ -12,7 +12,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { MockType, RQMockSchema } from "../types";
-import { createMockFromUploadedFile } from "../utils";
+import { createMockFromUploadedFile, generateFinalUrl } from "../utils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const { Dragger } = Upload;
@@ -21,9 +21,10 @@ interface Props {
   visible: boolean;
   toggleModalVisibility: (visible: boolean) => void;
   mockType: MockType;
+  selectMockOnUpload?: (url: string) => void;
 }
 
-const MockUploaderModal: React.FC<Props> = ({ visible, toggleModalVisibility, mockType }) => {
+const MockUploaderModal: React.FC<Props> = ({ visible, toggleModalVisibility, mockType, selectMockOnUpload }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -43,6 +44,9 @@ const MockUploaderModal: React.FC<Props> = ({ visible, toggleModalVisibility, mo
           redirectToMockEditorEditMock(navigate, mock.id);
         } else if (mockType === MockType.FILE) {
           redirectToFileMockEditorEditMock(navigate, mock.id);
+        } else {
+          selectMockOnUpload &&
+            selectMockOnUpload(generateFinalUrl(mock.endpoint, user?.details?.profile?.uid, null, teamId));
         }
       })
       .catch((err) => {

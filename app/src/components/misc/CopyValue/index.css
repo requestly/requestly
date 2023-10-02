@@ -1,0 +1,17 @@
+.copy-value-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid transparent;
+  box-shadow: var(--input-box-shadow);
+  background-color: var(--component-dark-background);
+  border-radius: var(--border-radius-sm);
+  padding: 8px;
+  margin-top: 4px;
+  gap: 8px;
+  cursor: text;
+}
+
+.copy-value-wrapper .ant-btn {
+  padding: initial 1.125rem;
+}

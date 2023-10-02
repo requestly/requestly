@@ -1,15 +1,16 @@
 import React, { useMemo, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getUserPersonaSurveyDetails, getAppMode } from "store/selectors";
 import { actions } from "store";
 import { SurveyModalFooter } from "./ModalFooter";
 import { SurveyConfig, OptionsConfig } from "./config";
-import { shouldShowOnboarding, shuffleOptions } from "./utils";
-import { isExtensionInstalled } from "actions/ExtensionActions";
-import { Option, PageConfig, QuestionnaireType } from "./types";
+import { getSurveyPage, shouldShowOnboarding, shuffleOptions } from "./utils";
+import { handleSurveyNavigation } from "./actions";
+import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/personaSurvey";
+import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/onboarding";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
@@ -22,111 +23,95 @@ interface SurveyProps {
   isOpen?: boolean;
 }
 
+const SkipButton = () => {
+  const dispatch = useDispatch();
+
+  return (
+    <div className="skip-recommendation-wrapper">
+      Existing user?
+      <RQButton
+        className="skip-recommendation-btn persona-login-btn"
+        type="link"
+        onClick={() => {
+          trackPersonaSurveySignInClicked();
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "authModal",
+              newProps: {
+                callback: () => {
+                  dispatch(actions.updateIsPersonaSurveyCompleted(true));
+                },
+                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+              },
+            })
+          );
+        }}
+      >
+        Sign in
+      </RQButton>
+    </div>
+  );
+};
+
 export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, isOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const currentPage = userPersona.page;
+  const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
-  const shuffledQ1 = useMemo(() => {
-    return shuffleOptions(OptionsConfig[QuestionnaireType.PERSONA].options);
+  const shuffledQuestionnaire = useMemo(() => {
+    if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
+    const options = OptionsConfig[currentPage]?.options;
+    return shuffleOptions(options);
+  }, [currentPage]);
+
+  const renderOptions = useCallback((options: Option[], questionnaire: QuestionnaireType) => {
+    return (
+      <div className="survey-options-container">
+        {options.map((option: Option, index: number) => (
+          <SurveyOption
+            key={index}
+            option={option}
+            action={OptionsConfig[questionnaire].questionResponseAction}
+            questionnaire={questionnaire}
+          />
+        ))}
+      </div>
+    );
   }, []);
 
-  const SkippableButton = useCallback(() => {
-    switch (currentPage) {
-      case 0:
-        return (
-          <div className="skip-recommendation-wrapper">
-            Existing user?
-            <RQButton
-              className="skip-recommendation-btn persona-login-btn"
-              type="link"
-              onClick={() => {
-                trackPersonaSurveySignInClicked();
-                dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newProps: {
-                      callback: () => {
-                        dispatch(actions.updateIsPersonaSurveyCompleted(true));
-                      },
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      eventSource: AUTH.SOURCE.PERSONA_SURVEY,
-                    },
-                  })
-                );
-              }}
-            >
-              Sign in
-            </RQButton>
-          </div>
-        );
-      default:
-        return null;
-    }
-  }, [currentPage, dispatch]);
-
-  const renderPageHeader = useCallback(
-    (page: PageConfig) => {
-      return (
-        <>
-          <SkippableButton />
-          <div className="text-center white text-bold survey-title">{page.title}</div>
-          <div className="w-full survey-subtitle-wrapper">
-            <div className="text-gray text-center mt-8">{page.subTitle}</div>
-          </div>
-        </>
-      );
-    },
-    [SkippableButton]
-  );
-
   const renderQuestionnaire = useCallback(
-    (optionSet: QuestionnaireType) => {
-      switch (optionSet) {
-        case QuestionnaireType.PERSONA:
-          return renderOptions(shuffledQ1, optionSet);
-        default:
-          return null;
-      }
+    (questionnaire: QuestionnaireType) => {
+      if (questionnaire) return renderOptions(shuffledQuestionnaire, questionnaire);
     },
-    [shuffledQ1]
+    [shuffledQuestionnaire, renderOptions]
   );
 
-  const renderOptions = (options: Option[], optionSet: QuestionnaireType) => {
-    return (
-      <>
-        <div className="survey-options-container">
-          {options.map((option: Option, index: number) => (
-            <SurveyOption
-              key={index}
-              option={option}
-              questionType={OptionsConfig[optionSet].questionType}
-              isActive={OptionsConfig[optionSet].isActive}
-              action={OptionsConfig[optionSet].action}
-              fieldKey={OptionsConfig[optionSet].key}
-            />
-          ))}
-        </div>
-      </>
-    );
-  };
-
-  const renderPage = useCallback(
-    (page: PageConfig) => {
+  const currentSurveyPage = useMemo(() => {
+    const page = SurveyConfig[currentPage as SurveyPage];
+    const shouldShowPage = page?.visibility({ userPersona });
+    if (shouldShowPage) {
       return (
         <>
-          {renderPageHeader(page)}
-          <>{typeof page.render === "function" ? page.render() : renderQuestionnaire(page.render)}</>
+          {currentPage === SurveyPage.GETTING_STARTED && <SkipButton />}
+          <div className="text-center white text-bold survey-title">{page?.title}</div>
+          <div className="w-full survey-subtitle-wrapper">
+            <div className="text-gray text-center mt-8">{page?.subTitle}</div>
+          </div>
+          <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
         </>
       );
-    },
-    [renderPageHeader, renderQuestionnaire]
-  );
+    } else handleSurveyNavigation(currentPage, dispatch);
+  }, [renderQuestionnaire, currentPage, dispatch, userPersona]);
 
   useEffect(() => {
-    if (SurveyConfig[currentPage]?.skip || (!isSurveyModal && currentPage === 0)) {
-      dispatch(actions.updatePersonaSurveyPage(currentPage + 1));
+    if (
+      SurveyConfig[currentPage as SurveyPage]?.skip ||
+      (!isSurveyModal && currentPage === SurveyPage.GETTING_STARTED)
+    ) {
+      handleSurveyNavigation(currentPage, dispatch);
     }
   }, [currentPage, dispatch, isSurveyModal]);
 
@@ -134,44 +119,39 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
     if (isSurveyModal) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result) {
-          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-            dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
-          } else {
-            if (isExtensionInstalled()) {
-              const isRecommendationScreen = currentPage === 2;
-              dispatch(
-                actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: !isRecommendationScreen })
-              );
-            }
-          }
+          dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: true }));
         }
       });
     }
-  }, [appMode, currentPage, dispatch, isSurveyModal]);
+  }, [appMode, currentPage, dispatch, navigate, isSurveyModal]);
 
   useEffect(() => {
-    if (currentPage === 0) {
+    if (isSurveyModal && currentPage === SurveyPage.GETTING_STARTED) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result) {
-          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-            trackPersonaSurveyViewed();
-          } else if (isExtensionInstalled()) {
-            trackPersonaSurveyViewed();
-          }
+          if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) trackPersonaSurveyViewed();
         }
       });
     }
-  }, [appMode, currentPage]);
+  }, [appMode, currentPage, isSurveyModal]);
 
   useEffect(() => {
     if (userPersona?.page > 2) dispatch(actions.updateIsPersonaSurveyCompleted(true));
   }, [dispatch, userPersona?.page]);
 
-  const renderSurveyPages = useCallback(() => {
-    return SurveyConfig.filter((config) => !config.skip).map((page, index) => (
-      <React.Fragment key={index}>{currentPage === page.pageId && <>{renderPage(page)}</>}</React.Fragment>
-    ));
-  }, [currentPage, renderPage]);
+  useEffect(() => {
+    if (!(currentPage in SurveyConfig)) {
+      if (isSurveyModal) {
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) dispatch(actions.updateIsPersonaSurveyCompleted(true));
+        else dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
+      } else callback?.();
+    }
+  }, [currentPage, dispatch, callback, isSurveyModal, appMode]);
+
+  const surveyPages = useMemo(
+    () => <>{currentPage !== SurveyPage.RECOMMENDATIONS ? <>{currentSurveyPage}</> : null}</>,
+    [currentSurveyPage, currentPage]
+  );
 
   return (
     <>
@@ -185,13 +165,13 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
           maskStyle={{ background: "#0D0D10" }}
         >
           <div className="persona-survey-container">
-            {renderSurveyPages()}
+            {surveyPages}
             <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
           </div>
         </RQModal>
       ) : (
         <div className="persona-survey-container">
-          {renderSurveyPages()}
+          {surveyPages}
           <SurveyModalFooter isSurveyModal={isSurveyModal} currentPage={currentPage} callback={callback} />
         </div>
       )}

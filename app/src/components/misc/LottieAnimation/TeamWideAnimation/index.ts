@@ -1,5 +1,5 @@
-// import lazyload from "utils/lazyload";
+import lazyWithRetry from "utils/lazyWithRetry";
 
-// export default lazyload(() => import(/* webpackChunkName: "TeamWideAnimation" */ "./TeamWideAnimation"), null);
+export default lazyWithRetry(() => import(/* webpackChunkName: "TeamWideAnimation" */ "./TeamWideAnimation"), null);
 
-export { default } from "./TeamWideAnimation";
+// export { default } from "./TeamWideAnimation";

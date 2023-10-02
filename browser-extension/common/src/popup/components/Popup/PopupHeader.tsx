@@ -11,7 +11,7 @@ interface PopupHeaderProps {
 
 const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
   const onOpenAppButtonClick = useCallback(() => {
-    window.open(`${config.WEB_URL}/rules/my-rules?source=popup`, "_blank");
+    window.open(`${config.WEB_URL}?source=popup`, "_blank");
     sendEvent(EVENT.OPEN_APP_CLICKED);
   }, []);
 

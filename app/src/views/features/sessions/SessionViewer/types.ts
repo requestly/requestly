@@ -2,6 +2,16 @@
 import { NetworkEventData, RQSessionAttributes } from "@requestly/web-sdk";
 import { LogData } from "rrweb";
 
+export enum SessionSaveMode {
+  LOCAL = "local",
+  ONLINE = "online",
+}
+
+export enum DebugInfo {
+  INCLUDE_NETWORK_LOGS = "includeNetworkLogs",
+  INCLUDE_CONSOLE_LOGS = "includeConsoleLogs",
+}
+
 export enum Visibility {
   ONLY_ME = "only-me",
   PUBLIC = "public",
@@ -9,7 +19,7 @@ export enum Visibility {
   ORGANIZATION = "organization",
 }
 
-export interface SessionRecording {
+export interface SessionRecordingMetadata {
   id?: string;
   isRequestedByOwner?: boolean;
   eventsFilePath?: string;
@@ -38,5 +48,13 @@ export interface ConsoleLog extends LogData {
 }
 
 export interface NetworkLog extends NetworkEventData {
+  timeOffset: number;
+}
+
+export interface PageNavigationLog {
+  href: string;
+  width: number;
+  height: number;
+  timestamp: number;
   timeOffset: number;
 }

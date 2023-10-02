@@ -1,4 +1,4 @@
-import { Column } from "../../components/ResourceTable";
+import { Column } from "@requestly-ui/resource-table";
 import { NetworkEvent } from "../../types";
 
 export enum NETWORK_TABLE_COLUMN_IDS {

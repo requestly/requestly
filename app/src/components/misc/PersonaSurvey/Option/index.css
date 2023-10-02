@@ -1,7 +1,23 @@
+.persona-survey-container .survey-input-option {
+  width: 100%;
+}
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper,
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper:focus {
+  background: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+.persona-survey-container .survey-input-option .ant-input-affix-wrapper .ant-input {
+  border-bottom: 1px solid var(--border-dark);
+  background: none;
+  border-radius: 0;
+  margin-left: 6px;
+}
+
 .persona-survey-container .survey-option {
-  border: 1px solid var(--border-dark);
+  border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
-  background: var(--body-background);
   padding: 12px;
   cursor: pointer;
   display: flex;
@@ -9,7 +25,7 @@
   transition: 0.2s ease-in-out;
 }
 .persona-survey-container .survey-option:not(.outline-active-option):hover {
-  border: 1px solid #4f5257;
+  border: 1px solid #62656a;
 }
 .persona-survey-container .survey-option.survey-select {
   cursor: pointer;

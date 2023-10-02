@@ -18,7 +18,7 @@ export const createRule = <T extends Rule>(
   initRuleData: (rule: T) => void,
   inputSelectorToFocus?: string
 ) => {
-  const editorUrl = `${config.WEB_URL}/rules/editor/create/${ruleTypeUrlFragment}`;
+  const editorUrl = `${config.WEB_URL}/rules/editor/create/${ruleTypeUrlFragment}?source=devtool`;
   let editorWindow: Window;
   const onMessageReceived = (event: MessageEvent<PostMessageData>) => {
     const { author, action, payload } = event.data;
@@ -108,4 +108,20 @@ export const matchResourceTypeFilter = (
     case ResourceTypeFilterValue.OTHER:
       return true;
   }
+};
+
+export const isRequestBodyParseable = (mimeType: string): boolean => {
+  if (mimeType && mimeType.startsWith("application/json")) {
+    return true;
+  }
+
+  return false;
+};
+
+export const isContentBodyEditable = (networkResourceType: NetworkResourceType): boolean => {
+  if (matchResourceTypeFilter(networkResourceType, ResourceTypeFilterValue.AJAX)) {
+    return true;
+  }
+
+  return false;
 };

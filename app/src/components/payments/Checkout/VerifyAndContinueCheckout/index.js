@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "utils/Toast.js";
 // Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUserAuthDetails } from "../../../../store/selectors";
-import { redirectToPaymentFailed, redirectToUpdateSubscription } from "../../../../utils/RedirectionUtils";
+import { redirectToPaymentFailed, redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
 // Constants
 import APP_CONSTANTS from "../../../../config/constants";
 
@@ -15,11 +15,9 @@ const VerifyAndContinueCheckout = ({
   duration,
   isPlanVerificationPassed,
   stripe,
-  planType,
+  planName,
   quantity,
 }) => {
-  const mountedRef = useRef(true);
-
   // Global State
   const user = useSelector(getUserAuthDetails);
 
@@ -27,14 +25,11 @@ const VerifyAndContinueCheckout = ({
   const [isSubscriptionCheckPassed, setIsSubscriptionCheckPassed] = useState(false);
   const [isCheckoutSessionProcessing, setIsCheckoutSessionProcessing] = useState(false);
 
-  const initiateCheckoutSession = async () => {
-    if (!mountedRef.current) return null;
+  const initiateCheckoutSession = useCallback(async () => {
     if (!isSubscriptionCheckPassed) return null;
     if (!isPlanVerificationPassed) return null;
     if (isCheckoutSessionProcessing) return null;
     setIsCheckoutSessionProcessing(true);
-
-    const rqPlanId = "professional_12m"; // to fix
 
     let FFName;
     switch (mode) {
@@ -53,10 +48,11 @@ const VerifyAndContinueCheckout = ({
     const createSubscriptionUsingStripeCheckout = httpsCallable(functions, FFName);
 
     createSubscriptionUsingStripeCheckout({
-      rqPlanId: rqPlanId,
       currency: currency,
       teamId: teamId,
       quantity: quantity,
+      planName,
+      duration,
       success_url:
         "http://" +
         window.location.host +
@@ -69,7 +65,6 @@ const VerifyAndContinueCheckout = ({
         `?ref=stripe&paymentId=5357551a-e2d7`,
     })
       .then((res) => {
-        if (!mountedRef.current) return null;
         const response = res.data;
         if (response.success) {
           // Use Stripe's checkout URL since ours is impacted by extension injecting the code
@@ -87,20 +82,20 @@ const VerifyAndContinueCheckout = ({
       .catch((err) => {
         redirectToPaymentFailed();
       });
-  };
-
-  const stableInitiateCheckoutSession = useCallback(initiateCheckoutSession, [
-    isSubscriptionCheckPassed,
-    isPlanVerificationPassed,
-    isCheckoutSessionProcessing,
-    mode,
+  }, [
     currency,
-    teamId,
+    duration,
+    isCheckoutSessionProcessing,
+    isPlanVerificationPassed,
+    isSubscriptionCheckPassed,
+    mode,
+    planName,
     quantity,
     stripe,
+    teamId,
   ]);
 
-  const fetchTeamInfo = () => {
+  const fetchTeamSubscriptionInfo = useCallback(() => {
     const functions = getFunctions();
     const getTeamInfo = httpsCallable(functions, "teams-getTeamInfo");
 
@@ -111,14 +106,13 @@ const VerifyAndContinueCheckout = ({
 
     getTeamInfo({ teamId: teamId })
       .then((res) => {
-        if (!mountedRef.current) return null;
         const response = res.data;
 
         if (response.success) {
           const teamInfo = response.data;
 
           // Handle case where an active subscription already exists
-          if (teamInfo.subscriptionStatus === "active") {
+          if (teamInfo.subscriptionStatus === "active" || teamInfo.subscriptionStatus === "trialing") {
             throw new Error("You are already premium");
           }
 
@@ -128,81 +122,58 @@ const VerifyAndContinueCheckout = ({
         }
       })
       .catch((err) => {
-        if (!mountedRef.current) return null;
         if (err) {
           setIsSubscriptionCheckPassed(false);
           toast.error("You might already have a subscription");
-          redirectToUpdateSubscription({
-            mode: "team",
-            planType: "enterprise",
-            teamId: teamId,
-          });
+          redirectToUpdateSubscriptionContactUs();
         }
       });
-  };
+  }, [teamId]);
 
-  const stableFetchTeamInfo = useCallback(fetchTeamInfo, [teamId]);
-
-  const fetchUserInfo = () => {
+  const fetchUserSubscriptionInfo = useCallback(() => {
     if (user && user.details && user.details.profile.email) {
       // Check if user already has a subscription
       const functions = getFunctions();
-      const fetchIndividualUserSubscriptionDetailsFF = httpsCallable(
-        functions,
-        "fetchIndividualUserSubscriptionDetails"
-      );
+      const fetchIndividualUserSubscriptionDetails = httpsCallable(functions, "fetchIndividualUserSubscriptionDetails");
 
-      fetchIndividualUserSubscriptionDetailsFF({})
+      fetchIndividualUserSubscriptionDetails({})
         .then((res) => {
-          if (!mountedRef.current) return null;
           const userSubscriptionDetails = res.data.data;
 
           if (res.data.success === true && userSubscriptionDetails.status === "active") {
             setIsSubscriptionCheckPassed(false);
-            redirectToUpdateSubscription({
-              mode: "individual",
-              planType: "gold",
-            });
+            redirectToUpdateSubscriptionContactUs();
           } else {
             setIsSubscriptionCheckPassed(true);
           }
         })
         .catch((err) => {
-          if (!mountedRef.current) {
-            setIsSubscriptionCheckPassed(true);
-          }
+          setIsSubscriptionCheckPassed(true);
         });
     }
-  };
-
-  const stableFetchUserInfo = useCallback(fetchUserInfo, [user]);
+  }, [user]);
 
   useEffect(() => {
     if (isPlanVerificationPassed) {
       if (mode === "team") {
-        stableFetchTeamInfo();
+        fetchTeamSubscriptionInfo();
       } else if (mode === "individual") {
-        stableFetchUserInfo();
+        fetchUserSubscriptionInfo();
       }
-      if (mode && currency && duration && planType && isPlanVerificationPassed && isSubscriptionCheckPassed) {
-        stableInitiateCheckoutSession();
+      if (mode && currency && duration && planName && isPlanVerificationPassed && isSubscriptionCheckPassed) {
+        initiateCheckoutSession();
       }
     }
-
-    // Cleanup
-    return () => {
-      // mountedRef.current = false;
-    };
   }, [
-    stableFetchTeamInfo,
-    stableFetchUserInfo,
     mode,
     isPlanVerificationPassed,
     currency,
     duration,
-    stableInitiateCheckoutSession,
     isSubscriptionCheckPassed,
-    planType,
+    initiateCheckoutSession,
+    fetchUserSubscriptionInfo,
+    fetchTeamSubscriptionInfo,
+    planName,
   ]);
 
   return <></>;

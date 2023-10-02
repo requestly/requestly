@@ -6,8 +6,9 @@ import { MockType } from "../../types";
 import { getUserAuthDetails } from "store/selectors";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 
-import { AiOutlineCloudUpload, AiOutlineQuestionCircle } from "react-icons/ai";
-import { FiArrowUpRight } from "react-icons/fi";
+import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
+import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
+import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
 //@ts-ignore
 import noMocksIcon from "../../../../../assets/img/icons/common/no-mocks.svg";
 
@@ -70,7 +71,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
         return "No mock APIs created yet";
 
       default:
-        return "No mock APIs created yet"; //for mock picker modal
+        return "No mocks created yet"; //for mock picker modal
     }
   };
 

@@ -38,38 +38,17 @@ declare global {
 
 export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
 resetSyncDebounceTimerStart();
-const waitPeriod = 5000; // allow bulk sync calls in this time
 
-/**
- * This function applies an animation to the "sync-icon" element in the DOM.
- * The animation is "1s rotate infinite linear", and it lasts for 2.5 seconds.
- * If the "sync-icon" element is not found in the DOM, an error will be thrown and logged.
- *
- * @returns {void}
- * @throws Will throw an error if the "sync-icon" element is not found in the DOM.
- */
-const animateSyncIcon = (): void => {
+export const resetSyncDebounce = () => {
   try {
-    const syncIcon: HTMLElement | null = document.getElementById("sync-icon");
-    if (!syncIcon) {
-      throw new Error("Sync icon not found");
-    }
-
-    syncIcon.style.animation = "1s rotate infinite linear";
-
-    setTimeout(() => {
-      if (syncIcon) {
-        syncIcon.style.removeProperty("animation");
-      }
-    }, 2500);
-  } catch (e) {
-    if (e instanceof Error) {
-      Logger.error(e.message);
-    } else {
-      Logger.error("Unknown error occurred");
-    }
+    doSyncDebounced?.cancel();
+    console.log("[Debug] Sync Debounce Canceled");
+  } catch (err) {
+    Logger.log("Sync Debounce cancel failed");
   }
 };
+
+const waitPeriod = 5000; // allow bulk sync calls in this time
 
 /**
  * This function sets the last sync target using sync target, user ID, and team ID.
@@ -108,9 +87,12 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { localRecords });
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { recordsOnFirebase });
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { mergedRecords });
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -174,6 +156,7 @@ export const doSync = async (
   syncTarget: "teamSync" | "sync",
   team_id: string
 ): Promise<void> => {
+  console.log("DEBUG", "doSync");
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
@@ -227,7 +210,10 @@ export const doSync = async (
 };
 
 /** Debounced version of the doSync function */
-export const doSyncDebounced = _.debounce(doSync, 5000);
+export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+  console.log("[DEBUG] doSyncDebounced in action");
+  doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+}, 5000);
 
 /**
  * Initiates the syncing process if conditions are met
@@ -272,8 +258,6 @@ export const invokeSyncingIfRequired = async ({
     ? latestFirebaseRecords
     : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
 
-  animateSyncIcon();
-
   if (!isLocalStoragePresent(appMode)) {
     // Just refresh the rules table in this case
     dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
@@ -282,8 +266,10 @@ export const invokeSyncingIfRequired = async ({
     return;
   }
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+    console.log("DEBUG", "doSyncDebounced");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
+    resetSyncDebounce();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
 };

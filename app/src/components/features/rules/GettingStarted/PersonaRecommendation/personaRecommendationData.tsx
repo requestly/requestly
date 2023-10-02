@@ -2,9 +2,12 @@ import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
-import { Document, PaperUpload, Video } from "react-iconly";
+import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
+import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
+import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { FeatureSection } from "./types";
 import { ApiOutlined } from "@ant-design/icons";
+import { FeatureReleaseTag } from "./types";
 
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
 const { RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -56,16 +59,39 @@ export const personaRecommendationData: FeatureSection[] = [
     ],
   },
   {
+    section: "Page HTML",
+    features: [
+      {
+        id: "record_session",
+        title: "Record a session",
+        icon: () => <FiVideo />,
+        subTitle: "Record your browsing sessions along with network and console logs",
+        link: PATHS.SESSIONS.ABSOLUTE,
+        tag: FeatureReleaseTag.NEW,
+      },
+      {
+        id: "inject_script",
+        title: "Inject script",
+        icon: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].ICON,
+        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].DESCRIPTION,
+        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.SCRIPT}`,
+      },
+      {
+        id: "host_js_css",
+        title: "Host JS/CSS",
+        icon: () => <MdOutlineUploadFile />,
+        subTitle: "Host your JS/CSS/HTML files and use them anywhere for debugging",
+        link: PATHS.FILE_SERVER_V2.ABSOLUTE,
+      },
+    ],
+  },
+  {
     section: "API's",
     features: [
       {
         id: "new_api_end_point",
         title: "New API endpoint",
-        icon: () => (
-          <span className="remix-icon">
-            <Document set="curved" />
-          </span>
-        ),
+        icon: () => <IoDocumentTextOutline />,
         subTitle: "Create mocks for your APIs",
         link: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       },
@@ -90,40 +116,6 @@ export const personaRecommendationData: FeatureSection[] = [
         icon: () => <ApiOutlined />,
         subTitle: "Test responses quickly using API Client",
         link: PATHS.API_CLIENT.ABSOLUTE,
-      },
-    ],
-  },
-  {
-    section: "Page HTML",
-    features: [
-      {
-        id: "inject_script",
-        title: "Inject script",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.SCRIPT}`,
-      },
-      {
-        id: "replay_session",
-        title: "Replay session",
-        icon: () => (
-          <span className="remix-icon">
-            <Video set="curved" />
-          </span>
-        ),
-        subTitle: "Record your browsing sessions along with network and console logs",
-        link: PATHS.SESSIONS.ABSOLUTE,
-      },
-      {
-        id: "host_js_css",
-        title: "Host JS/CSS",
-        icon: () => (
-          <span className="remix-icon">
-            <PaperUpload set="curved" />
-          </span>
-        ),
-        subTitle: "Host your JS/CSS/HTML files and use them anywhere for debugging",
-        link: PATHS.FILE_SERVER_V2.ABSOLUTE,
       },
     ],
   },

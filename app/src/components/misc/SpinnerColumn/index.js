@@ -1,6 +1,6 @@
 import React from "react";
 import { Col } from "reactstrap";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { Skeleton } from "antd";
 

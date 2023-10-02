@@ -38,6 +38,11 @@ export const AUTH = {
     FAILED: "email_verification_failed",
   },
 
+  EMAIL_LINK_SIGNIN_FORM: {
+    SEEN: "email_link_signin_form_seen",
+    SUBMITTED: "email_link_signin_form_submitted",
+  },
+
   VERIFY_OOBCODE: {
     ATTEMPTED: "verify_oobcode_attempted",
     FAILED: "verify_oobcode_failed",
@@ -45,6 +50,8 @@ export const AUTH = {
   },
   AUTH_MODAL: {
     SHOWN: "auth_modal_shown",
+    EMAIL_LOGIN_LINK_GENERATED: "email_login_link_generated",
+    GENERATE_MAGIC_LINK_FAILED: "magic_link_generation_failed",
   },
   AUTH_ONE_TAP_PROMPT: {
     VISIBLE: "auth_one_tap_prompt_visible",
@@ -141,6 +148,12 @@ export const ONBOARDING = {
   HELPDESK_CLICKED: "helpdesk_clicked",
   FOOTER_CLICKED: "footer_clicked",
   DESKTOP_APP_PROMO_CLICKED: "desktop_app_download_promo_clicked",
+  PRODUCT_HUNT_BANNER_CLICKED: "product_hunt_banner_clicked",
+  PRODUCTS_DROPDOWN_CLICKED: "products_dropdown_clicked",
+  PRODUCT_CLICKED: "product_clicked",
+  PIN_EXTENSION_POPUP_VIEWED: "pin_extension_popup_viewed",
+  PIN_EXTENSION_POPUP_EXPANDED: "pin_extension_popup_expanded",
+  PIN_EXTENSION_POPUP_CLOSED: "pin_extension_popup_closed",
 };
 
 export const TEAMS = {
@@ -148,22 +161,22 @@ export const TEAMS = {
   INVITE_TEAMMATES_CLICKED: "invite_teammates_clicked",
   INVITE_TEAMMATES_BANNER_CLICKED: "invite_teammates_banner_clicked",
   INVITE_MORE_TEAMMATES_BUTTON_CLICKED: "invite_more_teammates_button_clicked",
-  CREATE_NEW_WORKSPACE_CLICKED: "create_new_workspace_clicked",
   CREATE_NEW_TEAM_CLICKED: "create_new_team_clicked",
   NEW_WORKSPACE_CREATED: "new_workspace_created",
   WORKSPACE_DELETE_CLICKED: "workspace_delete_clicked",
   WORKSPACE_DELETED: "workspace_deleted",
-  ADD_MEMBER_CLICKED: "add_member_clicked",
   REQUEST_TEAM_PLAN_CARD_SHOWN: "request_team_plan_card_shown",
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
-  TEAM_PLAN_INTEREST_CAPTURED: "team_plan_interest_captured",
   WORKSPACE_SETTING_TOGGLED: "workspace_setting_toggled",
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
   UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
-  ONBOARDING_WORKSPACE_SKIP: "onboarding_workspace_skip",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_VIEWED: "team_workspace_organization_card_viewed",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
+  TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
+  WORKSPACE_INVITE_ANIMATION_VIEWED: "workspace_invite_animation_viewed",
 };
 
 export const TRAFFIC_TABLE = {
@@ -171,4 +184,9 @@ export const TRAFFIC_TABLE = {
   SIDEBAR_FILTER_EXPANDED: "sidebar_filter_expanded",
   SIDEBAR_FILTER_COLLAPSED: "sidebar_filter_collapsed",
   SIDEBAR_FILTER_CLEAR_ALL_CLICKED: "sidebar_filter_clear_all_clicked",
+};
+
+export const FEATURE_LIMITER = {
+  UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
+  UPGRADE_BANNER_VIEWED: "feature_limiter_upgrade_banner_viewed",
 };

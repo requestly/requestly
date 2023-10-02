@@ -3,6 +3,7 @@ import { useScript } from "./useScript";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import { trackOneTapPromptVisible } from "modules/analytics/events/common/auth/oneTapPrompt";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -42,14 +43,14 @@ export const useGoogleOneTapLogin = () => {
       client_id: window.location.host.includes("app.requestly.io")
         ? "911299702852-u365fa2rdf8g64q144gtccna87rmd8ji.apps.googleusercontent.com"
         : "553216647714-b34rhgl06o7vokpebigjttrgebmm495h.apps.googleusercontent.com",
-      disabled: user?.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+      disabled: isAppOpenedInIframe() || user?.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       prompt_parent_id: "one-tap-container",
       callback: handleSignIn,
     };
   }, [user?.loggedIn, appMode]);
 
   const listener = useEffect(() => {
-    if (script === "ready" && !config.disabled) {
+    if (script === "ready" && !config.disabled && window.google) {
       window.google.accounts.id.initialize({ ...config });
       window.google.accounts.id.prompt((notification: any) => {
         if (notification.isDisplayed()) {

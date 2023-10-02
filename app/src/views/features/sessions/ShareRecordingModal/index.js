@@ -1,15 +1,19 @@
 import { Button, Col, Modal, Row, Radio, Tag, Typography } from "antd";
-import { BsBuilding } from "react-icons/bs";
-import { AiOutlineLink } from "react-icons/ai";
+import { BsBuilding } from "@react-icons/all-files/bs/BsBuilding";
+import { AiOutlineLink } from "@react-icons/all-files/ai/AiOutlineLink";
 import React, { useEffect, useState, useRef } from "react";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { ShareAltOutlined } from "@ant-design/icons";
-import { IoEarthOutline } from "react-icons/io5";
+import { IoEarthOutline } from "@react-icons/all-files/io5/IoEarthOutline";
 import firebaseApp from "../../../../firebase";
-import { FiLock, FiUsers } from "react-icons/fi";
+import { FiLock } from "@react-icons/all-files/fi/FiLock";
+import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { ReactMultiEmail, isEmail } from "react-multi-email";
-import { trackSessionRecordingShareLinkCopied } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackIframeEmbedCopied,
+  trackSessionRecordingShareLinkCopied,
+} from "modules/analytics/events/features/sessionRecording";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
@@ -24,16 +28,16 @@ export const renderHeroIcon = (currentVisibility, size = 16) => {
   switch (currentVisibility) {
     default:
     case Visibility.PUBLIC:
-      return <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />;
+      return <IoEarthOutline size={size} className="radio-hero-icon" />;
 
     case Visibility.CUSTOM:
-      return <FiUsers size={size} className="remix-icon radio-hero-icon" />;
+      return <FiUsers size={size} className="radio-hero-icon" />;
 
     case Visibility.ONLY_ME:
-      return <FiLock size={size} className="remix-icon radio-hero-icon" />;
+      return <FiLock size={size} className="radio-hero-icon" />;
 
     case Visibility.ORGANIZATION:
-      return <BsBuilding size={size} className="remix-icon radio-hero-icon" />;
+      return <BsBuilding size={size} className="radio-hero-icon" />;
   }
 };
 
@@ -59,7 +63,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
 
   const publicURL = getSessionRecordingSharedLink(recordingId);
   // Component State
-  const [copiedText, setCopiedText] = useState("");
+  const [isTextCopied, setIsTextCopied] = useState("");
   const [isAnyListChangePending, setIsAnyListChangePending] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [currentEmails, setCurrentEmails] = useState([]);
@@ -72,11 +76,32 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
   };
 
   const onCopyHandler = () => {
-    trackSessionRecordingShareLinkCopied();
-    setCopiedText(publicURL);
+    trackSessionRecordingShareLinkCopied("app");
+    setIsTextCopied(true);
     navigator.clipboard.writeText(publicURL); //copy to clipboard
     setTimeout(() => {
-      setCopiedText("");
+      setIsTextCopied(false);
+    }, 700);
+  };
+
+  const handleIframeEmbedCopy = () => {
+    trackIframeEmbedCopied();
+    setIsTextCopied(true);
+
+    const iframeEmbed = `<iframe
+    width="700"
+    height="615"
+    frameBorder="0"
+    allowFullscreen
+    title="Requestly session"
+    style="border:0; border-radius: 8px; overflow:hidden;"
+    src="${publicURL}"
+  />`;
+
+    navigator.clipboard.writeText(iframeEmbed);
+
+    setTimeout(() => {
+      setIsTextCopied(false);
     }, 700);
   };
 
@@ -220,7 +245,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
     <Modal
       title={
         <span>
-          <ShareAltOutlined style={{ marginRight: 5 }} /> Share Recording
+          <ShareAltOutlined style={{ marginRight: 5 }} /> Share Replay
         </span>
       }
       open={isVisible}
@@ -243,7 +268,18 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
                     Copy Link
                   </div>
                 </Button>
-                {copiedText && (
+                <Button shape="default" onClick={handleIframeEmbedCopy}>
+                  <div
+                    style={{
+                      gap: "0.5rem",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Copy Iframe Embed
+                  </div>
+                </Button>
+                {isTextCopied && (
                   <Typography.Text style={{ alignSelf: "center" }} type="secondary">
                     Copied!
                   </Typography.Text>
