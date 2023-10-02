@@ -4,7 +4,7 @@ import { Button, Badge, Tag } from "antd";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
-import { trackCreateNewWorkspaceClicked } from "modules/analytics/events/common/teams";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
@@ -19,6 +19,7 @@ const TeamsList = ({ teams = [] }) => {
   const renderSubscriptionStatus = (subscriptionStatus, teamId) => {
     switch (subscriptionStatus) {
       case "active":
+      case "trialing":
         return (
           <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
             <Badge status="success" /> Active
@@ -127,8 +128,14 @@ const TeamsList = ({ teams = [] }) => {
           <Button
             type="primary"
             onClick={() => {
-              trackCreateNewWorkspaceClicked("my_teams");
-              dispatch(actions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: true }));
+              trackCreateNewTeamClicked("my_teams");
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: { source: "my_teams" },
+                })
+              );
             }}
             icon={<PlusOutlined />}
           >

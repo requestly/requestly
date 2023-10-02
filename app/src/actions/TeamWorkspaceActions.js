@@ -4,7 +4,11 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
 import { actions } from "store";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
-import { mergeRecordsAndSaveToFirebase, resetSyncDebounceTimerStart } from "hooks/DbListenerInit/syncingNodeListener";
+import {
+  mergeRecordsAndSaveToFirebase,
+  resetSyncDebounce,
+  resetSyncDebounceTimerStart,
+} from "hooks/DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
@@ -19,7 +23,14 @@ export const showSwitchWorkspaceSuccessToast = (teamName) => {
   else toast.info(`Switched back to ${APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE}`);
 };
 
-export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSyncingState, appMode, setLoader) => {
+export const switchWorkspace = async (
+  newWorkspaceDetails,
+  dispatch,
+  currentSyncingState,
+  appMode,
+  setLoader,
+  source
+) => {
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
@@ -40,8 +51,7 @@ export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSync
       }
     }
   }
-
-  trackWorkspaceSwitched();
+  trackWorkspaceSwitched(source);
   dispatch(actions.updateIsRulesListLoading(true));
 
   setLoader?.();
@@ -64,6 +74,7 @@ export const switchWorkspace = async (newWorkspaceDetails, dispatch, currentSync
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
+  resetSyncDebounce();
 
   // Don't clear when appMode is Extension but user has not installed it!
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;

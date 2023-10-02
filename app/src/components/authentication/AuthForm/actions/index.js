@@ -50,8 +50,8 @@ export const handleGoogleSignIn = (appMode, MODE, eventSource) => {
   return functionToCall(null, MODE, eventSource);
 };
 
-export const handleEmailSignUp = (name, email, password, referralCode, eventSource) => {
-  return signUp(name, email, password, referralCode, eventSource);
+export const handleEmailSignUp = (email, password, referralCode, eventSource) => {
+  return signUp(email, password, referralCode, eventSource);
 };
 
 export const handleForgotPasswordButtonOnClick = (event, email, setLoader, callbackOnSuccess) => {

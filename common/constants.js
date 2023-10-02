@@ -139,12 +139,18 @@ CONSTANTS.EXTENSION_MESSAGES = {
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
+  START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
+  STOP_RECORDING: "stopRecording",
+  WATCH_RECORDING: "watchRecording",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
   START_RECORDING_ON_URL: "startRecordingOnUrl",
   NOTIFY_EXTENSION_UPDATED: "notifyExtensionUpdated",
+  TEST_RULE_ON_URL: "testRuleOnUrl",
+  SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
 };
 
 CONSTANTS.HEADERS_TARGET = {
@@ -198,6 +204,7 @@ CONSTANTS.STORAGE_KEYS = {
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
   USE_EVENTS_ENGINE: "useEventsEngine",
   SEND_EXECUTION_EVENTS: "sendExecutionEvents",
+  TEST_REPORTS: "testReports",
 };
 
 CONSTANTS.REQUEST_STATE = {

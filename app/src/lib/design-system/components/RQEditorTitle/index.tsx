@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { BiPencil } from "react-icons/bi";
+import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { TextAreaRef } from "antd/lib/input/TextArea";
 import "./RQEditorTitle.css";
 
@@ -19,6 +19,7 @@ interface TitleProps {
   errors?: ValidationErrors;
   mode?: "create" | "edit";
   tagText?: string;
+  defaultName?: string;
 }
 
 const { TextArea } = Input;
@@ -31,6 +32,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   namePlaceholder,
   descriptionPlaceholder,
   descriptionChangeCallback,
+  defaultName,
   mode = "edit",
   tagText,
   errors,
@@ -54,6 +56,13 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
     }
   }, [isDescriptionEditable]);
 
+  useEffect(() => {
+    if (!defaultName || mode === "edit") return;
+
+    nameChangeCallback(defaultName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, defaultName]);
+
   return (
     <Col
       span={22}
@@ -76,7 +85,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                   ref={nameInputRef}
                   data-tour-id="rule-editor-title"
                   className={`${errors?.name && !name ? "error" : null}`}
-                  autoFocus={true || mode === "create"}
+                  autoFocus={true}
                   onFocus={() => setIsNameEditable(true)}
                   onBlur={() => setIsNameEditable(false)}
                   bordered={false}
@@ -119,6 +128,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             ) : (
               <div className="editor-description">
                 <Typography.Paragraph
+                  style={{ width: "100%" }}
                   ellipsis={{
                     rows: 3,
                   }}

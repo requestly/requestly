@@ -4,15 +4,16 @@ import firebaseApp from "../../firebase";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
-import { RecordingOptions, SessionRecording, Visibility } from "views/features/sessions/SessionViewer/types";
+import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
 
 export const saveRecording = async (
   uid: string,
   workspaceId: string | null,
-  payload: SessionRecording,
+  payload: SessionRecordingMetadata,
   events: any,
-  options: RecordingOptions
+  options: RecordingOptions,
+  source: string
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
@@ -36,6 +37,7 @@ export const saveRecording = async (
     lastUpdatedBy: uid,
     updatedTs: Date.now(),
     createdTs: Date.now(),
+    source,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)

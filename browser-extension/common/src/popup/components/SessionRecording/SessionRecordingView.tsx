@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Typography } from "antd";
-import config from "../../../config";
-import { CLIENT_MESSAGES } from "../../../constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
 import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
 import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
 import { EVENT, sendEvent } from "../../events";
@@ -14,29 +13,34 @@ const SessionRecordingView: React.FC = () => {
 
   const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED);
-    chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.START_RECORDING }, { frameId: 0 }, () =>
-      setIsRecordingSession(true)
-    );
-  }, [currentTabId]);
-
-  const openRecordedSession = useCallback(() => {
-    window.open(`${config.WEB_URL}/sessions/draft/${currentTabId}`, "_blank");
+    chrome.runtime.sendMessage({
+      action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
+      tabId: currentTabId,
+      showWidget: true,
+    });
+    setIsManualMode(true);
+    setIsRecordingSession(true);
   }, [currentTabId]);
 
   const viewRecordingOnClick = useCallback(
     (stopRecording?: boolean) => {
       if (isManualMode || stopRecording) {
         sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
-        chrome.tabs.sendMessage(currentTabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, { frameId: 0 }, () => {
-          setIsRecordingSession(false);
-          openRecordedSession();
+        chrome.runtime.sendMessage({
+          action: EXTENSION_MESSAGES.STOP_RECORDING,
+          tabId: currentTabId,
+          openRecording: true,
         });
+        setIsRecordingSession(false);
       } else {
         sendEvent(EVENT.VIEW_RECORDING_CLICKED);
-        openRecordedSession();
+        chrome.runtime.sendMessage({
+          action: EXTENSION_MESSAGES.WATCH_RECORDING,
+          tabId: currentTabId,
+        });
       }
     },
-    [openRecordedSession, isManualMode]
+    [isManualMode, currentTabId]
   );
 
   useEffect(() => {
@@ -62,7 +66,7 @@ const SessionRecordingView: React.FC = () => {
         setIsManualMode
       );
     }
-  }, [isRecordingSession]);
+  }, [currentTabId]);
 
   return (
     <Row
@@ -88,7 +92,7 @@ const SessionRecordingView: React.FC = () => {
                 </Typography.Text>
                 <br />
                 <Typography.Text className="custom-mode-caption">
-                  This tab is being recorded by session recorder
+                  This tab is being recorded by session Replay
                 </Typography.Text>
               </>
             ) : (
@@ -134,7 +138,7 @@ const SessionRecordingView: React.FC = () => {
             className="session-view-link-button"
             onClick={() => viewRecordingOnClick()}
           >
-            <EyeOutlined /> <span>{isManualMode ? "Stop & watch recording" : "Watch recording"}</span>
+            <EyeOutlined /> <span>{isManualMode ? "Stop & watch replay" : "Watch replay"}</span>
           </Button>
         ) : (
           <Typography.Link

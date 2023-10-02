@@ -1,7 +1,6 @@
 // import firebase from "../firebase";
 // Firebase App
 import firebaseApp from "firebase.js";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -18,6 +17,7 @@ import {
   confirmPasswordReset,
   signOut as signOutFirebaseFunction,
   sendEmailVerification,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -34,9 +34,11 @@ import {
   trackSignupSuccessEvent,
 } from "modules/analytics/events/common/auth/signup";
 import {
+  trackEmailLoginLinkGenerated,
   trackLoginAttemptedEvent,
   trackLoginFailedEvent,
   trackLoginSuccessEvent,
+  trackGenerateMagicLinkFailed,
 } from "modules/analytics/events/common/auth/login";
 import {
   trackResetPasswordAttemptedEvent,
@@ -54,7 +56,6 @@ import {
   trackVerifyOobCodeSuccess,
 } from "modules/analytics/events/common/auth/verifyOobcode";
 import { sanitizeDataForFirebase } from "utils/Misc";
-import { createNewUsername } from "backend/auth/username";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
@@ -64,6 +65,7 @@ import {
   trackLogoutFailed,
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
+import { toast } from "utils/Toast";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -72,7 +74,7 @@ const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000
  * SignIn with Google in popup window and create profile node
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
  */
-export async function signUp(name, email, password, refCode, source) {
+export async function signUp(email, password, refCode, source) {
   const email_type = getEmailType(email);
   const domain = email.split("@")[1];
   trackSignUpAttemptedEvent({
@@ -83,15 +85,15 @@ export async function signUp(name, email, password, refCode, source) {
     domain,
     source,
   });
-  if (!name || isEmpty(name)) {
-    trackSignUpFailedEvent({
-      auth_provider: AUTH_PROVIDERS.EMAIL,
-      email,
-      error: "no-name",
-      source,
-    });
-    return Promise.reject({ status: false, errorCode: "no-name" });
-  }
+  // if (!name || isEmpty(name)) {
+  //   trackSignUpFailedEvent({
+  //     auth_provider: AUTH_PROVIDERS.EMAIL,
+  //     email,
+  //     error: "no-name",
+  //     source,
+  //   });
+  //   return Promise.reject({ status: false, errorCode: "no-name" });
+  // }
   if (!email || isEmpty(email)) {
     trackSignUpFailedEvent({
       auth_provider: AUTH_PROVIDERS.EMAIL,
@@ -121,24 +123,14 @@ export async function signUp(name, email, password, refCode, source) {
         setEmailVerified(result.user.uid, false);
       });
       return updateProfile(result.user, {
-        displayName: name,
         photoURL: `https://www.gravatar.com/avatar/${md5(email)}`,
       })
         .then(() => {
-          const functions = getFunctions();
-          const addUserToCRM = httpsCallable(functions, "addUserToCRM");
-          addUserToCRM({});
           const authData = getAuthData(result.user);
           const database = getDatabase();
           return update(ref(database, getUserProfilePath(authData.uid)), authData)
             .then(() => {
               Logger.log("Profile Created Successfully");
-
-              createNewUsername(authData.uid)
-                .then((username) => {
-                  // Do Nothing
-                })
-                .catch((e) => Logger.error(e));
 
               trackSignupSuccessEvent({
                 auth_provider: AUTH_PROVIDERS.EMAIL,
@@ -194,6 +186,28 @@ export async function signUp(name, email, password, refCode, source) {
       });
       // var errorMessage = error.message;
       return Promise.reject({ status: false, errorCode });
+    });
+}
+
+export async function sendEmailLinkForSignin(
+  email,
+  source,
+  toastMessage = "Please check your email for instructions to login."
+) {
+  const auth = getAuth(firebaseApp);
+  return sendSignInLinkToEmail(auth, email, {
+    url: window.location.href,
+    handleCodeInApp: true,
+  })
+    .then((res) => {
+      window.localStorage.setItem("RQEmailForSignIn", email);
+      toast.info(toastMessage);
+      trackEmailLoginLinkGenerated(email, source);
+    })
+    .catch((err) => {
+      toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
+      trackGenerateMagicLinkFailed(email, source);
+      console.log(err);
     });
 }
 
@@ -310,7 +324,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
     const uid = result?.user?.uid || null;
     const email = result?.user?.email || null;
 
-    const additionalUserInfo = getAdditionalUserInfo(result);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
     const is_new_user = additionalUserInfo?.isNewUser || false;
 
     if (is_new_user) {
@@ -377,12 +391,6 @@ export async function googleSignIn(callback, MODE, source) {
         });
         setSignupDate(uid);
         setEmailVerified(uid, true);
-
-        createNewUsername(uid)
-          .then((username) => {
-            // Do Nothing
-          })
-          .catch((e) => Logger.error(e));
       } else {
         trackLoginAttemptedEvent({
           auth_provider: AUTH_PROVIDERS.GMAIL,
@@ -444,6 +452,8 @@ export const signInWithEmailLink = async (email, callback) => {
   try {
     const auth = getAuth(firebaseApp);
     const result = await signInWithEmailLinkFirebaseLib(auth, email, window.location.href);
+    const additionalUserInfo = getAdditionalUserInfo(result); // get this info
+    const isNewUser = additionalUserInfo?.isNewUser || false;
 
     // Update details in db
     const authData = getAuthData(result.user);
@@ -459,8 +469,34 @@ export const signInWithEmailLink = async (email, callback) => {
     });
 
     callback && callback.call(null, true);
-    return authData;
-  } catch (e) {
+    return { authData, isNewUser };
+  } catch (error) {
+    if (error?.code === "auth/email-already-in-use") {
+      /* user already exists with another auth provider */
+      const userEmail = error?.email;
+      try {
+        const auth = getAuth(firebaseApp);
+        const authData = getAuthData(auth.currentUser) || {};
+        authData.email = userEmail;
+
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
+          uid: authData.uid,
+          email,
+        });
+
+        return {
+          authData,
+          isNewUser: false,
+        };
+      } catch (e) {
+        /* wait for sign in to be triggered again, once userAuth is ready */
+        return {
+          authData: { email: userEmail },
+          isNewUser: false,
+        };
+      }
+    }
     trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
     return null;
   }

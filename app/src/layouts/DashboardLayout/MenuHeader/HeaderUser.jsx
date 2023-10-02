@@ -20,7 +20,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
-  const userName = user.loggedIn && user?.details?.profile?.displayName ? user.details.profile.displayName : "User";
+  const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
 
   const userPhoto =
     user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
@@ -139,6 +139,7 @@ export default function HeaderUser() {
   let showUserDropdown = true;
 
   Object.values(APP_CONSTANTS.PATHS.AUTH).forEach((AUTH_PATH) => {
+    // SO THAT USER CANNOT TRIGGER OTHER AUTH ACTIONS DURING CURRENT AUTH FLOW
     if (window.location.pathname === AUTH_PATH.ABSOLUTE) {
       showUserDropdown = false;
     }
@@ -150,11 +151,7 @@ export default function HeaderUser() {
 
   return (
     <>
-      {user.loggedIn &&
-      user.details &&
-      user.details.profile &&
-      user.details.profile.displayName &&
-      user.details.profile.photoURL
+      {user.loggedIn && user.details && user.details.profile && user.details.profile.photoURL
         ? renderUserDetails()
         : renderLoginBtn()}
     </>

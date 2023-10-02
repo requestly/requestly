@@ -11,6 +11,7 @@
 
 .editor-title-container .editor-title-name,
 .editor-title-container .editor-description {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 4px;

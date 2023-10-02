@@ -10,6 +10,8 @@ import Page403 from "views/misc/ServerResponses/403";
 import Page404 from "views/misc/ServerResponses/404";
 import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
+import { Home } from "components/landing/Home";
+import AppSumoModal from "components/landing/Appsumo/Appsumo";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -52,6 +54,14 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
     element: <ProtectedRoute component={AcceptTeamInvite} />,
+  },
+  {
+    path: PATHS.HOME.RELATIVE,
+    element: <Home />,
+  },
+  {
+    path: PATHS.APPSUMO.RELATIVE,
+    element: <ProtectedRoute component={AppSumoModal} />,
   },
   {
     path: PATHS.ANY,

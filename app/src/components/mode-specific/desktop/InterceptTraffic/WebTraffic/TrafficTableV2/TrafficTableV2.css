@@ -12,7 +12,7 @@
 .traffic-table-sidebar,
 .traffic-table-sidebar .ant-menu.ant-menu-dark,
 .traffic-table-sidebar .ant-menu.ant-menu-dark ul.ant-menu-sub {
-  background-color: var(--app-secondary-sidebar-background);
+  background-color: var(--component-background);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {

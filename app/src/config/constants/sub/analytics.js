@@ -123,6 +123,7 @@ export const GA_EVENTS = {
     COUPON_VALUE: "coupon_value",
     LICENSE: "licensekey",
     COMPANY: "company",
+    REF: "ref",
 
     PROFILE: "profile",
 
@@ -136,14 +137,18 @@ export const GA_EVENTS = {
     NUM_FILES: "num_files",
     NUM_MOCKS: "num_mocks",
     NUM_SESSIONS: "num_sessions",
+    NUM_SESSIONS_SAVED_ONLINE: "num_sessions_saved_online",
+    NUM_SESSIONS_SAVED_OFFLINE: "num_sessions_saved_offline",
+
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
     ONBOARDING_V1_DONE: "ONBOARDING_V1_DONE",
 
     PERSONA: "persona",
-    USE_CASES: "use_cases",
-    REFERRAL_CHANNEL: "referral_channel",
-    NUMBER_OF_EMPLOYEES: "number_of_employees",
+    INDUSTRY: "industry",
+    // USE_CASES: "use_cases",
+    // REFERRAL_CHANNEL: "referral_channel",
+    // NUMBER_OF_EMPLOYEES: "number_of_employees",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
@@ -163,6 +168,7 @@ export const GA_EVENTS = {
     HAS_AVAILED_GITHUB_TRIAL: "HAS_AVAILED_GITHUB_TRIAL",
     TRIAL_MODE_ENABLED: "trial_mode_enabled",
     NUM_WORKSPACES: "num_workspaces",
+    SESSION_REPLAY_LIFETIME_REDEEMED: "session_replay_lifetime_redeemed",
   },
   VALUES: {
     PAYPAL: "paypal",

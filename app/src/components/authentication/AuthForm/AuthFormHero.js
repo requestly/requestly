@@ -1,5 +1,5 @@
 import { Typography, Row, Col } from "antd";
-import { HiArrowRight } from "react-icons/hi";
+import { HiArrowRight } from "@react-icons/all-files/hi/HiArrowRight";
 import { CompanyMarquee } from "components/misc/Marquee";
 import quoteIcon from "../../../assets/img/icons/common/quote.svg";
 import underlineIcon from "../../../assets/img/icons/common/underline.svg";
@@ -8,7 +8,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
   const workEmailsBenefits = [
     "Use Requestly with your colleagues",
     "Access to Team Workspaces",
-    "Access to Session Recording",
+    "Access to Session Replay",
     "Organization level access controls",
   ];
 

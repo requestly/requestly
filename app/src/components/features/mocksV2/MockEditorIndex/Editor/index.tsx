@@ -10,7 +10,7 @@ import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BsStars } from "react-icons/bs";
+import { BsStars } from "@react-icons/all-files/bs/BsStars";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType } from "../../types";
@@ -412,18 +412,27 @@ const MockEditor: React.FC<Props> = ({
         handleSave={handleOnSave}
         handleTest={handleTest}
       />
-      <RQEditorTitle
-        name={name}
-        description={desc}
-        namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
-        descriptionPlaceholder="Add your description here."
-        nameChangeCallback={onNameChange}
-        descriptionChangeCallback={onDescriptionChange}
-        tagText={fileType}
-        errors={errors}
-      />
+      <div className="mock-editor-title-container">
+        <RQEditorTitle
+          name={name}
+          mode={isNew ? "create" : "edit"}
+          description={desc}
+          namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+          descriptionPlaceholder="Add your description here."
+          nameChangeCallback={onNameChange}
+          descriptionChangeCallback={onDescriptionChange}
+          tagText={fileType}
+          errors={errors}
+        />
+      </div>
       <Row className="mock-editor-container">
-        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
+        <Col
+          className="mock-editor-container-col"
+          span={22}
+          offset={1}
+          md={{ offset: 2, span: 20 }}
+          lg={{ offset: 4, span: 16 }}
+        >
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}

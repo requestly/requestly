@@ -1,3 +1,9 @@
+.session-tutorial-btn.ant-btn {
+  color: var(--white);
+  border: 1px solid var(--border);
+  background-color: var(--component-background);
+}
+
 .onboarding-content-container {
   .settings-row {
     margin-right: 9px;
@@ -74,6 +80,42 @@
           width: 85%;
           display: flex;
           justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+.create-new-session-modal {
+  .onboarding-content-container {
+    .onboarding-banner {
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .banner-text {
+        color: var(--text-gray);
+        font-size: 14px;
+      }
+
+      .banner-title {
+        text-align: center;
+        font-size: 1.5rem;
+        width: 100%;
+      }
+
+      .banner-description {
+        margin-bottom: 2.5rem;
+        .banner-text {
+          text-align: center;
+        }
+      }
+
+      .input-container {
+        .ant-input {
+          font-size: 14px;
         }
       }
     }

@@ -25,12 +25,13 @@ import { shouldShowOnboarding } from "components/misc/PersonaSurvey/utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { OnboardingSteps } from "./types";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getPendingInvites } from "backend/workspace";
 import { actions } from "store";
 import { Invite, InviteUsage } from "types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
-import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/common/teams";
+import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 
@@ -49,19 +50,12 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
 
+  const [isNewUserFromEmailLinkSignIn, setIsNewUserFromEmailLinkSignIn] = useState(false);
   const [defaultTeamData, setDefaultTeamData] = useState(null);
   const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
-    []
-  );
-  const getPendingInvites = useMemo(
-    () =>
-      httpsCallable<{ email: boolean; domain: boolean }, { pendingInvites: Invite[]; success: boolean }>(
-        getFunctions(),
-        "teams-getPendingTeamInvites"
-      ),
     []
   );
 
@@ -126,6 +120,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   ]);
 
   useEffect(() => {
+    setIsNewUserFromEmailLinkSignIn(!!window.localStorage.getItem("isNewUser"));
+  }, []);
+
+  useEffect(() => {
     if (step === OnboardingSteps.CREATE_JOIN_WORKSPACE) {
       if (workspaceOnboardingTeamDetails.createdTeam) {
         setDefaultTeamData(workspaceOnboardingTeamDetails.createdTeam);
@@ -140,33 +138,36 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   useEffect(() => {
     if (user?.loggedIn) {
       getPendingInvites({ email: true, domain: true })
-        .then((res) => {
-          setPendingInvites(res?.data?.pendingInvites ?? []);
-          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.data?.pendingInvites }));
+        .then((res: any) => {
+          setPendingInvites(res?.pendingInvites ?? []);
+          dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.pendingInvites ?? [] }));
         })
         .catch((e) => {
           setPendingInvites([]);
         });
     }
-  }, [dispatch, getPendingInvites, user?.loggedIn]);
+  }, [dispatch, user?.loggedIn]);
 
   useEffect(() => {
     if (user?.loggedIn && step === OnboardingSteps.AUTH) {
       if (currentTeams?.length) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      else if (isNewUserFromEmailLinkSignIn)
+        dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
       else dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
     }
-  }, [dispatch, user?.loggedIn, currentTeams?.length, step]);
+  }, [dispatch, user?.loggedIn, currentTeams?.length, step, isNewUserFromEmailLinkSignIn]);
 
   useEffect(() => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       shouldShowOnboarding(appMode).then((result) => {
         if (result && isExtensionInstalled()) {
           trackWorkspaceOnboardingViewed();
-          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
+          dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal", newValue: true }));
         }
       });
     }
-  }, [appMode, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode, dispatch, window.location.href]);
 
   useEffect(() => {
     return () => {
@@ -175,7 +176,10 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   }, [toggle]);
 
   useEffect(() => {
-    if (userPersona?.page > 2) dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+    if (userPersona?.page > 2) {
+      dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+      window.localStorage.removeItem("isNewUser");
+    }
   }, [dispatch, userPersona?.page]);
 
   const renderOnboardingBanner = useCallback(() => {
@@ -205,7 +209,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
                 type="text"
                 onClick={() => {
                   trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
-                  dispatch(actions.updateIsWorkspaceOnboardingCompleted());
+                  dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
                 }}
               >
                 Skip for now
