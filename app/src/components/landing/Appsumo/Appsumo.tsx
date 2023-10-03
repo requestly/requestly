@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
@@ -56,6 +56,7 @@ const AppSumoModal: React.FC = () => {
   const [emailValidationError, setEmailValidationError] = useState(null);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
+  const isCreatingTeam = useRef(false);
 
   const addAppSumoCodeInput = () => {
     setAppsumoCodes((prev) => [...prev, { ...DEFAULT_APPSUMO_INPUT }]);
@@ -177,8 +178,9 @@ const AppSumoModal: React.FC = () => {
   }, [workspaceToUpgrade]);
 
   useEffect(() => {
-    if (!isNull(availableTeams) && !availableTeams.length) {
+    if (!isCreatingTeam.current && !isNull(availableTeams) && !availableTeams.length) {
       setIsLoading(true);
+      isCreatingTeam.current = true;
       const newTeamName = "Team Workspace";
       createTeam({ teamName: newTeamName }).then((response: any) => {
         trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
