@@ -12,6 +12,7 @@ import { actions } from "store";
 import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const RulePreviewModal = ({ rule, isOpen, toggle }) => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
   const appMode = useSelector(getAppMode);
 
   const createdBy = user?.details?.profile?.uid || null;
-  const currentOwner = user?.details?.profile?.uid || null;
+  // const currentOwner = user?.details?.profile?.uid || null; // here
   const saveRuleTemplate = (ruleObj) => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       if (!isExtensionInstalled()) {
@@ -35,13 +36,13 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
         return;
       }
     }
-    const modificationDate = Date.now();
+    const modificationDate = generateObjectCreationDate();
 
     const ruleToSave = {
       ...ruleObj.ruleDefinition,
       id: `${ruleObj.ruleDefinition.ruleType}_${generateObjectId()}`,
       createdBy,
-      currentOwner,
+      // currentOwner,
       modificationDate,
     };
 
