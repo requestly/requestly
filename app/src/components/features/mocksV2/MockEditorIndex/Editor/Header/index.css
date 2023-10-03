@@ -32,3 +32,21 @@
 .mock-editor-layout-header .header-right-section .ant-btn {
   font-weight: 500;
 }
+.mock-editor-options-trigger-icon {
+  margin-left: 5px;
+}
+
+.mock-editor-options-dropdown-trigger {
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  padding: 7px 8px 6px 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-dark-background);
+  border: 1px solid transparent;
+  transition: border 0.3s;
+}
+
+.mock-editor-options-dropdown-trigger.mock-editor-options-dropdown-active {
+  border-color: var(--dropdown-active-border-color);
+}
