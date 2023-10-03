@@ -1,6 +1,5 @@
 import { RRWebEventData, NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-//@ts-ignore
 import ReactDom from "react-dom";
 import Replayer from "rrweb-player";
 import { Badge, Input, Tabs } from "antd";
