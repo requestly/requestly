@@ -20,6 +20,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { FilePicker } from "components/common/FilePicker";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const ImportRulesModal = (props) => {
   const { toggle: toggleModal, isOpen } = props;
@@ -29,6 +30,8 @@ const ImportRulesModal = (props) => {
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
@@ -58,7 +61,7 @@ const ImportRulesModal = (props) => {
         try {
           parsedArray = JSON.parse(reader.result);
           //Start processing data
-          processDataToImport(parsedArray, user, allRules).then((result) => {
+          processDataToImport(parsedArray, user, currentlyActiveWorkspace?.id, allRules).then((result) => {
             setDataToImport(result.data);
             setRulesToImportCount(result.rulesCount);
             setGroupsToImportCount(result.groupsCount);
@@ -80,7 +83,7 @@ const ImportRulesModal = (props) => {
       };
       reader.readAsText(file);
     },
-    [user, allRules, toggleModal]
+    [user, allRules, currentlyActiveWorkspace, toggleModal]
   );
 
   const renderFilePicker = () => {

@@ -26,7 +26,7 @@ import { trackTemplateImportCompleted } from "modules/analytics/events/features/
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getSharedListIdFromURL } from "../SharedListViewerIndexPage/actions";
 import { actions } from "store";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
 
@@ -41,6 +41,8 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+
   const user = useSelector(getUserAuthDetails);
   const isTemplate = queryParams.get("template") === "true" ? true : false;
 
@@ -110,18 +112,20 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
     });
 
     //process Data
-    processDataToImport([...rulesToImport, ...groupsToImport], user, allRules).then((result) => {
-      const processedRulesToImport = result.data;
+    processDataToImport([...rulesToImport, ...groupsToImport], user, currentlyActiveWorkspace.id, allRules).then(
+      (result) => {
+        const processedRulesToImport = result.data;
 
-      addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
-        toast.info(`Successfully imported rules`);
-        trackSharedListImportCompleted(id);
-        if (isTemplate) {
-          trackTemplateImportCompleted(snakeCase("Load Google Analytics in Debug Mode"));
-        }
-        redirectToRules(navigate);
-      });
-    });
+        addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
+          toast.info(`Successfully imported rules`);
+          trackSharedListImportCompleted(id);
+          if (isTemplate) {
+            trackTemplateImportCompleted(snakeCase("Load Google Analytics in Debug Mode"));
+          }
+          redirectToRules(navigate);
+        });
+      }
+    );
   };
 
   return (
