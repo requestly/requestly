@@ -84,9 +84,9 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       skipBack.setAttribute("style", "padding-right: 4px; cursor: pointer;");
       skipBack.addEventListener("click", () => {
         if (currentPlayerTime.current > 10000) {
-          player?.goto(currentPlayerTime.current - 10000, true);
+          player.goto(currentPlayerTime.current - 10000);
         } else {
-          player?.goto(0, true);
+          player.goto(0);
         }
       });
 
@@ -96,9 +96,9 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       skipForward.setAttribute("style", "padding-right: 4px; cursor: pointer;");
       skipForward.addEventListener("click", () => {
         if (currentPlayerTime.current + 10000 < attributes?.duration) {
-          player?.goto(currentPlayerTime.current + 10000, true);
+          player.goto(currentPlayerTime.current + 10000);
         } else {
-          player?.goto(attributes?.duration, true);
+          player.goto(attributes?.duration);
         }
       });
 
