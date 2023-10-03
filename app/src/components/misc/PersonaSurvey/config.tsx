@@ -1,4 +1,4 @@
-import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig, SurveyPage, Visibility } from "./types";
+import { PageConfig, PersonaType, QuestionnaireType, SurveyOptionsConfig, SurveyPage } from "./types";
 import { setUserPersona } from "./actions";
 import { GettingStartedWithSurvey } from "./GettingStartedWithSurvey";
 
@@ -102,15 +102,5 @@ export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
     subTitle: "Please select one you closely relate to",
     visibility: () => true,
     render: QuestionnaireType.PERSONA,
-  },
-  [SurveyPage.INDUSTRY]: {
-    pageId: SurveyPage.INDUSTRY,
-    title: "In which industry do you apply your skills as a developer?",
-    subTitle: "Select one",
-    visibility: ({ userPersona }: Visibility) =>
-      userPersona.persona === PersonaType.FRONTEND ||
-      userPersona.persona === PersonaType.BACKEND ||
-      userPersona.persona === PersonaType.FULLSTACK,
-    render: QuestionnaireType.INDUSTRY,
   },
 };

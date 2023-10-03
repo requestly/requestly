@@ -12,7 +12,7 @@ import { QuestionnaireType, SurveyPage } from "./types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
-import { trackPersonaQ1Completed, trackPersonaQ2Completed } from "modules/analytics/events/misc/onboarding";
+import { trackPersonaQ1Completed } from "modules/analytics/events/misc/onboarding";
 import "./index.css";
 
 interface FooterProps {
@@ -27,7 +27,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
   const appMode = useSelector(getAppMode);
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
   const surveyLength = useMemo(() => Object.keys(SurveyConfig).length, []);
-  const currentPageIndex = useMemo(() => Object.keys(SurveyConfig).indexOf(currentPage), [currentPage]);
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
 
   const disableContinue = useMemo(() => {
@@ -46,16 +45,6 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
       case QuestionnaireType.PERSONA:
         trackPersonaQ1Completed(userPersona.persona);
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
-        break;
-
-      case QuestionnaireType.INDUSTRY:
-        if (typeof userPersona.industry === "object") {
-          trackPersonaQ2Completed(userPersona.industry.value);
-          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry.value);
-        } else {
-          trackPersonaQ2Completed(userPersona.industry);
-          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, userPersona.industry);
-        }
         break;
     }
 
@@ -78,18 +67,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, callback
   return (
     <>
       <div className="survey-footer w-full rq-modal-footer">
-        <Row justify="space-between" align="middle">
-          <Col>
-            {isSurveyModal && currentPage === SurveyPage.GETTING_STARTED ? (
-              <>
-                <span className="survey-modal-emoji">😁</span> We are excited to see you here
-              </>
-            ) : (
-              <>
-                {currentPageIndex} / {surveyLength - 1}
-              </>
-            )}
-          </Col>
+        <Row justify="end" align="middle">
           <Col>
             <RQButton
               type="primary"
