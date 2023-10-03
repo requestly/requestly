@@ -79,9 +79,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const renderSkipButtons = useCallback(() => {
     if (playerContainer.current && player) {
       const skipBack = document.createElement("span");
-      skipBack.setAttribute("id", "rq-session-skip-back");
-      skipBack.setAttribute("class", "display-flex rq-skip-button");
-      skipBack.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      skipBack.id = "rq-session-skip-back";
+      skipBack.className = "rq-skip-button";
       skipBack.addEventListener("click", () => {
         if (currentPlayerTime.current > 10000) {
           player.goto(currentPlayerTime.current - 10000);
@@ -91,9 +90,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       });
 
       const skipForward = document.createElement("span");
-      skipForward.setAttribute("id", "rq-session-skip-forward");
-      skipForward.setAttribute("class", "display-flex rq-skip-button");
-      skipForward.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      skipForward.id = "rq-session-skip-forward";
+      skipForward.className = "rq-skip-button";
       skipForward.addEventListener("click", () => {
         if (currentPlayerTime.current + 10000 < attributes?.duration) {
           player.goto(currentPlayerTime.current + 10000);
@@ -105,6 +103,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       const controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
       controller__btns.children[0].insertAdjacentElement("afterend", skipForward);
       controller__btns.children[0].insertAdjacentElement("afterend", skipBack);
+
       ReactDom.render(<MdOutlineReplay10 />, playerContainer.current.querySelector("#rq-session-skip-back"));
       ReactDom.render(<MdOutlineForward10 />, playerContainer.current.querySelector("#rq-session-skip-forward"));
     }

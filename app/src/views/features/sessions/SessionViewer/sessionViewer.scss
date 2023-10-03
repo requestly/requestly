@@ -30,6 +30,9 @@
         width: auto;
       }
       .rq-skip-button {
+        cursor: pointer;
+        padding-right: 4px;
+        display: flex;
         svg {
           height: 24px;
           width: 24px;
