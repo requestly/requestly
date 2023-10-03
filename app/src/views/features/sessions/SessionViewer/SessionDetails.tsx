@@ -1,5 +1,7 @@
 import { RRWebEventData, NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+//@ts-ignore
+import ReactDom from "react-dom";
 import Replayer from "rrweb-player";
 import { Badge, Input, Tabs } from "antd";
 import "rrweb-player/dist/style.css";
@@ -26,6 +28,8 @@ import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./NetworkLogs/helpers";
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
+import { ReactComponent as BackIcon } from "assets/icons/back-10s.svg";
+import { ReactComponent as ForwardIcon } from "assets/icons/forward-10s.svg";
 import "./sessionViewer.scss";
 
 interface SessionDetailsProps {
@@ -42,6 +46,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
+  const currentPlayerTime = useRef<number>(0);
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
@@ -112,6 +117,33 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   }, [events]);
 
   useEffect(() => {
+    if (playerContainer.current && player) {
+      const back = document.createElement("span");
+      back.setAttribute("id", "rq-session-skip-back");
+      back.setAttribute("class", "display-flex");
+      back.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      back.addEventListener("click", () => {
+        //!!!TODO: check for negative
+        player?.goto(currentPlayerTime.current - 10000, true);
+      });
+
+      const forward = document.createElement("span");
+      forward.setAttribute("id", "rq-session-skip-forward");
+      forward.setAttribute("class", "display-flex");
+      forward.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      forward.addEventListener("click", () => {
+        //!!!TODO: check for duration
+        player?.goto(currentPlayerTime.current + 10000, true);
+      });
+      const controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
+      controller__btns.children[0].insertAdjacentElement("afterend", forward);
+      controller__btns.children[0].insertAdjacentElement("afterend", back);
+      ReactDom.render(<BackIcon />, playerContainer.current.querySelector("#rq-session-skip-back"));
+      ReactDom.render(<ForwardIcon />, playerContainer.current.querySelector("#rq-session-skip-forward"));
+    }
+  }, [player]);
+
+  useEffect(() => {
     const pauseVideo = () => {
       player?.pause();
     };
@@ -131,6 +163,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
+      currentPlayerTime.current = payload;
       setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
     });
   }, [player, startTime]);
