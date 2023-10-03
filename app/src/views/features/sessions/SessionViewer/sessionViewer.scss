@@ -29,6 +29,12 @@
       .rr-player .rr-player_frame {
         width: auto;
       }
+      .rq-skip-button {
+        svg {
+          height: 24px;
+          width: 24px;
+        }
+      }
     }
 
     .session-recording-properties {
