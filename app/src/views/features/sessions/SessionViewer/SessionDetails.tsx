@@ -76,6 +76,40 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     return Math.floor((currentTimeRef.current - startTime) / 1000);
   }, [startTime]);
 
+  const renderSkipButtons = useCallback(() => {
+    if (playerContainer.current && player) {
+      const skipBack = document.createElement("span");
+      skipBack.setAttribute("id", "rq-session-skip-back");
+      skipBack.setAttribute("class", "display-flex");
+      skipBack.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      skipBack.addEventListener("click", () => {
+        if (currentPlayerTime.current > 10000) {
+          player?.goto(currentPlayerTime.current - 10000, true);
+        } else {
+          player?.goto(0, true);
+        }
+      });
+
+      const skipForward = document.createElement("span");
+      skipForward.setAttribute("id", "rq-session-skip-forward");
+      skipForward.setAttribute("class", "display-flex");
+      skipForward.setAttribute("style", "padding-right: 4px; cursor: pointer;");
+      skipForward.addEventListener("click", () => {
+        if (currentPlayerTime.current + 10000 < attributes?.duration) {
+          player?.goto(currentPlayerTime.current + 10000, true);
+        } else {
+          player?.goto(attributes?.duration, true);
+        }
+      });
+
+      const controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
+      controller__btns.children[0].insertAdjacentElement("afterend", skipForward);
+      controller__btns.children[0].insertAdjacentElement("afterend", skipBack);
+      ReactDom.render(<BackIcon />, playerContainer.current.querySelector("#rq-session-skip-back"));
+      ReactDom.render(<ForwardIcon />, playerContainer.current.querySelector("#rq-session-skip-forward"));
+    }
+  }, [attributes?.duration, player]);
+
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -117,31 +151,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   }, [events]);
 
   useEffect(() => {
-    if (playerContainer.current && player) {
-      const back = document.createElement("span");
-      back.setAttribute("id", "rq-session-skip-back");
-      back.setAttribute("class", "display-flex");
-      back.setAttribute("style", "padding-right: 4px; cursor: pointer;");
-      back.addEventListener("click", () => {
-        //!!!TODO: check for negative
-        player?.goto(currentPlayerTime.current - 10000, true);
-      });
-
-      const forward = document.createElement("span");
-      forward.setAttribute("id", "rq-session-skip-forward");
-      forward.setAttribute("class", "display-flex");
-      forward.setAttribute("style", "padding-right: 4px; cursor: pointer;");
-      forward.addEventListener("click", () => {
-        //!!!TODO: check for duration
-        player?.goto(currentPlayerTime.current + 10000, true);
-      });
-      const controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
-      controller__btns.children[0].insertAdjacentElement("afterend", forward);
-      controller__btns.children[0].insertAdjacentElement("afterend", back);
-      ReactDom.render(<BackIcon />, playerContainer.current.querySelector("#rq-session-skip-back"));
-      ReactDom.render(<ForwardIcon />, playerContainer.current.querySelector("#rq-session-skip-forward"));
-    }
-  }, [player]);
+    renderSkipButtons();
+  }, [renderSkipButtons]);
 
   useEffect(() => {
     const pauseVideo = () => {
