@@ -150,6 +150,9 @@
 .w-full {
   width: 100%;
 }
+.h-full {
+  height: 100%;
+}
 
 .shrink-0 {
   flex-shrink: 0;
