@@ -1,6 +1,6 @@
 import { RRWebEventData, NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ReactDom from "react-dom";
+import { createRoot } from "react-dom/client";
 import Replayer from "rrweb-player";
 import { Badge, Input, Tabs } from "antd";
 import "rrweb-player/dist/style.css";
@@ -78,7 +78,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const renderSkipButtons = useCallback(() => {
     if (playerContainer.current && player) {
       const skipBack = document.createElement("span");
-      skipBack.id = "rq-session-skip-back";
       skipBack.className = "rq-skip-button";
       skipBack.addEventListener("click", () => {
         if (currentPlayerTime.current > 10000) {
@@ -89,7 +88,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       });
 
       const skipForward = document.createElement("span");
-      skipForward.id = "rq-session-skip-forward";
       skipForward.className = "rq-skip-button";
       skipForward.addEventListener("click", () => {
         if (currentPlayerTime.current + 10000 < attributes?.duration) {
@@ -103,8 +101,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       controller__btns.children[0].insertAdjacentElement("afterend", skipForward);
       controller__btns.children[0].insertAdjacentElement("afterend", skipBack);
 
-      ReactDom.render(<MdOutlineReplay10 />, playerContainer.current.querySelector("#rq-session-skip-back"));
-      ReactDom.render(<MdOutlineForward10 />, playerContainer.current.querySelector("#rq-session-skip-forward"));
+      createRoot(skipBack).render(<MdOutlineReplay10 />);
+      createRoot(skipForward).render(<MdOutlineForward10 />);
     }
   }, [attributes?.duration, player]);
 
