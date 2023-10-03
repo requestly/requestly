@@ -7,6 +7,7 @@ import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-r
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
+import { getOwnerId } from "backend/utils";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -90,7 +91,7 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
   });
 };
 
-export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
+export const processDataToImport = (incomingArray, user, workspaceId, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
   const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
@@ -108,12 +109,14 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   //Merge valid rules & groups
   const importedRulesAndGroups = rules.concat(groups);
 
-  const currentOwner = user?.details?.profile?.uid || null;
+  const createdBy = user?.details?.profile?.uid || null;
+  const currentOwner = getOwnerId(createdBy, workspaceId);
 
   const combinedRulesAndGroups = [];
   if (rules.length || groups.length) {
     importedRulesAndGroups.forEach((data) => {
-      const updatedData = { ...data, currentOwner };
+      const originalCreator = data.createdBy ?? null;
+      const updatedData = { ...data, createdBy, currentOwner, originalCreator };
       combinedRulesAndGroups.push(updatedData);
     });
   }

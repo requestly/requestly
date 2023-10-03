@@ -63,23 +63,18 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   const handleSaveRuleNameOnClick = (e) => {
     setIsSavingGroup(true);
 
-    let createdBy;
-    const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
+    const modificationDate = generateObjectCreationDate();
+    // const currentOwner = user?.details?.profile?.uid || null; // todo: check if this is also called on creation
 
-    if (typeof originalGroup.createdBy === "undefined") {
-      createdBy = user?.details?.profile?.uid || null;
-    } else {
-      createdBy = originalGroup.createdBy;
-    }
+    const createdBy = originalGroup.createdBy ?? (user?.details?.profile?.uid || null);
 
     const newGroup = {
       ...originalGroup,
       name: groupName,
       createdBy,
-      currentOwner,
       lastModifiedBy,
-      modificationDate: generateObjectCreationDate(),
+      modificationDate,
     };
 
     Logger.log("Writing to storage in RenameGroupModal");
