@@ -14,9 +14,5 @@ export const handleSurveyNavigation = (currentPage: SurveyPage, dispatch: any) =
     case SurveyPage.PERSONA:
       dispatch(actions.updatePersonaSurveyPage(SurveyPage.INDUSTRY));
       break;
-
-    case SurveyPage.INDUSTRY:
-      dispatch(actions.updatePersonaSurveyPage(SurveyPage.RECOMMENDATIONS));
-      break;
   }
 };
