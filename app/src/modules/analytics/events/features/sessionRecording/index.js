@@ -43,6 +43,8 @@ export const trackDraftSessionSaveFailed = (reason) =>
 export const trackSavedSessionViewed = (source) =>
   trackEvent(SESSION_RECORDING.saved_session_recording_viewed, { source });
 
+export const trackBadSessionRecordingViewed = () => trackEvent(SESSION_RECORDING.bad_session_recording_viewed);
+
 export const trackSessionRecordingShareClicked = () => {
   trackEvent(SESSION_RECORDING.session_recording_share_clicked);
   trackRQLastActivity(SESSION_RECORDING.session_recording_share_clicked);
