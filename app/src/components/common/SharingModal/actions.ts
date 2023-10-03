@@ -5,6 +5,7 @@ import { Group, Rule } from "types";
 import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
+import { getOwnerId } from "backend/utils";
 
 export const createSharedList = async (
   appMode: string,
@@ -68,7 +69,7 @@ export const prepareContentToExport = (
 
 export const duplicateRulesToTargetWorkspace = async (
   appMode: string,
-  workspaceId: string,
+  workspaceId: string, // is workspace non null??
   ruleIdsToShare: string[],
   groupwiseRules: Record<string, Group>
 ) => {
@@ -77,6 +78,8 @@ export const duplicateRulesToTargetWorkspace = async (
   // mapping of old group IDs to new group IDs
   const groupIdMapping: Record<string, string> = {};
 
+  const uid = window.uid;
+
   const formatRule = (rule: Rule, newGroupId: string) => ({
     ...rule,
     creationDate: generateObjectCreationDate(),
@@ -84,6 +87,9 @@ export const duplicateRulesToTargetWorkspace = async (
     name: `${rule.name} Copy`,
     id: `${rule.ruleType}_${generateObjectId()}`,
     groupId: newGroupId,
+    originalCreator: rule.createdBy ?? null,
+    createdBy: uid,
+    currentOwner: getOwnerId(uid, workspaceId),
   });
 
   const formattedGroups = groups.reduce((acc: Group[], group: Group) => {
@@ -93,6 +99,8 @@ export const duplicateRulesToTargetWorkspace = async (
       ...group,
       id: newGroupId,
       name: `${group.name} Copy`,
+      createdBy: uid,
+      currentOwner: getOwnerId(uid, workspaceId),
     });
     return acc;
   }, []);
