@@ -25,6 +25,7 @@ export const SESSION_RECORDING = {
   NEW_SESSION_CLICKED: "new_session clicked",
   network_log_context_menu_open: "network_log_context_menu_open",
   network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
+  bad_session_recording_viewed: "bad_session_recording_viewed",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
