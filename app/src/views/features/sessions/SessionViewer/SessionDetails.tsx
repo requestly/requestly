@@ -1,6 +1,6 @@
 import { RRWebEventData, NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { createPortal } from "react-dom";
 import Replayer from "rrweb-player";
 import { Badge, Input, Tabs } from "antd";
 import "rrweb-player/dist/style.css";
@@ -41,15 +41,16 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
   const startTime = attributes?.startTime;
 
-  const [player, setPlayer] = useState<Replayer>();
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
-  const currentPlayerTimeRef = useRef<number>(0);
+
+  const [player, setPlayer] = useState<Replayer>();
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
+  const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -74,37 +75,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const getCurrentTimeOffset = useCallback(() => {
     return Math.floor((currentTimeRef.current - startTime) / 1000);
   }, [startTime]);
-
-  const renderSkipButtons = useCallback(() => {
-    if (playerContainer.current && player) {
-      const skipBack = document.createElement("span");
-      skipBack.className = "rq-skip-button";
-      skipBack.addEventListener("click", () => {
-        if (currentPlayerTimeRef.current > 10000) {
-          player.goto(currentPlayerTimeRef.current - 10000);
-        } else {
-          player.goto(0);
-        }
-      });
-
-      const skipForward = document.createElement("span");
-      skipForward.className = "rq-skip-button";
-      skipForward.addEventListener("click", () => {
-        if (currentPlayerTimeRef.current + 10000 < attributes?.duration) {
-          player.goto(currentPlayerTimeRef.current + 10000);
-        } else {
-          player.goto(attributes?.duration);
-        }
-      });
-
-      const controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
-      controller__btns.children[0].insertAdjacentElement("afterend", skipForward);
-      controller__btns.children[0].insertAdjacentElement("afterend", skipBack);
-
-      createRoot(skipBack).render(<MdOutlineReplay10 />);
-      createRoot(skipForward).render(<MdOutlineForward10 />);
-    }
-  }, [attributes?.duration, player]);
 
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
@@ -147,8 +117,16 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   }, [events]);
 
   useEffect(() => {
-    renderSkipButtons();
-  }, [renderSkipButtons]);
+    if (playerContainer.current && player) {
+      const controllerButtonContainer = document.createElement("div");
+      controllerButtonContainer.id = "rq-controller-btns";
+
+      const rr_controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
+      setRQControllerButtonContainer(
+        rr_controller__btns.children[0].insertAdjacentElement("afterend", controllerButtonContainer)
+      );
+    }
+  }, [player]);
 
   useEffect(() => {
     const pauseVideo = () => {
@@ -170,7 +148,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
-      currentPlayerTimeRef.current = payload;
       setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
     });
   }, [player, startTime]);
@@ -198,6 +175,32 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       document.removeEventListener("keydown", togglePlay);
     };
   }, [player]);
+
+  const customControllerButtons = useMemo(
+    () => [
+      {
+        icon: <MdOutlineReplay10 />,
+        onClick: () => {
+          if (playerTimeOffset > 10) {
+            player.goto((playerTimeOffset - 10) * 1000);
+          } else {
+            player.goto(0);
+          }
+        },
+      },
+      {
+        icon: <MdOutlineForward10 />,
+        onClick: () => {
+          if ((playerTimeOffset + 10) * 1000 < attributes?.duration) {
+            player.goto((playerTimeOffset + 10) * 1000);
+          } else {
+            player.goto(attributes?.duration);
+          }
+        },
+      },
+    ],
+    [attributes?.duration, player, playerTimeOffset]
+  );
 
   const getSessionPanelTabs = useMemo(() => {
     const tabItems = [
@@ -292,6 +295,15 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       </div>
       <div className="session-recording-player-row">
         <div className="session-recording-player-container" ref={playerContainer} />
+        {RQControllerButtonContainer &&
+          createPortal(
+            customControllerButtons.map((button) => (
+              <span className="rq-controller-button" onClick={button.onClick}>
+                {button.icon}
+              </span>
+            )),
+            RQControllerButtonContainer
+          )}
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
       </div>
       <ProCard
