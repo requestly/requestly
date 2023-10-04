@@ -12,6 +12,7 @@ export interface RQNetworkTableProps {
   onContextMenuOpenChange?: GenericNetworkTableProps<RQNetworkLog>["onContextMenuOpenChange"];
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
   emptyView?: GenericNetworkTableProps<RQNetworkLog>["emptyView"];
+  isRowPending?: (log: RQNetworkLog) => boolean;
 }
 
 export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
@@ -20,6 +21,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   sessionRecordingStartTime = 0,
   onContextMenuOpenChange = (isOpen) => {},
   emptyView,
+  isRowPending,
 }) => {
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
     () => [
@@ -29,7 +31,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         width: 4,
         priority: 0.5,
         render: (log) => {
-          const offset = getOffset(log, sessionRecordingStartTime);
+          const offset = Math.floor(getOffset(log, sessionRecordingStartTime));
           return secToMinutesAndSeconds(offset);
         },
       },
@@ -47,6 +49,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         contextMenuOptions={contextMenuOptions}
         onContextMenuOpenChange={onContextMenuOpenChange}
         emptyView={emptyView}
+        isRowPending={isRowPending}
       />
     </div>
   );

@@ -1,11 +1,6 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import {
-  ColorScheme,
-  ContextMenuOption,
-  DetailsTab,
-  ResourceTableProps,
-  ResourceTable,
-} from "@requestly-ui/resource-table";
+import { ColorScheme, ContextMenuOption, DetailsTab, ResourceTableProps } from "@requestly-ui/resource-table";
+import { ResourceTable } from "./resource-table/src";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
@@ -37,6 +32,8 @@ export interface GenericNetworkTableProps<NetworkLog> {
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
 
   emptyView?: ResourceTableProps<NetworkLog>["emptyView"];
+
+  isRowPending?: (log: NetworkLog) => boolean;
 }
 
 /**
@@ -51,6 +48,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
   emptyView,
+  isRowPending,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
@@ -121,6 +119,7 @@ export const GenericNetworkTable = <NetworkLog,>({
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
           emptyView={emptyView}
+          isRowPending={isRowPending}
         />
       </div>
     </div>

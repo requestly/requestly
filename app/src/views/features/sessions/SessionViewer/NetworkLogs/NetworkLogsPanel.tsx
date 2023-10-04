@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Empty, Typography, Row } from "antd";
 import { getIncludeNetworkLogs } from "store/features/session-recording/selectors";
@@ -8,9 +8,9 @@ import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types"
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
-import { getOffset } from "./helpers";
 import { RuleType } from "types";
 import { copyToClipBoard } from "utils/Misc";
+import { getOffset } from "./helpers";
 import { snakeCase } from "lodash";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import {
@@ -23,26 +23,19 @@ interface Props {
   startTime: number;
   networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
-  updateCount: (count: number) => void;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, updateCount }) => {
+const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset }) => {
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
   const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState<APIClientRequest>(null);
 
-  const visibleNetworkLogs = useMemo<RQNetworkLog[]>(() => {
-    return networkLogs.filter((log: RQNetworkLog) => {
-      return getOffset(log, startTime) <= playerTimeOffset;
-    });
-  }, [networkLogs, startTime, playerTimeOffset]);
-
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
 
-  useEffect(() => {
-    updateCount(visibleNetworkLogs.length);
-  }, [visibleNetworkLogs, updateCount]);
+  const isLogPending = (log: RQNetworkLog) => {
+    return getOffset(log, startTime) >= playerTimeOffset;
+  };
 
   const handleContextMenuRuleOptionSelect = useCallback(
     (key: React.Key, log: RQNetworkLog) => {
@@ -178,16 +171,17 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
 
   return (
     <div className="session-panel-content network-logs-panel">
-      {visibleNetworkLogs.length > 0 ? (
+      {networkLogs.length > 0 ? (
         <>
           <RQNetworkTable
-            logs={visibleNetworkLogs}
+            logs={networkLogs}
             contextMenuOptions={options}
             sessionRecordingStartTime={startTime}
             onContextMenuOpenChange={(isOpen) => {
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
             }}
             emptyView={emptyTableView}
+            isRowPending={isLogPending}
           />
 
           {isApiClientModalOpen && (
