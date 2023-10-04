@@ -29,6 +29,18 @@
       .rr-player .rr-player_frame {
         width: auto;
       }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
     }
 
     .session-recording-properties {
