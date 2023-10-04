@@ -45,7 +45,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
-  const currentPlayerTime = useRef<number>(0);
+  const currentPlayerTimeRef = useRef<number>(0);
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
@@ -80,8 +80,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       const skipBack = document.createElement("span");
       skipBack.className = "rq-skip-button";
       skipBack.addEventListener("click", () => {
-        if (currentPlayerTime.current > 10000) {
-          player.goto(currentPlayerTime.current - 10000);
+        if (currentPlayerTimeRef.current > 10000) {
+          player.goto(currentPlayerTimeRef.current - 10000);
         } else {
           player.goto(0);
         }
@@ -90,8 +90,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       const skipForward = document.createElement("span");
       skipForward.className = "rq-skip-button";
       skipForward.addEventListener("click", () => {
-        if (currentPlayerTime.current + 10000 < attributes?.duration) {
-          player.goto(currentPlayerTime.current + 10000);
+        if (currentPlayerTimeRef.current + 10000 < attributes?.duration) {
+          player.goto(currentPlayerTimeRef.current + 10000);
         } else {
           player.goto(attributes?.duration);
         }
@@ -170,7 +170,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
-      currentPlayerTime.current = payload;
+      currentPlayerTimeRef.current = payload;
       setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
     });
   }, [player, startTime]);
