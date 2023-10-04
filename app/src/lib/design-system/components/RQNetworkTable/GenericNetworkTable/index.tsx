@@ -97,7 +97,6 @@ export const GenericNetworkTable = <NetworkLog,>({
     (networkLog: NetworkLog) => {
       let includeLog = false;
       const entry = networkEntrySelector(networkLog);
-      console.log({ entry });
       includeLog =
         !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) &&
         statusCodeFilter(entry) &&

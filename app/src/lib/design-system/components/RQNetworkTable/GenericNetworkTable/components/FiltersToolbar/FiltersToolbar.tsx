@@ -21,24 +21,16 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
   };
 
   const onGroupFilterChange = useCallback(
-    (filterValue: string, filterType: string) => {
-      const currentFilter = filterType === FilterKeys.STATUS_CODE ? statusCodeFilters : methodFilters;
-
-      if (currentFilter.indexOf(filterValue) !== -1) {
-        currentFilter.splice(currentFilter.indexOf(filterValue), 1);
-      } else {
-        currentFilter.push(filterValue);
-      }
-
+    (newFilters: string[], filterType: FilterKeys) => {
       if (filterType === FilterKeys.STATUS_CODE) {
-        setStatusCodeFilters([...currentFilter]);
-        setFilters({ ...filters, statusCode: [...currentFilter] });
+        setStatusCodeFilters([...newFilters]);
+        setFilters({ ...filters, statusCode: [...newFilters] });
       } else if (filterType === FilterKeys.METHOD) {
-        setMethodFilters([...currentFilter]);
-        setFilters({ ...filters, method: [...currentFilter] });
+        setMethodFilters([...newFilters]);
+        setFilters({ ...filters, method: [...newFilters] });
       }
     },
-    [statusCodeFilters, methodFilters, filters, setStatusCodeFilters, setMethodFilters, setFilters]
+    [filters, setStatusCodeFilters, setFilters]
   );
 
   const debouncedSearchFilter = useDebounce((value: string) => onSearchFilterChange(value));
@@ -56,9 +48,15 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
         allowClear
       />
       <Divider type="vertical" orientation="center" className="filters-divider" />
-      <StatusCodeFilter statusCodeFilters={statusCodeFilters} handleStatusCodeFilterChange={onGroupFilterChange} />
+      <StatusCodeFilter
+        statusCodeFilters={statusCodeFilters}
+        handleStatusCodeFilterChange={(groups) => onGroupFilterChange(groups, FilterKeys.STATUS_CODE)}
+      />
       <Divider type="vertical" orientation="center" className="filters-divider" />
-      <MethodFilter methodFilters={methodFilters} handleMethodsFilterChange={onGroupFilterChange} />
+      <MethodFilter
+        methodFilters={methodFilters}
+        handleMethodsFilterChange={(methods) => onGroupFilterChange(methods, FilterKeys.METHOD)}
+      />
     </div>
   );
 };
