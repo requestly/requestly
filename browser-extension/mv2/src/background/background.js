@@ -560,31 +560,38 @@ BG.Methods.onBeforeRequest = (details) => {
   return BG.Methods.modifyUrl(details);
 };
 
-BG.Methods.modifyHeadersForSessionReplayPlayer = ({ updatedHeaders, modifiedHeaders, details, originalHeaders }) => {
+BG.Methods.modifyHeadersForSessionReplayPlayer = ({
+  headersToUpdate,
+  ruleModifiedHeaders,
+  requestDetails,
+  originalHeaders,
+}) => {
   try {
-    const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+    const requestInitiator = new URL(requestDetails.initiator ?? requestDetails.originUrl); // firefox does not contain "initiator"
     const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
     const fontTypes = ["woff", "woff2", "otf", "ttf", "eot"];
-    const requestURL = new URL(details.url);
+    const requestURL = new URL(requestDetails.url);
     const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
 
-    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
-      const formattedHeaders = Object.keys(updatedHeaders).map((key) => ({
+    if (isAppInitiator && (requestDetails.type === "font" || isFontResourceLink)) {
+      const formattedHeaders = Object.keys(headersToUpdate).map((key) => ({
         name: key,
-        value: updatedHeaders[key],
+        value: headersToUpdate[key],
       }));
 
       const modifyHeaders = (headers) => {
-        return headers.filter((header) => !(header?.name?.toLowerCase() in updatedHeaders)).concat(...formattedHeaders);
+        return headers
+          .filter((header) => !(header?.name?.toLowerCase() in headersToUpdate))
+          .concat(...formattedHeaders);
       };
 
-      return !modifiedHeaders ? modifyHeaders(originalHeaders) : modifyHeaders(modifiedHeaders);
+      return !ruleModifiedHeaders ? modifyHeaders(originalHeaders) : modifyHeaders(ruleModifiedHeaders);
     }
   } catch (e) {
     // do nothing
   }
 
-  return modifiedHeaders;
+  return ruleModifiedHeaders;
 };
 
 BG.Methods.modifyRequestHeadersListener = function (details) {
@@ -598,9 +605,9 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
     const requestHeaders = { referer: requestURL.origin + "/" };
 
     modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
-      details,
-      modifiedHeaders,
-      updatedHeaders: requestHeaders,
+      requestDetails: details,
+      headersToUpdate: requestHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
       originalHeaders: details.requestHeaders,
     });
   } catch (e) {
@@ -627,9 +634,9 @@ BG.Methods.onHeadersReceived = function (details) {
     };
 
     modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
-      details,
-      modifiedHeaders,
-      updatedHeaders: corsHeaders,
+      requestDetails: details,
+      headersToUpdate: corsHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
       originalHeaders: details.responseHeaders,
     });
   } catch (e) {
