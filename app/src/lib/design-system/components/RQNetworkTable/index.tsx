@@ -53,9 +53,9 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   useEffect(() => {
     const recentLog = logs.reduce(
       (closest, log: RQNetworkLog) => {
-        const timeDifference = Math.abs(sessionCurrentOffset - getOffset(log, sessionRecordingStartTime));
-        if (timeDifference < closest.minTimeDifference && timeDifference >= 0) {
-          return { log: log, minTimeDifference: timeDifference };
+        const difference = Math.abs(sessionCurrentOffset - getOffset(log, sessionRecordingStartTime));
+        if (difference < closest.minTimeDifference) {
+          return { log: log, minTimeDifference: difference };
         }
 
         return closest;

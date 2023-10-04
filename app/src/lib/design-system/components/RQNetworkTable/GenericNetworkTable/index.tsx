@@ -1,6 +1,11 @@
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { ColorScheme, ContextMenuOption, DetailsTab, ResourceTableProps } from "@requestly-ui/resource-table";
-import { ResourceTable } from "./resource-table/src";
+import {
+  ColorScheme,
+  ContextMenuOption,
+  DetailsTab,
+  ResourceTableProps,
+  ResourceTable,
+} from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
