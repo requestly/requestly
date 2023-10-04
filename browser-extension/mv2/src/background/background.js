@@ -593,7 +593,8 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
   try {
     const requestURL = new URL(details.url);
 
-    // Overriding Referer header since for session replay player it's value is app.requestly.io
+    // Overriding referer header since for session replay player
+    // it's value is app.requestly.io, which break some websites eg apple.com
     const requestHeaders = { referer: requestURL.origin + "/" };
 
     modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
