@@ -560,8 +560,51 @@ BG.Methods.onBeforeRequest = (details) => {
   return BG.Methods.modifyUrl(details);
 };
 
+BG.Methods.modifyHeadersForSessionReplayPlayer = ({ updatedHeaders, modifiedHeaders, details, originalHeaders }) => {
+  try {
+    const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+    const fontTypes = ["woff", "woff2", "otf", "ttf", "eot"];
+    const requestURL = new URL(details.url);
+    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
+
+    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
+      const formattedHeaders = Object.keys(updatedHeaders).map((key) => ({
+        name: key,
+        value: updatedHeaders[key],
+      }));
+
+      const modifyHeaders = (headers) => {
+        return headers.filter((header) => !(header?.name?.toLowerCase() in updatedHeaders)).concat(...formattedHeaders);
+      };
+
+      return !modifiedHeaders ? modifyHeaders(originalHeaders) : modifyHeaders(modifiedHeaders);
+    }
+  } catch (e) {
+    // do nothing
+  }
+
+  return modifiedHeaders;
+};
+
 BG.Methods.modifyRequestHeadersListener = function (details) {
   var modifiedHeaders = BG.Methods.modifyHeaders(details.requestHeaders, RQ.HEADERS_TARGET.REQUEST, details);
+
+  try {
+    const requestURL = new URL(details.url);
+
+    // Overriding Referer header since for session replay player it's value is app.requestly.io
+    const requestHeaders = { referer: requestURL.origin + "/" };
+
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      details,
+      modifiedHeaders,
+      updatedHeaders: requestHeaders,
+      originalHeaders: details.requestHeaders,
+    });
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { requestHeaders: modifiedHeaders };
@@ -573,26 +616,21 @@ BG.Methods.onHeadersReceived = function (details) {
 
   try {
     const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
-    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
-    const fontTypes = ["woff", "woff2", "otf", "ttf"];
-    const requestURL = new URL(details.url);
-    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
 
     // This bypasses the CORS error in session replay player
-    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
-      const corsHeaders = {
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": requestInitiator.origin,
-      };
+    const corsHeaders = {
+      "access-control-allow-methods": "*",
+      "access-control-allow-headers": "*",
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": requestInitiator.origin,
+    };
 
-      const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
-
-      modifiedHeaders = !modifiedHeaders
-        ? formattedCorsHeaders
-        : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
-    }
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      details,
+      modifiedHeaders,
+      updatedHeaders: corsHeaders,
+      originalHeaders: details.responseHeaders,
+    });
   } catch (e) {
     // do nothing
   }
