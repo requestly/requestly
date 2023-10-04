@@ -177,6 +177,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             logs={networkLogs}
             contextMenuOptions={options}
             sessionRecordingStartTime={startTime}
+            sessionCurrentOffset={playerTimeOffset}
             onContextMenuOpenChange={(isOpen) => {
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
             }}
