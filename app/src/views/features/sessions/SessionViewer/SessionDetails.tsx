@@ -110,6 +110,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             // The elements inside the player were stealing the focus from the inputs in the session viewer pages
             // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
             triggerFocus: false,
+            inactiveColor: "#B4B4B4",
           },
         })
       );
