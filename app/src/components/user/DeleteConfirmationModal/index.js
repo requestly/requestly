@@ -8,8 +8,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 const DeleteConfirmationModal = ({
   isOpen,
   toggle,
-  ruleToDelete,
-  rulesToDelete,
+  ruleIdsToDelete,
   promptToLogin,
   deleteRecordFromStorage,
   handleRecordsDeletion,
@@ -34,7 +33,7 @@ const DeleteConfirmationModal = ({
 
   // eslint-disable-next-line no-unused-vars
   const handleDeleteRecordFromStorage = () => {
-    deleteRecordFromStorage(false, ruleToDelete);
+    deleteRecordFromStorage(false, ruleIdsToDelete);
   };
 
   const renderMultipleRuleDeleteModal = () => {
@@ -52,13 +51,13 @@ const DeleteConfirmationModal = ({
             <h3 className="heading">
               {user.loggedIn && !isWorkspaceMode ? (
                 <>
-                  Are you sure you want to move selected {rulesToDelete.length}{" "}
-                  {rulesToDelete.length === 1 ? "rule" : "rules"} into trash?
+                  Are you sure you want to move selected {ruleIdsToDelete.length}{" "}
+                  {ruleIdsToDelete.length === 1 ? "rule" : "rules"} into trash?
                 </>
               ) : (
                 <>
-                  Are you sure you want to delete selected {rulesToDelete.length}{" "}
-                  {rulesToDelete.length === 1 ? "rule" : "rules"} permanently?
+                  Are you sure you want to delete selected {ruleIdsToDelete.length}{" "}
+                  {ruleIdsToDelete.length === 1 ? "rule" : "rules"} permanently?
                   <br />
                   {!isWorkspaceMode ? (
                     <>
