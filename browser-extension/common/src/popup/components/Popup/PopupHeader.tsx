@@ -40,6 +40,8 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
               open={!isExtensionEnabled}
               title="Please switch on the Requestly extension. When paused, rules won't be applied and sessions won't be recorded."
               overlayClassName="enable-extension-tooltip"
+              color="var(--neutrals-black)"
+              overlayInnerStyle={{ fontSize: "14px" }}
             >
               <Switch
                 checked={isExtensionEnabled}

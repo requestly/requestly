@@ -36,11 +36,14 @@ const Popup: React.FC = () => {
           isExtensionEnabled={isExtensionEnabled}
           handleToggleExtensionStatus={handleToggleExtensionStatus}
         />
-        <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
-        <PopupFooter
-          isExtensionEnabled={isExtensionEnabled}
-          handleToggleExtensionStatus={handleToggleExtensionStatus}
-        />
+        <div className="popup-body">
+          {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
+          <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
+          <PopupFooter
+            isExtensionEnabled={isExtensionEnabled}
+            handleToggleExtensionStatus={handleToggleExtensionStatus}
+          />
+        </div>
       </div>
     </>
   );
