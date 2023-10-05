@@ -8,7 +8,7 @@ import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
-export const useInitializeNewUserSessionConfig = () => {
+export const useInitializeNewUserSessionRecordingConfig = () => {
   const appMode = useSelector(getAppMode);
   const extenionInstallDate = useSelector(getExtensionInstallDate);
 

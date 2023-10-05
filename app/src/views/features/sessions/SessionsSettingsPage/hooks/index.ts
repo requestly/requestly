@@ -1,1 +1,1 @@
-export { useInitializeNewUserSessionConfig } from "./useInitializeNewUserSessionConfig";
+export { useInitializeNewUserSessionRecordingConfig } from "./useInitializeNewUserSessionRecordingConfig";
