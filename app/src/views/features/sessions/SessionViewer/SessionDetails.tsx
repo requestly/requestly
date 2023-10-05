@@ -155,13 +155,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
     });
 
-    player?.addEventListener("play", () => {
-      console.log("!!!debug", "play event");
-      setPlayerState(PlayerState.PLAYING);
-    });
-
     player?.addEventListener("start", () => {
-      console.log("!!!debug", "start event");
       if (isSkipping) {
         setPlayerState(PlayerState.SKIPPING);
       } else {
@@ -170,7 +164,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     });
 
     player?.addEventListener("pause", () => {
-      console.log("!!!debug", "pause event");
       if (isSkipping) {
         setPlayerState(PlayerState.SKIPPING);
       } else {
@@ -178,16 +171,12 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       }
     });
 
-    player?.addEventListener("skip-start", (e) => {
-      console.log("!!!debug", "skip start event", e);
-      // player.setSpeed(360);
+    player?.addEventListener("skip-start", () => {
       setPlayerState(PlayerState.SKIPPING);
       setIsSkipping(true);
     });
 
-    player?.addEventListener("skip-end", (e) => {
-      console.log("!!!debug", "skip end event", e);
-      // player.setSpeed(1);
+    player?.addEventListener("skip-end", () => {
       setPlayerState(PlayerState.PLAYING);
       setIsSkipping(false);
     });
