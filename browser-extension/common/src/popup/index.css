@@ -8,7 +8,7 @@
   --color-link: #1e69ff;
   --color-icon: #b0b0b5;
   --border-color: #3e4044;
-  --background-color-primary: #1c1d21;
+
   --background-color-secondary: #242529;
   --background-color-row-hover: #2c2d31;
   --background-color-component: #323337;
@@ -73,6 +73,8 @@
   --text-default: var(--neutrals-white);
 
   --background: var(--neutrals-gray-900);
+
+  --border-radius-sm: 4px;
 }
 
 /* reset */
@@ -86,7 +88,7 @@
 
 body {
   margin: 0;
-  background-color: var(--background-color-primary);
+  background-color: var(--background);
 }
 
 ul,
