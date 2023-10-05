@@ -62,6 +62,7 @@ export const addRecordsToTrash = async (uid, records) => {
 
     return { success: true };
   } catch (error) {
+    console.log("errror", error);
     Sentry.captureException(new Error(`Trash Error. ${error.toString()}`));
     return { success: false };
   }

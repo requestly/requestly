@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Typography } from "antd";
@@ -13,6 +13,7 @@ import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
@@ -80,10 +81,10 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRuleI
         setLoadingSomething(false);
       });
   };
+  const ruleIdsToDelete = useMemo(() => groupRules.map((rule) => rule.id), [groupRules]);
 
   const handleRulesDeletion = async (uid) => {
     if (!uid) return;
-    const ruleIdsToDelete = groupRules.map((rule) => rule.id);
 
     return addRecordsToTrash(uid, groupRules).then((result) => {
       return new Promise((resolve, reject) => {
@@ -97,9 +98,9 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRuleI
   };
 
   const handleRecordsDeletion = async (uid) => {
-    // here
     await handleRulesDeletion(uid);
     await deleteGroupsFromStorage(appMode, [groupIdToDelete]);
+    deleteTestReportByRuleId(appMode, ruleIdsToDelete);
   };
 
   const promptUserToSignup = (source) => {

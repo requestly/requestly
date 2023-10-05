@@ -180,8 +180,6 @@ const RulesTable = ({
 
   const showGroupPinIcon = isFeatureCompatible(FEATURES.EXTENSION_GROUP_PIN_ICON);
 
-  console.log("selectedGroupIds", selectedGroupIds);
-
   // Component State
   const selectedRowKeys = useMemo(() => [...selectedRuleIds, ...selectedGroupIds], [selectedRuleIds, selectedGroupIds]);
 

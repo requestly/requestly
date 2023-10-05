@@ -21,5 +21,9 @@ export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) =
 
 export const deleteGroupsFromStorage = async (appMode, groupIdsToDelete) => {
   Logger.log("Removing from storage in deleteGroupsFromStorage");
-  return StorageService(appMode).removeRecords(groupIdsToDelete);
+  return StorageService(appMode)
+    .removeRecords(groupIdsToDelete)
+    .then(() => {
+      console.log("done deleting groups", groupIdsToDelete);
+    });
 };

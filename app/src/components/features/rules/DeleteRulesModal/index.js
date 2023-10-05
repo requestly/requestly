@@ -12,12 +12,13 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
+import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
   isOpen,
   ruleIdsToDelete,
-  groupIdsToDelete,
+  groupIdsToDelete = [],
   clearSearch,
   ruleDeletedCallback,
 }) => {
@@ -34,6 +35,7 @@ const DeleteRulesModal = ({
   }, [appMode, ruleIdsToDelete]);
 
   const postDeletionSteps = () => {
+    console.log("trigger postDeletionSteps");
     //Delete test reports for ruleIdsToDelete
     handleDeleteRuleTestReports();
     //Refresh List
@@ -51,6 +53,7 @@ const DeleteRulesModal = ({
 
     //Unselect all rules
     unselectAllRules(dispatch);
+    console.log("finish postDeletionSteps");
   };
 
   const stablePostDeletionSteps = useCallback(postDeletionSteps, [
@@ -70,7 +73,6 @@ const DeleteRulesModal = ({
         return new Promise((resolve, reject) => {
           if (result.success) {
             deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
-              stablePostDeletionSteps();
               toast.info(`Moved selected rules to trash`);
               trackRulesTrashedEvent(ruleIdsToDelete.length);
               trackRQLastActivity("rules_deleted");
@@ -85,7 +87,7 @@ const DeleteRulesModal = ({
         });
       });
     },
-    [appMode, ruleIdsToDelete, stablePostDeletionSteps]
+    [appMode, ruleIdsToDelete]
   );
 
   const handleDeleteRulesPermanently = useCallback(async () => {
@@ -94,14 +96,15 @@ const DeleteRulesModal = ({
       trackRQLastActivity("rules_deleted");
       trackRulesDeletedEvent(ruleIdsToDelete.length);
     });
-
-    stablePostDeletionSteps();
-  }, [appMode, ruleIdsToDelete, stablePostDeletionSteps]);
+  }, [appMode, ruleIdsToDelete]);
 
   const handleRecordsDeletion = useCallback(
     async (uid) => {
       await handleRulesDeletion(uid);
-      await deleteGroupsFromStorage(appMode, groupIdsToDelete);
+      await deleteGroupsFromStorage(
+        appMode,
+        groupIdsToDelete.filter((id) => id !== RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID)
+      );
       stablePostDeletionSteps();
     },
     [handleRulesDeletion, stablePostDeletionSteps, appMode, groupIdsToDelete]

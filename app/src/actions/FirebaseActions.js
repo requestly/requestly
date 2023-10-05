@@ -613,6 +613,7 @@ export function updateValue(pathArray, value, callback) {
 }
 
 export function updateValueAsPromise(pathArray, value) {
+  console.log("updateValueAsPromise pathArray, value", pathArray, value);
   return new Promise((resolve) => updateValue(pathArray, value, resolve));
 }
 
