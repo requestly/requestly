@@ -227,6 +227,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
           } else {
             player.goto(0);
           }
+          setIsSkipping(false);
         },
       },
       {
@@ -237,6 +238,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
           } else {
             player.goto(attributes?.duration);
           }
+          setIsSkipping(false);
         },
       },
     ],
