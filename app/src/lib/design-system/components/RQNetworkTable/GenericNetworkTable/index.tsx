@@ -39,6 +39,10 @@ export interface GenericNetworkTableProps<NetworkLog> {
   emptyView?: ResourceTableProps<NetworkLog>["emptyView"];
 
   isRowPending?: (log: NetworkLog) => boolean;
+
+  rowClassName?: (log: NetworkLog) => string | string;
+
+  disableAutoScroll?: boolean;
 }
 
 /**
@@ -53,7 +57,8 @@ export const GenericNetworkTable = <NetworkLog,>({
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
   emptyView,
-  isRowPending,
+  rowClassName,
+  disableAutoScroll,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
@@ -124,7 +129,8 @@ export const GenericNetworkTable = <NetworkLog,>({
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
           emptyView={emptyView}
-          isRowPending={isRowPending}
+          rowClassName={rowClassName}
+          disableAutoScroll={disableAutoScroll}
         />
       </div>
     </div>
