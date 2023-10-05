@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
-import { Button, Dropdown, Menu, Row, Typography } from "antd";
+import { Button, Col, Row, Switch, Typography } from "antd";
 import config from "../../../config";
-import ArrowDown from "../../../../resources/icons/arrowDown.svg";
 import { EVENT, sendEvent } from "../../events";
 
 interface PopupHeaderProps {
@@ -14,21 +13,6 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
     window.open(`${config.WEB_URL}?source=popup`, "_blank");
     sendEvent(EVENT.OPEN_APP_CLICKED);
   }, []);
-
-  const items = (
-    <Menu className="popup-header-dropdown-menu">
-      <Menu.Item key="1" className="popup-header-dropdown-menu-item">
-        <div>
-          <Typography.Text type="secondary">
-            When paused, rules won't be applied and sessions won't be recorded.
-          </Typography.Text>
-          <Button type="text" danger={!isExtensionEnabled} onClick={handleToggleExtensionStatus}>
-            <span>{`${isExtensionEnabled ? "Pause" : "Resume"} requestly`}</span>
-          </Button>
-        </div>
-      </Menu.Item>
-    </Menu>
-  );
 
   return (
     <div className="popup-header">
@@ -49,21 +33,23 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
         </div> */}
       </div>
 
-      <Row align="middle">
-        <Dropdown overlay={items} placement="bottomRight">
-          <Typography.Text type="secondary">
-            <span className="popup-header-dropdown-text">
-              <Typography.Text type={isExtensionEnabled ? "secondary" : "danger"}>
-                {`Requestly ${isExtensionEnabled ? "running" : "paused"}`}
-              </Typography.Text>
-              <ArrowDown />
-            </span>
-          </Typography.Text>
-        </Dropdown>
-
-        <Button type="primary" className="open-app-btn" onClick={onOpenAppButtonClick}>
-          Open app
-        </Button>
+      <Row align="middle" gutter={16}>
+        <Col>
+          <Row align="middle">
+            <Switch
+              checked={isExtensionEnabled}
+              onChange={handleToggleExtensionStatus}
+              size="small"
+              className="pause-switch"
+            />
+            <Typography.Text>{`Requestly ${isExtensionEnabled ? "running" : "paused"}`}</Typography.Text>
+          </Row>
+        </Col>
+        <Col>
+          <Button type="primary" className="open-app-btn" onClick={onOpenAppButtonClick}>
+            Open app
+          </Button>
+        </Col>
       </Row>
     </div>
   );
