@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Button, Col, Row, Switch, Typography } from "antd";
+import { Button, Col, Row, Switch, Typography, Tooltip } from "antd";
 import config from "../../../config";
 import { EVENT, sendEvent } from "../../events";
 
@@ -36,12 +36,18 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
       <Row align="middle" gutter={16}>
         <Col>
           <Row align="middle">
-            <Switch
-              checked={isExtensionEnabled}
-              onChange={handleToggleExtensionStatus}
-              size="small"
-              className="pause-switch"
-            />
+            <Tooltip
+              open={!isExtensionEnabled}
+              title="Please switch on the Requestly extension. When paused, rules won't be applied and sessions won't be recorded."
+              overlayClassName="enable-extension-tooltip"
+            >
+              <Switch
+                checked={isExtensionEnabled}
+                onChange={handleToggleExtensionStatus}
+                size="small"
+                className="pause-switch"
+              />
+            </Tooltip>
             <Typography.Text>{`Requestly ${isExtensionEnabled ? "running" : "paused"}`}</Typography.Text>
           </Row>
         </Col>
