@@ -343,9 +343,8 @@ const RulesTable = ({
 
   const deleteGroupOnClickHandler = useCallback(
     (event, groupData) => {
-      // if this is here
       setGroupToEmpty(groupData.id);
-      // event.stopPropagation();
+      event.stopPropagation();
 
       deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate)
         .then(async (args) => {
@@ -543,7 +542,6 @@ const RulesTable = ({
     const newSelectedGroupObject = {};
     const newSelectedRulesObject = {};
 
-    // selectedRowKeys also contains the group ids, which we don't need, ProTable will handle it internally!
     selectedRowKeys.forEach((objectId) => {
       if (!objectId.startsWith("Group_") && objectId !== UNGROUPED_GROUP_ID) {
         newSelectedRulesObject[objectId] = true;

@@ -46,6 +46,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
 
   const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
+  // groups not handled in trash, because currently trash does not support groups
   const onSelectChange = (selectedRowKeys) => {
     // Update the global state so that it could be consumed by other components as well
 

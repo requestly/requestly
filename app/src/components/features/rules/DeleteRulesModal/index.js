@@ -66,7 +66,6 @@ const DeleteRulesModal = ({
 
   const handleRulesDeletion = useCallback(
     async (uid) => {
-      // here // also handle group deletion
       if (!uid) return;
       setAreRulesMovingToTrash(true);
       return addRecordsToTrash(uid, rulesToDelete).then((result) => {

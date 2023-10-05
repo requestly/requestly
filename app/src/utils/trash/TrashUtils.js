@@ -46,8 +46,7 @@ export const addRecordsToTrash = async (uid, records) => {
 
     records.forEach(async (recordData) => {
       const record = { ...recordData };
-      if (record.objectType === "rule") {
-        // todo: contants
+      if (record.objectType === GLOBAL_CONSTANTS.OBJECT_TYPES.RULE) {
         record.deletedDate = deletedDate;
         record.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
         record.status = GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE;
