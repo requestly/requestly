@@ -137,7 +137,7 @@ const RulesTable = ({
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
   // const [ungroupOrDeleteRulesModalData, setUngroupOrDeleteRulesModalData] = useState(null);
-  const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
+  const [ruleToDelete, setRuleToDelete] = useState([]);
   const [groupToEmpty, setGroupToEmpty] = useState(null);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
@@ -537,7 +537,7 @@ const RulesTable = ({
 
   const deleteIconOnClickHandler = async (event, rule) => {
     event.stopPropagation();
-    setRuleIdToDelete([rule.id]);
+    setRuleToDelete(rule);
     setIsDeleteConfirmationModalActive(true);
   };
 
@@ -1403,7 +1403,7 @@ const RulesTable = ({
         <DeleteRulesModal
           isOpen={isDeleteConfirmationModalActive}
           toggle={toggleDeleteConfirmationModal}
-          ruleIdsToDelete={ruleIdToDelete}
+          rulesToDelete={[ruleToDelete]}
           groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
         />

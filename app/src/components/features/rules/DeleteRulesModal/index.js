@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteGroupsFromStorage, deleteRulesFromStorage } from "./actions";
 import { unselectAllRules } from "../actions";
@@ -17,11 +17,12 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
   isOpen,
-  ruleIdsToDelete,
+  rulesToDelete,
   groupIdsToDelete = [],
   clearSearch,
   ruleDeletedCallback,
 }) => {
+  console.log("rulesToDelete", rulesToDelete);
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -29,6 +30,8 @@ const DeleteRulesModal = ({
   //Component State
   const [areRulesMovingToTrash, setAreRulesMovingToTrash] = useState(false);
   const [areRulesBeingDeleted, setAreRulesBeingDeleted] = useState(false);
+
+  const ruleIdsToDelete = useMemo(() => rulesToDelete.map((rule) => rule.id), [rulesToDelete]);
 
   const handleDeleteRuleTestReports = useCallback(async () => {
     deleteTestReportByRuleId(appMode, ruleIdsToDelete);
@@ -69,7 +72,7 @@ const DeleteRulesModal = ({
       // here // also handle group deletion
       if (!uid) return;
       setAreRulesMovingToTrash(true);
-      return addRecordsToTrash(uid, ruleIdsToDelete).then((result) => {
+      return addRecordsToTrash(uid, rulesToDelete).then((result) => {
         return new Promise((resolve, reject) => {
           if (result.success) {
             deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
@@ -87,7 +90,7 @@ const DeleteRulesModal = ({
         });
       });
     },
-    [appMode, ruleIdsToDelete]
+    [appMode, ruleIdsToDelete, rulesToDelete]
   );
 
   const handleDeleteRulesPermanently = useCallback(async () => {

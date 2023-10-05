@@ -40,7 +40,7 @@ const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal
           isRuleEditor={true}
           isOpen={isDeleteConfirmationModalActive}
           toggle={toggleDeleteConfirmationModal}
-          ruleIdsToDelete={[rule.id]}
+          rulesToDelete={[rule]}
           ruleDeletedCallback={ruleDeletedCallback}
         />
       ) : null}

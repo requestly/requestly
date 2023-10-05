@@ -54,8 +54,16 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
+  console.log("allRules", allRules);
+  console.log("rulesSelection", rulesSelection);
+  console.log(
+    "rulesToDelete",
+    allRules?.filter((rule) => rulesSelection[rule.id])
+  );
+
   //Component State
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
+  const rulesToDelete = useMemo(() => allRules.filter((rule) => !!rulesSelection[rule.id]), [allRules, rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(groupsSelection), [groupsSelection]);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -286,7 +294,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         <DeleteRulesModal
           isOpen={isDeleteRulesModalActive}
           toggle={toggleDeleteRulesModal}
-          ruleIdsToDelete={selectedRuleIds}
+          rulesToDelete={rulesToDelete}
           groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
         />

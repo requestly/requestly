@@ -39,6 +39,7 @@ export const addRecordToTrash = async (uid, record) => {
 
 // Adds multiple records to trash
 export const addRecordsToTrash = async (uid, records) => {
+  console.log("Adding to trash", records);
   try {
     const database = getFirestore();
     const batch = writeBatch(database);
