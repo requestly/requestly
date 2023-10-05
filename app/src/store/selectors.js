@@ -207,6 +207,10 @@ export const getUserRulesCount = (state) => {
   return getUserAttributes(state)?.num_rules ?? 0;
 };
 
+export const getExtensionInstallDate = (state) => {
+  return getUserAttributes(state).install_date;
+};
+
 export const getIsProductHuntLaunchedBannerClosed = (state) => {
   return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
