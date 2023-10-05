@@ -52,6 +52,11 @@ export const updateSelectedGroups = (prevState, action) => {
   prevState.rules.selectedGroups = action.payload;
 };
 
+export const clearSelectedRecords = (prevState) => {
+  prevState.rules.selectedRules = {};
+  prevState.rules.selectedGroups = {};
+};
+
 export const clearSelectedRules = (prevState) => {
   prevState.rules.selectedRules = {};
 };

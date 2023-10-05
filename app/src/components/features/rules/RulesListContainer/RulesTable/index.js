@@ -77,7 +77,7 @@ import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/const
 import Logger from "lib/logger";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
-import { unselectAllRules } from "../../actions";
+import { unselectAllRecords } from "../../actions";
 
 //Lodash
 const set = require("lodash/set");
@@ -329,8 +329,7 @@ const RulesTable = ({
       .then(() => {
         clearSearch();
 
-        //Unselect all rules
-        unselectAllRules(dispatch);
+        unselectAllRecords(dispatch);
 
         //Refresh List
         updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
@@ -937,7 +936,7 @@ const RulesTable = ({
 
   const cleanup = () => {
     //Unselect all rules
-    unselectAllRules(dispatch);
+    unselectAllRecords(dispatch);
   };
 
   const EscFn = (event) => {
@@ -1081,8 +1080,8 @@ const RulesTable = ({
     return rowKeys;
   };
 
-  const handleClearSelectedRules = () => {
-    dispatch(actions.clearSelectedRules());
+  const handleClearSelectedRecords = () => {
+    unselectAllRecords(dispatch);
   };
 
   const dropdownOverlay = useMemo(
@@ -1203,7 +1202,7 @@ const RulesTable = ({
                   size="small"
                   icon={<CloseOutlined />}
                   style={{ margin: "0 8px 0 -14px" }}
-                  onClick={handleClearSelectedRules}
+                  onClick={handleClearSelectedRecords}
                 />
               </Tooltip>
               <span>{`${selectedRuleIds.length} Rules selected`}</span>

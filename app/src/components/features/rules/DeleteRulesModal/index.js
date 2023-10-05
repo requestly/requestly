@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteGroupsFromStorage, deleteRulesFromStorage } from "./actions";
-import { unselectAllRules } from "../actions";
+import { unselectAllRecords } from "../actions";
 import { toast } from "utils/Toast.js";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
@@ -55,7 +55,7 @@ const DeleteRulesModal = ({
     ruleDeletedCallback?.();
 
     //Unselect all rules
-    unselectAllRules(dispatch);
+    unselectAllRecords(dispatch);
     console.log("finish postDeletionSteps");
   };
 

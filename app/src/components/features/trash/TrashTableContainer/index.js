@@ -18,6 +18,7 @@ import SharedListViewerModal from "components/features/rules/SharedListRuleViewe
 import { deleteRecordsFromTrash, importRecordsToLocalStorage } from "utils/trash/TrashUtils";
 import { trackTrashRulesRecovered } from "modules/analytics/events/features/trash";
 import RuleTypeTag from "../../../common/RuleTypeTag";
+import { unselectAllRecords } from "components/features/rules/actions";
 
 const { Link } = Typography;
 
@@ -34,14 +35,8 @@ const TrashTableContainer = ({ records, updateTrash }) => {
 
   const selectedRules = getSelectedRules(rulesSelection);
 
-  const unselectAllRules = (dispatch) => {
-    //Unselect All Rules
-    dispatch(actions.clearSelectedRules());
-  };
-
   const cleanup = () => {
-    //Unselect all rules
-    unselectAllRules(dispatch);
+    unselectAllRecords(dispatch);
   };
 
   const stableCleanup = useCallback(cleanup, [dispatch]);
@@ -102,7 +97,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
     importRecordsToLocalStorage(appMode, selectedRules, user.details.profile.uid)
       .then((result) => {
         if (result.success) {
-          unselectAllRules(dispatch);
+          unselectAllRecords(dispatch);
           updateTrash(selectedRules);
           toast.info(`Restored the ${selectedRules.length > 1 ? "rules" : "rule"}`);
           trackTrashRulesRecovered(selectedRules.length);
@@ -122,7 +117,7 @@ const TrashTableContainer = ({ records, updateTrash }) => {
 
     deleteRecordsFromTrash(user.details.profile.uid, selectedRules).then((result) => {
       if (result.success) {
-        unselectAllRules(dispatch);
+        unselectAllRecords(dispatch);
         updateTrash(selectedRules);
         toast.info(`Deleted the ${selectedRules.length > 1 ? "rules" : "rule"}`);
       }
