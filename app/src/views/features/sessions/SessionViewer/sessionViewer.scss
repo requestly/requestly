@@ -26,8 +26,28 @@
       iframe {
         background: white;
       }
-      .rr-player .rr-player_frame {
+      .rr-player .rr-player__frame {
         width: auto;
+        .overlay-frame {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          color: rgba(0, 0, 0, 0.5);
+          font-size: 4rem;
+          .blur {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            backdrop-filter: blur(4px);
+            z-index: 1;
+          }
+          .overlay-content {
+            z-index: 10;
+          }
+        }
       }
       #rq-controller-btns {
         display: flex;

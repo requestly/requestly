@@ -58,3 +58,9 @@ export interface PageNavigationLog {
   timestamp: number;
   timeOffset: number;
 }
+
+export enum PlayerState {
+  PLAYING = "playing",
+  PAUSED = "paused",
+  SKIPPING = "skipping",
+}

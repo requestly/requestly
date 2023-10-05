@@ -9,7 +9,7 @@ import ConsoleLogsPanel from "./ConsoleLogs/ConsoleLogsPanel";
 import NetworkLogsPanel from "./NetworkLogs/NetworkLogsPanel";
 import EnvironmentDetailsPanel from "./EnvironmentDetailsPanel";
 import { ApiOutlined, CodeOutlined, ProfileOutlined } from "@ant-design/icons";
-import { ConsoleLog, NetworkLog, PageNavigationLog } from "./types";
+import { ConsoleLog, NetworkLog, PageNavigationLog, PlayerState } from "./types";
 import SessionPropertiesPanel from "./SessionPropertiesPanel";
 import PageURLInfo from "./PageURLInfo";
 import {
@@ -30,6 +30,7 @@ import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/f
 import { MdOutlineReplay10 } from "@react-icons/all-files/md/MdOutlineReplay10";
 import { MdOutlineForward10 } from "@react-icons/all-files/md/MdOutlineForward10";
 import "./sessionViewer.scss";
+import PlayerFrameOverlay from "./PlayerOverlay";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
@@ -51,6 +52,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
   const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
+  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
+  const [isSkipping, setIsSkipping] = useState<boolean>(false);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -151,7 +154,44 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       currentTimeRef.current = startTime + payload;
       setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
     });
-  }, [player, startTime]);
+
+    player?.addEventListener("play", () => {
+      console.log("!!!debug", "play event");
+      setPlayerState(PlayerState.PLAYING);
+    });
+
+    player?.addEventListener("start", () => {
+      console.log("!!!debug", "start event");
+      if (isSkipping) {
+        setPlayerState(PlayerState.SKIPPING);
+      } else {
+        setPlayerState(PlayerState.PLAYING);
+      }
+    });
+
+    player?.addEventListener("pause", () => {
+      console.log("!!!debug", "pause event");
+      if (isSkipping) {
+        setPlayerState(PlayerState.SKIPPING);
+      } else {
+        setPlayerState(PlayerState.PAUSED);
+      }
+    });
+
+    player?.addEventListener("skip-start", (e) => {
+      console.log("!!!debug", "skip start event", e);
+      // player.setSpeed(360);
+      setPlayerState(PlayerState.SKIPPING);
+      setIsSkipping(true);
+    });
+
+    player?.addEventListener("skip-end", (e) => {
+      console.log("!!!debug", "skip end event", e);
+      // player.setSpeed(1);
+      setPlayerState(PlayerState.PLAYING);
+      setIsSkipping(false);
+    });
+  }, [isSkipping, player, startTime]);
 
   useEffect(() => {
     if (!player) {
@@ -305,6 +345,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             )),
             RQControllerButtonContainer
           )}
+        <PlayerFrameOverlay playerContainer={playerContainer.current} playerState={playerState} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
       </div>
       <ProCard
