@@ -212,7 +212,9 @@
       bottom: 20px;
       transform: translate(-50%, 0);
     }
-
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
