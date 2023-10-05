@@ -54,13 +54,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
-  console.log("allRules", allRules);
-  console.log("rulesSelection", rulesSelection);
-  console.log(
-    "rulesToDelete",
-    allRules?.filter((rule) => rulesSelection[rule.id])
-  );
-
   //Component State
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const rulesToDelete = useMemo(() => allRules.filter((rule) => !!rulesSelection[rule.id]), [allRules, rulesSelection]);

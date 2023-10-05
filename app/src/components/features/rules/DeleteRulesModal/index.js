@@ -22,7 +22,6 @@ const DeleteRulesModal = ({
   clearSearch,
   ruleDeletedCallback,
 }) => {
-  console.log("rulesToDelete", rulesToDelete);
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -38,7 +37,6 @@ const DeleteRulesModal = ({
   }, [appMode, ruleIdsToDelete]);
 
   const postDeletionSteps = () => {
-    console.log("trigger postDeletionSteps");
     //Delete test reports for ruleIdsToDelete
     handleDeleteRuleTestReports();
     //Refresh List
@@ -56,7 +54,6 @@ const DeleteRulesModal = ({
 
     //Unselect all rules
     unselectAllRecords(dispatch);
-    console.log("finish postDeletionSteps");
   };
 
   const stablePostDeletionSteps = useCallback(postDeletionSteps, [

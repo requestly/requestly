@@ -345,12 +345,10 @@ const RulesTable = ({
     (event, groupData) => {
       // if this is here
       setGroupToEmpty(groupData.id);
-      console.log("deleteGroupOnClickHandler", groupData);
       // event.stopPropagation();
 
       deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate)
         .then(async (args) => {
-          console.log("result", args);
           if (args && args.err) {
             if (args.err === "ungroup-rules-first") {
               setIsUngroupOrDeleteRulesModalActive(true);
@@ -547,12 +545,9 @@ const RulesTable = ({
 
     // selectedRowKeys also contains the group ids, which we don't need, ProTable will handle it internally!
     selectedRowKeys.forEach((objectId) => {
-      console.log(objectId);
       if (!objectId.startsWith("Group_") && objectId !== UNGROUPED_GROUP_ID) {
-        console.log("selected rule", objectId);
         newSelectedRulesObject[objectId] = true;
       } else {
-        console.log("selected group", objectId);
         newSelectedGroupObject[objectId] = true;
       }
     });
@@ -795,7 +790,6 @@ const RulesTable = ({
                         <Tooltip title="Delete Group">
                           <Tag
                             onClick={(e) => {
-                              console.log("delete group", e, record);
                               deleteGroupOnClickHandler(e, record);
                               handleGroupState(false, record);
                             }}

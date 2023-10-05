@@ -45,7 +45,6 @@ export const doSyncRecords = async (
   appMode: AppMode,
   options: { forceSync?: boolean; workspaceId?: string } = {}
 ): Promise<void> => {
-  console.log("dosync triggered");
   // If the user is not logged in, do not proceed with syncing
   if (!window.uid) return;
 
@@ -115,7 +114,6 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
  * @param {AppMode} appMode - A string representing the current mode of the application.
  */
 export const syncRecordsRemoval = async (recordIds: string[], appMode: AppMode): Promise<void> => {
-  console.log("record ids", recordIds);
   // Trigger the record synchronization tracking with provided user id, record count and sync type.
   trackSyncTriggered(window.uid, recordIds.length, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS);
 

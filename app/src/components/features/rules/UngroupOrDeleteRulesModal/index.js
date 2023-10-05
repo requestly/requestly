@@ -18,7 +18,6 @@ import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
 const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRuleIds: groupRules, callback }) => {
-  console.log("UngroupOrDeleteRulesModal", groupIdToDelete, groupRules);
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -45,7 +44,6 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRuleI
           });
 
           Logger.log("Writing storage in doMoveToUngrouped");
-          console.log("updatedRules", updatedRules);
           StorageService(appMode)
             .saveMultipleRulesOrGroups(updatedRules)
             .then(() => resolve());

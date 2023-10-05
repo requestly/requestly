@@ -160,7 +160,6 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
  * @param {Array} recordIds List of deleted rule ids
  */
 export const removeUserSyncRecords = (uid, recordIds) => {
-  console.log("removeUserSyncRecords", uid, recordIds);
   const getSyncPath = (recordId) => {
     if (window.currentlyActiveWorkspaceTeamId) {
       // This is a team workspace syncing
@@ -175,7 +174,6 @@ export const removeUserSyncRecords = (uid, recordIds) => {
   recordIds.forEach((recordId) => {
     recordIdsObject[getSyncPath(recordId)] = null;
   });
-  console.log("recordIdsObject", recordIdsObject);
   return new Promise((resolve, reject) => {
     // null is passed to update Value as no node ref is
     // required when deleting multiple value using update function

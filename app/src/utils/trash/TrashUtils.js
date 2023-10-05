@@ -39,7 +39,6 @@ export const addRecordToTrash = async (uid, record) => {
 
 // Adds multiple records to trash
 export const addRecordsToTrash = async (uid, records) => {
-  console.log("Adding to trash", records);
   try {
     const database = getFirestore();
     const batch = writeBatch(database);
@@ -63,7 +62,6 @@ export const addRecordsToTrash = async (uid, records) => {
 
     return { success: true };
   } catch (error) {
-    console.log("errror", error);
     Sentry.captureException(new Error(`Trash Error. ${error.toString()}`));
     return { success: false };
   }
