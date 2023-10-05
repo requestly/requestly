@@ -143,3 +143,7 @@ export const getFormattedTimestamp = (timestamp) => {
   const formattedDate = `${day} ${month} ${year} - ${hours}:${minutes < 10 ? "0" : ""}${minutes}${ampm}`;
   return formattedDate;
 };
+
+export const dateStringToEpoch = (dateString) => {
+  return new Date(dateString).getTime();
+};
