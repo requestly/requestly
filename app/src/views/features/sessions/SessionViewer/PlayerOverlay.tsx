@@ -31,7 +31,7 @@ const PlayerFrameOverlay: React.FC<{ playerContainer: HTMLDivElement; playerStat
   const [overlayContainer, setOverlayContainer] = useState<Element>(null);
 
   useEffect(() => {
-    if (playerContainer) {
+    if (playerContainer && !playerContainer.querySelector(".overlay-frame")) {
       const overlayFrame = document.createElement("div");
       overlayFrame.className = "overlay-frame";
       const rr_player = playerContainer.querySelector(".replayer-wrapper");
