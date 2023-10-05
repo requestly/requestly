@@ -53,7 +53,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   emptyView,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
-  const [filters, setFilters] = useState<NetworkFilters>({ search: "" });
+  const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
 
   const finalColumns = useMemo(
     () =>
@@ -77,14 +77,33 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
+  const statusCodeFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.statusCode.length) return true;
+      return filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]);
+    },
+    [filters.statusCode]
+  );
+
+  const methodsFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.method.length) return true;
+      return filters.method.some((method) => method === logEntry?.request.method);
+    },
+    [filters.method]
+  );
+
   const filterLog = useCallback(
     (networkLog: NetworkLog) => {
       let includeLog = false;
       const entry = networkEntrySelector(networkLog);
-      includeLog = !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()); // TODO: add checks for other filters here
+      includeLog =
+        !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) &&
+        statusCodeFilter(entry) &&
+        methodsFilter(entry); // TODO: add checks for other filters here
       return includeLog;
     },
-    [networkEntrySelector, filters.search]
+    [networkEntrySelector, filters.search, statusCodeFilter, methodsFilter]
   );
 
   return (
