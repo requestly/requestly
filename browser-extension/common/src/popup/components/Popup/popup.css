@@ -5,8 +5,8 @@
 }
 
 .popup-header {
-  height: 54px;
-  padding: 12px;
+  height: 56px;
+  padding: 12px 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -148,10 +148,17 @@
   font-size: 12px;
   padding: 8px 16px;
   font-weight: 500;
+  letter-spacing: 0.4px;
 }
+
 .pause-switch {
   margin-right: 8px;
   align-self: center;
+}
+
+.enable-extension-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
+  background-color: var(--neutrals-black);
+  font-size: 14px;
 }
 
 .pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked,
