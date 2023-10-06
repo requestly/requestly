@@ -1263,10 +1263,11 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
     }
   } else if (!sessionRecordingData.explicit) {
     // stop recording if config was changed to turn off auto-recording for the session URL
-    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(sessionRecordingData.url);
+    const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
     if (!sessionRecordingConfig) {
       BG.Methods.stopRecording(tab.id);
+      RQ.extensionIconManager.markNotRecording(tab.id);
       return;
     }
   }
