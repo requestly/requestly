@@ -1,8 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Col, Row, Typography } from "antd";
+import { Row, Tooltip } from "antd";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
-import VideoRecorderIcon from "../../../../resources/icons/videoRecorder.svg";
-import { EyeOutlined, PlayCircleFilled } from "@ant-design/icons";
+import { PrimaryActionButton } from "../common/PrimaryActionButton";
+import SettingIcon from "../../../../resources/icons/setting.svg";
+import PlayRecordingIcon from "../../../../resources/icons/playRecording.svg";
+import StopRecordingIcon from "../../../../resources/icons/stopRecording.svg";
+import ReplayLastFiveMinuteIcon from "../../../../resources/icons/replayLastFiveMinute.svg";
+import ShieldIcon from "../../../../resources/icons/shield.svg";
+import config from "../../../config";
 import { EVENT, sendEvent } from "../../events";
 import "./sessionRecordingView.css";
 
@@ -22,26 +27,23 @@ const SessionRecordingView: React.FC = () => {
     setIsRecordingSession(true);
   }, [currentTabId]);
 
-  const viewRecordingOnClick = useCallback(
-    (stopRecording?: boolean) => {
-      if (isManualMode || stopRecording) {
-        sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
-        chrome.runtime.sendMessage({
-          action: EXTENSION_MESSAGES.STOP_RECORDING,
-          tabId: currentTabId,
-          openRecording: true,
-        });
-        setIsRecordingSession(false);
-      } else {
-        sendEvent(EVENT.VIEW_RECORDING_CLICKED);
-        chrome.runtime.sendMessage({
-          action: EXTENSION_MESSAGES.WATCH_RECORDING,
-          tabId: currentTabId,
-        });
-      }
-    },
-    [isManualMode, currentTabId]
-  );
+  const viewRecordingOnClick = useCallback(() => {
+    if (isManualMode) {
+      sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.STOP_RECORDING,
+        tabId: currentTabId,
+        openRecording: true,
+      });
+      setIsRecordingSession(false);
+    } else {
+      sendEvent(EVENT.VIEW_RECORDING_CLICKED);
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.WATCH_RECORDING,
+        tabId: currentTabId,
+      });
+    }
+  }, [isManualMode, currentTabId]);
 
   useEffect(() => {
     chrome.tabs.query({ currentWindow: true, active: true }, ([activeTab]) => {
@@ -68,92 +70,65 @@ const SessionRecordingView: React.FC = () => {
     }
   }, [currentTabId]);
 
+  const isRecordingInManualMode = isRecordingSession && isManualMode;
+  const isRecordingInAutoMode = isRecordingSession && !isManualMode;
+
   return (
-    <Row
-      wrap={false}
-      align="middle"
-      justify="space-between"
-      className="session-view-content"
-      style={{
-        backgroundColor: isRecordingSession ? (isManualMode ? "#295FF6" : "#B429F6") : "transparent",
-      }}
-    >
-      {isRecordingSession ? (
-        <Row align="middle" justify="center">
-          <div className="icon-wrapper session-recording-camera-icon">
-            <VideoRecorderIcon />
-          </div>
-
-          <Col>
-            {isManualMode ? (
-              <>
-                <Typography.Text strong className="">
-                  Recording...
-                </Typography.Text>
-                <br />
-                <Typography.Text className="custom-mode-caption">
-                  This tab is being recorded by session Replay
-                </Typography.Text>
-              </>
-            ) : (
-              <>
-                <Typography.Text strong>Automatically recording</Typography.Text>
-                <br />
-                <Button
-                  type="link"
-                  target="_blank"
-                  className="session-view-link-button"
-                  onClick={() => viewRecordingOnClick(true)}
-                >
-                  <span className="stop-recording-text">Stop recording</span>
-                </Button>
-              </>
-            )}
-          </Col>
-        </Row>
-      ) : (
-        <>
-          <Row align="middle">
-            <Col>
-              <div className="icon-wrapper session-recording-camera-icon">
-                <VideoRecorderIcon />
-              </div>
-            </Col>
-            <Col className="no-session-recording-message">
-              <Typography.Text type="secondary" className="session-recording-caption">
-                Capture <span>mouse movement</span>, <span>console</span>, <span>network & environment data</span>
-                <br />
-                automatically for sharing and debugging
-              </Typography.Text>
-            </Col>
-          </Row>
-        </>
-      )}
-
-      <Col>
-        {isRecordingSession ? (
-          <Button
-            type="link"
-            target="_blank"
-            className="session-view-link-button"
-            onClick={() => viewRecordingOnClick()}
+    <div className="session-view-content">
+      <Row align="middle" justify="space-between">
+        <div className="title">Record session for debugging and sharing</div>
+        <div
+          className="configure-btn"
+          onClick={() => {
+            // TODO: send analytics
+            window.open(`${config.WEB_URL}/sessions/settings?source=popup`, "_blank");
+          }}
+        >
+          <SettingIcon /> Configure
+        </div>
+      </Row>
+      <Row wrap={false} align="middle" className="action-btns">
+        <Tooltip
+          arrow={null}
+          placement="top"
+          title="Capture mouse movement, console, network, and more."
+          overlayClassName="action-btn-tooltip"
+        >
+          <PrimaryActionButton
+            block
+            disabled={isRecordingInAutoMode}
+            className={isRecordingInManualMode ? "stop-btn" : ""}
+            icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
+            onClick={isRecordingInManualMode ? viewRecordingOnClick : startRecordingOnClick}
           >
-            <EyeOutlined /> <span>{isManualMode ? "Stop & watch replay" : "Watch replay"}</span>
-          </Button>
-        ) : (
-          <Typography.Link
-            underline
-            type="secondary"
-            target="_blank"
-            className="session-start-recording-link"
-            onClick={startRecordingOnClick}
+            {isRecordingInManualMode ? "Stop and watch" : " Record this tab"}
+          </PrimaryActionButton>
+        </Tooltip>
+
+        <Tooltip
+          arrow={null}
+          placement="top"
+          title="Instantly play last 5 min auto recorded session for this tab."
+          overlayClassName="action-btn-tooltip"
+        >
+          <PrimaryActionButton
+            block
+            icon={<ReplayLastFiveMinuteIcon />}
+            disabled={isRecordingInManualMode || !isRecordingSession}
+            onClick={viewRecordingOnClick}
           >
-            <PlayCircleFilled />
-            <span>Start Recording</span>
-          </Typography.Link>
-        )}
-      </Col>
-    </Row>
+            Watch last 5 min replay
+          </PrimaryActionButton>
+        </Tooltip>
+      </Row>
+      <div className="session-replay-security-msg">
+        <ShieldIcon />
+        <div className="msg">
+          To keep your information private, we save session replays on your browser locally, not in the cloud. You
+          decide when to save them.
+        </div>
+      </div>
+    </div>
   );
 };
 

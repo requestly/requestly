@@ -5,6 +5,7 @@ import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
 import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
+import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import "./popup.css";
 
 const Popup: React.FC = () => {
@@ -39,13 +40,9 @@ const Popup: React.FC = () => {
 
         <div className="popup-content">
           {/* remove negation */}
-          {!ifNoRulesPresent ? (
-            <>
-              <HttpsRuleOptions />
-            </>
-          ) : (
-            <PopupTabs />
-          )}
+          {!ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
+
+          <SessionRecordingView />
         </div>
         <PopupFooter />
       </div>

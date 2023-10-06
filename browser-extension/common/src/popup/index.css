@@ -64,6 +64,7 @@
   --primary-color: var(--blue-500);
   --danger: var(--red-500);
   --success: var(--green-500);
+  --disable: var(--neutrals-gray-500);
 
   --surface-1: var(--neutrals-gray-800);
   --surface-2: var(--neutrals-gray-700);

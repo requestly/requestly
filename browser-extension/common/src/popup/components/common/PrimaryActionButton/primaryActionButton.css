@@ -6,6 +6,7 @@
   letter-spacing: 0.25px;
   display: flex;
   align-items: center;
+  color: var(--text-default);
   background: var(--surface-2);
   border: 1px solid var(--surface-3);
   border-radius: var(--border-radius-sm);
@@ -23,4 +24,13 @@
   height: 20px;
   margin-right: 12px;
   color: var(--text-light);
+}
+
+.primary-action-btn.ant-btn:disabled,
+.primary-action-btn.ant-btn:disabled svg {
+  color: var(--disable);
+}
+
+.primary-action-btn.ant-btn:disabled {
+  border: 1px solid var(--surface-3);
 }

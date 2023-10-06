@@ -63,5 +63,6 @@ export const STORAGE_KEYS = {
 };
 
 export const LINKS = {
-  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.io/troubleshooting",
+  REQUESTLY_EXTENSION_TROUBLESHOOTING:
+    "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
 };
