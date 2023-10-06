@@ -24,10 +24,3 @@ const App: React.FC = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById("root"));
-
-/**
- * - Check how to distinguish between existing and first time users [done]
- * - start with common components
- * - Start with home screen
- * - Session section
- */

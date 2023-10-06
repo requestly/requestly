@@ -7,15 +7,6 @@ import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { EVENT, sendEvent } from "../../events";
 import "./httpsRuleOptions.css";
 
-/**
- * - fix all the tooltips
- * - Fix icon spacing [done]
- * - complete session recording section
- * - check existing events properly
- * - add config link
- * - hook the new UI with the old session recording behaviour
- */
-
 export const HttpsRuleOptions: React.FC = () => {
   const ruleList = useMemo(
     () => [
@@ -52,15 +43,8 @@ export const HttpsRuleOptions: React.FC = () => {
       <div className="title">Intercept and modify HTTP(s) requests</div>
       <div className="options">
         {ruleList.map(({ icon, title, editorLink, tooltipTitle }, index) => (
-          <Tooltip
-            key={index}
-            // open={index === 0}
-            arrow={null}
-            placement="top"
-            title={tooltipTitle}
-            overlayClassName="action-btn-tooltip"
-          >
-            <PrimaryActionButton icon={icon} onClick={() => window.open(editorLink, "_blank")}>
+          <Tooltip key={index} arrow={null} placement="top" title={tooltipTitle} overlayClassName="action-btn-tooltip">
+            <PrimaryActionButton block icon={icon} onClick={() => window.open(editorLink, "_blank")}>
               {title}
             </PrimaryActionButton>
           </Tooltip>
