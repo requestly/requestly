@@ -39,9 +39,7 @@ const Popup: React.FC = () => {
         />
 
         <div className="popup-content">
-          {/* remove negation */}
-          {!ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
-
+          {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
           <SessionRecordingView />
         </div>
         <PopupFooter />
