@@ -6,6 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { getOwnerId } from "backend/utils";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -24,6 +25,21 @@ const processRules = (rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules =
 const sanitizeRule = (rule) => {
   const sanitizedRule = rule;
   delete sanitizedRule.isFavourite; // https://github.com/requestly/requestly/issues/205
+
+  /* adding creator and owner. Missing when rules created before login */
+  const uid = window.uid;
+  if (!uid) return sanitizedRule;
+
+  if (!sanitizedRule.createdBy) {
+    sanitizedRule.createdBy = null;
+  }
+
+  if (!sanitizedRule.currentOwner) {
+    const teamId = window.currentlyActiveWorkspaceTeamId;
+    const ownerId = getOwnerId(uid, teamId);
+    sanitizedRule.currentOwner = ownerId;
+  }
+
   return sanitizedRule;
 };
 

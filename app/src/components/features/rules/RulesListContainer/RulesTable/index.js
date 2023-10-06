@@ -77,6 +77,7 @@ import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/const
 import Logger from "lib/logger";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 //Lodash
 const set = require("lodash/set");
@@ -270,21 +271,16 @@ const RulesTable = ({
       ? GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
       : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
 
-    let createdBy;
-    const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
+    const modificationDate = generateObjectCreationDate();
 
-    if (typeof groupData.createdBy === "undefined") {
-      createdBy = user?.details?.profile?.uid || null;
-    } else {
-      createdBy = groupData.createdBy;
-    }
+    const createdBy = groupData.createdBy ?? (user?.details?.profile?.uid || null);
 
     const newGroup = {
       ...groupData,
       createdBy,
-      currentOwner,
       lastModifiedBy,
+      modificationDate,
       status: updatedStatus,
     };
 

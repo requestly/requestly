@@ -8,6 +8,7 @@ import { trackRuleEditorHeaderClicked, trackRulePinToggled } from "modules/analy
 import "./PinButton.css";
 import { getModeData } from "../../../actions";
 import { StorageService } from "init";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const PinButton = ({ rule, isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -17,12 +18,13 @@ const PinButton = ({ rule, isRuleEditorModal }) => {
   const isPinned = rule.isFavourite;
 
   const handlePinRuleClick = () => {
-    const currentOwner = rule.currentOwner ? user?.details?.profile?.uid || null : rule.currentOwner;
-
+    const lastModifiedBy = user?.details?.profile?.uid || null;
+    const modificationDate = generateObjectCreationDate();
     const updateValue = !rule.isFavourite;
     const updatedRule = {
       ...rule,
-      currentOwner,
+      lastModifiedBy,
+      modificationDate,
       isFavourite: updateValue,
     };
 

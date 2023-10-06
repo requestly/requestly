@@ -15,11 +15,14 @@ import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
 import Logger from "lib/logger";
+import { getOwnerId } from "backend/utils";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 const CreateNewRuleGroupModal = (props) => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
 
@@ -33,7 +36,7 @@ const CreateNewRuleGroupModal = (props) => {
 
   const createNewGroup = (newGroupName) => {
     const createdBy = user?.details?.profile?.uid || null;
-    const currentOwner = user?.details?.profile?.uid || null;
+    const currentOwner = getOwnerId(createdBy, currentlyActiveWorkspace.id);
     const lastModifiedBy = user?.details?.profile?.uid || null;
     const newGroupId = `Group_${generateObjectId()}`;
     const newGroup = {

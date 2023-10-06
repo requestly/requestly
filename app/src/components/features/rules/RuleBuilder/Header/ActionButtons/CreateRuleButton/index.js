@@ -31,6 +31,8 @@ import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import "../RuleEditorActionButtons.css";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getOwnerId } from "backend/utils";
 
 // This is also the save rule button
 const CreateRuleButton = ({
@@ -49,6 +51,7 @@ const CreateRuleButton = ({
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -63,7 +66,7 @@ const CreateRuleButton = ({
 
   const handleBtnOnClick = async () => {
     const createdBy = currentlySelectedRuleData?.createdBy || user?.details?.profile?.uid || null;
-    const currentOwner = user?.details?.profile?.uid || null;
+    const currentOwner = getOwnerId(createdBy, currentlyActiveWorkspace.id);
     const lastModifiedBy = user?.details?.profile?.uid || null;
 
     //Pre-validation: regex fix + trim whitespaces
