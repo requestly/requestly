@@ -111,13 +111,13 @@
 }
 
 .popup-header-dropdown-menu-item .ant-btn:hover,
-.popup-header-dropdown-menu-item .ant-btn.ant-btn-dangerous:hover,
-.popup-footer-resume-btn.ant-btn.ant-btn-dangerous:hover {
+.popup-header-dropdown-menu-item .ant-btn.ant-btn-dangerous:hover {
   opacity: 0.6;
 }
 
 .popup-content {
   padding: 16px;
+  padding-bottom: 0;
 }
 
 .header-content-separator {
@@ -211,27 +211,25 @@
 }
 
 /* footer */
-.popup-footer .resume-btn-container {
+.popup-footer {
+  padding: 16px;
+}
+
+.popup-footer .need-help {
   display: inline-flex;
   align-items: center;
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration-line: underline;
+  color: var(--text-light);
+  cursor: pointer;
 }
 
-.popup-footer .resume-btn-container,
-.popup-footer .session-view-content {
-  height: 58px;
-  padding: 10px 12px 10px 10px;
-}
-
-.popup-footer-resume-btn.ant-btn.ant-btn-dangerous,
-.popup-footer-resume-btn.ant-btn.ant-btn-dangerous:hover {
-  margin-right: 8px;
-  color: var(--color-primary);
-  background-color: rgba(250, 40, 40, 0.2);
-  border: 1px solid rgba(250, 40, 40, 0.6);
-}
-
-.popup-footer-resume-btn-text {
-  margin-left: 6px;
+.popup-footer .need-help svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  color: var(--text-light);
 }
 
 /* utils */
