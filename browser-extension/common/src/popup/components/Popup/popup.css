@@ -1,7 +1,12 @@
 /* popup */
 .popup {
-  width: 562px;
-  min-height: 379px;
+  width: 560px;
+  min-height: 460px;
+  max-height: 546px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: var(--text-default);
 }
 
 .popup-header {
@@ -112,10 +117,7 @@
 }
 
 .popup-content {
-  padding: 20px 0;
-  min-height: 302px;
-  max-height: 390px;
-  background-color: var(--background-color-secondary);
+  padding: 16px;
 }
 
 .header-content-separator {
@@ -254,6 +256,26 @@
 }
 
 /* tooltip */
+.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  background: var(--neutrals-black);
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
+}
+
+.action-btn-tooltip.ant-tooltip {
+  margin-top: 3px;
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
+}
+
+.action-btn-tooltip.action-btn-tooltip .ant-tooltip-inner {
+  max-width: 232px;
+  padding: 8px 12px;
+  background: var(--neutrals-black);
+  border-radius: var(--border-radius-sm);
+}
+
 .ant-tooltip.ant-tooltip-placement-topLeft .ant-tooltip-content .ant-tooltip-arrow {
   left: 0px;
 }
@@ -261,10 +283,6 @@
 .ant-tooltip.ant-tooltip-placement-topLeft .ant-tooltip-content {
   margin-left: -2px;
   margin-bottom: -5px;
-}
-
-.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
-  background-color: var(--border-color);
 }
 
 /* tabs */

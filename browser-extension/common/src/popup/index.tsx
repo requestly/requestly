@@ -6,7 +6,7 @@ import { RecordsProvider } from "./contexts/RecordsContext";
 import "./index.css";
 
 const aliasToken = {
-  fontSize: 13,
+  fontSize: 14,
   borderRadius: 4,
   controlHeight: 30,
   colorText: "#ffffff",
@@ -24,3 +24,10 @@ const App: React.FC = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById("root"));
+
+/**
+ * - Check how to distinguish between existing and first time users [done]
+ * - start with common components
+ * - Start with home screen
+ * - Session section
+ */
