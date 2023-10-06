@@ -34,7 +34,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
 
   const isLogPending = (log: RQNetworkLog) => {
-    return getOffset(log, startTime) >= playerTimeOffset;
+    return getOffset(log, startTime) > playerTimeOffset;
   };
 
   const handleContextMenuRuleOptionSelect = useCallback(

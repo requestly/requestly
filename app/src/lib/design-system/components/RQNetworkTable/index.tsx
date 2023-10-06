@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { GenericNetworkTable, GenericNetworkTableProps } from "./GenericNetworkTable";
 import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
@@ -28,7 +28,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   rowClassName,
   disableAutoScroll = false,
 }) => {
-  const activeLogId = useRef(null);
+  const [activeLogId, setActiveLogId] = useState(null);
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
     () => [
       {
@@ -40,33 +40,35 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
           const offset = Math.floor(getOffset(log, sessionRecordingStartTime));
           return (
             <div className="offset-cell">
-              <span className="row-pointer">
-                {activeLogId.current === log.id && <AiFillCaretRight color="var(--white)" />}
-              </span>
+              <span className="row-pointer">{activeLogId === log.id && <AiFillCaretRight color="var(--white)" />}</span>
               <span>{secToMinutesAndSeconds(offset)}</span>
             </div>
           );
         },
       },
     ],
-    [sessionRecordingStartTime]
+    [sessionRecordingStartTime, activeLogId]
   );
 
   useEffect(() => {
-    const recentLog = logs.reduce(
+    const closestLog = logs.reduce(
       (closest, log: RQNetworkLog) => {
-        const difference = Math.abs(sessionCurrentOffset - getOffset(log, sessionRecordingStartTime));
-        if (difference < closest.minTimeDifference) {
-          return { log: log, minTimeDifference: difference };
+        const logOffset = getOffset(log, sessionRecordingStartTime);
+
+        if (logOffset <= sessionCurrentOffset) {
+          const currentLogDifference = Math.abs(sessionCurrentOffset - logOffset);
+          if (currentLogDifference < closest.minTimeDifference) {
+            return { log: log, minTimeDifference: currentLogDifference };
+          }
         }
 
         return closest;
       },
       { log: null, minTimeDifference: Infinity }
     );
-    if (getOffset(recentLog.log, sessionRecordingStartTime) <= sessionCurrentOffset)
-      activeLogId.current = recentLog.log.id;
-  }, [logs, sessionCurrentOffset]);
+
+    setActiveLogId(closestLog?.log?.id);
+  }, [logs, sessionCurrentOffset, sessionRecordingStartTime]);
 
   return (
     <div className="rq-network-table-container">
