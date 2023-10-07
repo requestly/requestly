@@ -61,6 +61,18 @@
           }
         }
       }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
     }
 
     .session-recording-properties {
@@ -232,7 +244,9 @@
       bottom: 20px;
       transform: translate(-50%, 0);
     }
-
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
