@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
-import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { prepareContentToExport } from "../actions";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { Rule } from "types";
@@ -11,6 +11,7 @@ import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import "./DownloadRules.css";
+import { RULES } from "modules/analytics/events/common/constants";
 
 interface DownloadRulesProps {
   selectedRules: string[];
@@ -20,6 +21,7 @@ interface DownloadRulesProps {
 export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = [], toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [rulesToDownload, setRulesToDownload] = useState<{
@@ -42,14 +44,14 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
     (e: unknown) => {
       const { rulesCount, fileContent } = rulesToDownload ?? {};
 
-      trackRQLastActivity("rules_exported");
-      trackRulesExportedEvent(rulesCount);
+      trackRQLastActivity(RULES.RULES_EXPORTED);
+      trackRulesExportedEvent(rulesCount, user?.details?.profile?.workspaceMemberCount || null);
       dispatch(actions.clearSelectedRules());
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
       toggleModal();
     },
-    [fileName, dispatch, toggleModal, rulesToDownload]
+    [fileName, dispatch, toggleModal, rulesToDownload, user]
   );
 
   useEffect(() => {

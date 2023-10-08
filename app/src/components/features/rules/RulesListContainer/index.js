@@ -37,6 +37,7 @@ import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./RulesListContainer.css";
+import { SHARED_LIST } from "modules/analytics/events/features/constants";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -168,7 +169,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     const newSelectedRules = getSelectedRules(rulesSelection);
     setSelectedRules(newSelectedRules);
     toggleSharingModal(newSelectedRules);
-    trackRQLastActivity("sharedList_created");
+    trackRQLastActivity(SHARED_LIST.CREATED);
   };
 
   const handleImportRulesOnClick = (e) => {

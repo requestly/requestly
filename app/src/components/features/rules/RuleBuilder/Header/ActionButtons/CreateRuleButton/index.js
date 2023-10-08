@@ -113,6 +113,7 @@ const CreateRuleButton = ({
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
                   ? getAllResponseBodyTypes(currentlySelectedRuleData)
                   : null,
+              workspaceMemberCount: user?.details?.profile?.workspaceMemberCount || null,
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
             trackRuleEditedEvent(
@@ -121,7 +122,8 @@ const CreateRuleButton = ({
               currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                 ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                 : null,
-              analyticEventRuleCreatedSource
+              analyticEventRuleCreatedSource,
+              user?.details?.profile?.workspaceMemberCount || null
             );
           }
           ruleModifiedAnalytics(user);
