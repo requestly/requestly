@@ -6,13 +6,20 @@ import { EVENT, sendEvent } from "../../events";
 interface PopupHeaderProps {
   isExtensionEnabled: boolean;
   handleToggleExtensionStatus: () => void;
+  initPauseToolip: boolean;
 }
 
-const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
+const PopupHeader: React.FC<PopupHeaderProps> = ({
+  isExtensionEnabled,
+  handleToggleExtensionStatus,
+  initPauseToolip,
+}) => {
   const onOpenAppButtonClick = useCallback(() => {
     window.open(`${config.WEB_URL}?source=popup`, "_blank");
     sendEvent(EVENT.OPEN_APP_CLICKED);
   }, []);
+
+  console.log({ initPauseToolip });
 
   return (
     <div className="popup-header">
@@ -37,7 +44,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
         <Col>
           <Row align="middle">
             <Tooltip
-              open={!isExtensionEnabled}
+              open={!isExtensionEnabled && initPauseToolip}
               title="Please switch on the Requestly extension. When paused, rules won't be applied and sessions won't be recorded."
               overlayClassName="enable-extension-tooltip"
               color="var(--neutrals-black)"
