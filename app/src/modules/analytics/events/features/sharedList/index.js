@@ -10,7 +10,8 @@ export const trackSharedListCreatedEvent = (
   source,
   access_type,
   non_rq_users,
-  num_users_notified
+  num_users_notified,
+  workspaceMemberCount
 ) => {
   const params = {
     id,
@@ -18,6 +19,7 @@ export const trackSharedListCreatedEvent = (
     num_rules,
     source,
     access_type,
+    workspace_member_count: workspaceMemberCount,
   };
 
   if (!isNull(num_users_notified)) params.num_users_notified = num_users_notified;

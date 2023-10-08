@@ -1,9 +1,17 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-export const trackRuleCreatedEvent = ({ rule_type, description, destination_types, source, body_types }) => {
+export const trackRuleCreatedEvent = ({
+  rule_type,
+  description,
+  destination_types,
+  source,
+  body_types,
+  workspaceMemberCount,
+}) => {
   const params = {
     rule_type,
+    workspace_member_count: workspaceMemberCount,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
@@ -13,9 +21,10 @@ export const trackRuleCreatedEvent = ({ rule_type, description, destination_type
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (rule_type, description, destination_types, source) => {
+export const trackRuleEditedEvent = (rule_type, description, destination_types, source, workspaceMemberCount) => {
   const params = {
     rule_type,
+    workspace_member_count: workspaceMemberCount,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
@@ -73,9 +82,10 @@ export const trackRuleExportedEvent = (count, rule_type) => {
   trackEvent(RULES.RULE_EXPORTED, params);
 };
 
-export const trackRulesExportedEvent = (count) => {
+export const trackRulesExportedEvent = (count, workspaceMemberCount) => {
   const params = {
     count,
+    workspace_member_count: workspaceMemberCount,
   };
   trackEvent(RULES.RULES_EXPORTED, params);
 };
@@ -100,8 +110,8 @@ export const trackRulesUngrouped = () => {
   trackEvent(RULES.RULES_UNGROUPED, params);
 };
 
-export const trackRuleExecuted = (type, count, month, year) => {
-  const params = { type, count, month, year };
+export const trackRuleExecuted = (type, count, month, year, executorIsCreator = null) => {
+  const params = { type, count, month, year, executor_is_creator: executorIsCreator };
   trackEvent(RULES.RULE_EXECUTED, params);
 };
 

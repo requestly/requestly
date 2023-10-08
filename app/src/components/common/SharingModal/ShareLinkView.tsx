@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
@@ -19,6 +19,7 @@ import { Rule } from "types";
 import Logger from "lib/logger";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
+import { SHARED_LIST } from "modules/analytics/events/features/constants";
 
 interface ShareLinkProps {
   selectedRules: string[];
@@ -29,6 +30,7 @@ interface ShareLinkProps {
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source }) => {
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
@@ -170,7 +172,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
         sharedLinkVisibility,
         sharedListRecipients
       ).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
-        trackRQLastActivity("sharedList_created");
+        trackRQLastActivity(SHARED_LIST.CREATED);
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,
@@ -200,7 +202,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
           source,
           sharedLinkVisibility,
           nonRQEmailsCount,
-          recipientsCount
+          recipientsCount,
+          user?.details?.profile?.workspaceMemberCount || null
         );
         setIsLinkGenerating(false);
       });
@@ -217,6 +220,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
     sharedListRecipients,
     sendSharedListShareEmail,
     validateSharedListName,
+    user,
   ]);
 
   useEffect(() => {
