@@ -17,7 +17,7 @@ import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
-const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRuleIds: groupRules, callback }) => {
+const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules, callback }) => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);

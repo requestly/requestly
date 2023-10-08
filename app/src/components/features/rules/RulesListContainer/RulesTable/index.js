@@ -1404,7 +1404,7 @@ const RulesTable = ({
           isOpen={isUngroupOrDeleteRulesModalActive}
           toggle={toggleUngroupOrDeleteRulesModal}
           groupIdToDelete={groupToEmpty ?? null}
-          groupRuleIds={rulesOfGroupsToEmptyFrom}
+          groupRules={rulesOfGroupsToEmptyFrom}
           callback={() => {
             setGroupToEmpty(null);
           }}
