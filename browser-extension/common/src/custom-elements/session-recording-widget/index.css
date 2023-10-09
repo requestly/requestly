@@ -69,6 +69,10 @@
   height: 18px;
 }
 
+.recording-time {
+  min-width: 37px;
+}
+
 @keyframes blink {
   from {
     opacity: 1;

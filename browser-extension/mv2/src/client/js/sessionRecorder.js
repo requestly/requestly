@@ -6,6 +6,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isExplicitRecording = false;
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
+  RQ.SessionRecorder.recordingStartTime = null;
   RQ.SessionRecorder.sendResponseCallbacks = {};
   RQ.SessionRecorder.recordingMode;
 
@@ -53,7 +54,7 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
@@ -72,6 +73,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
+  RQ.SessionRecorder.recordingStartTime = recordingStartTime;
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -117,6 +119,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
+      RQ.SessionRecorder.recordingStartTime = null;
       RQ.SessionRecorder.hideWidget();
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -213,6 +216,7 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     document.documentElement.appendChild(widget);
 
     widget.addEventListener("stop", () => {
+      widget.removeAttribute("recording-start-time");
       chrome.runtime.sendMessage({
         action: RQ.EXTENSION_MESSAGES.STOP_RECORDING,
         openRecording: true,
@@ -220,6 +224,7 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     });
 
     widget.addEventListener("discard", () => {
+      widget.removeAttribute("recording-start-time");
       chrome.runtime.sendMessage({
         action: RQ.EXTENSION_MESSAGES.STOP_RECORDING,
       });
@@ -230,6 +235,7 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     });
   }
 
+  widget.setAttribute("recording-start-time", `${RQ.SessionRecorder.recordingStartTime}`);
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
@@ -241,6 +247,7 @@ RQ.SessionRecorder.showRecordingWidget = () => {
 
 RQ.SessionRecorder.hideWidget = () => {
   const widget = RQ.SessionRecorder.getWidget();
+  widget?.removeAttribute("recording-start-time");
   widget?.dispatchEvent(new CustomEvent("hide"));
 };
 

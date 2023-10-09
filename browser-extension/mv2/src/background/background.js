@@ -1026,7 +1026,11 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
+        BG.Methods.startRecordingExplicitly(
+          message.tabId ?? sender.tab.id,
+          message.showWidget,
+          message.recordingStartTime
+        );
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1374,13 +1378,13 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
+BG.Methods.startRecordingExplicitly = (tabId, showWidget = true, recordingStartTime) => {
   const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   if (sessionRecordingDataExist) {
     return;
   }
 
-  const sessionRecordingData = { explicit: true, showWidget };
+  const sessionRecordingData = { explicit: true, showWidget, recordingStartTime };
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
