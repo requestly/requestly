@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Typography } from "antd";
@@ -17,6 +17,7 @@ import {
   trackCharlesSettingsImportFailed,
   trackCharlesSettingsImportComplete,
   trackCharlesSettingsImportDocsClicked,
+  trackCharlesSettingsImportViewed,
 } from "modules/analytics/events/features/rules";
 import "./ImportFromCharlesModal.css";
 
@@ -69,6 +70,34 @@ const CharlesDocsLink = ({
 );
 
 export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, triggeredBy }) => {
+  useEffect(() => {
+    trackCharlesSettingsImportViewed(triggeredBy);
+  }, [triggeredBy]);
+  return (
+    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
+      <div className="rq-modal-content">
+        <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
+      </div>
+    </RQModal>
+  );
+};
+
+interface ImportFromCharlesProps {
+  modalSrc?: string | null; // null indicates this is not mounted inside modal
+  callBack?: () => void;
+}
+
+export const ImportFromCharlesRoot: React.FC = () => {
+  useEffect(() => {
+    trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
+  }, []);
+  return (
+    <div className="root-wrapper">
+      <ImportFromCharles />
+    </div>
+  );
+};
+const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, callBack }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -149,7 +178,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
 
         trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-        toggle();
+        callBack && callBack();
       })
       .finally(() => setIsLoading(false));
   };
@@ -165,8 +194,8 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
   ]);
 
   return (
-    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
-      <div className="rq-modal-content">
+    <>
+      <div>
         <div className="header text-center">Import Charles Proxy settings</div>
         <div className="mt-16">
           {isParseComplete ? (
@@ -190,7 +219,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
                     <CharlesDocsLink
                       title="Learn more"
                       linkClickSrc="some_settings_unsupported_screen"
-                      importTriggerSrc={triggeredBy}
+                      importTriggerSrc={modalSrc}
                     />
                   </div>
                 ) : (
@@ -200,7 +229,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
                     <CharlesDocsLink
                       title="here"
                       linkClickSrc="all_settings_unsupported_screen"
-                      importTriggerSrc={triggeredBy}
+                      importTriggerSrc={modalSrc}
                     />
                     .
                   </div>
@@ -247,7 +276,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
         <div className="text-center title mt-16">
           {" "}
           To export your rules from Charles,{" "}
-          <CharlesDocsLink title="Follow these steps" linkClickSrc="upload_screen" importTriggerSrc={triggeredBy} />
+          <CharlesDocsLink title="Follow these steps" linkClickSrc="upload_screen" importTriggerSrc={modalSrc} />
         </div>
       </div>
 
@@ -270,6 +299,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
           </div>
         )
       ) : null}
-    </RQModal>
+    </>
   );
 };
