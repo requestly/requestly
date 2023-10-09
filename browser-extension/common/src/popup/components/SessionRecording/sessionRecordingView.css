@@ -1,104 +1,47 @@
-@keyframes blink {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 .session-view-content {
-  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface-1);
+  border-radius: var(--border-radius-sm);
 }
 
-.session-view-content .ant-typography {
+.session-view-content .title {
+  line-height: 20px;
+}
+
+.session-view-content .configure-btn {
+  cursor: pointer;
   font-size: 12px;
-  line-height: 16px;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  column-gap: 4px;
+  align-items: center;
+  color: var(--text-default);
 }
 
-.session-view-content .main-row {
+.session-view-content .action-btns {
+  margin: 8px 0;
+  column-gap: 12px;
+}
+
+.session-view-content .action-btns .stop-btn {
+  background: var(--danger);
+}
+
+.session-view-content .session-replay-security-msg {
+  color: var(--text-light);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.session-view-content p {
-  margin: 0;
-}
-
-.session-view-content .record-indicator {
-  margin: 0;
-  display: inline-block;
-  height: 8px;
-  width: 8px;
-  border-radius: 50%;
-  background-color: #fa2828;
-  animation: blink 0.5s cubic-bezier(0.5, 0, 1, 1) infinite alternate;
-}
-
-.session-view-link-button,
-.session-start-recording-link {
-  padding: 0;
-  height: auto;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--color-primary);
-}
-
-.session-view-link-button span,
-.session-start-recording-link u {
-  text-decoration: underline;
-  display: inline-flex;
   align-items: center;
   column-gap: 4px;
+  padding-top: 4px;
 }
 
-.session-view-link-button.ant-btn:hover {
-  opacity: 0.7;
-  color: var(--color-primary);
+.session-view-content .session-replay-security-msg svg {
+  align-self: flex-start;
 }
 
-.custom-mode-caption.ant-typography,
-.session-view-link-button span.stop-recording-text {
-  color: #ffffffb3;
+.session-view-content .session-replay-security-msg .msg {
+  width: 100%;
+  font-size: 12px;
   line-height: 16px;
-}
-
-.session-start-recording-link.ant-typography {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-link);
-}
-
-.session-start-recording-link.ant-typography:hover {
-  opacity: 0.7;
-  color: var(--color-link);
-}
-
-.session-view-link-button .anticon,
-.session-start-recording-link.ant-typography .anticon {
-  font-size: 16px;
-}
-
-.session-recording-caption {
-  font-size: 12px;
-}
-
-.session-recording-caption span {
-  color: #d2d2d3;
-  font-weight: 500;
-}
-
-.no-session-recording-message {
-  display: flex;
-  flex-direction: column;
-}
-
-.no-session-recording-message .ant-typography {
-  line-height: 150%;
-}
-
-.session-recording-camera-icon {
-  margin-right: 6px;
+  letter-spacing: 0.4px;
 }

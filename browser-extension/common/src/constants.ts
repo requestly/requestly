@@ -61,3 +61,8 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
 };
+
+export const LINKS = {
+  REQUESTLY_EXTENSION_TROUBLESHOOTING:
+    "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
+};
