@@ -14,7 +14,7 @@ export interface RQNetworkTableProps {
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
   emptyView?: GenericNetworkTableProps<RQNetworkLog>["emptyView"];
   sessionCurrentOffset?: number;
-  disableAutoScroll?: boolean;
+  autoScroll?: boolean;
 }
 
 export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
@@ -24,7 +24,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   onContextMenuOpenChange = (isOpen) => {},
   emptyView,
   sessionCurrentOffset,
-  disableAutoScroll = false,
+  autoScroll = false,
 }) => {
   const [activeLogId, setActiveLogId] = useState(null);
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
@@ -83,7 +83,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         onContextMenuOpenChange={onContextMenuOpenChange}
         emptyView={emptyView}
         rowStyle={(log: RQNetworkLog) => (isLogPending(log) ? { opacity: 0.45 } : {})}
-        disableAutoScroll={disableAutoScroll}
+        autoScroll={autoScroll}
       />
     </div>
   );
