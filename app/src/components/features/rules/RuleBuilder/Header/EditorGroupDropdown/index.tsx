@@ -94,7 +94,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const handleGroupChange = (groupId: string) => {
     dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
-    updateGroupOfSelectedRules(appMode, { [rule.id]: true }, groupId, user).then(() => {
+    updateGroupOfSelectedRules(appMode, [rule.id], groupId, user).then(() => {
       dispatch(
         actions.updateRefreshPendingStatus({
           type: "rules",
