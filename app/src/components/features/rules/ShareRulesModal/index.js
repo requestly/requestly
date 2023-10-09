@@ -12,7 +12,7 @@ import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 //ACTIONS
 import { deleteRulesFromStorage } from "./actions";
 import { actions } from "../../../../store";
-import { unselectAllRules } from "../actions";
+import { unselectAllRecords } from "../actions";
 
 const ShareRulesModal = (props) => {
   const { toggle, isOpen, rulesToShare } = props;
@@ -125,7 +125,7 @@ const ShareRulesModal = (props) => {
     //Close Modal
     toggle();
     //Unselect all rules
-    unselectAllRules(dispatch);
+    unselectAllRecords(dispatch);
   };
   const stablePostDeletionSteps = useCallback(postDeletionSteps, [dispatch, isRulesListRefreshPending, toggle]);
 

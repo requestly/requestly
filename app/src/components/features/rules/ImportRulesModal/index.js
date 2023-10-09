@@ -9,6 +9,7 @@ import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { AUTH } from "modules/analytics/events/common/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { RQModal } from "lib/design-system/components";
@@ -260,7 +261,8 @@ const ImportRulesModal = (props) => {
     setShowImportOptions(false);
   };
 
-  const modifyModalContentForCharlesImportOption = isCharlesImportFeatureFlagOn && showImportOptions;
+  const modifyModalContentForCharlesImportOption =
+    isCharlesImportFeatureFlagOn && showImportOptions && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (
     <>
