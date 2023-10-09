@@ -18,13 +18,7 @@ export const trackSessionRecordingFailed = (reason) =>
   trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
 
 export const trackDraftSessionViewed = (source, recording_mode) => {
-  const params = {
-    source,
-  };
-  if (recording_mode) {
-    params.recording_mode = recording_mode;
-  }
-  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, params);
+  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, { source, recording_mode });
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
 };
 
