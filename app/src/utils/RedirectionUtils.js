@@ -229,13 +229,6 @@ export const redirectToGDPRPage = (navigate, { newTab }) => {
   }
 };
 
-/* USER */
-
-/* USER - Unlock Premium */
-export const redirectToUnlockPremium = (navigate) => {
-  navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
-};
-
 /* ACCOUNT */
 
 /* ACCOUNT - View Account Details */
@@ -244,32 +237,6 @@ export const redirectToAccountDetails = (navigate, hardRedirect) => {
     window.location.href = PATHS.ACCOUNT.ABSOLUTE;
   } else {
     navigate(PATHS.ACCOUNT.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - My Organization*/
-export const redirectToMyOrganization = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE);
-  }
-};
-/* ACCOUNT - Create new Org */
-export const redirectToCreateOrg = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - View Backups */
-export const redirectToBackups = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE);
   }
 };
 
@@ -342,15 +309,6 @@ export const redirectToCheckout = ({ mode, teamId, planName, duration, quantity 
   }
 };
 
-/* MARKETPLACE REDIRECT */
-export const redirectToMarketplace = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.MARKETPLACE.ABSOLUTE;
-  } else {
-    navigate(PATHS.MARKETPLACE.ABSOLUTE);
-  }
-};
-
 /* ACCOUNT - UPDATE SUBSCRIPTION */
 export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal }) => {
   const url = new URL(window.location.href);
@@ -392,15 +350,6 @@ export const redirectToRefreshSubscription = (navigate, hardRedirect) => {
   }
 };
 
-/* ONBOARDING PAGE */
-export const redirectToOnboardingPage = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ONBOARDING.ABSOLUTE;
-  } else {
-    navigate(PATHS.ONBOARDING.ABSOLUTE);
-  }
-};
-
 /* MISC */
 export const redirectTo404 = (navigate, hardRedirect) => {
   if (hardRedirect) {
@@ -434,11 +383,6 @@ export const redirectToSupportEmail = (navigate, { newTab }) => {
   } else {
     navigate(LINKS.CONTACT_US);
   }
-};
-
-/* Change App Mode */
-export const redirectToAppMode = (navigate) => {
-  navigate(PATHS.APP_MODE.ABSOLUTE);
 };
 
 /* App Mode Specific Pages - Desktop - Home Page */

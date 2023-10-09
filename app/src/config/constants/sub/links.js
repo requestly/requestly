@@ -96,11 +96,6 @@ const LINKS = {
     SIGN_DPA: "https://privacy.requestly.io/dpa",
   },
 
-  /** MARKETTING */
-  PRODUCT_HUNT: {
-    MOBILE_INTERCEPTOR: "https://www.producthunt.com/posts/requestly-for-android",
-  },
-
   /** TUTORIALS */
   YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
 

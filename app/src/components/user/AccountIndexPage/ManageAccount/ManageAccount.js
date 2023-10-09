@@ -9,12 +9,14 @@ import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
 import DataStoreUtils from "../../../../utils/DataStoreUtils";
-import { redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
+import {
+  redirectToDeleteAccount,
+  redirectToSignDPA,
+  redirectToUpdateSubscriptionContactUs,
+} from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
 import { refreshUserInGlobalState } from "../../common/actions";
-// CONSTANTS
-import APP_CONSTANTS from "../../../../config/constants";
 import ProCard from "@ant-design/pro-card";
 import { Dropdown, Menu } from "antd";
 
@@ -22,6 +24,7 @@ import isEmpty from "is-empty";
 import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { useDispatch, useSelector } from "react-redux";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const getDesignationDisplayValue = (originalValue) => {
   switch (originalValue) {
@@ -110,6 +113,7 @@ const ManageAccount = () => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const navigate = useNavigate();
 
   //Component State
   const [areChangesPending, setAreChangesPending] = useState(false);
@@ -267,9 +271,9 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.EXPORT_DATA, "_blank")}
+                          onClick={() => redirectToSignDPA(navigate, { newTab: true })}
                         >
-                          Request Data Download
+                          Request DPA
                         </AntButton>
                       </Col>
                     </Row>
@@ -278,7 +282,7 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.DELETE_ACCOUNT, "_blank")}
+                          onClick={() => redirectToDeleteAccount(navigate, { newTab: true })}
                         >
                           Request Account Deletion
                         </AntButton>
