@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
 import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
@@ -11,6 +10,7 @@ import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import "./DownloadRules.css";
+import { unselectAllRecords } from "components/features/rules/actions";
 
 interface DownloadRulesProps {
   selectedRules: string[];
@@ -44,12 +44,12 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
 
       trackRQLastActivity("rules_exported");
       trackRulesExportedEvent(rulesCount);
-      dispatch(actions.clearSelectedRules());
+      unselectAllRecords(dispatch);
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
       toggleModal();
     },
-    [fileName, dispatch, toggleModal, rulesToDownload]
+    [rulesToDownload, dispatch, fileName, toggleModal]
   );
 
   useEffect(() => {
