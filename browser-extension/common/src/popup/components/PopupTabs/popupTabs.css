@@ -3,6 +3,7 @@
   margin-bottom: 1rem;
   border-radius: var(--border-radius);
   padding: 12px 1rem;
+  height: 270px;
 }
 
 .tabs-header {
@@ -11,11 +12,16 @@
 
 .popup-tabs .ant-tabs-tab {
   padding-top: 4px;
-  color: #b0b0b5;
+  color: var(--white);
 }
 
 .popup-tabs .ant-tabs-tab .anticon {
   margin-right: 8px;
+}
+
+.popup-tabs .ant-tabs-content-holder {
+  height: 158px;
+  overflow-y: auto;
 }
 
 .new-rule-dropdown-btn.ant-btn {

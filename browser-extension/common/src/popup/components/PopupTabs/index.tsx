@@ -6,7 +6,7 @@ import RecentRecords from "../RecentRecords";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ArrowIcon from "../../../../resources/icons/arrowDown.svg";
-import { PushpinFilled, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { PushpinOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { icons } from "../../ruleTypeIcons";
 import { EVENT, sendEvent } from "../../events";
 import "./popupTabs.css";
@@ -27,7 +27,7 @@ const PopupTabs: React.FC = () => {
         key: PopupTabKey.PINNED_RULES,
         label: (
           <span>
-            <PushpinFilled rotate={-45} />
+            <PushpinOutlined rotate={-45} />
             Pinned rules
           </span>
         ),
