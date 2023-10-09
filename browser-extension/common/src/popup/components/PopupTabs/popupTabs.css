@@ -40,17 +40,19 @@
 
 .popup-tab-badge {
   margin-left: 4px;
+  border: none;
 }
 
 .popup-tab-badge .ant-badge-count.ant-scroll-number {
-  height: 17px;
-  padding: 2px 4px;
-  font-size: 10px;
-  line-height: 11px;
-  color: var(--color-success);
-  background-color: transparent;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-success);
+  width: 23px;
+  height: 16px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--white);
+  background-color: var(--success);
+  border-radius: 100px;
+  border: none;
 }
 
 .rule-type-dropdown ul.ant-dropdown-menu {
