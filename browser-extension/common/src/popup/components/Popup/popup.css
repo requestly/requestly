@@ -197,8 +197,12 @@
   margin-left: 42px;
 }
 
-.record-name.link:hover {
-  color: var(--color-primary);
+.record-name-container.link,
+.rule-name-container .rule-type-icons.icon-wrapper svg {
+  color: var(--blue-400);
+}
+
+.record-name-container.link:hover {
   text-decoration: underline;
 }
 
@@ -217,13 +221,13 @@
   padding: 7px 11px 7px 0;
 }
 
-.record-name-container:hover {
+/* .record-name-container:hover {
   cursor: pointer;
   border-top-right-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
   background-color: var(--background-color-row-hover);
   transition: background-color 0.2s ease;
-}
+} */
 
 .record-status-text {
   margin-right: 8px;
