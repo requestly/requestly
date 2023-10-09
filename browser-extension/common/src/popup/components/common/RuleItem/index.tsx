@@ -57,22 +57,21 @@ const RuleItem: React.FC<RuleItemProps> = ({
   return (
     <li>
       <Row align="middle" className="record-item" wrap={false}>
-        <Col span={isChildren ? 20 : 18} className="record-name-container">
+        <Col
+          span={isChildren ? 20 : 18}
+          className="record-name-container link"
+          onClick={() => {
+            sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
+            window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
+          }}
+        >
           <Row wrap={false} align="middle" className={`rule-name-container ${isChildren ? "child-rule" : ""}`}>
             <Tooltip placement="topRight" title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}>
               <span className="icon-wrapper rule-type-icons">{icons[rule.ruleType]}</span>
             </Tooltip>
 
             <RecordName name={rule.name}>
-              <span
-                className="record-name link"
-                onClick={() => {
-                  sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
-                  window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
-                }}
-              >
-                {rule.name}
-              </span>
+              <span>{rule.name}</span>
             </RecordName>
           </Row>
         </Col>

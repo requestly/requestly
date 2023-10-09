@@ -1,13 +1,23 @@
 .group-expand-icon {
-  font-size: 11px;
+  font-size: 14px;
   cursor: pointer;
-  color: var(--color-icon);
-  margin: 0 8px 0 16px;
+  color: var(--white);
+  margin: 0 8px;
+  margin-right: 14px;
 }
 
-.group-expanded,
-.record-name-container .group-expanded.icon-wrapper svg {
-  color: var(--color-primary);
+.record-name-container {
+  cursor: pointer;
+}
+
+.record-name-container .group-icon-wrapper {
+  margin-top: 5px;
+}
+
+.record-name-container .group-icon-wrapper svg {
+  color: var(--white);
+  width: 20px;
+  height: 20px;
 }
 
 .empty-group-message {

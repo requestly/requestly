@@ -34,29 +34,25 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
       <Row align="middle" className="record-item" wrap={false}>
         <Col span={18} className="record-name-container" onClick={() => setIsExpanded((prev) => !prev)}>
           <Row wrap={false} align="middle">
-            <>
-              <Col>
-                <CaretRightOutlined
-                  rotate={isExpanded ? 90 : 0}
-                  className={`group-expand-icon ${isExpanded ? "group-expanded" : ""}`}
-                />
-              </Col>
-              <Col>
-                <Row wrap={false} align="middle">
-                  <>
-                    <Tooltip title="Group">
-                      <span className={`icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
-                        <GroupIcon />
-                      </span>
-                    </Tooltip>
+            <Col>
+              <CaretRightOutlined
+                rotate={isExpanded ? 90 : 0}
+                className={`group-expand-icon ${isExpanded ? "group-expanded" : ""}`}
+              />
+            </Col>
+            <Col>
+              <Row wrap={false} align="middle">
+                <Tooltip title="Group">
+                  <span className={`group-icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
+                    <GroupIcon />
+                  </span>
+                </Tooltip>
 
-                    <RecordName name={group.name as string}>
-                      <span className="record-name">{group.name as string}</span>
-                    </RecordName>
-                  </>
-                </Row>
-              </Col>
-            </>
+                <RecordName name={group.name as string}>
+                  <span className="record-name">{group.name as string}</span>
+                </RecordName>
+              </Row>
+            </Col>
           </Row>
         </Col>
 

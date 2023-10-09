@@ -1,12 +1,8 @@
-.rule-name-container {
-  margin-left: 10px;
-}
-
 .child-rule {
-  padding-left: 52px;
+  margin-left: 30px;
 }
 
 .rule-name-container .rule-type-icons.icon-wrapper svg {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
 }
