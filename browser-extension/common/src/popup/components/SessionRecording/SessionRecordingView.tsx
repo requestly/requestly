@@ -89,8 +89,8 @@ const SessionRecordingView: React.FC = () => {
       </Row>
       <Row wrap={false} align="middle" className="action-btns">
         <Tooltip
-          arrow={null}
           placement="top"
+          color="#000000"
           title="Capture mouse movement, console, network, and more."
           overlayClassName="action-btn-tooltip"
         >
@@ -106,8 +106,8 @@ const SessionRecordingView: React.FC = () => {
         </Tooltip>
 
         <Tooltip
-          arrow={null}
           placement="top"
+          color="#000000"
           title="Instantly play last 5 min auto recorded session for this tab."
           overlayClassName="action-btn-tooltip"
         >

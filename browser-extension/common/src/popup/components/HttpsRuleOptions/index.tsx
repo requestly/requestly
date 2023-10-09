@@ -43,7 +43,13 @@ export const HttpsRuleOptions: React.FC = () => {
       <div className="title">Intercept and modify HTTP(s) requests</div>
       <div className="options">
         {ruleList.map(({ icon, title, editorLink, tooltipTitle }, index) => (
-          <Tooltip key={index} arrow={null} placement="top" title={tooltipTitle} overlayClassName="action-btn-tooltip">
+          <Tooltip
+            key={index}
+            color="#000000"
+            placement="top"
+            title={tooltipTitle}
+            overlayClassName="action-btn-tooltip"
+          >
             <PrimaryActionButton block icon={icon} onClick={() => window.open(editorLink, "_blank")}>
               {title}
             </PrimaryActionButton>
