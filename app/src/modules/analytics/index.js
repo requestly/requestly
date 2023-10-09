@@ -26,6 +26,7 @@ export const trackEvent = (name, params, config) => {
   newParams.automation_enabled = window.navigator.webdriver === true;
   newParams.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
   newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
+  newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 
   Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });
   posthogIntegration.trackEvent(name, newParams);

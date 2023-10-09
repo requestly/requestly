@@ -1,12 +1,46 @@
 .filters-toolbar {
   display: flex;
+  // justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 2px 0px;
 
+  .filters-divider {
+    height: 1.4rem;
+    align-self: flex-end;
+    border-left: 1px solid var(--border);
+  }
+
   .search-filter {
-    width: 250px;
-    padding: 4px 6px;
+    width: 200px;
+    padding: 2px 4px;
+    font-size: 13px;
+    align-self: flex-end;
+  }
+  .btn-group-filters-wrapper {
+    .status-code-filter-btns {
+      gap: 3px;
+      margin-top: 4px;
+    }
+  }
+  .filter-btn.rq-btn,
+  .filter-btn.rq-btn:focus {
+    font-size: 12px;
+    padding: 0 4px;
+    color: var(--text-gray);
+    height: 22px;
+    background-color: transparent;
+  }
+  .filter-btn.rq-btn.ant-btn:focus {
+    border-color: var(--border);
+  }
+
+  .active-filter-btn.rq-btn.ant-btn,
+  .active-filter-btn.rq-btn.ant-btn:focus,
+  .active-filter-btn.rq-btn.ant-btn:hover {
+    color: #fff;
+    background: var(--primary);
+    border-color: var(--primary);
   }
 }
