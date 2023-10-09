@@ -71,6 +71,7 @@ const MockEditor: React.FC<Props> = ({
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
+  const [rulePassword, setRulePassword] = useState<string>("");
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
@@ -82,12 +83,10 @@ const MockEditor: React.FC<Props> = ({
   const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
-  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId), [
-    endpoint,
-    teamId,
-    user?.details?.profile?.uid,
-    username,
-  ]);
+  const finalUrl = useMemo(
+    () => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId, rulePassword),
+    [endpoint, teamId, user?.details?.profile?.uid, username, rulePassword]
+  );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
     return {
@@ -111,7 +110,7 @@ const MockEditor: React.FC<Props> = ({
     setLatency(0);
   };
 
-  const createMockEditorData = () => {
+  const createMockEditorData = (metaData?: Partial<MockEditorDataSchema>) => {
     let headersDict: { [key: string]: string } = {};
     try {
       headersDict = JSON.parse(headersString);
@@ -138,6 +137,7 @@ const MockEditor: React.FC<Props> = ({
       headers: headersDict,
       body: body || "{}",
       responseId: mockData.responseId,
+      password: metaData?.password,
     };
 
     return tempMockData;
@@ -173,8 +173,8 @@ const MockEditor: React.FC<Props> = ({
     return false;
   };
 
-  const handleOnSave = () => {
-    const finalMockData = createMockEditorData();
+  const handleOnSave = (metaData?: Partial<MockEditorDataSchema>) => {
+    const finalMockData = createMockEditorData(metaData);
     const success = validateMockEditorData(finalMockData);
 
     if (success) {
@@ -295,6 +295,7 @@ const MockEditor: React.FC<Props> = ({
         setEndpoint={setEndpoint}
         mockType={mockType}
         ref={endpointRef}
+        rulePassword={rulePassword}
       />
     );
   };
@@ -411,6 +412,8 @@ const MockEditor: React.FC<Props> = ({
         handleClose={onClose}
         handleSave={handleOnSave}
         handleTest={handleTest}
+        setRulePassword={setRulePassword}
+        rulePassword={rulePassword}
       />
       <div className="mock-editor-title-container">
         <RQEditorTitle

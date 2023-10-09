@@ -70,7 +70,13 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnS
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
           if (selectOnSave) {
-            const url = generateFinalUrl(finalMockData.endpoint, user?.details?.profile?.uid, null, teamId);
+            const url = generateFinalUrl(
+              finalMockData.endpoint,
+              user?.details?.profile?.uid,
+              null,
+              teamId,
+              data?.password
+            );
             selectOnSave(url);
             return;
           }

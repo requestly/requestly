@@ -16,6 +16,8 @@ interface HeaderProps {
   handleClose: Function;
   handleSave: Function;
   handleTest: () => void;
+  setRulePassword: (password: string) => void;
+  rulePassword: string;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -25,17 +27,13 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleClose,
   handleSave,
   handleTest,
+  setRulePassword,
+  rulePassword,
 }) => {
   const location = useLocation();
 
-  const getRulePassword = (): string => {
-    // Replace with actual implemention to fetch existing password
-    return localStorage.getItem("rq-password") ?? "";
-  };
-
   // Component State
   const [showInput, setShowInput] = useState(false);
-  const [rulePassword, setRulePassword] = useState(getRulePassword());
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleRulePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,16 +48,10 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   };
 
   const handleUpdatePassword = () => {
-    // Replace with actual implemention to save password
-    localStorage.setItem("rq-password", rulePassword);
-
     setShowDropdown(false);
   };
 
   const handlePasswordDelete = () => {
-    // Replace with actual implemention to save password
-    localStorage.removeItem("rq-password");
-
     setRulePassword("");
     setShowDropdown(false);
   };
@@ -172,7 +164,12 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           >
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
+          <RQButton
+            type="primary"
+            loading={savingInProgress}
+            disabled={savingInProgress}
+            onClick={() => handleSave({ password: rulePassword })}
+          >
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
           </RQButton>
         </Col>
