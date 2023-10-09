@@ -58,7 +58,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
     <li>
       <Row align="middle" className="record-item" wrap={false}>
         <Col
-          span={isChildren ? 20 : 18}
+          span={isChildren ? 21 : 19}
           className="record-name-container link"
           onClick={() => {
             sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
@@ -84,7 +84,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
           </Col>
         )}
 
-        <Col span={4} className="record-switch-container">
+        <Col span={3} className="record-switch-container">
           <Popconfirm
             trigger="hover"
             placement="topRight"
@@ -99,19 +99,14 @@ const RuleItem: React.FC<RuleItemProps> = ({
             cancelButtonProps={{ ghost: true, type: "text" }}
             onConfirm={handleGroupActiveClick}
           >
-            <Row wrap={false} align="middle" justify="center">
-              <div>
-                <span className={`record-status-text ${!isRuleActive ? "text-gray" : ""}`}>
-                  {isRuleActive ? "On" : "Off"}
-                </span>
-                <Switch
-                  className="record-switch"
-                  checked={isRuleActive}
-                  disabled={isGroupInactive}
-                  onChange={handleToggleStatus}
-                />
-              </div>
-            </Row>
+            <Switch
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+              className="record-switch"
+              checked={isRuleActive}
+              disabled={isGroupInactive}
+              onChange={handleToggleStatus}
+            />
           </Popconfirm>
         </Col>
       </Row>
