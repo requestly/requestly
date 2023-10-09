@@ -148,6 +148,18 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     };
   }, [player]);
 
+  const skipStartEventRef = useRef(null);
+
+  const setSkipStartTimestamp = useCallback(
+    (event: any) => {
+      skipStartEventRef.current = event;
+      setTimeout(() => {
+        player.setSpeed(256);
+      }, 1000);
+    },
+    [player]
+  );
+
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
@@ -173,13 +185,22 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     player?.addEventListener("skip-start", () => {
       setPlayerState(PlayerState.SKIPPING);
       setIsSkipping(true);
+      const replayer = player.getReplayer();
+      replayer.on("event-cast", setSkipStartTimestamp);
+      setTimeout(() => {
+        replayer.off("event-cast", setSkipStartTimestamp);
+      }, 500);
     });
 
-    player?.addEventListener("skip-end", () => {
-      setPlayerState(PlayerState.PLAYING);
-      setIsSkipping(false);
+    player?.addEventListener("event-cast", (event) => {
+      if (event.timestamp - skipStartEventRef.current?.timestamp > 10000) {
+        skipStartEventRef.current = null;
+        player.setSpeed(1);
+        setPlayerState(PlayerState.PLAYING);
+        setIsSkipping(false);
+      }
     });
-  }, [isSkipping, player, startTime]);
+  }, [isSkipping, player, setSkipStartTimestamp, startTime]);
 
   useEffect(() => {
     if (!player) {
