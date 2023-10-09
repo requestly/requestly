@@ -3,7 +3,7 @@
   margin-bottom: 1rem;
   border-radius: var(--border-radius);
   padding: 12px 1rem;
-  height: 270px;
+  height: 330px;
 }
 
 .tabs-header {
@@ -20,7 +20,7 @@
 }
 
 .popup-tabs .ant-tabs-content-holder {
-  height: 158px;
+  height: 220px;
   overflow-y: auto;
 }
 

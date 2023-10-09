@@ -1,3 +1,7 @@
+.rule-name-container {
+  margin-left: 5px;
+}
+
 .child-rule {
   margin-left: 30px;
 }
