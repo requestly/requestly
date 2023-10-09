@@ -47,7 +47,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
   const [player, setPlayer] = useState<Replayer>();
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
-  const [visibleNetworkLogsCount, setVisibleNetworkLogsCount] = useState(0);
   const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
   const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
@@ -148,7 +147,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
-      setPlayerTimeOffset(Math.ceil(payload / 1000)); // millis -> secs
+      setPlayerTimeOffset(payload / 1000); // millis -> secs
     });
   }, [player, startTime]);
 
@@ -232,12 +231,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
           <span>
             <ApiOutlined style={{ marginRight: "5px" }} />
             Network
-            <Badge
-              size="small"
-              count={visibleNetworkLogsCount || undefined}
-              dot={visibleNetworkLogsCount === 0 && rqNetworkLogs.length > 0}
-              style={{ margin: "0 5px" }}
-            />
+            <Badge size="small" count={networkLogs.length || undefined} style={{ margin: "0 5px" }} />
           </span>
         ),
         children: (
@@ -245,7 +239,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             startTime={attributes?.startTime ?? 0}
             networkLogs={rqNetworkLogs}
             playerTimeOffset={playerTimeOffset}
-            updateCount={setVisibleNetworkLogsCount}
           />
         ),
       },
@@ -269,7 +262,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     rqNetworkLogs,
     playerTimeOffset,
     visibleConsoleLogsCount,
-    visibleNetworkLogsCount,
+    networkLogs.length,
   ]);
 
   return (
