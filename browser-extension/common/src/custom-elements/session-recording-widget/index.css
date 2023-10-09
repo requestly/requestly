@@ -4,9 +4,9 @@
 }
 
 #container {
-  background-color: #295ff6;
+  background-color: #212121;
   border-radius: 24px;
-  padding: 12px 18px;
+  padding: 4px;
   margin: auto;
   color: #fff;
   font-family: system-ui;
@@ -14,7 +14,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   white-space: nowrap;
   cursor: move;
   display: none;
@@ -24,30 +24,49 @@
   display: flex;
 }
 
-#container > div {
+.action {
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: 0.2s border;
+  border: 1px solid transparent;
+}
+
+.action:hover {
+  border: 1px solid #161a25;
+}
+
+.stop-recording {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 35px;
+  background: #e43434;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  box-sizing: border-box;
 }
 
-.stop-recording:hover {
-  text-decoration: underline;
-}
-
-.divider {
-  display: inline-block;
-  height: 20px;
-  width: 1px;
-  background: #fff;
+.stop-recording svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 7px;
+  flex-shrink: 0;
 }
 
 .discard-recording {
-  margin-top: 2px;
+  gap: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 35px;
+  background: #51525c;
 }
 
-.action {
-  cursor: pointer;
+.discard-recording svg {
+  width: 18px;
+  height: 18px;
 }
 
 @keyframes blink {
@@ -60,11 +79,15 @@
 }
 
 .recording-icon {
+  flex-shrink: 0;
   display: inline-block;
-  height: 4px;
-  width: 4px;
-  border: 4px solid #fff;
+  margin: 0 8px;
+  margin-left: 12px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #ea3323;
+  border: 3px solid #ffffff;
+  background: #e43434;
+  box-sizing: border-box;
   animation: blink 1s cubic-bezier(0.5, 0, 1, 1) infinite alternate;
 }

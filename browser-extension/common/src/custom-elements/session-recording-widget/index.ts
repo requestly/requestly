@@ -1,6 +1,7 @@
 import styles from "./index.css";
 import { registerCustomElement, setInnerHTML } from "../utils";
 import BinIcon from "../../../resources/icons/bin.svg";
+import StopRecordingIcon from "../../../resources/icons/stopRecording.svg";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 
 enum RQSessionRecordingWidgetEvent {
@@ -54,14 +55,9 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     return `
       <style>${styles}</style>
       <div id="container">
-        <div>
           <span class="recording-icon"></span>
-          <span class="action stop-recording">Stop & Watch Replay</span>
-        </div>
-        <div>
-          <span class="divider"></span>
-          <span class="action discard-recording" title="Discard">${BinIcon}</span>
-        </div>
+          <div class="action stop-recording">${StopRecordingIcon} Stop & watch</div>
+          <div class="action discard-recording" title="Discard">${BinIcon}</div>
       </div>
     `;
   }
