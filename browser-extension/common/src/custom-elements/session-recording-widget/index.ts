@@ -2,6 +2,7 @@ import styles from "./index.css";
 import { getEpochToMMSSFormat, registerCustomElement, setInnerHTML } from "../utils";
 import BinIcon from "../../../resources/icons/bin.svg";
 import StopRecordingIcon from "../../../resources/icons/stopRecording.svg";
+import InfoIcon from "../../../resources/icons/info.svg";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 
 enum RQSessionRecordingWidgetEvent {
@@ -56,11 +57,17 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   }
 
   _getDefaultMarkup() {
+    const tooltipContent =
+      "Session recording is limited to the most recent 5 minutes. The recording is still active, but you can only view the last 5 minutes of the session replay.";
+
     return `
       <style>${styles}</style>
       <div id="container">
           <span class="recording-icon"></span>
           <span class="recording-time">00:00</span>
+          <div title="Recording info" class="recording-info-icon" data-tooltip="${tooltipContent}">
+            ${InfoIcon}
+          </div>
           <div class="action stop-recording">${StopRecordingIcon} Stop & watch</div>
           <div class="action discard-recording" title="Discard">${BinIcon}</div>
       </div>
@@ -77,7 +84,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
 
     if (startTime) {
       // additional one sec since timer will run from 0 to 59 secs
-      const recordingLimitInMilliseconds = 5 * 60 * 1000 + 1 * 1000; // 5 mins * 60 secs * 1000 ms
+      const recordingLimitInMilliseconds = 1 * 60 * 1000 + 1 * 1000; // 5 mins * 60 secs * 1000 ms
       const recordingStartTime = Number(startTime);
       const recordingStopTime = recordingStartTime + recordingLimitInMilliseconds;
 
@@ -86,6 +93,8 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
 
         if (this.#currentRecordingTime <= recordingLimitInMilliseconds) {
           container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+        } else {
+          container.querySelector(".recording-info-icon").classList.add("visible");
         }
       }, 1000);
 

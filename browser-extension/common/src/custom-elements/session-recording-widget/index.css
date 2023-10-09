@@ -73,6 +73,51 @@
   min-width: 37px;
 }
 
+.recording-info-icon {
+  display: none;
+  margin-right: 8px;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
+.recording-info-icon.visible {
+  display: flex;
+}
+
+.recording-info-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.recording-info-icon:hover::after {
+  display: block;
+}
+
+.recording-info-icon::after {
+  display: none;
+  content: attr(data-tooltip);
+  white-space: break-spaces;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  transform: translate(-30%, -112%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  width: 218px;
+  max-width: 232px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #000000;
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
+}
+
 @keyframes blink {
   from {
     opacity: 1;
@@ -85,12 +130,10 @@
 .recording-icon {
   flex-shrink: 0;
   display: inline-block;
-  margin: 0 8px;
   margin-left: 12px;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 3px solid #ffffff;
   background: #e43434;
   box-sizing: border-box;
   animation: blink 1s cubic-bezier(0.5, 0, 1, 1) infinite alternate;
