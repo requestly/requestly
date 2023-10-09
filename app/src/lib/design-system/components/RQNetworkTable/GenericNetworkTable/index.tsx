@@ -40,7 +40,7 @@ export interface GenericNetworkTableProps<NetworkLog> {
 
   isRowPending?: (log: NetworkLog) => boolean;
 
-  rowClassName?: (log: NetworkLog) => string | string;
+  rowStyle?: (log: NetworkLog) => object | object;
 
   disableAutoScroll?: boolean;
 }
@@ -57,7 +57,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
   emptyView,
-  rowClassName,
+  rowStyle,
   disableAutoScroll,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
@@ -129,7 +129,7 @@ export const GenericNetworkTable = <NetworkLog,>({
           contextMenuOptions={contextMenuOptions}
           filter={filterLog}
           emptyView={emptyView}
-          rowClassName={rowClassName}
+          rowStyle={rowStyle}
           disableAutoScroll={disableAutoScroll}
         />
       </div>

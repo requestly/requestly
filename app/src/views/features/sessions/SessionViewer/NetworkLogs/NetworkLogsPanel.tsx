@@ -10,7 +10,6 @@ import { APIClient, APIClientRequest } from "components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
 import { RuleType } from "types";
 import { copyToClipBoard } from "utils/Misc";
-import { getOffset } from "./helpers";
 import { snakeCase } from "lodash";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import {
@@ -32,10 +31,6 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
   const [selectedRequestData, setSelectedRequestData] = useState<APIClientRequest>(null);
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
-
-  const isLogPending = (log: RQNetworkLog) => {
-    return getOffset(log, startTime) > playerTimeOffset;
-  };
 
   const handleContextMenuRuleOptionSelect = useCallback(
     (key: React.Key, log: RQNetworkLog) => {
@@ -182,7 +177,6 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
             }}
             emptyView={emptyTableView}
-            rowClassName={(log: RQNetworkLog) => (isLogPending(log) ? "pending-log" : "")}
             disableAutoScroll
           />
 
