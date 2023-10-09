@@ -64,6 +64,7 @@
   --primary-color: var(--blue-500);
   --danger: var(--red-500);
   --success: var(--green-500);
+  --disable: var(--neutrals-gray-500);
 
   --surface-1: var(--neutrals-gray-800);
   --surface-2: var(--neutrals-gray-700);
@@ -73,6 +74,8 @@
   --text-default: var(--neutrals-white);
 
   --background: var(--neutrals-gray-900);
+
+  --border-radius-sm: 4px;
 }
 
 /* reset */
@@ -86,7 +89,7 @@
 
 body {
   margin: 0;
-  background-color: var(--background-color-primary);
+  background-color: var(--background);
 }
 
 ul,

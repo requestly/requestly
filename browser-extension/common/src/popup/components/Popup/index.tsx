@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import PopupTabs from "../PopupTabs";
 import { EXTENSION_MESSAGES } from "../../../constants";
-import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
 import PopupFooter from "./PopupFooter";
+import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
+import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import "./popup.css";
 
 const Popup: React.FC = () => {
@@ -38,11 +39,11 @@ const Popup: React.FC = () => {
         />
         <div className="popup-body">
           {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
-          <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
-          <PopupFooter
-            isExtensionEnabled={isExtensionEnabled}
-            handleToggleExtensionStatus={handleToggleExtensionStatus}
-          />
+          <div className="popup-content">
+            {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
+            <SessionRecordingView />
+          </div>
+          <PopupFooter />
         </div>
       </div>
     </>
