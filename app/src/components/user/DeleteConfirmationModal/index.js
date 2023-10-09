@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/selectors";
@@ -9,8 +9,6 @@ const DeleteConfirmationModal = ({
   isOpen,
   toggle,
   ruleIdsToDelete,
-  promptToLogin,
-  deleteRecordFromStorage,
   handleRecordsDeletion,
   handleDeleteRulesPermanently,
   isMoveToTrashInProgress,
@@ -19,22 +17,21 @@ const DeleteConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
-  const tryMoveToTrash = () => {
+  const tryMoveToTrash = useCallback(() => {
     if (!user.loggedIn) {
       handleDeleteRulesPermanently();
-      return;
     }
     if (isWorkspaceMode) {
       handleDeleteRulesPermanently();
     } else {
       handleRecordsDeletion(user?.details?.profile?.uid);
     }
-  };
+  }, [user, isWorkspaceMode, handleDeleteRulesPermanently, handleRecordsDeletion]);
 
-  // eslint-disable-next-line no-unused-vars
-  const handleDeleteRecordFromStorage = () => {
-    deleteRecordFromStorage(false, ruleIdsToDelete);
-  };
+  const handleDeleteClick = useCallback(() => {
+    tryMoveToTrash();
+    if (isOpen) toggle();
+  }, [tryMoveToTrash, toggle, isOpen]);
 
   const renderMultipleRuleDeleteModal = () => {
     return (
@@ -58,15 +55,6 @@ const DeleteConfirmationModal = ({
                 <>
                   Are you sure you want to delete selected {ruleIdsToDelete.length}{" "}
                   {ruleIdsToDelete.length === 1 ? "rule" : "rules"} permanently?
-                  <br />
-                  {!isWorkspaceMode ? (
-                    <>
-                      <Button type="link" size="large" className="signin-link" onClick={promptToLogin}>
-                        Sign in
-                      </Button>
-                      to move rules to trash. You can recover rules from trash later on.
-                    </>
-                  ) : null}
                 </>
               )}
             </h3>
@@ -89,7 +77,7 @@ const DeleteConfirmationModal = ({
             type="primary"
             data-dismiss="modal"
             icon={<DeleteOutlined />}
-            onClick={tryMoveToTrash}
+            onClick={handleDeleteClick}
             loading={isMoveToTrashInProgress}
             disabled={isDeletionInProgress || isMoveToTrashInProgress}
           >

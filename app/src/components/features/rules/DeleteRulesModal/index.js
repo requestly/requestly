@@ -7,8 +7,6 @@ import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import DeleteConfirmationModal from "components/user/DeleteConfirmationModal";
 import { actions } from "store";
 import { getAppMode } from "store/selectors";
-import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
@@ -109,31 +107,11 @@ const DeleteRulesModal = ({
     [handleRulesDeletion, stablePostDeletionSteps, appMode, groupIdsToDelete]
   );
 
-  const promptUserToLogin = () => {
-    const signInSuccessCallback = (uid) => {
-      handleRecordsDeletion(uid);
-    };
-
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          src: APP_CONSTANTS.FEATURES.RULES,
-          callback: signInSuccessCallback,
-          eventSource: AUTH.SOURCE.DELETE_RULE,
-        },
-      })
-    );
-  };
-
   return (
     <DeleteConfirmationModal
       isOpen={isOpen}
       toggle={toggleDeleteRulesModal}
       ruleIdsToDelete={ruleIdsToDelete}
-      promptToLogin={promptUserToLogin}
       handleRecordsDeletion={handleRecordsDeletion}
       handleDeleteRulesPermanently={handleDeleteRulesPermanently}
       isMoveToTrashInProgress={areRulesMovingToTrash}
