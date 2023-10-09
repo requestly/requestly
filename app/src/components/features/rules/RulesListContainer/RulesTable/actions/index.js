@@ -44,7 +44,7 @@ export const ungroupSelectedRules = (appMode, selectedRuleIds, user) => {
   });
 };
 
-export const deleteGroup = (appMode, groupId, groupwiseRulesToPopulate, forceDelete) => {
+export const deleteGroup = (appMode, groupId, groupwiseRulesToPopulate, forceDelete = false) => {
   if (forceDelete) {
     Logger.log("Removing from storage in deleteGroup");
     return StorageService(appMode).removeRecord(groupId);
