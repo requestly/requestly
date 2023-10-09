@@ -71,7 +71,6 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.isExplicitRecording = explicit;
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
-  console.log("!!!debug", "start recording", RQ.SessionRecorder.recordingMode);
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
 };
 

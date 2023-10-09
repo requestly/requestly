@@ -29,7 +29,11 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 import LINKS from "config/constants/sub/links";
-import { trackTestRuleSessionDraftSaved, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
+import {
+  trackTestRuleSessionDraftViewed,
+  trackTroubleshootClicked,
+} from "modules/analytics/events/features/ruleEditor";
+import { SessionRecordingMode } from "./types";
 
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
@@ -53,6 +57,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
@@ -112,12 +117,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   }, [navigate, isImportedSession, sessionRecordingMetadata]);
 
   useEffect(() => {
-    trackDraftSessionViewed(source);
-
-    if (testRuleDraftSession) {
-      trackTestRuleSessionDraftSaved();
-    }
-
     setIsLoading(true);
 
     if (tabId === "imported") {
@@ -133,12 +132,11 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
     } else {
-      getTabSession(parseInt(tabId)).then((payload: any) => {
-        console.log("!!!debug", "app draft viewer", payload);
+      getTabSession(parseInt(tabId)).then((payload: unknown) => {
         if (typeof payload === "string") {
           setLoadingError(payload);
         } else {
-          const tabSession = payload as RQSession;
+          const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
           if (!tabSession) {
             return;
           }
@@ -150,6 +148,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               sessionRecordingActions.setSessionRecordingMetadata({
                 sessionAttributes: tabSession.attributes,
                 name: generateDraftSessionTitle(tabSession.attributes?.url),
+                recordingMode: tabSession.recordingMode,
               })
             );
 
@@ -161,6 +160,14 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       });
     }
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession, source]);
+
+  useEffect(() => {
+    trackDraftSessionViewed(source, sessionRecordingMetadata.recordingMode);
+
+    if (testRuleDraftSession) {
+      trackTestRuleSessionDraftViewed();
+    }
+  }, [sessionRecordingMetadata.recordingMode, source, testRuleDraftSession]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
