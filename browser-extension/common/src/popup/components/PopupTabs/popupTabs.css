@@ -1,3 +1,14 @@
+.popup-tabs-wrapper {
+  background: var(--surface-1);
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius);
+  padding: 12px 1rem;
+}
+
+.tabs-header {
+  margin-bottom: 8px;
+}
+
 .popup-tabs .ant-tabs-tab {
   padding-top: 4px;
   color: #b0b0b5;
@@ -7,8 +18,18 @@
   margin-right: 8px;
 }
 
-.popup-tabs .ant-tabs-nav .ant-tabs-nav-wrap {
-  justify-content: center;
+.new-rule-dropdown-btn.ant-btn {
+  gap: 8px;
+}
+
+.new-rule-dropdown-btn.ant-btn .new-rule-dropdown-btn-arrow {
+  height: 6px;
+  width: 1rem;
+  margin-right: 0;
+}
+
+.new-rule-dropdown-btn-arrow-up {
+  transform: scaleY(-1);
 }
 
 .popup-tab-badge {
@@ -24,4 +45,21 @@
   background-color: transparent;
   border-radius: var(--border-radius);
   border: 1px solid var(--color-success);
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu {
+  background-color: var(--surface-2);
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item-icon {
+  color: var(--color-icon);
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item {
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.rule-type-dropdown .ant-dropdown-menu-item:last-child .ant-dropdown-menu-title-content .more-rules-link-option > div {
+  font-size: 12px;
 }
