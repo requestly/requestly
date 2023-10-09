@@ -45,7 +45,7 @@ export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSche
         body: mockEditorData.body,
       },
     ],
-    password: mockEditorData?.password,
+    password: mockEditorData.password ?? null,
   };
 
   return mockData;
@@ -75,6 +75,7 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
     contentType: contentType,
     body: mockData.responses[0]?.body || "",
     responseId: mockData.responses[0]?.id,
+    password: mockData.password ?? "",
   };
 
   return mockEditorData;

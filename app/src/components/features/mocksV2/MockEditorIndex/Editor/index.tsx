@@ -71,7 +71,7 @@ const MockEditor: React.FC<Props> = ({
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
-  const [rulePassword, setRulePassword] = useState<string>("");
+  const [rulePassword, setRulePassword] = useState<string>(mockData.password ?? "");
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
