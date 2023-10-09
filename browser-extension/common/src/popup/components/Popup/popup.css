@@ -111,11 +111,13 @@
 .popup-footer-resume-btn.ant-btn.ant-btn-dangerous:hover {
   opacity: 0.6;
 }
+
 .popup-body {
   position: relative;
   width: 100%;
   height: 100%;
 }
+
 .popup-content {
   padding: 20px 0;
   min-height: 302px;
@@ -164,6 +166,7 @@
 .pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked:hover {
   background: var(--success);
 }
+
 .extension-paused-overlay {
   position: absolute;
   inset: 0;
