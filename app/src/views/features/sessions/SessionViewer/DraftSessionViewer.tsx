@@ -133,7 +133,8 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
     } else {
-      getTabSession(parseInt(tabId)).then((payload: unknown) => {
+      getTabSession(parseInt(tabId)).then((payload: any) => {
+        console.log("!!!debug", "app draft viewer", payload);
         if (typeof payload === "string") {
           setLoadingError(payload);
         } else {

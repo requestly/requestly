@@ -7,6 +7,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.sendResponseCallbacks = {};
+  RQ.SessionRecorder.recordingMode;
 
   const isTopDocument = !RQ.SessionRecorder.isIframe();
 
@@ -39,7 +40,12 @@ RQ.SessionRecorder.setup = () => {
           break;
 
         case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
-          RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
+          RQ.SessionRecorder.sendMessageToClient("getSessionData", null, (session) =>
+            sendResponse({
+              ...session,
+              recordingMode: RQ.SessionRecorder.recordingMode,
+            })
+          );
           return true;
       }
     }
@@ -65,6 +71,8 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.isExplicitRecording = explicit;
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
+  console.log("!!!debug", "start recording", RQ.SessionRecorder.recordingMode);
+  RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -124,6 +132,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
         payload: {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
+          recordingMode: RQ.SessionRecorder.recordingMode,
         },
       });
     });
