@@ -163,8 +163,8 @@
   align-self: center;
 }
 
-.pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked,
-.pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked:hover {
+.pause-switch.ant-switch.ant-switch-checked,
+.pause-switch.ant-switch.ant-switch-checked:hover {
   background: var(--success);
 }
 
