@@ -110,7 +110,7 @@ const generateEndpointSuffix = (username: string, uid?: string, teamId?: string,
     searchParamsObj["rq_uid"] = uid;
   }
 
-  if (password) {
+  if (password && password.length > 0) {
     searchParamsObj["rq_password"] = password;
   }
 
