@@ -45,6 +45,7 @@ export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSche
         body: mockEditorData.body,
       },
     ],
+    password: mockEditorData?.password,
   };
 
   return mockData;
