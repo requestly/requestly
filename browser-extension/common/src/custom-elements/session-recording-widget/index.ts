@@ -83,8 +83,8 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     const startTime = this.attributes.getNamedItem("recording-start-time")?.value ?? null;
 
     if (startTime) {
-      // additional one sec since timer will run from 0 to 59 secs
-      const recordingLimitInMilliseconds = 1 * 60 * 1000 + 1 * 1000; // 5 mins * 60 secs * 1000 ms
+      // additional one sec else timer will stop at 59th sec
+      const recordingLimitInMilliseconds = 5 * 60 * 1000 + 1000; // 5 mins * 60 secs * 1000 ms
       const recordingStartTime = Number(startTime);
       const recordingStopTime = recordingStartTime + recordingLimitInMilliseconds;
 
@@ -94,6 +94,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
         if (this.#currentRecordingTime <= recordingLimitInMilliseconds) {
           container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
         } else {
+          container.querySelector(".recording-time").innerHTML = "05:00";
           container.querySelector(".recording-info-icon").classList.add("visible");
         }
       }, 1000);
@@ -114,6 +115,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     this.#currentRecordingTime = 0;
     this.#recordingTimerIntervalId = null;
     this.getContainer().querySelector(".recording-time").innerHTML = "00:00";
+    this.getContainer().querySelector(".recording-info-icon").classList.remove("visible");
   }
 
   hide() {
