@@ -1,30 +1,20 @@
 import React from "react";
-import { Button, Row, Typography } from "antd";
-import SessionRecordingView from "../SessionRecording/SessionRecordingView";
-import PlayIcon from "../../../../resources/icons/play.svg";
+import { Row } from "antd";
+import QuestionLine from "../../../../resources/icons/questionLine.svg";
+import { LINKS } from "../../../constants";
 
-interface PopupFooterProps {
-  isExtensionEnabled: boolean;
-  handleToggleExtensionStatus: () => void;
-}
-
-const PopupFooter: React.FC<PopupFooterProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
+const PopupFooter: React.FC = () => {
   return (
-    <Row align="middle" className="popup-footer">
-      {isExtensionEnabled ? (
-        <SessionRecordingView />
-      ) : (
-        <div className="resume-btn-container">
-          <Button danger className="popup-footer-resume-btn" onClick={handleToggleExtensionStatus}>
-            <PlayIcon />
-            <span className="popup-footer-resume-btn-text">Resume</span>
-          </Button>
-
-          <Typography.Text type="secondary">
-            When paused, rules won't be applied and sessions won't be recorded.
-          </Typography.Text>
-        </div>
-      )}
+    <Row align="middle" justify="end" className="popup-footer">
+      <div
+        className="need-help"
+        onClick={() => {
+          // TODO: add analytics
+          window.open(LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING, "_blank");
+        }}
+      >
+        <QuestionLine /> Need help
+      </div>
     </Row>
   );
 };
