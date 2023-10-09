@@ -10,11 +10,12 @@
 }
 
 .popup-header {
-  height: 54px;
-  padding: 12px;
+  height: 56px;
+  padding: 12px 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: var(--surface-1);
 }
 
 .popup-header-workspace-section {
@@ -115,6 +116,12 @@
   opacity: 0.6;
 }
 
+.popup-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .popup-content {
   padding: 16px;
   padding-bottom: 0;
@@ -148,6 +155,26 @@
   justify-content: center;
   font-size: 12px;
   padding: 8px 16px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.pause-switch {
+  margin-right: 8px;
+  align-self: center;
+}
+
+.pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked,
+.pause-switch:where(.css-1mzf6dm).ant-switch.ant-switch-checked:hover {
+  background: var(--success);
+}
+
+.extension-paused-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-1);
+  z-index: 2;
+  opacity: 0.6;
 }
 
 .empty-records-title {
