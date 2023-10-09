@@ -9,8 +9,7 @@ import "./popup.css";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(false);
-  const [initPauseToolip, setInitPauseTooltip] = useState(false);
+  const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT }, (noRulesPresent) => {
@@ -20,10 +19,7 @@ const Popup: React.FC = () => {
       });
     });
 
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, (isEnabled) => {
-      setIsExtensionEnabled(isEnabled);
-      setInitPauseTooltip(true);
-    });
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, setIsExtensionEnabled);
   }, []);
 
   const handleToggleExtensionStatus = useCallback(() => {
@@ -37,7 +33,6 @@ const Popup: React.FC = () => {
     <>
       <div className="popup">
         <PopupHeader
-          initPauseToolip={initPauseToolip}
           isExtensionEnabled={isExtensionEnabled}
           handleToggleExtensionStatus={handleToggleExtensionStatus}
         />
