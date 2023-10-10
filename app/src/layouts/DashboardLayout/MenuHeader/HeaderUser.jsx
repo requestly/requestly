@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu } from "antd";
@@ -20,85 +20,70 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
-  const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
+  const userName = useMemo(() => (user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null), [
+    user?.details?.profile?.displayName,
+    user.loggedIn,
+  ]);
 
-  const userPhoto =
-    user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
+  const userPhoto = useMemo(
+    () =>
+      user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null,
+    [user.details.profile.photoURL, user.loggedIn]
+  );
 
-  const userEmail = user?.details?.profile?.email;
+  const userEmail = useMemo(() => user?.details?.profile?.email, [user.details.profile.email]);
 
   // Component State
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [hideUserDropDown, setHideUserDropdown] = useState(false);
 
-  const promptUserToSignup = (source) => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: source,
-        },
-      })
-    );
-  };
+  useEffect(() => {
+    Object.values(APP_CONSTANTS.PATHS.AUTH).forEach((AUTH_PATH) => {
+      // SO THAT USER CANNOT TRIGGER OTHER AUTH ACTIONS DURING CURRENT AUTH FLOW
+      if (window.location.pathname === AUTH_PATH.ABSOLUTE) {
+        setHideUserDropdown(true);
+      }
+    });
+  }, []);
 
-  const menu = (
-    <Menu className="profile-dropdown">
-      <Menu.Item key={0} className="profile-avatar-container" onClick={() => redirectToAccountDetails(navigate)}>
-        <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer" />
-        <div className="profile-details">
-          <div className="profile-username">{userName}</div>
-          {userEmail ? <div className="text-gray text-sm">{userEmail}</div> : null}
-        </div>
-      </Menu.Item>
-      <Divider className="profile-divider" />
-      <Menu.Item key={1} className="profile-menu-items" onClick={() => redirectToAccountDetails(navigate)}>
-        Profile
-      </Menu.Item>
-      <Menu.Item key={2} className="profile-menu-items" onClick={() => redirectToMyTeams(navigate)}>
-        Manage Workspaces
-      </Menu.Item>
-      <Divider className="profile-divider" />
-      <Menu.Item
-        key={4}
-        className="profile-menu-items profile-sign-out"
-        onClick={() => {
-          setIsLoading(true);
-          handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
-            .then(() =>
-              dispatch(
-                actions.updateHardRefreshPendingStatus({
-                  type: "rules",
-                })
+  const renderUserDetails = useCallback(() => {
+    const menu = (
+      <Menu className="profile-dropdown">
+        <Menu.Item key={0} className="profile-avatar-container" onClick={() => redirectToAccountDetails(navigate)}>
+          <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer" />
+          <div className="profile-details">
+            <div className="profile-username">{userName}</div>
+            {userEmail ? <div className="text-gray text-sm">{userEmail}</div> : null}
+          </div>
+        </Menu.Item>
+        <Divider className="profile-divider" />
+        <Menu.Item key={1} className="profile-menu-items" onClick={() => redirectToAccountDetails(navigate)}>
+          Profile
+        </Menu.Item>
+        <Menu.Item key={2} className="profile-menu-items" onClick={() => redirectToMyTeams(navigate)}>
+          Manage Workspaces
+        </Menu.Item>
+        <Divider className="profile-divider" />
+        <Menu.Item
+          key={4}
+          className="profile-menu-items profile-sign-out"
+          onClick={() => {
+            setLoading(true);
+            handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
+              .then(() =>
+                dispatch(
+                  actions.updateHardRefreshPendingStatus({
+                    type: "rules",
+                  })
+                )
               )
-            )
-            .finally(() => setIsLoading(false));
-        }}
-      >
-        Sign out
-      </Menu.Item>
-    </Menu>
-  );
-
-  const loading = (
-    <span>
-      <Spin
-        size="small"
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-        }}
-      />
-    </span>
-  );
-
-  if (isLoading) {
-    return loading;
-  }
-
-  const renderUserDetails = () => {
+              .finally(() => setLoading(false));
+          }}
+        >
+          Sign out
+        </Menu.Item>
+      </Menu>
+    );
     return (
       <>
         <Col>
@@ -116,9 +101,9 @@ export default function HeaderUser() {
         </Col>
       </>
     );
-  };
+  }, [appMode, dispatch, isWorkspaceMode, navigate, userEmail, userName, userPhoto]);
 
-  const renderLoginBtn = () => {
+  const renderLoginBtn = useCallback(() => {
     return (
       <Col>
         <Button
@@ -126,7 +111,18 @@ export default function HeaderUser() {
           className="layout-header-signup-btn"
           onClick={(e) => {
             e.preventDefault();
-            promptUserToSignup(AUTH.SOURCE.NAVBAR);
+            // PROMPT USER TO SIGNUP
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  redirectURL: window.location.href,
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                  eventSource: AUTH.SOURCE.NAVBAR,
+                },
+              })
+            );
             return false;
           }}
         >
@@ -134,22 +130,23 @@ export default function HeaderUser() {
         </Button>
       </Col>
     );
-  };
+  }, [dispatch]);
 
-  let showUserDropdown = true;
-
-  Object.values(APP_CONSTANTS.PATHS.AUTH).forEach((AUTH_PATH) => {
-    // SO THAT USER CANNOT TRIGGER OTHER AUTH ACTIONS DURING CURRENT AUTH FLOW
-    if (window.location.pathname === AUTH_PATH.ABSOLUTE) {
-      showUserDropdown = false;
-    }
-  });
-
-  if (!showUserDropdown) {
-    return null;
+  if (loading) {
+    return (
+      <span>
+        <Spin
+          size="small"
+          style={{
+            marginLeft: 8,
+            marginRight: 8,
+          }}
+        />
+      </span>
+    );
   }
 
-  return (
+  return hideUserDropDown ? null : (
     <>
       {user.loggedIn && user.details && user.details.profile && user.details.profile.photoURL
         ? renderUserDetails()
