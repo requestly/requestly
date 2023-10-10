@@ -31,6 +31,7 @@ import { MdOutlineReplay10 } from "@react-icons/all-files/md/MdOutlineReplay10";
 import { MdOutlineForward10 } from "@react-icons/all-files/md/MdOutlineForward10";
 import "./sessionViewer.scss";
 import PlayerFrameOverlay from "./PlayerOverlay";
+import { getInactiveSegments } from "./utils";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
@@ -53,6 +54,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [isSkipping, setIsSkipping] = useState<boolean>(false);
+  const [skipInactiveSegments, setSkipInactiveSegments] = useState<boolean>(true);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -73,6 +75,10 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   }, [events, startTime]);
 
   const rqNetworkLogs = useMemo(() => convertSessionRecordingNetworkLogsToRQNetworkLogs(networkLogs), [networkLogs]);
+
+  const inactiveSegments = useMemo(() => getInactiveSegments(events[RQSessionEventType.RRWEB] as RRWebEventData[]), [
+    events,
+  ]);
 
   const getCurrentTimeOffset = useCallback(() => {
     return Math.floor((currentTimeRef.current - startTime) / 1000);
@@ -128,6 +134,16 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       setRQControllerButtonContainer(
         rr_controller__btns.children[0].insertAdjacentElement("afterend", controllerButtonContainer)
       );
+
+      const rrSkipInactiveToggleHandler = (e: InputEvent) => {
+        setSkipInactiveSegments((e.target as HTMLInputElement).checked);
+      };
+
+      const rrSkipInactiveToggle = rr_controller__btns?.querySelector(".switch #skip");
+      rrSkipInactiveToggle?.addEventListener("change", rrSkipInactiveToggleHandler);
+      return () => {
+        rrSkipInactiveToggle?.removeEventListener("change", rrSkipInactiveToggleHandler);
+      };
     }
   }, [player]);
 
@@ -148,59 +164,57 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     };
   }, [player]);
 
-  const skipStartEventRef = useRef(null);
-
-  const setSkipStartTimestamp = useCallback(
-    (event: any) => {
-      skipStartEventRef.current = event;
-      setTimeout(() => {
-        player.setSpeed(256);
-      }, 1000);
-    },
-    [player]
-  );
-
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
       currentTimeRef.current = startTime + payload;
       setPlayerTimeOffset(payload / 1000); // millis -> secs
     });
+  }, [player, startTime]);
 
-    player?.addEventListener("start", () => {
+  const eventCastHandler = useCallback(
+    (event: RRWebEventData) => {
+      if (isSkipping || !skipInactiveSegments) return;
+
+      const skipEvent = inactiveSegments?.find(([startTime]) => {
+        return event.timestamp === startTime && event.timestamp >= currentTimeRef.current;
+      });
+
+      if (skipEvent) {
+        setPlayerState(PlayerState.SKIPPING);
+        setIsSkipping(true);
+        setTimeout(() => {
+          player.goto(skipEvent[1] - startTime - 2000);
+          setPlayerState(PlayerState.PLAYING);
+          setIsSkipping(false);
+        }, 2000);
+      }
+    },
+    [inactiveSegments, isSkipping, player, skipInactiveSegments, startTime]
+  );
+
+  const playerStateChangeHandler = useCallback(
+    (event: { payload: PlayerState }) => {
       if (isSkipping) {
         setPlayerState(PlayerState.SKIPPING);
       } else {
-        setPlayerState(PlayerState.PLAYING);
+        setPlayerState(event.payload);
       }
-    });
+    },
+    [isSkipping]
+  );
 
-    player?.addEventListener("pause", () => {
-      if (isSkipping) {
-        setPlayerState(PlayerState.SKIPPING);
-      } else {
-        setPlayerState(PlayerState.PAUSED);
-      }
-    });
+  useEffect(() => {
+    if (!player) return;
 
-    player?.addEventListener("skip-start", () => {
-      setPlayerState(PlayerState.SKIPPING);
-      setIsSkipping(true);
-      const replayer = player.getReplayer();
-      replayer.on("event-cast", setSkipStartTimestamp);
-      setTimeout(() => {
-        replayer.off("event-cast", setSkipStartTimestamp);
-      }, 500);
-    });
+    const replayer = player?.getReplayer();
 
-    player?.addEventListener("event-cast", (event) => {
-      if (event.timestamp - skipStartEventRef.current?.timestamp > 10000) {
-        skipStartEventRef.current = null;
-        player.setSpeed(1);
-        setPlayerState(PlayerState.PLAYING);
-        setIsSkipping(false);
-      }
-    });
-  }, [isSkipping, player, setSkipStartTimestamp, startTime]);
+    replayer?.on("ui-update-player-state", playerStateChangeHandler);
+    replayer?.on("event-cast", eventCastHandler);
+    return () => {
+      replayer?.off("ui-update-player-state", playerStateChangeHandler);
+      replayer?.off("event-cast", eventCastHandler);
+    };
+  }, [eventCastHandler, player, playerStateChangeHandler]);
 
   useEffect(() => {
     if (!player) {
