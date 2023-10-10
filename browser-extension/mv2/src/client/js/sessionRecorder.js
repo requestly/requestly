@@ -251,18 +251,10 @@ RQ.SessionRecorder.showRecordingWidget = () => {
   }
 
   const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
-  const recordingStartTime = RQ.SessionRecorder.recordingStartTime;
-
-  // When recording starts ideally currentRecordingTime should be 0
-  // but there will some milliseconds difference
-  const currentRecordingTime = Date.now() - recordingStartTime;
+  const currentRecordingTime = Date.now() - RQ.SessionRecorder.recordingStartTime;
 
   RQ.SessionRecorder.currentRecordingTime =
-    currentRecordingTime < 1000
-      ? 0 // correction for millisecond difference
-      : currentRecordingTime <= recordingLimitInMilliseconds
-      ? currentRecordingTime
-      : null;
+    currentRecordingTime <= recordingLimitInMilliseconds ? currentRecordingTime : null;
 
   widget.dispatchEvent(
     new CustomEvent("show", {

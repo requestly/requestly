@@ -46,6 +46,7 @@
   font-weight: 500;
   color: #ffffff;
   box-sizing: border-box;
+  margin-left: 8px;
 }
 
 .stop-recording svg {
@@ -83,6 +84,10 @@
 
 .recording-info-icon.visible {
   display: flex;
+}
+
+.recording-info-icon.visible + .stop-recording {
+  margin-left: 0;
 }
 
 .recording-info-icon svg {
