@@ -44,8 +44,8 @@ class RQSessionRecordingAutoModeWidget extends RQDraggableWidget {
     return `
     <style>${styles}</style>
     <div id="container">
-      <span class="rq-logo">${RQLogo}</span>
       <button class="watch-replay">
+        <span class="rq-logo">${RQLogo}</span>
         <span class="btn-text">${ReplayLastFiveMinuteIcon} Watch last 5 min replay</span>
       </button>
     </div>
