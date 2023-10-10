@@ -133,7 +133,6 @@ const PopupTabs: React.FC = () => {
         items={tabItems}
         activeKey={activeTabKey}
         className="popup-tabs"
-        destroyInactiveTabPane
         onChange={(key: PopupTabKey) => {
           setActiveTabKey(key);
           sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key });
