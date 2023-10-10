@@ -164,12 +164,31 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     };
   }, [player]);
 
+  const skipInProgress = useRef(false);
+
   useEffect(() => {
     player?.addEventListener("ui-update-current-time", ({ payload }) => {
-      currentTimeRef.current = startTime + payload;
+      const currentTime = startTime + payload;
+      currentTimeRef.current = currentTime;
       setPlayerTimeOffset(payload / 1000); // millis -> secs
+      if (skipInProgress.current) return;
+      const skipEvent = inactiveSegments?.find(([startTime, endTime]) => {
+        return currentTime >= startTime && currentTime < endTime - 2000;
+      });
+
+      if (skipEvent && !isSkipping && skipInactiveSegments) {
+        setPlayerState(PlayerState.SKIPPING);
+        setIsSkipping(true);
+        skipInProgress.current = true;
+        setTimeout(() => {
+          player.goto(skipEvent[1] - startTime - 2000);
+          setPlayerState(PlayerState.PLAYING);
+          setIsSkipping(false);
+          skipInProgress.current = false;
+        }, 2000);
+      }
     });
-  }, [player, startTime]);
+  }, [inactiveSegments, isSkipping, player, skipInactiveSegments, startTime]);
 
   const eventCastHandler = useCallback(
     (event: RRWebEventData) => {
@@ -182,10 +201,12 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       if (skipEvent) {
         setPlayerState(PlayerState.SKIPPING);
         setIsSkipping(true);
+        skipInProgress.current = true;
         setTimeout(() => {
           player.goto(skipEvent[1] - startTime - 2000);
           setPlayerState(PlayerState.PLAYING);
           setIsSkipping(false);
+          skipInProgress.current = false;
         }, 2000);
       }
     },
