@@ -7,6 +7,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.recordingStartTime = null;
+  RQ.SessionRecorder.currentRecordingTime = null;
   RQ.SessionRecorder.sendResponseCallbacks = {};
   RQ.SessionRecorder.recordingMode;
 
@@ -54,7 +55,17 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
+  const {
+    config,
+    previousSession,
+    notify,
+    explicit = false,
+    widgetPosition,
+    showWidget,
+    recordingStartTime,
+    currentRecordingTime,
+  } = options;
+
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
@@ -73,7 +84,11 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
-  RQ.SessionRecorder.recordingStartTime = recordingStartTime;
+
+  if (explicit) {
+    RQ.SessionRecorder.recordingStartTime = recordingStartTime;
+    RQ.SessionRecorder.currentRecordingTime = currentRecordingTime;
+  }
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -120,6 +135,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
       RQ.SessionRecorder.recordingStartTime = null;
+      RQ.SessionRecorder.currentRecordingTime = null;
       RQ.SessionRecorder.hideWidget();
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -135,6 +151,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
           recordingMode: RQ.SessionRecorder.recordingMode,
+          currentRecordingTime: RQ.SessionRecorder.currentRecordingTime,
         },
       });
     });
@@ -235,11 +252,25 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     });
   }
 
-  widget.setAttribute("recording-start-time", `${RQ.SessionRecorder.recordingStartTime}`);
+  const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
+  const recordingStartTime = RQ.SessionRecorder.recordingStartTime;
+
+  // When recording starts ideally currentRecordingTime should be 0
+  // but there will some milliseconds difference
+  const currentRecordingTime = Date.now() - recordingStartTime;
+
+  RQ.SessionRecorder.currentRecordingTime =
+    currentRecordingTime < 1000
+      ? 0 // correction for millisecond difference
+      : currentRecordingTime <= recordingLimitInMilliseconds
+      ? currentRecordingTime
+      : null;
+
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
         position: RQ.SessionRecorder.widgetPosition,
+        currentRecordingTime: RQ.SessionRecorder.currentRecordingTime,
       },
     })
   );
@@ -247,7 +278,6 @@ RQ.SessionRecorder.showRecordingWidget = () => {
 
 RQ.SessionRecorder.hideWidget = () => {
   const widget = RQ.SessionRecorder.getWidget();
-  widget?.removeAttribute("recording-start-time");
   widget?.dispatchEvent(new CustomEvent("hide"));
 };
 

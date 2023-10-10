@@ -12,6 +12,7 @@ enum RQSessionRecordingWidgetEvent {
 
 const TAG_NAME = "rq-session-recording-widget";
 const DEFAULT_POSITION = { left: 30, bottom: 30 };
+const EXPLICIT_RECORDING_LIMIT = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
 
 class RQSessionRecordingWidget extends RQDraggableWidget {
   #currentRecordingTime = 0;
@@ -46,7 +47,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     });
 
     this.addEventListener("show", (evt: CustomEvent) => {
-      this.show(evt.detail?.position);
+      this.show(evt.detail?.position, evt.detail?.currentRecordingTime);
     });
 
     this.addEventListener("hide", this.hide);
@@ -74,36 +75,32 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     `;
   }
 
-  show(position = DEFAULT_POSITION) {
+  show(position = DEFAULT_POSITION, currentRecordingTime: number | null = null) {
     this.moveToPostion(position);
     this.setAttribute("draggable", "true");
     const container = this.getContainer();
-
     container.classList.add("visible");
-    const startTime = this.attributes.getNamedItem("recording-start-time")?.value ?? null;
 
-    if (startTime) {
-      // additional one sec else timer will stop at 59th sec
-      const recordingLimitInMilliseconds = 5 * 60 * 1000 + 1000; // 5 mins * 60 secs * 1000 ms
-      const recordingStartTime = Number(startTime);
-      const recordingStopTime = recordingStartTime + recordingLimitInMilliseconds;
+    if (currentRecordingTime !== null) {
+      this.#currentRecordingTime = currentRecordingTime;
 
-      this.#recordingTimerIntervalId = setInterval(() => {
-        this.#currentRecordingTime = Date.now() - recordingStartTime;
+      if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+        container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+      }
 
-        if (this.#currentRecordingTime <= recordingLimitInMilliseconds) {
-          container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
-        } else {
-          container.querySelector(".recording-time").innerHTML = "05:00";
-          container.querySelector(".recording-info-icon").classList.add("visible");
-        }
-      }, 1000);
-
-      setTimeout(() => {
-        if (this.#recordingTimerIntervalId) {
-          clearInterval(this.#recordingTimerIntervalId);
-        }
-      }, recordingStopTime - this.#currentRecordingTime);
+      this.#recordingTimerIntervalId = setInterval(
+        () => {
+          if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+            this.#currentRecordingTime = this.#currentRecordingTime + 1000;
+            container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+          } else {
+            clearInterval(this.#recordingTimerIntervalId);
+            container.querySelector(".recording-time").innerHTML = "05:00";
+            container.querySelector(".recording-info-icon").classList.add("visible");
+          }
+        },
+        this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT ? 1000 : 0
+      );
     }
   }
 
