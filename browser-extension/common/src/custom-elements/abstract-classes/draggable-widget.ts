@@ -1,3 +1,7 @@
+enum RQDraggableWidgetEvent {
+  MOVED = "moved",
+}
+
 export abstract class RQDraggableWidget extends HTMLElement {
   #isDragging: boolean;
   #defaultPosition;
@@ -83,5 +87,7 @@ export abstract class RQDraggableWidget extends HTMLElement {
     this.style.top = getCSSPostionValue(position.top);
     this.style.bottom = getCSSPostionValue(position.bottom);
     this.style.right = getCSSPostionValue(position.right);
+
+    this.dispatchEvent(new CustomEvent(RQDraggableWidgetEvent.MOVED, { detail: position }));
   }
 }
