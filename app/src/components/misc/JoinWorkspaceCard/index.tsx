@@ -61,6 +61,7 @@ export const JoinWorkspaceCard = () => {
           newValue: true,
           newProps: {
             callback: () => dispatch(actions.updateJoinWorkspaceCardVisible(false)),
+            source: "card_business_users",
           },
         })
       );
