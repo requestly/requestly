@@ -81,32 +81,32 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     const container = this.getContainer();
     container.classList.add("visible");
 
-    if (currentRecordingTime !== null) {
-      this.#currentRecordingTime = currentRecordingTime;
+    if (currentRecordingTime === null) return;
 
-      if (this.#recordingTimerIntervalId) {
-        clearInterval(this.#recordingTimerIntervalId);
-      }
+    this.#currentRecordingTime = currentRecordingTime;
 
-      if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
-        container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
-      }
-
-      this.#recordingTimerIntervalId = setInterval(
-        () => {
-          this.#currentRecordingTime = this.#currentRecordingTime + 1000;
-
-          if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
-            container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
-          } else {
-            container.querySelector(".recording-time").innerHTML = "05:00";
-            container.querySelector(".recording-info-icon").classList.add("visible");
-            clearInterval(this.#recordingTimerIntervalId);
-          }
-        },
-        this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT ? 1000 : 0
-      );
+    if (this.#recordingTimerIntervalId) {
+      clearInterval(this.#recordingTimerIntervalId);
     }
+
+    if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+      container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+    }
+
+    this.#recordingTimerIntervalId = setInterval(
+      () => {
+        this.#currentRecordingTime = this.#currentRecordingTime + 1000;
+
+        if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+          container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+        } else {
+          container.querySelector(".recording-time").innerHTML = "05:00";
+          container.querySelector(".recording-info-icon").classList.add("visible");
+          clearInterval(this.#recordingTimerIntervalId);
+        }
+      },
+      this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT ? 1000 : 0
+    );
   }
 
   resetTimer() {
