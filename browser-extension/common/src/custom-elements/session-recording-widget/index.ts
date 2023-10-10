@@ -84,19 +84,24 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     if (currentRecordingTime !== null) {
       this.#currentRecordingTime = currentRecordingTime;
 
+      if (this.#recordingTimerIntervalId) {
+        clearInterval(this.#recordingTimerIntervalId);
+      }
+
       if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
         container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
       }
 
       this.#recordingTimerIntervalId = setInterval(
         () => {
+          this.#currentRecordingTime = this.#currentRecordingTime + 1000;
+
           if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
-            this.#currentRecordingTime = this.#currentRecordingTime + 1000;
             container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
           } else {
-            clearInterval(this.#recordingTimerIntervalId);
             container.querySelector(".recording-time").innerHTML = "05:00";
             container.querySelector(".recording-info-icon").classList.add("visible");
+            clearInterval(this.#recordingTimerIntervalId);
           }
         },
         this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT ? 1000 : 0
