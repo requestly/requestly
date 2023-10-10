@@ -3,7 +3,6 @@
   margin-bottom: 1rem;
   border-radius: var(--border-radius);
   padding: 12px 1rem;
-  height: 330px;
 }
 
 .tabs-header {
@@ -29,13 +28,16 @@
 }
 
 .new-rule-dropdown-btn.ant-btn .new-rule-dropdown-btn-arrow {
-  height: 6px;
-  width: 1rem;
+  height: auto;
+  width: min-content;
   margin-right: 0;
+  transform-origin: center center;
+  transition: 0.2s ease-in-out;
 }
 
 .new-rule-dropdown-btn-arrow-up {
-  transform: scaleY(-1);
+  transform-origin: center center;
+  transform: rotate(180deg);
 }
 
 .popup-tab-badge {
@@ -59,20 +61,28 @@
   background-color: var(--surface-2);
 }
 
-.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item-icon {
-  color: var(--color-icon);
-}
-
 .rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item {
   padding: 12px 14px;
+}
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item svg {
+  color: var(--color-icon);
+  align-self: center;
 }
 
 .rule-type-dropdown .ant-dropdown-menu-item:last-child .ant-dropdown-menu-title-content .more-rules-link-option > div {
   font-size: 12px;
 }
 
-.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder div {
+.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder .ant-tabs-content,
+.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder .ant-tabs-content .ant-tabs-tabpane,
+.popup-tabs-wrapper .empty-tab-view-container {
   height: 100%;
 }
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Badge, Col, Dropdown, Row, Tabs, Typography } from "antd";
+import { Badge, Col, Dropdown, Menu, Row, Tabs, Typography } from "antd";
 import ExecutedRules from "../ExecutedRules";
 import PinnedRecords from "../PinnedRecords";
 import RecentRecords from "../RecentRecords";
@@ -9,6 +9,7 @@ import ArrowIcon from "../../../../resources/icons/arrowDown.svg";
 import { PushpinOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { icons } from "../../ruleTypeIcons";
 import { EVENT, sendEvent } from "../../events";
+import config from "../../../config";
 import "./popupTabs.css";
 
 enum PopupTabKey {
@@ -57,61 +58,72 @@ const PopupTabs: React.FC = () => {
     ];
   }, [executedRulesCount]);
 
-  const ruleDropdownTypes = {
-    items: [
-      {
-        key: "modify_response",
-        label: <span>Modify API Response</span>,
-        icon: icons.Response,
-      },
-      {
-        key: "modify_headers",
-        label: <span>Modify Headers</span>,
-        icon: icons.Headers,
-      },
-      {
-        key: "redirect_request",
-        label: <span>Redirect Request</span>,
-        icon: icons.Redirect,
-      },
-      {
-        key: "replace_string",
-        label: <span>Replace String</span>,
-        icon: icons.Replace,
-      },
-      {
-        key: "divider",
-        type: "divider",
-      },
-      {
-        key: "other",
-        label: (
+  const handleRulesDropdownItemClick = (url: string) => {
+    setIsRuleDropdownOpen(false);
+    window.open(url, "_blank");
+  };
+
+  const rulesDropdownMenu = useMemo(
+    () => (
+      <Menu>
+        <Menu.Item
+          key="modify_response"
+          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Response?source=popup`)}
+        >
+          {icons.Response}
+          <span>Modify API Response</span>
+        </Menu.Item>
+        <Menu.Item
+          key="modify_headers"
+          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`)}
+        >
+          {icons.Headers}
+          <span>Modify Headers</span>
+        </Menu.Item>
+        <Menu.Item
+          key="redirect_request"
+          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Redirect?source=popup`)}
+        >
+          {icons.Redirect}
+          <span>Redirect Request</span>
+        </Menu.Item>
+        <Menu.Item
+          key="replace_string"
+          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`)}
+        >
+          {icons.Replace}
+          <span>Replace String</span>
+        </Menu.Item>
+        <Menu.Divider />
+        <Menu.Item
+          key="other"
+          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`)}
+        >
           <Row align="middle" gutter={8} className="more-rules-link-option">
             <Col>View more options</Col>
-            <ExternalLinkIcon />
+            <ExternalLinkIcon style={{ color: "var(--white)" }} />
           </Row>
-        ),
-      },
-    ],
-  };
+        </Menu.Item>
+      </Menu>
+    ),
+    []
+  );
 
   return (
     <div className="popup-tabs-wrapper">
       <Row justify="space-between" align="middle" className="tabs-header">
         <Typography.Text strong>HTTP rules</Typography.Text>
         <Dropdown
-          menu={ruleDropdownTypes}
+          overlay={rulesDropdownMenu}
           trigger={["click"]}
           onOpenChange={(open) => setIsRuleDropdownOpen(open)}
           overlayClassName="rule-type-dropdown"
         >
           <PrimaryActionButton className="new-rule-dropdown-btn" size="small">
             New rule{" "}
-            <div
+            <ArrowIcon
               className={`new-rule-dropdown-btn-arrow ${isRuleDropdownOpen ? "new-rule-dropdown-btn-arrow-up" : ""}`}
-            >
-              <ArrowIcon />
-            </div>
+            />
           </PrimaryActionButton>
         </Dropdown>
       </Row>
