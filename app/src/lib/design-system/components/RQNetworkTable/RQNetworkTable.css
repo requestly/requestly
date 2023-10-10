@@ -83,3 +83,12 @@
   height: calc(100% - 56px); /* deducting filter input height */
   margin-top: 8px;
 }
+
+.rq-network-table-container .offset-cell {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.rq-network-table-container .offset-cell .row-pointer {
+  margin-top: 2px;
+}

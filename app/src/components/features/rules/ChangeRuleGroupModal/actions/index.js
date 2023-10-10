@@ -6,7 +6,6 @@ import { StorageService } from "../../../../../init";
 //CONSTANT
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //ACTIONS
-import { getSelectedRules } from "../../actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
 
@@ -30,13 +29,11 @@ export const createNewGroup = (appMode, newGroupName, callback, user, status = G
     });
 };
 
-export const updateGroupOfSelectedRules = (appMode, rulesSelection, newGroupId, user) => {
+export const updateGroupOfSelectedRules = (appMode, selectedRuleIds, newGroupId, user) => {
   return new Promise((resolve, reject) => {
     // Filter only Selected Rules
 
-    const selectedRules = getSelectedRules(rulesSelection);
-
-    if (isEmpty(selectedRules)) {
+    if (isEmpty(selectedRuleIds)) {
       reject();
     }
 
@@ -47,7 +44,7 @@ export const updateGroupOfSelectedRules = (appMode, rulesSelection, newGroupId, 
       .then((allRecords) => {
         //Update Rules
         const newRules = [];
-        selectedRules.forEach(async (selectedRuleId) => {
+        selectedRuleIds.forEach(async (selectedRuleId) => {
           const newRule = {
             ...allRecords[selectedRuleId],
             groupId: newGroupId,

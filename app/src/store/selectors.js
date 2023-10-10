@@ -47,6 +47,11 @@ export const getRulesSelection = (state) => {
   return rulesNode["selectedRules"];
 };
 
+export const getGroupsSelection = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["selectedGroups"];
+};
+
 export const getCurrentlySelectedRule = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["currentlySelectedRule"];
