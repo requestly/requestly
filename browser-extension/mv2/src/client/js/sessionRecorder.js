@@ -233,7 +233,6 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     document.documentElement.appendChild(widget);
 
     widget.addEventListener("stop", () => {
-      widget.removeAttribute("recording-start-time");
       chrome.runtime.sendMessage({
         action: RQ.EXTENSION_MESSAGES.STOP_RECORDING,
         openRecording: true,
@@ -241,7 +240,6 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     });
 
     widget.addEventListener("discard", () => {
-      widget.removeAttribute("recording-start-time");
       chrome.runtime.sendMessage({
         action: RQ.EXTENSION_MESSAGES.STOP_RECORDING,
       });
