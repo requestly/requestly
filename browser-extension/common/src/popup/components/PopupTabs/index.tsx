@@ -111,7 +111,7 @@ const PopupTabs: React.FC = () => {
   );
 
   return (
-    <div className="popup-tabs-wrapper">
+    <Col className="popup-tabs-wrapper">
       <Row justify="space-between" align="middle" className="tabs-header">
         <Typography.Text strong>HTTP rules</Typography.Text>
         <Dropdown
@@ -138,7 +138,7 @@ const PopupTabs: React.FC = () => {
           sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key });
         }}
       />
-    </div>
+    </Col>
   );
 };
 

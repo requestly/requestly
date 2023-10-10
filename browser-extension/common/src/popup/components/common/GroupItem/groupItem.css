@@ -1,7 +1,7 @@
 .group-expand-icon {
   font-size: 14px;
   cursor: pointer;
-  color: var(--white);
+  color: var(--text-default);
   margin: 0 8px;
   margin-right: 14px;
 }
@@ -15,7 +15,7 @@
 }
 
 .record-name-container .group-icon-wrapper svg {
-  color: var(--white);
+  color: var(--text-deafult);
   width: 20px;
   height: 20px;
 }

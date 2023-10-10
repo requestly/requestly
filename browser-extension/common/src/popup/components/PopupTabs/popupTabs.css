@@ -11,17 +11,12 @@
 
 .popup-tabs .ant-tabs-tab {
   padding-top: 4px;
-  color: var(--white);
+  color: var(--text-default);
 }
 
 .popup-tabs .ant-tabs-tab .anticon {
   margin-right: 8px;
 }
-
-/* .popup-tabs .ant-tabs-content-holder {
-  height: 220px;
-  overflow-y: auto;
-} */
 
 .new-rule-dropdown-btn.ant-btn {
   gap: 8px;
@@ -50,7 +45,7 @@
   padding: 0 8px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--white);
+  color: var(--text-default);
   background-color: var(--success);
   border-radius: 100px;
   border: none;
