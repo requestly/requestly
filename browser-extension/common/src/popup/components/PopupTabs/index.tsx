@@ -12,7 +12,7 @@ import { EVENT, sendEvent } from "../../events";
 import config from "../../../config";
 import "./popupTabs.css";
 
-enum PopupTabKey {
+export enum PopupTabKey {
   PINNED_RULES = "pinned_rules",
   RECENTLY_USED = "recently_used",
   EXECUTED_RULES = "executed_rules",
@@ -21,6 +21,7 @@ enum PopupTabKey {
 const PopupTabs: React.FC = () => {
   const [executedRulesCount, setExecutedRulesCount] = useState(0);
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState(PopupTabKey.PINNED_RULES);
 
   const tabItems = useMemo(() => {
     return [
@@ -32,7 +33,7 @@ const PopupTabs: React.FC = () => {
             Pinned rules
           </span>
         ),
-        children: <PinnedRecords />,
+        children: <PinnedRecords setActiveTabKey={setActiveTabKey} />,
       },
       {
         key: PopupTabKey.RECENTLY_USED,
@@ -130,10 +131,13 @@ const PopupTabs: React.FC = () => {
       <Tabs
         size="middle"
         items={tabItems}
-        defaultActiveKey={PopupTabKey.PINNED_RULES}
+        activeKey={activeTabKey}
         className="popup-tabs"
         destroyInactiveTabPane
-        onChange={(key) => sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key })}
+        onChange={(key: PopupTabKey) => {
+          setActiveTabKey(key);
+          sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key });
+        }}
       />
     </div>
   );
