@@ -78,6 +78,10 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
   }
+
+  if (config?.autoRecording?.mode === "custom") {
+    RQ.SessionRecorder.showWidget = true;
+  }
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -117,12 +121,17 @@ RQ.SessionRecorder.addMessageListeners = () => {
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
 
-      if (RQ.SessionRecorder.showWidget) {
+      if (!RQ.SessionRecorder.showWidget) return;
+
+      if (RQ.SessionRecorder.isExplicitRecording) {
         RQ.SessionRecorder.showRecordingWidget();
+      } else {
+        RQ.SessionRecorder.showAutoModeRecordingWidget();
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
+      RQ.SessionRecorder.showWidget = false;
       RQ.SessionRecorder.recordingStartTime = null;
       RQ.SessionRecorder.hideWidget();
       chrome.runtime.sendMessage({
@@ -259,4 +268,33 @@ RQ.SessionRecorder.hideWidget = () => {
 
 RQ.SessionRecorder.getWidget = () => {
   return document.querySelector("rq-session-recording-widget");
+};
+
+RQ.SessionRecorder.showAutoModeRecordingWidget = () => {
+  const tagName = "rq-session-recording-auto-mode-widget";
+  let widget = document.querySelector(tagName);
+
+  if (!widget) {
+    widget = document.createElement(tagName);
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("watch", () => {
+      chrome.runtime.sendMessage({
+        action: RQ.EXTENSION_MESSAGES.WATCH_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt) => {
+      RQ.SessionRecorder.widgetPosition = evt.detail;
+    });
+  }
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        position: RQ.SessionRecorder.widgetPosition,
+      },
+    })
+  );
 };
