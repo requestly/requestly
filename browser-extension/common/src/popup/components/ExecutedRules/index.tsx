@@ -46,7 +46,6 @@ const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) 
       title="No rules executed for this tab!"
       description={
         <>
-          {" "}
           Your executed rules will appear here.
           <br /> If you encounter any issues, check our troubleshooting guide.
         </>
