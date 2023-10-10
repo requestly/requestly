@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { EXTENSION_MESSAGES } from "../../../constants";
+import { EXTENSION_MESSAGES, LINKS } from "../../../constants";
 import { Rule } from "../../../types";
 import RuleItem from "../common/RuleItem";
 import { updateItemInCollection } from "../../utils";
@@ -50,7 +50,14 @@ const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) 
           <br /> If you encounter any issues, check our troubleshooting guide.
         </>
       }
-      actionButton={<PrimaryActionButton size="small">Read troubleshooting guide</PrimaryActionButton>}
+      actionButton={
+        <PrimaryActionButton
+          size="small"
+          onClick={() => window.open(LINKS.REQUESTLY_EXTENSION_TROUBLESHOOTING, "_blank")}
+        >
+          Read troubleshooting guide
+        </PrimaryActionButton>
+      }
     />
   );
 };
