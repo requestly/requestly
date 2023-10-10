@@ -71,3 +71,28 @@
 .rule-type-dropdown .ant-dropdown-menu-item:last-child .ant-dropdown-menu-title-content .more-rules-link-option > div {
   font-size: 12px;
 }
+
+.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder div {
+  height: 100%;
+}
+
+.empty-tab-view-title {
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.empty-tab-view-description {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 8px;
+  margin-bottom: 1rem;
+}
+
+.empty-tab-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

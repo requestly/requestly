@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Row } from "antd";
 import { EXTENSION_MESSAGES } from "../../../constants";
 import { Rule } from "../../../types";
 import RuleItem from "../common/RuleItem";
 import { updateItemInCollection } from "../../utils";
 import TabContentSection from "../common/TabContentSection";
+import { PrimaryActionButton } from "../common/PrimaryActionButton";
+import { EmptyPopupTab } from "../PopupTabs/EmptyPopupTab";
 
 interface ExecutedRulesProps {
   setExecutedRulesCount: (count: number) => void;
@@ -41,9 +42,17 @@ const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) 
       </ul>
     </TabContentSection>
   ) : (
-    <Row align="middle" justify="center">
-      <span className="empty-records-title">No rules executed in this tab.</span>
-    </Row>
+    <EmptyPopupTab
+      title="No rules executed for this tab!"
+      description={
+        <>
+          {" "}
+          Your executed rules will appear here.
+          <br /> If you encounter any issues, check our troubleshooting guide.
+        </>
+      }
+      actionButton={<PrimaryActionButton size="small">Read troubleshooting guide</PrimaryActionButton>}
+    />
   );
 };
 

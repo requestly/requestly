@@ -176,11 +176,6 @@
   opacity: 0.6;
 }
 
-.empty-records-title {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
 .record-name {
   max-width: 42ch;
   overflow: hidden;
@@ -202,7 +197,10 @@
 }
 
 .record-name-container.link:hover {
-  text-decoration: underline;
+  text-decoration-line: underline;
+  text-decoration-color: var(--blue-400);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
 .record-name-container .icon-wrapper svg {
@@ -219,14 +217,6 @@
 .record-name-container {
   padding: 7px 11px 7px 0;
 }
-
-/* .record-name-container:hover {
-  cursor: pointer;
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  background-color: var(--background-color-row-hover);
-  transition: background-color 0.2s ease;
-} */
 
 .record-status-text {
   margin-right: 8px;
