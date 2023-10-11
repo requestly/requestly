@@ -211,7 +211,7 @@
 
 .record-list {
   overflow: auto;
-  height: 230px;
+  height: 185px;
 }
 
 .record-list::-webkit-scrollbar {
@@ -228,8 +228,12 @@
   border-radius: var(--border-radius);
 }
 
-.record-name-container {
-  padding: 7px 11px 7px 0;
+.record-list li {
+  margin-top: 12px;
+}
+
+.record-list .record-item {
+  height: 22px;
 }
 
 .record-status-text {
@@ -317,5 +321,5 @@
 
 /* tabs */
 .ant-tabs.ant-tabs-top.popup-tabs .ant-tabs-nav {
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }

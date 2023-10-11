@@ -2,8 +2,8 @@ import { Col, Row, Typography } from "antd";
 import React, { ReactNode } from "react";
 
 interface EmptyTabProps {
-  title: string | ReactNode;
-  description: string | ReactNode;
+  title: ReactNode;
+  description: ReactNode;
   actionButton: ReactNode;
 }
 

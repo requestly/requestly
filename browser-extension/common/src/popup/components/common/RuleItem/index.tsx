@@ -66,12 +66,16 @@ const RuleItem: React.FC<RuleItemProps> = ({
           }}
         >
           <Row wrap={false} align="middle" className={`rule-name-container ${isChildren ? "child-rule" : ""}`}>
-            <Tooltip placement="topRight" title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}>
+            <Tooltip
+              placement="topRight"
+              title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}
+              color="var(--neutrals-black)"
+            >
               <span className="icon-wrapper rule-type-icons">{icons[rule.ruleType]}</span>
             </Tooltip>
 
             <RecordName name={rule.name}>
-              <span>{rule.name}</span>
+              <span className="rule-name">{rule.name}</span>
             </RecordName>
           </Row>
         </Col>

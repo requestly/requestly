@@ -64,50 +64,75 @@ const PopupTabs: React.FC = () => {
     window.open(url, "_blank");
   };
 
-  const rulesDropdownMenu = useMemo(
-    () => (
-      <Menu>
-        <Menu.Item
-          key="modify_response"
-          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Response?source=popup`)}
-        >
-          {icons.Response}
-          <span>Modify API Response</span>
-        </Menu.Item>
-        <Menu.Item
-          key="modify_headers"
-          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`)}
-        >
-          {icons.Headers}
-          <span>Modify Headers</span>
-        </Menu.Item>
-        <Menu.Item
-          key="redirect_request"
-          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Redirect?source=popup`)}
-        >
-          {icons.Redirect}
-          <span>Redirect Request</span>
-        </Menu.Item>
-        <Menu.Item
-          key="replace_string"
-          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`)}
-        >
-          {icons.Replace}
-          <span>Replace String</span>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item
-          key="other"
-          onClick={() => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`)}
-        >
+  const ruleDropdownItemsMap = useMemo(
+    () => [
+      {
+        key: "modify_response",
+        children: (
+          <>
+            {icons.Response}
+            <span>Modify API Response</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Response?source=popup`),
+      },
+      {
+        key: "modify_headers",
+        children: (
+          <>
+            {icons.Headers}
+            <span>Modify Headers</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`),
+      },
+      {
+        key: "redirect_request",
+        children: (
+          <>
+            {icons.Redirect}
+            <span>Redirect Request</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Redirect?source=popup`),
+      },
+      {
+        key: "replace_string",
+        children: (
+          <>
+            {icons.Replace}
+            <span>Replace String</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`),
+      },
+      { key: "divider" },
+      {
+        key: "other",
+        children: (
           <Row align="middle" gutter={8} className="more-rules-link-option">
             <Col>View more options</Col>
             <ExternalLinkIcon style={{ color: "var(--white)" }} />
           </Row>
-        </Menu.Item>
-      </Menu>
-    ),
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`),
+      },
+    ],
     []
+  );
+
+  const ruleDropdownMenu = (
+    <Menu>
+      {ruleDropdownItemsMap.map((item) =>
+        item.key === "divider" ? (
+          <Menu.Divider />
+        ) : (
+          <Menu.Item key={item.key} onClick={item.clickHandler}>
+            {item.children}
+          </Menu.Item>
+        )
+      )}
+    </Menu>
   );
 
   return (
@@ -115,7 +140,7 @@ const PopupTabs: React.FC = () => {
       <Row justify="space-between" align="middle" className="tabs-header">
         <Typography.Text strong>HTTP rules</Typography.Text>
         <Dropdown
-          overlay={rulesDropdownMenu}
+          overlay={ruleDropdownMenu}
           trigger={["click"]}
           onOpenChange={(open) => setIsRuleDropdownOpen(open)}
           overlayClassName="rule-type-dropdown"

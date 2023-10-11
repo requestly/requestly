@@ -42,7 +42,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
             </Col>
             <Col>
               <Row wrap={false} align="middle">
-                <Tooltip title="Group">
+                <Tooltip title="Group" color="var(--neutrals-black)">
                   <span className={`group-icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
                     <GroupIcon />
                   </span>

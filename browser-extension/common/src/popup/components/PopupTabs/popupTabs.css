@@ -3,6 +3,7 @@
   margin-bottom: 1rem;
   border-radius: var(--border-radius);
   padding: 12px 1rem;
+  padding-bottom: 0;
 }
 
 .tabs-header {
@@ -80,7 +81,7 @@
 }
 
 .popup-tabs-wrapper .empty-tab-view-container {
-  height: 230px;
+  height: 185px;
 }
 
 .empty-tab-view-title {
