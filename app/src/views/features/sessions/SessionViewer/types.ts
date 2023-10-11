@@ -36,6 +36,7 @@ export interface SessionRecordingMetadata {
   createdTs?: number;
   updatedTs?: number;
   lastUpdatedBy?: string;
+  recordingMode?: SessionRecordingMode;
 }
 
 export interface RecordingOptions {
@@ -57,4 +58,9 @@ export interface PageNavigationLog {
   height: number;
   timestamp: number;
   timeOffset: number;
+}
+
+export enum SessionRecordingMode {
+  AUTO = "auto",
+  MANUAL = "manual",
 }

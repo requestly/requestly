@@ -26,6 +26,10 @@ export const trackRulesJsonParsed = (params) => {
   trackEvent(IMPORT.JSON_PARSED, params);
 };
 
+export const trackCharlesSettingsImportViewed = (source) => {
+  trackEvent(CHARLES_SETTINGS.VIEWED, { source });
+};
+
 export const trackCharlesSettingsImportStarted = (source) => {
   const params = { source };
   trackEvent(CHARLES_SETTINGS.IMPORT_STARTED, params);
