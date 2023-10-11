@@ -54,16 +54,7 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const {
-    config,
-    previousSession,
-    notify,
-    explicit = false,
-    widgetPosition,
-    showWidget,
-    recordingStartTime,
-    currentRecordingTime,
-  } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
 
   await RQ.SessionRecorder.initialize();
 
