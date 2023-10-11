@@ -254,7 +254,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     consoleLogs,
     rqNetworkLogs,
     playerTimeOffset,
-    consoleLogs.length,
     networkLogs.length,
   ]);
 
