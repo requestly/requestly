@@ -162,12 +162,12 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession, source]);
 
   useEffect(() => {
-    trackDraftSessionViewed(source, sessionRecordingMetadata.recordingMode);
+    trackDraftSessionViewed(source, sessionRecordingMetadata?.recordingMode);
 
     if (testRuleDraftSession) {
       trackTestRuleSessionDraftViewed();
     }
-  }, [sessionRecordingMetadata.recordingMode, source, testRuleDraftSession]);
+  }, [sessionRecordingMetadata?.recordingMode, source, testRuleDraftSession]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
