@@ -6,6 +6,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isExplicitRecording = false;
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
+  RQ.SessionRecorder.recordingStartTime = null;
   RQ.SessionRecorder.sendResponseCallbacks = {};
   RQ.SessionRecorder.recordingMode;
 
@@ -53,7 +54,8 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
+
   await RQ.SessionRecorder.initialize();
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
@@ -72,6 +74,10 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
+
+  if (explicit) {
+    RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
+  }
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -117,6 +123,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
+      RQ.SessionRecorder.recordingStartTime = null;
       RQ.SessionRecorder.hideWidget();
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -132,6 +139,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
           recordingMode: RQ.SessionRecorder.recordingMode,
+          recordingStartTime: RQ.SessionRecorder.recordingStartTime,
         },
       });
     });
@@ -230,9 +238,14 @@ RQ.SessionRecorder.showRecordingWidget = () => {
     });
   }
 
+  const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
+  const recordingTime = Date.now() - RQ.SessionRecorder.recordingStartTime;
+  const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
+
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
+        currentRecordingTime,
         position: RQ.SessionRecorder.widgetPosition,
       },
     })
