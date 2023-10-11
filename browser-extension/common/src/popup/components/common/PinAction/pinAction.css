@@ -2,15 +2,9 @@
   font-size: 15px;
   color: var(--color-secondary);
   padding: 14px;
-}
-
-.pin-icon:hover {
   cursor: pointer;
-  border-radius: var(--border-radius);
-  background-color: var(--background-color-row-hover);
-  transition: background-color 0.2s ease;
 }
 
 .pin-icon.active {
-  color: var(--color-link);
+  color: var(--blue-400);
 }

@@ -1,27 +1,106 @@
+.popup-tabs-wrapper {
+  background: var(--surface-1);
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius);
+  padding: 12px 1rem;
+  padding-bottom: 0;
+}
+
+.tabs-header {
+  margin-bottom: 8px;
+}
+
 .popup-tabs .ant-tabs-tab {
   padding-top: 4px;
-  color: #b0b0b5;
+  color: var(--text-default);
 }
 
 .popup-tabs .ant-tabs-tab .anticon {
   margin-right: 8px;
 }
 
-.popup-tabs .ant-tabs-nav .ant-tabs-nav-wrap {
-  justify-content: center;
+.new-rule-dropdown-btn.ant-btn {
+  gap: 8px;
+}
+
+.new-rule-dropdown-btn.ant-btn .new-rule-dropdown-btn-arrow {
+  height: auto;
+  width: min-content;
+  margin-right: 0;
+  transform-origin: center center;
+  transition: 0.2s ease-in-out;
+}
+
+.new-rule-dropdown-btn-arrow-up {
+  transform: rotate(180deg);
 }
 
 .popup-tab-badge {
   margin-left: 4px;
+  border: none;
 }
 
 .popup-tab-badge .ant-badge-count.ant-scroll-number {
-  height: 17px;
-  padding: 2px 4px;
-  font-size: 10px;
-  line-height: 11px;
-  color: var(--color-success);
-  background-color: transparent;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-success);
+  width: 23px;
+  height: 16px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-default);
+  background-color: var(--success);
+  border-radius: 100px;
+  border: none;
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu {
+  background-color: var(--surface-2);
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item {
+  padding: 12px 14px;
+}
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item svg {
+  color: var(--color-icon);
+  align-self: center;
+}
+
+.rule-type-dropdown .ant-dropdown-menu-item:last-child .ant-dropdown-menu-title-content .more-rules-link-option > div {
+  font-size: 12px;
+}
+
+.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder .ant-tabs-content,
+.popup-tabs-wrapper .ant-tabs .ant-tabs-content-holder .ant-tabs-content .ant-tabs-tabpane {
+  height: 100%;
+}
+
+.popup-tabs-wrapper .empty-tab-view-container {
+  height: 185px;
+}
+
+.empty-tab-view-title {
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.empty-tab-view-description {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 8px;
+  margin-bottom: 1rem;
+}
+
+.empty-tab-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

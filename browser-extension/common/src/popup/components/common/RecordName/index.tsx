@@ -8,7 +8,7 @@ interface RecordNameProps {
 
 const RecordName: React.FC<RecordNameProps> = ({ name = "", children }) => {
   return name.length > 54 ? (
-    <Tooltip title={name} placement="top" mouseEnterDelay={0.5} autoAdjustOverflow>
+    <Tooltip title={name} placement="top" mouseEnterDelay={0.5} autoAdjustOverflow color="var(--neutrals-black)">
       {children}
     </Tooltip>
   ) : (

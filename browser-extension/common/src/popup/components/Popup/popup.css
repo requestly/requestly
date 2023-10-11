@@ -124,7 +124,6 @@
 
 .popup-content {
   padding: 16px;
-  padding-bottom: 0;
 }
 
 .header-content-separator {
@@ -177,11 +176,6 @@
   opacity: 0.6;
 }
 
-.empty-records-title {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
 .record-name {
   max-width: 42ch;
   overflow: hidden;
@@ -197,9 +191,16 @@
   margin-left: 42px;
 }
 
-.record-name.link:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
+.record-name-container.link,
+.rule-name-container .rule-type-icons.icon-wrapper svg {
+  color: var(--blue-400);
+}
+
+.record-name-container.link:hover {
+  text-decoration-line: underline;
+  text-decoration-color: var(--blue-400);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
 .record-name-container .icon-wrapper svg {
@@ -210,19 +211,29 @@
 
 .record-list {
   overflow: auto;
-  max-height: 300px;
+  height: 185px;
 }
 
-.record-name-container {
-  padding: 7px 11px 7px 0;
+.record-list::-webkit-scrollbar {
+  width: 0.5rem;
 }
 
-.record-name-container:hover {
-  cursor: pointer;
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  background-color: var(--background-color-row-hover);
-  transition: background-color 0.2s ease;
+.record-list::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: var(--border-radius);
+}
+
+.record-list::-webkit-scrollbar-thumb {
+  background-color: var(--surface-2);
+  border-radius: var(--border-radius);
+}
+
+.record-list li {
+  margin-top: 12px;
+}
+
+.record-list .record-item {
+  height: 22px;
 }
 
 .record-status-text {
@@ -310,5 +321,5 @@
 
 /* tabs */
 .ant-tabs.ant-tabs-top.popup-tabs .ant-tabs-nav {
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
