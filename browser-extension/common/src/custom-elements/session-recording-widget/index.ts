@@ -6,7 +6,6 @@ import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 enum RQSessionRecordingWidgetEvent {
   STOP_RECORDING = "stop",
   DISCARD_RECORDING = "discard",
-  MOVED = "moved",
 }
 
 const TAG_NAME = "rq-session-recording-widget";

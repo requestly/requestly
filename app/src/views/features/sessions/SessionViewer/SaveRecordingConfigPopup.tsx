@@ -135,12 +135,13 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         if (response?.success) {
           onClose();
           toast.success("Recording saved successfully");
-          trackDraftSessionSaved(
-            sessionRecordingMetadata?.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.ONLINE,
-            source
-          );
+          trackDraftSessionSaved({
+            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
+            options: recordingOptionsToSave,
+            type: SessionSaveMode.ONLINE,
+            source,
+            recording_mode: sessionRecordingMetadata?.recordingMode,
+          });
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
           trackSessionsCreatedCount();
           if (testRuleDraftSession) {
@@ -193,6 +194,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         name: sessionRecordingMetadata.name,
         options: { ...recordingOptionsToSave },
         sessionAttributes: { ...sessionRecordingMetadata.sessionAttributes },
+        recordingMode: sessionRecordingMetadata?.recordingMode,
       };
 
       prepareSessionToExport(events, metadata)
@@ -201,12 +203,13 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           toast.success("Recording downloaded successfully.");
           onClose();
           setIsSaving(false);
-          trackDraftSessionSaved(
-            sessionRecordingMetadata.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.LOCAL,
-            source
-          );
+          trackDraftSessionSaved({
+            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
+            options: recordingOptionsToSave,
+            type: SessionSaveMode.LOCAL,
+            source,
+            recording_mode: sessionRecordingMetadata?.recordingMode,
+          });
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
           trackSessionsCreatedCount(true);
         });
