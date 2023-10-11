@@ -5,18 +5,27 @@
   &.error-log {
     background: #5f2d3559;
   }
+
   &.warning-log {
     background: #9c8b1536;
   }
+
   &.default-log {
     border-radius: 0;
     border-bottom: 1px solid var(--gray-dark);
   }
+
+  &.pending-log {
+    opacity: 0.45;
+  }
+
   .right-info a {
     text-decoration: underline;
     color: var(--text-gray);
   }
+
   .trace-logs-wrapper {
+    margin-top: 5px;
     .trace-log {
       margin: 3px 0;
       line-height: 13px;

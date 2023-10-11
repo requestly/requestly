@@ -21,6 +21,9 @@ const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset }) =>
   // }, [consoleLogs, playerTimeOffset]);
 
   // const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(consoleLogs);
+  const isLogPending = (log: ConsoleLog) => {
+    return log.timeOffset > playerTimeOffset;
+  };
 
   const includeConsoleLogs = useSelector(getIncludeConsoleLogs);
 
@@ -29,7 +32,7 @@ const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset }) =>
       {consoleLogs.length ? (
         <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
           {consoleLogs.map((log, index) => (
-            <ConsoleLogRow key={index} {...log} />
+            <ConsoleLogRow key={index} {...log} isPending={() => isLogPending(log)} />
           ))}
         </ThemeProvider>
       ) : includeConsoleLogs === false ? (

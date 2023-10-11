@@ -5,7 +5,11 @@ import SessionDetailsPanelRow from "../SessionDetailsPanelRow";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Space } from "antd";
 
-const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace = [] }) => {
+interface LogRowProps extends ConsoleLog {
+  isPending: () => boolean;
+}
+
+const ConsoleLogRow: React.FC<LogRowProps> = ({ timeOffset, level, payload, trace = [], isPending }) => {
   const parsedLevel = useMemo(() => {
     if (level === "assert" && payload[0] === "false") {
       return "error";
@@ -72,7 +76,7 @@ const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace
     <SessionDetailsPanelRow
       className={`console-log-row ${
         parsedLevel === "error" ? "error-log" : parsedLevel === "warn" ? "warning-log" : "default-log"
-      }`}
+      } ${isPending() ? "pending-log" : ""}`}
       timeOffset={timeOffset}
       rightInfo={logSource}
       secondaryMessage={
