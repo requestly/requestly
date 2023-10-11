@@ -78,10 +78,6 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
   }
-
-  if (config?.autoRecording?.mode === "custom") {
-    RQ.SessionRecorder.showWidget = true;
-  }
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -117,11 +113,12 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.sendResponseToRuntime(event.data.action, event.data.payload);
     } else if (event.data.action === "sessionRecordingStarted") {
       RQ.SessionRecorder.isRecording = true;
+
+      if (!RQ.SessionRecorder.showWidget) return;
+
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
-
-      if (!RQ.SessionRecorder.showWidget) return;
 
       if (RQ.SessionRecorder.isExplicitRecording) {
         RQ.SessionRecorder.showRecordingWidget();
@@ -134,6 +131,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.showWidget = false;
       RQ.SessionRecorder.recordingStartTime = null;
       RQ.SessionRecorder.hideWidget();
+
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });

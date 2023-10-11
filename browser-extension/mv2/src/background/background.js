@@ -1260,6 +1260,8 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+
+      sessionRecordingData.showWidget = sessionRecordingConfig?.autoRecording?.mode === "custom" ?? false;
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
