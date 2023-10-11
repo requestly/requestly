@@ -16,6 +16,14 @@
   align-items: center;
 }
 
+.watch-replay,
+.watch-replay .rq-logo,
+.watch-replay .btn-text {
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
 .watch-replay {
   flex-shrink: 0;
   margin: 0;
@@ -27,14 +35,9 @@
   cursor: pointer;
   position: relative;
   background: #004eeb;
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  transition: all 0.2s;
   max-width: 36px;
-}
-
-.watch-replay:hover {
-  min-width: 196px;
+  min-width: 36px;
+  overflow: hidden;
 }
 
 .rq-logo {
@@ -46,9 +49,6 @@
   align-items: center;
   cursor: pointer;
   background: transparent;
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  transition: all 0.2s;
 }
 
 .rq-logo svg {
@@ -74,7 +74,12 @@
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.watch-replay:hover {
+  min-width: 196px;
 }
 
 .watch-replay:hover .rq-logo {
@@ -83,4 +88,5 @@
 
 .watch-replay:hover .btn-text {
   opacity: 1;
+  transform: scaleX(1);
 }
