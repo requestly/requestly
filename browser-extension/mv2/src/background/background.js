@@ -1026,11 +1026,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(
-          message.tabId ?? sender.tab.id,
-          message.showWidget,
-          message.recordingStartTime
-        );
+        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1193,6 +1189,7 @@ BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
       ...sessionRecordingData,
       previousSession: payload.session,
       widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };

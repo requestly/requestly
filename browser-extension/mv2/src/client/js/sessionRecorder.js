@@ -54,16 +54,7 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const {
-    config,
-    previousSession,
-    notify,
-    explicit = false,
-    widgetPosition,
-    showWidget,
-    recordingStartTime,
-    currentRecordingTime,
-  } = options;
+  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
 
   await RQ.SessionRecorder.initialize();
 
@@ -85,7 +76,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
 
   if (explicit) {
-    RQ.SessionRecorder.recordingStartTime = recordingStartTime;
+    RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
   }
 };
 
@@ -148,6 +139,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
           recordingMode: RQ.SessionRecorder.recordingMode,
+          recordingStartTime: RQ.SessionRecorder.recordingStartTime,
         },
       });
     });

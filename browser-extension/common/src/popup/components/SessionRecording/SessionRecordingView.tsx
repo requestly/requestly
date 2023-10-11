@@ -22,7 +22,6 @@ const SessionRecordingView: React.FC = () => {
       action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
       tabId: currentTabId,
       showWidget: true,
-      recordingStartTime: Date.now(),
     });
     setIsManualMode(true);
     setIsRecordingSession(true);
