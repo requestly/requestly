@@ -10,6 +10,10 @@
   cursor: pointer;
 }
 
+.record-name-container .record-name {
+  max-width: 320px;
+}
+
 .record-name-container .group-icon-wrapper {
   margin-top: 5px;
 }
