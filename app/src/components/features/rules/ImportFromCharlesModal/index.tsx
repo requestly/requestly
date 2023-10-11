@@ -178,7 +178,7 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
 
         trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-        callBack && callBack();
+        callBack?.();
       })
       .finally(() => setIsLoading(false));
   };
