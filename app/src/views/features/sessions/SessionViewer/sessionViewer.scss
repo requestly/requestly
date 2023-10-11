@@ -271,13 +271,6 @@
           }
         }
 
-        .right-info {
-          max-width: 180px;
-          margin-left: 8px;
-          text-align: right;
-          flex-shrink: 0;
-        }
-
         .secondary-message {
           word-break: break-word;
           padding-left: 40px;
@@ -570,6 +563,9 @@ body.dark {
         min-height: auto;
       }
     }
+    .right-info {
+      display: none;
+    }
   }
 }
 
@@ -586,10 +582,6 @@ body.dark {
         .primary-message,
         .secondary-message {
           width: 28rem;
-        }
-
-        .right-info {
-          display: none;
         }
       }
     }
@@ -659,7 +651,7 @@ body.dark {
       &.console-log-row {
         .primary-message,
         .secondary-message {
-          width: 60rem;
+          width: 64rem;
         }
       }
     }

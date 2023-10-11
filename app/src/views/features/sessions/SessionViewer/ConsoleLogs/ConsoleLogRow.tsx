@@ -4,12 +4,19 @@ import LogIcon from "./LogIcon";
 import SessionDetailsPanelRow from "../SessionDetailsPanelRow";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Space } from "antd";
-
 interface LogRowProps extends ConsoleLog {
   isPending: () => boolean;
+  recentLogOffset: number;
 }
 
-const ConsoleLogRow: React.FC<LogRowProps> = ({ timeOffset, level, payload, trace = [], isPending }) => {
+const ConsoleLogRow: React.FC<LogRowProps> = ({
+  timeOffset,
+  level,
+  payload,
+  trace = [],
+  isPending,
+  recentLogOffset,
+}) => {
   const parsedLevel = useMemo(() => {
     if (level === "assert" && payload[0] === "false") {
       return "error";
@@ -76,8 +83,9 @@ const ConsoleLogRow: React.FC<LogRowProps> = ({ timeOffset, level, payload, trac
     <SessionDetailsPanelRow
       className={`console-log-row ${
         parsedLevel === "error" ? "error-log" : parsedLevel === "warn" ? "warning-log" : "default-log"
-      } ${isPending() ? "pending-log" : ""}`}
+      } ${isPending() ? "pending-log" : ""} ${Number(recentLogOffset) === timeOffset ? "recent-log-border" : ""}`}
       timeOffset={timeOffset}
+      isRecent={recentLogOffset === timeOffset}
       rightInfo={logSource}
       secondaryMessage={
         logSource === null && trace.length > 0 ? (

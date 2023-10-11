@@ -19,9 +19,21 @@
     opacity: 0.45;
   }
 
+  &.recent-log-border {
+    border-left: 2px solid var(--white);
+    border-radius: 2px;
+  }
+
+  .right-info {
+    text-align: right;
+  }
   .right-info a {
     text-decoration: underline;
     color: var(--text-gray);
+  }
+
+  .right-info a:hover {
+    color: var(--white);
   }
 
   .trace-logs-wrapper {
@@ -34,5 +46,25 @@
 
   .log-icon {
     margin-right: 8px;
+    min-width: 12px;
+    min-height: 12px;
+  }
+
+  .recent-log-pointer {
+    color: var(--white);
+    font-size: 1rem;
+  }
+
+  .log-offset-row {
+    display: grid;
+    width: 80px;
+    grid-template-columns: 0.5fr 1fr;
+    align-items: center;
+    margin-left: -8px;
+    // TODO: add cursor pointer here after adding autoscroll
+
+    .log-offset {
+      margin-left: -5px;
+    }
   }
 }

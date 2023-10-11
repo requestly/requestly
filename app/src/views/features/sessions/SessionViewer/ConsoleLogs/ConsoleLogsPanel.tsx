@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Empty, Typography } from "antd";
 import { ConsoleLog } from "../types";
 import ConsoleLogRow from "./ConsoleLogRow";
@@ -14,25 +14,38 @@ interface Props {
 }
 
 const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset }) => {
-  // const visibleConsoleLogs = useMemo<ConsoleLog[]>(() => {
-  //   return consoleLogs.filter((consoleLog: ConsoleLog) => {
-  //     return consoleLog.timeOffset <= playerTimeOffset;
-  //   });
-  // }, [consoleLogs, playerTimeOffset]);
+  const [recentLogOffset, setRecentLogOffset] = useState(null);
 
-  // const [containerRef, onScroll] = useAutoScrollableContainer<HTMLDivElement>(consoleLogs);
   const isLogPending = (log: ConsoleLog) => {
     return log.timeOffset > playerTimeOffset;
   };
 
   const includeConsoleLogs = useSelector(getIncludeConsoleLogs);
 
+  useEffect(() => {
+    const closestLog = consoleLogs.reduce(
+      (closest, log: ConsoleLog) => {
+        if (log.timeOffset <= playerTimeOffset) {
+          const currentLogDifference = Math.abs(playerTimeOffset - log.timeOffset);
+          if (currentLogDifference < closest.minTimeDifference) {
+            return { log: log, minTimeDifference: currentLogDifference };
+          }
+        }
+
+        return closest;
+      },
+      { log: null, minTimeDifference: Infinity }
+    );
+
+    setRecentLogOffset(closestLog.log?.timeOffset);
+  }, [consoleLogs, playerTimeOffset]);
+
   return (
     <div className="session-panel-content">
       {consoleLogs.length ? (
         <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
           {consoleLogs.map((log, index) => (
-            <ConsoleLogRow key={index} {...log} isPending={() => isLogPending(log)} />
+            <ConsoleLogRow key={index} {...log} isPending={() => isLogPending(log)} recentLogOffset={recentLogOffset} />
           ))}
         </ThemeProvider>
       ) : includeConsoleLogs === false ? (
