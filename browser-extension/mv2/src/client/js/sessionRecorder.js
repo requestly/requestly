@@ -7,7 +7,6 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.recordingStartTime = null;
-  RQ.SessionRecorder.currentRecordingTime = null;
   RQ.SessionRecorder.sendResponseCallbacks = {};
   RQ.SessionRecorder.recordingMode;
 
@@ -87,7 +86,6 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime;
-    RQ.SessionRecorder.currentRecordingTime = currentRecordingTime;
   }
 };
 
@@ -135,7 +133,6 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
       RQ.SessionRecorder.recordingStartTime = null;
-      RQ.SessionRecorder.currentRecordingTime = null;
       RQ.SessionRecorder.hideWidget();
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -151,7 +148,6 @@ RQ.SessionRecorder.addMessageListeners = () => {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
           recordingMode: RQ.SessionRecorder.recordingMode,
-          currentRecordingTime: RQ.SessionRecorder.currentRecordingTime,
         },
       });
     });
@@ -251,16 +247,14 @@ RQ.SessionRecorder.showRecordingWidget = () => {
   }
 
   const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
-  const currentRecordingTime = Date.now() - RQ.SessionRecorder.recordingStartTime;
-
-  RQ.SessionRecorder.currentRecordingTime =
-    currentRecordingTime <= recordingLimitInMilliseconds ? currentRecordingTime : null;
+  const recordingTime = Date.now() - RQ.SessionRecorder.recordingStartTime;
+  const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
 
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
+        currentRecordingTime,
         position: RQ.SessionRecorder.widgetPosition,
-        currentRecordingTime: RQ.SessionRecorder.currentRecordingTime,
       },
     })
   );
