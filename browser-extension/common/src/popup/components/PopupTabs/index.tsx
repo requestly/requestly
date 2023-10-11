@@ -8,6 +8,7 @@ import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ArrowIcon from "../../../../resources/icons/arrowDown.svg";
 import { PushpinOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { icons } from "../../ruleTypeIcons";
+import { RuleType } from "../../../types";
 import { EVENT, sendEvent } from "../../events";
 import config from "../../../config";
 import "./popupTabs.css";
@@ -59,7 +60,11 @@ const PopupTabs: React.FC = () => {
     ];
   }, [executedRulesCount]);
 
-  const handleRulesDropdownItemClick = (url: string) => {
+  const handleRulesDropdownItemClick = (url: string, ruleType?: RuleType) => {
+    if (ruleType) {
+      sendEvent(EVENT.RULE_CREATION_WORKFLOW_STARTED, { rule_type: ruleType });
+    }
+
     setIsRuleDropdownOpen(false);
     window.open(url, "_blank");
   };
@@ -74,7 +79,11 @@ const PopupTabs: React.FC = () => {
             <span>Modify API Response</span>
           </>
         ),
-        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Response?source=popup`),
+        clickHandler: () =>
+          handleRulesDropdownItemClick(
+            `${config.WEB_URL}/rules/editor/create/Response?source=popup`,
+            RuleType.RESPONSE
+          ),
       },
       {
         key: "modify_headers",
@@ -84,7 +93,8 @@ const PopupTabs: React.FC = () => {
             <span>Modify Headers</span>
           </>
         ),
-        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`),
+        clickHandler: () =>
+          handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`, RuleType.HEADERS),
       },
       {
         key: "redirect_request",
@@ -94,7 +104,11 @@ const PopupTabs: React.FC = () => {
             <span>Redirect Request</span>
           </>
         ),
-        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Redirect?source=popup`),
+        clickHandler: () =>
+          handleRulesDropdownItemClick(
+            `${config.WEB_URL}/rules/editor/create/Redirect?source=popup`,
+            RuleType.REDIRECT
+          ),
       },
       {
         key: "replace_string",
@@ -104,7 +118,8 @@ const PopupTabs: React.FC = () => {
             <span>Replace String</span>
           </>
         ),
-        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`),
+        clickHandler: () =>
+          handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`, RuleType.REPLACE),
       },
       { key: "divider" },
       {
@@ -115,7 +130,10 @@ const PopupTabs: React.FC = () => {
             <ExternalLinkIcon style={{ color: "var(--white)" }} />
           </Row>
         ),
-        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`),
+        clickHandler: () => {
+          sendEvent(EVENT.EXTENSION_VIEW_ALL_MODIFICATIONS_CLICKED);
+          handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`);
+        },
       },
     ],
     []
@@ -145,7 +163,11 @@ const PopupTabs: React.FC = () => {
           onOpenChange={(open) => setIsRuleDropdownOpen(open)}
           overlayClassName="rule-type-dropdown"
         >
-          <PrimaryActionButton className="new-rule-dropdown-btn" size="small">
+          <PrimaryActionButton
+            size="small"
+            className="new-rule-dropdown-btn"
+            onClick={() => sendEvent(EVENT.NEW_RULE_BUTTON_CLICKED)}
+          >
             New rule{" "}
             <ArrowIcon
               className={`new-rule-dropdown-btn-arrow ${isRuleDropdownOpen ? "new-rule-dropdown-btn-arrow-up" : ""}`}
