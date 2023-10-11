@@ -46,6 +46,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
+  const isSkippingInactivity = useRef(false);
+  const skipInactiveSegments = useRef(true);
 
   const [player, setPlayer] = useState<Replayer>();
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
@@ -53,8 +55,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
   const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
-  const [isSkipping, setIsSkipping] = useState<boolean>(false);
-  const [skipInactiveSegments, setSkipInactiveSegments] = useState<boolean>(true);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -136,7 +136,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
       );
 
       const rrSkipInactiveToggleHandler = (e: InputEvent) => {
-        setSkipInactiveSegments((e.target as HTMLInputElement).checked);
+        skipInactiveSegments.current = (e.target as HTMLInputElement).checked;
       };
 
       const rrSkipInactiveToggle = rr_controller__btns?.querySelector(".switch #skip");
@@ -164,78 +164,70 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     };
   }, [player]);
 
-  const skipInProgress = useRef(false);
-
-  useEffect(() => {
-    player?.addEventListener("ui-update-current-time", ({ payload }) => {
+  const updateCurrentTimeHandler = useCallback(
+    ({ payload }: { payload: number }) => {
       const currentTime = startTime + payload;
       currentTimeRef.current = currentTime;
       setPlayerTimeOffset(payload / 1000); // millis -> secs
-      if (skipInProgress.current) return;
-      const skipEvent = inactiveSegments?.find(([startTime, endTime]) => {
-        return currentTime >= startTime && currentTime < endTime - 2000;
-      });
 
-      if (skipEvent && !isSkipping && skipInactiveSegments) {
-        setPlayerState(PlayerState.SKIPPING);
-        setIsSkipping(true);
-        skipInProgress.current = true;
-        setTimeout(() => {
-          player.goto(skipEvent[1] - startTime - 2000);
-          setPlayerState(PlayerState.PLAYING);
-          setIsSkipping(false);
-          skipInProgress.current = false;
-        }, 2000);
+      if (!isSkippingInactivity.current && skipInactiveSegments.current) {
+        const skipEvent = inactiveSegments?.find(([startTime, endTime]) => {
+          return currentTime >= startTime && currentTime < endTime - 2000;
+        });
+
+        if (skipEvent) {
+          setPlayerState(PlayerState.SKIPPING);
+          isSkippingInactivity.current = true;
+
+          setTimeout(() => {
+            player.goto(skipEvent[1] - startTime - 2000);
+            setPlayerState(PlayerState.PLAYING);
+            isSkippingInactivity.current = false;
+          }, 2000);
+        }
       }
-    });
-  }, [inactiveSegments, isSkipping, player, skipInactiveSegments, startTime]);
+    },
+    [inactiveSegments, player, startTime]
+  );
 
   const eventCastHandler = useCallback(
     (event: RRWebEventData) => {
-      if (isSkipping || !skipInactiveSegments) return;
+      if (!skipInactiveSegments.current) return;
+      if (isSkippingInactivity.current) return;
+      if (event.timestamp + event.delay < currentTimeRef.current) return;
 
       const skipEvent = inactiveSegments?.find(([startTime]) => {
-        return event.timestamp === startTime && event.timestamp >= currentTimeRef.current;
+        return event.timestamp === startTime;
       });
 
       if (skipEvent) {
         setPlayerState(PlayerState.SKIPPING);
-        setIsSkipping(true);
-        skipInProgress.current = true;
+        isSkippingInactivity.current = true;
         setTimeout(() => {
           player.goto(skipEvent[1] - startTime - 2000);
           setPlayerState(PlayerState.PLAYING);
-          setIsSkipping(false);
-          skipInProgress.current = false;
+          isSkippingInactivity.current = false;
         }, 2000);
       }
     },
-    [inactiveSegments, isSkipping, player, skipInactiveSegments, startTime]
+    [inactiveSegments, player, startTime]
   );
 
-  const playerStateChangeHandler = useCallback(
-    (event: { payload: PlayerState }) => {
-      if (isSkipping) {
-        setPlayerState(PlayerState.SKIPPING);
-      } else {
-        setPlayerState(event.payload);
-      }
-    },
-    [isSkipping]
-  );
+  const playerStateChangeHandler = useCallback((event: { payload: PlayerState }) => {
+    if (isSkippingInactivity.current) {
+      setPlayerState(PlayerState.SKIPPING);
+    } else {
+      setPlayerState(event.payload);
+    }
+  }, []);
 
   useEffect(() => {
     if (!player) return;
 
-    const replayer = player?.getReplayer();
-
-    replayer?.on("ui-update-player-state", playerStateChangeHandler);
-    replayer?.on("event-cast", eventCastHandler);
-    return () => {
-      replayer?.off("ui-update-player-state", playerStateChangeHandler);
-      replayer?.off("event-cast", eventCastHandler);
-    };
-  }, [eventCastHandler, player, playerStateChangeHandler]);
+    player.addEventListener("ui-update-current-time", updateCurrentTimeHandler);
+    player.addEventListener("ui-update-player-state", playerStateChangeHandler);
+    player.addEventListener("event-cast", eventCastHandler);
+  }, [eventCastHandler, player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
   useEffect(() => {
     if (!player) {
@@ -271,7 +263,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
           } else {
             player.goto(0);
           }
-          setIsSkipping(false);
         },
       },
       {
@@ -282,7 +273,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
           } else {
             player.goto(attributes?.duration);
           }
-          setIsSkipping(false);
         },
       },
     ],
