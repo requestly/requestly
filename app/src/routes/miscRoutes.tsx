@@ -12,7 +12,7 @@ import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { Home } from "components/landing/Home";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
-import { ImportFromCharlesRoot } from "components/features/rules/ImportFromCharlesModal";
+import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -58,7 +58,7 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.IMPORT_FROM_CHARLES.RELATIVE,
-    element: <ImportFromCharlesRoot />,
+    element: <ImportFromCharlesWrapperView />,
   },
   {
     path: PATHS.HOME.RELATIVE,

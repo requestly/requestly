@@ -87,7 +87,7 @@ interface ImportFromCharlesProps {
   callBack?: () => void;
 }
 
-export const ImportFromCharlesRoot: React.FC = () => {
+export const ImportFromCharlesWrapperView: React.FC = () => {
   useEffect(() => {
     trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
   }, []);
