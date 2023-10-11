@@ -26,9 +26,9 @@ const sendEventsBatch = (eventBatch: EventBatch): void => {
 
       if (ruleCreator && currentUserId) {
         const isExecutorCreator = currentUserId === ruleCreator;
-        delete event.eventParams["rule_creator"];
         event.eventParams["is_executor_creator"] = isExecutorCreator;
       }
+      delete event.eventParams["rule_creator"];
     }
 
     trackEvent(event.eventName, event.eventParams, eventConfig);
