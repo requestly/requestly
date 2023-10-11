@@ -194,7 +194,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     (event: RRWebEventData) => {
       if (!skipInactiveSegments.current) return;
       if (isSkippingInactivity.current) return;
-      if (event.timestamp + event.delay < currentTimeRef.current) return;
+      // rrweb adds a delay to the events, so we need to add that delay to the timestamp to compare with the current time
+      if (event.timestamp + (event.delay ?? 0) < currentTimeRef.current) return;
 
       const skipEvent = inactiveSegments?.find(([startTime]) => {
         return event.timestamp === startTime;
