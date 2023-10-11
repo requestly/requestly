@@ -3,6 +3,16 @@
   border-bottom-right-radius: inherit;
 }
 
+.root-wrapper {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 16px;
+  max-width: 900px;
+  background-color: var(--surface-2);
+  padding: 24px;
+  border-radius: 8px;
+}
+
 .parsed-rules-info {
   margin-top: 1.5rem;
 }
