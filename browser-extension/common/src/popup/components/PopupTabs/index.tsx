@@ -1,13 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { Badge, Tabs } from "antd";
+import { Badge, Col, Dropdown, Menu, Row, Tabs, Typography } from "antd";
 import ExecutedRules from "../ExecutedRules";
 import PinnedRecords from "../PinnedRecords";
 import RecentRecords from "../RecentRecords";
-import { PushpinFilled, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import "./popupTabs.css";
+import { PrimaryActionButton } from "../common/PrimaryActionButton";
+import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
+import ArrowIcon from "../../../../resources/icons/arrowDown.svg";
+import { PushpinOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { icons } from "../../ruleTypeIcons";
 import { EVENT, sendEvent } from "../../events";
+import config from "../../../config";
+import "./popupTabs.css";
 
-enum PopupTabKey {
+export enum PopupTabKey {
   PINNED_RULES = "pinned_rules",
   RECENTLY_USED = "recently_used",
   EXECUTED_RULES = "executed_rules",
@@ -15,17 +20,20 @@ enum PopupTabKey {
 
 const PopupTabs: React.FC = () => {
   const [executedRulesCount, setExecutedRulesCount] = useState(0);
+  const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState(PopupTabKey.PINNED_RULES);
+
   const tabItems = useMemo(() => {
     return [
       {
         key: PopupTabKey.PINNED_RULES,
         label: (
           <span>
-            <PushpinFilled rotate={-45} />
+            <PushpinOutlined rotate={-45} />
             Pinned rules
           </span>
         ),
-        children: <PinnedRecords />,
+        children: <PinnedRecords setActiveTabKey={setActiveTabKey} />,
       },
       {
         key: PopupTabKey.RECENTLY_USED,
@@ -51,15 +59,111 @@ const PopupTabs: React.FC = () => {
     ];
   }, [executedRulesCount]);
 
+  const handleRulesDropdownItemClick = (url: string) => {
+    setIsRuleDropdownOpen(false);
+    window.open(url, "_blank");
+  };
+
+  const ruleDropdownItemsMap = useMemo(
+    () => [
+      {
+        key: "modify_response",
+        children: (
+          <>
+            {icons.Response}
+            <span>Modify API Response</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Response?source=popup`),
+      },
+      {
+        key: "modify_headers",
+        children: (
+          <>
+            {icons.Headers}
+            <span>Modify Headers</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Headers?source=popup`),
+      },
+      {
+        key: "redirect_request",
+        children: (
+          <>
+            {icons.Redirect}
+            <span>Redirect Request</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Redirect?source=popup`),
+      },
+      {
+        key: "replace_string",
+        children: (
+          <>
+            {icons.Replace}
+            <span>Replace String</span>
+          </>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/editor/create/Replace?source=popup`),
+      },
+      { key: "divider" },
+      {
+        key: "other",
+        children: (
+          <Row align="middle" gutter={8} className="more-rules-link-option">
+            <Col>View more options</Col>
+            <ExternalLinkIcon style={{ color: "var(--white)" }} />
+          </Row>
+        ),
+        clickHandler: () => handleRulesDropdownItemClick(`${config.WEB_URL}/rules/create?source=popup`),
+      },
+    ],
+    []
+  );
+
+  const ruleDropdownMenu = (
+    <Menu>
+      {ruleDropdownItemsMap.map((item) =>
+        item.key === "divider" ? (
+          <Menu.Divider />
+        ) : (
+          <Menu.Item key={item.key} onClick={item.clickHandler}>
+            {item.children}
+          </Menu.Item>
+        )
+      )}
+    </Menu>
+  );
+
   return (
-    <Tabs
-      size="middle"
-      items={tabItems}
-      defaultActiveKey={PopupTabKey.PINNED_RULES}
-      className="popup-tabs"
-      destroyInactiveTabPane
-      onChange={(key) => sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key })}
-    />
+    <Col className="popup-tabs-wrapper">
+      <Row justify="space-between" align="middle" className="tabs-header">
+        <Typography.Text strong>HTTP rules</Typography.Text>
+        <Dropdown
+          overlay={ruleDropdownMenu}
+          trigger={["click"]}
+          onOpenChange={(open) => setIsRuleDropdownOpen(open)}
+          overlayClassName="rule-type-dropdown"
+        >
+          <PrimaryActionButton className="new-rule-dropdown-btn" size="small">
+            New rule{" "}
+            <ArrowIcon
+              className={`new-rule-dropdown-btn-arrow ${isRuleDropdownOpen ? "new-rule-dropdown-btn-arrow-up" : ""}`}
+            />
+          </PrimaryActionButton>
+        </Dropdown>
+      </Row>
+      <Tabs
+        size="middle"
+        items={tabItems}
+        activeKey={activeTabKey}
+        className="popup-tabs"
+        onChange={(key: PopupTabKey) => {
+          setActiveTabKey(key);
+          sendEvent(EVENT.POPUP_TAB_SELECTED, { tab: key });
+        }}
+      />
+    </Col>
   );
 };
 

@@ -123,10 +123,7 @@ const SessionRecordingView: React.FC = () => {
       </Row>
       <div className="session-replay-security-msg">
         <ShieldIcon />
-        <div className="msg">
-          To keep your information private, we save session replays on your browser locally, not in the cloud. You
-          decide when to save them.
-        </div>
+        <div className="msg">Sessions are recorded locally in your browser.</div>
       </div>
     </div>
   );

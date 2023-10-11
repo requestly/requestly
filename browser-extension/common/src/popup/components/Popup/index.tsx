@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import PopupTabs from "../PopupTabs";
 import { EXTENSION_MESSAGES } from "../../../constants";
 import PopupHeader from "./PopupHeader";
-import PopupFooter from "./PopupFooter";
 import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
@@ -43,7 +42,6 @@ const Popup: React.FC = () => {
             {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
             <SessionRecordingView />
           </div>
-          <PopupFooter />
         </div>
       </div>
     </>

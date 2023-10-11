@@ -1,12 +1,23 @@
 .rule-name-container {
-  margin-left: 10px;
+  margin-left: 5px;
 }
 
 .child-rule {
-  padding-left: 52px;
+  margin-left: 30px;
 }
 
 .rule-name-container .rule-type-icons.icon-wrapper svg {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
+}
+
+.rule-name-container .rule-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 350px;
+}
+
+.child-rule .rule-name {
+  max-width: 320px;
 }

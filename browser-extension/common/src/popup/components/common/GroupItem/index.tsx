@@ -32,31 +32,27 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
   return (
     <li>
       <Row align="middle" className="record-item" wrap={false}>
-        <Col span={18} className="record-name-container" onClick={() => setIsExpanded((prev) => !prev)}>
+        <Col span={19} className="record-name-container" onClick={() => setIsExpanded((prev) => !prev)}>
           <Row wrap={false} align="middle">
-            <>
-              <Col>
-                <CaretRightOutlined
-                  rotate={isExpanded ? 90 : 0}
-                  className={`group-expand-icon ${isExpanded ? "group-expanded" : ""}`}
-                />
-              </Col>
-              <Col>
-                <Row wrap={false} align="middle">
-                  <>
-                    <Tooltip title="Group">
-                      <span className={`icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
-                        <GroupIcon />
-                      </span>
-                    </Tooltip>
+            <Col>
+              <CaretRightOutlined
+                rotate={isExpanded ? 90 : 0}
+                className={`group-expand-icon ${isExpanded ? "group-expanded" : ""}`}
+              />
+            </Col>
+            <Col>
+              <Row wrap={false} align="middle">
+                <Tooltip title="Group" color="var(--neutrals-black)">
+                  <span className={`group-icon-wrapper ${isExpanded ? "group-expanded" : ""}`}>
+                    <GroupIcon />
+                  </span>
+                </Tooltip>
 
-                    <RecordName name={group.name as string}>
-                      <span className="record-name">{group.name as string}</span>
-                    </RecordName>
-                  </>
-                </Row>
-              </Col>
-            </>
+                <RecordName name={group.name as string}>
+                  <span className="record-name">{group.name as string}</span>
+                </RecordName>
+              </Row>
+            </Col>
           </Row>
         </Col>
 
@@ -66,15 +62,8 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
           </Row>
         </Col>
 
-        <Col span={4} className="record-switch-container">
-          <Row align="middle" justify="center">
-            <div>
-              <span className={`record-status-text ${!isGroupActive ? "text-gray" : ""}`}>
-                {isGroupActive ? "On" : "Off"}
-              </span>
-              <Switch onChange={handleToggleStatus} checked={isGroupActive} />
-            </div>
-          </Row>
+        <Col span={3} className="record-switch-container">
+          <Switch checkedChildren="ON" unCheckedChildren="OFF" onChange={handleToggleStatus} checked={isGroupActive} />
         </Col>
       </Row>
 

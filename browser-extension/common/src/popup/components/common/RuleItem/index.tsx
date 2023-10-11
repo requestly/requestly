@@ -57,22 +57,25 @@ const RuleItem: React.FC<RuleItemProps> = ({
   return (
     <li>
       <Row align="middle" className="record-item" wrap={false}>
-        <Col span={isChildren ? 20 : 18} className="record-name-container">
+        <Col
+          span={isChildren ? 21 : 19}
+          className="record-name-container link"
+          onClick={() => {
+            sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
+            window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
+          }}
+        >
           <Row wrap={false} align="middle" className={`rule-name-container ${isChildren ? "child-rule" : ""}`}>
-            <Tooltip placement="topRight" title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}>
+            <Tooltip
+              placement="topRight"
+              title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}
+              color="var(--neutrals-black)"
+            >
               <span className="icon-wrapper rule-type-icons">{icons[rule.ruleType]}</span>
             </Tooltip>
 
             <RecordName name={rule.name}>
-              <span
-                className="record-name link"
-                onClick={() => {
-                  sendEvent(EVENT.EXTENSION_RULE_CLICKED, { rule_type: rule.ruleType });
-                  window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
-                }}
-              >
-                {rule.name}
-              </span>
+              <span className="rule-name">{rule.name}</span>
             </RecordName>
           </Row>
         </Col>
@@ -85,7 +88,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
           </Col>
         )}
 
-        <Col span={4} className="record-switch-container">
+        <Col span={3} className="record-switch-container">
           <Popconfirm
             trigger="hover"
             placement="topRight"
@@ -100,19 +103,14 @@ const RuleItem: React.FC<RuleItemProps> = ({
             cancelButtonProps={{ ghost: true, type: "text" }}
             onConfirm={handleGroupActiveClick}
           >
-            <Row wrap={false} align="middle" justify="center">
-              <div>
-                <span className={`record-status-text ${!isRuleActive ? "text-gray" : ""}`}>
-                  {isRuleActive ? "On" : "Off"}
-                </span>
-                <Switch
-                  className="record-switch"
-                  checked={isRuleActive}
-                  disabled={isGroupInactive}
-                  onChange={handleToggleStatus}
-                />
-              </div>
-            </Row>
+            <Switch
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+              className="record-switch"
+              checked={isRuleActive}
+              disabled={isGroupInactive}
+              onChange={handleToggleStatus}
+            />
           </Popconfirm>
         </Col>
       </Row>
